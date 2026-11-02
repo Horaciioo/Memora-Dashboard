@@ -250,6 +250,8 @@ export const TOP_BAR = {
   // Memora button
   assistant:
     'glass-panel flex size-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[var(--color-hover)]',
+  // Portrait of the file before its name
+  crumbLead: 'flex size-6 shrink-0 items-center justify-center [&_svg]:size-6! [&>*]:size-6!',
   crumbFold:
     'flex size-7 shrink-0 items-center justify-center rounded-full text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)]',
   // Pages behind the fold, in a box under the bar
@@ -315,8 +317,12 @@ export const ACCOUNT_BLOCK = {
 export const DETAIL_BLOCK = {
   // Two properties side by side from the narrowest screen
   grid: `grid grid-cols-2 ${PROPERTY_SPACING.rows} ${PROPERTY_SPACING.columns}`,
+  // Three on one line from md
+  gridInline: `grid grid-cols-2 md:grid-cols-3 ${PROPERTY_SPACING.rows} ${PROPERTY_SPACING.columns}`,
   entry: `flex min-w-0 flex-col ${PROPERTY_SPACING.within}`,
   stack: `flex flex-col ${PROPERTY_SPACING.rows}`,
+  // Side by side on a phone, one column from md
+  stackPaired: `grid grid-cols-2 ${PROPERTY_SPACING.columns} md:flex md:flex-col ${PROPERTY_SPACING.rows}`,
   // Long text runs edge to edge
   entryWide: `flex min-w-0 flex-col col-span-2 ${PROPERTY_SPACING.within}`,
   label: PROPERTY_LABEL,
@@ -374,6 +380,20 @@ export const MEMBER_BLOCK = {
 } as const
 
 /**
+ * Green button of an observer, check then words
+ * @type {Record<string, string>}
+ */
+
+export const OBSERVE_SUCCESS = {
+  row: 'inline-flex items-center gap-2',
+  // White disc, the green check reads on the green button
+  mark: 'flex size-6 items-center justify-center rounded-full bg-white shadow-panel',
+  markPop: 'observe-pop',
+  glyph: 'size-5',
+  textReveal: 'observe-reveal',
+} as const
+
+/**
  * Moderator file layout: an identity rail that stays put
  * @type {Record<string, string>}
  */
@@ -383,6 +403,8 @@ export const MEMBER_FILE = {
   main: 'flex min-w-0 flex-col gap-6',
   // Rail follows the scroll on wide screens only
   railStack: 'flex flex-col gap-3 lg:sticky lg:top-6',
+  // Timeline of the rail, shown from lg, below it the overview carries it
+  railTimeline: 'hidden lg:block',
   rail: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)]',
   head: 'grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1 px-4 pt-4 text-left md:flex md:flex-col md:gap-2 md:px-5 md:pt-7 md:text-center',
   name: 'text-xl font-bold tracking-tight break-words',

@@ -129,6 +129,24 @@ export function formatDayTime(date: Date | string | null | undefined): string {
 }
 
 /**
+ * Format a weekday, its day and its time
+ * @param {Date | string | null | undefined} date - Date to format
+ * @return {string} - Weekday, day, month and time
+ */
+
+export function formatWeekdayTime(date: Date | string | null | undefined): string {
+  if (!date) return DATE_COPY.none
+
+  const parsed = new Date(date)
+
+  return `${formatWeekday(parsed)} ${DATE_COPY.at} ${parsed.toLocaleTimeString(DATE_LOCALE, {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: getActiveZone(),
+  })}`
+}
+
+/**
  * Format a wall clock as written, the zone never moves it
  * @param {string | null | undefined} wall - "YYYY-MM-DDTHH:mm"
  * @return {string} - Day and time
