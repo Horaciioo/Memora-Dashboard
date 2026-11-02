@@ -4,6 +4,7 @@ import { useEffect, useEffectEvent, useState } from 'react'
 
 import { GOLF_VOTE_COPY } from '@/declarations/play/golf/vote'
 import { GOLF_VOTE } from '@/declarations/ui/variants'
+import type { VoteLook } from '@/declarations/ui/variants/golf'
 import { MINUTE_MS } from '@/utils/constants/time'
 import { cn } from '@/utils/classnames'
 
@@ -21,6 +22,8 @@ export interface GolfVoteTimerProps {
   serverTime: number
   // Step ran out, anyone may close it
   onExpire: () => void
+  // Classes of the screen, Golf's by default
+  look?: VoteLook
 }
 
 /**
@@ -29,7 +32,12 @@ export interface GolfVoteTimerProps {
  * @return {JSX.Element}
  */
 
-export const GolfVoteTimer = ({ endsAt, serverTime, onExpire }: GolfVoteTimerProps) => {
+export const GolfVoteTimer = ({
+  endsAt,
+  serverTime,
+  onExpire,
+  look = GOLF_VOTE,
+}: GolfVoteTimerProps) => {
   const [left, setLeft] = useState(endsAt - serverTime)
   const expire = useEffectEvent(onExpire)
 
@@ -51,7 +59,7 @@ export const GolfVoteTimer = ({ endsAt, serverTime, onExpire }: GolfVoteTimerPro
 
   return (
     <span
-      className={cn(GOLF_VOTE.timer, seconds <= LOW_SECONDS && GOLF_VOTE.timerLow)}
+      className={cn(look.timer, seconds <= LOW_SECONDS && look.timerLow)}
       role="timer"
       aria-label={GOLF_VOTE_COPY.timer}
     >

@@ -321,3 +321,10 @@ export const GOLF_VOTE = {
     'golf-plate min-h-12 px-8 text-base font-black tracking-wide text-white uppercase transition-[filter,translate] hover:-translate-y-0.5 hover:brightness-125 disabled:pointer-events-none disabled:opacity-50',
   buttonMain: 'bg-[var(--play-golf-vote-strip)]',
 } as const
+
+/**
+ * Classes of a vote screen, one look per game family
+ * @typedef {Record<string, string>} VoteLook
+ */
+
+export type VoteLook = Record<keyof typeof GOLF_VOTE, string>

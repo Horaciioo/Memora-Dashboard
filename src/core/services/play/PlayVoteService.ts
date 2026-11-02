@@ -7,6 +7,7 @@ import { conflict } from '@/core/lib/errors'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { signalPlay } from '@/core/lib/play/signal'
+import { clearDeadline, scheduleDeadline } from '@/core/lib/play/timers'
 import { voteAt, voteOf, voteRulesOf } from '@/core/lib/play/vote'
 import type { PlayVoteRules, PlayVoteState } from '@/core/lib/play/vote'
 import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
@@ -51,6 +52,8 @@ interface VoteContext {
   vote: PlayVoteState | null
   rules: PlayVoteRules
   raw: Record<string, unknown>
+  // The server's own clock closing the step, no player behind it
+  isSystem: boolean
 }
 
 // Settings stored back, the game launched when the last step closed
@@ -106,17 +109,19 @@ const pick = async (context: VoteContext): Promise<VoteOutcome> => {
 }
 
 /**
- * Close the step: the host any time, anyone once the clock ran out
+ * Close the step: the host any time, anyone once the clock ran out, the server clock itself
  * @param {VoteContext} context - Game
  * @return {Promise<VoteOutcome>} - Outcome
  */
 
 const close = async (context: VoteContext): Promise<VoteOutcome> => {
-  const { session, vote, accountId, raw, rules } = context
-  requireSeat(session, accountId)
+  const { session, vote, accountId, raw, rules, isSystem } = context
+  if (!isSystem) requireSeat(session, accountId)
   const isStale = !vote || raw.step !== vote.step
   const isOver = vote && Date.now() >= vote.endsAt - CLOCK_SLACK_MS
-  if (isStale || !(session.hostId === accountId || isOver)) return { isStarting: false }
+  if (isStale || !(isSystem || session.hostId === accountId || isOver)) {
+    return { isStarting: false }
+  }
 
   const present = new Set(session.seats.filter(isPresent).map((seat) => seat.accountId))
   const picks = Object.fromEntries(
@@ -164,16 +169,36 @@ const ACTIONS: Record<GolfVoteAction, (context: VoteContext) => Promise<VoteOutc
 }
 
 /**
- * Play one action of the launch vote of a lobby
+ * Run the server's clock on the step on screen, so a vote never waits on a player's screen
  * @param {string} sessionId - Game
- * @param {string} accountId - Player
+ * @return {Promise<void>} - Clock set, or dropped when no vote is open
+ */
+
+const armVote = async (sessionId: string): Promise<void> => {
+  const row = await prisma.playSession.findUnique({
+    where: { id: sessionId },
+    select: { settings: true },
+  })
+  const vote = row ? voteOf(row.settings) : null
+  if (!vote) return clearDeadline(sessionId)
+
+  // Slack lets the players' own clocks close it first
+  scheduleDeadline(sessionId, new Date(vote.endsAt + CLOCK_SLACK_MS), () =>
+    runVote(sessionId, null, { action: GolfVoteActions.Close, step: vote.step })
+  )
+}
+
+/**
+ * Play one action of the vote, for a player or for the server clock
+ * @param {string} sessionId - Game
+ * @param {string | null} accountId - Player, null for the server clock
  * @param {Record<string, unknown>} raw - Body with action, key and step
  * @return {Promise<void>} - Done, the game started when the last step closed
  */
 
-export const voteInLobby = async (
+const runVote = async (
   sessionId: string,
-  accountId: string,
+  accountId: string | null,
   raw: Record<string, unknown>
 ): Promise<void> => {
   const action = ACTIONS[raw.action as GolfVoteAction]
@@ -186,10 +211,34 @@ export const voteInLobby = async (
     if (!rules) throw conflict(PLAY_ERRORS.noVote)
 
     return {
-      outcome: await action({ tx, session, accountId, raw, rules, vote: voteOf(session.settings) }),
+      outcome: await action({
+        tx,
+        session,
+        accountId: accountId ?? session.hostId,
+        raw,
+        rules,
+        vote: voteOf(session.settings),
+        isSystem: accountId === null,
+      }),
       hostId: session.hostId,
     }
   })
   await signalPlay(sessionId)
+  // A pick leaves the clock as it is
+  if (raw.action !== GolfVoteActions.Pick) await armVote(sessionId)
   if (outcome.isStarting) await startSession(sessionId, hostId)
 }
+
+/**
+ * Play one action of the launch vote of a lobby
+ * @param {string} sessionId - Game
+ * @param {string} accountId - Player
+ * @param {Record<string, unknown>} raw - Body with action, key and step
+ * @return {Promise<void>} - Done, the game started when the last step closed
+ */
+
+export const voteInLobby = (
+  sessionId: string,
+  accountId: string,
+  raw: Record<string, unknown>
+): Promise<void> => runVote(sessionId, accountId, raw)
