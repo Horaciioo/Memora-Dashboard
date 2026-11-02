@@ -10,6 +10,7 @@ import {
   PLAY_REALTIME_REQUESTS,
   PLAY_REALTIME_TOPICS,
 } from '@/core/services/play/live/PlayRealtimeService'
+import { SECTION_REALTIME_TOPICS } from '@/core/services/realtime/SectionRealtimeService'
 import { RECRUITMENT_REALTIME_TOPICS } from '@/core/services/recruitment/RecruitmentRealtimeService'
 
 export { issueTicket } from '@/core/lib/realtime/server/tickets'
@@ -26,7 +27,12 @@ const globalForHub = globalThis as unknown as { memoraRealtime?: RealtimeHub }
 export const wireRealtime = (): void => {
   globalForHub.memoraRealtime?.close()
   const hub = createHub({
-    topics: [...PLAY_REALTIME_TOPICS, ...RECRUITMENT_REALTIME_TOPICS, ...PAGE_REALTIME_TOPICS],
+    topics: [
+      ...PLAY_REALTIME_TOPICS,
+      ...RECRUITMENT_REALTIME_TOPICS,
+      ...PAGE_REALTIME_TOPICS,
+      ...SECTION_REALTIME_TOPICS,
+    ],
     requests: {
       ...PLAY_REALTIME_REQUESTS,
       ...PRESENCE_REALTIME_REQUESTS,

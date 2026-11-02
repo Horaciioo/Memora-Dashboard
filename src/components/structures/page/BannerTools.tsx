@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
+import { SectionPresence } from '@/components/structures/presence/SectionPresence'
 import { FavoriteToggle } from '@/components/structures/page/FavoriteToggle'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { PAGE_OPTIONS_HOST_ID, TOP_BAR_TOOLS_HOST_ID } from '@/declarations/ui/banners'
@@ -31,6 +32,7 @@ export const BannerTools = ({ title }: BannerToolsProps) => {
 
   const tools = (
     <div className={PAGE_STYLES.bannerOptions}>
+      <SectionPresence />
       <div id={PAGE_OPTIONS_HOST_ID} className="contents" />
       <FavoriteToggle title={title} />
     </div>
