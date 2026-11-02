@@ -390,8 +390,8 @@ const mentionTasks = async (accountId: string): Promise<HomeTask[]> => {
  */
 
 const reportTasks = async (viewer: SessionUser, access: PermissionHelpers): Promise<HomeTask[]> => {
-  // A report only leads where the viewer may open it
-  if (!access.can(Permissions.LiveLogRead)) return []
+  // A report only leads where the viewer may open it, and parents are not inherited
+  if (!access.canAll([Permissions.LiveRead, Permissions.LiveLogRead])) return []
 
   const unread = (await unreadReports(viewer.id)).filter((report) => report.targetId)
   if (unread.length === 0) return []
