@@ -183,6 +183,25 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout de la possibilité de ranger tes pages privées dans des catégories du menu de gauche : « Créer une catégorie », glisser une page dedans ou dehors, renommer ou supprimer la catégorie d’un clic droit.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.home,
+        text: 'Ajout d’une boîte sur l’accueil qui rassemble tes dernières pages visitées, tes pages privées et tes pages favorites.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.home,
+        text: 'Ajout d’un mot de bienvenue de Memora à chaque arrivée sur l’accueil, depuis son bouton flottant, et d’une première phrase du chat qui change selon l’heure et cite ton nom.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de suggestions dans la recherche avant même de taper : tes dernières pages ouvertes et des demandes à faire à Memora.',
+      },
+      {
+        tag: ChangelogTags.Added,
         text: 'Ajout d’une courte présentation en vidéo au milieu de l’écran à la première connexion après une mise à jour : le chat de l’assistant, une page privée qui se remplit puis son partage, avec pause et relecture.',
       },
       {
@@ -196,6 +215,25 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.preferences,
         text: 'Ajout de réglages de confort dans « Paramètres » : fond du cadre, cartes, arrondis (francs par défaut), interligne, liens soulignés, animations et repère du clavier.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.home,
+        text: 'Amélioration de l’accueil : la salutation et les raccourcis laissent place à des cartes « Les nouveautés » plus compactes, selon tes accès, et les tâches urgentes ne sont plus écrites en rouge.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la recherche : elle s’ouvre depuis un bouton de la barre du menu de gauche, et son champ reprend le style du chat de Memora.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration de « Recrutements » : tes entretiens se lisent du plus récent au plus ancien dans une seule liste, et tes propres candidats passent en premier dans la liste des candidats.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de Memora : la main s’affiche au survol de tout ce qui se clique.',
       },
       {
         tag: ChangelogTags.Improved,
@@ -226,6 +264,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Fixed,
         text: 'Correction d’un bug qui coupait le panneau des notifications au niveau du menu de gauche.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.home,
+        permission: Permissions.LiveLogRead,
+        text: 'Correction d’un bug qui proposait sur l’accueil la tâche d’un bilan de live à des membres qui ne pouvaient pas l’ouvrir.',
       },
     ],
   },
