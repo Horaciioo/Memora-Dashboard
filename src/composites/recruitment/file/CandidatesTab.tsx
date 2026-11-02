@@ -9,6 +9,7 @@ import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FilterBar, type FilterDefinition } from '@/components/structures/data/FilterBar'
+import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { accentVars } from '@/declarations/ui/theme'
 import { PASTEL_TAG } from '@/declarations/ui/variants'
 import { ACTION_COPY } from '@/declarations/ui/copy'
@@ -43,6 +44,7 @@ export const CandidatesTab = () => {
   const { detail, file, can, candidateForm, candidateMenu, openCandidate } = useRecruitmentState()
   const [search, setSearch] = useState('')
   const [view, setView, resetView] = useCandidateView()
+  const { session } = useAuthContext()
 
   const sort = isCandidateSort(view.sort) ? view.sort : DEFAULT_CANDIDATE_SORT
   const isFiltered = search.trim() !== '' || view.recruiterId !== '' || view.outcomeId !== ''
@@ -146,7 +148,9 @@ export const CandidatesTab = () => {
           .filter((candidate) => candidate.recruiters.some((seat) => seat.id === recruiter.id))
           .map(rowOf),
       }))
-      .filter((group) => group.items.length > 0),
+      .filter((group) => group.items.length > 0)
+      // The member's own candidates lead
+      .sort((a, b) => Number(b.id === session?.id) - Number(a.id === session?.id)),
     {
       id: 'unassigned',
       label: RECRUITMENT_COPY.noRecruiter,
