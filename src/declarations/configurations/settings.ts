@@ -179,7 +179,7 @@ export const ABSENCE_SETTINGS = {
 
 /**
  * Search behaviour
- * @type {{ minLength: number, maxResultsPerGroup: number, debounceMs: number, recentLimit: number }}
+ * @type {{ minLength: number, maxResultsPerGroup: number, debounceMs: number, recentLimit: number, recentPagesShown: number }}
  */
 
 export const SEARCH_SETTINGS = {
@@ -200,6 +200,8 @@ export const SEARCH_SETTINGS = {
     min: 0,
   }),
   recentLimit: 5,
+  // Pages shown in the palette
+  recentPagesShown: 3,
 }
 
 const pageSize = readInteger(notifications.pageSize, {

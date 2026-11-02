@@ -30,8 +30,6 @@ export const NAV_COPY = {
   searchShortcut: '⌘ K',
   searchTitle: 'Recherche',
   searchEmpty: 'Rien ne correspond à cette recherche.',
-  searchPrompt: 'Tape pour chercher un modérateur, un projet, une tâche ou une réunion.',
-  searchNavigate: '↑ ↓ pour naviguer, ↵ pour ouvrir',
   preferences: 'Paramètres',
   theme: 'Thème',
   themeLight: 'Passer en thème clair',

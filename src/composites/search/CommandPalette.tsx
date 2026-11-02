@@ -18,7 +18,7 @@ import { useAssistantStore } from '@/core/store/assistant'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { SEARCH_SETTINGS } from '@/declarations/configurations/settings'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import { ASSISTANT_STYLES, PALETTE_STYLES } from '@/declarations/ui/variants'
+import { PALETTE_STYLES } from '@/declarations/ui/variants'
 import type { SearchHit } from '@/types/search'
 
 export interface CommandPaletteProps {
@@ -128,23 +128,27 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
         className={PALETTE_STYLES.panel}
       >
         <div className={PALETTE_STYLES.field}>
-          <BrainMark
-            motion={chat.isBusy || preview.isLoading ? 'loop' : 'idle'}
-            className={ASSISTANT_STYLES.fieldMark}
-          />
-          <input
-            autoFocus
-            value={term}
-            onChange={(event) => setTerm(event.target.value)}
-            onKeyDown={onKeyDown}
-            placeholder={
-              chat.isAnswering ? ASSISTANT_COPY.answerPlaceholder : ASSISTANT_COPY.placeholder
-            }
-            aria-label={ASSISTANT_COPY.launcherTitle}
-            className={PALETTE_STYLES.input}
-          />
+          <span className={PALETTE_STYLES.fieldBadge}>
+            <BrainMark
+              motion={chat.isBusy || preview.isLoading ? 'loop' : 'idle'}
+              className={PALETTE_STYLES.fieldBrain}
+            />
+          </span>
+          <div className={PALETTE_STYLES.fieldPill}>
+            <input
+              autoFocus
+              value={term}
+              onChange={(event) => setTerm(event.target.value)}
+              onKeyDown={onKeyDown}
+              placeholder={
+                chat.isAnswering ? ASSISTANT_COPY.answerPlaceholder : ASSISTANT_COPY.placeholder
+              }
+              aria-label={ASSISTANT_COPY.launcherTitle}
+              className={PALETTE_STYLES.input}
+            />
+            <kbd className={PALETTE_STYLES.kbd}>{NAV_COPY.searchShortcut}</kbd>
+          </div>
         </div>
-        <div className={PALETTE_STYLES.divider} role="separator" />
         <div className={PALETTE_STYLES.results}>
           {isChat ? (
             <AssistantThread chat={chat} onSuggestion={(text) => chat.start(text)} />
@@ -170,20 +174,18 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
                 onHover={setCursor}
                 onOpen={openHit}
                 onRecent={setTerm}
+                onGo={openHref}
               />
             </>
           )}
         </div>
-        <div className={PALETTE_STYLES.hint}>
-          {isChat ? (
+        {isChat && (
+          <div className={PALETTE_STYLES.hint}>
             <button type="button" onClick={chat.reset} className="hover:underline">
               {ASSISTANT_COPY.back}
             </button>
-          ) : (
-            <span>{NAV_COPY.searchNavigate}</span>
-          )}
-          <span>{NAV_COPY.searchShortcut}</span>
-        </div>
+          </div>
+        )}
       </div>
     </div>,
     document.body
