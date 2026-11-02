@@ -12,6 +12,9 @@ export const HOP_ATTRIBUTE = 'data-beacon-hop'
 // Bell of the rail, invitations point at it
 export const NOTIFICATIONS_BEACON = 'notifications-bell'
 
+// Feed key of the Play dock, invitations point at it in Play
+export const PLAY_FEED_BEACON = 'play-dock-feed'
+
 /**
  * Attributes making an element a beacon
  * @param {string} name - Beacon name

@@ -6,6 +6,7 @@ import { PlayDock } from '@/composites/play/dock/PlayDock'
 import type { PlayDockProps } from '@/composites/play/dock/PlayDock'
 
 import { PlayReward } from '@/composites/play/hub/PlayReward'
+import { PlayInviteHost } from '@/composites/play/invites/PlayInviteHost'
 import { usePlayReward } from '@/core/hooks/data/play/usePlayReward'
 import { useBareShell } from '@/core/hooks/interaction/layout/useBareShell'
 import { PLAY_SHELL } from '@/declarations/ui/variants'
@@ -29,6 +30,7 @@ export const PlayShell = ({ children, dock }: { children: ReactNode; dock: PlayD
       <div className={PLAY_SHELL.content}>{children}</div>
       <PlayDock {...dock} />
       <PlayReward reward={reward} />
+      <PlayInviteHost isPlay />
     </div>
   )
 }

@@ -26,12 +26,16 @@ export interface BellSpot {
 const TAIL_INSET = 36
 
 /**
- * Aim at the visible notifications bell
+ * Aim at the visible notifications bell, or another beacon
  * @param {boolean} isActive - Bubble shown
+ * @param {string} [beacon] - Beacon aimed at
  * @return {BellSpot | null} - Spot, null without a bell on screen
  */
 
-export const useBellSpot = (isActive: boolean): BellSpot | null => {
+export const useBellSpot = (
+  isActive: boolean,
+  beacon: string = NOTIFICATIONS_BEACON
+): BellSpot | null => {
   const [spot, setSpot] = useState<BellSpot | null>(null)
 
   useEffect(() => {
@@ -39,7 +43,7 @@ export const useBellSpot = (isActive: boolean): BellSpot | null => {
 
     // Follow the bell
     const place = () => {
-      const bell = findVisibleBeacon(NOTIFICATIONS_BEACON)
+      const bell = findVisibleBeacon(beacon)
       if (!bell) return setSpot(null)
       const box = bell.getBoundingClientRect()
       const { gapPx, edgePx } = PLAY_INVITE_SETTINGS
@@ -59,7 +63,7 @@ export const useBellSpot = (isActive: boolean): BellSpot | null => {
     window.addEventListener('resize', place)
 
     return () => window.removeEventListener('resize', place)
-  }, [isActive])
+  }, [isActive, beacon])
 
   return isActive ? spot : null
 }

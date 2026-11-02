@@ -32,8 +32,9 @@ export const PLAY_INVITE_SETTINGS = {
 export const PLAY_INVITE_COPY = {
   label: 'Invitation à jouer',
   eyebrow: 'Memora Play',
-  play: '{name} t’invite à jouer {game}',
-  watch: '{name} t’invite à regarder sa partie {game}',
+  play: '{name} t’a invité à jouer {game}',
+  watch: '{name} t’a invité à regarder sa partie {game}',
+  join: 'Rejoindre',
   accept: 'Accepter',
   decline: 'Refuser',
 } as const

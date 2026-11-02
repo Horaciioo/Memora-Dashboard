@@ -19,7 +19,9 @@ import { RailToolbar } from '@/composites/shell/RailToolbar'
 import { RailShortcuts } from '@/composites/shell/RailShortcuts'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
 import { PlayNotice } from '@/composites/play/hub/PlayNotice'
+import { PlayInviteNotice } from '@/composites/play/invites/PlayInviteNotice'
 import { usePlayNotice } from '@/core/hooks/interaction/layout/usePlayNotice'
+import { usePendingInvite } from '@/core/store/playInvites'
 import { useCalendarRail } from '@/core/hooks/interaction/calendar/useCalendarRail'
 import { useCalendarRailView } from '@/core/hooks/interaction/calendar/useCalendarRailView'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
@@ -107,6 +109,8 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   const playAt = shortcuts.findIndex((item) => item.href === ROUTES.play)
   // One bubble at a time, Play first until it is dismissed
   const [isPlayDismissed] = usePlayNotice()
+  // A waiting invitation comes before both
+  const hasInvite = usePendingInvite() !== null
   const hasPlayNotice = playAt >= 0 && !isPlayDismissed
   // Pointer under the middle of a box
   const pointAt = (index: number) => (index + 0.5) / shortcuts.length
@@ -127,8 +131,13 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
     <>
       <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
       {/* Hangs under the news shortcut it announces */}
-      {!isCompact && !isCalendarMenu && hasPlayNotice && <PlayNotice pointedAt={pointAt(playAt)} />}
-      {!isCompact && !isCalendarMenu && !hasPlayNotice && (
+      {!isCompact && !isCalendarMenu && hasInvite && (
+        <PlayInviteNotice pointedAt={playAt >= 0 ? pointAt(playAt) : undefined} />
+      )}
+      {!isCompact && !isCalendarMenu && !hasInvite && hasPlayNotice && (
+        <PlayNotice pointedAt={pointAt(playAt)} />
+      )}
+      {!isCompact && !isCalendarMenu && !hasInvite && !hasPlayNotice && (
         <ReleaseNotice pointedAt={newsAt >= 0 ? pointAt(newsAt) : undefined} />
       )}
     </>
