@@ -7,11 +7,16 @@ import { FloatingLayer } from '@/components/structures/overlays/FloatingLayer'
 import { TIP } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
+// Space between anchor and bubble
+const TIP_GAP = 8
+
 export interface TipProps {
   label: string
   className?: string
   // Bubble lifted to the body, never clipped by a panel
   floating?: boolean
+  // Floating bubble under its anchor
+  below?: boolean
   children: ReactNode
 }
 
@@ -20,11 +25,12 @@ export interface TipProps {
  * @param {string} label - Name shown
  * @param {string} [className] - Wrapper classes
  * @param {boolean} [floating] - Bubble lifted out of clipping parents
+ * @param {boolean} [below] - Bubble under the anchor
  * @param {ReactNode} children - Glyph hovered
  * @return {JSX.Element}
  */
 
-export const Tip = ({ label, className, floating, children }: TipProps) => {
+export const Tip = ({ label, className, floating, below, children }: TipProps) => {
   const [anchor, setAnchor] = useState<DOMRect | null>(null)
 
   if (floating) {
@@ -39,11 +45,14 @@ export const Tip = ({ label, className, floating, children }: TipProps) => {
           <FloatingLayer>
             <span
               role="tooltip"
-              className={TIP.floating}
-              style={{ left: anchor.left + anchor.width / 2, top: anchor.top - 8 }}
+              className={cn(TIP.floating, !below && TIP.floatingAbove)}
+              style={{
+                left: anchor.left + anchor.width / 2,
+                top: below ? anchor.bottom + TIP_GAP : anchor.top - TIP_GAP,
+              }}
             >
               {label}
-              <span className={TIP.arrow} aria-hidden="true" />
+              <span className={below ? TIP.arrowBelow : TIP.arrow} aria-hidden="true" />
             </span>
           </FloatingLayer>
         )}

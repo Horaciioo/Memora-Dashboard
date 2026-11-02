@@ -7,6 +7,9 @@ import v8 from 'node:v8'
 import { prisma } from '@/core/lib/db'
 import { readAvailableMemory } from '@/core/lib/system/hostMemory'
 import { liveListenerCount } from '@/core/lib/lives/bus'
+import { realtimeSocketCount } from '@/core/lib/realtime/server'
+import { openDocCount } from '@/core/lib/realtime/server/docs'
+import { presenceSeatCount } from '@/core/lib/realtime/server/presence'
 import { readStorageReport } from '@/core/services/system/ConsoleService'
 import { HEALTH_SETTINGS } from '@/declarations/system/monitoring/health'
 import { MICROSECONDS_PER_MS } from '@/utils/constants/time'
@@ -48,7 +51,14 @@ export interface HealthReport {
   }
   processor: { cpu: number; loop: number; load: number; uptimeSeconds: number }
   database: { bytes: number; connections: number; maxConnections: number; cacheHit: number | null }
-  now: { sessions: number; readers: number; files: number }
+  now: {
+    sessions: number
+    readers: number
+    sockets: number
+    presence: number
+    docs: number
+    files: number
+  }
   heaviest: { heap: RankedLoad[]; tables: RankedLoad[]; buckets: RankedLoad[] }
 }
 
@@ -126,7 +136,14 @@ export const readHealthReport = async (): Promise<HealthReport> => {
       maxConnections: connections[0]?.max ?? 0,
       cacheHit: reads > 0 ? (caches[0]?.hit ?? 0) / reads : null,
     },
-    now: { sessions, readers: liveListenerCount(), files: storage.entries },
+    now: {
+      sessions,
+      readers: liveListenerCount(),
+      sockets: realtimeSocketCount(),
+      presence: presenceSeatCount(),
+      docs: openDocCount(),
+      files: storage.entries,
+    },
     heaviest: {
       heap: v8
         .getHeapSpaceStatistics()

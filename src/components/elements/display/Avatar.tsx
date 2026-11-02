@@ -1,19 +1,6 @@
+import { initialsOf } from '@/utils/format/initials'
 import { AVATAR_STYLES, type AvatarSize } from '@/declarations/ui/variants/surfaces'
 import { cn } from '@/utils/classnames'
-
-/**
- * Build the fallback initials of a name
- * @param {string} name - Display name
- * @return {string} - Up to two letters
- */
-
-const initialsOf = (name: string): string =>
-  name
-    .split(/\s+/)
-    .filter((part) => part.length > 0)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('')
 
 // Pixel size per token
 const PIXEL_SIZES: Record<AvatarSize, number> = {
@@ -30,6 +17,8 @@ export interface AvatarProps {
   src?: string | null
   size?: AvatarSize
   className?: string
+  // Native hover label, empty for none
+  title?: string
 }
 
 /**
@@ -38,11 +27,15 @@ export interface AvatarProps {
  * @param {string | null} [src] - Portrait URL
  * @param {AvatarSize} [size] - Size token
  * @param {string} [className] - Extra classes merged onto the portrait
+ * @param {string} [title] - Hover label
  * @return {JSX.Element}
  */
 
-export const Avatar = ({ name, src, size = 'sm', className }: AvatarProps) => (
-  <span className={cn(AVATAR_STYLES.base, AVATAR_STYLES[size], className)} title={name}>
+export const Avatar = ({ name, src, size = 'sm', className, title = name }: AvatarProps) => (
+  <span
+    className={cn(AVATAR_STYLES.base, AVATAR_STYLES[size], className)}
+    title={title || undefined}
+  >
     {src ? (
       /*
        * A portrait is member supplied and usually served by the session guarded file route

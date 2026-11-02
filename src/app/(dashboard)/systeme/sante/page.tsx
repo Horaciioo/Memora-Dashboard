@@ -109,6 +109,9 @@ export default async function HealthPage() {
           metrics={[
             { label: HEALTH_COPY.sessions, value: now.sessions },
             { label: HEALTH_COPY.readers, value: now.readers, hint: HEALTH_COPY.readersHint },
+            { label: HEALTH_COPY.sockets, value: now.sockets, hint: HEALTH_COPY.socketsHint },
+            { label: HEALTH_COPY.presence, value: now.presence, hint: HEALTH_COPY.presenceHint },
+            { label: HEALTH_COPY.docs, value: now.docs, hint: HEALTH_COPY.docsHint },
             { label: HEALTH_COPY.files, value: now.files, hint: HEALTH_COPY.filesHint },
           ]}
         />

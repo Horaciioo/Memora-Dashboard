@@ -96,6 +96,7 @@ export const EVENT_TYPES = createEnumeration({
   PagePurged: { id: 87, label: 'Page supprimée définitivement' },
   PageMoved: { id: 88, label: 'Page déplacée' },
   PageInheritanceChanged: { id: 89, label: 'Héritage des accès changé' },
+  PageVersionRestored: { id: 90, label: 'Version de page restaurée' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

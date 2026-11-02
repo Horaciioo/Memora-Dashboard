@@ -38,9 +38,5 @@
   "moderation": {
     "windowSeconds": 60,
     "max": 240
-  },
-  "pageSave": {
-    "windowSeconds": 60,
-    "max": 180
   }
 }
