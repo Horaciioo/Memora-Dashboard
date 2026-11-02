@@ -38,6 +38,8 @@ export const QUERY_KEYS = {
   page: (id: string) => ['pages', 'detail', id] as const,
   pageSharing: (id: string) => ['pages', 'sharing', id] as const,
   pageComments: (id: string) => ['pages', 'comments', id] as const,
+  pageRevisions: (id: string) => ['pages', 'revisions', id] as const,
+  pageRevision: (id: string, versionId: string) => ['pages', 'revisions', id, versionId] as const,
   pageSearch: (term: string) => ['pages', 'search', term] as const,
   pageTrash: ['pages', 'trash'] as const,
 } as const

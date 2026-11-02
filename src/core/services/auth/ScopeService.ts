@@ -131,6 +131,25 @@ export const readFullPerimeter = async (
 }
 
 /**
+ * Whole perimeter as a scope, outside any request (sockets)
+ * @param {SessionUser} viewer - Signed-in member
+ * @param {PermissionHelpers} access - Permission helpers
+ * @return {Promise<AccessScope>} - Perimeter, never narrowed
+ */
+
+export const readFullScope = async (
+  viewer: SessionUser,
+  access: PermissionHelpers
+): Promise<AccessScope> =>
+  access.isGlobal
+    ? { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
+    : {
+        isGlobal: false,
+        youtuberIds: await readFullPerimeter(viewer, access),
+        activeYoutuberId: null,
+      }
+
+/**
  * Narrow a query to the creators in perimeter
  * @param {ScopeTarget} target - Scopable model
  * @param {AccessScope} scope - Perimeter

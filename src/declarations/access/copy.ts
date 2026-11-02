@@ -136,7 +136,11 @@ export const VIEW_COPY = {
   simulatedLeave: 'Revenir à ma vue',
   simulatedBlocked: 'Tu es en vue simulée, repasse sur ta vue pour modifier.',
   noCreator: 'Aucun',
+  // Creator select with nobody picked
+  normalView: 'Vue normale',
   activeCreator: 'YouTubeur en cours',
+  // Creator option, {name} filled in
+  creatorView: 'Vue du {name}',
   adminTitle: 'Console admin',
   adminLead: 'L’état réel du back-end, des accès et des données de Memora.',
   adminRuntime: 'Infrastructure',

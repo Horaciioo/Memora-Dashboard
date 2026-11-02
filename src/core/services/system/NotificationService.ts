@@ -124,12 +124,14 @@ const pushNotifications = async (
  * Raise a mention for every member named in a body
  * @param {string | null | undefined} body - Written text
  * @param {Omit<NotificationInput, 'kind' | 'recipients'>} input - Where the mention sits
+ * @param {(ids: string[]) => Promise<string[]>} [allow] - Keeps who may read the record
  * @return {Promise<void>} - Raised
  */
 
 export const notifyMentions = async (
   body: string | null | undefined,
-  input: Omit<NotificationInput, 'kind' | 'recipients'>
+  input: Omit<NotificationInput, 'kind' | 'recipients'>,
+  allow: (ids: string[]) => Promise<string[]> = async (ids) => ids
 ): Promise<void> => {
   // No at sign
   if (!body?.includes('@')) return
@@ -152,7 +154,7 @@ export const notifyMentions = async (
   await notify({
     ...input,
     kind: 'Mentioned',
-    recipients: accounts.map((account) => account.id),
+    recipients: await allow(accounts.map((account) => account.id)),
   })
 }
 

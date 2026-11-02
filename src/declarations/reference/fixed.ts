@@ -367,7 +367,6 @@ export interface FixedRecruitmentOutcome {
 export const OutcomeNames = {
   ToProcess: 'À traiter',
   Scheduled: 'Entretien posé',
-  Deliberating: 'En délibération',
   Favorable: 'Favorable',
   Unfavorable: 'Défavorable',
   Mixed: 'Mitigé',
@@ -393,7 +392,6 @@ export const VERDICT_OUTCOMES: readonly string[] = [
  */
 
 export const PAST_INTERVIEW_OUTCOMES: readonly string[] = [
-  OutcomeNames.Deliberating,
   OutcomeNames.Favorable,
   OutcomeNames.Unfavorable,
   OutcomeNames.Mixed,
@@ -418,13 +416,6 @@ export const FIXED_RECRUITMENT_OUTCOMES: readonly FixedRecruitmentOutcome[] = [
   {
     name: OutcomeNames.Scheduled,
     accent: 'info',
-    isDefault: false,
-    isTerminal: false,
-    admits: false,
-  },
-  {
-    name: OutcomeNames.Deliberating,
-    accent: 'caution',
     isDefault: false,
     isTerminal: false,
     admits: false,

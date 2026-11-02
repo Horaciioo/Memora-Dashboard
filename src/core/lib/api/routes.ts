@@ -254,7 +254,6 @@ export const API_ROUTES = {
   page: (id: string) => `/api/pages/${id}`,
   pageCategories: '/api/pages/categories',
   pageCategory: (id: string) => `/api/pages/categories/${id}`,
-  pageContent: (id: string) => `/api/pages/${id}/contenu`,
   pageMove: (id: string) => `/api/pages/${id}/deplacer`,
   pageRestore: (id: string) => `/api/pages/${id}/restaurer`,
   pagePurge: (id: string) => `/api/pages/${id}/definitif`,
@@ -263,6 +262,10 @@ export const API_ROUTES = {
   pageMediaUpload: (id: string) => `/api/pages/${id}/medias`,
   pageMedia: (mediaId: string) => `/api/pages/medias/${mediaId}`,
   pageComments: (id: string) => `/api/pages/${id}/commentaires`,
+  pageRevisions: (id: string) => `/api/pages/${id}/versions`,
+  pageRevision: (id: string, versionId: string) => `/api/pages/${id}/versions/${versionId}`,
+  pageRevisionRestore: (id: string, versionId: string) =>
+    `/api/pages/${id}/versions/${versionId}/restaurer`,
   pageComment: (commentId: string) => `/api/pages/commentaires/${commentId}`,
   pageTrash: '/api/pages/corbeille',
   pageSearch: (term: string) => `/api/pages/recherche?q=${encodeURIComponent(term)}`,
