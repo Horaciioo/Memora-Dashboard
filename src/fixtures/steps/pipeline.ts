@@ -618,7 +618,7 @@ const writeCandidates = async (input: {
           ? weighted([
               ['À traiter', 25],
               ['Entretien posé', 35],
-              ['En délibération', 25],
+              ['Mitigé', 25],
               ['Refusé', 10],
               ['Désisté', 5],
             ])
