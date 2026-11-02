@@ -604,3 +604,80 @@
     left: 130%;
   }
 }
+
+/* Full grade, stars hop in turn then share one soft sheen */
+.star-hop {
+  animation: star-hop 420ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--star-i) * var(--star-step))
+    backwards;
+}
+
+.star-sheen {
+  animation: star-sheen 3.2s ease-in-out 1s infinite;
+}
+
+@keyframes star-hop {
+  40% {
+    translate: 0 -0.45rem;
+  }
+}
+
+@keyframes star-sheen {
+  0% {
+    translate: -8px 0;
+  }
+  35%,
+  100% {
+    translate: 32px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-hop,
+  .star-sheen {
+    animation: none;
+  }
+}
+
+/* Burst of sparks leaving the avatars */
+.showcase-burst {
+  animation: showcase-burst 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes showcase-burst {
+  from {
+    transform: rotate(var(--angle)) translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(var(--angle)) translateY(calc(var(--reach, 3.5rem) * -1)) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-burst {
+    display: none;
+  }
+}
+
+/* Ring spreading from a click */
+.showcase-click {
+  animation: showcase-click 500ms ease-out forwards;
+}
+
+@keyframes showcase-click {
+  from {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-click {
+    display: none;
+  }
+}

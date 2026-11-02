@@ -60,7 +60,6 @@ export const RECRUITMENT_COPY = {
   myObservationsEmpty: 'Tu n’observes aucun entretien dans cette session.',
   dayToday: 'Aujourd’hui',
   dayEmpty: 'Aucun entretien aujourd’hui.',
-  dayTomorrow: 'Demain',
   openQuestionnaire: 'Ouvrir le questionnaire',
   joinObservation: 'Rejoindre l’observation',
   tabCandidates: 'Candidats',

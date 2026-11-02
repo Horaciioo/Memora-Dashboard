@@ -71,6 +71,21 @@ export const groupByDay = (candidates: CandidateView[]): InterviewDay[] => {
 }
 
 /**
+ * Interviews from the latest to the oldest, the unplanned ones last
+ * @param {CandidateView[]} candidates - Interviews to range
+ * @return {CandidateView[]} - Newest first
+ */
+
+export const newestFirst = (candidates: CandidateView[]): CandidateView[] =>
+  [...candidates].sort((a, b) => {
+    if (a.interviewAt === null || b.interviewAt === null) {
+      return Number(a.interviewAt === null) - Number(b.interviewAt === null)
+    }
+
+    return b.interviewAt.localeCompare(a.interviewAt)
+  })
+
+/**
  * Whether an interview falls today
  * @param {CandidateView[]} candidates - Interviews of the viewer
  * @param {number} now - Server milliseconds

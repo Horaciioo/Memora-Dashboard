@@ -85,6 +85,8 @@ export const LEFT_SIDEBAR = {
   rail: 'rail-ground relative z-40 font-[family-name:var(--font-system)] hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:fixed md:inset-y-0 md:left-0 md:flex md:transition-[width] md:duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none print:hidden',
   // Calendar menu or classic menu, plain buttons
   viewButtons: 'flex shrink-0 gap-2 px-4 pb-3',
+  // Line between the page types and the shortcuts
+  viewDivider: 'mx-4 h-px shrink-0 bg-[var(--color-border)]',
   viewButton:
     'flex h-8 flex-1 items-center justify-center rounded-[var(--radius-lg)] border border-transparent text-caption font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   viewButtonActive:
@@ -115,7 +117,10 @@ export const LEFT_SIDEBAR = {
   nav: 'rail-nav flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto px-4 pt-5 pb-4',
   navGroup: 'flex flex-col gap-2',
   navGroupLabel:
-    'rail-fold group flex w-full items-center gap-1 px-3 pb-1 text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'rail-fold group flex w-full items-center gap-1 px-3 pb-1 text-xs font-bold tracking-wide uppercase',
+  // Greyed, fading toward the baseline like the page titles
+  navGroupTitle:
+    'bg-gradient-to-b from-[color-mix(in_srgb,var(--color-ink-subtle)_75%,transparent)] from-30% to-[color-mix(in_srgb,var(--color-ink-subtle)_30%,transparent)] bg-clip-text text-transparent',
   navGroupChevron:
     'h-4 w-4 shrink-0 opacity-70 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100 md:h-3.5 md:w-3.5 md:opacity-0',
   navGroupChevronCollapsed: '-rotate-90',

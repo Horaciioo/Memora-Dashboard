@@ -12,6 +12,16 @@ export const PAGE_SETTINGS = {
     fallback: 200,
     min: 1,
   }),
+  categoryNameMaxLength: readInteger(pages.categoryNameMaxLength, {
+    path: 'system/pages.categoryNameMaxLength',
+    fallback: 60,
+    min: 1,
+  }),
+  categoriesMax: readInteger(pages.categoriesMax, {
+    path: 'system/pages.categoriesMax',
+    fallback: 50,
+    min: 1,
+  }),
   documentMaxBytes: readInteger(pages.documentMaxBytes, {
     path: 'system/pages.documentMaxBytes',
     fallback: 1_048_576,

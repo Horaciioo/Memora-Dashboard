@@ -179,7 +179,7 @@ export const ABSENCE_SETTINGS = {
 
 /**
  * Search behaviour
- * @type {{ minLength: number, maxResultsPerGroup: number, debounceMs: number, recentLimit: number }}
+ * @type {{ minLength: number, maxResultsPerGroup: number, debounceMs: number, recentLimit: number, recentPagesShown: number }}
  */
 
 export const SEARCH_SETTINGS = {
@@ -200,6 +200,8 @@ export const SEARCH_SETTINGS = {
     min: 0,
   }),
   recentLimit: 5,
+  // Pages shown in the palette
+  recentPagesShown: 3,
 }
 
 const pageSize = readInteger(notifications.pageSize, {
@@ -613,6 +615,12 @@ const skillMaxPercent = readInteger(academy.skillMaxPercent, {
   min: 1,
 })
 
+const skillStars = readInteger(academy.skillStars, {
+  path: 'system/academy.skillStars',
+  fallback: 5,
+  min: 1,
+})
+
 const trainingMaxMinutes = readInteger(academy.trainingMaxMinutes, {
   path: 'system/academy.trainingMaxMinutes',
   fallback: 50,
@@ -621,13 +629,14 @@ const trainingMaxMinutes = readInteger(academy.trainingMaxMinutes, {
 
 /**
  * Academy bounds
- * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, conversationLineMs: number, judgementLineMs: number, courseSampleOffenses: number, tourStepMs: number, tourBuildMs: number, orgBubbleMs: number, liveconCycleMs: number, ladderRungDelayMs: number, feedbackScale: number, ceremonyFillMs: number, ceremonySlamMs: number, ceremonyFlyMs: number, ceremonyConfetti: number, ceremonyBurstPx: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
+ * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, conversationLineMs: number, judgementLineMs: number, courseSampleOffenses: number, tourStepMs: number, tourBuildMs: number, orgBubbleMs: number, liveconCycleMs: number, ladderRungDelayMs: number, feedbackScale: number, ceremonyFillMs: number, ceremonySlamMs: number, ceremonyFlyMs: number, ceremonyConfetti: number, ceremonyBurstPx: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStars: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
  */
 
 export const ACADEMY_SETTINGS = {
   weeksMax,
   stepOffsetMax,
   skillMaxPercent,
+  skillStars,
   trainingMaxMinutes,
   trainingMinMinutes: readInteger(academy.trainingMinMinutes, {
     path: 'system/academy.trainingMinMinutes',

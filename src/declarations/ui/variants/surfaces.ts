@@ -355,17 +355,29 @@ export const PALETTE_STYLES = {
   overlay:
     'overlay-enter fixed inset-0 z-[80] flex items-center justify-center bg-[var(--color-scrim)] p-4 backdrop-blur-sm',
   panel:
-    'surface-enter flex max-h-[70dvh] w-full max-w-xl flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/90 shadow-[var(--shadow-lg)] backdrop-blur-2xl backdrop-saturate-150',
-  field: 'flex items-center gap-3 px-5 py-4',
-  input: 'w-full bg-transparent text-lg outline-none placeholder:text-[var(--color-ink-subtle)]',
-  divider: 'mx-5 h-px shrink-0 bg-[var(--color-border)]',
-  results: 'flex-1 overflow-y-auto p-2',
+    'card-surface surface-enter flex max-h-[70dvh] w-full max-w-xl flex-col overflow-hidden rounded-[var(--radius-xl)] border',
+  // Memora's badge, then a tinted pill like the chat bar
+  field: 'flex items-center gap-3 p-3',
+  fieldBadge: 'flex shrink-0 items-center justify-center pl-1',
+  fieldBrain: 'h-7 shrink-0',
+  fieldPill:
+    'flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)] py-2.5 pr-3 pl-5',
+  input:
+    'min-w-0 flex-1 bg-transparent text-body outline-none focus-visible:border-transparent focus-visible:shadow-none placeholder:text-[var(--color-ink-subtle)]',
+  kbd: 'inline-flex h-6 min-w-6 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 text-micro font-semibold text-[var(--color-ink-subtle)]',
+  results: 'flex-1 overflow-y-auto px-2 pb-2',
   group:
-    'px-3 pt-2 pb-1 text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'px-3 pt-6 pb-2 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   result:
-    'flex w-full items-center gap-3 rounded-[var(--radius-lg)] px-3 py-2.5 text-left text-sm transition-colors duration-150',
+    'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-left text-sm transition-colors duration-150',
   resultActive: 'bg-[var(--color-hover)]',
-  hint: 'flex items-center justify-between px-5 py-2.5 text-xs text-[var(--color-ink-subtle)]',
+  suggestion:
+    'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-left text-sm font-semibold transition-colors duration-150 hover:bg-[var(--color-hover)]',
+  suggestionIcon: 'size-5 shrink-0 text-[var(--color-ink-accent)]',
+  chip: 'inline-flex cursor-pointer items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-transparent px-3.5 py-1.5 text-sm font-semibold transition-[transform,background-color] duration-150 hover:-translate-y-0.5 hover:bg-[var(--color-hover)]',
+  chips: 'flex flex-wrap gap-2 px-3 pb-3',
+  chipIcon: 'size-4 text-[var(--color-ink-accent)]',
+  hint: 'flex items-center gap-4 px-5 pt-1 pb-4 text-caption text-[var(--color-ink-subtle)]',
 } as const
 
 /**

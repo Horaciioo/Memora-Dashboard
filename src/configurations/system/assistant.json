@@ -8,8 +8,11 @@
   "typingMsPerChar": 22,
   "typingMinMs": 500,
   "typingMaxMs": 1200,
+  "eraseMsPerChar": 12,
+  "draftPauseMs": 600,
   "handoffSeconds": 10,
   "maxPicks": 6,
+  "paletteAsks": 3,
   "pickStaggerMs": 90,
   "thinkingMs": 900
 }

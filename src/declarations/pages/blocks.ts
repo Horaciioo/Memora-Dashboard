@@ -179,5 +179,7 @@ export const filterBlocks = (query: string): PageBlockKind[] => {
     return keywords.some((word) => word.includes(needle)) ? 3 : 4
   }
 
-  return PAGE_BLOCKS.keys.filter((kind) => score(kind) < 4).toSorted((left, right) => score(left) - score(right))
+  return PAGE_BLOCKS.keys
+    .filter((kind) => score(kind) < 4)
+    .toSorted((left, right) => score(left) - score(right))
 }

@@ -61,7 +61,7 @@ export const HOME_STYLES = {
 
 export const HOME_FLOW = {
   // Reaches into the shell gutters, a little further where the shell caps its width
-  page: 'flex flex-col gap-8 md:gap-10 md:-mx-5 min-[1700px]:-mx-10',
+  page: 'flex flex-col gap-12 md:gap-16 md:-mx-5 min-[1700px]:-mx-10',
   // Latest note, one gold line
   news: 'group/news relative isolate flex items-center gap-4 overflow-hidden rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--color-gold-100)] via-[var(--color-gold-300)] to-[var(--color-gold-400)] px-4 py-3 text-black shadow-[var(--shadow-md)] ring-1 ring-white/40 ring-inset transition-shadow hover:shadow-[var(--shadow-lg)]',
   newsSheen:
@@ -75,18 +75,6 @@ export const HOME_FLOW = {
 } as const
 
 /**
- * Greeting under the banner
- * @type {Record<string, string>}
- */
-
-export const HOME_HERO = {
-  row: 'flex flex-wrap items-end justify-between gap-x-6 gap-y-2',
-  words: 'flex min-w-0 flex-col gap-1',
-  greeting: 'truncate pr-[0.2em] text-3xl font-bold tracking-tight italic sm:text-5xl',
-  hello: 'text-sm font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase italic',
-} as const
-
-/**
  * Planned entries and coming birthdays
  * @type {Record<string, string>}
  */
@@ -94,9 +82,9 @@ export const HOME_HERO = {
 export const HOME_PLAN = {
   list: 'flex flex-col',
   empty: 'text-sm text-[var(--color-ink-subtle)]',
-  row: 'group flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 text-sm transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
+  row: '-ml-2 group flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 text-sm transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
   group: 'flex flex-col pt-2 first:pt-0',
-  when: 'px-2 text-[11px] font-bold uppercase tracking-wide text-[var(--color-ink-subtle)]',
+  when: 'text-[11px] font-bold uppercase tracking-wide text-[var(--color-ink-subtle)]',
   whenExact:
     'shrink-0 text-xs font-bold tabular-nums text-[var(--color-ink)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:hidden',
   glyph: 'h-5 w-5 shrink-0',
@@ -117,15 +105,15 @@ export const HOME_PLAN = {
 
 export const HOME_CARDS = {
   grid: 'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3',
-  card: 'group relative isolate flex h-36 flex-col justify-end md:h-48 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] p-5 text-[var(--color-on-media)] shadow-[var(--shadow-md)] transition-[transform,box-shadow] duration-[var(--motion-duration-panel)] hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  card: 'group relative isolate flex h-24 flex-col justify-end overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3.5 text-[var(--color-on-media)] shadow-[var(--shadow-sm)] md:h-28 transition-[transform,box-shadow] duration-[var(--motion-duration-panel)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   image:
     'absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-[var(--motion-duration-slow)] group-hover:scale-105',
   shade: 'absolute inset-0 -z-10 bg-gradient-to-t from-black/75 via-black/25 to-black/5',
-  tile: 'mb-3',
-  glyph: 'h-8 w-8 drop-shadow-[0_1px_2px_rgb(0_0_0/0.4)]',
-  title: 'text-2xl leading-tight font-bold tracking-tight',
-  go: 'absolute top-5 right-5 transition-transform group-hover:translate-x-1',
-  goGlyph: 'h-5 w-5 drop-shadow-[0_1px_2px_rgb(0_0_0/0.4)]',
+  tile: 'mb-1.5',
+  glyph: 'h-5 w-5 drop-shadow-[0_1px_2px_rgb(0_0_0/0.4)]',
+  title: 'text-base leading-tight font-bold tracking-tight',
+  go: 'absolute top-3.5 right-3.5 transition-transform group-hover:translate-x-1',
+  goGlyph: 'h-4 w-4 drop-shadow-[0_1px_2px_rgb(0_0_0/0.4)]',
 } as const
 
 /**
@@ -174,14 +162,13 @@ export const HOME_LIVE = {
 
 export const HOME_TASKS = {
   list: 'flex flex-col',
-  row: 'group flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-3 text-left transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
+  row: '-ml-2 group flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-3 text-left transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
   glyph: 'h-6 w-6 shrink-0',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
   sentence: 'text-body',
   sentenceDone:
     'text-[var(--color-ink-subtle)] line-through decoration-2 decoration-[var(--color-ink-subtle)]/60',
   number: 'font-bold',
-  urgent: 'text-[var(--color-danger)]',
   chevron:
     'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform group-hover:translate-x-0.5',
 } as const
@@ -195,4 +182,19 @@ export const HOME_BOARD = {
   card: 'card-surface grid grid-cols-1 rounded-[var(--radius-xl)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] xl:grid-cols-3',
   // The vertical divider stops short of the top and the bottom edges
   col: 'relative flex min-w-0 flex-col border-t border-[var(--color-border)] px-4 py-6 first:border-t-0 xl:border-t-0 sm:px-5 xl:px-6 xl:py-8 xl:before:absolute xl:before:inset-y-8 xl:before:left-0 xl:before:w-px xl:before:bg-[var(--color-border)] xl:first:before:hidden',
+} as const
+
+/**
+ * Favorites box above the home board
+ * @type {Record<string, string>}
+ */
+
+export const HOME_FAVORITES_STYLES = {
+  // Lines fill a column of three, the rest goes to the side
+  lines: 'grid grid-flow-col auto-cols-[minmax(0,1fr)] gap-x-6',
+  // Pulled out by its padding so the glyph starts under the first letter of the title
+  row: '-mx-2 group flex min-w-0 items-center gap-3 rounded-[var(--radius-md)] px-2 py-3 text-body transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
+  glyph: 'h-6 w-6 shrink-0',
+  title:
+    'min-w-0 flex-1 truncate font-semibold group-hover:underline group-focus-visible:underline',
 } as const

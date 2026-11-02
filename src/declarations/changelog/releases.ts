@@ -108,6 +108,7 @@ export interface ChangelogComment {
  * @property {string} description - Why the changes were made
  * @property {ChangelogItem[]} items - Change lines
  * @property {ChangelogComment[]} [comments] - Team words
+ * @property {boolean} [hasShowcase] - Animated tour on top
  */
 
 export interface ChangelogRelease {
@@ -118,6 +119,7 @@ export interface ChangelogRelease {
   description: string
   items: ChangelogItem[]
   comments?: ChangelogComment[]
+  hasShowcase?: boolean
 }
 
 /**
@@ -126,6 +128,151 @@ export interface ChangelogRelease {
  */
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
+  {
+    version: '0.10.0',
+    date: '2026-11-02',
+    title: 'L’assistant et les pages privées arrivent !',
+    intro:
+      'Memora te parle maintenant : demande-lui une absence ou une mise à jour, elle s’en occupe. Et tes notes ont enfin leur place, rien qu’à toi ou partagées.',
+    description:
+      'Déclarer une absence ou mettre à jour un dossier obligeait à retrouver la bonne page, puis le bon formulaire, et les notes personnelles vivaient en dehors de Memora. Cette version ajoute un assistant qui mène la discussion pas à pas et des pages privées en blocs, à partager avec qui tu veux. Les réglages, les sanctions, les lives terminés et la page de statut gagnent aussi en clarté au passage.',
+    hasShowcase: true,
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Assistant Memora » : depuis la recherche et le bouton flottant, Memora te guide pas à pas dans une discussion, avec son cerveau animé et des réponses à cliquer.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.absences,
+        permission: Permissions.AbsenceCreate,
+        text: 'Ajout de la possibilité de déclarer une absence en discutant avec l’« Assistant Memora » : les dates sont demandées, un récapitulatif est proposé, puis « Oui » ou « Non » suffit pour valider.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la possibilité de retrouver un candidat, un Junior, un entretien ou une tâche par son nom dans l’« Assistant Memora » et de modifier ses informations à sa place, selon tes accès.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de petites phrases de Memora près du bouton flottant « + » de chaque page, qui proposent le geste utile à cet endroit : déclarer une absence, ajouter un candidat, mettre à jour une tâche.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Pages privées » : des pages de notes à toi, ouvertes à tous les membres, avec un éditeur en blocs (menu « / » et barre de mise en forme).',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout de la possibilité de partager une page privée avec des membres, un rôle ou tout Memora, avec le niveau d’accès choisi : lecture, commentaire, modification ou accès complet.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout d’une « Corbeille » pour les pages privées : une page supprimée s’y restaure avec ses sous-pages, ou s’efface définitivement.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout de modèles de pages, d’une recherche dans les pages ouvertes à toi, d’une icône et d’une couverture pour chaque page.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout de la possibilité de commenter une page privée, de copier son lien, de créer des sous-pages et de déplacer une page sous une autre.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout de la possibilité de ranger tes pages privées dans des catégories du menu de gauche : « Créer une catégorie », glisser une page dedans ou dehors, renommer ou supprimer la catégorie d’un clic droit.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.home,
+        text: 'Ajout d’une boîte sur l’accueil qui rassemble tes dernières pages visitées, tes pages privées et tes pages favorites.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.home,
+        text: 'Ajout d’un mot de bienvenue de Memora à chaque arrivée sur l’accueil, depuis son bouton flottant, et d’une première phrase du chat qui change selon l’heure et cite ton nom.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de suggestions dans la recherche avant même de taper : tes dernières pages ouvertes et des demandes à faire à Memora.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une courte présentation en vidéo au milieu de l’écran à la première connexion après une mise à jour : le chat de l’assistant, une page privée qui se remplit puis son partage, avec pause et relecture.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveLogRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de corriger un live terminé : renommer le live, modifier ou retirer un geste de modération et ajuster le temps d’un modérateur.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.preferences,
+        text: 'Ajout de réglages de confort dans « Paramètres » : fond du cadre, cartes, arrondis (francs par défaut), interligne, liens soulignés, animations et repère du clavier.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.home,
+        text: 'Amélioration de l’accueil : la salutation et les raccourcis laissent place à des cartes « Les nouveautés » plus compactes, selon tes accès, et les tâches urgentes ne sont plus écrites en rouge.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la recherche : elle s’ouvre depuis un bouton de la barre du menu de gauche, et son champ reprend le style du chat de Memora.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration de « Recrutements » : tes entretiens se lisent du plus récent au plus ancien dans une seule liste, et tes propres candidats passent en premier dans la liste des candidats.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de Memora : la main s’affiche au survol de tout ce qui se clique.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Amélioration de la fiche d’un Junior : les compétences se notent en étoiles, dont la couleur passe du rouge au vert, avec la note de chaque catégorie résumée en étoiles.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.preferences,
+        text: 'Amélioration de « Paramètres » : les onglets sont repensés, regroupés par réglage et illustrés. Le bouton « Récupérer mes données » quitte l’onglet « Confidentialité ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.sanctions,
+        permission: Permissions.SanctionRead,
+        text: 'Amélioration du « Panel Twitch » : l’échelle de sanctions d’une infraction se lit et se modifie plus clairement, avec la gravité choisie parmi des barres de priorité.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.status,
+        text: 'Amélioration de « Memora Status » : au survol d’une barre, une bulle indique le jour et l’état du service ce jour-là, et la ligne des 90 jours est mieux aérée.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle de Memora : onglets et sélecteurs aux angles plus francs, verre des surfaces adouci.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui coupait le panneau des notifications au niveau du menu de gauche.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.home,
+        permission: Permissions.LiveLogRead,
+        text: 'Correction d’un bug qui proposait sur l’accueil la tâche d’un bilan de live à des membres qui ne pouvaient pas l’ouvrir.',
+      },
+    ],
+  },
   {
     version: '0.9.0',
     date: '2026-11-01',
@@ -163,27 +310,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Added,
         text: 'Ajout d’un message quand la connexion est perdue, et d’un écran plein cadre qui propose de recharger quand une nouvelle version de Memora est disponible.',
-      },
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.pages,
-        text: 'Ajout d’une nouvelle fonctionnalité nommée « Pages privées » : des pages de notes à toi, avec un éditeur en blocs (menu « / » et barre de mise en forme), le partage avec d’autres membres et une corbeille.',
-      },
-      {
-        tag: ChangelogTags.Added,
-        text: 'Ajout d’une nouvelle fonctionnalité nommée « Assistant Memora » : depuis la recherche et le bouton flottant, Memora te guide pas à pas pour déclarer une absence ou mettre à jour un candidat, un Junior, un entretien ou une tâche, selon tes accès.',
-      },
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.lives,
-        permission: Permissions.LiveLogRead,
-        audience: ChangelogAudiences.Responsables,
-        text: 'Ajout de la possibilité de corriger un live terminé : renommer le live, modifier ou retirer un geste de modération et ajuster le temps d’un modérateur.',
-      },
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.preferences,
-        text: 'Ajout de réglages de confort dans « Paramètres » : fond du cadre, cartes, arrondis (francs par défaut), interligne, liens soulignés, animations et repère du clavier.',
       },
       {
         tag: ChangelogTags.Improved,
@@ -241,17 +367,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.members,
         permission: Permissions.RecruitmentRead,
         text: 'Amélioration de « Modérateurs » : un candidat accepté reste avec les candidats jusqu’au début de sa procédure académique.',
-      },
-      {
-        tag: ChangelogTags.Improved,
-        page: ROUTES.preferences,
-        text: 'Amélioration de « Paramètres » : les onglets sont repensés, regroupés par réglage et illustrés. Le bouton « Récupérer mes données » quitte l’onglet « Confidentialité ».',
-      },
-      {
-        tag: ChangelogTags.Improved,
-        page: ROUTES.sanctions,
-        permission: Permissions.SanctionRead,
-        text: 'Amélioration du « Panel Twitch » : l’échelle de sanctions d’une infraction se lit et se modifie plus clairement, avec la gravité choisie parmi des barres de priorité.',
       },
       {
         tag: ChangelogTags.Fixed,

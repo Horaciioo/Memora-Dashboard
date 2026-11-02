@@ -417,6 +417,7 @@ model Account {
   exerciseLinks         ExerciseLink[]           @relation("ExerciseLinkCreatedBy")
   pagesOwned            Page[]                   @relation("PageOwner")
   pagesEdited           Page[]                   @relation("PageEditor")
+  pageCategories        PageCategory[]           @relation("PageCategoryOwner")
   pageGrants            PageGrant[]              @relation("PageGrantAccount")
   pageGrantsGiven       PageGrant[]              @relation("PageGrantAuthor")
   pageMedia             PageMedia[]              @relation("PageMediaUploader")
@@ -3224,6 +3225,8 @@ model Page {
   id            String    @id @default(uuid())
   ownerId       String
   parentId      String?
+  // Category of a root page, its owner's alone
+  categoryId    String?
   title         String    @default("")
   // One emoji
   icon          String?
@@ -3251,6 +3254,7 @@ model Page {
   editor    Account?       @relation("PageEditor", fields: [editedById], references: [id], onDelete: SetNull)
   parent    Page?          @relation("PageTree", fields: [parentId], references: [id], onDelete: Cascade)
   children  Page[]         @relation("PageTree")
+  category  PageCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   grants    PageGrant[]
   media     PageMedia[]
   revisions PageRevision[]
@@ -3258,8 +3262,25 @@ model Page {
 
   @@index([ownerId, trashedAt])
   @@index([parentId, position])
+  @@index([categoryId, position])
   @@index([trashRootId])
   @@map("pages")
+}
+
+// Folder of the private rail, its pages fall back to the root when it goes
+model PageCategory {
+  id        String   @id @default(uuid())
+  ownerId   String
+  name      String
+  // Order among the owner's categories
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  owner Account @relation("PageCategoryOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  pages Page[]
+
+  @@index([ownerId, position])
+  @@map("page_categories")
 }
 
 // One share of a page; targetKey keeps a single row per audience

@@ -1,6 +1,7 @@
 'use client'
 
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
+import { SearchSuggestions } from '@/composites/search/SearchSuggestions'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { PALETTE_STYLES } from '@/declarations/ui/variants'
@@ -20,6 +21,7 @@ export interface SearchResultsProps {
   onHover: (index: number) => void
   onOpen: (hit: SearchHit) => void
   onRecent: (term: string) => void
+  onGo: (href: string) => void
 }
 
 /**
@@ -39,6 +41,7 @@ export const SearchResults = ({
   onHover,
   onOpen,
   onRecent,
+  onGo,
 }: SearchResultsProps) => {
   const ClockIcon = ICONS.clock
   const showRecents = isTooShort && recents.length > 0
@@ -58,9 +61,7 @@ export const SearchResults = ({
             <span className="min-w-0 flex-1 truncate">{recent}</span>
           </button>
         ))}
-      {isTooShort && !showRecents && (
-        <p className="px-4 py-6 text-sm text-[var(--color-ink-subtle)]">{NAV_COPY.searchPrompt}</p>
-      )}
+      {isTooShort && <SearchSuggestions onGo={onGo} />}
       {!isTooShort && isLoading && (
         <div className="flex justify-center py-6">
           <BrandLoader variant="ink" />

@@ -24,7 +24,7 @@ export interface AssistantDockProps {
  */
 
 export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
-  const { action, greeting, toggle, close } = useAssistantDock()
+  const { action, greeting, hello, welcome, toggle, close } = useAssistantDock()
   const { session } = useAuthContext()
   const { shortcuts, groups } = useRailEntries(viewContext)
   const isOpen = greeting !== null
@@ -39,7 +39,9 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
     return icon && (offer !== action?.offer || offer.scenario) ? [{ offer, icon }] : []
   })
 
-  const nudge = useNudgeCycle(action?.offer.nudges ?? ASSISTANT_DOCK_COPY.nudges, !isOpen)
+  const cycled = useNudgeCycle(action?.offer.nudges ?? ASSISTANT_DOCK_COPY.nudges, !isOpen)
+  // The landing welcome speaks before the usual lines
+  const nudge = isOpen ? null : (welcome ?? cycled)
 
   return (
     <div
@@ -48,9 +50,10 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
         if (event.key === 'Escape') close()
       }}
     >
-      {greeting && (
+      {greeting && hello && (
         <FloatingChat
           name={session?.displayName.split(' ')[0] ?? ''}
+          hello={hello}
           greeting={greeting}
           action={action}
           picks={picks.slice(0, ASSISTANT_SETTINGS.maxPicks)}

@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { MentionText } from '@/components/elements/display/MentionText'
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { useMemoraIntro } from '@/core/hooks/interaction/scenes/useMemoraIntro'
 import type { DockAction } from '@/core/store/assistantDock'
 import { ASSISTANT_COPY, ASSISTANT_INTRO_COPY } from '@/declarations/assistant/copy'
+import type { AssistantHello } from '@/declarations/assistant/copy'
 import type { AssistantOffer } from '@/declarations/assistant/offers'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { ICONS } from '@/declarations/ui/icons'
@@ -26,6 +28,7 @@ export interface ChatPick {
 
 export interface MemoraIntroProps {
   name: string
+  hello: AssistantHello
   greeting: string
   action: DockAction | null
   picks: ChatPick[]
@@ -39,12 +42,13 @@ export interface MemoraIntroProps {
 
 /**
  * Memora types her welcome, then drops her questions
- * @param {MemoraIntroProps} props - Member, greeting, page creation and other questions
+ * @param {MemoraIntroProps} props - Member, welcome, greeting, page creation and other questions
  * @return {JSX.Element}
  */
 
 export const MemoraIntro = ({
   name,
+  hello,
   greeting,
   action,
   picks,
@@ -54,8 +58,14 @@ export const MemoraIntro = ({
   onDone,
 }: MemoraIntroProps) => {
   const script = useMemo(
-    () => [ASSISTANT_INTRO_COPY.hello.replace('{name}', name), greeting],
-    [name, greeting]
+    () => [
+      {
+        text: hello.text.replace('{name}', name),
+        draft: hello.draft?.replace('{name}', name),
+      },
+      { text: greeting },
+    ],
+    [name, hello, greeting]
   )
   const intro = useMemoraIntro(script)
   const { isDone } = intro
@@ -80,7 +90,7 @@ export const MemoraIntro = ({
         <span className={ASSISTANT_STYLES.author}>{ASSISTANT_COPY.name}</span>
         {intro.lines.map((line, index) => (
           <p key={index} className={ASSISTANT_STYLES.line}>
-            {line}
+            <MentionText text={line} />
             {!intro.isDone && index === intro.lines.length - 1 && (
               <span className={FLOATING_ADD_STYLES.chatCaret} aria-hidden="true" />
             )}
@@ -115,7 +125,7 @@ export const MemoraIntro = ({
 
                 return (
                   <button
-                    key={offer.href}
+                    key={offer.ask}
                     type="button"
                     aria-label={offer.ask}
                     onClick={() => onPick(offer)}

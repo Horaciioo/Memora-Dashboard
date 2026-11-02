@@ -1,4 +1,5 @@
 export { reachablePageIds, requirePage } from '@/core/services/pages/AccessService'
+export { createCategory, deleteCategory, listCategories, updateCategory } from '@/core/services/pages/CategoryService'
 export { addComment, deleteComment, listComments, resolveComment } from '@/core/services/pages/CommentService'
 export { viewerOf } from '@/core/services/pages/lookups'
 export { authorizePageMedia, describePageMedia, readPageMedia, uploadPageMedia } from '@/core/services/pages/MediaService'

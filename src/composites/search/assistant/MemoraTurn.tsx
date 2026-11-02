@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 
+import { MentionText } from '@/components/elements/display/MentionText'
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { ASSISTANT_STYLES } from '@/declarations/ui/variants'
@@ -29,7 +30,9 @@ export const MemoraTurn = ({ text, isFollow, children }: MemoraTurnProps) => (
     </span>
     <div className={ASSISTANT_STYLES.body}>
       {!isFollow && <span className={ASSISTANT_STYLES.author}>{ASSISTANT_COPY.name}</span>}
-      <p className={ASSISTANT_STYLES.line}>{text}</p>
+      <p className={ASSISTANT_STYLES.line}>
+        <MentionText text={text} />
+      </p>
       {children}
     </div>
   </div>

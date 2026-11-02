@@ -252,6 +252,8 @@ export const API_ROUTES = {
   commentUnread: (id: string) => `/api/commentaires-non-lus/${id}`,
   pages: '/api/pages',
   page: (id: string) => `/api/pages/${id}`,
+  pageCategories: '/api/pages/categories',
+  pageCategory: (id: string) => `/api/pages/categories/${id}`,
   pageContent: (id: string) => `/api/pages/${id}/contenu`,
   pageMove: (id: string) => `/api/pages/${id}/deplacer`,
   pageRestore: (id: string) => `/api/pages/${id}/restaurer`,

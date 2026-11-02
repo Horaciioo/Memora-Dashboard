@@ -104,7 +104,9 @@ import {
   Newspaper,
   Notepad,
   Path,
+  Pause,
   PencilSimple,
+  Play,
   PencilSimpleLine,
   Phone,
   DownloadSimple,
@@ -197,6 +199,7 @@ import {
   CloudCheck,
   CloudSlash,
   CloudArrowUp,
+  FolderSimplePlus,
 } from '@phosphor-icons/react/ssr'
 import type { Icon, IconWeight } from '@phosphor-icons/react'
 import {
@@ -491,6 +494,8 @@ export const ICONS = {
   dislike: phosphor(ThumbsDown),
   neutral: phosphor(Equals),
   skip: phosphor(SkipForward),
+  mediaPlay: phosphor(Play, { weight: 'fill' }),
+  mediaPause: phosphor(Pause, { weight: 'fill' }),
   climb: phosphor(TrendUp),
   paragraph: phosphor(TextAa),
   rule: phosphor(Minus),
@@ -546,6 +551,7 @@ export const ICONS = {
   image: phosphor(Image),
   callout: phosphor(Lightbulb),
   page: phosphor(FileText),
+  pageCategoryAdd: phosphor(FolderSimplePlus),
   undo: phosphor(ArrowUUpLeft),
   redo: phosphor(ArrowUUpRight),
   indent: phosphor(TextIndent),

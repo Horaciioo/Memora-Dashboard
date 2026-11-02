@@ -99,6 +99,7 @@ export const toCrumb = (row: { id: string; title: string; icon: string | null })
 export const SUMMARY_SELECT = {
   id: true,
   parentId: true,
+  categoryId: true,
   title: true,
   icon: true,
   position: true,
@@ -120,6 +121,7 @@ export type SummaryRow = Prisma.PageGetPayload<{ select: typeof SUMMARY_SELECT }
 export const toSummary = (row: SummaryRow, viewerId: string): PageSummary => ({
   id: row.id,
   parentId: row.parentId,
+  categoryId: row.categoryId,
   title: row.title,
   icon: row.icon,
   position: row.position,
@@ -132,12 +134,17 @@ export const toSummary = (row: SummaryRow, viewerId: string): PageSummary => ({
  * Next free sibling position
  * @param {string | null} parentId - Parent page
  * @param {string} ownerId - Owner of a root page
+ * @param {string | null} [categoryId] - Category of a root page
  * @return {Promise<number>} - Position
  */
 
-export const nextPosition = async (parentId: string | null, ownerId: string): Promise<number> => {
+export const nextPosition = async (
+  parentId: string | null,
+  ownerId: string,
+  categoryId: string | null = null
+): Promise<number> => {
   const last = await prisma.page.findFirst({
-    where: parentId ? { parentId } : { parentId: null, ownerId },
+    where: parentId ? { parentId } : { parentId: null, ownerId, categoryId },
     orderBy: { position: 'desc' },
     select: { position: true },
   })

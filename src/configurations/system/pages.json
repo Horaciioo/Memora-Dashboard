@@ -1,5 +1,7 @@
 {
   "titleMaxLength": 200,
+  "categoryNameMaxLength": 60,
+  "categoriesMax": 50,
   "documentMaxBytes": 1048576,
   "documentMaxNodes": 20000,
   "documentMaxDepth": 12,

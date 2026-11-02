@@ -10,5 +10,5 @@ export const POST = createProtectedRoute({
   status: 201,
   descriptor: { summary: 'Create a private page', tags: ['pages'] },
   handler: ({ raw, session }) =>
-    createPage(viewerOf(session), { parentId: raw.parentId, template: raw.template }),
+    createPage(viewerOf(session), { parentId: raw.parentId, categoryId: raw.categoryId, template: raw.template }),
 })

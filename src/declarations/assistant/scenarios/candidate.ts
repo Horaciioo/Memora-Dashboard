@@ -11,15 +11,15 @@ export const CANDIDATE_SCENARIO_COPY = {
   whoTooMany:
     'Il y en a beaucoup, je t’en montre {shown}. Si ce n’est pas lui, précise ta recherche.',
   whoOther: 'Chercher quelqu’un d’autre',
-  picked: 'Noté, on met quoi à jour sur {name} ?',
-  again: 'C’est à jour ! On met autre chose à jour sur {name} ?',
-  finished: 'Parfait, {name} est à jour. Je reste dispo.',
+  picked: 'Noté, on met quoi à jour sur @[{name}] ?',
+  again: 'C’est à jour ! On met autre chose à jour sur @[{name}] ?',
+  finished: 'Parfait, @[{name}] est à jour. Je reste dispo.',
   // On the file of a candidate
-  fileAsk: 'Je peux t’aider avec {name} ?',
+  fileAsk: 'Je peux t’aider avec @[{name}] ?',
   fileNo: 'D’accord, je reste dispo si tu changes d’avis.',
   fileWhich: 'Qu’est-ce qu’on met à jour ?',
   fileGo: 'Parfait, on les prend une par une.',
-  fileDone: 'C’est tout bon, {name} est à jour.',
+  fileDone: 'C’est tout bon, @[{name}] est à jour.',
   noted: 'C’est noté !',
   // Properties
   interviewAt: 'Entretien',

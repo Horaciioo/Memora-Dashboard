@@ -27,7 +27,8 @@ export const PAGE_EDITOR_UI = {
   mobileButton:
     'flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] active:bg-[var(--color-hover)]',
   mobileGlyph: 'size-5',
-  mobileDone: 'min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold text-[var(--color-ink-accent)]',
+  mobileDone:
+    'min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold text-[var(--color-ink-accent)]',
   linkPopover: `${FLOATING} fixed z-[85] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-1.5 p-3`,
   linkLabel: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   linkInput: FIELD,
@@ -84,7 +85,8 @@ export const PAGE_VIEW_STYLES = {
   trail: 'text-sm',
   trailList: 'flex flex-wrap items-center gap-1 text-[var(--color-ink-subtle)]',
   trailItem: "flex items-center gap-1 after:content-['/'] after:opacity-50 last:after:content-none",
-  trailLink: 'inline-flex items-center gap-1 rounded-[var(--radius-xs)] px-1 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  trailLink:
+    'inline-flex items-center gap-1 rounded-[var(--radius-xs)] px-1 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   readOnly: 'text-sm text-[var(--color-ink-subtle)] italic',
   // Rail floating on the right edge, one icon until opened
   commentsHost: 'fixed top-1/2 right-3 z-40 flex -translate-y-1/2 flex-col items-end gap-2',
@@ -118,14 +120,18 @@ export const SHARE_PANEL_STYLES = {
   panel: `${FLOATING} popover-enter fixed inset-x-4 top-20 z-[60] flex max-h-[80dvh] flex-col gap-2 overflow-y-auto p-3 text-sm md:absolute md:inset-x-auto md:top-[calc(100%+0.5rem)] md:right-0 md:w-[26rem]`,
   invite: 'relative',
   inviteInput: FIELD,
-  suggestions: 'mt-1 flex max-h-64 flex-col gap-0.5 overflow-y-auto rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1',
-  suggestion: 'flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] px-2 text-left hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  group: 'px-2 pt-1.5 pb-0.5 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  suggestions:
+    'mt-1 flex max-h-64 flex-col gap-0.5 overflow-y-auto rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1',
+  suggestion:
+    'flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] px-2 text-left hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  group:
+    'px-2 pt-1.5 pb-0.5 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   empty: 'px-2 py-2 text-[var(--color-ink-subtle)] italic',
   section: 'px-1 pt-2 text-micro font-bold tracking-wide text-[var(--color-ink)] uppercase',
   list: 'flex flex-col gap-0.5',
   row: 'flex min-h-11 items-center gap-2.5 rounded-[var(--radius-sm)] px-1',
-  rowTile: 'flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface-sunken)]',
+  rowTile:
+    'flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface-sunken)]',
   rowGlyph: 'size-4 shrink-0 text-[var(--color-ink-subtle)]',
   rowText: 'flex min-w-0 flex-1 flex-col',
   name: 'truncate font-medium text-[var(--color-ink)]',
@@ -137,7 +143,8 @@ export const SHARE_PANEL_STYLES = {
   inherit: 'flex flex-col gap-1 border-t border-[var(--color-border)] pt-2',
   footer: 'border-t border-[var(--color-border)] px-1 pt-2 text-xs text-[var(--color-ink-subtle)]',
   matrix: 'rounded-[var(--radius-md)] px-1',
-  matrixSummary: 'cursor-pointer py-1.5 text-xs font-semibold text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]',
+  matrixSummary:
+    'cursor-pointer py-1.5 text-xs font-semibold text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]',
   matrixTable: 'w-full border-collapse text-xs',
   matrixHead: 'px-1 pb-1 text-center font-semibold text-[var(--color-ink-subtle)]',
   matrixRow: 'py-1 pr-2 text-left font-medium text-[var(--color-ink)]',
@@ -170,8 +177,10 @@ export const PAGES_HOME_STYLES = {
   rowTitle: 'truncate text-sm font-medium text-[var(--color-ink)]',
   rowHint: 'line-clamp-2 text-xs text-[var(--color-ink-subtle)]',
   rowDate: 'shrink-0 text-xs text-[var(--color-ink-subtle)]',
-  trashLink: 'self-start text-sm font-semibold text-[var(--color-ink-subtle)] underline-offset-4 hover:text-[var(--color-ink)] hover:underline',
-  trashRow: 'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] card-surface px-3 py-2',
+  trashLink:
+    'self-start text-sm font-semibold text-[var(--color-ink-subtle)] underline-offset-4 hover:text-[var(--color-ink)] hover:underline',
+  trashRow:
+    'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] card-surface px-3 py-2',
 } as const
 
 /**
@@ -198,10 +207,11 @@ export const PAGE_REGISTRY_STYLES = {
 
 export const PAGE_RAIL_STYLES = {
   head: 'group/pages flex items-center gap-1 pr-1',
-  headLink: 'w-auto flex-1 hover:text-[var(--color-ink)]',
+  headLink: 'w-auto flex-1',
   create: 'w-full cursor-pointer text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]',
   divider: 'mx-3 my-1 h-px border-0 bg-[var(--color-border)]',
-  subhead: 'px-3 pt-3 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  subhead:
+    'px-3 pt-3 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   row: 'group/page flex items-center gap-0.5 rounded-[var(--radius-lg)] pr-1 transition-colors hover:bg-[var(--color-surface)]',
   rowActive: 'bg-[var(--color-surface)] font-semibold',
   toggle:
@@ -211,9 +221,21 @@ export const PAGE_RAIL_STYLES = {
   emoji: 'w-5 shrink-0 text-center leading-none',
   glyph: 'size-4 shrink-0',
   title: 'truncate',
-  add:
-    'flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] opacity-100 hover:text-[var(--color-ink)] focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] md:opacity-0 md:group-hover/page:opacity-100',
+  add: 'flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] opacity-100 hover:text-[var(--color-ink)] focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] md:opacity-0 md:group-hover/page:opacity-100',
   children: 'flex flex-col gap-px',
+  dragged: 'opacity-40',
+  category: 'rounded-[var(--radius-lg)] transition-colors',
+  // Same title-to-pages air as the destinations groups
+  categoryGroup: 'flex flex-col gap-2',
+  categories: 'flex flex-col gap-4',
+  categoryOver: 'bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]',
+  categoryHead:
+    'group/page flex cursor-grab items-center gap-0.5 rounded-[var(--radius-lg)] pr-1 hover:bg-[var(--color-surface)]',
+  categoryName:
+    'min-w-0 flex-1 truncate py-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  categoryEmpty: 'pl-9',
+  dropHint:
+    'mx-3 my-1 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] px-2 py-2 text-center text-xs text-[var(--color-ink-subtle)]',
   empty: 'py-1 text-xs text-[var(--color-ink-subtle)] italic',
 } as const
 

@@ -95,7 +95,7 @@ export const RailNav = ({
                 aria-expanded={!isGroupCollapsed}
                 className={LEFT_SIDEBAR.navGroupLabel}
               >
-                {group.label}
+                <span className={LEFT_SIDEBAR.navGroupTitle}>{group.label}</span>
                 <ChevronIcon
                   className={cn(
                     LEFT_SIDEBAR.navGroupChevron,

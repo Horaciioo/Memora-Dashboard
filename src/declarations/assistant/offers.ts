@@ -50,7 +50,7 @@ export const ASSISTANT_OFFERS = {
     ask: 'On met à jour un candidat ?',
     href: ROUTES.recruitments,
     scenario: 'candidate',
-    nudges: ['Un candidat à mettre à jour ?', 'Un entretien à caler ? Dis-moi qui.'],
+    nudges: ['Un candidat à mettre à jour ? Je suis là !', 'Un entretien à caler ? Dis-moi qui.'],
   },
   junior: {
     ask: 'On s’occupe d’un Junior ?',
@@ -119,6 +119,6 @@ export const ASSISTANT_DOCK_COPY = {
   nudges: [
     'Besoin d’un coup de main ?',
     'Je suis là si tu as besoin.',
-    'Une tâche à créer ? Demande-moi.',
+    'Une tâche à créer ? Demande-le moi.',
   ],
 } as const

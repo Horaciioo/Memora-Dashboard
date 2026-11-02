@@ -34,6 +34,7 @@ export const QUERY_KEYS = {
   livePanel: (youtuberId: string, panel: string, levelId: string | null) =>
     ['lives', 'panel', youtuberId, panel, levelId] as const,
   pages: ['pages'] as const,
+  pageCategories: ['pages', 'categories'] as const,
   page: (id: string) => ['pages', 'detail', id] as const,
   pageSharing: (id: string) => ['pages', 'sharing', id] as const,
   pageComments: (id: string) => ['pages', 'comments', id] as const,

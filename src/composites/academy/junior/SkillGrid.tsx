@@ -4,8 +4,9 @@ import { Dotted } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 
 import { Status } from '@/components/elements/display/Status'
-import { PercentSlider } from '@/components/elements/forms/inputs/PercentSlider'
+import { StarRating } from '@/components/elements/forms/inputs/StarRating'
 import { groupSkills } from '@/core/lib/academy/skillGroups'
+import { percentToStars, starsToPercent } from '@/core/lib/academy/skillStars'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { ICONS } from '@/declarations/ui/icons'
@@ -21,7 +22,7 @@ export interface SkillGridProps {
 }
 
 /**
- * Competencies in one box per category, each graded by typing its percentage
+ * Competencies in one box per category, each graded in stars
  * @param {JuniorSkillView[]} skills - Competency grades
  * @param {boolean} canWrite - Member may grade
  * @param {(skillId: string, percent: number) => void} onGrade - Called with a new grade
@@ -32,6 +33,7 @@ export const SkillGrid = ({ skills, canWrite, onGrade }: SkillGridProps) => {
   // Descriptions unfolded
   const [open, setOpen] = useState<Set<string>>(new Set())
   const Chevron = ICONS.expand
+  const { skillMaxPercent: maxPercent, skillStars: stars } = ACADEMY_SETTINGS
 
   const toggle = (skillId: string) =>
     setOpen((current) => {
@@ -54,7 +56,13 @@ export const SkillGrid = ({ skills, canWrite, onGrade }: SkillGridProps) => {
               <h3 className={SKILL_GRID.title}>
                 <Status label={group.name} accent={group.accent} />
               </h3>
-              <span className={SKILL_GRID.average}>{`${average}%`}</span>
+              <StarRating
+                isSmall
+                disabled
+                value={percentToStars(average, maxPercent, stars)}
+                count={stars}
+                label={`${group.name}, ${ACADEMY_COPY.skillStarsLabel}`}
+              />
             </header>
             {group.items.map((skill) => {
               const isOpen = open.has(skill.skillId)
@@ -85,12 +93,14 @@ export const SkillGrid = ({ skills, canWrite, onGrade }: SkillGridProps) => {
                       </span>
                     )}
                     <div className={SKILL_GRID.bar}>
-                      <PercentSlider
-                        value={skill.percent}
-                        max={ACADEMY_SETTINGS.skillMaxPercent}
-                        label={`${skill.name}, ${ACADEMY_COPY.skillPercentLabel}`}
+                      <StarRating
+                        value={percentToStars(skill.percent, maxPercent, stars)}
+                        count={stars}
+                        label={`${skill.name}, ${ACADEMY_COPY.skillStarsLabel}`}
                         disabled={!canWrite}
-                        onCommit={(percent) => onGrade(skill.skillId, percent)}
+                        onCommit={(count) =>
+                          onGrade(skill.skillId, starsToPercent(count, maxPercent, stars))
+                        }
                       />
                     </div>
                   </div>

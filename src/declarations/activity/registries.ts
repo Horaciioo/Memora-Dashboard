@@ -140,11 +140,21 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
   PageCreated: { label: 'Page', tone: 'success', verb: 'créé', target: 'une page privée' },
   PageShared: { label: 'Partage', tone: 'info', verb: 'partagé', target: 'une page' },
   PageUnshared: { label: 'Partage', tone: 'neutral', verb: 'retiré', target: 'un partage de page' },
-  PageTrashed: { label: 'Corbeille', tone: 'danger', verb: 'mis à la corbeille', target: 'une page' },
+  PageTrashed: {
+    label: 'Corbeille',
+    tone: 'danger',
+    verb: 'mis à la corbeille',
+    target: 'une page',
+  },
   PageRestored: { label: 'Corbeille', tone: 'success', verb: 'restauré', target: 'une page' },
   PagePurged: { label: 'Suppression', tone: 'danger', verb: 'supprimé', target: 'une page' },
   PageMoved: { label: 'Page', tone: 'info', verb: 'déplacé', target: 'une page' },
-  PageInheritanceChanged: { label: 'Partage', tone: 'info', verb: 'changé', target: 'l’héritage des accès' },
+  PageInheritanceChanged: {
+    label: 'Partage',
+    tone: 'info',
+    verb: 'changé',
+    target: 'l’héritage des accès',
+  },
   RecruitmentClosed: {
     label: 'Clôture',
     tone: 'info',
