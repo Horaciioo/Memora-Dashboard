@@ -79,7 +79,8 @@ export const PlayChat = ({
   onFold,
 }: PlayChatProps) => {
   const { lines: messages, add } = usePlayChatLines(sessionId, rendered)
-  const { isSaving, run } = useMutation()
+  const { run } = useMutation()
+  const isSending = useRef(false)
   const [draft, setDraft] = useState('')
   const list = useRef<HTMLDivElement>(null)
   const FoldIcon = ICONS.playFold
@@ -107,16 +108,20 @@ export const PlayChat = ({
 
   const send = async () => {
     const body = draft.trim()
-    if (!body || isSaving) return
+    // One line in flight, a second Enter waits
+    if (!body || isSending.current) return
+    isSending.current = true
+    setDraft('')
     const sent = await run(() =>
       apiPost<PlayMessageView>(API_ROUTES.playMessages(sessionId), { body })
     )
-    if (sent === null) return
-    setDraft('')
+    isSending.current = false
+    if (sent === null) return setDraft(body)
     add(sent)
   }
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key !== 'Enter' || event.shiftKey) return
+    // Enter closing an accent or a suggestion is not a send
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return
     event.preventDefault()
     void send()
   }
