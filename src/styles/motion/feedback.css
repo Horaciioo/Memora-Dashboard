@@ -659,3 +659,25 @@
     display: none;
   }
 }
+
+/* Ring spreading from a click */
+.showcase-click {
+  animation: showcase-click 500ms ease-out forwards;
+}
+
+@keyframes showcase-click {
+  from {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-click {
+    display: none;
+  }
+}
