@@ -46,7 +46,9 @@ export const CalendarDaySheet = ({
     open={dayKey !== null}
     onClose={onClose}
     title={CALENDAR_COPY.day}
-    figure={dayKey && <span className={CALENDAR_MOBILE.sheetTitle}>{periodLabel(dayKey, 'day')}</span>}
+    figure={
+      dayKey && <span className={CALENDAR_MOBILE.sheetTitle}>{periodLabel(dayKey, 'day')}</span>
+    }
   >
     {dayKey && (
       <div className={CALENDAR_MOBILE.sheetBody}>

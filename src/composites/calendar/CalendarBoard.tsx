@@ -611,7 +611,7 @@ export const CalendarBoard = ({
               soloId={soloId}
               onSolo={soloCreator}
               railProps={sessionId ? undefined : railProps}
-                          />
+            />
 
             <div className={CALENDAR_STYLES.toolbar}>
               <div className={CALENDAR_STYLES.toolbarMain}>
