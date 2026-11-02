@@ -89,3 +89,33 @@ textarea:focus-visible {
   min-height: 2.75rem;
   min-width: 2.75rem;
 }
+
+/* Clickable elements show the hand, utilities still override it */
+@layer base {
+  a[href],
+  button,
+  summary,
+  select,
+  label[for],
+  [role='button'],
+  [role='link'],
+  [role='menuitem'],
+  [role='tab'],
+  [role='switch'],
+  [role='option'],
+  input:is(
+    [type='checkbox'],
+    [type='radio'],
+    [type='range'],
+    [type='submit'],
+    [type='button'],
+    [type='file']
+  ) {
+    cursor: pointer;
+  }
+
+  :is(button, select, input):disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+}
