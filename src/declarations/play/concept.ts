@@ -94,7 +94,7 @@ export const PLAY_CONCEPT: Record<PlayGameName, PlayConceptStep[]> = {
   [PlayGames.Ludo]: [
     {
       title: 'Lance le dé',
-      text: 'Un 6 sort un pion de ta base, et te fait rejouer.',
+      text: 'Un 1 ou un 6 sort un pion de ta base, et un 6 te fait rejouer.',
       clip: PlayConceptClips.LudoRoll,
     },
     {

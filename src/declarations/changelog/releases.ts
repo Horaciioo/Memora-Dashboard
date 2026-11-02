@@ -434,6 +434,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Fixed,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Ludo » qui empêchait de sortir un pion avec un 1, et de manger un adversaire posé sur sa case de départ en sortant.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
         text: 'Correction d’un bug qui empêchait d’afficher les invitations de parties dans « Memora Play ».',
       },
       {

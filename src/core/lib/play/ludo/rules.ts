@@ -105,14 +105,17 @@ const planOf = ({
     ? mover.pawns.filter((step, index) => index !== pawn && step === to).length
     : 0
 
+  // A pawn leaving the yard eats whoever sits on its start, safe or not
+  const isShielded = safeSquares && isSafe && !isExit
+
   // Never two pawns on one square: a mate, or a rival a safe square would spare
-  if (mates > 0 || (safeSquares && isSafe && rivals.length > 0)) return null
+  if (mates > 0 || (isShielded && rivals.length > 0)) return null
 
   return {
     pawn,
     from,
     to,
-    captures: safeSquares && isSafe ? [] : rivals,
+    captures: isShielded ? [] : rivals,
     isExit,
     isHome: to === GOAL_STEP,
     isSafe: safeSquares && isSafe,

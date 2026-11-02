@@ -10,7 +10,7 @@
     "oneOrSix": [1, 6],
     "fiveOrSix": [5, 6]
   },
-  "exit": "six",
+  "exit": "oneOrSix",
   "ending": "podium",
   "rules": {
     "sixReplay": true,
