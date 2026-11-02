@@ -137,6 +137,7 @@
 
 /* Padded for an easy click */
 .page-editor hr {
+  box-sizing: content-box;
   height: 1px;
   border: 0;
   padding: 0.5em 0;

@@ -1,5 +1,9 @@
-/* Invitation popups, arcade night in the game colour */
+/* Invitation popups, arcade night in the game colour, light ink whatever the room */
 .play-invite {
+  --play-ink: #ffffff;
+  --play-ink-soft: rgb(236 232 255 / 0.72);
+  --play-ink-faint: rgb(236 232 255 / 0.45);
+  --play-line: rgb(255 255 255 / 0.1);
   background:
     radial-gradient(
       22rem 12rem at 0% 0%,

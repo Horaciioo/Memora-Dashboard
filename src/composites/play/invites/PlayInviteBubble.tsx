@@ -11,16 +11,27 @@ import { playKeysOf } from '@/declarations/play/games'
 import { PLAY_INVITE_COPY, PLAY_INVITE_SETTINGS } from '@/declarations/play/invites'
 import { PLAY_INVITE_CALL } from '@/declarations/ui/variants'
 import type { PlayInviteView } from '@/types/play'
+import { cn } from '@/utils/classnames'
 
 /**
  * Invitation springing from the notifications bell, accept to go straight to the game
  * @param {Object} props - Bubble
  * @param {PlayInviteView} props.invite - Invitation
+ * @param {string} [props.beacon] - Key aimed at, the bell by default
+ * @param {string} [props.className] - Extra classes
  * @return {JSX.Element | null}
  */
 
-export const PlayInviteBubble = ({ invite }: { invite: PlayInviteView }) => {
-  const spot = useBellSpot(true)
+export const PlayInviteBubble = ({
+  invite,
+  beacon,
+  className,
+}: {
+  invite: PlayInviteView
+  beacon?: string
+  className?: string
+}) => {
+  const spot = useBellSpot(true, beacon)
   const { isSaving, accept, decline } = usePlayInviteAnswer(invite)
   // Without a bell on screen (fullscreen game), pinned top centre
   const place: Record<string, string | number> = spot
@@ -34,7 +45,7 @@ export const PlayInviteBubble = ({ invite }: { invite: PlayInviteView }) => {
   return (
     <aside
       key={invite.id}
-      className={PLAY_INVITE_CALL.anchor}
+      className={cn(PLAY_INVITE_CALL.anchor, className)}
       style={{ ...place, ...playKeysOf(invite.game) } as CSSProperties}
       aria-label={PLAY_INVITE_COPY.label}
       role="alertdialog"

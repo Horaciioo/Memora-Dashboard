@@ -12,6 +12,7 @@ import { GolfSetupDrawer } from '@/composites/play/golf/setup/GolfSetupDrawer'
 import { GolfStartVote } from '@/composites/play/golf/vote/GolfStartVote'
 import { LudoRulesDrawer } from '@/composites/play/ludo/LudoRulesDrawer'
 import { LudoSetupDrawer } from '@/composites/play/ludo/LudoSetupDrawer'
+import { declaredVote } from '@/composites/play/vote/PlayStartVote'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
 import { golfSettingsOf } from '@/core/lib/play/golf/settings'
@@ -89,6 +90,9 @@ export const PLAY_SETUP_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
 
 export const PLAY_START_VOTES: Partial<Record<PlayGameName, ComponentType<PlayVoteProps>>> = {
   [PlayGames.Golf]: GolfStartVote,
+  [PlayGames.Baccalaureat]: declaredVote(PlayGames.Baccalaureat),
+  [PlayGames.Bomb]: declaredVote(PlayGames.Bomb),
+  [PlayGames.Ludo]: declaredVote(PlayGames.Ludo),
 }
 
 /**

@@ -31,9 +31,13 @@ export const usePlayInviteFeed = (): void => {
       // Chime for an invitation landing now
       const heard = known.current
       known.current = new Set(invites.map((invite) => invite.id))
-      const { isMuted, volume } = usePlaySoundStore.getState()
+      const { isMuted, master } = usePlaySoundStore.getState()
       if (heard && !isMuted && invites.some((invite) => !heard.has(invite.id))) {
-        playSound(PLAY_INVITE_SOUND, volume)
+        playSound(
+          PLAY_INVITE_SOUND.path,
+          master * PLAY_INVITE_SOUND.level,
+          PLAY_INVITE_SOUND.lowpass
+        )
       }
       usePlayInviteStore.getState().receive(invites)
     }

@@ -1,3 +1,5 @@
+import { PLAY_VOLUME } from '@/declarations/play/sounds'
+
 // Gestures that unlock audio
 const UNLOCK_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const
 
@@ -68,7 +70,7 @@ const voiceOf = (context: AudioContext, buffer: AudioBuffer, volume: number) => 
   const source = context.createBufferSource()
   const gain = context.createGain()
   source.buffer = buffer
-  gain.gain.value = volume
+  gain.gain.value = volume * PLAY_VOLUME.output
   source.connect(gain)
   gain.connect(context.destination)
 
@@ -90,16 +92,38 @@ export const preloadSounds = (paths: readonly string[]): void => {
  * Play a sound once
  * @param {string} path - Public path
  * @param {number} volume - Zero to one
+ * @param {number} [lowpass] - Highs cut above this, in Hz
  * @return {void}
  */
 
-export const playSound = (path: string, volume: number): void => {
+export const playSound = (path: string, volume: number, lowpass?: number): void => {
   const context = volume > 0 ? contextOf() : null
   if (!context) return
   void bufferOf(context, path).then((buffer) => {
-    if (buffer) voiceOf(context, buffer, volume).source.start()
+    if (!buffer) return
+    const { source, gain } = voiceOf(context, buffer, volume)
+    // Softened: the gain goes through a filter
+    if (lowpass) {
+      const filter = context.createBiquadFilter()
+      filter.type = 'lowpass'
+      filter.frequency.value = lowpass
+      gain.disconnect()
+      gain.connect(filter).connect(context.destination)
+    }
+    source.start()
   })
 }
+
+// Exponential ramps refuse a target at zero
+const SILENT = 0.0001
+
+/**
+ * Loudest point of a ramp, never at zero
+ * @param {number} level - Before the output trim
+ * @return {number} - Above silence
+ */
+
+const peakOf = (level: number): number => Math.max(SILENT, level * PLAY_VOLUME.output)
 
 /**
  * Rising sparkle, no file
@@ -109,7 +133,7 @@ export const playSound = (path: string, volume: number): void => {
  */
 
 export const playChime = (notes: number[], volume: number): void => {
-  const context = contextOf()
+  const context = volume > 0 ? contextOf() : null
   if (!context) return
   notes.forEach((hertz, index) => {
     const start = context.currentTime + index * 0.09
@@ -118,7 +142,7 @@ export const playChime = (notes: number[], volume: number): void => {
     tone.type = 'triangle'
     tone.frequency.value = hertz
     gain.gain.setValueAtTime(0.0001, start)
-    gain.gain.exponentialRampToValueAtTime(0.35 * volume, start + 0.02)
+    gain.gain.exponentialRampToValueAtTime(peakOf(0.35 * volume), start + 0.02)
     gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.5)
     tone.connect(gain).connect(context.destination)
     tone.start(start)
@@ -140,7 +164,7 @@ export const playSweep = (
   { from, to, seconds }: { from: number; to: number; seconds: number },
   volume: number
 ): void => {
-  const context = contextOf()
+  const context = volume > 0 ? contextOf() : null
   if (!context) return
   const start = context.currentTime
   const tone = context.createOscillator()
@@ -149,7 +173,7 @@ export const playSweep = (
   tone.frequency.setValueAtTime(from, start)
   tone.frequency.exponentialRampToValueAtTime(to, start + seconds)
   gain.gain.setValueAtTime(0.0001, start)
-  gain.gain.exponentialRampToValueAtTime(0.18 * volume, start + seconds * 0.3)
+  gain.gain.exponentialRampToValueAtTime(peakOf(0.18 * volume), start + seconds * 0.3)
   gain.gain.exponentialRampToValueAtTime(0.0001, start + seconds)
   tone.connect(gain).connect(context.destination)
   tone.start(start)
@@ -195,7 +219,7 @@ export const loopSound = (path: string): SoundLoop => {
     set: (volume, rate) => {
       level = { volume, rate }
       if (!voice || !context) return
-      voice.gain.gain.setTargetAtTime(volume, context.currentTime, LOOP_GLIDE)
+      voice.gain.gain.setTargetAtTime(volume * PLAY_VOLUME.output, context.currentTime, LOOP_GLIDE)
       voice.source.playbackRate.setTargetAtTime(rate, context.currentTime, LOOP_GLIDE)
     },
     stop: () => {

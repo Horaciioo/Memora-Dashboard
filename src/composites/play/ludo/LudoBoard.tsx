@@ -25,6 +25,7 @@ import { fillPlayMessage } from '@/declarations/play/copy'
 import { LUDO_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { SECOND_MS } from '@/utils/constants/time'
+import { PlayGames } from '@/utils/constants/play'
 
 const CORNER_COUNT = LUDO_CORNERS.length
 
@@ -145,6 +146,7 @@ export const LudoBoard = ({
     <div className={LUDO_BOARD.board}>
       {countdown > 0 && (
         <PlayCountdown
+          game={PlayGames.Ludo}
           seconds={countdown}
           total={LUDO_SETTINGS.countdownSeconds}
           lead={LUDO_BOARD_COPY.starting}

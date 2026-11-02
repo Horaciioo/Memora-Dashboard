@@ -17,6 +17,8 @@ export const PLAY_INVITE_CALL = {
   text: 'text-sm leading-snug font-semibold text-[var(--play-ink-soft)]',
   name: 'font-extrabold text-[var(--play-ink)]',
   actions: 'flex items-center gap-2',
+  // The rail notice takes over from tablets
+  phoneOnly: 'md:hidden',
 } as const
 
 /**
@@ -25,7 +27,8 @@ export const PLAY_INVITE_CALL = {
  */
 
 export const HOME_PLAY_INVITE = {
-  box: 'play-invite flex items-center gap-4 rounded-[var(--radius-lg)] px-4 py-3',
+  // The rail notice takes over from tablets
+  box: 'play-invite flex md:hidden items-center gap-4 rounded-[var(--radius-lg)] px-4 py-3',
   logo: 'play-invite-logo size-10 shrink-0',
   body: 'flex min-w-0 flex-1 flex-col',
   eyebrow: 'text-micro font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
@@ -35,4 +38,14 @@ export const HOME_PLAY_INVITE = {
     'shrink-0 text-xs font-bold text-[var(--play-ink-soft)] transition-colors hover:text-[var(--play-ink)] disabled:opacity-50',
   join: 'flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--play-key)] text-white transition-transform hover:scale-105 disabled:opacity-50',
   joinIcon: 'size-5',
+} as const
+
+/**
+ * Rail card of an invitation, dressed like the release note
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_INVITE_NOTICE = {
+  link: 'w-full text-left disabled:opacity-60',
+  name: 'font-extrabold',
 } as const

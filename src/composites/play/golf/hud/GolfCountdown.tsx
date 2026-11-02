@@ -7,6 +7,7 @@ import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 /**
  * Before a hole: the big count for the first, a title card for the next ones
@@ -37,6 +38,7 @@ export const GolfCountdown = ({
   if (hole === 0) {
     return (
       <PlayCountdown
+        game={PlayGames.Golf}
         seconds={seconds}
         total={GOLF_SETTINGS.countdownSeconds}
         lead={`${course} - ${title}`}

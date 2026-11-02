@@ -14,12 +14,18 @@ import { beaconProps } from '@/declarations/ui/beacons'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import type { FormValues } from '@/types/forms'
 
+export interface MeetingRequestProps {
+  // Icon alone, for the phone header
+  compact?: boolean
+}
+
 /**
  * The one thing a moderator does on the calendar: ask their responsables for a meeting
+ * @param {boolean} [compact] - Icon alone
  * @return {JSX.Element}
  */
 
-export const MeetingRequest = () => {
+export const MeetingRequest = ({ compact }: MeetingRequestProps) => {
   const [isOpen, setOpen] = useState(false)
   const { isSaving, issues, run } = useMutation()
 
@@ -33,9 +39,19 @@ export const MeetingRequest = () => {
   return (
     <>
       <span {...beaconProps(TOUR_BEACONS.calendarRequest)}>
-        <Button variant="primary" onClick={() => setOpen(true)}>
-          {CALENDAR_COPY.requestMeeting}
-        </Button>
+        {compact ? (
+          <Button
+            variant="primary"
+            icon="add"
+            aria-label={CALENDAR_COPY.requestMeeting}
+            title={CALENDAR_COPY.requestMeeting}
+            onClick={() => setOpen(true)}
+          />
+        ) : (
+          <Button variant="primary" onClick={() => setOpen(true)}>
+            {CALENDAR_COPY.requestMeeting}
+          </Button>
+        )}
       </span>
 
       <FormDrawer

@@ -12,6 +12,7 @@ import { PlayDockTrophies } from '@/composites/play/dock/PlayDockTrophies'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/useOutsideDismiss'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HUB_COPY } from '@/declarations/play'
+import { beaconProps, PLAY_FEED_BEACON } from '@/declarations/ui/beacons'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { PLAY_DOCK } from '@/declarations/ui/variants'
@@ -117,6 +118,7 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
     return (
       <button
         data-dock={key}
+        {...(key === 'feed' ? beaconProps(PLAY_FEED_BEACON) : {})}
         type="button"
         aria-label={label}
         aria-expanded={open === key}

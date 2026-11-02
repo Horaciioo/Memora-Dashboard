@@ -6,18 +6,25 @@ import { PlayInviteBubble } from '@/composites/play/invites/PlayInviteBubble'
 import { usePlayInviteFeed } from '@/core/hooks/data/play/usePlayInviteFeed'
 import { usePendingInvite } from '@/core/store/playInvites'
 import { ROUTES } from '@/declarations/navigation'
+import { PLAY_FEED_BEACON } from '@/declarations/ui/beacons'
+import { PLAY_INVITE_CALL } from '@/declarations/ui/variants'
 
 /**
- * Game invitations of the member, the home page showing its own popup
+ * Game invitations of the member: over the dock feed key in Play, on phones elsewhere
+ * @param {Object} props - Host
+ * @param {boolean} [props.isPlay] - Inside Memora Play
  * @return {JSX.Element | null}
  */
 
-export const PlayInviteHost = () => {
+export const PlayInviteHost = ({ isPlay }: { isPlay?: boolean }) => {
   usePlayInviteFeed()
   const invite = usePendingInvite()
   const pathname = usePathname()
 
-  if (!invite || pathname === ROUTES.dashboard) return null
+  if (!invite) return null
+  if (isPlay) return <PlayInviteBubble key={invite.id} invite={invite} beacon={PLAY_FEED_BEACON} />
+  // Home shows its own box, the rail its notice
+  if (pathname === ROUTES.dashboard) return null
 
-  return <PlayInviteBubble key={invite.id} invite={invite} />
+  return <PlayInviteBubble key={invite.id} invite={invite} className={PLAY_INVITE_CALL.phoneOnly} />
 }

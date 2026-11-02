@@ -32,8 +32,9 @@ export const PLAY_INVITE_SETTINGS = {
 export const PLAY_INVITE_COPY = {
   label: 'Invitation à jouer',
   eyebrow: 'Memora Play',
-  play: '{name} t’invite à jouer {game}',
-  watch: '{name} t’invite à regarder sa partie {game}',
+  play: '{name} t’a invité à jouer {game}',
+  watch: '{name} t’a invité à regarder sa partie {game}',
+  join: 'Rejoindre',
   accept: 'Accepter',
   decline: 'Refuser',
 } as const
@@ -50,5 +51,15 @@ export const PLAY_INVITE_GAMES: Record<PlayGameName, { play: string; watch: stri
   [PlayGames.Ludo]: { play: 'au Ludo', watch: 'de Ludo' },
 }
 
-// Invitation chime, any page
-export const PLAY_INVITE_SOUND = '/play/sons/effets/invitation.mp3'
+/**
+ * Invitation chime, any page, kept low and muffled
+ * @type {Object}
+ */
+
+export const PLAY_INVITE_SOUND = {
+  path: '/play/sons/effets/invitation.mp3',
+  // Share of the Play level
+  level: 0.45,
+  // Highs cut above, in Hz
+  lowpass: 1800,
+} as const

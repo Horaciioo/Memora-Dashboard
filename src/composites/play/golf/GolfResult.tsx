@@ -7,6 +7,7 @@ import { rankCards } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { BOMB_BOARD, GOLF_SCORECARD } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 /**
  * End of the course: fewest strokes on the podium, the full scorecard below, full screen key kept
@@ -30,7 +31,7 @@ export const GolfResult = (props: GolfScorecardProps) => {
   return (
     <div className={BOMB_BOARD.result}>
       {/* The course keys are gone with the HUD */}
-      {isFullscreen && <PlayStageKeys />}
+      {isFullscreen && <PlayStageKeys game={PlayGames.Golf} />}
       <PlayPodium ranked={ranked} hasWinner={props.players.some((player) => !player.hasLeft)} />
       <section className={GOLF_SCORECARD.card}>
         <h2 className={GOLF_SCORECARD.title}>{GOLF_BOARD_COPY.scorecard}</h2>

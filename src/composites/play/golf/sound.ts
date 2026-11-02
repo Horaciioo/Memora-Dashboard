@@ -1,7 +1,8 @@
 import { playChime, playSound, playSweep } from '@/core/lib/play/sounds'
-import { usePlaySoundStore } from '@/core/store/playSound'
+import { playLevelOf } from '@/core/store/playSound'
 import { GOLF_SOUNDS } from '@/declarations/play/golf/sounds'
 import type { GolfSoundName } from '@/declarations/play/golf/sounds'
+import { PlayGames } from '@/utils/constants/play'
 
 /**
  * Golf sound at the player's level
@@ -11,8 +12,7 @@ import type { GolfSoundName } from '@/declarations/play/golf/sounds'
  */
 
 export const playGolfSound = (sound: GolfSoundName, level = 1): void => {
-  const { isMuted, volume } = usePlaySoundStore.getState()
-  if (!isMuted) playSound(GOLF_SOUNDS[sound], volume * level)
+  playSound(GOLF_SOUNDS[sound], playLevelOf(PlayGames.Golf) * level)
 }
 
 // C major arpeggio of a power won
@@ -24,8 +24,7 @@ const POWER_CHIME = [659.25, 830.61, 987.77, 1318.51, 1661.22]
  */
 
 export const playPowerChime = (): void => {
-  const { isMuted, volume } = usePlaySoundStore.getState()
-  if (!isMuted) playChime(POWER_CHIME, volume)
+  playChime(POWER_CHIME, playLevelOf(PlayGames.Golf))
 }
 
 // Boost zip pitch and length
@@ -37,6 +36,5 @@ const BOOST_SWEEP = { from: 220, to: 1400, seconds: 0.35 }
  */
 
 export const playBoostSweep = (): void => {
-  const { isMuted, volume } = usePlaySoundStore.getState()
-  if (!isMuted) playSweep(BOOST_SWEEP, volume)
+  playSweep(BOOST_SWEEP, playLevelOf(PlayGames.Golf))
 }

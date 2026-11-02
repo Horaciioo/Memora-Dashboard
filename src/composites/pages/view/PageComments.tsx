@@ -37,19 +37,21 @@ export const PageComments = ({ pageId, canComment, canModerate }: PageCommentsPr
   if (!isShown) return null
 
   return (
-    <aside className={PAGE_VIEW_STYLES.commentsHost}>
-      <button
-        type="button"
-        aria-label={isOpen ? PAGE_COMMENT_COPY.close : PAGE_COMMENT_COPY.open}
-        aria-expanded={isOpen}
-        className={cn(
-          PAGE_VIEW_STYLES.commentsToggle,
-          isOpen && PAGE_VIEW_STYLES.commentsToggleOpen
-        )}
-        onClick={() => setOpen(!isOpen)}
-      >
-        <ChatIcon className={PAGE_VIEW_STYLES.commentsGlyph} aria-hidden="true" />
-      </button>
+    <>
+      <aside className={PAGE_VIEW_STYLES.commentsHost}>
+        <button
+          type="button"
+          aria-label={isOpen ? PAGE_COMMENT_COPY.close : PAGE_COMMENT_COPY.open}
+          aria-expanded={isOpen}
+          className={cn(
+            PAGE_VIEW_STYLES.commentsToggle,
+            isOpen && PAGE_VIEW_STYLES.commentsToggleOpen
+          )}
+          onClick={() => setOpen(!isOpen)}
+        >
+          <ChatIcon className={PAGE_VIEW_STYLES.commentsGlyph} aria-hidden="true" />
+        </button>
+      </aside>
 
       {isOpen && (
         <section aria-labelledby="page-comments-title" className={PAGE_VIEW_STYLES.commentsRail}>
@@ -98,6 +100,6 @@ export const PageComments = ({ pageId, canComment, canModerate }: PageCommentsPr
             ))}
         </section>
       )}
-    </aside>
+    </>
   )
 }

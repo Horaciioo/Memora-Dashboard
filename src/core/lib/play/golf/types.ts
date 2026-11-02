@@ -167,6 +167,8 @@ export interface GolfBlock {
   z0: number
   z1: number
   floor: number
+  // Ground at each corner, x0z0 x1z0 x1z1 x0z1, ramps tilt it
+  corners: number[]
 }
 
 /**

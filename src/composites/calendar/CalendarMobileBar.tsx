@@ -15,18 +15,12 @@ import type { CalendarUnit } from '@/utils/format/calendar'
 // Every creator at once
 const ALL_CREATORS = 'all'
 
-// Months the strip offers
-const STRIP_MONTHS = 12
-
 export interface CalendarMobileBarProps {
   title: string
   unit: CalendarUnit
   // Views in the order the list shows them
   units: { value: CalendarUnit; label: string }[]
   onUnit: (unit: CalendarUnit) => void
-  // ISO day on screen
-  cursor: string
-  onCursor: (dayKey: string) => void
   onToday: () => void
   isLoading: boolean
   youtubers: FieldOption[]
@@ -40,42 +34,7 @@ export interface CalendarMobileBarProps {
 }
 
 /**
- * One strip entry
- * @typedef {Object} StripEntry
- * @property {string} key - ISO first day of the month
- * @property {string} label - Short month name
- * @property {boolean} [year] - A year marker, not a month
- */
-
-interface StripEntry {
-  key: string
-  label: string
-  year?: boolean
-}
-
-/**
- * Months starting at the one on screen, the year named where it turns
- * @param {string} cursor - ISO day on screen
- * @return {StripEntry[]} - Entries
- */
-
-const monthStrip = (cursor: string): StripEntry[] => {
-  const [year, month] = cursor.split('-').map(Number)
-
-  return Array.from({ length: STRIP_MONTHS }, (_, index) => {
-    const day = new Date(Date.UTC(year, month - 1 + index, 1))
-    const key = day.toISOString().slice(0, 10)
-    const label = day.toLocaleDateString('fr-FR', { month: 'short', timeZone: 'UTC' })
-    const entries: StripEntry[] = [{ key, label }]
-
-    return day.getUTCMonth() === 0 && index > 0
-      ? [{ key: `year-${key}`, label: String(day.getUTCFullYear()), year: true }, ...entries]
-      : entries
-  }).flat()
-}
-
-/**
- * Header of the calendar on a phone: the period with its views, the months to jump to, today, the filters and the creator
+ * Header of the calendar on a phone: the period with its views, today, the filters and the creator
  * @param {CalendarMobileBarProps} props - Header state
  * @return {JSX.Element}
  */
@@ -85,8 +44,6 @@ export const CalendarMobileBar = ({
   unit,
   units,
   onUnit,
-  cursor,
-  onCursor,
   onToday,
   isLoading,
   youtubers,
@@ -178,28 +135,6 @@ export const CalendarMobileBar = ({
           />
         )}
       </div>
-
-      {unit === 'month' && (
-        <div className={CALENDAR_MOBILE.strip}>
-          {monthStrip(cursor).map((entry, index) =>
-            entry.year ? (
-              <span key={entry.key} className={CALENDAR_MOBILE.year}>
-                {entry.label}
-              </span>
-            ) : (
-              <button
-                key={entry.key}
-                type="button"
-                aria-current={index === 0 ? 'date' : undefined}
-                onClick={() => onCursor(entry.key)}
-                className={cn(CALENDAR_MOBILE.month, index === 0 && CALENDAR_MOBILE.monthActive)}
-              >
-                {entry.label}
-              </button>
-            )
-          )}
-        </div>
-      )}
     </div>
   )
 }

@@ -10,8 +10,8 @@ import type { GolfPaint } from '@/composites/play/golf/scene/paint'
 import { aimedAngle } from '@/composites/play/golf/scene/pointer'
 import type { GolfPointerState } from '@/composites/play/golf/scene/pointer'
 import type { GolfRig } from '@/composites/play/golf/scene/rig'
-import { aimGuide, isAimHidden, shownAngle } from '@/core/lib/play/golf'
-import type { GolfHole, GolfPoint } from '@/core/lib/play/golf'
+import { aimGuide, groundFrom, isAimHidden, shownAngle } from '@/core/lib/play/golf'
+import type { GolfHole, GolfPad, GolfPoint } from '@/core/lib/play/golf'
 import type { GolfPowerName } from '@/utils/constants/play'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
@@ -40,11 +40,12 @@ const headGeometry = (width: number, length: number): ShapeGeometry => {
 }
 
 /**
- * Dots laid along a polyline
+ * Dots laid along a polyline, each on the ground under it
  * @param {InstancedMesh} dots - Dots
  * @param {GolfPoint[]} line - Polyline
  * @param {Object} place - Placement
- * @param {number} place.height - Ground height
+ * @param {GolfPad[]} place.pads - Slabs
+ * @param {number} place.floor - Ground under the ball
  * @param {number} place.skip - Metres under the arrow
  * @return {void}
  */
@@ -52,12 +53,14 @@ const headGeometry = (width: number, length: number): ShapeGeometry => {
 const layDots = (
   dots: InstancedMesh,
   line: GolfPoint[],
-  { height, skip }: { height: number; skip: number }
+  { pads, floor, skip }: { pads: GolfPad[]; floor: number; skip: number }
 ): void => {
   const holder = new Object3D()
   holder.rotation.set(...FLAT)
   let index = 0
   let carry = skip
+  // Climbs ramps from the ball
+  let level = floor
   for (let leg = 1; leg < line.length; leg += 1) {
     const [ax, az] = line[leg - 1]
     const [bx, bz] = line[leg]
@@ -66,7 +69,10 @@ const layDots = (
     let along = carry
     for (; along < length && index < arrow.dots; along += arrow.dotGap) {
       const share = along / length
-      holder.position.set(ax + (bx - ax) * share, height, az + (bz - az) * share)
+      const x = ax + (bx - ax) * share
+      const z = az + (bz - az) * share
+      level = groundFrom(pads, x, z, level)
+      holder.position.set(x, level + arrow.lift, z)
       holder.scale.setScalar(1 - (index / arrow.dots) * arrow.dotFade)
       holder.updateMatrix()
       dots.setMatrixAt(index, holder.matrix)
@@ -126,7 +132,8 @@ export const GolfAim = ({
     if (!ball || !shot || !group.current || !ahead.current) return
     // Mirror draws the lie
     const angle = shownAngle(aimedAngle(shot, held), held)
-    const ground = ball.y - physics.ballRadius + arrow.lift
+    const floor = ball.y - physics.ballRadius
+    const ground = floor + arrow.lift
 
     // One more chevron per step of pull
     const count = Math.max(1, Math.ceil(shot.power * arrow.chevrons))
@@ -135,8 +142,17 @@ export const GolfAim = ({
     if (chevrons.current) {
       const holder = new Object3D()
       holder.rotation.set(...FLAT)
+      let level = floor
       for (let index = 0; index < count; index += 1) {
-        holder.position.set(0, 0, arrow.start + index * arrow.gap)
+        // Each chevron rests on the ground ahead, ramps included
+        const reach = arrow.start + index * arrow.gap
+        level = groundFrom(
+          hole.pads,
+          ball.x + Math.sin(angle) * reach,
+          ball.z + Math.cos(angle) * reach,
+          level
+        )
+        holder.position.set(0, level - floor, reach)
         holder.scale.setScalar(1 - (index / arrow.chevrons) * arrow.shrink)
         holder.updateMatrix()
         chevrons.current.setMatrixAt(index, holder.matrix)
@@ -164,12 +180,12 @@ export const GolfAim = ({
     if (dots.current) {
       const line = aimGuide(hole, {
         from: [ball.x, ball.z],
-        floor: ball.y - physics.ballRadius,
+        floor,
         angle,
         power: shot.power,
       })
       const skip = arrow.start + arrow.chevrons * arrow.gap
-      layDots(dots.current, line, { height: ground, skip })
+      layDots(dots.current, line, { pads: hole.pads, floor, skip })
     }
   })
 

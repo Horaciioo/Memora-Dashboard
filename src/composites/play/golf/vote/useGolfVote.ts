@@ -3,8 +3,7 @@
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { playGolfSound } from '@/composites/play/golf/sound'
-import { winningCard } from '@/core/lib/play/golf'
-import type { GolfGameSettings, GolfVoteState } from '@/core/lib/play/golf'
+import type { PlayVoteState } from '@/core/lib/play/vote'
 import { preloadSounds } from '@/core/lib/play/sounds'
 import { GOLF_SOUNDS } from '@/declarations/play/golf/sounds'
 import { GOLF_VOTE_TIMING, GolfVoteActions } from '@/declarations/play/golf/vote'
@@ -19,10 +18,10 @@ const VOTE_SOUNDS = [
 ]
 
 export interface GolfVoteInput {
-  vote: GolfVoteState
-  settings: GolfGameSettings
+  vote: PlayVoteState
+  // Leading card of some picks
+  winner: (picks: Record<string, string>) => string
   viewerId: string
-  hostId: string
   isHost: boolean
   // Sends one action to the vote route
   onSend: (payload: Record<string, unknown>) => void
@@ -34,19 +33,12 @@ export interface GolfVoteInput {
  * @return {Object} - Picks, leading card and gestures
  */
 
-export const useGolfVote = ({
-  vote,
-  settings,
-  viewerId,
-  hostId,
-  isHost,
-  onSend,
-}: GolfVoteInput) => {
+export const useGolfVote = ({ vote, winner, viewerId, isHost, onSend }: GolfVoteInput) => {
   // Own pick, shown before the server answers
   const [mine, setMine] = useState<{ step: string; key: string } | null>(null)
   const timers = useRef<number[]>([])
   const picks = mine?.step === vote.step ? { ...vote.picks, [viewerId]: mine.key } : vote.picks
-  const leader = winningCard(vote.step, picks, hostId, settings)
+  const leader = winner(picks)
 
   // Files ready, timers cleared on leave
   useEffect(() => {

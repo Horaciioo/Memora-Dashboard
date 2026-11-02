@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+
 import { fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_STATS } from '@/declarations/ui/variants'
@@ -36,19 +38,45 @@ export const recordOf = ({ wins, draws, losses }: PlayTileTotals): string =>
 
 export const figuresOf = (
   totals: PlayTileTotals
-): { label: string; value: string | number; icon: keyof typeof ICONS }[] => [
-  { label: PLAY_HUB_COPY.statPlayed, value: totals.played, icon: 'play' },
+): { label: string; value: string | number; icon: keyof typeof ICONS; tone: string }[] => [
+  {
+    label: PLAY_HUB_COPY.statPlayed,
+    value: totals.played,
+    icon: 'play',
+    tone: '--play-baccalaureat',
+  },
   {
     label: PLAY_HUB_COPY.statWinRate,
     value: fillPlayMessage(PLAY_HUB_COPY.percent, {
       value: Math.round((totals.winRate ?? 0) * 100),
     }),
     icon: 'playStar',
+    tone: '--play-gold-deep',
   },
-  { label: PLAY_HUB_COPY.statRecord, value: recordOf(totals), icon: 'playStats' },
-  { label: PLAY_HUB_COPY.statStreak, value: totals.bestStreak, icon: 'playFlame' },
-  { label: PLAY_HUB_COPY.statTournaments, value: totals.tournamentsWon, icon: 'playTrophy' },
-  { label: PLAY_HUB_COPY.statTime, value: playTime(totals.playSeconds), icon: 'playClock' },
+  {
+    label: PLAY_HUB_COPY.statRecord,
+    value: recordOf(totals),
+    icon: 'playStats',
+    tone: '--play-golf',
+  },
+  {
+    label: PLAY_HUB_COPY.statStreak,
+    value: totals.bestStreak,
+    icon: 'playFlame',
+    tone: '--play-bomb',
+  },
+  {
+    label: PLAY_HUB_COPY.statTournaments,
+    value: totals.tournamentsWon,
+    icon: 'playTrophy',
+    tone: '--play-ludo',
+  },
+  {
+    label: PLAY_HUB_COPY.statTime,
+    value: playTime(totals.playSeconds),
+    icon: 'playClock',
+    tone: '--play-key',
+  },
 ]
 
 /**
@@ -64,7 +92,11 @@ export const PlayStatTiles = ({ totals }: { totals: PlayTileTotals }) => (
       const Icon = ICONS[tile.icon]
 
       return (
-        <div key={tile.label} className={PLAY_STATS.tile}>
+        <div
+          key={tile.label}
+          className={PLAY_STATS.tile}
+          style={{ '--tile': `var(${tile.tone})` } as CSSProperties}
+        >
           <span className={PLAY_STATS.tileIcon}>
             <Icon className={PLAY_STATS.glyph} aria-hidden="true" />
           </span>

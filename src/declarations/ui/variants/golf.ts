@@ -38,7 +38,7 @@ export const GOLF_BOARD = {
   settings: `${GLASS} absolute top-full right-0 z-10 mt-3 flex w-72 flex-col gap-1 p-3`,
   setting:
     'flex items-center justify-between gap-3 px-1 py-1.5 text-left text-base font-extrabold text-[var(--play-ink)]',
-  soundRow: 'flex items-center gap-3 px-1 py-1.5 text-base font-extrabold text-[var(--play-ink)]',
+  soundRow: 'flex flex-col gap-1 px-1 py-1.5 text-base font-extrabold text-[var(--play-ink)]',
   volume: 'min-w-0 flex-1 cursor-pointer accent-[var(--play-accent)]',
   // Players strip
   players: `${GLASS} pointer-events-auto hidden items-center gap-3 px-3 py-2 md:order-1 md:flex`,

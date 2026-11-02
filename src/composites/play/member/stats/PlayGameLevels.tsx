@@ -27,7 +27,9 @@ export const PlayGameLevels = ({ games }: { games: PlayProfileView['games'] }) =
             className={PLAY_STATS.game}
             style={{ '--game': `var(${PLAY_GAMES.get(entry.game).tone})` } as CSSProperties}
           >
-            <PlayGameLogo game={entry.game} className={PLAY_STATS.gameLogo} />
+            <span className={PLAY_STATS.gameBand}>
+              <PlayGameLogo game={entry.game} className={PLAY_STATS.gameLogo} />
+            </span>
             <div className={PLAY_STATS.gameText}>
               <span className={PLAY_STATS.gameHead}>
                 <span className={PLAY_STATS.gameName}>{PLAY_GAMES.label(entry.game)}</span>
