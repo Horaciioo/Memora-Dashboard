@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { PlaySignal } from '@/composites/play/hub/PlaySignal'
 import { PlayBackLink } from '@/composites/play/member/stats/PlayBackLink'
 import { PlayPlayerHero } from '@/composites/play/member/stats/PlayPlayerHero'
 import { openGameOfSlug, readPlayPlayer } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
+import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { PLAY_HUB } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -31,6 +33,7 @@ export default async function PlayPlayerGamePage({ params }: PlayPlayerGamePageP
 
   return (
     <div className={PLAY_HUB.main}>
+      <PlaySignal topic={PLAY_TOPICS.lobbies} />
       <PlayBackLink />
       <PlayPlayerHero totals={totals} player={found.player} subtitle={PLAY_GAMES.label(game)} />
     </div>

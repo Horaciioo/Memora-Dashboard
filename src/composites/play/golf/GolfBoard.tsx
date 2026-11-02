@@ -22,6 +22,7 @@ import { useGolfBoard } from '@/core/hooks/data/play/useGolfBoard'
 import { useGolfStroke } from '@/core/hooks/data/play/useGolfStroke'
 import { useGolfPowerCue } from '@/core/hooks/interaction/golf/useGolfPowerCue'
 import { useGolfPhase } from '@/core/hooks/interaction/golf/useGolfPhase'
+import { useServerAlarm } from '@/core/hooks/interaction/state/useServerAlarm'
 import {
   canPlaceAt,
   closestRival,
@@ -30,7 +31,7 @@ import {
   holesOf,
   strokeCeiling,
 } from '@/core/lib/play/golf'
-import type { GolfBoardView } from '@/core/lib/play/golf'
+import type { GolfBoardState, GolfBoardView } from '@/core/lib/play/golf'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_COURSES } from '@/declarations/play/golf/courses'
 import { golfHudTones } from '@/declarations/play/golf/paint'
@@ -56,6 +57,28 @@ export interface GolfBoardProps {
 }
 
 /**
+ * Board whose balls count as holed once they have stopped, not when the stroke is struck
+ * @param {GolfBoardState} board - Newest board
+ * @return {GolfBoardState} - Board as the screen tells it
+ */
+
+const useSettledBall = (board: GolfBoardState): GolfBoardState => {
+  const offset = board.serverTime - board.receivedAt
+  const now = useServerAlarm(
+    board.players.map((player) => (player.isHoled ? player.restsAt : null)),
+    offset,
+    board.receivedAt
+  )
+
+  return {
+    ...board,
+    players: board.players.map((player) =>
+      player.isHoled && player.restsAt > now ? { ...player, isHoled: false } : player
+    ),
+  }
+}
+
+/**
  * Golf course screen: the 3D hole with its cards, the scorecard between holes, the podium at the end
  * @param {GolfBoardProps} props - Board and table
  * @return {JSX.Element}
@@ -68,7 +91,8 @@ export const GolfBoard = ({
   viewerId,
   isSeated,
 }: GolfBoardProps) => {
-  const board = useGolfBoard(sessionId, initial)
+  const live = useGolfBoard(sessionId, initial)
+  const board = useSettledBall(live)
   const isFullscreen = usePlayStageStore((state) => state.isFullscreen)
   const phase = useGolfPhase(board)
   const layouts = holesOf(board.settings)

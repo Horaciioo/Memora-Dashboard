@@ -100,7 +100,7 @@ export const LudoBoard = ({
 }: LudoBoardProps) => {
   const board = useLudoBoard(sessionId, initial)
   const now = useServerNow(initial.serverTime)
-  const motion = useLudoMotion(board, viewerId)
+  const motion = useLudoMotion(board, viewerId, sessionId)
   const { act, isSaving } = usePlayAct(sessionId)
   // Revision a move was sent on: the board stays shut until a newer one is pushed
   const [sentRev, setSentRev] = useState<number | null>(null)

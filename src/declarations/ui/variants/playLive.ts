@@ -1,3 +1,5 @@
+import type { VoteLook } from '@/declarations/ui/variants/golf'
+
 // Glass of the Play boxes
 const GLASS = 'play-glass rounded-3xl'
 
@@ -7,13 +9,13 @@ const GLASS = 'play-glass rounded-3xl'
  */
 
 export const PLAY_LIVE = {
-  box: `${GLASS} flex min-h-0 flex-col gap-3 p-4`,
+  box: `${GLASS} flex min-h-0 flex-col gap-4 p-5`,
   head: 'flex items-center gap-2 px-1',
   pulse: 'play-live-dot size-2.5 shrink-0 rounded-full bg-[var(--play-live)]',
   title: 'text-sm font-extrabold tracking-wide text-[var(--play-ink)] uppercase',
   list: 'flex min-h-0 flex-col gap-2 overflow-y-auto',
   empty: 'px-1 py-6 text-center text-sm italic text-[var(--play-ink-faint)]',
-  card: 'flex flex-col gap-3 rounded-2xl bg-[var(--play-panel)] p-3 ring-1 ring-[var(--play-line)]',
+  card: 'flex flex-col gap-3.5 rounded-2xl bg-[var(--play-chip)] p-4 ring-1 ring-[var(--play-line)]',
   cardMine: 'ring-2 ring-[var(--play-key)]',
   top: 'flex items-center gap-3',
   logo: 'size-11 shrink-0',
@@ -21,25 +23,54 @@ export const PLAY_LIVE = {
   name: 'truncate text-sm font-extrabold text-[var(--play-ink)]',
   stage: 'text-xs font-bold text-[var(--play-ink-soft)]',
   stageLive: 'text-[var(--play-live)]',
-  bottom: 'flex items-center justify-between gap-3',
+  bottom: 'flex flex-wrap items-center justify-between gap-x-3 gap-y-2.5',
   faces: 'flex items-center -space-x-2',
   face: 'ring-2 ring-[var(--play-panel-strong)]',
   more: 'grid size-7 place-items-center rounded-full bg-[var(--play-chip)] text-[0.65rem] font-extrabold text-[var(--play-ink)] ring-2 ring-[var(--play-panel-strong)]',
-  count: 'ml-3 text-xs font-semibold tabular-nums text-[var(--play-ink-soft)]',
-  actions: 'flex shrink-0 items-center gap-2',
+  count: 'ml-3 whitespace-nowrap text-xs font-semibold tabular-nums text-[var(--play-ink-soft)]',
+  actions: 'ml-auto flex shrink-0 items-center gap-2',
 } as const
 
 /**
- * Launch vote of the games without a 3D course, tinted by the game key
- * @type {Record<string, string>}
+ * Launch vote of the games without a 3D course: soft tiles, round keys, tinted by the game key
+ * @type {VoteLook}
  */
 
-export const PLAY_VOTE = {
-  root: 'bg-[radial-gradient(60rem_40rem_at_50%_-10%,color-mix(in_srgb,var(--play-key)_45%,transparent),transparent_70%),var(--play-night)]',
-  title: 'text-white!',
-  glyph: 'text-white!',
-  main: 'bg-[var(--play-key)]!',
-} as const
+export const PLAY_VOTE: VoteLook = {
+  // Opaque full screen, the lobby never shows through
+  root: 'fixed inset-0 z-[80] overflow-y-auto bg-[var(--play-night)] bg-[radial-gradient(60rem_40rem_at_50%_-10%,color-mix(in_srgb,var(--play-key)_45%,transparent),transparent_70%)] text-white select-none',
+  stage:
+    'relative z-10 flex min-h-dvh flex-col items-center justify-center gap-10 px-4 pt-4 pb-8 sm:gap-14',
+  head: 'flex flex-col items-center gap-3',
+  title: 'golf-vote-title text-center text-4xl font-black tracking-tight text-white sm:text-5xl',
+  lead: 'golf-vote-title text-center text-base font-bold text-white/70 sm:text-lg',
+  deck: 'relative flex w-full flex-col items-center py-2 [--vote-card:clamp(6rem,12vw,11rem)] [--vote-gap:clamp(1rem,3vw,3rem)]',
+  band: 'hidden',
+  row: 'relative flex flex-wrap items-start justify-center gap-x-[var(--vote-gap)] gap-y-6 px-4',
+  card: 'golf-vote-card group/card relative flex w-[var(--vote-card)] flex-col items-center gap-3 outline-none',
+  face: 'relative grid aspect-square w-full place-items-center overflow-hidden rounded-[2rem] bg-[color-mix(in_srgb,var(--play-key)_40%,var(--play-night))] shadow-[0_0.5rem_0_rgb(0_0_0/0.28)] transition-[filter,translate] duration-150 group-hover/card:-translate-y-1 group-hover/card:brightness-110 group-focus-visible/card:ring-4 group-focus-visible/card:ring-white group-data-[picked=true]/card:bg-[var(--play-key)]',
+  faceOn: 'ring-4 ring-white',
+  faceFramed: 'ring-4 ring-white',
+  shot: 'size-full object-cover',
+  glyph: 'size-[58%] text-white drop-shadow-[0_3px_0_rgb(0_0_0/0.25)]',
+  number:
+    'text-[calc(var(--vote-card)*0.52)] leading-none font-black text-white [text-shadow:0_4px_0_rgb(0_0_0/0.25)]',
+  unit: 'absolute inset-x-0 bottom-[8%] text-center text-xs font-extrabold tracking-widest text-white/80 uppercase',
+  label: 'text-center text-lg font-extrabold text-white sm:text-2xl',
+  strip: 'w-full px-2 py-1 text-center text-sm font-extrabold text-white sm:text-base',
+  avatarBox:
+    'pointer-events-none absolute inset-x-0 bottom-full mb-2 flex flex-wrap items-end justify-center -space-x-1.5',
+  avatarRing: 'shadow-[0_0.25rem_0_rgb(0_0_0/0.3)]',
+  avatarName: 'absolute top-full mt-1 text-xs font-extrabold text-white/80',
+  timer:
+    'grid min-w-16 place-items-center rounded-full bg-white/12 px-5 py-2 text-3xl leading-none font-black tabular-nums text-white ring-1 ring-white/20',
+  timerLow: 'animate-pulse',
+  hint: 'golf-vote-title max-w-xl px-6 py-2 text-center text-base font-bold text-white/80',
+  actions: 'flex flex-wrap items-center justify-center gap-3',
+  button:
+    'min-h-12 rounded-full bg-white/12 px-8 text-base font-extrabold text-white shadow-[0_0.25rem_0_rgb(0_0_0/0.3)] ring-1 ring-white/20 transition-[filter,translate] hover:-translate-y-0.5 hover:brightness-125 disabled:pointer-events-none disabled:opacity-50',
+  buttonMain: 'bg-[var(--play-key)]!',
+}
 
 /**
  * Concept window of a game hub: a clip player, its steps, the golf powers

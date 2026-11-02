@@ -29,7 +29,6 @@ export const PLAY_HUB_COPY = {
   enter: 'Entrer dans le hub',
   create: 'Créer une partie',
   // Hub menu
-  menuLobbies: 'Rejoindre une partie',
   menuLeaders: 'Classement',
   menuStats: 'Voir mes stats',
   soon: 'Bientôt',
@@ -37,7 +36,6 @@ export const PLAY_HUB_COPY = {
   watch: 'Regarder',
   resume: 'Reprendre',
   current: 'Tu es dans une partie de {game}',
-  noLobby: 'Aucune partie ouverte, crée la tienne.',
   // Tables being played
   liveTitle: 'En ce moment',
   liveEmpty: 'Personne ne joue pour l’instant. Lance la première partie !',

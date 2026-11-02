@@ -15,10 +15,7 @@ import { cn } from '@/utils/classnames'
 import type { PlayGameName } from '@/utils/constants/play'
 
 // Panels the menu opens: games first, then the player's side
-const GAME_VIEWS = [
-  { key: 'lobbies', label: PLAY_HUB_COPY.menuLobbies },
-  { key: 'concept', label: PLAY_CONCEPT_COPY.menu },
-] as const
+const GAME_VIEWS = [{ key: 'concept', label: PLAY_CONCEPT_COPY.menu }] as const
 const PLAYER_VIEWS = [
   { key: 'leaders', label: PLAY_HUB_COPY.menuLeaders },
   { key: 'stats', label: PLAY_HUB_COPY.menuStats },

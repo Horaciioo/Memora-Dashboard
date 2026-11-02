@@ -11,6 +11,7 @@ import { EditableDetailGrid } from '@/components/structures/inline/EditableDetai
 import type { EditableEntry } from '@/components/structures/inline/EditableDetailGrid'
 import { useStartInterview } from '@/composites/recruitment/file/useStartInterview'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
+import { useClock } from '@/core/hooks/interaction/state/useClock'
 import { useObserving } from '@/core/hooks/data/recruitment/useObserving'
 import type { RecordFile } from '@/core/hooks/data/work/useRecordFile'
 import { pickedOptions } from '@/core/lib/forms/options'
@@ -85,24 +86,24 @@ export const CandidateTeam = ({ candidate, record }: CandidateTeamProps) => {
   const isRecruiter = candidate.recruiters.some((seat) => seat.id === can.viewerId)
   // A barred candidate is never taken in interview
   const isBarred = detail.bannedIds.includes(candidate.discordId)
-  const isJudged = candidate.verdictAt !== null || candidate.interviewEndedAt !== null
-  // The review waits for the final moment of the timeline
+  const now = useClock()
+  // The timeline decides the button: review once at the final moment, else start
   const states = candidateStates(
     progressOf(candidate, record.values),
     detail.outcomes,
-    candidate.stageMarks
+    candidate.stageMarks,
+    now
   )
-  const lead = isJudged
-    ? states.results === 'upcoming'
-      ? null
-      : {
+  const lead =
+    states.results !== 'upcoming'
+      ? {
           label: CANDIDATE_COPY.review,
           run: () => router.push(ROUTES.interview(detail.summary.id, candidate.id)),
         }
-    : {
-        label: candidate.interviewStartedAt ? CANDIDATE_COPY.resume : CANDIDATE_COPY.start,
-        run: () => startInterview(candidate.id),
-      }
+      : {
+          label: candidate.interviewStartedAt ? CANDIDATE_COPY.resume : CANDIDATE_COPY.start,
+          run: () => startInterview(candidate.id),
+        }
 
   // The animation plays on the gesture, not each time the file opens
   const [justJoined, setJustJoined] = useState(false)

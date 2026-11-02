@@ -15,7 +15,7 @@ import { GOLF_VOTE_COPY } from '@/declarations/play/golf/vote'
 import { PLAY_VOTE_STEPS } from '@/declarations/play/votes'
 import type { PlayVoteStepSpec } from '@/declarations/play/votes'
 import { ICONS } from '@/declarations/ui/icons'
-import { GOLF_VOTE, PLAY_VOTE } from '@/declarations/ui/variants'
+import { PLAY_VOTE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -33,9 +33,9 @@ const cardsOf = (spec: PlayVoteStepSpec): GolfVoteCard[] =>
       key: choice.key,
       label: choice.label,
       face: Icon ? (
-        <Icon className={cn(GOLF_VOTE.glyph, PLAY_VOTE.glyph)} aria-hidden="true" />
+        <Icon className={PLAY_VOTE.glyph} aria-hidden="true" />
       ) : (
-        <span className={GOLF_VOTE.number}>{choice.key}</span>
+        <span className={PLAY_VOTE.number}>{choice.key}</span>
       ),
     }
   })
@@ -72,32 +72,28 @@ const VoteScreen = ({
   if (!spec) return <></>
 
   return (
-    <div
-      className={cn(GOLF_VOTE.root, PLAY_VOTE.root)}
-      style={playKeysOf(game)}
-      role="dialog"
-      aria-label={spec.title}
-    >
-      <div className={GOLF_VOTE.stage}>
-        <div key={`head-${vote.step}`} className={GOLF_VOTE.head}>
-          <h2 className={cn(GOLF_VOTE.title, PLAY_VOTE.title)}>{spec.title}</h2>
-          <p className={GOLF_VOTE.lead}>{spec.lead}</p>
+    <div className={PLAY_VOTE.root} style={playKeysOf(game)} role="dialog" aria-label={spec.title}>
+      <div className={PLAY_VOTE.stage}>
+        <div key={`head-${vote.step}`} className={PLAY_VOTE.head}>
+          <h2 className={PLAY_VOTE.title}>{spec.title}</h2>
+          <p className={PLAY_VOTE.lead}>{spec.lead}</p>
         </div>
         <GolfVoteDeck
           key={vote.step}
           cards={cardsOf(spec)}
           value={leader}
           voters={voters}
+          look={PLAY_VOTE}
           onPick={pick}
         />
-        <p key={`hint-${leader}`} className={cn(GOLF_VOTE.hint, 'golf-vote-title')}>
+        <p key={`hint-${leader}`} className={PLAY_VOTE.hint}>
           {spec.choices.find((choice) => choice.key === leader)?.hint}
         </p>
-        <div className={GOLF_VOTE.actions}>
+        <div className={PLAY_VOTE.actions}>
           {isHost && (
             <button
               type="button"
-              className={GOLF_VOTE.button}
+              className={PLAY_VOTE.button}
               onClick={back}
               disabled={moves.isSaving}
             >
@@ -109,11 +105,12 @@ const VoteScreen = ({
             endsAt={vote.endsAt}
             serverTime={serverTime}
             onExpire={close}
+            look={PLAY_VOTE}
           />
           {isHost && (
             <button
               type="button"
-              className={cn(GOLF_VOTE.button, PLAY_VOTE.main)}
+              className={cn(PLAY_VOTE.button, PLAY_VOTE.buttonMain)}
               onClick={validate}
               disabled={moves.isSaving}
             >

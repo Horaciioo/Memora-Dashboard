@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import { GolfVoteAvatar } from '@/composites/play/golf/vote/GolfVoteAvatar'
 import type { GolfVoter } from '@/composites/play/golf/vote/GolfVoteAvatar'
 import { GOLF_VOTE } from '@/declarations/ui/variants'
+import type { VoteLook } from '@/declarations/ui/variants/golf'
 import { cn } from '@/utils/classnames'
 
 /**
@@ -26,6 +27,8 @@ export interface GolfVoteDeckProps {
   voters: GolfVoter[]
   // White frame on the picture, name on a green strip
   isCourse?: boolean
+  // Classes of the screen, Golf's by default
+  look?: VoteLook
   onPick: (key: string) => void
 }
 
@@ -40,6 +43,7 @@ export const GolfVoteDeck = ({
   value,
   voters,
   isCourse = false,
+  look = GOLF_VOTE,
   onPick,
 }: GolfVoteDeckProps) => {
   const positions = Object.fromEntries(
@@ -63,9 +67,9 @@ export const GolfVoteDeck = ({
   }
 
   return (
-    <div className={GOLF_VOTE.deck}>
-      <span className={GOLF_VOTE.band} />
-      <div className={GOLF_VOTE.row} role="radiogroup">
+    <div className={look.deck}>
+      <span className={look.band} />
+      <div className={look.row} role="radiogroup">
         {cards.map((card, position) => {
           const isOn = card.key === value
           const here = voters.filter((voter) => voter.key === card.key)
@@ -77,28 +81,27 @@ export const GolfVoteDeck = ({
               role="radio"
               aria-checked={isOn}
               aria-label={card.label}
-              className={GOLF_VOTE.card}
+              className={look.card}
               data-picked={isOn}
               style={{ '--i': position } as CSSProperties}
               onClick={() => onPick(card.key)}
             >
               {here.length > 0 && (
-                <span className={GOLF_VOTE.avatarBox}>
+                <span className={look.avatarBox}>
                   {here.map((voter) => (
-                    <GolfVoteAvatar key={voter.id} voter={voter} hops={hops[voter.id] ?? 0} />
+                    <GolfVoteAvatar
+                      key={voter.id}
+                      voter={voter}
+                      hops={hops[voter.id] ?? 0}
+                      look={look}
+                    />
                   ))}
                 </span>
               )}
-              <span
-                className={cn(
-                  GOLF_VOTE.face,
-                  isOn && GOLF_VOTE.faceOn,
-                  isCourse && GOLF_VOTE.faceFramed
-                )}
-              >
+              <span className={cn(look.face, isOn && look.faceOn, isCourse && look.faceFramed)}>
                 {card.face}
               </span>
-              <span className={isCourse ? GOLF_VOTE.strip : GOLF_VOTE.label}>{card.label}</span>
+              <span className={isCourse ? look.strip : look.label}>{card.label}</span>
             </button>
           )
         })}

@@ -20,6 +20,7 @@ import {
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { FloatingFocus } from '@/composites/search/assistant/FloatingFocus'
+import { useClock } from '@/core/hooks/interaction/state/useClock'
 import { useCandidateRecord } from '@/core/hooks/data/recruitment/useCandidateRecord'
 import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
 import { candidateStates, progressOf } from '@/core/lib/recruitment/candidateTimeline'
@@ -58,7 +59,7 @@ const CandidateBody = ({
   const record = useCandidateRecord(candidate)
 
   const progress = progressOf(candidate, record.values)
-  const states = candidateStates(progress, detail.outcomes, candidate.stageMarks)
+  const states = candidateStates(progress, detail.outcomes, candidate.stageMarks, useClock())
 
   const back = `${ROUTES.recruitment(detail.summary.id)}?${CANDIDATE_TAB_PARAM}=candidates`
 
