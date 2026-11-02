@@ -7,6 +7,7 @@ export const CALENDAR_COPY = {
   title: 'Calendrier',
   lead: 'Ce qui est prévu cette semaine et ce mois-ci, filtré sur ce que tu as le droit de voir.',
   add: 'Poser un évènement',
+  addAnother: 'Créer un autre évènement',
   requestMeeting: 'Demander un rendez-vous',
   requestSend: 'Envoyer',
   requestSent: 'Demande envoyée à tes responsables',

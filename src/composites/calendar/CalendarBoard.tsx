@@ -14,6 +14,7 @@ import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/page/Section'
 import { CalendarDetail } from '@/composites/calendar/CalendarDetail'
+import { CalendarDaySheet } from '@/composites/calendar/CalendarDaySheet'
 import { CalendarAgenda } from '@/composites/calendar/CalendarAgenda'
 import { groupOpenSlots } from '@/core/lib/calendar/slotRanges'
 import { PeriodFrameLayer } from '@/composites/calendar/PeriodFrameLayer'
@@ -23,6 +24,7 @@ import { ZoneTitleLayer } from '@/composites/calendar/ZoneTitleLayer'
 import { chunkDays, zoneTitleSpots } from '@/core/lib/calendar/zoneTitles'
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
 import { CalendarMobileBar } from '@/composites/calendar/CalendarMobileBar'
+import { MobileDayDots } from '@/composites/calendar/MobileDayDots'
 import { MobilePeriodBars } from '@/composites/calendar/MobilePeriodBars'
 import { MeetingRequest } from '@/composites/calendar/MeetingRequest'
 import type { CalendarSidebarProps } from '@/composites/calendar/CalendarSidebar'
@@ -242,11 +244,17 @@ export const CalendarBoard = ({
 
   const days = useMemo(() => unitGrid(cursor, unit), [cursor, unit])
 
+  // Day of the phone month whose list is open
+  const [pickedDay, setPickedDay] = useState<string | null>(null)
+
   // A day number opens that day on its own
   const openDay = (dayKey: string) => {
     setCursor(dayKey)
     setUnit('day')
   }
+
+  // A phone month lists the day in a sheet
+  const pickDay = (dayKey: string) => (isMobile ? setPickedDay(dayKey) : openDay(dayKey))
 
   // A swipe steps the period
   const { handlers: swipe, axisStyle } = useSwipe({
@@ -597,16 +605,13 @@ export const CalendarBoard = ({
               unit={unit}
               units={MOBILE_UNITS}
               onUnit={setUnit}
-              cursor={cursor}
-              onCursor={setCursor}
               onToday={() => setCursor(toDayKey(new Date()))}
               isLoading={calendar.isLoading}
               youtubers={youtubers}
               soloId={soloId}
               onSolo={soloCreator}
               railProps={sessionId ? undefined : railProps}
-              extra={!canManage ? <MeetingRequest /> : undefined}
-            />
+                          />
 
             <div className={CALENDAR_STYLES.toolbar}>
               <div className={CALENDAR_STYLES.toolbarMain}>
@@ -827,11 +832,11 @@ export const CalendarBoard = ({
                                 {...(canManage ? containerProps(day.key) : {})}
                                 {...slotProps(day.key)}
                                 onMouseEnter={() => setHoverDay(day.key)}
-                                onClick={isMobile ? () => openDay(day.key) : undefined}
+                                onClick={isMobile ? () => pickDay(day.key) : undefined}
                               >
                                 <button
                                   type="button"
-                                  onClick={() => openDay(day.key)}
+                                  onClick={() => pickDay(day.key)}
                                   className={cn(
                                     CALENDAR_STYLES.dayNumber,
                                     CALENDAR_STYLES.dayNumberButton,
@@ -868,14 +873,18 @@ export const CalendarBoard = ({
                                 )}
                                 {renderZoneLabels(day.key)}
                                 {renderBands(day.key)}
-                                {shown.map((entry) => renderCard(entry, day.key, true))}
+                                {isMobile ? (
+                                  <MobileDayDots entries={shown} />
+                                ) : (
+                                  shown.map((entry) => renderCard(entry, day.key, true))
+                                )}
                                 {hiddenCount > 0 && (
                                   <button
                                     type="button"
-                                    onClick={() => openDay(day.key)}
+                                    onClick={() => pickDay(day.key)}
                                     className={CALENDAR_STYLES.overflow}
                                   >
-                                    <span className="md:hidden">•••</span>
+                                    <span className="md:hidden">{`+${hiddenCount}`}</span>
                                     <span className="hidden md:inline">
                                       {`+${hiddenCount}`}
                                       <span className="hidden sm:inline">
@@ -898,6 +907,27 @@ export const CalendarBoard = ({
           </div>
         </div>
       </Section>
+
+      <CalendarDaySheet
+        dayKey={pickedDay}
+        entries={visible}
+        selection={selection}
+        canManage={canManage}
+        onOpen={(entry, additive) => {
+          setPickedDay(null)
+          openEntry(entry, additive)
+        }}
+        onCreate={(dayKey) => {
+          setPickedDay(null)
+          openForm(null, {
+            startsAt: toFieldValue(
+              dayBounds(dayKey, CALENDAR_SETTINGS.dayStartHour, CALENDAR_SETTINGS.dayEndHour)
+                .startsAt
+            ),
+          })
+        }}
+        onClose={() => setPickedDay(null)}
+      />
 
       {canManage && (
         <FloatingAdd

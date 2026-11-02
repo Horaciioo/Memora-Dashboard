@@ -128,14 +128,6 @@ export const CALENDAR_MOBILE = {
   today:
     'touch-target flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border-2 border-[var(--color-ink)] text-sm font-bold tabular-nums',
   creator: '!w-auto shrink-0 rounded-full border-0 p-0.5',
-  // Months to jump to, scrolled sideways
-  strip:
-    '-mx-4 flex snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden items-center gap-2 overflow-x-auto px-4 sm:-mx-6 sm:px-6',
-  month:
-    'flex min-h-9 shrink-0 snap-start items-center rounded-full border border-[var(--color-border-strong)] px-4 text-sm font-medium transition-colors',
-  monthActive:
-    'border-transparent bg-[var(--color-brand-soft)] text-[var(--color-ink-accent)] font-bold',
-  year: 'shrink-0 px-1 text-sm font-bold tabular-nums',
   // Week of a phone month: bars of the periods lie under the day numbers
   lanes: 'pointer-events-none absolute inset-x-0 top-7 z-[3] grid auto-rows-5 gap-y-0.5 md:hidden',
   lane: 'pointer-events-auto chip-solid truncate px-1 text-left text-micro font-semibold leading-5',
@@ -143,6 +135,12 @@ export const CALENDAR_MOBILE = {
   laneCloses: 'mr-0.5 rounded-r-[var(--radius-sm)]',
   // Gap kept under the day number for the bars of the week
   laneSpacer: 'shrink-0 md:hidden',
+  // Sheet of a touched day
+  sheetTitle: 'text-lg font-bold first-letter:uppercase',
+  sheetBody: 'flex flex-col gap-4',
+  // One dot per entry of a day, wrapped under its number
+  dots: 'flex flex-wrap justify-center gap-1 px-0.5',
+  dot: 'size-2 rounded-full bg-[var(--accent-mobile)]',
   // Dots standing for the entries that do not fit
   overflow: 'text-center text-xs leading-none tracking-widest text-[var(--color-ink-subtle)]',
 } as const
@@ -431,7 +429,7 @@ export const CALENDAR_STYLES = {
   month: 'flex flex-col',
   // One week of the month, titles lie over its seven days
   monthWeek: 'relative grid grid-cols-7',
-  day: 'group relative flex min-h-24 flex-col gap-1 overflow-hidden md:touch-none border-r border-b border-[var(--color-border)] p-0.5 last:border-r-0 sm:p-1.5 md:min-h-28',
+  day: 'group relative flex min-h-16 flex-col gap-1 overflow-hidden md:touch-none border-r border-b border-[var(--color-border)] p-0.5 last:border-r-0 sm:min-h-24 sm:p-1.5 md:min-h-28',
   dayOutside: 'bg-[var(--color-surface)]/50',
   dayDrafted: 'ring-2 ring-[var(--color-pick)] ring-inset',
   dayNumber:
