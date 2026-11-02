@@ -217,6 +217,38 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Ajout de réglages de confort dans « Paramètres » : fond du cadre, cartes, arrondis (francs par défaut), interligne, liens soulignés, animations et repère du clavier.',
       },
       {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout de la possibilité de modifier une page privée à plusieurs en même temps : les changements des autres apparaissent aussitôt, avec le curseur de chacun repéré par son avatar.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout de la présence sur une page privée : les avatars des membres qui la lisent s’affichent en haut de la page.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout d’un « Historique des versions » pour les pages privées : lire une ancienne version, voir ce qui a changé depuis, puis la restaurer.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout de la possibilité de répondre à un commentaire d’une page privée, son auteur reçoit une notification « Réponse ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Ajout de la présence sur un entretien : les avatars des recruteurs qui le suivent s’affichent, avec la question sur laquelle chacun se trouve.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité de demander à rejoindre une partie déjà lancée : la demande s’affiche dans le chat de la partie.',
+      },
+      {
         tag: ChangelogTags.Improved,
         page: ROUTES.home,
         text: 'Amélioration de l’accueil : la salutation et les raccourcis laissent place à des cartes « Les nouveautés » plus compactes, selon tes accès, et les tâches urgentes ne sont plus écrites en rouge.',
@@ -260,6 +292,21 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Improved,
         text: 'Amélioration visuelle de Memora : onglets et sélecteurs aux angles plus francs, verre des surfaces adouci.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.pages,
+        text: 'Amélioration des pages privées : une modification faite en même temps par deux personnes ne demande plus de choisir une version, les changements se fondent ensemble.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration de « Recrutements » : l’issue « En délibération » disparaît, les candidats concernés passent en « Mitigé ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration du menu du compte : les dernières notifications s’y affichent, et le thème se change d’un clic sur la rangée des réglages.',
       },
       {
         tag: ChangelogTags.Fixed,
