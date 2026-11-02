@@ -83,7 +83,7 @@ self.addEventListener('message', (event) => {
 })
 
 /**
- * Page from the network, the fallback page once it fails
+ * Page from the network
  * @param {FetchEvent} event - Navigation
  * @return {Promise<Response>} - Page
  */
@@ -167,7 +167,7 @@ const receive = async (event: PushEvent): Promise<void> => {
   const isFocused = windows.some((window) => window.focused)
   if (payload && staysQuiet(isFocused, navigator.userAgent)) return
 
-  // A push always ends on screen, an unreadable one included
+  // A push always ends on screen
   await self.registration.showNotification(payload?.title ?? INSTALL_COPY.name, {
     body: payload?.body ?? NOTIFICATION_COPY.metaUnread,
     tag: payload?.tag,
@@ -183,7 +183,7 @@ self.addEventListener('push', (event) => {
 })
 
 /**
- * Open the page a notification points at, in a Memora window when one is open
+ * Open the page a notification points at
  * @param {PushPayload | null} payload - Clicked push
  * @return {Promise<void>} - Opened
  */
