@@ -18,7 +18,12 @@ export const PUT = createProtectedRoute({
       viewerId: session.id,
     })
     const patch = readAnswerPatch(raw)
-    const { sessionId, created, answer } = await saveAnswer(params.id, params.key, patch, await scope())
+    const { sessionId, created, answer } = await saveAnswer(
+      params.id,
+      params.key,
+      patch,
+      await scope()
+    )
     // Readers first, the journal can wait
     await signalAnswer({ sessionId, candidateId: params.id, key: params.key, answer })
 

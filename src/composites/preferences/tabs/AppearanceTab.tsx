@@ -29,10 +29,7 @@ export const AppearanceTab = () => (
     <SettingsGroup title={SETTINGS_GROUP_COPY.shape}>
       <ComfortCards settingKey="radius" />
     </SettingsGroup>
-    <SettingsGroup
-      title={PREFERENCES_COPY.colorVisionTitle}
-      maturity="beta"
-    >
+    <SettingsGroup title={PREFERENCES_COPY.colorVisionTitle} maturity="beta">
       <ColorVisionPreferences />
     </SettingsGroup>
   </div>

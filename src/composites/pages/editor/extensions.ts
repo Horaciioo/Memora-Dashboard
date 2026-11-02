@@ -98,8 +98,10 @@ export const pageEditorExtensions = (
     }),
   }),
   ...pageSchemaExtensions().map((extension) => {
-    if (extension.name === Callout.name) return Callout.extend({ addNodeView: () => ReactNodeViewRenderer(CalloutView) })
-    if (extension.name === Subpage.name) return Subpage.extend({ addNodeView: () => ReactNodeViewRenderer(SubpageView) })
+    if (extension.name === Callout.name)
+      return Callout.extend({ addNodeView: () => ReactNodeViewRenderer(CalloutView) })
+    if (extension.name === Subpage.name)
+      return Subpage.extend({ addNodeView: () => ReactNodeViewRenderer(SubpageView) })
 
     return extension
   }),

@@ -30,12 +30,17 @@ const openStore = (): Promise<IDBDatabase | null> =>
  * @return {Promise<T | null>} - Result
  */
 
-const withTable = async <T>(mode: IDBTransactionMode, run: (table: IDBObjectStore) => IDBRequest<T>): Promise<T | null> => {
+const withTable = async <T>(
+  mode: IDBTransactionMode,
+  run: (table: IDBObjectStore) => IDBRequest<T>
+): Promise<T | null> => {
   const database = await openStore()
   if (!database) return null
 
   return new Promise((resolve) => {
-    const request = run(database.transaction(PAGE_OFFLINE_STORE.table, mode).objectStore(PAGE_OFFLINE_STORE.table))
+    const request = run(
+      database.transaction(PAGE_OFFLINE_STORE.table, mode).objectStore(PAGE_OFFLINE_STORE.table)
+    )
     request.onsuccess = () => resolve(request.result)
     request.onerror = () => resolve(null)
   })
@@ -73,9 +78,12 @@ export const pruneOfflinePages = async (accountId: string): Promise<void> => {
  * @return {Promise<OfflineEntry | null>} - Copy
  */
 
-export const readOfflinePage = async (accountId: string, pageId: string): Promise<OfflineEntry | null> =>
-  ((await withTable('readonly', (table) => table.get(offlineKey(accountId, pageId)))) as OfflineEntry | undefined) ??
-  null
+export const readOfflinePage = async (
+  accountId: string,
+  pageId: string
+): Promise<OfflineEntry | null> =>
+  ((await withTable('readonly', (table) => table.get(offlineKey(accountId, pageId)))) as
+    OfflineEntry | undefined) ?? null
 
 /**
  * Pages readable offline, newest first; one account at a time lives here

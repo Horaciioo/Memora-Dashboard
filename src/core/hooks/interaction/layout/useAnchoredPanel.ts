@@ -80,9 +80,7 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
       const height = panel.offsetHeight
       const room = window.innerHeight - trigger.bottom - EDGE_MARGIN
       const above = trigger.top - EDGE_MARGIN
-      const flip = prefersAbove
-        ? height <= above || above > room
-        : height > room && above > room
+      const flip = prefersAbove ? height <= above || above > room : height > room && above > room
 
       // Panel shrinks to the side it sits on
       const space = (flip ? above : room) - PANEL_GAP

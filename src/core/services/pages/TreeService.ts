@@ -27,16 +27,22 @@ export const movePage = async (
   input: { parentId: unknown; categoryId?: unknown; position: unknown }
 ): Promise<PageSummary> => {
   const { page } = await requirePage(pageId, viewer, 'organize')
-  const owner = await prisma.page.findUniqueOrThrow({ where: { id: page.id }, select: { ownerId: true } })
+  const owner = await prisma.page.findUniqueOrThrow({
+    where: { id: page.id },
+    select: { ownerId: true },
+  })
 
   // The destination takes writes from the mover
-  const parentId = input.parentId ? (await requirePage(input.parentId, viewer, 'write')).page.id : null
+  const parentId = input.parentId
+    ? (await requirePage(input.parentId, viewer, 'write')).page.id
+    : null
   if (parentId && (await loadChain(parentId)).some((row) => row.id === page.id)) {
     throw invalidInput([{ field: 'parentId', message: PAGE_DOCUMENT_COPY.moveLoop }])
   }
 
   // A category holds root pages of its owner
-  const categoryId = !parentId && input.categoryId ? (await requireCategory(input.categoryId, viewer)).id : null
+  const categoryId =
+    !parentId && input.categoryId ? (await requireCategory(input.categoryId, viewer)).id : null
   if (categoryId && owner.ownerId !== viewer.id) throw forbidden()
 
   const siblings = await prisma.page.findMany({
@@ -50,8 +56,15 @@ export const movePage = async (
   })
 
   // Renumber the new sibling row
-  const index = typeof input.position === 'number' ? Math.max(0, Math.min(siblings.length, Math.floor(input.position))) : siblings.length
-  const order = [...siblings.slice(0, index).map((row) => row.id), page.id, ...siblings.slice(index).map((row) => row.id)]
+  const index =
+    typeof input.position === 'number'
+      ? Math.max(0, Math.min(siblings.length, Math.floor(input.position)))
+      : siblings.length
+  const order = [
+    ...siblings.slice(0, index).map((row) => row.id),
+    page.id,
+    ...siblings.slice(index).map((row) => row.id),
+  ]
 
   await prisma.$transaction([
     prisma.page.update({ where: { id: page.id }, data: { parentId, categoryId } }),
@@ -66,7 +79,10 @@ export const movePage = async (
     payload: { from: page.parentId, to: parentId, categoryId },
   })
 
-  const row = await prisma.page.findUniqueOrThrow({ where: { id: page.id }, select: SUMMARY_SELECT })
+  const row = await prisma.page.findUniqueOrThrow({
+    where: { id: page.id },
+    select: SUMMARY_SELECT,
+  })
 
   return toSummary(row, viewer.id)
 }

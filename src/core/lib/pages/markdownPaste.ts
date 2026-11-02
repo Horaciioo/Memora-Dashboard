@@ -39,10 +39,17 @@ export const inlineNodes = (line: string): PageDocument[] =>
 
       // Wrapped mark
       const wrapper = WRAPPERS.find(
-        (entry) => part.length > entry.open.length * 2 && part.startsWith(entry.open) && part.endsWith(entry.close)
+        (entry) =>
+          part.length > entry.open.length * 2 &&
+          part.startsWith(entry.open) &&
+          part.endsWith(entry.close)
       )
       if (wrapper) {
-        return { type: 'text', text: part.slice(wrapper.open.length, -wrapper.close.length), marks: [{ type: wrapper.mark }] }
+        return {
+          type: 'text',
+          text: part.slice(wrapper.open.length, -wrapper.close.length),
+          marks: [{ type: wrapper.mark }],
+        }
       }
 
       return { type: 'text', text: part }
@@ -56,7 +63,11 @@ export const inlineNodes = (line: string): PageDocument[] =>
  * @return {PageDocument} - Textblock
  */
 
-const textblock = (text: string, type = 'paragraph', attrs?: Record<string, unknown>): PageDocument => {
+const textblock = (
+  text: string,
+  type = 'paragraph',
+  attrs?: Record<string, unknown>
+): PageDocument => {
   const content = inlineNodes(text)
 
   return { type, ...(attrs ? { attrs } : {}), ...(content.length > 0 ? { content } : {}) }
@@ -68,7 +79,10 @@ const SINGLE: Partial<Record<EditorBlockKind, (block: EditorBlock) => PageDocume
   heading1: (block) => textblock(block.text, 'heading', { level: 1 }),
   heading2: (block) => textblock(block.text, 'heading', { level: 2 }),
   heading3: (block) => textblock(block.text, 'heading', { level: 3 }),
-  code: (block) => ({ type: 'codeBlock', ...(block.text ? { content: [{ type: 'text', text: block.text }] } : {}) }),
+  code: (block) => ({
+    type: 'codeBlock',
+    ...(block.text ? { content: [{ type: 'text', text: block.text }] } : {}),
+  }),
   rule: () => ({ type: 'horizontalRule' }),
 }
 
@@ -83,15 +97,24 @@ const listEntry = (block: EditorBlock): { list: string; item: PageDocument } => 
   if (task) {
     return {
       list: 'taskList',
-      item: { type: 'taskItem', attrs: { checked: task[1] !== ' ' }, content: [textblock(task[2] ?? '')] },
+      item: {
+        type: 'taskItem',
+        attrs: { checked: task[1] !== ' ' },
+        content: [textblock(task[2] ?? '')],
+      },
     }
   }
 
-  const list = { bullet: 'bulletList', numbered: 'orderedList', quote: 'blockquote' }[block.kind as 'bullet']
+  const list = { bullet: 'bulletList', numbered: 'orderedList', quote: 'blockquote' }[
+    block.kind as 'bullet'
+  ]
 
   return {
     list,
-    item: list === 'blockquote' ? textblock(block.text) : { type: 'listItem', content: [textblock(block.text)] },
+    item:
+      list === 'blockquote'
+        ? textblock(block.text)
+        : { type: 'listItem', content: [textblock(block.text)] },
   }
 }
 
@@ -109,7 +132,8 @@ export const markdownToBlocks = (source: string): PageDocument[] =>
     // Consecutive items share their list
     const { list, item } = listEntry(block)
     const last = nodes.at(-1)
-    if (last?.type === list) return [...nodes.slice(0, -1), { ...last, content: [...(last.content ?? []), item] }]
+    if (last?.type === list)
+      return [...nodes.slice(0, -1), { ...last, content: [...(last.content ?? []), item] }]
 
     return [...nodes, { type: list, content: [item] }]
   }, [])
@@ -121,4 +145,5 @@ export const markdownToBlocks = (source: string): PageDocument[] =>
  */
 
 export const looksLikeMarkdown = (text: string): boolean =>
-  /^(#{1,3}\s|[-*]\s|\d+[.)]\s|>\s|```|---\s*$)/m.test(text) || /\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\)/.test(text)
+  /^(#{1,3}\s|[-*]\s|\d+[.)]\s|>\s|```|---\s*$)/m.test(text) ||
+  /\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\)/.test(text)

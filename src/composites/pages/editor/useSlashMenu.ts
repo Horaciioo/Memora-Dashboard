@@ -67,7 +67,10 @@ export const useSlashMenu = (editor: Editor | null, context: BlockCommandContext
       const count = Math.max(kinds.length, 1)
 
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-        setMenu({ ...menu, index: (menu.index + (event.key === 'ArrowDown' ? 1 : -1) + count) % count })
+        setMenu({
+          ...menu,
+          index: (menu.index + (event.key === 'ArrowDown' ? 1 : -1) + count) % count,
+        })
         return true
       }
       if (event.key === 'Enter' && kinds[menu.index]) {
@@ -85,7 +88,10 @@ export const useSlashMenu = (editor: Editor | null, context: BlockCommandContext
     [menu, pick]
   )
 
-  const hover = useCallback((index: number) => setMenu((current) => (current ? { ...current, index } : current)), [])
+  const hover = useCallback(
+    (index: number) => setMenu((current) => (current ? { ...current, index } : current)),
+    []
+  )
 
   return { menu, refresh, pick, onKey, hover }
 }

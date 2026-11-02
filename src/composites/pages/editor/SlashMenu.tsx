@@ -40,7 +40,9 @@ export const PageSlashMenu = ({ query, activeIndex, rect, onPick, onHover }: Sla
       }
       onMouseDown={(event) => event.preventDefault()}
     >
-      {kinds.length === 0 && <p className={BLOCK_EDITOR.slashEmpty}>{PAGE_EDITOR_COPY.slashEmpty}</p>}
+      {kinds.length === 0 && (
+        <p className={BLOCK_EDITOR.slashEmpty}>{PAGE_EDITOR_COPY.slashEmpty}</p>
+      )}
 
       {kinds.map((kind, index) => {
         const block = PAGE_BLOCKS.get(kind)
@@ -59,7 +61,10 @@ export const PageSlashMenu = ({ query, activeIndex, rect, onPick, onHover }: Sla
             }}
             onMouseEnter={() => onHover(index)}
             onClick={() => onPick(kind)}
-            className={cn(BLOCK_EDITOR.slashItem, isActive ? BLOCK_EDITOR.slashItemActive : BLOCK_EDITOR.slashItemIdle)}
+            className={cn(
+              BLOCK_EDITOR.slashItem,
+              isActive ? BLOCK_EDITOR.slashItemActive : BLOCK_EDITOR.slashItemIdle
+            )}
           >
             <span className={BLOCK_EDITOR.slashTile}>
               <Glyph className={BLOCK_EDITOR.slashGlyph} aria-hidden="true" />

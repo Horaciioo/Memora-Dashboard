@@ -28,7 +28,9 @@ export interface SharePanelProps {
  */
 
 const shareHint = (share: PageShare): string | null =>
-  share.fromPage ? PAGE_SHARE_COPY.inheritedFrom.replace('{parent}', share.fromPage.title || PAGES_COPY.untitled) : null
+  share.fromPage
+    ? PAGE_SHARE_COPY.inheritedFrom.replace('{parent}', share.fromPage.title || PAGES_COPY.untitled)
+    : null
 
 /**
  * Share popover: invite, general access, who has access
@@ -50,7 +52,12 @@ export const SharePanel = ({ page, onClose }: SharePanelProps) => {
   const workspace = own.find((entry) => entry.scope === PageShareScopes.Workspace)
 
   return (
-    <div ref={boundary} role="dialog" aria-label={PAGE_SHARE_COPY.title} className={SHARE_PANEL_STYLES.panel}>
+    <div
+      ref={boundary}
+      role="dialog"
+      aria-label={PAGE_SHARE_COPY.title}
+      className={SHARE_PANEL_STYLES.panel}
+    >
       {canShare && (
         <ShareInvite
           excluded={[...own.map((entry) => entry.accountId ?? ''), sharing?.owner.id ?? '']}
@@ -67,9 +74,18 @@ export const SharePanel = ({ page, onClose }: SharePanelProps) => {
           control={
             canShare &&
             (workspace ? (
-              <LevelSelect value={workspace.level} ceiling={ceiling} onChange={(next) => void share({ scope: 'WORKSPACE' }, next)} onRemove={() => void unshare(workspace.id)} />
+              <LevelSelect
+                value={workspace.level}
+                ceiling={ceiling}
+                onChange={(next) => void share({ scope: 'WORKSPACE' }, next)}
+                onRemove={() => void unshare(workspace.id)}
+              />
             ) : (
-              <button type="button" className={SHARE_PANEL_STYLES.link} onClick={() => void share({ scope: 'WORKSPACE' }, 'VIEW')}>
+              <button
+                type="button"
+                className={SHARE_PANEL_STYLES.link}
+                onClick={() => void share({ scope: 'WORKSPACE' }, 'VIEW')}
+              >
                 {PAGE_SHARE_COPY.workspaceEnable}
               </button>
             ))
@@ -96,9 +112,25 @@ export const SharePanel = ({ page, onClose }: SharePanelProps) => {
               icon={entry.scope === PageShareScopes.Role ? 'roles' : undefined}
               control={
                 canShare ? (
-                  <LevelSelect value={entry.level} ceiling={ceiling} onChange={(next) => void share({ scope: entry.scope, accountId: entry.accountId ?? undefined, role: entry.role ?? undefined }, next)} onRemove={() => void unshare(entry.id)} />
+                  <LevelSelect
+                    value={entry.level}
+                    ceiling={ceiling}
+                    onChange={(next) =>
+                      void share(
+                        {
+                          scope: entry.scope,
+                          accountId: entry.accountId ?? undefined,
+                          role: entry.role ?? undefined,
+                        },
+                        next
+                      )
+                    }
+                    onRemove={() => void unshare(entry.id)}
+                  />
                 ) : (
-                  <span className={SHARE_PANEL_STYLES.fixed}>{PAGE_LEVELS.get(entry.level).label}</span>
+                  <span className={SHARE_PANEL_STYLES.fixed}>
+                    {PAGE_LEVELS.get(entry.level).label}
+                  </span>
                 )
               }
             />
@@ -108,17 +140,35 @@ export const SharePanel = ({ page, onClose }: SharePanelProps) => {
             key={entry.id}
             name={entry.name}
             image={entry.image}
-            icon={entry.scope === PageShareScopes.Account ? undefined : entry.scope === PageShareScopes.Role ? 'roles' : 'globe'}
+            icon={
+              entry.scope === PageShareScopes.Account
+                ? undefined
+                : entry.scope === PageShareScopes.Role
+                  ? 'roles'
+                  : 'globe'
+            }
             hint={shareHint(entry)}
-            control={<span className={SHARE_PANEL_STYLES.fixed}>{PAGE_LEVELS.get(entry.level).label}</span>}
+            control={
+              <span className={SHARE_PANEL_STYLES.fixed}>{PAGE_LEVELS.get(entry.level).label}</span>
+            }
           />
         ))}
       </ul>
 
       {sharing?.parent && (
         <div className={SHARE_PANEL_STYLES.inherit}>
-          <Toggle label={PAGE_SHARE_COPY.inherit} checked={sharing.inheritAccess} disabled={!canShare} onChange={(next) => void setInherit(next)} />
-          <p className={SHARE_PANEL_STYLES.hint}>{PAGE_SHARE_COPY.inheritHint.replace('{parent}', sharing.parent.title || PAGES_COPY.untitled)}</p>
+          <Toggle
+            label={PAGE_SHARE_COPY.inherit}
+            checked={sharing.inheritAccess}
+            disabled={!canShare}
+            onChange={(next) => void setInherit(next)}
+          />
+          <p className={SHARE_PANEL_STYLES.hint}>
+            {PAGE_SHARE_COPY.inheritHint.replace(
+              '{parent}',
+              sharing.parent.title || PAGES_COPY.untitled
+            )}
+          </p>
         </div>
       )}
 

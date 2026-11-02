@@ -38,7 +38,9 @@ export const useQuestionnaire = (
     const wanted = new Set(keys)
     // A fold family comes whole, whichever of its members was kept
     const families = new Set(
-      bank.flatMap((question) => (wanted.has(question.key) && question.family ? [question.family] : []))
+      bank.flatMap((question) =>
+        wanted.has(question.key) && question.family ? [question.family] : []
+      )
     )
 
     return {

@@ -56,7 +56,10 @@ export const usePageActions = (): PageActions => {
   const { notify, notifyError } = useNotifications()
 
   // Every page list reloads
-  const refresh = useCallback(() => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.pages }), [queryClient])
+  const refresh = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.pages }),
+    [queryClient]
+  )
 
   const attempt = useCallback(
     async <T>(action: () => Promise<T>, success?: string): Promise<T | null> => {

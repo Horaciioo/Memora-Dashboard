@@ -48,7 +48,12 @@ export const trashPage = async (pageId: unknown, viewer: PageViewer): Promise<{ 
     data: { trashedAt: new Date(), trashedById: viewer.id, trashRootId: page.id },
   })
 
-  await journalPage({ eventType: 'PageTrashed', actorId: viewer.id, pageId: page.id, summary: page.title })
+  await journalPage({
+    eventType: 'PageTrashed',
+    actorId: viewer.id,
+    pageId: page.id,
+    summary: page.title,
+  })
   await signalAccess()
 
   return { id: page.id }
@@ -63,7 +68,10 @@ export const trashPage = async (pageId: unknown, viewer: PageViewer): Promise<{ 
 
 export const restorePage = async (pageId: unknown, viewer: PageViewer): Promise<{ id: string }> => {
   const { page, chain } = await requirePage(pageId, viewer, 'trash', { allowTrashed: true })
-  const row = await prisma.page.findUniqueOrThrow({ where: { id: page.id }, select: { trashRootId: true } })
+  const row = await prisma.page.findUniqueOrThrow({
+    where: { id: page.id },
+    select: { trashRootId: true },
+  })
   if (!page.trashedAt || !row.trashRootId) throw notFound()
 
   // Same sweep, under this page
@@ -76,10 +84,17 @@ export const restorePage = async (pageId: unknown, viewer: PageViewer): Promise<
       data: { trashedAt: null, trashedById: null, trashRootId: null },
     }),
     // A parent still in the trash lets go
-    ...(isParentGone ? [prisma.page.update({ where: { id: page.id }, data: { parentId: null } })] : []),
+    ...(isParentGone
+      ? [prisma.page.update({ where: { id: page.id }, data: { parentId: null } })]
+      : []),
   ])
 
-  await journalPage({ eventType: 'PageRestored', actorId: viewer.id, pageId: page.id, summary: page.title })
+  await journalPage({
+    eventType: 'PageRestored',
+    actorId: viewer.id,
+    pageId: page.id,
+    summary: page.title,
+  })
 
   return { id: page.id }
 }
@@ -96,15 +111,25 @@ export const purgePage = async (pageId: unknown, viewer: PageViewer): Promise<{ 
   if (!page.trashedAt) throw notFound()
 
   const ids = await subtreeIds(page.id)
-  const media = await prisma.pageMedia.findMany({ where: { pageId: { in: ids } }, select: { storageEntryId: true } })
+  const media = await prisma.pageMedia.findMany({
+    where: { pageId: { in: ids } },
+    select: { storageEntryId: true },
+  })
 
   // Children cascade from the page row
   await prisma.$transaction([
     prisma.page.delete({ where: { id: page.id } }),
-    prisma.storageEntry.deleteMany({ where: { id: { in: media.map((entry) => entry.storageEntryId) } } }),
+    prisma.storageEntry.deleteMany({
+      where: { id: { in: media.map((entry) => entry.storageEntryId) } },
+    }),
   ])
 
-  await journalPage({ eventType: 'PagePurged', actorId: viewer.id, pageId: page.id, summary: page.title })
+  await journalPage({
+    eventType: 'PagePurged',
+    actorId: viewer.id,
+    pageId: page.id,
+    summary: page.title,
+  })
   await signalAccess()
 
   return { id: page.id }
@@ -127,10 +152,17 @@ export const listTrash = async (viewer: PageViewer): Promise<TrashedPage[]> => {
   const kept = await Promise.all(
     roots
       .filter((row) => row.trashRootId === row.id)
-      .map(async (row) => (levelAllows(levelOnChain(await loadChain(row.id), viewer), 'trash') ? row : null))
+      .map(async (row) =>
+        levelAllows(levelOnChain(await loadChain(row.id), viewer), 'trash') ? row : null
+      )
   )
 
   return kept
     .filter((row) => row !== null)
-    .map((row) => ({ id: row.id, title: row.title, icon: row.icon, trashedAt: row.trashedAt!.toISOString() }))
+    .map((row) => ({
+      id: row.id,
+      title: row.title,
+      icon: row.icon,
+      trashedAt: row.trashedAt!.toISOString(),
+    }))
 }

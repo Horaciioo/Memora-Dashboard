@@ -23,15 +23,13 @@ export const PlayInviteBubble = ({ invite }: { invite: PlayInviteView }) => {
   const spot = useBellSpot(true)
   const { isSaving, accept, decline } = usePlayInviteAnswer(invite)
   // Without a bell on screen (fullscreen game), pinned top centre
-  const place: Record<string, string | number> = (
-    spot
-      ? {
-          left: spot.left,
-          [spot.isAbove ? 'bottom' : 'top']: spot.edge,
-          '--origin': `${spot.tail}px ${spot.isAbove ? '100%' : '0%'}`,
-        }
-      : { top: PLAY_INVITE_SETTINGS.gapPx, left: '50%', translate: '-50% 0', '--origin': '50% 0%' }
-  )
+  const place: Record<string, string | number> = spot
+    ? {
+        left: spot.left,
+        [spot.isAbove ? 'bottom' : 'top']: spot.edge,
+        '--origin': `${spot.tail}px ${spot.isAbove ? '100%' : '0%'}`,
+      }
+    : { top: PLAY_INVITE_SETTINGS.gapPx, left: '50%', translate: '-50% 0', '--origin': '50% 0%' }
 
   return (
     <aside

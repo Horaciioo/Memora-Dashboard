@@ -17,9 +17,15 @@ import { cn } from '@/utils/classnames'
  * @return {Promise<Metadata>} - Page metadata
  */
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
   const session = await optionalUser()
-  const page = session ? await readPage((await params).id, viewerOf(session)).catch(() => null) : null
+  const page = session
+    ? await readPage((await params).id, viewerOf(session)).catch(() => null)
+    : null
 
   return { title: page ? page.title || PAGES_COPY.untitled : PAGES_COPY.title }
 }

@@ -1,4 +1,8 @@
-import type { GrantableLevelName, PageLevelName, PageShareScopeName } from '@/declarations/pages/access'
+import type {
+  GrantableLevelName,
+  PageLevelName,
+  PageShareScopeName,
+} from '@/declarations/pages/access'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 
 /**

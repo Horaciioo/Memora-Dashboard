@@ -30,7 +30,11 @@ export interface PageMediaView {
  * @return {Promise<PageMediaView>} - Stored picture
  */
 
-export const uploadPageMedia = async (pageId: unknown, viewer: PageViewer, file: File): Promise<PageMediaView> => {
+export const uploadPageMedia = async (
+  pageId: unknown,
+  viewer: PageViewer,
+  file: File
+): Promise<PageMediaView> => {
   const { page } = await requirePage(pageId, viewer, 'write')
   const stored = await storeFile('pages', file)
 
@@ -50,7 +54,10 @@ export const uploadPageMedia = async (pageId: unknown, viewer: PageViewer, file:
 
 const findMedia = async (mediaId: string): Promise<{ pageId: string; storageEntryId: string }> => {
   const media = isPageId(mediaId)
-    ? await prisma.pageMedia.findUnique({ where: { id: mediaId }, select: { pageId: true, storageEntryId: true } })
+    ? await prisma.pageMedia.findUnique({
+        where: { id: mediaId },
+        select: { pageId: true, storageEntryId: true },
+      })
     : null
   if (!media) throw notFound()
 

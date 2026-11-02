@@ -58,7 +58,10 @@ export const PageTopBar = ({ page, status, contentAt, presence, onRetry }: PageT
           type="button"
           aria-haspopup="dialog"
           aria-expanded={isSharing}
-          className={cn(PAGE_VIEW_STYLES.shareButton, isSharing && PAGE_VIEW_STYLES.shareButtonOpen)}
+          className={cn(
+            PAGE_VIEW_STYLES.shareButton,
+            isSharing && PAGE_VIEW_STYLES.shareButtonOpen
+          )}
           onClick={() => setSharing(!isSharing)}
         >
           <LockIcon className={PAGE_VIEW_STYLES.barGlyph} aria-hidden="true" />

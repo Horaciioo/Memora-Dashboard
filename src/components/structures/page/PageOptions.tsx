@@ -67,7 +67,9 @@ export interface PageSectioned {
 }
 
 // A yes/no switch, one pick among a few, a whole block, a note, a profile, or a single gesture
-export type PageOption = (PageToggle | PageChoice | PageContent | PageNote | PageProfile | PageAction) &
+export type PageOption = (
+  PageToggle | PageChoice | PageContent | PageNote | PageProfile | PageAction
+) &
   PageSectioned
 
 export interface PageOptionsProps {

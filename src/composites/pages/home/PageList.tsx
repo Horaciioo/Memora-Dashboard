@@ -33,10 +33,14 @@ export const PageList = ({ pages }: PageListProps) => {
               <PageIcon className={PAGES_HOME_STYLES.rowGlyph} aria-hidden="true" />
             )}
             <span className={PAGES_HOME_STYLES.rowBody}>
-              <span className={PAGES_HOME_STYLES.rowTitle}>{page.title || PAGES_COPY.untitled}</span>
+              <span className={PAGES_HOME_STYLES.rowTitle}>
+                {page.title || PAGES_COPY.untitled}
+              </span>
               {page.hint && <span className={PAGES_HOME_STYLES.rowHint}>{page.hint}</span>}
             </span>
-            {page.updatedAt && <span className={PAGES_HOME_STYLES.rowDate}>{formatSince(page.updatedAt)}</span>}
+            {page.updatedAt && (
+              <span className={PAGES_HOME_STYLES.rowDate}>{formatSince(page.updatedAt)}</span>
+            )}
           </Link>
         </li>
       ))}

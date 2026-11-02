@@ -55,7 +55,8 @@ export const usePageComments = (pageId: string): PageCommentsState => {
 
   return {
     comments: data ?? [],
-    add: (body, parentId) => attempt(() => apiPost(API_ROUTES.pageComments(pageId), { body, parentId })),
+    add: (body, parentId) =>
+      attempt(() => apiPost(API_ROUTES.pageComments(pageId), { body, parentId })),
     resolve: async (commentId, resolved) => {
       await attempt(() => apiPatch(API_ROUTES.pageComment(commentId), { resolved }))
     },

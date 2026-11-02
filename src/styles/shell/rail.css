@@ -124,7 +124,8 @@
   box-shadow: var(--frost-shadow);
 }
 
-.rail-ground .glass-panel:not(.fixed, .shortcut-fresh, .rail-footer-box, [aria-current='page']):hover {
+.rail-ground
+  .glass-panel:not(.fixed, .shortcut-fresh, .rail-footer-box, [aria-current='page']):hover {
   background: linear-gradient(rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.14)), var(--frost-fill);
 }
 

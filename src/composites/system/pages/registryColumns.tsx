@@ -24,7 +24,9 @@ export const REGISTRY_COLUMNS: DataTableColumn<PageRegistryRow>[] = [
           {row.title || PAGES_COPY.untitled}
         </span>
         {row.parentTitle !== null && (
-          <span className={PAGE_REGISTRY_STYLES.hint}>{`${PAGES_COPY.subpagesTitle} · ${row.parentTitle || PAGES_COPY.untitled}`}</span>
+          <span
+            className={PAGE_REGISTRY_STYLES.hint}
+          >{`${PAGES_COPY.subpagesTitle} · ${row.parentTitle || PAGES_COPY.untitled}`}</span>
         )}
       </span>
     ),
@@ -45,12 +47,19 @@ export const REGISTRY_COLUMNS: DataTableColumn<PageRegistryRow>[] = [
     header: PAGE_REGISTRY_COPY.columnAccess,
     render: (row) => (
       <span className={PAGE_REGISTRY_STYLES.access}>
-        {row.shares.length === 0 && <span className={PAGE_REGISTRY_STYLES.hint}>{PAGE_REGISTRY_COPY.onlyOwner}</span>}
+        {row.shares.length === 0 && (
+          <span className={PAGE_REGISTRY_STYLES.hint}>{PAGE_REGISTRY_COPY.onlyOwner}</span>
+        )}
         {row.shares.map((share) => (
           <span key={share.label}>{`${share.label} · ${PAGE_LEVELS.get(share.level).label}`}</span>
         ))}
         {row.parentTitle !== null && row.inheritAccess && (
-          <span className={PAGE_REGISTRY_STYLES.hint}>{PAGE_REGISTRY_COPY.inherited.replace('{parent}', row.parentTitle || PAGES_COPY.untitled)}</span>
+          <span className={PAGE_REGISTRY_STYLES.hint}>
+            {PAGE_REGISTRY_COPY.inherited.replace(
+              '{parent}',
+              row.parentTitle || PAGES_COPY.untitled
+            )}
+          </span>
         )}
       </span>
     ),

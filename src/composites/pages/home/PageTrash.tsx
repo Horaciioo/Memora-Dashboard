@@ -52,12 +52,22 @@ export const PageTrash = ({ initial }: PageTrashProps) => {
                 {page.icon ? `${page.icon} ` : ''}
                 {page.title || PAGES_COPY.untitled}
               </span>
-              <span className={PAGES_HOME_STYLES.rowHint}>{PAGES_COPY.trashedOn.replace('{date}', formatDay(page.trashedAt))}</span>
+              <span className={PAGES_HOME_STYLES.rowHint}>
+                {PAGES_COPY.trashedOn.replace('{date}', formatDay(page.trashedAt))}
+              </span>
             </Link>
-            <button type="button" className={cn(BUTTON_STYLES.base, BUTTON_STYLES.ghost)} onClick={() => setPurging(page.id)}>
+            <button
+              type="button"
+              className={cn(BUTTON_STYLES.base, BUTTON_STYLES.ghost)}
+              onClick={() => setPurging(page.id)}
+            >
               {PAGES_COPY.trashPurge}
             </button>
-            <button type="button" className={cn(BUTTON_STYLES.base, BUTTON_STYLES.secondary)} onClick={() => void restore(page.id)}>
+            <button
+              type="button"
+              className={cn(BUTTON_STYLES.base, BUTTON_STYLES.secondary)}
+              onClick={() => void restore(page.id)}
+            >
               {PAGES_COPY.trashRestore}
             </button>
           </li>

@@ -42,14 +42,21 @@ export const PageRegistry = ({ rows }: PageRegistryProps) => {
   const needle = term.trim().toLowerCase()
 
   const visible = rows.filter(
-    (row) => FILTERS[filter](row) && (!needle || `${row.title} ${row.ownerName}`.toLowerCase().includes(needle))
+    (row) =>
+      FILTERS[filter](row) &&
+      (!needle || `${row.title} ${row.ownerName}`.toLowerCase().includes(needle))
   )
 
   return (
     <div className={PAGE_REGISTRY_STYLES.column}>
       <p className={PAGE_REGISTRY_STYLES.sealed}>{PAGE_REGISTRY_COPY.sealed}</p>
       <div className={PAGE_REGISTRY_STYLES.toolbar}>
-        <SegmentedControl options={FILTER_OPTIONS} value={filter} onChange={setFilter} label={PAGE_REGISTRY_COPY.columnState} />
+        <SegmentedControl
+          options={FILTER_OPTIONS}
+          value={filter}
+          onChange={setFilter}
+          label={PAGE_REGISTRY_COPY.columnState}
+        />
         <input
           type="search"
           value={term}
@@ -63,7 +70,11 @@ export const PageRegistry = ({ rows }: PageRegistryProps) => {
         columns={REGISTRY_COLUMNS}
         rows={visible}
         getRowId={(row) => row.id}
-        emptyState={{ title: PAGE_REGISTRY_COPY.emptyTitle, description: PAGE_REGISTRY_COPY.emptyLead, action: null }}
+        emptyState={{
+          title: PAGE_REGISTRY_COPY.emptyTitle,
+          description: PAGE_REGISTRY_COPY.emptyLead,
+          action: null,
+        }}
       />
     </div>
   )

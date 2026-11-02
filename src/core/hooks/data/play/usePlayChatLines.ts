@@ -34,10 +34,12 @@ const mergeLines = (rendered: PlayMessageView[], pushed: PlayMessageView[]): Pla
 export const usePlayChatLines = (sessionId: string, rendered: PlayMessageView[]) => {
   const [pushed, setPushed] = useState<PlayMessageView[]>([])
   const add = useCallback(
-    (line: PlayMessageView) => setPushed((lines) =>
+    (line: PlayMessageView) =>
+      setPushed((lines) =>
         lines.some((entry) => entry.id === line.id)
           ? lines
-          : [...lines, line].slice(-PLAY_CHAT.history)),
+          : [...lines, line].slice(-PLAY_CHAT.history)
+      ),
     []
   )
 

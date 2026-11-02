@@ -67,7 +67,10 @@ export const pageSchemaExtensions = (generateId?: () => string): AnyExtension[] 
     nested: true,
     a11y: {
       checkboxLabel: (node, checked) =>
-        (checked ? PAGE_EDITOR_COPY.taskChecked : PAGE_EDITOR_COPY.taskOpen).replace('{task}', node.textContent || PAGE_EDITOR_COPY.taskEmpty),
+        (checked ? PAGE_EDITOR_COPY.taskChecked : PAGE_EDITOR_COPY.taskOpen).replace(
+          '{task}',
+          node.textContent || PAGE_EDITOR_COPY.taskEmpty
+        ),
     },
   }),
   Image.configure({ inline: false, allowBase64: false }),

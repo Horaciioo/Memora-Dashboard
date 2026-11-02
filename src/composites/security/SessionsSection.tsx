@@ -24,9 +24,7 @@ export const SessionsSection = ({ state }: SessionsSectionProps) => {
   const others = sessions.filter((session) => !session.isCurrent)
 
   return (
-    <SettingsGroup
-      title={SECURITY_COPY.sessionsSectionTitle}
-    >
+    <SettingsGroup title={SECURITY_COPY.sessionsSectionTitle}>
       <ul className={SESSION_LIST.list}>
         {sessions.map((session) => {
           const Glyph = ICONS[readDevice(session.userAgent).icon]

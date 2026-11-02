@@ -65,7 +65,10 @@ export const usePresence = (topic: string, place: string | null): PresenceView =
 
     return listenRealtime(topic, (event, data) => {
       if (event !== REALTIME_EVENTS.presence) return
-      setSnapshot({ topic, members: (data as { members?: PresenceMember[] } | null)?.members ?? [] })
+      setSnapshot({
+        topic,
+        members: (data as { members?: PresenceMember[] } | null)?.members ?? [],
+      })
       if (!isSeatPending.current) return
       isSeatPending.current = false
       send()

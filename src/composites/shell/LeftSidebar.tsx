@@ -57,7 +57,7 @@ export interface LeftSidebarProps {
 export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   const { session } = useAuthContext()
   const [isPicking, setPicking] = useState(false)
-    const { isTouring, isIntroOpen, isUnlocked, next } = useTour()
+  const { isTouring, isIntroOpen, isUnlocked, next } = useTour()
   const pathname = usePathname()
   // The visit points at a page of the menu, which the calendar menu would hide
   const isPointing = isTouring && next !== null && pathname !== next

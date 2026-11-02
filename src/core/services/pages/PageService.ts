@@ -14,7 +14,13 @@ import type { PageViewer } from '@/core/lib/pages'
 import { requireCategory } from '@/core/services/pages/CategoryService'
 import { reachablePageIds, requirePage } from '@/core/services/pages/AccessService'
 import { journalPage } from '@/core/services/pages/journal'
-import { SUMMARY_SELECT, nextPosition, toAccessNode, toCrumb, toSummary } from '@/core/services/pages/lookups'
+import {
+  SUMMARY_SELECT,
+  nextPosition,
+  toAccessNode,
+  toCrumb,
+  toSummary,
+} from '@/core/services/pages/lookups'
 import { pageSharedState } from '@/core/services/pages/PageDocService'
 import { signalPage } from '@/core/services/pages/signal'
 import { PAGE_SETTINGS } from '@/declarations/configurations/pages'
@@ -61,10 +67,13 @@ export const createPage = async (
   if (!input.parentId && !canOwnPages(viewer)) throw forbidden()
 
   // A sub page needs write access on its parent
-  const parentId = input.parentId ? (await requirePage(input.parentId, viewer, 'write')).page.id : null
+  const parentId = input.parentId
+    ? (await requirePage(input.parentId, viewer, 'write')).page.id
+    : null
 
   // Only a root page sits in a category
-  const categoryId = !parentId && input.categoryId ? (await requireCategory(input.categoryId, viewer)).id : null
+  const categoryId =
+    !parentId && input.categoryId ? (await requireCategory(input.categoryId, viewer)).id : null
 
   const template = typeof input.template === 'string' && input.template ? input.template : null
   if (template && !PAGE_TEMPLATES.has(template)) {
@@ -93,7 +102,12 @@ export const createPage = async (
     select: SUMMARY_SELECT,
   })
 
-  await journalPage({ eventType: 'PageCreated', actorId: viewer.id, pageId: row.id, summary: row.title })
+  await journalPage({
+    eventType: 'PageCreated',
+    actorId: viewer.id,
+    pageId: row.id,
+    summary: row.title,
+  })
 
   return toSummary(row, viewer.id)
 }
@@ -106,7 +120,9 @@ export const createPage = async (
  */
 
 export const readPage = async (pageId: unknown, viewer: PageViewer): Promise<PageDetail> => {
-  const { page, chain, level, isTrashed } = await requirePage(pageId, viewer, 'read', { allowTrashed: true })
+  const { page, chain, level, isTrashed } = await requirePage(pageId, viewer, 'read', {
+    allowTrashed: true,
+  })
 
   const row = await prisma.page.findUniqueOrThrow({
     where: { id: page.id },
@@ -132,7 +148,10 @@ export const readPage = async (pageId: unknown, viewer: PageViewer): Promise<Pag
   })
 
   // Ancestors shown only while readable
-  const trail = chain.slice(1).filter((ancestor) => isTrashed || reachable.has(ancestor.id)).reverse()
+  const trail = chain
+    .slice(1)
+    .filter((ancestor) => isTrashed || reachable.has(ancestor.id))
+    .reverse()
 
   return {
     ...toSummary(row, viewer.id),
@@ -145,7 +164,9 @@ export const readPage = async (pageId: unknown, viewer: PageViewer): Promise<Pag
     level,
     inheritAccess: row.inheritAccess,
     trail: trail.map(toCrumb),
-    children: children.filter((child) => reachable.has(child.id)).map((child) => toSummary(child, viewer.id)),
+    children: children
+      .filter((child) => reachable.has(child.id))
+      .map((child) => toSummary(child, viewer.id)),
     trashedAt: row.trashedAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
     contentAt: row.contentAt.toISOString(),
@@ -220,7 +241,9 @@ const readCover = async (pageId: string, value: unknown): Promise<string | null>
   if (value === null || value === '') return null
 
   const mediaId = typeof value === 'string' ? mediaIdOf(value) : null
-  const media = mediaId ? await prisma.pageMedia.findFirst({ where: { id: mediaId, pageId } }) : null
+  const media = mediaId
+    ? await prisma.pageMedia.findFirst({ where: { id: mediaId, pageId } })
+    : null
   if (!media) throw invalidInput([{ field: 'cover', message: PAGE_DOCUMENT_COPY.cover }])
 
   return media.id

@@ -121,17 +121,23 @@ export const readSharing = async (pageId: unknown, viewer: PageViewer): Promise<
 const readTarget = async (
   raw: Record<string, unknown>,
   ownerId: string
-): Promise<{ scope: PageShareScopeName; accountId: string | null; role: MemberRoleName | null }> => {
+): Promise<{
+  scope: PageShareScopeName
+  accountId: string | null
+  role: MemberRoleName | null
+}> => {
   const refuse = () => invalidInput([{ field: 'scope', message: PAGE_DOCUMENT_COPY.shareTarget }])
 
-  if (raw.scope === PageShareScopes.Workspace) return { scope: raw.scope, accountId: null, role: null }
+  if (raw.scope === PageShareScopes.Workspace)
+    return { scope: raw.scope, accountId: null, role: null }
   if (raw.scope === PageShareScopes.Role) {
     if (typeof raw.role !== 'string' || !ROLE_REGISTRY.has(raw.role)) throw refuse()
 
     return { scope: raw.scope, accountId: null, role: raw.role as MemberRoleName }
   }
   if (raw.scope !== PageShareScopes.Account || typeof raw.accountId !== 'string') throw refuse()
-  if (raw.accountId === ownerId) throw invalidInput([{ field: 'accountId', message: PAGE_DOCUMENT_COPY.shareSelf }])
+  if (raw.accountId === ownerId)
+    throw invalidInput([{ field: 'accountId', message: PAGE_DOCUMENT_COPY.shareSelf }])
 
   // Only a current member
   const account = await prisma.account.findFirst({
@@ -157,7 +163,10 @@ export const upsertShare = async (
   raw: Record<string, unknown>
 ): Promise<PageSharing> => {
   const { page, level: sharer } = await requirePage(pageId, viewer, 'share')
-  const owner = await prisma.page.findUniqueOrThrow({ where: { id: page.id }, select: { ownerId: true } })
+  const owner = await prisma.page.findUniqueOrThrow({
+    where: { id: page.id },
+    select: { ownerId: true },
+  })
   const target = await readTarget(raw, owner.ownerId)
 
   const level = raw.level as GrantableLevelName
@@ -166,11 +175,19 @@ export const upsertShare = async (
   }
 
   const targetKey = shareTargetKey(target)
-  const previous = await prisma.pageGrant.findUnique({ where: { pageId_targetKey: { pageId: page.id, targetKey } } })
+  const previous = await prisma.pageGrant.findUnique({
+    where: { pageId_targetKey: { pageId: page.id, targetKey } },
+  })
 
   await prisma.pageGrant.upsert({
     where: { pageId_targetKey: { pageId: page.id, targetKey } },
-    create: { pageId: page.id, ...target, level: level as PageAccessLevel, targetKey, grantedById: viewer.id },
+    create: {
+      pageId: page.id,
+      ...target,
+      level: level as PageAccessLevel,
+      targetKey,
+      grantedById: viewer.id,
+    },
     update: { level: level as PageAccessLevel, grantedById: viewer.id },
   })
 
@@ -194,7 +211,11 @@ export const upsertShare = async (
  * @return {Promise<PageSharing>} - Sharing state
  */
 
-export const removeShare = async (pageId: unknown, shareId: string, viewer: PageViewer): Promise<PageSharing> => {
+export const removeShare = async (
+  pageId: unknown,
+  shareId: string,
+  viewer: PageViewer
+): Promise<PageSharing> => {
   const { page } = await requirePage(pageId, viewer, 'share')
 
   const grant = await prisma.pageGrant.findFirst({ where: { id: shareId, pageId: page.id } })
@@ -223,7 +244,10 @@ export const removeShare = async (pageId: unknown, shareId: string, viewer: Page
 const sharesToKeep = async (chain: ChainRow[], viewerId: string) => {
   const sources = inheritedFrom(chain)
   const [page] = chain
-  const owners = await prisma.page.findMany({ where: { id: { in: sources.map((row) => row.id) } }, select: { ownerId: true } })
+  const owners = await prisma.page.findMany({
+    where: { id: { in: sources.map((row) => row.id) } },
+    select: { ownerId: true },
+  })
 
   // Parent shares, ancestor owners and the cutter stay in
   const candidates = [
@@ -240,7 +264,8 @@ const sharesToKeep = async (chain: ChainRow[], viewerId: string) => {
   for (const grant of candidates) {
     const key = shareTargetKey(grant)
     const kept = strongest.get(key)
-    if (!kept || GRANTABLE_LEVELS.indexOf(grant.level) < GRANTABLE_LEVELS.indexOf(kept.level)) strongest.set(key, grant)
+    if (!kept || GRANTABLE_LEVELS.indexOf(grant.level) < GRANTABLE_LEVELS.indexOf(kept.level))
+      strongest.set(key, grant)
   }
 
   return [...strongest.entries()].map(([targetKey, grant]) => ({ targetKey, ...grant }))
@@ -254,7 +279,11 @@ const sharesToKeep = async (chain: ChainRow[], viewerId: string) => {
  * @return {Promise<PageSharing>} - Sharing state
  */
 
-export const setInheritance = async (pageId: unknown, viewer: PageViewer, inherit: boolean): Promise<PageSharing> => {
+export const setInheritance = async (
+  pageId: unknown,
+  viewer: PageViewer,
+  inherit: boolean
+): Promise<PageSharing> => {
   const { page, chain } = await requirePage(pageId, viewer, 'share')
   if (!page.parentId || page.inheritAccess === inherit) return readSharing(page.id, viewer)
 
@@ -267,7 +296,12 @@ export const setInheritance = async (pageId: unknown, viewer: PageViewer, inheri
     prisma.pageGrant.createMany({
       data: kept
         .filter((grant) => !own.has(grant.targetKey))
-        .map((grant) => ({ pageId: page.id, ...grant, level: grant.level as PageAccessLevel, grantedById: viewer.id })),
+        .map((grant) => ({
+          pageId: page.id,
+          ...grant,
+          level: grant.level as PageAccessLevel,
+          grantedById: viewer.id,
+        })),
     }),
   ])
 

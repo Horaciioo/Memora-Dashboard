@@ -3,7 +3,12 @@ import type { Schema } from '@tiptap/pm/model'
 
 import { pageSchemaExtensions } from '@/core/lib/pages/schema/extensions'
 
-export { BLOCK_ID_ATTRIBUTE, BLOCK_NODE_TYPES, PAGE_HEADING_LEVELS, pageSchemaExtensions } from '@/core/lib/pages/schema/extensions'
+export {
+  BLOCK_ID_ATTRIBUTE,
+  BLOCK_NODE_TYPES,
+  PAGE_HEADING_LEVELS,
+  pageSchemaExtensions,
+} from '@/core/lib/pages/schema/extensions'
 export { CALLOUT_ICON, Callout } from '@/core/lib/pages/schema/callout'
 export { Subpage } from '@/core/lib/pages/schema/subpage'
 

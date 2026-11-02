@@ -20,7 +20,11 @@ const EXCERPT_RADIUS = 60
 
 export const excerptAround = (text: string, term: string): string => {
   const at = text.toLowerCase().indexOf(term.toLowerCase())
-  if (at < 0) return text.slice(0, EXCERPT_RADIUS * 2).replace(/\s+/g, ' ').trim()
+  if (at < 0)
+    return text
+      .slice(0, EXCERPT_RADIUS * 2)
+      .replace(/\s+/g, ' ')
+      .trim()
 
   const start = Math.max(0, at - EXCERPT_RADIUS)
   const end = Math.min(text.length, at + term.length + EXCERPT_RADIUS)
@@ -50,7 +54,10 @@ export const searchPages = async (viewer: PageViewer, term: string): Promise<Pag
       orderBy: { contentAt: 'desc' },
       take: PAGE_SETTINGS.searchResults,
     }),
-    prisma.page.findMany({ where: { id: { in: ids } }, select: { id: true, parentId: true, title: true } }),
+    prisma.page.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, parentId: true, title: true },
+    }),
   ])
 
   // Trail through readable parents only

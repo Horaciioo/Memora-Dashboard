@@ -32,10 +32,17 @@ const STATES: Record<SyncStatusName, { icon: IconName; label: string; isAlert?: 
 export const SyncStatus = ({ status, contentAt, onRetry }: SyncStatusProps) => {
   const state = STATES[status]
   const Glyph = ICONS[state.icon]
-  const label = status === 'saved' ? PAGES_COPY.editedAgo.replace('{ago}', formatSince(contentAt).toLowerCase()) : state.label
+  const label =
+    status === 'saved'
+      ? PAGES_COPY.editedAgo.replace('{ago}', formatSince(contentAt).toLowerCase())
+      : state.label
 
   return (
-    <span role="status" aria-live="polite" className={cn(PAGE_VIEW_STYLES.sync, state.isAlert && PAGE_VIEW_STYLES.syncAlert)}>
+    <span
+      role="status"
+      aria-live="polite"
+      className={cn(PAGE_VIEW_STYLES.sync, state.isAlert && PAGE_VIEW_STYLES.syncAlert)}
+    >
       <Glyph className={PAGE_VIEW_STYLES.syncGlyph} aria-hidden="true" />
       <span className={PAGE_VIEW_STYLES.syncLabel}>{label}</span>
       {status === 'failed' && (

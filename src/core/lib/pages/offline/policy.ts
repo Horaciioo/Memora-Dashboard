@@ -54,7 +54,8 @@ export const staleEntries = (
     .toSorted((left, right) => Date.parse(right.savedAt) - Date.parse(left.savedAt))
 
   const expired = own.filter(
-    (entry, index) => !entry.isPending && (index >= rules.max || Date.parse(entry.savedAt) < horizon)
+    (entry, index) =>
+      !entry.isPending && (index >= rules.max || Date.parse(entry.savedAt) < horizon)
   )
 
   return [...foreign, ...expired].map((entry) => entry.key)

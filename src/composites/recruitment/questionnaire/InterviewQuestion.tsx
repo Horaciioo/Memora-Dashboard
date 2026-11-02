@@ -79,7 +79,10 @@ export const InterviewQuestion = ({
   // Left aside, one line is enough
   if (!isBare && (state.skipped || covered)) {
     return (
-      <article className={cn(INTERVIEW.card, INTERVIEW.cardSkipped)} {...questionMark(question.key)}>
+      <article
+        className={cn(INTERVIEW.card, INTERVIEW.cardSkipped)}
+        {...questionMark(question.key)}
+      >
         <div className={INTERVIEW.head}>
           <div className={INTERVIEW.headBody}>
             <p className={cn(INTERVIEW.prompt, INTERVIEW.promptSkipped)}>{question.prompt}</p>
@@ -101,7 +104,10 @@ export const InterviewQuestion = ({
   }
 
   return (
-    <article className={isBare ? INTERVIEW.foldChosen : INTERVIEW.card} {...questionMark(question.key)}>
+    <article
+      className={isBare ? INTERVIEW.foldChosen : INTERVIEW.card}
+      {...questionMark(question.key)}
+    >
       <div className={cn(INTERVIEW.ask, TINTS[state.appreciation ?? ''])}>
         <div className={INTERVIEW.askBody}>
           {!isBare && question.when && <span className={INTERVIEW.when}>{question.when}</span>}
