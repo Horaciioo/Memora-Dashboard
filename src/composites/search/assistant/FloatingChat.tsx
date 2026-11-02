@@ -13,12 +13,14 @@ import { useAssistantChat } from '@/core/hooks/data/system/useAssistantChat'
 import { useAssistantDock } from '@/core/store/assistantDock'
 import type { DockAction } from '@/core/store/assistantDock'
 import { ASSISTANT_COPY, ASSISTANT_INTRO_COPY } from '@/declarations/assistant/copy'
+import type { AssistantHello } from '@/declarations/assistant/copy'
 import { ASSISTANT_DOCK_COPY } from '@/declarations/assistant/offers'
 import { ICONS } from '@/declarations/ui/icons'
 import { FLOATING_ADD_STYLES } from '@/declarations/ui/variants'
 
 export interface FloatingChatProps {
   name: string
+  hello: AssistantHello
   greeting: string
   action: DockAction | null
   // Creations of other pages the member reaches
@@ -28,11 +30,18 @@ export interface FloatingChatProps {
 
 /**
  * Chat opened by the Memora button, forgotten on close
- * @param {FloatingChatProps} props - Member, greeting, creations and close
+ * @param {FloatingChatProps} props - Member, welcome, greeting, creations and close
  * @return {JSX.Element}
  */
 
-export const FloatingChat = ({ name, greeting, action, picks, onClose }: FloatingChatProps) => {
+export const FloatingChat = ({
+  name,
+  hello,
+  greeting,
+  action,
+  picks,
+  onClose,
+}: FloatingChatProps) => {
   const router = useRouter()
   const handOff = useAssistantDock((state) => state.handOff)
   const focus = useAssistantDock((state) => state.focus)
@@ -90,6 +99,7 @@ export const FloatingChat = ({ name, greeting, action, picks, onClose }: Floatin
             opening={
               <MemoraIntro
                 name={name}
+                hello={hello}
                 greeting={greeting}
                 action={action}
                 picks={picks}

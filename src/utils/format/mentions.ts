@@ -61,6 +61,35 @@ export const splitMentions = (body: string): MentionPiece[] =>
     })
 
 /**
+ * Letters a text shows once its handles are lit
+ * @param {string} body - Written text
+ * @return {number} - Visible length
+ */
+
+export const mentionLength = (body: string): number =>
+  splitMentions(body).reduce((total, piece) => total + piece.text.length, 0)
+
+/**
+ * First letters of a text, a handle cut midway stays whole
+ * @param {string} body - Written text
+ * @param {number} length - Visible letters kept
+ * @return {string} - Text a reader sees growing
+ */
+
+export const mentionPrefix = (body: string, length: number): string => {
+  let left = length
+
+  return splitMentions(body)
+    .map((piece) => {
+      const cut = piece.text.slice(0, Math.max(left, 0))
+      left -= cut.length
+
+      return piece.isMention && cut.length > 1 ? formatMention(cut.slice(1)) : cut
+    })
+    .join('')
+}
+
+/**
  * Collect the members a text names
  * @param {string} body - Written text
  * @param {number} limit - Most entries kept in each list

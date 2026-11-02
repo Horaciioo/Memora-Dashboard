@@ -3,7 +3,7 @@ import { readInteger } from '@/declarations/configurations/readers'
 
 /**
  * Assistant behaviour
- * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, handoffSeconds: number, maxPicks: number, pickStaggerMs: number, thinkingMs: number }}
+ * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number }}
  */
 
 export const ASSISTANT_SETTINGS = {
@@ -53,6 +53,17 @@ export const ASSISTANT_SETTINGS = {
     fallback: 1200,
     min: 0,
   }),
+  // A drafted line is read, then wiped
+  eraseMsPerChar: readInteger(assistant.eraseMsPerChar, {
+    path: 'system/assistant.eraseMsPerChar',
+    fallback: 12,
+    min: 0,
+  }),
+  draftPauseMs: readInteger(assistant.draftPauseMs, {
+    path: 'system/assistant.draftPauseMs',
+    fallback: 600,
+    min: 0,
+  }),
   // A creation asked elsewhere opens on landing
   handoffSeconds: readInteger(assistant.handoffSeconds, {
     path: 'system/assistant.handoffSeconds',
@@ -63,6 +74,12 @@ export const ASSISTANT_SETTINGS = {
   maxPicks: readInteger(assistant.maxPicks, {
     path: 'system/assistant.maxPicks',
     fallback: 6,
+    min: 1,
+  }),
+  // Proposals under Ask Memora in the palette
+  paletteAsks: readInteger(assistant.paletteAsks, {
+    path: 'system/assistant.paletteAsks',
+    fallback: 3,
     min: 1,
   }),
   pickStaggerMs: readInteger(assistant.pickStaggerMs, {
