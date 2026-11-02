@@ -19,6 +19,8 @@ import type { FieldIssue, FieldValue, FormValues } from '@/types/forms'
  * @property {EditableEntry[]} [entries] - Properties edited in place
  * @property {ReactNode} [node] - Free content under the properties
  * @property {ReactNode} [side] - Frameless panel beside the box, as tall as it
+ * @property {string} [className] - Classes of the section
+ * @property {boolean} [inline] - Properties three to a line from md
  */
 
 export interface FileOverviewGroup {
@@ -27,6 +29,8 @@ export interface FileOverviewGroup {
   entries?: EditableEntry[]
   node?: ReactNode
   side?: ReactNode
+  className?: string
+  inline?: boolean
 }
 
 export interface FileOverviewProps {
@@ -83,13 +87,17 @@ export const FileOverview = ({
   return (
     <div className={FILE_BOX.stack}>
       {boxes.map((box, index) => (
-        <section key={box.id} className={hasSide ? FILE_BOX.row : SECTION_STYLES.wrapper}>
+        <section
+          key={box.id}
+          className={cn(hasSide ? FILE_BOX.row : SECTION_STYLES.wrapper, box.className)}
+        >
           <h2 className={cn(SECTION_STYLES.title, FILE_BOX.rowTitle)}>{box.title}</h2>
           <div className={cn(FILE_BOX.box, FILE_BOX.rowBox)}>
             <div className={FILE_BOX.main}>
               {box.entries && box.entries.length > 0 && (
                 <EditableDetailGrid
                   entries={box.entries}
+                  inline={box.inline}
                   values={values}
                   issues={issues}
                   disabled={disabled}

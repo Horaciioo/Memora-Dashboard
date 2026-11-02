@@ -4,29 +4,20 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { CommentThread } from '@/components/structures/data/CommentThread'
-import { AvatarStack } from '@/components/elements/display/Avatar'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
-import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
 import type { EditableEntry } from '@/components/structures/inline/EditableDetailGrid'
 import { FileOverview, type FileOverviewGroup } from '@/components/structures/page/FileOverview'
 import { CloseRecruitmentDialog } from '@/composites/recruitment/CloseRecruitmentDialog'
 import { SessionTimelineCard } from '@/composites/recruitment/file/SessionTimelineCard'
+import { useSessionRecord } from '@/composites/recruitment/file/useSessionRecord'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { useRecordFile } from '@/core/hooks/data/work/useRecordFile'
-import { pickedOptions } from '@/core/lib/forms/options'
-import { API_ROUTES } from '@/core/lib/api/routes'
-import { RECRUITMENT_ENTITY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
 import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
 import { FILE_BOX } from '@/declarations/ui/variants'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { RecruitmentStatuses } from '@/utils/constants/recruitment'
 import { formatDayTime } from '@/utils/format/dates'
-
-// Portraits drawn side by side
-const portraits = (list: { id: string; name: string; src?: string | null }[]) =>
-  list.length > 0 ? <AvatarStack wrap size="sm" people={list} max={list.length} /> : null
 
 /**
  * Overview of a recruitment session: boxes of what it is, who carries it
@@ -38,15 +29,7 @@ export const OverviewTab = () => {
   const [isClosing, setClosing] = useState(false)
   const { detail, file, fields, can } = useRecruitmentState()
   const { summary } = detail
-  const record = useRecordFile({
-    path: API_ROUTES.recruitment(summary.id),
-    entity: RECRUITMENT_ENTITY,
-    initialValues: summary.values,
-  })
-
-  const fieldFor = (name: string) => fields.session.find((field) => field.name === name)!
-  const text = (name: string) =>
-    typeof record.values[name] === 'string' ? (record.values[name] as string) : ''
+  const { record, fieldFor, text, teamEntry } = useSessionRecord()
   const status =
     RECRUITMENT_STATUS_REGISTRY.map[text('status') as keyof typeof RECRUITMENT_STATUS_REGISTRY.map]
   const FunctionGlyph =
@@ -54,24 +37,10 @@ export const OverviewTab = () => {
       ? ICONS[summary.jobFunction.icon]
       : null
 
-  // One editable row of portraits per team field
-  const teamEntry = (label: string, name: string): EditableEntry => ({
-    label,
-    field: fieldFor(name),
-    display: portraits(
-      pickedOptions(fieldFor(name), record.values[name]).map((option) => ({
-        id: option.value,
-        name: option.label,
-        src: option.image,
-      }))
-    ),
-  })
-
   const range = Array.isArray(record.values.period) ? record.values.period : null
   const period = range ? `${formatDayTime(range[0])} – ${formatDayTime(range[1])}` : null
 
   const session: EditableEntry[] = [
-    { label: SESSION_FILE_COPY.id, display: <RecordId id={summary.id} /> },
     {
       label: SESSION_FILE_COPY.status,
       field: fieldFor('status'),
@@ -92,7 +61,7 @@ export const OverviewTab = () => {
         </span>
       ),
     },
-    { label: SESSION_FILE_COPY.period, field: fieldFor('period'), display: period },
+    { label: SESSION_FILE_COPY.period, field: fieldFor('period'), display: period, wide: true },
   ]
 
   const team: EditableEntry[] = [
@@ -109,7 +78,8 @@ export const OverviewTab = () => {
       entries: session,
       side: <SessionTimelineCard />,
     },
-    { id: 'team', title: SESSION_FILE_COPY.team, entries: team },
+    // Managers read the team in the administration tab
+    ...(can.manage ? [] : [{ id: 'team', title: SESSION_FILE_COPY.team, entries: team }]),
   ]
 
   return (

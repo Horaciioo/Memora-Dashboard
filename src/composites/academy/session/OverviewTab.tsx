@@ -66,6 +66,7 @@ export const OverviewTab = () => {
       label: SESSION_FILE_COPY.period,
       field: fieldFor('period'),
       display: period ? formatDayRange(period[0], period[1]) : null,
+      wide: true,
     },
   ]
 
