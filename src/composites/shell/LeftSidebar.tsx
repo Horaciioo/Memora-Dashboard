@@ -5,16 +5,15 @@ import { useEffect, useState } from 'react'
 import { CourseRail } from '@/composites/academy/course/player/CourseRail'
 import { CalendarRailPanel, CalendarSearchBar } from '@/composites/calendar/CalendarSidebar'
 import { CalendarRailSwitch } from '@/composites/calendar/CalendarRailSwitch'
-import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { CreatorAccountMenu } from '@/composites/shell/CreatorAccountMenu'
+import { CreatorPickerButton, CreatorViewPanel } from '@/composites/shell/CreatorSelect'
 import { CreatorSwitch } from '@/composites/shell/CreatorSwitch'
 import { RailDeadlineBubbles } from '@/composites/shell/RailDeadlineBubbles'
 import { RailNav } from '@/composites/shell/RailNav'
 import { RailSectionSwitch } from '@/composites/shell/RailSectionSwitch'
 import type { RailSection } from '@/composites/shell/RailSectionSwitch'
 import { RailSlides } from '@/composites/shell/RailSlides'
-import { RoleSwitch } from '@/composites/shell/RoleSwitch'
 import { SimulationBanner } from '@/composites/shell/SimulationBanner'
 import { RailToolbar } from '@/composites/shell/RailToolbar'
 import { RailShortcuts } from '@/composites/shell/RailShortcuts'
@@ -55,9 +54,10 @@ export interface LeftSidebarProps {
  * @return {JSX.Element}
  */
 
-export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
+export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   const { session } = useAuthContext()
-  const { isTouring, isIntroOpen, isUnlocked, next } = useTour()
+  const [isPicking, setPicking] = useState(false)
+    const { isTouring, isIntroOpen, isUnlocked, next } = useTour()
   const pathname = usePathname()
   // The visit points at a page of the menu, which the calendar menu would hide
   const isPointing = isTouring && next !== null && pathname !== next
@@ -77,6 +77,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
 
   // Chapters need their room
   const isCompact = isRailCompact && !courseRail
+  const hasPicker = viewContext.creators.length > 1 && !isCompact
 
   // The calendar menu wears the page's own search, a folded rail keeps the classic glyphs
   const isCalendarMenu =
@@ -202,26 +203,28 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
         <div className={LEFT_SIDEBAR.footer}>
           <div className={isCompact ? LEFT_SIDEBAR.footerBare : LEFT_SIDEBAR.footerBox}>
             {viewContext.switchable && !isCompact && (
-              <>
-                <div className={LEFT_SIDEBAR.footerSwitch}>
-                  <SimulationBanner viewContext={viewContext} />
-                  <RoleSwitch viewContext={viewContext} />
-                </div>
-                <span className={LEFT_SIDEBAR.footerRule} aria-hidden="true" />
-              </>
+              <div className={LEFT_SIDEBAR.footerSwitch}>
+                <SimulationBanner viewContext={viewContext} />
+              </div>
+            )}
+
+            {hasPicker && (
+              <CreatorViewPanel
+                viewContext={viewContext}
+                isOpen={isPicking}
+                onClose={() => setPicking(false)}
+              />
             )}
 
             <div className={LEFT_SIDEBAR.footerRow}>
               <CreatorAccountMenu viewContext={viewContext} isCompact={isCompact} />
 
-              {/* A folded rail keeps the portrait alone */}
-              {!isCompact && (
-                <div className={LEFT_SIDEBAR.footerActions}>
-                  <NotificationsBell
-                    initialUnread={unreadCount}
-                    iconClassName={LEFT_SIDEBAR.footerIcon}
-                  />
-                </div>
+              {/* Several creators, one on screen */}
+              {hasPicker && (
+                <CreatorPickerButton
+                  isOpen={isPicking}
+                  onToggle={() => setPicking((open) => !open)}
+                />
               )}
             </div>
           </div>

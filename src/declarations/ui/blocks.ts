@@ -65,7 +65,8 @@ export const RAIL_POPOVER = {
     'rail-reset surface-enter fixed bottom-6 left-[calc(var(--shell-sidebar-w)+1.5rem)] z-[70] flex max-h-[calc(100dvh-3rem)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   // Lifted off the page by a layered shadow alone, no outline
   bell: 'w-[26rem] max-w-[calc(100vw-var(--shell-sidebar-w)-3rem)] border-transparent! shadow-[var(--shadow-lifted)]!',
-  account: 'w-80',
+  // Wide, not tall
+  account: 'w-[26rem] max-w-[calc(100vw-var(--shell-sidebar-w)-3rem)]',
   // Glyph above the title
   head: 'relative flex shrink-0 flex-col items-center gap-1.5 border-b border-[var(--color-border)] px-4 pt-5 pb-4 text-center',
   headGlyph: 'h-8 w-8 shrink-0',
@@ -158,16 +159,17 @@ export const LEFT_SIDEBAR = {
   toolbarIcon: 'size-[1.125rem] shrink-0',
   // Profile box, bell on its right
   footerBox:
-    'rail-footer-box glass-panel flex min-w-0 flex-1 flex-col rounded-[var(--radius-xl)] border p-2',
+    'rail-footer-box glass-panel flex min-w-0 flex-1 flex-col rounded-[var(--radius-xl)] border p-1.5',
   // Folded rail: the portrait alone, centred
   footerBare: 'flex min-w-0 flex-1 justify-center',
   // Level switch heading the profile box, a rule under it
   footerSwitch: 'px-1 pt-1',
-  footerRule: 'mx-1 my-2 h-px bg-[var(--color-border)]',
   footerRow: 'flex min-w-0 items-center gap-1',
   footerName: 'min-w-0 flex-1 truncate text-base font-semibold',
   footerActions: 'flex shrink-0 items-center gap-0.5',
   footerIcon: 'size-5 shrink-0',
+  // Creator pick under the account row
+  footerRule: 'mx-1 my-1.5 h-px bg-[var(--color-border)]',
   // Version under the nav
   version:
     'rail-fold mx-4 mt-2 mb-1 shrink-0 self-start rounded-[var(--radius-sm)] px-2 py-1 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
@@ -266,15 +268,18 @@ export const TOP_BAR = {
 
 export const ACCOUNT_SHEET = {
   stack: 'flex flex-col',
-  row: 'flex flex-wrap items-center justify-between gap-2 pb-3',
+  row: 'flex flex-wrap items-center justify-between gap-2 pb-2',
   label: PROPERTY_LABEL,
   divider: 'h-px bg-[var(--color-border)]',
+  // View switch, set apart from the theme row
+  switchRule: 'my-3 h-px bg-[var(--color-border)]',
   // A single row of glyph-only actions
-  iconRow: 'flex items-stretch pt-1',
+  iconRow: 'flex items-stretch',
   // Colour lives in the exclusive tones below
-  iconButton: 'flex flex-1 items-center justify-center py-3 transition-colors',
+  iconButton: 'flex flex-1 items-center justify-center py-2 transition-colors',
   iconIdle: 'text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]',
-  iconButtonDanger: 'text-[var(--color-danger)] hover:brightness-90',
+  // Softened red
+  iconButtonDanger: 'text-[var(--color-danger)]/65 hover:text-[var(--color-danger)]',
   icon: 'h-5 w-5',
   iconDivider: 'w-px shrink-0 bg-[var(--color-border)]',
   dot: 'absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-surface-raised)]',
@@ -816,27 +821,58 @@ export const NUDGE = {
 export const CREATOR_MENU = {
   wrapper: 'relative min-w-0 flex-1',
   trigger:
-    'flex w-full min-w-0 items-center gap-3 rounded-[var(--radius-lg)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--color-hover)]',
+    'flex w-full min-w-0 items-center gap-2 rounded-[var(--radius-lg)] px-1.5 py-1 text-left transition-colors hover:bg-[var(--color-hover)]',
   // Folded rail, portrait alone
   triggerBare: 'w-auto flex-none justify-center gap-0 p-1',
-  // Same footprint as a portrait
-  noneGlyph: 'h-8 w-8 shrink-0 p-1',
-  name: 'rail-fold min-w-0 flex-1 truncate text-body font-medium',
-  chevron: 'rail-fold h-4 w-4 shrink-0 transition-transform motion-reduce:transition-none',
+  portrait: 'relative shrink-0',
+  // Unopened notifications, softened red
+  dot: 'absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-[var(--color-danger)]/70 ring-2 ring-[var(--color-surface-raised)]',
+  name: 'rail-fold min-w-0 flex-1 truncate text-sm font-medium',
+  chevron: 'rail-fold h-3.5 w-3.5 shrink-0 transition-transform motion-reduce:transition-none',
   // Closed points down
   chevronShut: 'rotate-0',
   chevronOpen: 'rotate-180',
-  body: 'flex flex-col gap-2 p-3',
+  // Portrait beside the name, not above
+  head: 'flex shrink-0 flex-col items-center gap-1 border-b border-[var(--color-border)] px-4 py-3 text-center',
+  body: 'flex flex-col gap-1 p-2',
   divider: 'h-px bg-[var(--color-border)]',
-  heading: `px-1 pt-1 ${PROPERTY_LABEL}`,
-  list: 'flex max-h-64 flex-col gap-0.5 overflow-y-auto',
-  option:
-    'flex w-full items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-1.5 text-left text-sm transition-colors disabled:opacity-60',
-  optionIdle: 'hover:bg-[var(--color-hover)]',
-  optionActive: 'bg-[var(--color-hover)] font-semibold',
-  optionName: 'min-w-0 flex-1 truncate',
-  // Creator accent dot
-  optionMark: 'h-2 w-2 shrink-0 rounded-full bg-[var(--accent)]',
+} as const
+
+/**
+ * Creator view unrolled above the account row
+ * @type {Record<string, string>}
+ */
+
+export const CREATOR_VIEW = {
+  // Height unrolls from nothing
+  fold: 'grid transition-[grid-template-rows] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  foldOpen: 'grid-rows-[1fr]',
+  foldShut: 'grid-rows-[0fr]',
+  foldInner: 'min-h-0 overflow-hidden',
+  list: 'flex max-h-48 flex-col overflow-y-auto',
+  row: 'flex w-full min-w-0 items-center gap-2 rounded-[var(--radius-md)] px-1.5 py-1 text-left text-sm transition-colors',
+  rowPick: 'hover:bg-[var(--color-hover)]',
+  rowCurrent: 'font-semibold',
+  rowGlyph: 'size-6 shrink-0',
+  label: 'min-w-0 flex-1 truncate',
+  rule: 'mx-1 my-1.5 h-px bg-[var(--color-border)]',
+  button:
+    'flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  buttonIcon: 'size-[1.125rem]',
+} as const
+
+/**
+ * Latest notifications of the account box
+ * @type {Record<string, string>}
+ */
+
+export const ACCOUNT_NOTIFICATIONS = {
+  wrapper: 'flex flex-col gap-1',
+  head: 'flex items-center justify-between gap-2 px-1 pt-1',
+  heading: PROPERTY_LABEL,
+  seeAll:
+    'text-xs font-semibold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  empty: `px-1 py-2 text-sm ${EMPTY_VALUE}`,
 } as const
 
 /**

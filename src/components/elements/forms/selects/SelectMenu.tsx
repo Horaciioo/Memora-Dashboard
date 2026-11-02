@@ -38,6 +38,10 @@ export interface SelectMenuProps {
   // Link pinned above the options
   action?: Omit<FieldAction, 'permission'>
   size?: SelectMenuSize
+  // Panel opens upward
+  opensUp?: boolean
+  // Trigger drawn without the field box
+  isBare?: boolean
   disabled?: boolean
   invalid?: boolean
   describedBy?: string
@@ -64,6 +68,8 @@ const SEARCH_THRESHOLD = 8
  * @param {boolean} [isMarkOnly] - Trigger shows the glyph alone
  * @param {FieldAction} [action] - Link above the options
  * @param {SelectMenuSize} [size] - Size token
+ * @param {boolean} [opensUp] - Panel opens upward
+ * @param {boolean} [isBare] - Trigger without the field box
  * @param {boolean} [disabled] - Blocks the control
  * @param {boolean} [invalid] - Paints the rejection border
  * @param {string} [describedBy] - Identifier of the message describing the control
@@ -84,6 +90,8 @@ export const SelectMenu = ({
   isMarkOnly,
   action,
   size = 'block',
+  opensUp,
+  isBare,
   disabled,
   invalid,
   describedBy,
@@ -97,6 +105,7 @@ export const SelectMenu = ({
   const { isOpen, setOpen, close, triggerRef, panelRef } = useAnchoredPanel({
     matchTriggerWidth: true,
     minWidth: MIN_PANEL_WIDTH,
+    prefersAbove: opensUp,
   })
 
   const { showHint } = useHints()
@@ -201,7 +210,7 @@ export const SelectMenu = ({
         }
       }}
       className={cn(
-        SELECT_MENU_STYLES.trigger,
+        isBare ? SELECT_MENU_STYLES.triggerBare : SELECT_MENU_STYLES.trigger,
         SELECT_MENU_SIZES[size].trigger,
         invalid && SELECT_MENU_STYLES.invalid,
         className

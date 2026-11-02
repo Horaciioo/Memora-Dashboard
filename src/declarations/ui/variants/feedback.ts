@@ -329,7 +329,11 @@ export const TIP = {
     'absolute top-full left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[var(--color-ink)]',
   // Same bubble drawn on the body, centred above its anchor
   floating:
-    'pointer-events-none fixed z-[90] -translate-x-1/2 -translate-y-full rounded-[var(--radius-sm)] bg-[var(--color-ink)] px-2 py-1 text-xs leading-none font-semibold tracking-normal whitespace-nowrap text-[var(--color-surface-raised)] normal-case shadow-[var(--shadow-md)]',
+    'pointer-events-none fixed z-[90] -translate-x-1/2 rounded-[var(--radius-sm)] bg-[var(--color-ink)] px-2 py-1 text-xs leading-none font-semibold tracking-normal whitespace-nowrap text-[var(--color-surface-raised)] normal-case shadow-[var(--shadow-md)]',
+  floatingAbove: '-translate-y-full',
+  // Under its anchor, near the window top
+  arrowBelow:
+    'absolute bottom-full left-1/2 h-2 w-2 -translate-x-1/2 translate-y-1/2 rotate-45 bg-[var(--color-ink)]',
 } as const
 
 /**

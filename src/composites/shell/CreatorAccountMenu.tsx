@@ -1,15 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
-import { pickCreator } from '@/app/(dashboard)/actions'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { AccountActions } from '@/composites/shell/AccountActions'
+import { AccountNotifications } from '@/composites/shell/AccountNotifications'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/useOutsideDismiss'
-import { VIEW_COPY } from '@/declarations/access/copy'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { CREATOR_MENU, RAIL_POPOVER } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
-import { accentVars } from '@/declarations/ui/theme'
+import { useNotificationsStore } from '@/core/store/notifications'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
 import { cn } from '@/utils/classnames'
@@ -20,8 +19,8 @@ export interface CreatorAccountMenuProps {
 }
 
 /**
- * Account footer of the rail, its box opening beside the rail with the account actions and,
- * for a member of several creators, the creator on screen
+ * Account footer of the rail, its box opening beside the rail with the account actions
+ * and the latest notifications
  * @param {ViewContext} viewContext - View resolved server-side
  * @param {boolean} [isCompact] - Rail is folded, only a small portrait shows
  * @return {JSX.Element | null}
@@ -30,13 +29,9 @@ export interface CreatorAccountMenuProps {
 export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMenuProps) => {
   const { session } = useAuthContext()
   const [isOpen, setOpen] = useState(false)
-  const [isPicking, startPicking] = useTransition()
   const boundary = useRef<HTMLDivElement>(null)
   const Chevron = ICONS.expand
-  const OffIcon = ICONS.youtuberOff
-
-  const { creators, activeYoutuberId } = viewContext
-  const hasChoice = creators.length > 1
+  const unread = useNotificationsStore((state) => state.feed.unread)
 
   const shut = useCallback(() => setOpen(false), [])
   useOutsideDismiss(isOpen, boundary, shut)
@@ -55,14 +50,6 @@ export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMen
 
   if (!session) return null
 
-  const active = creators.find((creator) => creator.id === activeYoutuberId) ?? null
-  const shown = hasChoice ? active : null
-
-  const pick = (youtuberId: string | null) => {
-    shut()
-    startPicking(() => void pickCreator(youtuberId))
-  }
-
   return (
     <div ref={boundary} className={CREATOR_MENU.wrapper}>
       <button
@@ -70,15 +57,18 @@ export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMen
         aria-expanded={isOpen}
         aria-haspopup="true"
         onClick={() => setOpen((open) => !open)}
-        title={isCompact ? (shown?.name ?? session.displayName) : undefined}
+        title={isCompact ? session.displayName : undefined}
         className={cn(CREATOR_MENU.trigger, isCompact && CREATOR_MENU.triggerBare)}
       >
-        <Avatar
-          name={shown?.name ?? session.displayName}
-          src={shown ? shown.avatarUrl : session.avatarUrl}
-          size={isCompact ? 'xs' : 'sm'}
-        />
-        <span className={CREATOR_MENU.name}>{shown?.name ?? session.displayName}</span>
+        <span className={CREATOR_MENU.portrait}>
+          <Avatar
+            name={session.displayName}
+            src={session.avatarUrl}
+            size={isCompact ? 'xs' : 'sm'}
+          />
+          {unread > 0 && <span className={CREATOR_MENU.dot} aria-hidden="true" />}
+        </span>
+        <span className={CREATOR_MENU.name}>{session.displayName}</span>
         <Chevron
           className={cn(
             CREATOR_MENU.chevron,
@@ -90,65 +80,16 @@ export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMen
 
       {isOpen && (
         <div role="dialog" className={cn(RAIL_POPOVER.panel, RAIL_POPOVER.account)}>
-          <div className={RAIL_POPOVER.head}>
-            <Avatar name={session.displayName} src={session.avatarUrl} size="lg" />
-            <p className={RAIL_POPOVER.headTitle}>{session.displayName}</p>
+          <div className={CREATOR_MENU.head}>
+            <Avatar name={session.displayName} src={session.avatarUrl} size="md" />
+            <p className={cn(RAIL_POPOVER.headTitle, 'truncate text-lg')}>{session.displayName}</p>
             <p className={RAIL_POPOVER.headMeta}>{ROLE_REGISTRY.label(session.role)}</p>
           </div>
 
           <div className={cn(RAIL_POPOVER.body, CREATOR_MENU.body)}>
-            <AccountActions onNavigate={shut} />
-
-            {hasChoice && (
-              <>
-                <span className={CREATOR_MENU.divider} aria-hidden="true" />
-                <p className={CREATOR_MENU.heading}>{VIEW_COPY.activeCreator}</p>
-                <ul className={CREATOR_MENU.list}>
-                  {creators.map((creator) => {
-                    const isActive = creator.id === activeYoutuberId
-
-                    return (
-                      <li key={creator.id}>
-                        <button
-                          type="button"
-                          disabled={isPicking}
-                          aria-pressed={isActive}
-                          style={accentVars(creator.accent, 'brand')}
-                          onClick={() => pick(creator.id)}
-                          className={cn(
-                            CREATOR_MENU.option,
-                            isActive ? CREATOR_MENU.optionActive : CREATOR_MENU.optionIdle
-                          )}
-                        >
-                          <Avatar name={creator.name} src={creator.avatarUrl} size="sm" />
-                          <span className={CREATOR_MENU.optionName}>{creator.name}</span>
-                          {isActive && (
-                            <span className={CREATOR_MENU.optionMark} aria-hidden="true" />
-                          )}
-                        </button>
-                      </li>
-                    )
-                  })}
-                  <li>
-                    <button
-                      type="button"
-                      disabled={isPicking}
-                      aria-pressed={activeYoutuberId === null}
-                      onClick={() => pick(null)}
-                      className={cn(
-                        CREATOR_MENU.option,
-                        activeYoutuberId === null
-                          ? CREATOR_MENU.optionActive
-                          : CREATOR_MENU.optionIdle
-                      )}
-                    >
-                      <OffIcon className={CREATOR_MENU.noneGlyph} aria-hidden="true" />
-                      <span className={CREATOR_MENU.optionName}>{VIEW_COPY.noCreator}</span>
-                    </button>
-                  </li>
-                </ul>
-              </>
-            )}
+            <AccountActions viewContext={viewContext} onNavigate={shut} />
+            <span className={CREATOR_MENU.divider} aria-hidden="true" />
+            <AccountNotifications onNavigate={shut} />
           </div>
         </div>
       )}

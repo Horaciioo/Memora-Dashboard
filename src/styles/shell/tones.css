@@ -95,6 +95,8 @@
   --color-frame-mauve: #e95360;
   --color-frame-blue: #dc4863;
   --color-frame: #e95360;
+  --footer-wash-start: 60%;
+  --footer-wash-end: 52%;
 }
 
 .app-tone[data-tone='junior'] {

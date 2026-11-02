@@ -33,6 +33,7 @@ export interface LivesBoardProps {
   canReport: boolean
   canDelete: boolean
   canCreatorReport: boolean
+  // Dev only: simulated live controls
 }
 
 /**
