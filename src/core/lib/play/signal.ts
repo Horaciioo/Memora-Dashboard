@@ -24,6 +24,15 @@ export const signalPlay = async (
 }
 
 /**
+ * Tell every Play page the tables moved
+ * @return {Promise<void>} - Sent
+ */
+
+export const signalLobbies = async (): Promise<void> => {
+  await publishLive(PLAY_TOPICS.lobbies, { type: PLAY_STREAM_EVENTS.changed, at: Date.now() })
+}
+
+/**
  * Hand a new chat line to a game's readers
  * @param {string} sessionId - Game
  * @param {PlayMessageView} message - Line

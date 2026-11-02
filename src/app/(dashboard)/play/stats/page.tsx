@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { PlaySignal } from '@/composites/play/hub/PlaySignal'
 import { PlayBackLink } from '@/composites/play/member/stats/PlayBackLink'
 import { PlayGameLevels } from '@/composites/play/member/stats/PlayGameLevels'
 import { PlayPlayerCard } from '@/composites/play/member/stats/PlayPlayerCard'
@@ -7,6 +8,7 @@ import { PlayStatTiles } from '@/composites/play/member/stats/PlayStatTiles'
 import { readPlayProfile } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_HUB_COPY } from '@/declarations/play'
+import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { PLAY_HUB } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -23,6 +25,7 @@ export default async function PlayStatsPage() {
 
   return (
     <div className={PLAY_HUB.main}>
+      <PlaySignal topic={PLAY_TOPICS.lobbies} />
       <PlayBackLink />
       <h1 className={PLAY_HUB.heading}>{PLAY_HUB_COPY.statsTitle}</h1>
       <PlayPlayerCard

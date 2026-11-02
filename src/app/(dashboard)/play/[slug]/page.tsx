@@ -9,7 +9,6 @@ import { PlayConcept } from '@/composites/play/hub/concept/PlayConcept'
 import { PlayHubMenu } from '@/composites/play/hub/PlayHubMenu'
 import { PlayLeaderboard } from '@/composites/play/hub/PlayLeaderboard'
 import { PlayLiveTables } from '@/composites/play/hub/PlayLiveTables'
-import { PlayLobbyList } from '@/composites/play/hub/PlayLobbyList'
 import { PlayEmbers } from '@/composites/play/hub/PlayEmbers'
 import { LudoHopField } from '@/composites/play/ludo/LudoHopField'
 import { PlayPaperWords } from '@/composites/play/hub/PlayPaperWords'
@@ -112,21 +111,13 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
           <PlayLiveTables
             title={PLAY_HUB_COPY.inGameTitle}
             empty={PLAY_HUB_COPY.inGameEmpty}
-            tables={tables.running}
+            tables={[...tables.running, ...tables.lobbies]}
             mineId={presence?.sessionId}
             isLocked={isLocked}
             className={PLAY_HUB.hubLive}
           />
         }
         panels={{
-          lobbies: (
-            <PlayLobbyList
-              lobbies={tables.lobbies}
-              presence={presence}
-              isLocked={isLocked}
-              empty={PLAY_HUB_COPY.noLobby}
-            />
-          ),
           concept: <PlayConcept game={game} />,
           leaders: <PlayLeaderboard leaders={leaders} meId={session.id} />,
           stats: (

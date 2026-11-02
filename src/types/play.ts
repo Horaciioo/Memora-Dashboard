@@ -7,6 +7,23 @@ import type {
 import type { Prisma } from '@prisma/client'
 
 /**
+ * Table card read by the hubs
+ * @typedef {Object} PlayLobbyCard
+ */
+
+export interface PlayLobbyCard {
+  id: string
+  game: PlayGameName
+  hostName: string | null
+  hostAvatarUrl: string | null
+  players: number
+  faces: { id: string; name: string; avatarUrl: string | null }[]
+  status: string
+  maxPlayers: number
+  gamesCount: number | null
+}
+
+/**
  * What an engine sees of a game
  * @typedef {Object} EngineSession
  * @property {string} id - Game

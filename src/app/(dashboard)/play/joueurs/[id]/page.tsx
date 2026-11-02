@@ -2,12 +2,14 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { PlayGameLevels } from '@/composites/play/member/stats/PlayGameLevels'
+import { PlaySignal } from '@/composites/play/hub/PlaySignal'
 import { PlayBackLink } from '@/composites/play/member/stats/PlayBackLink'
 import { PlayPlayerHero } from '@/composites/play/member/stats/PlayPlayerHero'
 import { PlayTrophies } from '@/composites/play/member/stats/PlayTrophies'
 import { readPlayPlayer } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_HUB_COPY } from '@/declarations/play'
+import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { PLAY_HUB } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -32,6 +34,7 @@ export default async function PlayPlayerPage({ params }: PlayPlayerPageProps) {
 
   return (
     <div className={PLAY_HUB.main}>
+      <PlaySignal topic={PLAY_TOPICS.lobbies} />
       <PlayBackLink />
       <PlayPlayerHero totals={profile.global} player={player} />
       <PlayGameLevels games={profile.games} />

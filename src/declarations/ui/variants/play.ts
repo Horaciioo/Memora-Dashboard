@@ -108,7 +108,7 @@ export const PLAY_HUB = {
   page: 'relative flex min-h-0 flex-1 flex-col',
   hub: 'relative flex min-h-0 flex-1 items-center justify-center max-sm:overflow-y-auto',
   hubSplit: 'flex flex-col items-center gap-8 lg:flex-row lg:gap-14 xl:gap-20',
-  hubLive: 'w-full max-w-sm shrink-0 lg:max-h-[min(34rem,calc(100dvh-14rem))] lg:w-80',
+  hubLive: 'w-full max-w-md shrink-0 lg:max-h-[min(36rem,calc(100dvh-14rem))] lg:w-[26rem]',
   hubIdentity: 'flex flex-col items-center gap-4 text-center',
   hubLogo: 'size-40 sm:size-52',
   hubLogoLarge: 'size-44 sm:size-72',
@@ -305,7 +305,7 @@ export const PLAY_NOTICE = {
 export const PLAY_CROSS = {
   // Games left, the live column right
   stage:
-    'mx-auto grid w-full max-w-[96rem] items-start gap-8 pb-28 lg:min-h-[calc(100dvh-11rem)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-center xl:grid-cols-[minmax(0,1fr)_27rem]',
+    'mx-auto grid w-full max-w-[96rem] items-start gap-8 pb-28 lg:min-h-[calc(100dvh-11rem)] lg:grid-cols-[minmax(0,1fr)_26rem] lg:items-center xl:grid-cols-[minmax(0,1fr)_29rem]',
   games: 'flex min-w-0 flex-col items-center gap-6',
   heading: `${HEADING} text-center sm:text-3xl`,
   // Two by two, posters as tall as the screen leaves room for
@@ -420,7 +420,7 @@ export const PLAY_CHAT_UI = {
   author: 'truncate text-sm font-extrabold',
   time: 'text-[0.7rem] font-semibold tabular-nums text-[var(--play-ink-faint)]',
   text: 'text-sm break-words whitespace-pre-wrap text-[var(--play-ink)]',
-  composer: 'flex items-end gap-2 border-t border-[var(--play-line)] p-3',
+  composer: 'relative flex items-end gap-2 border-t border-[var(--play-line)] p-3',
   invite:
     'grid size-11 shrink-0 place-items-center rounded-xl bg-[var(--play-chip)] text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-key)] hover:text-[var(--play-key-ink)]',
   inviteOn: 'bg-[var(--play-key)] text-[var(--play-key-ink)]',
@@ -438,7 +438,8 @@ export const PLAY_INVITE = {
   anchor: 'relative',
   panel: `${BUBBLE} absolute top-full left-0 z-30 mt-2 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-3 p-3 text-[var(--play-ink)]`,
   panelEnd: 'right-0 left-auto',
-  panelAbove: 'top-auto bottom-full mt-0 mb-2',
+  // Over the composer, as wide as it so the chat never clips it
+  panelDock: `${BUBBLE} absolute inset-x-3 bottom-full z-30 mb-2 flex flex-col gap-3 p-3 text-[var(--play-ink)]`,
   // Opens in the seats grid, never clipped
   anchorInline: 'contents',
   panelInline: `${PANEL} relative col-span-full mx-auto mt-2 flex w-full max-w-md flex-col gap-3 p-3 text-[var(--play-ink)]`,

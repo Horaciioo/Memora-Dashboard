@@ -26,7 +26,10 @@ export const PlayInviteAnchor = ({ trigger, inline, ...picker }: PlayInviteAncho
   useOutsideDismiss(isOpen, box, close)
 
   return (
-    <div ref={box} className={inline ? PLAY_INVITE.anchorInline : PLAY_INVITE.anchor}>
+    <div
+      ref={box}
+      className={inline || picker.above ? PLAY_INVITE.anchorInline : PLAY_INVITE.anchor}
+    >
       {trigger(() => setOpen((current) => !current), isOpen)}
       {isOpen && <PlayInvitePicker {...picker} inline={inline} onDone={close} />}
     </div>

@@ -83,7 +83,9 @@ export const PlayInvitePicker = ({
       className={
         inline
           ? PLAY_INVITE.panelInline
-          : cn(PLAY_INVITE.panel, alignEnd && PLAY_INVITE.panelEnd, above && PLAY_INVITE.panelAbove)
+          : above
+            ? PLAY_INVITE.panelDock
+            : cn(PLAY_INVITE.panel, alignEnd && PLAY_INVITE.panelEnd)
       }
     >
       {inline && <span aria-hidden="true" className={PLAY_INVITE.arrow} />}

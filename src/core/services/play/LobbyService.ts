@@ -6,7 +6,7 @@ import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { pickSeatColor, readBodyInteger, readBodyText } from '@/core/lib/play'
 import { clearDeadline } from '@/core/lib/play/timers'
-import { signalPlay } from '@/core/lib/play/signal'
+import { signalLobbies, signalPlay } from '@/core/lib/play/signal'
 import { PLAY_ERRORS, PLAY_GAMES, PLAY_JOURNAL, PLAY_SETTINGS } from '@/declarations/play'
 import { announceInChat } from '@/core/services/play/PlayChatService'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
@@ -117,10 +117,11 @@ export const listLobbies = async (accountId: string, game?: string | null) => {
   const idleSince = new Date(Date.now() - PLAY_SETTINGS.lobbyIdleMinutes * MINUTE_MS)
 
   // Forgotten lobbies close quietly
-  await prisma.playSession.updateMany({
+  const { count: closed } = await prisma.playSession.updateMany({
     where: { status: PlayStatuses.Lobby, updatedAt: { lt: idleSince } },
     data: { status: PlayStatuses.Abandoned },
   })
+  if (closed) await signalLobbies()
 
   // Running games welcome spectators
   const [lobbies, running, current] = await Promise.all([
@@ -442,7 +443,7 @@ export const updateSettings = async (
       },
     })
   })
-  await signalPlay(sessionId)
+  await signalPlay(sessionId, true)
 }
 
 /**
