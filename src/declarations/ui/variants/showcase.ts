@@ -96,7 +96,6 @@ export const SHOWCASE = {
   treeRow:
     'flex min-h-8 items-center gap-2 rounded-[var(--radius-lg)] px-3 py-1 text-caption font-medium whitespace-nowrap',
   treeRowOn: 'bg-[var(--color-surface)] font-semibold',
-  treeBone: `!h-8 ${BONE}`,
   glyph: 'size-4 shrink-0',
   // Share card
   share: `${FLOAT} right-8 bottom-28 flex w-80 flex-col gap-3 p-4`,

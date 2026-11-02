@@ -1,10 +1,4 @@
-import { Skeleton } from '@/components/elements/feedback/Skeleton'
-import {
-  SHOWCASE_COPY,
-  SHOWCASE_SETTINGS,
-  SHOWCASE_SKELETONS,
-  SHOWCASE_STEPS,
-} from '@/declarations/changelog/showcase'
+import { SHOWCASE_COPY, SHOWCASE_SETTINGS, SHOWCASE_STEPS } from '@/declarations/changelog/showcase'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { NAVIGATION, NavigationViews, ROUTES } from '@/declarations/navigation'
 import { PAGES_COPY } from '@/declarations/pages/copy'
@@ -72,15 +66,14 @@ export const ShowcaseRail = ({ step }: ShowcaseRailProps) => {
               <AddIcon className={LEFT_SIDEBAR.navIcon} />
               {PAGES_COPY.railNew}
             </span>
-            <hr className={PAGE_RAIL_STYLES.divider} />
-            {Array.from({ length: SHOWCASE_SKELETONS.tree }, (_, index) => (
-              <Skeleton key={index} shape="row" className={SHOWCASE.treeBone} />
-            ))}
             {isCreated && (
-              <span className={cn(SHOWCASE.treeRow, SHOWCASE.treeRowOn)}>
-                <PageIcon className={SHOWCASE.glyph} />
-                {step >= SHOWCASE_STEPS.fill ? SHOWCASE_COPY.pageName : PAGES_COPY.untitled}
-              </span>
+              <>
+                <hr className={PAGE_RAIL_STYLES.divider} />
+                <span className={cn(SHOWCASE.treeRow, SHOWCASE.treeRowOn)}>
+                  <PageIcon className={SHOWCASE.glyph} />
+                  {step >= SHOWCASE_STEPS.fill ? SHOWCASE_COPY.pageName : PAGES_COPY.untitled}
+                </span>
+              </>
             )}
           </div>
         ) : (

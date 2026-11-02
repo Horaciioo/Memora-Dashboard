@@ -100,4 +100,4 @@ export const SHOWCASE_COPY = {
 } as const
 
 // Skeleton rows around the real ones
-export const SHOWCASE_SKELETONS = { rows: 2, tree: 2 } as const
+export const SHOWCASE_SKELETONS = { rows: 2 } as const
