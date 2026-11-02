@@ -27,6 +27,8 @@ const feedLineOf = (move: LudoMove) => ({
   values: {
     victimId: move.victimId ?? '',
     place: move.to ? ludoPlaceLabel(move.to) : '',
+    // Told once the screen reaches this line
+    rev: move.rev,
   },
 })
 

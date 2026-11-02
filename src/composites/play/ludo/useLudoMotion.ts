@@ -13,6 +13,7 @@ import {
   YARD_STEP,
 } from '@/core/lib/play/ludo'
 import type { LudoBoardState, LudoLineView } from '@/core/lib/play/ludo'
+import { useLudoPlayedStore } from '@/core/store/ludoPlayed'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { LUDO_MIX } from '@/declarations/play/ludo/sounds'
 
@@ -72,10 +73,15 @@ const wait = (ms: number): Promise<void> => new Promise((done) => window.setTime
  * Board played line by line: the die tumbles, pawns hop square by square, sounds on each beat
  * @param {LudoBoardState} board - Newest board
  * @param {string} viewerId - Player watching
+ * @param {string} sessionId - Game, told how far the screen played
  * @return {LudoMotion} - Board on screen
  */
 
-export const useLudoMotion = (board: LudoBoardState, viewerId: string): LudoMotion => {
+export const useLudoMotion = (
+  board: LudoBoardState,
+  viewerId: string,
+  sessionId: string
+): LudoMotion => {
   const [motion, setMotion] = useState<LudoMotion>(() => ({
     pawns: pawnsOf(board.players),
     ...lastRoll(board.lines),
@@ -89,6 +95,7 @@ export const useLudoMotion = (board: LudoBoardState, viewerId: string): LudoMoti
   const queue = useRef<LudoLineView[]>([])
   const isRunning = useRef(false)
   const isAlive = useRef(true)
+  const setPlayed = useLudoPlayedStore((state) => state.setPlayed)
 
   // Files ready before the first roll
   useEffect(() => {
@@ -116,6 +123,8 @@ export const useLudoMotion = (board: LudoBoardState, viewerId: string): LudoMoti
     setMotion((current) => ({ ...current, isBusy: true }))
     while (queue.current.length && isAlive.current) {
       const line = queue.current.shift()!
+      // Its feed line is told as its beat starts
+      setPlayed(sessionId, line.rev)
       await playLine({
         line,
         next: queue.current[0],
@@ -127,6 +136,7 @@ export const useLudoMotion = (board: LudoBoardState, viewerId: string): LudoMoti
     }
     isRunning.current = false
     if (!isAlive.current) return
+    setPlayed(sessionId, latest.current.rev)
 
     // Screen settles on the server board
     setMotion((current) => ({
@@ -136,7 +146,7 @@ export const useLudoMotion = (board: LudoBoardState, viewerId: string): LudoMoti
       hop: null,
       walking: null,
     }))
-  }, [place, viewerId])
+  }, [place, viewerId, sessionId, setPlayed])
 
   // New board, its lines queued
   useEffect(() => {
@@ -145,6 +155,7 @@ export const useLudoMotion = (board: LudoBoardState, viewerId: string): LudoMoti
     if (fresh === null) {
       queue.current = []
       shown.current = board.rev
+      setPlayed(sessionId, board.rev)
       setMotion((current) => ({
         ...current,
         pawns: pawnsOf(board.players),
@@ -157,9 +168,10 @@ export const useLudoMotion = (board: LudoBoardState, viewerId: string): LudoMoti
     shown.current = Math.max(shown.current, ...fresh.map((line) => line.rev))
     if (!isRunning.current && queue.current.length) void run()
     else if (!isRunning.current) {
+      setPlayed(sessionId, board.rev)
       setMotion((current) => ({ ...current, pawns: pawnsOf(board.players) }))
     }
-  }, [board, run])
+  }, [board, run, sessionId, setPlayed])
 
   return motion
 }

@@ -13,11 +13,11 @@ export const LUDO_BOARD = {
   board:
     'relative mx-auto grid w-full grid-cols-2 gap-x-6 gap-y-3 pb-16 select-none [grid-template-areas:"tl_tr"_"board_board"_"status_status"_"bl_br"] lg:w-fit lg:grid-cols-[minmax(11rem,1fr)_auto_minmax(11rem,1fr)] lg:grid-rows-[1fr_1fr_auto] lg:[grid-template-areas:"tl_board_tr"_"bl_board_br"_"._status_."]',
   figure: 'play-figure text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
+  // Same size on every turn, so the table never moves
   status:
-    'justify-self-center text-center text-sm font-extrabold text-[var(--play-ink)] [grid-area:status]',
-  // The viewer's turn: a solid plate, set apart from the board
-  statusCall:
-    'mt-5 rounded-2xl bg-[var(--play-ludo)] px-6 py-3 text-lg text-[var(--play-on-art)] shadow-[0_0.2rem_0_var(--play-ludo-deep)]',
+    'my-4 min-h-7 max-w-full self-center justify-self-center truncate text-center text-lg leading-7 font-extrabold text-[var(--play-ink)] [grid-area:status]',
+  // The viewer's turn: blue text, no box
+  statusCall: 'text-[var(--play-ludo-call)]',
   frame: 'ludo-frame w-full [grid-area:board] lg:w-[min(36rem,calc(100dvh-13rem))]',
   surface: 'ludo-board',
   grid: 'absolute inset-0 size-full',
