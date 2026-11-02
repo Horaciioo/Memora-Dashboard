@@ -43,7 +43,9 @@
     ".next-ws/types/**/*.ts",
     ".next-ws/dev/types/**/*.ts",
     ".next-validate/types/**/*.ts",
-    ".next-validate/dev/types/**/*.ts"
+    ".next-validate/dev/types/**/*.ts",
+    ".next-build/types/**/*.ts",
+    ".next-build/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules", "src/worker/sw.ts"]
 }
