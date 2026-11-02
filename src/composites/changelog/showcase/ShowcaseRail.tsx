@@ -1,6 +1,5 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { SHOWCASE_COPY, SHOWCASE_SETTINGS, SHOWCASE_STEPS } from '@/declarations/changelog/showcase'
-import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { NAVIGATION, NavigationViews, ROUTES } from '@/declarations/navigation'
 import { PAGES_COPY } from '@/declarations/pages/copy'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
@@ -36,7 +35,6 @@ const ENTRIES = NAVIGATION.filter(
  */
 
 export const ShowcaseRail = ({ step }: ShowcaseRailProps) => {
-  const SearchIcon = ICONS.search
   const AddIcon = ICONS.add
   const BellIcon = ICONS.bell
   const PageIcon = ICONS.page
@@ -57,13 +55,7 @@ export const ShowcaseRail = ({ step }: ShowcaseRailProps) => {
           {NAV_COPY.railSectionNormal}
         </span>
       </div>
-
-      <div className={LEFT_SIDEBAR.searchRow}>
-        <span className={SHOWCASE.searchBox}>
-          <SearchIcon className={SHOWCASE.searchGlyph} />
-          {ASSISTANT_COPY.launcher}
-        </span>
-      </div>
+      <div className={LEFT_SIDEBAR.viewDivider} />
 
       <div className={LEFT_SIDEBAR.shortcuts}>
         {SHORTCUTS.map((item) => {

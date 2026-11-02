@@ -156,23 +156,16 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       )}
 
       {hasSections && <RailSectionSwitch value={section} onChange={setSection} />}
+      {hasSections && !courseRail && <div className={LEFT_SIDEBAR.viewDivider} />}
 
-      <div className={LEFT_SIDEBAR.searchRow}>
-        {isCalendarMenu && calendarRail ? (
-          <>
-            <CalendarSearchBar value={calendarRail.search} onChange={calendarRail.onSearch} />
-            {/* Kept mounted so the palette shortcut still answers */}
-            <div className="hidden">
-              <SearchLauncher />
-            </div>
-          </>
-        ) : (
-          <SearchLauncher
-            expanded={!isCompact}
-            className={isCompact ? LEFT_SIDEBAR.searchGlyph : undefined}
-            iconClassName={isCompact ? LEFT_SIDEBAR.shortcutIcon : undefined}
-          />
-        )}
+      {isCalendarMenu && calendarRail && (
+        <div className={LEFT_SIDEBAR.searchRow}>
+          <CalendarSearchBar value={calendarRail.search} onChange={calendarRail.onSearch} />
+        </div>
+      )}
+      {/* No visible bar, kept mounted so the palette shortcut still answers */}
+      <div className="hidden">
+        <SearchLauncher />
       </div>
 
       {!courseRail && topBlock}

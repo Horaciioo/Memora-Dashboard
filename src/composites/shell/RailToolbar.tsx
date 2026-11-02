@@ -1,6 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { CommandPalette } from '@/composites/search/CommandPalette'
 import { ROUTES } from '@/declarations/navigation'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
@@ -22,6 +24,7 @@ export interface RailToolbarProps {
 
 export const RailToolbar = ({ isCompact, onToggle }: RailToolbarProps) => {
   const router = useRouter()
+  const [isSearching, setSearching] = useState(false)
   const foldLabel = isCompact ? NAV_COPY.expandRail : NAV_COPY.collapseRail
 
   const buttons: { icon: IconName; label: string; onClick: () => void; className?: string }[] = [
@@ -32,12 +35,17 @@ export const RailToolbar = ({ isCompact, onToggle }: RailToolbarProps) => {
       onClick: router.forward,
       className: 'rail-fold',
     },
-    // Status and fold sit at the far end, centred once the rail is folded
+    // Search, status and fold sit at the far end, centred once the rail is folded
+    {
+      icon: 'search',
+      label: NAV_COPY.searchTitle,
+      onClick: () => setSearching(true),
+      className: isCompact ? undefined : 'ml-auto',
+    },
     {
       icon: 'metrics',
       label: NAV_COPY.status,
       onClick: () => router.push(ROUTES.status),
-      className: isCompact ? undefined : 'ml-auto',
     },
     { icon: 'sidebar', label: foldLabel, onClick: onToggle },
   ]
@@ -60,6 +68,7 @@ export const RailToolbar = ({ isCompact, onToggle }: RailToolbarProps) => {
           </button>
         )
       })}
+      {isSearching && <CommandPalette onClose={() => setSearching(false)} />}
     </div>
   )
 }

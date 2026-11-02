@@ -35,7 +35,8 @@ const Chain = ({ pages, depth, isRoot }: ChainProps) => {
 
   return (
     <div
-      className={cn('fold', isRoot && LEFT_SIDEBAR.subPageRoot)}
+      // A closed level keeps no pull, it would crowd the next destination
+      className={cn('fold', isRoot && isOpen && LEFT_SIDEBAR.subPageRoot)}
       data-open={isOpen}
       inert={!isOpen}
     >

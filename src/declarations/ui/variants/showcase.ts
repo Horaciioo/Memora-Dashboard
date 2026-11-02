@@ -46,9 +46,6 @@ export const SHOWCASE = {
   crumb: 'text-sm font-semibold text-[var(--color-ink-subtle)]',
   // Rail
   rail: 'rail-ground flex w-64 shrink-0 flex-col overflow-hidden rounded-[var(--radius-xl)] py-3',
-  searchBox:
-    'glass-panel flex h-11 w-full items-center gap-2 rounded-[var(--radius-lg)] border px-3 text-sm text-[var(--color-ink-subtle)]',
-  searchGlyph: 'size-4 shrink-0',
   railScroll: 'flex min-h-0 flex-1 flex-col gap-3 overflow-hidden px-4 pt-4',
   railLabel: 'px-3 pb-1 text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   // Cursor
