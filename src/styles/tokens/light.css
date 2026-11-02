@@ -63,6 +63,11 @@
 
   /* Status tones, flat and laid down, never neon */
   --color-success: #2e7d4f;
+  /* Star grades, red to bright green */
+  --color-star-low: #ef4444;
+  --color-star-medium: #f59e0b;
+  --color-star-good: #a3d12a;
+  --color-star-full: #1fd45f;
   --color-caution: #8a5a00;
   --color-warning: #964f08;
   --color-danger: #b83a3a;

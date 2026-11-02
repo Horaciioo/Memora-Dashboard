@@ -604,3 +604,36 @@
     left: 130%;
   }
 }
+
+/* Full grade, stars hop in turn then share one soft sheen */
+.star-hop {
+  animation: star-hop 420ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--star-i) * var(--star-step))
+    backwards;
+}
+
+.star-sheen {
+  animation: star-sheen 3.2s ease-in-out 1s infinite;
+}
+
+@keyframes star-hop {
+  40% {
+    translate: 0 -0.45rem;
+  }
+}
+
+@keyframes star-sheen {
+  0% {
+    translate: -8px 0;
+  }
+  35%,
+  100% {
+    translate: 32px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-hop,
+  .star-sheen {
+    animation: none;
+  }
+}
