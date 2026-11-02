@@ -14,6 +14,27 @@ const IS_CACHING = process.env.NODE_ENV === 'production'
 // This tab asked for the new version
 let isRequested = false
 
+// Where the last automatic swap is noted, and the gap before another one may run
+const AUTO_KEY = 'memora:auto-update'
+const AUTO_GAP_MS = 30_000
+
+/**
+ * Whether a reload may let the new version in by itself, once per gap so a bad deploy never loops
+ * @return {boolean} - Allowed, and now noted
+ */
+
+const claimAutoUpdate = (): boolean => {
+  try {
+    const last = Number(window.sessionStorage.getItem(AUTO_KEY) ?? 0)
+    if (Date.now() - last < AUTO_GAP_MS) return false
+    window.sessionStorage.setItem(AUTO_KEY, String(Date.now()))
+  } catch {
+    return false
+  }
+
+  return true
+}
+
 /**
  * Worker address carrying its settings, a new version being a new address
  * @return {string} - Script address
@@ -37,10 +58,16 @@ const workerUrl = (): string => {
 
 const watchWaiting = (registration: ServiceWorkerRegistration): void => {
   const { setWaiting } = usePwaStore.getState()
+  // A reload keeps the old worker in charge, so the new one is let in as soon as it waits, even late
+  const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
+  const isReload = navigation?.type === 'reload'
 
   // Only an update waits, a first install takes over at once
   const flag = () => {
-    if (registration.waiting && navigator.serviceWorker.controller) setWaiting(registration.waiting)
+    if (registration.waiting && navigator.serviceWorker.controller) {
+      setWaiting(registration.waiting)
+      if (isReload && performance.now() < AUTO_GAP_MS && claimAutoUpdate()) applyUpdate()
+    }
     // A newer deploy replaced the one on offer, the banner would answer nothing
     else if (usePwaStore.getState().waiting?.state === 'redundant') setWaiting(null)
   }
@@ -49,11 +76,6 @@ const watchWaiting = (registration: ServiceWorkerRegistration): void => {
   registration.addEventListener('updatefound', () => {
     registration.installing?.addEventListener('statechange', flag)
   })
-
-  // A manual reload keeps the old worker in charge, so it asks for the new one at once
-  const { waiting } = usePwaStore.getState()
-  const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
-  if (waiting && navigation?.type === 'reload') applyUpdate()
 }
 
 /**
