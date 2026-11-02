@@ -18,7 +18,7 @@ export const SHOWCASE_SETTINGS = {
   width: 1280,
   height: 760,
   // Entries of the rail
-  railRows: 13,
+  railRows: 10,
 } as const
 
 /**

@@ -1,3 +1,4 @@
+import { Avatar } from '@/components/elements/display/Avatar'
 import { SHOWCASE_COPY, SHOWCASE_SETTINGS, SHOWCASE_STEPS } from '@/declarations/changelog/showcase'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { NAVIGATION, NavigationViews, ROUTES } from '@/declarations/navigation'
@@ -12,12 +13,20 @@ export interface ShowcaseRailProps {
   step: number
 }
 
+// Shortcuts under the search
+const SHORTCUTS = NAVIGATION.flatMap((group) => group.items.filter((item) => item.quick)).slice(
+  0,
+  3
+)
+
 // Entries a moderator opens
 const ENTRIES = NAVIGATION.filter(
   (group) => group.from === NavigationViews.Junior || group.from === NavigationViews.Moderation
 ).map((group) => ({
   ...group,
-  items: group.items.filter((item) => !item.from || item.from === NavigationViews.Moderation),
+  items: group.items.filter(
+    (item) => item.href !== ROUTES.play && (!item.from || item.from === NavigationViews.Moderation)
+  ),
 }))
 
 /**
@@ -29,6 +38,7 @@ const ENTRIES = NAVIGATION.filter(
 export const ShowcaseRail = ({ step }: ShowcaseRailProps) => {
   const SearchIcon = ICONS.search
   const AddIcon = ICONS.add
+  const BellIcon = ICONS.bell
   const PageIcon = ICONS.page
   const isPrivate = step >= SHOWCASE_STEPS.private
   const isCreated = step >= SHOWCASE_STEPS.create
@@ -53,6 +63,25 @@ export const ShowcaseRail = ({ step }: ShowcaseRailProps) => {
           <SearchIcon className={SHOWCASE.searchGlyph} />
           {ASSISTANT_COPY.launcher}
         </span>
+      </div>
+
+      <div className={LEFT_SIDEBAR.shortcuts}>
+        {SHORTCUTS.map((item) => {
+          const Icon = ICONS[item.icon]
+
+          return (
+            <span
+              key={item.href}
+              title={item.label}
+              className={cn(
+                LEFT_SIDEBAR.shortcut,
+                item.href === ROUTES.dashboard && LEFT_SIDEBAR.shortcutActive
+              )}
+            >
+              <Icon className={LEFT_SIDEBAR.shortcutIcon} />
+            </span>
+          )
+        })}
       </div>
 
       <div className={SHOWCASE.railScroll}>
@@ -106,6 +135,17 @@ export const ShowcaseRail = ({ step }: ShowcaseRailProps) => {
             )
           })
         )}
+      </div>
+      <div className={LEFT_SIDEBAR.footer}>
+        <div className={LEFT_SIDEBAR.footerBox}>
+          <div className={LEFT_SIDEBAR.footerRow}>
+            <Avatar name={SHOWCASE_COPY.owner} src={null} size="sm" />
+            <span className={LEFT_SIDEBAR.footerName}>{SHOWCASE_COPY.owner}</span>
+            <div className={LEFT_SIDEBAR.footerActions}>
+              <BellIcon className={LEFT_SIDEBAR.footerIcon} />
+            </div>
+          </div>
+        </div>
       </div>
     </aside>
   )
