@@ -183,7 +183,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
-        text: 'Ajout d’une présentation animée au milieu de l’écran après une mise à jour : le chat de l’assistant, une page privée qui se remplit puis l’invitation de membres, avec la possibilité de la rejouer.',
+        text: 'Ajout d’une courte présentation en vidéo au milieu de l’écran à la première connexion après une mise à jour : le chat de l’assistant, une page privée qui se remplit puis son partage, avec pause et relecture.',
       },
       {
         tag: ChangelogTags.Added,
