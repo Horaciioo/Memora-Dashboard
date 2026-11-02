@@ -53,16 +53,20 @@ export const progressOf = (
  * @param {CandidateProgress} progress - What is known of them
  * @param {RecruitmentOutcomeView[]} outcomes - Columns of the results board
  * @param {Record<string, boolean>} [marks] - Position set by hand, one entry per moment
+ * @param {number | null} [now] - Clock in ms, null ignores the slot hour
  * @return {Record<CandidateStage, TimelineState>} - State per moment
  */
 
 export const candidateStates = (
   progress: CandidateProgress,
   outcomes: RecruitmentOutcomeView[],
-  marks: Record<string, boolean> = {}
+  marks: Record<string, boolean> = {},
+  now: number | null = null
 ): Record<CandidateStage, TimelineState> => {
   const isSlotted = progress.interviewAt !== null
-  const isStarted = progress.interviewStartedAt !== null
+  // Slot hour reached counts as the interview begun
+  const isDue = isSlotted && now !== null && Date.parse(progress.interviewAt!) <= now
+  const isStarted = progress.interviewStartedAt !== null || isDue
   // Closed by its recruiter, or judged
   const isJudged = progress.interviewEndedAt !== null || progress.verdictAt !== null
   const isDecided =

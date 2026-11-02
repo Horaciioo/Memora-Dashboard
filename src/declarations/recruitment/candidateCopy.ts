@@ -10,7 +10,7 @@ export const CANDIDATE_TAB_PARAM = 'onglet'
 
 export const CANDIDATE_COPY = {
   timeline: 'Sa timeline',
-  start: 'Démarrer l’entretien',
+  start: 'Commencer son entretien',
   back: 'Retour à la liste des candidats',
   resume: 'Reprendre l’entretien',
   review: 'Revoir l’entretien',
@@ -50,5 +50,5 @@ export const CANDIDATE_STAGE_COPY: Record<CandidateStage, string> = {
   availabilities: 'A donné ses disponibilités',
   waiting: 'En attente de son entretien',
   interviewing: 'En entretien',
-  results: 'En attente de la décision finale',
+  results: 'En attente de validation finale',
 }
