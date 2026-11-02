@@ -1,5 +1,5 @@
 import { offlineKey, staleEntries } from '@/core/lib/pages/offline/policy'
-import type { OfflineDraft, OfflineEntry } from '@/core/lib/pages/offline/policy'
+import type { OfflineEntry } from '@/core/lib/pages/offline/policy'
 import { PAGE_SETTINGS } from '@/declarations/configurations/pages'
 import { PAGE_OFFLINE_STORE } from '@/declarations/pages/offline'
 import type { PageDetail } from '@/types/pages'
@@ -86,7 +86,7 @@ export const listOfflinePages = async (): Promise<OfflineEntry[]> =>
   (await readAll()).toSorted((left, right) => Date.parse(right.savedAt) - Date.parse(left.savedAt))
 
 /**
- * Keep the last read copy, the draft stays
+ * Keep the last read copy, unsent changes stay
  * @param {string} accountId - Signed-in account
  * @param {PageDetail} page - Page read
  * @return {Promise<void>} - Kept
@@ -101,7 +101,8 @@ export const rememberPage = async (accountId: string, page: PageDetail): Promise
     accountId,
     page,
     savedAt: new Date().toISOString(),
-    draft: current?.draft ?? null,
+    yState: current?.yState ?? null,
+    isPending: current?.isPending ?? false,
   }
 
   await withTable('readwrite', (table) => table.put(entry))
@@ -109,23 +110,28 @@ export const rememberPage = async (accountId: string, page: PageDetail): Promise
 }
 
 /**
- * Keep or clear the unsent edit
+ * Keep the shared state and its readable copy
  * @param {string} accountId - Signed-in account
- * @param {PageDetail} page - Page edited
- * @param {OfflineDraft | null} draft - Edit, null once sent
+ * @param {PageDetail} page - Page with its current content
+ * @param {Object} doc - Shared state
+ * @param {string} doc.yState - State, base64
+ * @param {boolean} doc.isPending - Changes the server lacks
  * @return {Promise<void>} - Kept
  */
 
-export const keepDraft = async (accountId: string, page: PageDetail, draft: OfflineDraft | null): Promise<void> => {
-  const current = await readOfflinePage(accountId, page.id)
-
+export const keepDocState = async (
+  accountId: string,
+  page: PageDetail,
+  { yState, isPending }: { yState: string; isPending: boolean }
+): Promise<void> => {
   await withTable('readwrite', (table) =>
     table.put({
       key: offlineKey(accountId, page.id),
       accountId,
-      page: current?.page ?? page,
-      savedAt: current?.savedAt ?? new Date().toISOString(),
-      draft,
+      page,
+      savedAt: new Date().toISOString(),
+      yState,
+      isPending,
     } satisfies OfflineEntry)
   )
 }
@@ -145,5 +151,4 @@ export const wipeOfflinePages = (): Promise<void> =>
     request.onblocked = () => resolve()
   })
 
-export { draftOutcome } from '@/core/lib/pages/offline/policy'
-export type { OfflineDraft, OfflineEntry } from '@/core/lib/pages/offline/policy'
+export type { OfflineEntry } from '@/core/lib/pages/offline/policy'

@@ -13,3 +13,6 @@ export { Subpage } from '@/core/lib/pages/schema/subpage'
  */
 
 export const PAGE_SCHEMA: Schema = getSchema(pageSchemaExtensions())
+
+// Yjs fragment holding the page
+export const PAGE_DOC_FIELD = 'default'

@@ -1,19 +1,5 @@
-import type { PageDetail, PageDocument } from '@/types/pages'
+import type { PageDetail } from '@/types/pages'
 import { DAY_MS } from '@/utils/constants/time'
-
-/**
- * Edit not yet on the server
- * @typedef {Object} OfflineDraft
- * @property {PageDocument} content - Edited document
- * @property {number} baseVersion - Version the edit started from
- * @property {string} updatedAt - Last keystroke
- */
-
-export interface OfflineDraft {
-  content: PageDocument
-  baseVersion: number
-  updatedAt: string
-}
 
 /**
  * Page kept on this device
@@ -22,7 +8,8 @@ export interface OfflineDraft {
  * @property {string} accountId - Owner of the copy
  * @property {PageDetail} page - Last read copy
  * @property {string} savedAt - When it was kept
- * @property {OfflineDraft | null} draft - Unsent edit
+ * @property {string | null} yState - Shared state, base64
+ * @property {boolean} isPending - Holds changes the server lacks
  */
 
 export interface OfflineEntry {
@@ -30,7 +17,8 @@ export interface OfflineEntry {
   accountId: string
   page: PageDetail
   savedAt: string
-  draft: OfflineDraft | null
+  yState: string | null
+  isPending: boolean
 }
 
 /**
@@ -43,7 +31,7 @@ export interface OfflineEntry {
 export const offlineKey = (accountId: string, pageId: string): string => `${accountId}:${pageId}`
 
 /**
- * Copies to drop: other accounts, too old, beyond the cap; an unsent draft stays
+ * Copies to drop: other accounts, too old, beyond the cap; unsent changes stay
  * @param {OfflineEntry[]} entries - Kept copies
  * @param {Object} rules - Retention
  * @param {string} rules.accountId - Signed-in account
@@ -66,21 +54,8 @@ export const staleEntries = (
     .toSorted((left, right) => Date.parse(right.savedAt) - Date.parse(left.savedAt))
 
   const expired = own.filter(
-    (entry, index) => !entry.draft && (index >= rules.max || Date.parse(entry.savedAt) < horizon)
+    (entry, index) => !entry.isPending && (index >= rules.max || Date.parse(entry.savedAt) < horizon)
   )
 
   return [...foreign, ...expired].map((entry) => entry.key)
-}
-
-/**
- * What to do with a draft found on open
- * @param {OfflineDraft | null} draft - Unsent edit
- * @param {number} serverVersion - Version on the server
- * @return {'none' | 'resume' | 'conflict'} - Outcome
- */
-
-export const draftOutcome = (draft: OfflineDraft | null, serverVersion: number): 'none' | 'resume' | 'conflict' => {
-  if (!draft) return 'none'
-
-  return draft.baseVersion === serverVersion ? 'resume' : 'conflict'
 }

@@ -192,3 +192,8 @@
     padding-bottom: 45vh;
   }
 }
+
+/* Collaborator selection */
+.page-editor .collaboration-carets__selection {
+  background: color-mix(in srgb, var(--caret-tint, var(--color-brand-600)) 18%, transparent);
+}

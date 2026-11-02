@@ -8,6 +8,7 @@ import { canHandOut, shareTargetKey } from '@/core/lib/pages'
 import type { PageViewer } from '@/core/lib/pages'
 import { requirePage } from '@/core/services/pages/AccessService'
 import { journalPage } from '@/core/services/pages/journal'
+import { signalAccess } from '@/core/services/pages/signal'
 import { toCrumb } from '@/core/services/pages/lookups'
 import type { ChainRow } from '@/core/services/pages/lookups'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
@@ -180,6 +181,7 @@ export const upsertShare = async (
     summary: page.title,
     payload: { target: targetKey, level, previous: previous?.level ?? null },
   })
+  await signalAccess()
 
   return readSharing(page.id, viewer)
 }
@@ -206,6 +208,7 @@ export const removeShare = async (pageId: unknown, shareId: string, viewer: Page
     summary: page.title,
     payload: { target: grant.targetKey, level: grant.level },
   })
+  await signalAccess()
 
   return readSharing(page.id, viewer)
 }
@@ -275,6 +278,7 @@ export const setInheritance = async (pageId: unknown, viewer: PageViewer, inheri
     summary: page.title,
     payload: { inherit, copied: kept.map((grant) => grant.targetKey) },
   })
+  await signalAccess()
 
   return readSharing(page.id, viewer)
 }

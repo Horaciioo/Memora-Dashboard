@@ -8,6 +8,7 @@ import { levelAllows } from '@/core/lib/pages'
 import type { PageViewer } from '@/core/lib/pages'
 import { levelOnChain, requirePage } from '@/core/services/pages/AccessService'
 import { journalPage } from '@/core/services/pages/journal'
+import { signalAccess } from '@/core/services/pages/signal'
 import { loadChain } from '@/core/services/pages/lookups'
 import type { TrashedPage } from '@/types/pages'
 
@@ -48,6 +49,7 @@ export const trashPage = async (pageId: unknown, viewer: PageViewer): Promise<{ 
   })
 
   await journalPage({ eventType: 'PageTrashed', actorId: viewer.id, pageId: page.id, summary: page.title })
+  await signalAccess()
 
   return { id: page.id }
 }
@@ -103,6 +105,7 @@ export const purgePage = async (pageId: unknown, viewer: PageViewer): Promise<{ 
   ])
 
   await journalPage({ eventType: 'PagePurged', actorId: viewer.id, pageId: page.id, summary: page.title })
+  await signalAccess()
 
   return { id: page.id }
 }

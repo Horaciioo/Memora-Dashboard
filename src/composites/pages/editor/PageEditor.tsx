@@ -13,6 +13,7 @@ import { pageEditorExtensions, pasteMarkdown } from '@/composites/pages/editor/e
 import { PageFormatBar } from '@/composites/pages/editor/FormatBar'
 import { LinkPopover } from '@/composites/pages/editor/LinkPopover'
 import { MobileToolbar } from '@/composites/pages/editor/MobileToolbar'
+import { PeerCarets } from '@/composites/pages/editor/PeerCarets'
 import { PageSlashMenu } from '@/composites/pages/editor/SlashMenu'
 import { useBlockTarget } from '@/composites/pages/editor/useBlockTarget'
 import { useSlashMenu } from '@/composites/pages/editor/useSlashMenu'
@@ -22,14 +23,15 @@ import { ROUTES } from '@/declarations/navigation'
 import { PAGE_EDITOR_COPY } from '@/declarations/pages/copy'
 import { PAGE_EDITOR_UI } from '@/declarations/ui/variants'
 import { useMenu } from '@/managers/front-end/MenuManager'
-import type { PageDocument } from '@/types/pages'
+import type { SharedDoc } from '@/core/lib/realtime/sharedDoc'
 import { cn } from '@/utils/classnames'
 
 export interface PageEditorProps {
   pageId: string
-  initialContent: PageDocument
+  shared: SharedDoc
+  // Name and caret colour of this member
+  user: { name: string; image: string | null; tint: number }
   editable: boolean
-  onChange: (content: PageDocument) => void
   onReady: (editor: Editor | null) => void
   uploadImage: (file: File) => Promise<string | null>
   createSubpage: () => Promise<string | null>
@@ -43,9 +45,9 @@ export interface PageEditorProps {
 
 export const PageEditor = ({
   pageId,
-  initialContent,
+  shared,
+  user,
   editable,
-  onChange,
   onReady,
   uploadImage,
   createSubpage,
@@ -60,28 +62,30 @@ export const PageEditor = ({
   const keyRef = useRef<(event: KeyboardEvent) => boolean>(() => false)
   const refreshRef = useRef<(current: Editor) => void>(() => undefined)
   const pasteRef = useRef<(event: ClipboardEvent) => boolean>(() => false)
-  const extensions = useMemo(() => pageEditorExtensions(), [])
+  const extensions = useMemo(() => pageEditorExtensions(shared, user), [shared, user])
 
-  const editor = useEditor({
-    extensions,
-    content: initialContent,
-    editable,
-    immediatelyRender: false,
-    editorProps: {
-      attributes: { 'aria-label': PAGE_EDITOR_COPY.label, role: 'textbox', 'aria-multiline': 'true' },
-      handleKeyDown: (_view, event) => keyRef.current(event),
-      handlePaste: (_view, event) => pasteRef.current(event),
+  const editor = useEditor(
+    {
+      extensions,
+      editable,
+      immediatelyRender: false,
+      editorProps: {
+        attributes: {
+          'aria-label': PAGE_EDITOR_COPY.label,
+          role: 'textbox',
+          'aria-multiline': 'true',
+        },
+        handleKeyDown: (_view, event) => keyRef.current(event),
+        handlePaste: (_view, event) => pasteRef.current(event),
+      },
+      // Floating menus follow every change
+      onTransaction: ({ editor: current }) => {
+        refreshRef.current(current)
+        setTick((tick) => tick + 1)
+      },
     },
-    // A reader never saves, normalising included
-    onUpdate: ({ editor: current }) => {
-      if (current.isEditable) onChange(current.getJSON() as PageDocument)
-    },
-    // Floating menus follow every change
-    onTransaction: ({ editor: current }) => {
-      refreshRef.current(current)
-      setTick((tick) => tick + 1)
-    },
-  })
+    [extensions]
+  )
 
   const context: BlockCommandContext = {
     pickImage: () => fileInput.current?.click(),
@@ -116,7 +120,8 @@ export const PageEditor = ({
 
   // Right click on a divider
   const onDividerMenu = (event: MouseEvent<HTMLDivElement>) => {
-    const target = event.target instanceof Element ? event.target.closest<HTMLElement>('hr[data-id]') : null
+    const target =
+      event.target instanceof Element ? event.target.closest<HTMLElement>('hr[data-id]') : null
     if (!editor || !editable || !target?.dataset.id) return
 
     event.preventDefault()
@@ -129,7 +134,11 @@ export const PageEditor = ({
 
   return (
     <>
-      <div ref={setFrame} className={cn('page-editor', PAGE_EDITOR_UI.frame)} onContextMenu={onDividerMenu}>
+      <div
+        ref={setFrame}
+        className={cn('page-editor', PAGE_EDITOR_UI.frame)}
+        onContextMenu={onDividerMenu}
+      >
         {editor && editable && !isMobile && (
           <BlockHandle
             editor={editor}
@@ -137,7 +146,13 @@ export const PageEditor = ({
             onInsertBelow={insertBelow}
             onMenu={(blockId, origin) =>
               openMenu(
-                blockMenuItems({ editor, blockId, context, copyLink: (id) => void copy(`${window.location.origin}${ROUTES.pageBlock(pageId, id)}`) }),
+                blockMenuItems({
+                  editor,
+                  blockId,
+                  context,
+                  copyLink: (id) =>
+                    void copy(`${window.location.origin}${ROUTES.pageBlock(pageId, id)}`),
+                }),
                 origin,
                 undefined,
                 true
@@ -146,16 +161,27 @@ export const PageEditor = ({
           />
         )}
         <EditorContent editor={editor} />
+        {editor && frame && (
+          <PeerCarets editor={editor} awareness={shared.awareness} frame={frame} />
+        )}
       </div>
 
       {editor && slash.menu && (
-        <PageSlashMenu query={slash.menu.match.query} activeIndex={slash.menu.index} rect={slash.menu.rect} onPick={slash.pick} onHover={slash.hover} />
+        <PageSlashMenu
+          query={slash.menu.match.query}
+          activeIndex={slash.menu.index}
+          rect={slash.menu.rect}
+          onPick={slash.pick}
+          onHover={slash.hover}
+        />
       )}
       {editor && editable && !isMobile && !slash.menu && !isLinking && editor.isFocused && (
         <PageFormatBar editor={editor} onLink={() => setLinking(true)} />
       )}
       {editor && isLinking && <LinkPopover editor={editor} onClose={() => setLinking(false)} />}
-      {editor && editable && isMobile && editor.isFocused && <MobileToolbar editor={editor} context={context} />}
+      {editor && editable && isMobile && editor.isFocused && (
+        <MobileToolbar editor={editor} context={context} />
+      )}
 
       <input
         ref={fileInput}

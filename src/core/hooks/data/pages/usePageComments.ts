@@ -16,7 +16,7 @@ import type { PageCommentView } from '@/types/pages'
 
 export interface PageCommentsState {
   comments: PageCommentView[]
-  add: (body: string) => Promise<boolean>
+  add: (body: string, parentId?: string) => Promise<boolean>
   resolve: (commentId: string, resolved: boolean) => Promise<void>
   remove: (commentId: string) => Promise<void>
 }
@@ -55,7 +55,7 @@ export const usePageComments = (pageId: string): PageCommentsState => {
 
   return {
     comments: data ?? [],
-    add: (body) => attempt(() => apiPost(API_ROUTES.pageComments(pageId), { body })),
+    add: (body, parentId) => attempt(() => apiPost(API_ROUTES.pageComments(pageId), { body, parentId })),
     resolve: async (commentId, resolved) => {
       await attempt(() => apiPatch(API_ROUTES.pageComment(commentId), { resolved }))
     },

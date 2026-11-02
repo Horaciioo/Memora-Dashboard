@@ -124,3 +124,23 @@ export const reachablePageIds = async (viewer: PageViewer): Promise<string[]> =>
 
   return rows.map((row) => row.id)
 }
+
+/**
+ * Members among a list who may read a page
+ * @param {string} pageId - Page id
+ * @param {string[]} accountIds - Candidates
+ * @return {Promise<string[]>} - Readers
+ */
+
+export const readersOf = async (pageId: string, accountIds: string[]): Promise<string[]> => {
+  if (accountIds.length === 0) return []
+  const chain = await loadChain(pageId)
+  const accounts = await prisma.account.findMany({
+    where: { id: { in: accountIds } },
+    select: { id: true, role: true },
+  })
+
+  return accounts
+    .filter((account) => levelAllows(levelOnChain(chain, account), 'read'))
+    .map((account) => account.id)
+}

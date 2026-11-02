@@ -141,8 +141,8 @@
   background:
     linear-gradient(
       165deg,
-      color-mix(in srgb, var(--color-frame-pink) 46%, transparent),
-      color-mix(in srgb, var(--color-frame-mauve) 38%, transparent)
+      color-mix(in srgb, var(--color-frame-pink) var(--footer-wash-start, 46%), transparent),
+      color-mix(in srgb, var(--color-frame-mauve) var(--footer-wash-end, 38%), transparent)
     ),
     var(--frost-fill);
 }

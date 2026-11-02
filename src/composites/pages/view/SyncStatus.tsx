@@ -1,6 +1,6 @@
 'use client'
 
-import type { SyncStatus as SyncStatusName } from '@/core/hooks/data/pages'
+import type { DocLinkStatus as SyncStatusName } from '@/core/lib/realtime/docLink'
 import { PAGE_SYNC_COPY, PAGES_COPY } from '@/declarations/pages/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
@@ -21,7 +21,6 @@ const STATES: Record<SyncStatusName, { icon: IconName; label: string; isAlert?: 
   saving: { icon: 'syncing', label: PAGE_SYNC_COPY.saving },
   offline: { icon: 'unsynced', label: PAGE_SYNC_COPY.offline, isAlert: true },
   failed: { icon: 'unsynced', label: PAGE_SYNC_COPY.failed, isAlert: true },
-  conflict: { icon: 'unsynced', label: PAGE_SYNC_COPY.conflictTitle, isAlert: true },
 }
 
 /**

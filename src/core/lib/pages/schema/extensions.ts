@@ -52,6 +52,8 @@ export const BLOCK_ID_ATTRIBUTE = 'id'
 
 export const pageSchemaExtensions = (generateId?: () => string): AnyExtension[] => [
   StarterKit.configure({
+    // The shared document keeps its own undo
+    undoRedo: false,
     heading: { levels: PAGE_HEADING_LEVELS },
     link: {
       openOnClick: false,

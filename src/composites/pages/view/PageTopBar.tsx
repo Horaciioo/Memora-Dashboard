@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import { PresenceStack } from '@/components/structures/presence/PresenceStack'
 import { SharePanel } from '@/composites/pages/share/SharePanel'
 import { SyncStatus } from '@/composites/pages/view/SyncStatus'
-import type { SyncStatus as SyncStatusName } from '@/core/hooks/data/pages'
+import type { PagePresence } from '@/core/hooks/data/pages'
+import type { DocLinkStatus as SyncStatusName } from '@/core/lib/realtime/docLink'
 import { useBannerHost } from '@/core/hooks/interaction/layout/useBannerHost'
 import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { ROUTES } from '@/declarations/navigation'
@@ -20,16 +22,17 @@ export interface PageTopBarProps {
   page: PageDetail
   status: SyncStatusName
   contentAt: string
+  presence: PagePresence
   onRetry: () => void
 }
 
 /**
- * Banner bar of a page: save state, share, link
- * @param {PageTopBarProps} props - Page and sync state
+ * Banner bar of a page: who is here, save state, share, link
+ * @param {PageTopBarProps} props - Page, sync and presence
  * @return {JSX.Element | null}
  */
 
-export const PageTopBar = ({ page, status, contentAt, onRetry }: PageTopBarProps) => {
+export const PageTopBar = ({ page, status, contentAt, presence, onRetry }: PageTopBarProps) => {
   const host = useBannerHost(PAGE_OPTIONS_HOST_ID)
   const [isSharing, setSharing] = useState(false)
   const copy = useCopy(PAGE_SHARE_COPY.linkCopied)
@@ -40,6 +43,15 @@ export const PageTopBar = ({ page, status, contentAt, onRetry }: PageTopBarProps
 
   return createPortal(
     <div className={PAGE_VIEW_STYLES.topBar}>
+      {page.isCollaborative && (
+        <PresenceStack
+          members={presence.members}
+          isLive={presence.isLive}
+          isDown={presence.isDown}
+          describe={presence.describe}
+          onJump={presence.jump}
+        />
+      )}
       <SyncStatus status={status} contentAt={contentAt} onRetry={onRetry} />
       <div className={PAGE_VIEW_STYLES.shareHost}>
         <button

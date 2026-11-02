@@ -40,8 +40,8 @@ export const OfflinePages = () => {
         </button>
         <h1 className={PAGE_OFFLINE_STYLES.title}>{`${open.page.icon ?? ''} ${open.page.title || PAGES_COPY.untitled}`.trim()}</h1>
         <p className={PAGE_OFFLINE_STYLES.lead}>{PAGE_SYNC_COPY.offlineCopy.replace('{date}', formatDayTime(open.savedAt))}</p>
-        {open.draft && <p className={PAGE_OFFLINE_STYLES.draft}>{PAGE_OFFLINE_COPY.pendingDraft}</p>}
-        <PageDocumentView content={open.draft?.content ?? open.page.content} />
+        {open.isPending && <p className={PAGE_OFFLINE_STYLES.draft}>{PAGE_OFFLINE_COPY.pendingDraft}</p>}
+        <PageDocumentView content={open.page.content} />
       </article>
     )
   }

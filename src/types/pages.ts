@@ -79,6 +79,10 @@ export interface PageDetail extends PageSummary {
   createdAt: string
   contentAt: string
   editorName: string | null
+  // Someone else may open it
+  isCollaborative: boolean
+  // Shared editing state, base64
+  yState: string
 }
 
 /**
@@ -127,6 +131,8 @@ export interface TrashedPage extends PageCrumb {
 
 export interface PageCommentView {
   id: string
+  // Root comment of a reply
+  parentId: string | null
   blockId: string | null
   body: string
   authorId: string | null
@@ -148,16 +154,6 @@ export interface PageSearchHit {
   icon: string | null
   excerpt: string
   trail: string[]
-}
-
-/**
- * Saved content answer
- * @typedef {Object} PageSaveResult
- */
-
-export interface PageSaveResult {
-  version: number
-  contentAt: string
 }
 
 /**
@@ -191,4 +187,26 @@ export interface PageCategoryView {
   id: string
   name: string
   position: number
+}
+
+/**
+ * Kept version of a page
+ * @typedef {Object} PageRevisionSummary
+ */
+
+export interface PageRevisionSummary {
+  id: string
+  version: number
+  title: string
+  createdAt: string
+  authorName: string | null
+}
+
+/**
+ * Kept version with its content
+ * @typedef {Object} PageRevisionDetail
+ */
+
+export interface PageRevisionDetail extends PageRevisionSummary {
+  content: PageDocument
 }

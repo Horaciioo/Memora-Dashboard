@@ -39,7 +39,13 @@ export default async function PrivatePage({ params }: { params: Promise<{ id: st
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={PAGES_COPY.title} isLabel isBare image={page?.coverUrl ?? null} />
       {page ? (
-        <PageView key={page.id} page={page} accountId={session.id} />
+        <PageView
+          key={page.id}
+          page={page}
+          accountId={session.id}
+          accountName={session.displayName}
+          accountImage={session.avatarUrl}
+        />
       ) : (
         <EmptyState
           title={PAGES_COPY.notFoundTitle}

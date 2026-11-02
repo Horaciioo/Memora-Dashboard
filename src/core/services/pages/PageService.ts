@@ -5,21 +5,24 @@ import crypto from 'crypto'
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
-import { conflict, forbidden, invalidInput } from '@/core/lib/errors'
+import { forbidden, invalidInput } from '@/core/lib/errors'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { emptyDocument, mediaIdOf, validateDocument } from '@/core/lib/pages/document'
-import { canOwnPages } from '@/core/lib/pages'
+import { toBase64 } from '@/core/lib/realtime/codec'
+import { canOwnPages, reachesOthers } from '@/core/lib/pages'
 import type { PageViewer } from '@/core/lib/pages'
 import { requireCategory } from '@/core/services/pages/CategoryService'
 import { reachablePageIds, requirePage } from '@/core/services/pages/AccessService'
 import { journalPage } from '@/core/services/pages/journal'
-import { SUMMARY_SELECT, nextPosition, toCrumb, toSummary } from '@/core/services/pages/lookups'
-import { snapshotRevision } from '@/core/services/pages/RevisionService'
+import { SUMMARY_SELECT, nextPosition, toAccessNode, toCrumb, toSummary } from '@/core/services/pages/lookups'
+import { pageSharedState } from '@/core/services/pages/PageDocService'
+import { signalPage } from '@/core/services/pages/signal'
 import { PAGE_SETTINGS } from '@/declarations/configurations/pages'
 import { PAGE_DOCUMENT_COPY } from '@/declarations/pages/copy'
+import { PAGE_STREAM_EVENTS } from '@/declarations/pages/topics'
 import { PAGE_TEMPLATES, templateDocument } from '@/declarations/pages/templates'
 import type { PageTemplateName } from '@/declarations/pages/templates'
-import type { PageDetail, PageDocument, PageSaveResult, PageSummary } from '@/types/pages'
+import type { PageDetail, PageDocument, PageSummary } from '@/types/pages'
 
 /**
  * Every page a member may open, for the rail
@@ -147,6 +150,8 @@ export const readPage = async (pageId: unknown, viewer: PageViewer): Promise<Pag
     createdAt: row.createdAt.toISOString(),
     contentAt: row.contentAt.toISOString(),
     editorName: row.editor?.displayName ?? null,
+    isCollaborative: reachesOthers(chain.map(toAccessNode)),
+    yState: toBase64(await pageSharedState(page.id)),
   }
 }
 
@@ -199,6 +204,7 @@ export const updatePageMeta = async (
   if ('coverUrl' in raw) data.coverMediaId = await readCover(page.id, raw.coverUrl)
 
   const row = await prisma.page.update({ where: { id: page.id }, data, select: SUMMARY_SELECT })
+  await signalPage(page.id, PAGE_STREAM_EVENTS.meta)
 
   return toSummary(row, viewer.id)
 }
@@ -218,68 +224,4 @@ const readCover = async (pageId: string, value: unknown): Promise<string | null>
   if (!media) throw invalidInput([{ field: 'cover', message: PAGE_DOCUMENT_COPY.cover }])
 
   return media.id
-}
-
-/**
- * Save the block document, refused when the base moved
- * @param {string} pageId - Page id
- * @param {PageViewer} viewer - Member writing
- * @param {Object} input - Save
- * @param {unknown} input.content - Untrusted document
- * @param {unknown} input.baseVersion - Version the edit started from
- * @return {Promise<PageSaveResult>} - New version
- */
-
-export const savePageContent = async (
-  pageId: unknown,
-  viewer: PageViewer,
-  input: { content: unknown; baseVersion: unknown }
-): Promise<PageSaveResult> => {
-  const { page } = await requirePage(pageId, viewer, 'write')
-
-  const media = await prisma.pageMedia.findMany({ where: { pageId: page.id }, select: { id: true } })
-  const ownMedia = new Set(media.map((entry) => entry.id))
-
-  const check = validateDocument(input.content, { isOwnMedia: (id) => ownMedia.has(id), newId: crypto.randomUUID })
-  if (!check.ok) throw invalidInput([{ field: 'content', message: PAGE_DOCUMENT_COPY[check.issue] }])
-
-  return writeContent(page.id, viewer, check, input.baseVersion)
-}
-
-/**
- * Write a checked document under the version guard
- * @param {string} pageId - Page id
- * @param {PageViewer} viewer - Member writing
- * @param {Object} check - Checked document
- * @param {PageDocument} check.document - Document
- * @param {string} check.text - Search text
- * @param {unknown} baseVersion - Version the edit started from
- * @return {Promise<PageSaveResult>} - New version
- */
-
-const writeContent = async (
-  pageId: string,
-  viewer: PageViewer,
-  check: { document: PageDocument; text: string },
-  baseVersion: unknown
-): Promise<PageSaveResult> => {
-  const base = typeof baseVersion === 'number' && Number.isInteger(baseVersion) ? baseVersion : -1
-  const contentAt = new Date()
-
-  // Compare and swap on the version
-  const { count } = await prisma.page.updateMany({
-    where: { id: pageId, version: base },
-    data: {
-      content: check.document as unknown as Prisma.InputJsonValue,
-      searchText: check.text,
-      version: { increment: 1 },
-      editedById: viewer.id,
-      contentAt,
-    },
-  })
-  if (count === 0) throw conflict(PAGE_DOCUMENT_COPY.conflict)
-
-  await snapshotRevision(pageId, viewer.id)
-
-  return { version: base + 1, contentAt: contentAt.toISOString() }
 }
