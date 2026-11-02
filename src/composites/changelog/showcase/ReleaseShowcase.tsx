@@ -1,45 +1,51 @@
 'use client'
 
-import { ShowcaseAssistant } from '@/composites/changelog/showcase/ShowcaseAssistant'
+import { ShowcaseAbsences } from '@/composites/changelog/showcase/ShowcaseAbsences'
+import { ShowcaseCard } from '@/composites/changelog/showcase/ShowcaseCard'
 import { ShowcasePages } from '@/composites/changelog/showcase/ShowcasePages'
+import { ShowcaseWindow } from '@/composites/changelog/showcase/ShowcaseWindow'
 import { useShowcaseClock } from '@/core/hooks/interaction/useShowcaseClock'
-import { SHOWCASE_COPY, SHOWCASE_SETTINGS } from '@/declarations/changelog/showcase'
+import { SHOWCASE_COPY, SHOWCASE_SETTINGS, SHOWCASE_STEPS } from '@/declarations/changelog/showcase'
 import { SHOWCASE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
+// Dots under the stage
+const SCENES = 3
+
+// Sparks of the closing burst
+const FINALE_SPARKS = 28
+
 /**
- * Animated tour of the version
+ * Teaser of the version, from the first chat to the invitations
  * @return {JSX.Element}
  */
 
 export const ReleaseShowcase = () => {
   const { step, replay } = useShowcaseClock(SHOWCASE_SETTINGS.last, SHOWCASE_SETTINGS.stepMs)
+  const { introEnd, assistantEnd, pagesEnd } = SHOWCASE_SETTINGS
 
-  // Scene by step
-  const scene =
-    step <= SHOWCASE_SETTINGS.assistantEnd ? 0 : step <= SHOWCASE_SETTINGS.pagesEnd ? 1 : 2
+  // Beat by step
+  const scene = step <= assistantEnd ? 0 : step <= pagesEnd ? 1 : 2
+  const isPages = scene > 0
 
   return (
-    <section className={SHOWCASE.frame} aria-label={SHOWCASE_COPY.title}>
-      <header className={SHOWCASE.head}>
-        <h2 className={SHOWCASE.title}>{SHOWCASE_COPY.title}</h2>
-        <button type="button" className={SHOWCASE.replay} onClick={replay}>
-          {SHOWCASE_COPY.replay}
-        </button>
-      </header>
-
-      <div className={SHOWCASE.stage}>
-        {scene === 0 ? <ShowcaseAssistant step={step} /> : <ShowcasePages step={step} />}
+    <div className={SHOWCASE.root}>
+      <div className={SHOWCASE.stage} aria-hidden="true">
+        <ShowcaseWindow active={isPages ? 'pages' : 'absences'}>
+          {isPages ? <ShowcasePages step={step} /> : <ShowcaseAbsences step={step} />}
+        </ShowcaseWindow>
+        <ShowcaseCard isOn={step <= introEnd} />
+        <ShowcaseCard isFinale isOn={step >= SHOWCASE_STEPS.finale} sparks={FINALE_SPARKS} />
       </div>
 
-      <p className={SHOWCASE.caption} aria-live="polite">
-        {SHOWCASE_COPY.captions[scene]}
-      </p>
       <div className={SHOWCASE.dots} aria-hidden="true">
-        {SHOWCASE_COPY.captions.map((caption, index) => (
-          <span key={caption} className={cn(SHOWCASE.dot, index <= scene && SHOWCASE.dotOn)} />
+        {Array.from({ length: SCENES }, (_, index) => (
+          <span key={index} className={cn(SHOWCASE.dot, index <= scene && SHOWCASE.dotOn)} />
         ))}
       </div>
-    </section>
+      <button type="button" className={SHOWCASE.replay} onClick={replay}>
+        {SHOWCASE_COPY.replay}
+      </button>
+    </div>
   )
 }

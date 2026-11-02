@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 /**
- * Showcase clock state
+ * Showcase clock
  * @typedef {Object} ShowcaseClock
  * @property {number} step - Current step
  * @property {() => void} replay - Start over

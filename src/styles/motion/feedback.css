@@ -649,7 +649,7 @@
     opacity: 1;
   }
   to {
-    transform: rotate(var(--angle)) translateY(-3.5rem) scale(0.4);
+    transform: rotate(var(--angle)) translateY(calc(var(--reach, 3.5rem) * -1)) scale(0.4);
     opacity: 0;
   }
 }

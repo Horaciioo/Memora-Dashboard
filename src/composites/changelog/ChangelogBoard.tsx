@@ -4,7 +4,6 @@ import { useEffect } from 'react'
 
 import { ChangelogArchive } from '@/composites/changelog/ChangelogArchive'
 import { ChangelogCategory } from '@/composites/changelog/ChangelogCategory'
-import { ReleaseShowcase } from '@/composites/changelog/showcase/ReleaseShowcase'
 import { ReleaseDescription } from '@/composites/changelog/ReleaseDescription'
 import { useFreshRelease } from '@/core/hooks/data/system/useFreshRelease'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
@@ -47,8 +46,6 @@ export const ChangelogBoard = ({ version }: ChangelogBoardProps) => {
 
   return (
     <>
-      {release.hasShowcase && <ReleaseShowcase />}
-
       <ReleaseDescription release={release} />
 
       <div className={CHANGELOG_BOARD.blocks}>
