@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/elements/actions/Button'
+import type { ButtonVariant } from '@/declarations/ui/variants'
 import { Dialog } from '@/components/structures/overlays/Dialog'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import type { Tone } from '@/declarations/ui/theme'
@@ -8,9 +9,11 @@ import type { Tone } from '@/declarations/ui/theme'
 export interface ConfirmDialogProps {
   open: boolean
   title: string
-  description: string
+  description?: string
   confirmLabel?: string
   cancelLabel?: string
+  // Look of the dismissing button
+  cancelVariant?: ButtonVariant
   // Weight of the gesture
   tone?: Tone
   pending?: boolean
@@ -22,9 +25,10 @@ export interface ConfirmDialogProps {
  * Two button overlay guarding a gesture that cannot be taken back
  * @param {boolean} open - Overlay is mounted
  * @param {string} title - What is about to happen
- * @param {string} description - Consequence of confirming
+ * @param {string} [description] - Consequence of confirming
  * @param {string} [confirmLabel] - Accessible name of the confirming button
  * @param {string} [cancelLabel] - Name of the dismissing button
+ * @param {ButtonVariant} [cancelVariant] - Look of the dismissing button
  * @param {Tone} [tone] - Weight of the gesture
  * @param {boolean} [pending] - Blocks both buttons while the action runs
  * @param {() => void} onConfirm - Confirm handler
@@ -38,6 +42,7 @@ export const ConfirmDialog = ({
   description,
   confirmLabel,
   cancelLabel,
+  cancelVariant,
   tone = 'danger',
   pending,
   onConfirm,
@@ -59,7 +64,7 @@ export const ConfirmDialog = ({
       size="xs"
       footer={
         <>
-          <Button onClick={onCancel} disabled={pending}>
+          <Button variant={cancelVariant} onClick={onCancel} disabled={pending}>
             {cancelLabel ?? ACTION_COPY.cancel}
           </Button>
           <Button
@@ -72,7 +77,7 @@ export const ConfirmDialog = ({
         </>
       }
     >
-      <p className="text-sm text-[var(--color-ink-subtle)]">{description}</p>
+      {description && <p className="text-sm text-[var(--color-ink-subtle)]">{description}</p>}
     </Dialog>
   )
 }
