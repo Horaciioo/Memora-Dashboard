@@ -10,23 +10,26 @@ import { RECRUITMENT_COPY, RECRUITMENT_FIELD_COPY } from '@/declarations/recruit
 import { COMMENT_COPY } from '@/declarations/ui/copy'
 import { accentVars } from '@/declarations/ui/theme'
 import { PASTEL_TAG } from '@/declarations/ui/variants'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatWeekdayTime } from '@/utils/format/dates'
 import type { ReactNode } from 'react'
 
 export interface CandidateOverviewProps {
   record: RecordFile
   // Remarks box content
   comments: ReactNode
+  // Timeline body, read under the information on a phone
+  timeline: ReactNode
 }
 
 /**
  * Interview and remarks of a candidate, each value edited in place
  * @param {RecordFile} record - Inline state of their fields
  * @param {ReactNode} comments - Remarks box content
+ * @param {ReactNode} timeline - Timeline body
  * @return {JSX.Element}
  */
 
-export const CandidateOverview = ({ record, comments }: CandidateOverviewProps) => {
+export const CandidateOverview = ({ record, comments, timeline }: CandidateOverviewProps) => {
   const { detail, fields, can } = useRecruitmentState()
 
   const fieldFor = (name: string) => fields.candidate.find((field) => field.name === name)!
@@ -37,14 +40,18 @@ export const CandidateOverview = ({ record, comments }: CandidateOverviewProps) 
 
   const entries: EditableEntry[] = [
     {
-      label: RECRUITMENT_FIELD_COPY.interviewAt,
-      field: fieldFor('interviewAt'),
-      display: text('interviewAt') ? formatDayTime(text('interviewAt')) : null,
+      label: RECRUITMENT_FIELD_COPY.outcome,
+      field: fieldFor('outcomeId'),
+      display: outcome ? (
+        <span className={PASTEL_TAG} style={accentVars(outcome.accent)}>
+          {outcome.label}
+        </span>
+      ) : null,
     },
     {
-      label: RECRUITMENT_FIELD_COPY.formId,
-      field: fieldFor('formId'),
-      display: text('formId') || null,
+      label: RECRUITMENT_FIELD_COPY.interviewAt,
+      field: fieldFor('interviewAt'),
+      display: text('interviewAt') ? formatWeekdayTime(text('interviewAt')) : null,
     },
     {
       label: RECRUITMENT_FIELD_COPY.attended,
@@ -57,21 +64,13 @@ export const CandidateOverview = ({ record, comments }: CandidateOverviewProps) 
         />
       ),
     },
-    {
-      label: RECRUITMENT_FIELD_COPY.outcome,
-      field: fieldFor('outcomeId'),
-      display: outcome ? (
-        <span className={PASTEL_TAG} style={accentVars(outcome.accent)}>
-          {outcome.label}
-        </span>
-      ) : null,
-    },
   ]
 
   return (
     <FileOverview
       groups={[
-        { id: 'interview', title: CANDIDATE_COPY.informations, entries },
+        { id: 'interview', title: CANDIDATE_COPY.informations, entries, inline: true },
+        { id: 'timeline', title: CANDIDATE_COPY.timeline, node: timeline, className: 'lg:hidden' },
         // An observer never reads the remarks
         ...(can.observing ? [] : [{ id: 'comments', title: COMMENT_COPY.title, node: comments }]),
       ]}

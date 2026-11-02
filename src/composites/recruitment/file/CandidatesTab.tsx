@@ -117,25 +117,33 @@ export const CandidatesTab = () => {
     sort
   )
 
-  const rowOf = (candidate: CandidateView): RowListItem => ({
-    id: candidate.id,
-    title: candidate.name,
-    meta: candidate.interviewAt ? formatDayTime(candidate.interviewAt) : undefined,
-    metaTag: candidate.interviewAt ? undefined : (
-      <span
-        className={PASTEL_TAG}
-        style={accentVars(detail.outcomes.find((o) => o.id === candidate.outcomeId)?.accent)}
-      >
-        {RECRUITMENT_COPY.toSchedule}
-      </span>
-    ),
-    lead: <Avatar name={candidate.name} src={candidate.avatarUrl} size="md" />,
-    trail: detail.bannedIds.includes(candidate.discordId) ? (
-      <Status label={HISTORY_COPY.banned} tone="danger" />
-    ) : undefined,
-    menu: candidateMenu(candidate),
-    onOpen: () => openCandidate(candidate.id),
-  })
+  const rowOf = (candidate: CandidateView): RowListItem => {
+    const outcome = detail.outcomes.find((entry) => entry.id === candidate.outcomeId)
+    const isBanned = detail.bannedIds.includes(candidate.discordId)
+
+    return {
+      id: candidate.id,
+      title: candidate.name,
+      meta: candidate.interviewAt
+        ? formatDayTime(candidate.interviewAt)
+        : RECRUITMENT_COPY.toSchedule,
+      metaEmpty: !candidate.interviewAt,
+      lead: <Avatar name={candidate.name} src={candidate.avatarUrl} size="md" />,
+      trail:
+        outcome || isBanned ? (
+          <span className="flex items-center gap-2">
+            {outcome && (
+              <span className={PASTEL_TAG} style={accentVars(outcome.accent)}>
+                {outcome.label}
+              </span>
+            )}
+            {isBanned && <Status label={HISTORY_COPY.banned} tone="danger" />}
+          </span>
+        ) : undefined,
+      menu: candidateMenu(candidate),
+      onOpen: () => openCandidate(candidate.id),
+    }
+  }
 
   // One group per recruiter
   const groups: RowListGroup[] = [
