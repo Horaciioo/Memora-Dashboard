@@ -32,11 +32,16 @@ export const useHoldKey = (
 
     const onDown = (event: KeyboardEvent) => {
       // Alt with another key is a shortcut, never a freeze
-      if (event.key === key) set(true)
-      else set(false)
+      if (event.key === key) {
+        // Keeps the browser menu from taking the focus on release
+        event.preventDefault()
+        set(true)
+      } else set(false)
     }
     const onUp = (event: KeyboardEvent) => {
-      if (event.key === key) set(false)
+      if (event.key !== key) return
+      event.preventDefault()
+      set(false)
     }
     const onLeave = () => set(false)
 
