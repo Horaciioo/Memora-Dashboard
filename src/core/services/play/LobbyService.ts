@@ -5,10 +5,11 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { pickSeatColor, readBodyInteger, readBodyText } from '@/core/lib/play'
-import { clearDeadline } from '@/core/lib/play/timers'
+import { clearSessionTimers } from '@/core/lib/play/timers'
 import { signalLobbies, signalPlay } from '@/core/lib/play/signal'
 import { PLAY_ERRORS, PLAY_GAMES, PLAY_JOURNAL, PLAY_SETTINGS } from '@/declarations/play'
 import { announceInChat } from '@/core/services/play/PlayChatService'
+import { sweepIdleGames } from '@/core/services/play/PlayIdleService'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
 import {
   cloneTable,
@@ -122,6 +123,7 @@ export const listLobbies = async (accountId: string, game?: string | null) => {
     data: { status: PlayStatuses.Abandoned },
   })
   if (closed) await signalLobbies()
+  await sweepIdleGames()
 
   // Running games welcome spectators
   const [lobbies, running, current] = await Promise.all([
@@ -236,7 +238,7 @@ const afterDeparture = async (
         data: { status: PlayStatuses.Abandoned },
       })
     }
-    clearDeadline(session.id)
+    clearSessionTimers(session.id)
     return
   }
 

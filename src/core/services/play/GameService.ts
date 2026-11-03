@@ -3,9 +3,10 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { conflict } from '@/core/lib/errors'
 import { signalPlay } from '@/core/lib/play/signal'
-import { clearDeadline, scheduleDeadline } from '@/core/lib/play/timers'
+import { clearSessionTimers, scheduleDeadline } from '@/core/lib/play/timers'
 import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
 import type { EngineStep } from '@/core/engines/play'
+import { noteAction } from '@/core/services/play/PlayIdleService'
 import { finishSession } from '@/core/services/play/RewardService'
 import { tournamentStandings } from '@/core/services/play/TournamentService'
 import {
@@ -29,7 +30,7 @@ import { PlayStatuses } from '@/utils/constants/play'
 
 const applyStep = async (sessionId: string, step: EngineStep): Promise<void> => {
   if (step.finished) {
-    clearDeadline(sessionId)
+    clearSessionTimers(sessionId)
     await finishSession(sessionId)
   } else if (step.deadline) {
     scheduleDeadline(sessionId, step.deadline, () => settleSession(sessionId))
@@ -131,6 +132,7 @@ export const startSession = async (sessionId: string, hostId: string): Promise<v
     await signalPlay(sessionId, false)
     throw error
   }
+  noteAction(sessionId)
   await signalPlay(sessionId, true)
 }
 
@@ -151,6 +153,7 @@ export const actInSession = async (
   if (session.status !== PlayStatuses.Running) throw conflict(PLAY_ERRORS.notRunning)
   requireSeat(session, accountId)
 
+  noteAction(sessionId)
   await applyStep(
     sessionId,
     await engineOf(session.game).act(toEngineSession(session), accountId, raw)

@@ -2,13 +2,17 @@ import 'server-only'
 
 import { subscribeLive } from '@/core/lib/lives/bus'
 import { logger } from '@/core/lib/logger'
-import { toEngineSession } from '@/core/lib/play/session'
+import { isPresent, toEngineSession } from '@/core/lib/play/session'
+import { clearDeadline, scheduleDeadline, timerKey } from '@/core/lib/play/timers'
 import { eventFrame, eventOf, signalFrame } from '@/core/lib/realtime/server/frames'
 import { joinPresence } from '@/core/lib/realtime/server/presence'
 import type { RealtimeConnection } from '@/core/lib/realtime/server/types'
+import { abandonRunning } from '@/core/services/play/PlayIdleService'
 import { engineOf, loadSession } from '@/core/services/play/PlaySessionService'
 import { PLAY_STREAM_EVENTS, PLAY_TOPICS } from '@/declarations/play/topics'
+import { PLAY_SETTINGS } from '@/declarations/play'
 import { PlayStatuses } from '@/utils/constants/play'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Sockets following one game on this process
@@ -113,6 +117,28 @@ const openRoom = (sessionId: string): PlayRoom => {
 }
 
 /**
+ * Stop a running game once no player is connected for a while
+ * @param {string} sessionId - Game
+ * @return {void}
+ */
+
+const watchEmptyTable = (sessionId: string): void =>
+  scheduleDeadline(
+    timerKey('away', sessionId),
+    new Date(Date.now() + PLAY_SETTINGS.idle.emptyTableMinutes * MINUTE_MS),
+    async () => {
+      const session = await loadSession(sessionId)
+      if (session.status !== PlayStatuses.Running) return
+
+      // A player back in the room keeps the game
+      const connected = new Set([...(rooms.get(sessionId)?.members ?? [])].map((m) => m.session.id))
+      if (session.seats.some((seat) => isPresent(seat) && connected.has(seat.accountId))) return
+
+      await abandonRunning(sessionId)
+    }
+  )
+
+/**
  * Follow a game: boards pushed on each move, the reader seated in the room's presence
  * @param {string} sessionId - Game
  * @param {RealtimeConnection} connection - Socket
@@ -127,6 +153,7 @@ export const joinPlayRoom = async (
   await loadSession(sessionId)
   const room = rooms.get(sessionId) ?? openRoom(sessionId)
   room.members.add(connection)
+  clearDeadline(timerKey('away', sessionId))
   // The stands move through presence, no page read
   const leavePresence = joinPresence(PLAY_TOPICS.session(sessionId), connection)
   // The newcomer's board, missed moves included
@@ -135,6 +162,7 @@ export const joinPlayRoom = async (
   return () => {
     leavePresence()
     room.members.delete(connection)
+    if (room.members.size === 0) watchEmptyTable(sessionId)
     if (room.members.size > 0 || rooms.get(sessionId) !== room) return
     room.stopBus()
     rooms.delete(sessionId)
