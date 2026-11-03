@@ -9,7 +9,11 @@ import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { conflict, forbidden, immutable, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
-import { readTemporaryValues, syncTemporarySeats, temporaryFields } from '@/core/services/members/seats'
+import {
+  readTemporaryValues,
+  syncTemporarySeats,
+  temporaryFields,
+} from '@/core/services/members/seats'
 import { syncFunctionTeams } from '@/core/services/teams/FunctionTeamService'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import { activeAbsenceFilter, toAbsence } from '@/core/services/absences/AbsenceService'

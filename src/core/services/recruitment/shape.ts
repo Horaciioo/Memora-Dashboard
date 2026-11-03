@@ -231,7 +231,8 @@ export const toCandidate = (
     authorName: comment.author
       ? (hidden.get(comment.author.id) ?? comment.author.displayName)
       : null,
-    authorAvatar: comment.author && !hidden.has(comment.author.id) ? comment.author.avatarUrl : null,
+    authorAvatar:
+      comment.author && !hidden.has(comment.author.id) ? comment.author.avatarUrl : null,
     body: decryptField(comment.body) ?? '',
     createdAt: comment.createdAt.toISOString(),
     questionKey: comment.questionKey,
