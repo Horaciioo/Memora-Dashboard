@@ -213,6 +213,20 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        permission: Permissions.MemberRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de retirer, de rendre ou de supprimer les accès d’un Recruteur, d’un Observateur ou d’un Formateur à une session, d’un clic droit sur sa ligne dans la « Participation » de sa fiche.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une boîte « Participants » dans la fiche d’une session de « Recrutements » : qui y est affilié, avec les accès retirés en rouge.',
+      },
+      {
+        tag: ChangelogTags.Added,
         page: ROUTES.preferences,
         text: 'Ajout de réglages de confort dans « Paramètres » : fond du cadre, cartes, arrondis (francs par défaut), interligne, liens soulignés, animations et repère du clavier.',
       },
