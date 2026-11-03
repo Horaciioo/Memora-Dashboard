@@ -15,6 +15,8 @@ export const holds = (condition: FieldCondition, values: FormValues): boolean =>
   if (condition.truthy !== undefined) {
     const filled = Array.isArray(watched) ? watched.length > 0 : Boolean(watched)
     match = condition.truthy ? filled : !filled
+  } else if (condition.includes !== undefined) {
+    match = Array.isArray(watched) && watched.includes(condition.includes)
   } else if (condition.oneOf) {
     match = condition.oneOf.includes(String(watched))
   } else {

@@ -1,5 +1,6 @@
 import { AbsenceReason } from '@/components/elements/display/AbsenceReason'
 import { MemberParticipation } from '@/composites/members/MemberParticipation'
+import type { ParticipantIdentity } from '@/composites/members/MemberParticipation'
 import { Section } from '@/components/structures/page/Section'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { MEMBER_FILE } from '@/declarations/ui/blocks'
@@ -14,6 +15,8 @@ import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { formatDay, formatDayRange } from '@/utils/format/dates'
 
 export interface MemberOverviewProps {
+  member: ParticipantIdentity
+  canManageSeats: boolean
   absences: MemberAbsence[]
   participations: Participation[]
   playPresence: PlayPresence | null
@@ -23,6 +26,8 @@ export interface MemberOverviewProps {
 /**
  * Where a moderator stands right now: available or away, what
  * they did last. Everything links to the tab holding the whole story
+ * @param {ParticipantIdentity} member - Member the file belongs to
+ * @param {boolean} canManageSeats - Viewer may act on their temporary seats
  * @param {MemberAbsence[]} absences - Time off
  * @param {Participation[]} participations - Sessions joined
  * @param {PlayPresence | null} playPresence - Game they sit in
@@ -31,6 +36,8 @@ export interface MemberOverviewProps {
  */
 
 export const MemberOverview = ({
+  member,
+  canManageSeats,
   absences,
   participations,
   playPresence,
@@ -99,7 +106,12 @@ export const MemberOverview = ({
         )}
       </Section>
 
-      <MemberParticipation participations={participations} onNavigate={onNavigate} />
+      <MemberParticipation
+        member={member}
+        participations={participations}
+        canManageSeats={canManageSeats}
+        onNavigate={onNavigate}
+      />
     </div>
   )
 }

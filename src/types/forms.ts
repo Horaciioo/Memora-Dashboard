@@ -149,6 +149,7 @@ export interface FieldAction {
  * @property {string} field - Watched field name
  * @property {FieldValue} [equals] - Exact match
  * @property {string[]} [oneOf] - Match any
+ * @property {string} [includes] - Match a list holding this value
  * @property {boolean} [truthy] - Match on filled
  * @property {boolean} [negate] - Invert the match
  * @property {FieldCondition} [and] - Second rule that must hold too
@@ -158,6 +159,7 @@ export interface FieldCondition {
   field: string
   equals?: FieldValue
   oneOf?: string[]
+  includes?: string
   truthy?: boolean
   negate?: boolean
   and?: FieldCondition

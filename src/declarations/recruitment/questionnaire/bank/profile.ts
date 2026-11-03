@@ -154,6 +154,8 @@ export const PROFILE_QUESTIONS: readonly QuestionDefinition[] = [
     section: 'stress',
     kind: 'choice',
     family: 'imagery',
+    display: 'fold',
+    when: 'Un panneau de signalisation',
     recommended: true,
     minutes: 2,
     prompt:
@@ -166,6 +168,8 @@ export const PROFILE_QUESTIONS: readonly QuestionDefinition[] = [
     section: 'stress',
     kind: 'choice',
     family: 'imagery',
+    display: 'fold',
+    when: 'Un animal',
     minutes: 2,
     prompt:
       'Si [tu devais|vous deviez] être un animal, lequel [serais-tu|seriez-vous] ? Pourquoi ?',
@@ -177,6 +181,8 @@ export const PROFILE_QUESTIONS: readonly QuestionDefinition[] = [
     section: 'stress',
     kind: 'choice',
     family: 'imagery',
+    display: 'fold',
+    when: 'Une planète',
     minutes: 2,
     prompt:
       'Si [tu devais|vous deviez] être une planète, laquelle [serais-tu|seriez-vous] ? Pourquoi ?',
@@ -188,6 +194,8 @@ export const PROFILE_QUESTIONS: readonly QuestionDefinition[] = [
     section: 'stress',
     kind: 'choice',
     family: 'imagery',
+    display: 'fold',
+    when: 'Un fruit',
     minutes: 2,
     prompt: 'Si [tu devais|vous deviez] être un fruit, lequel [serais-tu|seriez-vous] ? Pourquoi ?',
     hint: 'Question au choix : une seule suffit, passe les autres de la même famille.',
@@ -198,6 +206,8 @@ export const PROFILE_QUESTIONS: readonly QuestionDefinition[] = [
     section: 'stress',
     kind: 'choice',
     family: 'imagery',
+    display: 'fold',
+    when: 'Une boisson',
     minutes: 2,
     prompt:
       'Si [tu devais|vous deviez] être une boisson, laquelle [serais-tu|seriez-vous] ? Pourquoi ?',

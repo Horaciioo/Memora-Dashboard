@@ -37,6 +37,12 @@ export const EXERCISES: Record<ExerciseKey, ExerciseOption> = {
     icon: 'note',
     cutsOff: false,
   },
+  dictation: {
+    label: 'La dictée écrite',
+    lead: 'Il écrit un texte dicté à l’oral, sans aide.',
+    icon: 'note',
+    cutsOff: false,
+  },
   cases: {
     label: 'Les cas d’étude',
     lead: 'Un cas complet à analyser, à débattre et à trancher.',
@@ -57,4 +63,4 @@ export const EXERCISES: Record<ExerciseKey, ExerciseOption> = {
  * @type {ExerciseKey[]}
  */
 
-export const EXERCISE_ORDER: ExerciseKey[] = ['sixty', 'written', 'documents', 'cases']
+export const EXERCISE_ORDER: ExerciseKey[] = ['sixty', 'written', 'dictation', 'documents', 'cases']

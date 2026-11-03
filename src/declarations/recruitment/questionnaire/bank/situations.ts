@@ -104,6 +104,27 @@ export const SITUATION_QUESTIONS: readonly QuestionDefinition[] = [
     branches: WRITTEN_BRANCHES,
   },
   {
+    key: 'exercise.dictation',
+    part: 'situation',
+    section: 'exercise',
+    kind: 'exercise',
+    exercise: 'dictation',
+    recommended: true,
+    minutes: 5,
+    prompt: '🖊️ La dictée écrite',
+    hint: 'Rigueur d’écriture, orthographe, concentration. S’il est dyslexique, répète 2 fois chaque mot de la dictée.',
+    say: 'Je vais désormais [te|vous] soumettre un exercice un peu particulier : « Une dictée ».',
+    steps: [
+      { prompt: '[As-tu|Avez-vous] un stylo et une feuille ?' },
+      { prompt: '[Es-tu|Êtes-vous] dyslexique ?' },
+    ],
+    scenario: `Lors d’un live sur Twitch, plusieurs spectateurs ont envoyé des messages inappropriés dans le chat.
+
+Les modérateurs doivent rester attentifs, faire preuve de discernement et intervenir lorsque cela s’avère nécessaire.
+
+Malgré les provocations répétées de certains utilisateurs, ils doivent garder leur sang-froid et appliquer les règles avec impartialité.`,
+  },
+  {
     key: 'exercise.mediation',
     part: 'situation',
     section: 'exercise',

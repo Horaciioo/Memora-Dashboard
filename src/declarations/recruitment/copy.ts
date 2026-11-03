@@ -53,7 +53,7 @@ export const RECRUITMENT_COPY = {
   infoSessionId: 'ID de session',
 
   tabMe: 'Moi',
-  tabAdmin: 'Administration',
+  tabAdmin: 'Admin',
   tabInstructions: 'Consignes',
   myInterviews: 'Mes entretiens',
   myObservations: 'Mes observations',

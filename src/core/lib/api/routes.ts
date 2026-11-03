@@ -65,6 +65,7 @@ export const API_ROUTES = {
   playMemberStats: (id: string) => `/api/play/joueurs/${id}/stats`,
   playMemberBan: (id: string) => `/api/play/joueurs/${id}/interdire`,
   playMemberUnban: (id: string) => `/api/play/joueurs/${id}/autoriser`,
+  participations: '/api/participations',
   memberFreeze: (id: string) => `/api/moderateurs/${id}/admin/gel`,
   memberDeparture: (id: string) => `/api/moderateurs/${id}/admin/depart`,
   memberSuspension: (id: string) => `/api/moderateurs/${id}/admin/suspension`,

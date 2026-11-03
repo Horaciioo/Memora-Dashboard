@@ -10,6 +10,7 @@ import { readPortraits } from '@/core/services/recruitment/CandidatePortraits'
 import type { FormValues } from '@/types/forms'
 import type { CandidateView } from '@/types/recruitment'
 import { assertNotBanned } from '@/core/services/recruitment/BanService'
+import { hiddenLabels } from '@/core/services/recruitment/SeatLabels'
 import { rethrowCandidate, toCandidate, CANDIDATE_INCLUDE } from '@/core/services/recruitment/shape'
 import {
   sessionScope,
@@ -37,7 +38,8 @@ export const readCandidate = async (id: string): Promise<CandidateView> => {
   return toCandidate(
     row,
     new Map(member ? [[member.discordId, member]] : []),
-    await readPortraits([row.discordId])
+    await readPortraits([row.discordId]),
+    await hiddenLabels(row.sessionId)
   )
 }
 

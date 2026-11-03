@@ -6,11 +6,13 @@ import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import { readActiveCreator } from '@/core/lib/auth/activeCreator'
 import { readLedCreatorIds } from '@/core/services/auth/LeadService'
+import { readSeatSessionIds } from '@/core/services/recruitment/SeatReader'
 import { SCOPE_SETTINGS } from '@/declarations/configurations/settings'
 import { SCOPE_TARGETS } from '@/declarations/access/scope'
 import type { ScopeTarget } from '@/declarations/access/scope'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import { OPEN_LIVE_STATUSES } from '@/utils/constants/lives'
+import { Permissions } from '@/utils/constants/permissions'
 
 /**
  * Creators a member is allowed to reach
@@ -19,6 +21,8 @@ import { OPEN_LIVE_STATUSES } from '@/utils/constants/lives'
  * @property {string[]} youtuberIds - Creators in perimeter
  * @property {string | null} activeYoutuberId - Creator the perimeter is narrowed to
  * @property {string[]} [reinforcedLiveIds] - Open lives the member was called to as reinforcement
+ * @property {string[]} [seatSessionIds] - Recruitment sessions a temporary seat opens, whatever the creator
+ * @property {boolean} [bySeat] - Recruitment sessions are reached by seat alone
  */
 
 export interface AccessScope {
@@ -26,6 +30,8 @@ export interface AccessScope {
   youtuberIds: string[]
   activeYoutuberId: string | null
   reinforcedLiveIds?: string[]
+  seatSessionIds?: string[]
+  bySeat?: boolean
 }
 
 // Teams a responsable leads widen their perimeter to the whole creator
@@ -64,13 +70,30 @@ export const readScope = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<AccessScope> => {
-  const [base, reinforcedLiveIds] = await Promise.all([
+  const [base, reinforcedLiveIds, seats] = await Promise.all([
     readBaseScope(viewer, access),
     reinforcedLives(viewer.id),
+    readSeats(viewer, access),
   ])
 
-  return { ...base, reinforcedLiveIds }
+  return { ...base, reinforcedLiveIds, ...seats }
 }
+
+/**
+ * Recruitment sessions a member reaches through a temporary seat
+ * @param {SessionUser} viewer - Signed-in member
+ * @param {PermissionHelpers} access - Permission helpers
+ * @return {Promise<Pick<AccessScope, 'seatSessionIds' | 'bySeat'>>} - Seat part of the perimeter
+ */
+
+const readSeats = async (
+  viewer: SessionUser,
+  access: PermissionHelpers
+): Promise<Pick<AccessScope, 'seatSessionIds' | 'bySeat'>> => ({
+  seatSessionIds: await readSeatSessionIds(viewer.id),
+  // Those who manage recruitment keep their creators, the others keep their seats
+  bySeat: !access.can(Permissions.RecruitmentManage),
+})
 
 /**
  * Creators a member may read, before any reinforcement
@@ -141,13 +164,16 @@ export const readFullScope = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<AccessScope> =>
-  access.isGlobal
-    ? { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
-    : {
-        isGlobal: false,
-        youtuberIds: await readFullPerimeter(viewer, access),
-        activeYoutuberId: null,
-      }
+  ({
+    ...(access.isGlobal
+      ? { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
+      : {
+          isGlobal: false,
+          youtuberIds: await readFullPerimeter(viewer, access),
+          activeYoutuberId: null,
+        }),
+    ...(await readSeats(viewer, access)),
+  })
 
 /**
  * Narrow a query to the creators in perimeter

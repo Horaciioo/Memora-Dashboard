@@ -7,7 +7,7 @@ import { notFound } from '@/core/lib/errors'
 import { STEP_ORDER } from '@/core/lib/recruitment/stepState'
 import { readDateRange, readList, readText } from '@/core/lib/forms/values'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { JUNIOR_FUNCTION_OF, OBSERVER_FUNCTION } from '@/declarations/reference/fixed'
+import { JUNIOR_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { INTEGRATION_STEP } from '@/declarations/recruitment/outcomes'
 import { PLATFORM_OF_TRADE } from '@/declarations/recruitment/registries'
@@ -187,8 +187,9 @@ export const updateSession = async (
 
   // Observer seats kept stay in place, dropped ones leave their interviews
   const observerIds = readList(values, 'observerIds')
+  const recruiterIds = readList(values, 'recruiterIds')
   const named = await prisma.recruitmentObserver.findMany({
-    where: { sessionId: id },
+    where: { sessionId: id, forgottenAt: null },
     select: { accountId: true },
   })
   const namedIds = new Set(named.map((seat) => seat.accountId))
@@ -210,17 +211,16 @@ export const updateSession = async (
       prisma.recruitmentResponsable.createMany({
         data: readList(values, 'responsableIds').map((accountId) => ({ sessionId: id, accountId })),
       }),
-      prisma.recruitmentRecruiter.deleteMany({ where: { sessionId: id } }),
-      prisma.recruitmentRecruiter.createMany({
-        data: readList(values, 'recruiterIds').map((accountId) => ({ sessionId: id, accountId })),
+      // Archives deleted stay out of the form, their seat is never rewritten
+      prisma.recruitmentRecruiter.deleteMany({
+        where: { sessionId: id, forgottenAt: null, accountId: { notIn: recruiterIds } },
       }),
-      // The Observateurs function keeps its interviews, the session never gave them
+      prisma.recruitmentRecruiter.createMany({
+        data: recruiterIds.map((accountId) => ({ sessionId: id, accountId })),
+        skipDuplicates: true,
+      }),
       prisma.recruitmentSeat.deleteMany({
-        where: {
-          accountId: { in: droppedIds },
-          candidate: { sessionId: id },
-          account: { functions: { none: { jobFunction: { name: OBSERVER_FUNCTION } } } },
-        },
+        where: { accountId: { in: droppedIds }, candidate: { sessionId: id } },
       }),
       prisma.recruitmentObserver.deleteMany({
         where: { sessionId: id, accountId: { in: droppedIds } },

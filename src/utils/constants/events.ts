@@ -97,6 +97,9 @@ export const EVENT_TYPES = createEnumeration({
   PageMoved: { id: 88, label: 'Page déplacée' },
   PageInheritanceChanged: { id: 89, label: 'Héritage des accès changé' },
   PageVersionRestored: { id: 90, label: 'Version de page restaurée' },
+  SeatRevoked: { id: 91, label: 'Accès de session retiré' },
+  SeatRestored: { id: 92, label: 'Accès de session rendu' },
+  SeatForgotten: { id: 93, label: 'Archives de session supprimées' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

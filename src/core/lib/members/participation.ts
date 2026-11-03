@@ -1,6 +1,18 @@
 import type { MemberParticipation, ParticipationRole } from '@/types/members'
 
 /**
+ * State of a temporary seat
+ * @typedef {Object} SeatFlags
+ * @property {Date | null} revokedAt - Access taken back
+ * @property {Date | null} forgottenAt - Archives deleted
+ */
+
+export interface SeatFlags {
+  revokedAt: Date | null
+  forgottenAt: Date | null
+}
+
+/**
  * Recruitment session with only the viewed member's seats
  * @typedef {Object} RecruitmentParticipationRow
  */
@@ -12,8 +24,8 @@ export interface RecruitmentParticipationRow {
   closesAt: Date | null
   createdAt: Date
   responsables: unknown[]
-  recruiters: unknown[]
-  observers: unknown[]
+  recruiters: SeatFlags[]
+  observers: SeatFlags[]
   candidates: { recruiters: unknown[]; observers: unknown[] }[]
 }
 
@@ -26,6 +38,7 @@ export interface AcademyParticipationRow {
   id: string
   startsAt: Date
   endsAt: Date | null
+  trainers: SeatFlags[]
 }
 
 /**
@@ -48,6 +61,19 @@ const recruitmentRoles = (row: RecruitmentParticipationRow): ParticipationRole[]
 }
 
 /**
+ * Whether the seats of a session are temporary, and whether their access was taken back
+ * @param {SeatFlags[]} seats - Session-level seats of the member
+ * @return {Pick<MemberParticipation, 'isTemporary' | 'isRevoked'>} - Flags of the line
+ */
+
+const temporaryState = (
+  seats: SeatFlags[]
+): Pick<MemberParticipation, 'isTemporary' | 'isRevoked'> => ({
+  isTemporary: seats.length > 0,
+  isRevoked: seats.length > 0 && seats.every((seat) => seat.revokedAt !== null),
+})
+
+/**
  * Merge every seat of a member into one line per session
  * @param {Object} input - Rows read
  * @param {RecruitmentParticipationRow[]} input.recruitments - Campaigns
@@ -68,7 +94,14 @@ export const mergeParticipation = ({
   promotionTitles: Map<string, string>
   canOpen: { recruitment: boolean; academy: boolean }
 }): MemberParticipation[] => {
-  const campaigns = recruitments.map((row): MemberParticipation => ({
+  // Archives deleted leave the file of the member
+  const kept = recruitments.filter(
+    (row) =>
+      row.responsables.length > 0 ||
+      ![...row.recruiters, ...row.observers].some((seat) => seat.forgottenAt)
+  )
+
+  const campaigns = kept.map((row): MemberParticipation => ({
     id: row.id,
     kind: 'recruitment',
     title: row.name,
@@ -78,9 +111,12 @@ export const mergeParticipation = ({
     led: row.candidates.filter((candidate) => candidate.recruiters.length > 0).length,
     observed: row.candidates.filter((candidate) => candidate.observers.length > 0).length,
     canOpen: canOpen.recruitment,
+    ...temporaryState([...row.recruiters, ...row.observers]),
   }))
 
-  const trained = promotions.map((row): MemberParticipation => ({
+  const trained = promotions
+    .filter((row) => !row.trainers.some((seat) => seat.forgottenAt))
+    .map((row): MemberParticipation => ({
     id: row.id,
     kind: 'academy',
     title: promotionTitles.get(row.id) ?? row.id,
@@ -90,6 +126,7 @@ export const mergeParticipation = ({
     led: 0,
     observed: 0,
     canOpen: canOpen.academy,
+    ...temporaryState(row.trainers),
   }))
 
   return [...campaigns, ...trained].sort((left, right) =>

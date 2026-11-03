@@ -1503,10 +1503,14 @@ model IntegrationClaim {
 
 // Moderator holding the trainer seat on a session
 model AcademySessionTrainer {
-  id        String   @id @default(cuid())
-  sessionId String
-  accountId String
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  sessionId   String
+  accountId   String
+  createdAt   DateTime  @default(now())
+  // Page access taken away, the participation stays
+  revokedAt   DateTime?
+  // Archives deleted, shown as unidentified everywhere in the session
+  forgottenAt DateTime?
 
   session AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account        @relation("AcademyTrainer", fields: [accountId], references: [id], onDelete: Cascade)
@@ -2383,10 +2387,14 @@ model RecruitmentResponsable {
 
 // Moderator leading the interviews of a recruitment session
 model RecruitmentRecruiter {
-  id        String   @id @default(cuid())
-  sessionId String
-  accountId String
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  sessionId   String
+  accountId   String
+  createdAt   DateTime  @default(now())
+  // Page access taken away, the participation stays
+  revokedAt   DateTime?
+  // Archives deleted, shown as unidentified everywhere in the session
+  forgottenAt DateTime?
 
   session RecruitmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account            @relation("RecruitmentRecruiter", fields: [accountId], references: [id], onDelete: Cascade)
@@ -2398,10 +2406,14 @@ model RecruitmentRecruiter {
 
 // Temporary member who may sit in on a few interviews of one session, never edit it
 model RecruitmentObserver {
-  id        String   @id @default(cuid())
-  sessionId String
-  accountId String
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  sessionId   String
+  accountId   String
+  createdAt   DateTime  @default(now())
+  // Page access taken away, the participation stays
+  revokedAt   DateTime?
+  // Archives deleted, shown as unidentified everywhere in the session
+  forgottenAt DateTime?
 
   session RecruitmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account            @relation("RecruitmentObserver", fields: [accountId], references: [id], onDelete: Cascade)

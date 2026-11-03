@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { isObserver } from '@/core/services/recruitment/ObserverReader'
+import { readSeatStates } from '@/core/services/recruitment/SeatReader'
 import type { PermissionHelpers } from '@/types/auth'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -24,11 +24,12 @@ export const recruitmentModeOf = async (
   accountId: string,
   sessionId: string
 ): Promise<RecruitmentMode | null> => {
-  if (access.can(Permissions.RecruitmentRead)) return 'read'
+  if (access.can(Permissions.RecruitmentManage)) return 'read'
 
-  // The Observateurs function opens every session, a named seat opens one
-  const isObserving =
-    access.can(Permissions.RecruitmentObserve) || (await isObserver(sessionId, accountId))
+  // A temporary seat opens one session, a finished one stays readable by those who took part
+  const state = (await readSeatStates(accountId, sessionId)).get(sessionId)
+  if (!state) return null
+  if (state.recruiting && access.can(Permissions.RecruitmentRead)) return 'read'
 
-  return isObserving ? 'observe' : null
+  return state.recruiting || state.observing || state.archived ? 'observe' : null
 }
