@@ -241,6 +241,7 @@ export const MODVIEW_CHAT = {
  */
 
 export const MODVIEW_WARN = {
+  body: 'flex flex-col gap-3',
   field: 'min-h-28 w-full',
 } as const
 
@@ -333,8 +334,11 @@ export const MODVIEW_USER = {
   commentAuthor: 'text-sm font-bold text-[var(--color-ink-accent)]',
   commentDate: 'shrink-0 text-xs text-[var(--twitch-muted)]',
   commentBody: 'text-sm break-words whitespace-pre-wrap',
-  presets: 'grid grid-cols-4 gap-1.5',
-  custom: 'flex items-center gap-1.5',
+  group: 'flex flex-col gap-1.5',
+  groupHead: 'flex items-center gap-1.5 text-xs font-bold text-[var(--twitch-muted)]',
+  groupIcon: 'h-4 w-4',
+  presets: 'grid grid-cols-3 gap-1.5',
+  presetWide: 'col-span-3',
   pager: 'flex items-center justify-between gap-2',
   pagerLabel: 'text-xs font-bold tabular-nums text-[var(--twitch-muted)]',
   messageRow: 'flex items-start gap-2',
@@ -343,8 +347,6 @@ export const MODVIEW_USER = {
     'flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-30',
   preset:
     'rounded-[var(--radius-md)] bg-[var(--twitch-head)] py-2 text-center text-xs font-bold transition-colors hover:brightness-125 disabled:cursor-not-allowed disabled:opacity-40',
-  reason:
-    'w-full rounded-[var(--radius-md)] bg-[var(--twitch-head)] px-3 py-2 text-sm outline-none placeholder:text-[var(--twitch-muted)] focus:ring-2 focus:ring-[var(--color-pick)]',
   actions: 'grid grid-cols-2 gap-2',
   lock: 'text-xs text-[var(--twitch-muted)]',
 } as const

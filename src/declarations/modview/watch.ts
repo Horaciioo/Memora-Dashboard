@@ -26,7 +26,8 @@ export const MODVIEW_WATCH_COPY = {
 export const MODVIEW_DOSSIER_COPY = {
   title: 'Dossier',
   ladderEmpty: 'Aucune infraction du panel enregistrée.',
-  ladderTitle: 'Où il en est dans le panel',
+  ladderTitle: 'Sanctions à mettre',
+  positionTitle: 'Où il en est dans le panel',
   step: 'Palier {n} sur {total}',
   next: 'Prochain : {measure}',
   last: 'Dernier palier atteint',
