@@ -512,6 +512,16 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Correction d’un bug qui obligeait à recliquer dans le chat pour que la touche Alt fige de nouveau les messages, alors que cela ne marchait qu’une fois.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui montrait de nouveau la présentation en vidéo à chaque mise à jour de la version en cours, alors qu’elle avait déjà été vue.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
         text: 'Correction d’un bug qui gardait l’ancienne version de Memora après avoir rechargé la page suite à une mise à jour.',
       },
     ],
