@@ -437,7 +437,6 @@ export const LIVE_ROSTER = {
   root: 'flex w-full flex-col gap-4 border-t border-[var(--color-border)] pt-5',
   head: 'flex flex-wrap items-baseline justify-between gap-2',
   title: PROPERTY_LABEL,
-  lead: 'text-xs text-[var(--color-ink-subtle)]',
   columns: 'grid grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-3',
   column:
     'flex min-h-28 min-w-0 flex-col gap-2 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-3 transition-colors',

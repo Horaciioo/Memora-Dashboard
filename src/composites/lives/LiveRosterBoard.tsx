@@ -43,7 +43,6 @@ export const LiveRosterBoard = ({ liveId }: LiveRosterBoardProps) => {
     <section className={LIVE_ROSTER.root} aria-label={LIVE_ROSTER_COPY.title}>
       <header className={LIVE_ROSTER.head}>
         <h3 className={LIVE_ROSTER.title}>{LIVE_ROSTER_COPY.title}</h3>
-        {!roster?.canManage && <p className={LIVE_ROSTER.lead}>{LIVE_ROSTER_COPY.lead}</p>}
       </header>
 
       {!roster ? (
