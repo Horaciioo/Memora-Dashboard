@@ -54,6 +54,7 @@ const levels = readNode(play.levels, 'play/play.levels')
 const tournament = readNode(play.tournament, 'play/play.tournament')
 const rewards = readNode(play.rewards, 'play/play.rewards')
 const admin = readNode(play.admin, 'play/play.admin')
+const idle = readNode(play.idle, 'play/play.idle')
 const stop = readNode(baccalaureat.stop, 'play/baccalaureat.stop')
 const points = readNode(baccalaureat.points, 'play/baccalaureat.points')
 const flash = readNode(baccalaureat.flash, 'play/baccalaureat.flash')
@@ -117,6 +118,18 @@ export const PLAY_SETTINGS = {
     fallback: 30,
     min: 1,
   }),
+  idle: {
+    gameMinutes: readInteger(idle.gameMinutes, {
+      path: 'play/play.idle.gameMinutes',
+      fallback: 15,
+      min: 1,
+    }),
+    emptyTableMinutes: readInteger(idle.emptyTableMinutes, {
+      path: 'play/play.idle.emptyTableMinutes',
+      fallback: 3,
+      min: 1,
+    }),
+  },
   seatColors: readInteger(play.seatColors, { path: 'play/play.seatColors', fallback: 15, min: 2 }),
   admin: {
     maxXpChange: readInteger(admin.maxXpChange, {

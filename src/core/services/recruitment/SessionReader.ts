@@ -20,6 +20,8 @@ import type {
 import { COMMENT_SHAPE, toComment } from '@/core/services/academy/juniors/CommentService'
 import { SUMMARY_INCLUDE, toSummary, toCandidate } from '@/core/services/recruitment/shape'
 import { sessionScope } from '@/core/services/recruitment/reach'
+import { readParticipants } from '@/core/services/recruitment/ParticipantReader'
+import { hiddenLabels } from '@/core/services/recruitment/SeatLabels'
 
 /**
  * Read every session in perimeter
@@ -91,6 +93,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
 
   if (!row) throw notFound()
 
+  const hidden = await hiddenLabels(id)
   const [outcomes, members] = await Promise.all([
     prisma.recruitmentOutcome.findMany({
       where: { archived: false },
@@ -134,7 +137,9 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     summary: toSummary(row, await sessionNumbers(), attendedCount),
     instructions: row.instructions,
     comments: row.comments.map(toComment),
-    candidates: row.candidates.map((candidate) => toCandidate(candidate, byDiscordId, portraits)),
+    candidates: row.candidates.map((candidate) =>
+      toCandidate(candidate, byDiscordId, portraits, hidden)
+    ),
     steps,
     // A session nobody configured asks the suggested pick
     questionKeys: row.questionKeys.length > 0 ? row.questionKeys : recommendedKeys(row.platform),
@@ -142,5 +147,6 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     link: row.invite ? toLinkView(row.invite) : null,
     identifiers: await identifiersForCreator(row.youtuberId),
     bannedIds: [],
+    participants: await readParticipants(id),
   }
 }

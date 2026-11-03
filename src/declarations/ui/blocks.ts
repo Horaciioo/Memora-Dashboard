@@ -445,6 +445,25 @@ export const MEMBER_FILE = {
 } as const
 
 /**
+ * Session lines of the Participation box
+ * @type {Record<string, string>}
+ */
+
+export const PARTICIPATION_BOX = {
+  list: 'flex flex-col gap-3',
+  box: 'flex w-full flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-4 py-3 text-left transition-colors',
+  link: 'cursor-pointer hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // Access taken back, the glass turns red
+  revoked: 'card-danger',
+  head: 'flex items-center gap-3',
+  title: 'min-w-0 truncate font-semibold',
+  period: 'text-sm font-normal text-[var(--color-ink-subtle)]',
+  facts: 'flex flex-col gap-0.5 pl-12 text-sm text-[var(--color-ink-subtle)]',
+  fact: 'flex gap-1.5',
+  factLabel: 'font-semibold text-[var(--color-ink)]',
+} as const
+
+/**
  * Vertical list of stages joined by a rail
  * @type {Record<string, string>}
  */

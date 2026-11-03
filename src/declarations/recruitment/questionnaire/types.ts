@@ -9,10 +9,10 @@ export type QuestionPartKey = 'profile' | 'discovery' | 'situation' | 'closing'
 
 /**
  * Exercise a question belongs to
- * @typedef {'sixty' | 'written' | 'cases' | 'documents'} ExerciseKey
+ * @typedef {'sixty' | 'written' | 'dictation' | 'cases' | 'documents'} ExerciseKey
  */
 
-export type ExerciseKey = 'sixty' | 'written' | 'cases' | 'documents'
+export type ExerciseKey = 'sixty' | 'written' | 'dictation' | 'cases' | 'documents'
 
 /**
  * How a question is played

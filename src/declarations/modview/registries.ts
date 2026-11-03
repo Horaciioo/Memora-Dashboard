@@ -150,7 +150,7 @@ export const PERMISSION_OWNERS: Partial<Record<PermissionName, string>> = {
  */
 
 export const TIMEOUT_PRESETS: readonly number[] = [
-  60, 300, 600, 1800, 3600, 86_400, 172_800, 604_800,
+  60, 300, 600, 1800, 3600, 18_000, 86_400, 259_200, 604_800,
 ]
 
 /**

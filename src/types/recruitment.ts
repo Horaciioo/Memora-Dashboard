@@ -2,6 +2,7 @@ import type { CommentView } from '@/types/comments'
 import type { DiscordIdentifierView } from '@/types/discord'
 import type { IntegrationLinkView } from '@/types/onboarding'
 import type { FieldDefinition, FormValues } from '@/types/forms'
+import type { ParticipationRole } from '@/types/members'
 import type {
   AnswerAppreciationName,
   RecruitmentOwnerName,
@@ -202,6 +203,30 @@ export interface RecruitmentOutcomeView {
 }
 
 /**
+ * Member affiliated to a session, whatever the way in
+ * @typedef {Object} SessionParticipant
+ * @property {string} id - Account identifier, empty once the archives are deleted
+ * @property {string} name - Display name, or the unidentified label
+ * @property {string | null} avatarUrl - Portrait
+ * @property {ParticipationRole[]} roles - Parts played in the session
+ * @property {number} led - Interviews led
+ * @property {number} observed - Interviews sat in on
+ * @property {boolean} isTemporary - Holds a temporary seat, its access can be taken back
+ * @property {boolean} isRevoked - Access to the session taken back
+ */
+
+export interface SessionParticipant {
+  id: string
+  name: string
+  avatarUrl: string | null
+  roles: ParticipationRole[]
+  led: number
+  observed: number
+  isTemporary: boolean
+  isRevoked: boolean
+}
+
+/**
  * Everything one session page renders
  * @typedef {Object} RecruitmentDetail
  * @property {RecruitmentSummary} summary - Session header
@@ -213,6 +238,7 @@ export interface RecruitmentOutcomeView {
  * @property {string[]} bannedIds - Barred identifiers, for those who manage
  * @property {RecruitmentOutcomeView[]} outcomes - Columns of the results board
  * @property {IntegrationLinkView | null} link - Integration form handed out
+ * @property {SessionParticipant[]} participants - Everyone affiliated, those who manage see them
  */
 
 export interface RecruitmentDetail {
@@ -227,6 +253,7 @@ export interface RecruitmentDetail {
   identifiers: DiscordIdentifierView[]
   // Identifiers barred from new sessions, filled for those who manage
   bannedIds: string[]
+  participants: SessionParticipant[]
 }
 
 /**

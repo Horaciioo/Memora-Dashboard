@@ -21,7 +21,7 @@ export const PUT = createProtectedRoute({
       params.id,
       session.id,
       joined,
-      access.can(Permissions.RecruitmentObserve) || access.can(Permissions.RecruitmentRead)
+      access.can(Permissions.RecruitmentManage)
     )
 
     await signalCandidate(params.id, sessionId)

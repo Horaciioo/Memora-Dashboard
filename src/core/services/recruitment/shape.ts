@@ -124,7 +124,10 @@ export const toSummary = (
   interviewedCount: number
 ): RecruitmentSummary => {
   const responsables = row.responsables.map(({ account }) => toPersonRef(account))
-  const recruiters = row.recruiters.map(({ account }) => toPersonRef(account))
+  // Archives deleted leave every list
+  const recruiters = row.recruiters
+    .filter((seat) => seat.forgottenAt === null)
+    .map(({ account }) => toPersonRef(account))
 
   return {
     id: row.id,
@@ -162,7 +165,9 @@ export const toSummary = (
         : null,
       responsableIds: responsables.map((seat) => seat.id),
       recruiterIds: recruiters.map((seat) => seat.id),
-      observerIds: row.observers.map((seat) => seat.accountId),
+      observerIds: row.observers
+        .filter((seat) => seat.forgottenAt === null)
+        .map((seat) => seat.accountId),
     },
   }
 }
@@ -172,6 +177,7 @@ export const toSummary = (
  * @param {object} row - Candidate row with its relations
  * @param {Map<string, { id: string, displayName: string }>} members - Moderators by Discord identifier
  * @param {Map<string, string>} portraits - Discord portraits by identifier
+ * @param {ReadonlyMap<string, string>} [hidden] - Unidentified label of each member whose archives were deleted
  * @return {CandidateView} - Candidate card
  */
 
@@ -199,7 +205,7 @@ export const toCandidate = (
       createdAt: Date
       questionKey: string | null
       pinnedAt: Date | null
-      author: { displayName: string; avatarUrl: string | null } | null
+      author: { id: string; displayName: string; avatarUrl: string | null } | null
     }[]
     answers: {
       questionKey: string
@@ -209,14 +215,23 @@ export const toCandidate = (
     }[]
   },
   members: Map<string, { id: string; displayName: string }>,
-  portraits: Map<string, string>
+  portraits: Map<string, string>,
+  hidden: ReadonlyMap<string, string> = new Map()
 ): CandidateView => {
   const member = members.get(row.discordId) ?? null
 
+  // Deleted archives lose their name and portrait everywhere in the session
+  const person = (account: { id: string; displayName: string; avatarUrl: string | null }) =>
+    hidden.has(account.id)
+      ? { id: '', label: hidden.get(account.id) as string, accent: null, image: null }
+      : toPersonRef(account)
+
   const comments: CommentView[] = row.comments.map((comment) => ({
     id: comment.id,
-    authorName: comment.author?.displayName ?? null,
-    authorAvatar: comment.author?.avatarUrl ?? null,
+    authorName: comment.author
+      ? (hidden.get(comment.author.id) ?? comment.author.displayName)
+      : null,
+    authorAvatar: comment.author && !hidden.has(comment.author.id) ? comment.author.avatarUrl : null,
     body: decryptField(comment.body) ?? '',
     createdAt: comment.createdAt.toISOString(),
     questionKey: comment.questionKey,
@@ -230,13 +245,8 @@ export const toCandidate = (
     // The member file wins
     name: member?.displayName ?? row.displayName ?? row.discordId,
     formId: row.formId,
-    recruiters: row.recruiters.map(({ account }) => toPersonRef(account)),
-    observers: row.observers.map(({ account }) => ({
-      id: account.id,
-      label: account.displayName,
-      accent: null,
-      image: account.avatarUrl,
-    })),
+    recruiters: row.recruiters.map(({ account }) => person(account)),
+    observers: row.observers.map(({ account }) => person(account)),
     interviewAt: row.interviewAt?.toISOString() ?? null,
     attended: row.attended,
     formal: row.formal,

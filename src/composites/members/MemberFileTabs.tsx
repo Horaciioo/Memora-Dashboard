@@ -35,6 +35,8 @@ import { ACCESS_EDITABLE } from '@/declarations/access/editing'
 import { ROUTES } from '@/declarations/navigation'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
+import { TEMPORARY_KINDS, TEMPORARY_SEATS } from '@/declarations/members/seats'
+import { isFieldVisible } from '@/core/lib/forms/visibility'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
@@ -173,6 +175,7 @@ const ASSIGNMENT_FIELD_NAMES = [
   'divisionId',
   'primaryFunctionIds',
   'secondaryFunctionIds',
+  ...TEMPORARY_KINDS.map((kind) => TEMPORARY_SEATS[kind].field),
   'joinedAt',
   'leftAt',
 ]
@@ -476,6 +479,19 @@ export const MemberFileTabs = ({
       field: fieldFor('secondaryFunctionIds'),
       display: optionMarks(fieldFor('secondaryFunctionIds'), identityValues.secondaryFunctionIds),
     },
+    // A temporary function shows the session it lasts through
+    ...TEMPORARY_KINDS.flatMap((kind) => {
+      const field = fieldByName.get(TEMPORARY_SEATS[kind].field)
+      if (!field || !isFieldVisible(field, identityValues)) return []
+
+      return [
+        {
+          label: field.label,
+          field,
+          display: optionLabel(field, identityValues[field.name] ?? null),
+        },
+      ]
+    }),
     {
       label: FIELD_COPY.joinedAt,
       field: fieldFor('joinedAt'),
@@ -613,6 +629,8 @@ export const MemberFileTabs = ({
 
   const overviewTab = () => (
     <MemberOverview
+      member={{ id: summary.id, name: summary.displayName, avatarUrl: summary.avatarUrl }}
+      canManageSeats={adminState !== null}
       absences={file.absences}
       participations={participations}
       playPresence={playPresence}

@@ -20,6 +20,7 @@ export const readMemberParticipation = async (
   access: PermissionHelpers
 ): Promise<MemberParticipation[]> => {
   const mine = { where: { accountId }, select: { accountId: true } }
+  const seat = { where: { accountId }, select: { revokedAt: true, forgottenAt: true } }
 
   const [recruitments, promotions, numbers] = await Promise.all([
     prisma.recruitmentSession.findMany({
@@ -39,8 +40,8 @@ export const readMemberParticipation = async (
         closesAt: true,
         createdAt: true,
         responsables: mine,
-        recruiters: mine,
-        observers: mine,
+        recruiters: seat,
+        observers: seat,
         candidates: {
           where: {
             OR: [{ recruiters: { some: { accountId } } }, { observers: { some: { accountId } } }],
@@ -51,7 +52,14 @@ export const readMemberParticipation = async (
     }),
     prisma.academySession.findMany({
       where: { trainers: { some: { accountId } } },
-      select: { id: true, functionId: true, startsAt: true, endsAt: true, jobFunction: true },
+      select: {
+        id: true,
+        functionId: true,
+        startsAt: true,
+        endsAt: true,
+        jobFunction: true,
+        trainers: seat,
+      },
     }),
     sessionNumbers(),
   ])

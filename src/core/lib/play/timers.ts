@@ -46,3 +46,24 @@ export const clearDeadline = (sessionId: string): void => {
   if (timer) clearTimeout(timer)
   timers.delete(sessionId)
 }
+
+/**
+ * Session timer key, one per kind
+ * @param {'idle' | 'away'} kind - Timer kind
+ * @param {string} sessionId - Game
+ * @return {string} - Key
+ */
+
+export const timerKey = (kind: 'idle' | 'away', sessionId: string): string => `${kind}:${sessionId}`
+
+/**
+ * Drop every pending timer of a game
+ * @param {string} sessionId - Game
+ * @return {void}
+ */
+
+export const clearSessionTimers = (sessionId: string): void => {
+  clearDeadline(sessionId)
+  clearDeadline(timerKey('idle', sessionId))
+  clearDeadline(timerKey('away', sessionId))
+}

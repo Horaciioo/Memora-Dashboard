@@ -261,6 +261,8 @@ export type ParticipationRole = 'responsable' | 'recruiter' | 'observer' | 'trai
  * @property {number} led - Interviews led
  * @property {number} observed - Interviews sat in on
  * @property {boolean} canOpen - Viewer may open the session
+ * @property {boolean} isTemporary - Held through a temporary function, its access can be taken back
+ * @property {boolean} isRevoked - Access to the session taken back, the participation stays
  */
 
 export interface MemberParticipation {
@@ -273,6 +275,8 @@ export interface MemberParticipation {
   led: number
   observed: number
   canOpen: boolean
+  isTemporary: boolean
+  isRevoked: boolean
 }
 
 /**

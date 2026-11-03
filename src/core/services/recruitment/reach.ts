@@ -6,12 +6,20 @@ import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 
 /**
- * Narrow a session query to the creators in perimeter
+ * Narrow a session query to the creators in perimeter, and to the seats held
  * @param {AccessScope} scope - Perimeter
  * @return {object} - Where clause
  */
 
-export const sessionScope = (scope: AccessScope) => scopedWhere('recruitmentSession', scope)
+export const sessionScope = (scope: AccessScope) => {
+  const seated = { id: { in: scope.seatSessionIds ?? [] } }
+  if (scope.bySeat) return seated
+
+  const reach = scopedWhere('recruitmentSession', scope)
+
+  // A seat opens its session whatever the creator
+  return scope.seatSessionIds?.length ? { OR: [reach, seated] } : reach
+}
 
 /**
  * Read the session a candidate belongs to, whoever asks

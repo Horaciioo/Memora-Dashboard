@@ -1,5 +1,6 @@
 'use client'
 
+import { ParticipantsBox } from '@/composites/recruitment/file/ParticipantsBox'
 import { RecordId } from '@/components/elements/display/RecordId'
 import type { EditableEntry } from '@/components/structures/inline/EditableDetailGrid'
 import { FileOverview } from '@/components/structures/page/FileOverview'
@@ -25,12 +26,19 @@ export const AdminTab = () => {
   ]
 
   return (
-    <FileOverview
-      groups={[{ id: 'admin', title: RECRUITMENT_COPY.tabAdmin, entries }]}
-      values={record.values}
-      issues={record.issues}
-      disabled={!can.manage}
-      onCommit={record.saveField}
-    />
+    <>
+      <FileOverview
+        groups={[{ id: 'admin', title: RECRUITMENT_COPY.tabAdmin, entries }]}
+        values={record.values}
+        issues={record.issues}
+        disabled={!can.manage}
+        onCommit={record.saveField}
+      />
+      <ParticipantsBox
+        sessionId={detail.summary.id}
+        participants={detail.participants}
+        canManage={can.manage}
+      />
+    </>
   )
 }

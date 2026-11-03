@@ -62,6 +62,18 @@
   --shadow-md: var(--glass-thick-shadow), var(--shadow-lg);
 }
 
+/* Same glass turned red, a taken back access */
+.card-danger {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-danger) 20%, transparent),
+      color-mix(in srgb, var(--color-danger) 6%, transparent)
+    ),
+    var(--glass-thick-fill);
+  border-color: color-mix(in srgb, var(--color-danger) 45%, transparent);
+}
+
 .card-surface > * {
   --color-border: var(--page-border);
   --shadow-sm: var(--page-shadow-sm);

@@ -55,7 +55,7 @@ export const loadRecruitment = async (
 
   // An observer never gets a way to reach a candidate, nor reads the remarks
   const detail = observing
-    ? { ...read, comments: [], candidates: read.candidates.map(maskForObserver) }
+    ? { ...read, comments: [], participants: [], candidates: read.candidates.map(maskForObserver) }
     : read
 
   // An observer never writes nor reads the journal

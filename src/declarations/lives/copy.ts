@@ -74,7 +74,6 @@ export const LIVE_FIELD_COPY = {
 export const LIVE_ROSTER_COPY = {
   title: 'Appel',
   open: 'Voir l’appel',
-  lead: 'Seuls les lives où un Junior est présent comptent pour sa PIM.',
   empty: 'Personne ici',
   moveTo: 'Passer en « {status} »',
   junior: 'Junior',

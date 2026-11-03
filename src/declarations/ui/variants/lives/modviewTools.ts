@@ -106,6 +106,7 @@ export const MODVIEW_DOSSIER = {
   rowBy: 'text-xs text-[var(--twitch-muted)] italic',
   line: 'text-xs text-[var(--color-ink-subtle)]',
   empty: 'text-xs text-[var(--color-ink-subtle)] italic',
+  section: 'flex flex-col gap-2',
 } as const
 
 /**

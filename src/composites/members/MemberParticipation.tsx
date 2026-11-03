@@ -1,10 +1,20 @@
-import Link from '@/components/elements/navigation/AppLink'
+'use client'
 
+import { useState } from 'react'
+
+import { Avatar } from '@/components/elements/display/Avatar'
+import Link from '@/components/elements/navigation/AppLink'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { Section } from '@/components/structures/page/Section'
+import { useSeatActions } from '@/core/hooks/data/people/useSeatActions'
+import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
+import { SEAT_COPY } from '@/declarations/members/seats'
+import type { SeatAction, TemporaryKind } from '@/declarations/members/seats'
 import { PARTICIPATION_ROLE_COPY, MEMBER_COPY } from '@/declarations/members/copy'
 import { ROUTES } from '@/declarations/navigation'
-import { MEMBER_FILE } from '@/declarations/ui/blocks'
-import { EMPTY_VALUE, HOME_STYLES, TASK_LIST } from '@/declarations/ui/variants'
+import { MEMBER_FILE, PARTICIPATION_BOX } from '@/declarations/ui/blocks'
+import { EMPTY_VALUE } from '@/declarations/ui/variants'
+import type { MenuItem } from '@/managers/front-end'
 import type { MemberParticipation as Participation } from '@/types/members'
 import { cn } from '@/utils/classnames'
 import { formatDay, formatDayRange } from '@/utils/format/dates'
@@ -12,69 +22,214 @@ import { formatDay, formatDayRange } from '@/utils/format/dates'
 // Sessions previewed before sending to the path tab
 const PREVIEW_PARTICIPATION = 3
 
+export interface ParticipantIdentity {
+  id: string
+  name: string
+  avatarUrl: string | null
+}
+
 export interface MemberParticipationProps {
+  member: ParticipantIdentity
   participations: Participation[]
+  // Responsable and above take access back or delete archives
+  canManageSeats: boolean
   onNavigate: (tab: string) => void
 }
 
 /**
- * Meta line of one session
+ * Facts under the title of one session
  * @param {Participation} entry - Session line
- * @return {string} - Roles, period, interviews
+ * @return {[string, string][]} - Label and value of each fact
  */
 
-const metaOf = (entry: Participation): string =>
+const factsOf = (entry: Participation): [string, string][] => [
   [
+    MEMBER_COPY.participationRole,
     entry.roles.map((role) => PARTICIPATION_ROLE_COPY[role]).join(', '),
-    entry.endsAt ? formatDayRange(entry.startsAt, entry.endsAt) : formatDay(entry.startsAt),
-    entry.led > 0 && MEMBER_COPY.participationLed.replace('{count}', String(entry.led)),
-    entry.observed > 0 &&
-      MEMBER_COPY.participationObserved.replace('{count}', String(entry.observed)),
-  ]
-    .filter(Boolean)
-    .join(' · ')
+  ],
+  ...(entry.roles.includes('recruiter')
+    ? [[MEMBER_COPY.participationLed, String(entry.led)] as [string, string]]
+    : []),
+  ...(entry.roles.includes('observer')
+    ? [[MEMBER_COPY.participationObserved, String(entry.observed)] as [string, string]]
+    : []),
+]
+
+/**
+ * Seat the unidentified label of a session line stands for
+ * @param {Participation} entry - Session line
+ * @return {TemporaryKind} - Trainer, recruiter, or observer alone
+ */
+
+const seatKindOf = (entry: Participation): TemporaryKind =>
+  entry.kind === 'academy'
+    ? 'trainer'
+    : entry.roles.includes('recruiter') || !entry.roles.includes('observer')
+      ? 'recruiter'
+      : 'observer'
+
+/**
+ * One session the member took part in, a right click for its seat
+ * @param {Object} props - Component props
+ * @param {Participation} props.entry - Session line
+ * @param {ParticipantIdentity} props.member - Member the file belongs to
+ * @param {boolean} props.canManageSeats - Viewer may act on the seat
+ * @param {(action: SeatAction) => void} props.onAct - Asks a gesture on the seat
+ * @return {JSX.Element}
+ */
+
+const ParticipationLine = ({
+  entry,
+  member,
+  canManageSeats,
+  onAct,
+}: {
+  entry: Participation
+  member: ParticipantIdentity
+  canManageSeats: boolean
+  onAct: (action: SeatAction) => void
+}) => {
+  const items: MenuItem[] =
+    canManageSeats && entry.isTemporary
+      ? [
+          entry.isRevoked
+            ? {
+                id: 'restore',
+                label: SEAT_COPY.restore,
+                icon: 'unlock',
+                onSelect: () => onAct('restore'),
+              }
+            : {
+                id: 'revoke',
+                label: SEAT_COPY.revoke,
+                icon: 'lock',
+                onSelect: () => onAct('revoke'),
+              },
+          {
+            id: 'forget',
+            label: SEAT_COPY.forget,
+            icon: 'remove',
+            danger: true,
+            separatorBefore: true,
+            onSelect: () => onAct('forget'),
+          },
+        ]
+      : []
+  const menu = useActionMenu(items, SEAT_COPY.menuTitle)
+
+  const period = entry.endsAt
+    ? formatDayRange(entry.startsAt, entry.endsAt)
+    : formatDay(entry.startsAt)
+  const href =
+    entry.kind === 'recruitment' ? ROUTES.recruitment(entry.id) : ROUTES.session(entry.id)
+  const isLink = entry.canOpen && !entry.isRevoked
+
+  const body = (
+    <>
+      <span className={PARTICIPATION_BOX.head}>
+        <Avatar name={member.name} src={member.avatarUrl} size="md" />
+        <span className={PARTICIPATION_BOX.title}>
+          {entry.title}
+          <span className={PARTICIPATION_BOX.period}> • {period}</span>
+        </span>
+      </span>
+      <span className={PARTICIPATION_BOX.facts}>
+        {factsOf(entry).map(([label, value]) => (
+          <span key={label} className={PARTICIPATION_BOX.fact}>
+            <span className={PARTICIPATION_BOX.factLabel}>{label} :</span>
+            {value}
+          </span>
+        ))}
+      </span>
+    </>
+  )
+  const className = cn(
+    PARTICIPATION_BOX.box,
+    isLink && PARTICIPATION_BOX.link,
+    entry.isRevoked && PARTICIPATION_BOX.revoked
+  )
+  const handlers = items.length > 0 ? { onContextMenu: menu.onContextMenu } : {}
+
+  return isLink ? (
+    <Link href={href} className={className} {...handlers}>
+      {body}
+    </Link>
+  ) : (
+    <div className={className} {...handlers}>
+      {body}
+    </div>
+  )
+}
 
 /**
  * Sessions a moderator took part in
+ * @param {ParticipantIdentity} member - Member the file belongs to
  * @param {Participation[]} participations - Sessions, latest first
+ * @param {boolean} canManageSeats - Viewer may act on the seats
  * @param {(tab: string) => void} onNavigate - Opens another tab
  * @return {JSX.Element}
  */
 
-export const MemberParticipation = ({ participations, onNavigate }: MemberParticipationProps) => (
-  <Section
-    title={MEMBER_COPY.participationTitle}
-    action={
-      participations.length > PREVIEW_PARTICIPATION && (
-        <button type="button" className={MEMBER_FILE.more} onClick={() => onNavigate('path')}>
-          {MEMBER_COPY.seeMore}
-        </button>
-      )
-    }
-    raised
-  >
-    {participations.length === 0 && (
-      <p className={cn('text-sm', EMPTY_VALUE)}>{MEMBER_COPY.participationEmpty}</p>
-    )}
-    {participations.slice(0, PREVIEW_PARTICIPATION).map((entry) => {
-      const body = (
-        <span className={TASK_LIST.body}>
-          <span className={TASK_LIST.title}>{entry.title}</span>
-          <span className={TASK_LIST.meta}>{metaOf(entry)}</span>
-        </span>
-      )
-      const href =
-        entry.kind === 'recruitment' ? ROUTES.recruitment(entry.id) : ROUTES.session(entry.id)
+export const MemberParticipation = ({
+  member,
+  participations,
+  canManageSeats,
+  onNavigate,
+}: MemberParticipationProps) => {
+  const { isSaving, act } = useSeatActions()
+  const [forgetting, setForgetting] = useState<Participation | null>(null)
 
-      return entry.canOpen ? (
-        <Link key={entry.id} href={href} className={cn(HOME_STYLES.line, HOME_STYLES.lineLink)}>
-          {body}
-        </Link>
-      ) : (
-        <div key={entry.id} className={HOME_STYLES.line}>
-          {body}
-        </div>
-      )
-    })}
-  </Section>
-)
+  const run = (entry: Participation, action: SeatAction) =>
+    act({
+      accountId: member.id,
+      family: entry.kind,
+      sessionId: entry.id,
+      action,
+    })
+
+  return (
+    <Section
+      title={MEMBER_COPY.participationTitle}
+      action={
+        participations.length > PREVIEW_PARTICIPATION && (
+          <button type="button" className={MEMBER_FILE.more} onClick={() => onNavigate('path')}>
+            {MEMBER_COPY.seeMore}
+          </button>
+        )
+      }
+      raised
+    >
+      {participations.length === 0 && (
+        <p className={cn('text-sm', EMPTY_VALUE)}>{MEMBER_COPY.participationEmpty}</p>
+      )}
+      <div className={PARTICIPATION_BOX.list}>
+        {participations.slice(0, PREVIEW_PARTICIPATION).map((entry) => (
+          <ParticipationLine
+            key={`${entry.kind}:${entry.id}`}
+            entry={entry}
+            member={member}
+            canManageSeats={canManageSeats}
+            onAct={(action) =>
+              action === 'forget' ? setForgetting(entry) : void run(entry, action)
+            }
+          />
+        ))}
+      </div>
+      <ConfirmDialog
+        open={forgetting !== null}
+        title={SEAT_COPY.forgetTitle}
+        description={SEAT_COPY.forgetDescription.replace(
+          '{label}',
+          SEAT_COPY.unidentified[forgetting ? seatKindOf(forgetting) : 'recruiter']
+        )}
+        confirmLabel={SEAT_COPY.forget}
+        tone="danger"
+        pending={isSaving}
+        onCancel={() => setForgetting(null)}
+        onConfirm={() => {
+          if (forgetting) void run(forgetting, 'forget').then(() => setForgetting(null))
+        }}
+      />
+    </Section>
+  )
+}

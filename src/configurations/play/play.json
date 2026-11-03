@@ -20,6 +20,10 @@
     "minSeconds": 60
   },
   "lobbyIdleMinutes": 30,
+  "idle": {
+    "gameMinutes": 15,
+    "emptyTableMinutes": 3
+  },
   "seatColors": 15,
   "leaderboardSize": 20,
   "invites": {

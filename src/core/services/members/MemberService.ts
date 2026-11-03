@@ -9,6 +9,7 @@ import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { conflict, forbidden, immutable, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
+import { readTemporaryValues, syncTemporarySeats, temporaryFields } from '@/core/services/members/seats'
 import { syncFunctionTeams } from '@/core/services/teams/FunctionTeamService'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import { activeAbsenceFilter, toAbsence } from '@/core/services/absences/AbsenceService'
@@ -247,7 +248,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
     disabled: !isAdmin && !divisions[index].leadAssignable,
   }))
 
-  return [
+  const base: FieldDefinition[] = [
     {
       name: 'displayName',
       kind: 'text',
@@ -389,6 +390,13 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       group: FORM_GROUPS.planning,
     },
   ]
+
+  // A temporary function asks for the session it lasts through
+  const functionIds = new Map(functions.map((entry) => [entry.name, entry.id]))
+  const temporary = await temporaryFields(functionIds)
+  const at = base.findIndex((field) => field.name === 'secondaryFunctionIds') + 1
+
+  return [...base.slice(0, at), ...temporary, ...base.slice(at)]
 }
 
 // Accepted juniors stay with the candidates until their PIM starts
@@ -478,6 +486,21 @@ const readHeldFunctionIds = async (values: FormValues): Promise<string[]> => {
 }
 
 /**
+ * Names of the functions behind some identifiers
+ * @param {string[]} functionIds - Function identifiers
+ * @return {Promise<Set<string>>} - Names
+ */
+
+const heldNames = async (functionIds: string[]): Promise<Set<string>> => {
+  const rows = await prisma.jobFunction.findMany({
+    where: { id: { in: functionIds } },
+    select: { name: true },
+  })
+
+  return new Set(rows.map((row) => row.name))
+}
+
+/**
  * Keep the ids that name an active function of one kind
  * @param {string[]} ids - Submitted identifiers
  * @param {FunctionKindName} kind - Principal or secondary
@@ -543,6 +566,7 @@ export const createMember = async (values: FormValues): Promise<MemberSummary> =
     },
     include: SUMMARY_INCLUDE,
   })
+  await syncTemporarySeats(row.id, await heldNames(functionIds), values)
   await syncFunctionTeams([row.id])
 
   // A brand new account never carries a note or a running absence yet
@@ -599,6 +623,7 @@ export const updateMember = async (
       _count: { select: { notesReceived: true, absences: { where: activeAbsenceFilter() } } },
     },
   })
+  await syncTemporarySeats(id, await heldNames(functionIds), values)
   await syncFunctionTeams([id])
 
   return toSummary(row, { notesCount: row._count.notesReceived, isAbsent: row._count.absences > 0 })
@@ -717,6 +742,7 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       secondaryFunctionIds: row.functions
         .filter((held) => held.jobFunction.kind === FunctionKinds.Secondary)
         .map((held) => held.functionId),
+      ...(await readTemporaryValues(id)),
       timezone: row.timezone,
       birthday: row.birthday ? row.birthday.toISOString().slice(0, 10) : null,
       joinedAt: row.joinedAt.toISOString().slice(0, 10),

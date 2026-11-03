@@ -14,8 +14,8 @@ export interface EmptyStateProps {
   // Falls back to generic copy on 'filter'
   title?: string
   description?: string
-  // Always rendered below the description — an EmptyState is never a dead end
-  action: ReactNode
+  // Rendered below the description, omitted for passive emptiness
+  action?: ReactNode
   // Shrinks padding and illustration
   compact?: boolean
   className?: string
@@ -27,7 +27,7 @@ export interface EmptyStateProps {
  * @param {IllustrationName} [figure] - Drawn figure overriding the variant default
  * @param {string} [title] - Headline
  * @param {string} [description] - Supporting line
- * @param {ReactNode} action - Mandatory way out
+ * @param {ReactNode} [action] - Optional way out
  * @param {boolean} [compact] - Smaller frame and illustration
  * @param {string} [className] - Extra classes merged onto the frame
  * @return {JSX.Element}
@@ -65,7 +65,7 @@ export const EmptyState = ({
       {resolvedDescription && (
         <p className="max-w-sm text-sm text-[var(--color-ink-subtle)]">{resolvedDescription}</p>
       )}
-      <div className="pt-1">{action}</div>
+      {action && <div className="pt-1">{action}</div>}
     </div>
   )
 }

@@ -4,7 +4,7 @@ import { memo, useState } from 'react'
 
 import { ActSentence } from '@/composites/modview/ActSentence'
 import { ChatText } from '@/composites/modview/ChatText'
-import { WarnDialog } from '@/composites/modview/WarnDialog'
+import { ReasonDialog } from '@/composites/modview/ReasonDialog'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { tierOf } from '@/core/lib/modview/tier'
 import { useMenu } from '@/managers/front-end'
@@ -243,8 +243,10 @@ const ChatLineBody = ({
       )}
       {toolsPosition === 'hover' && toolsNode}
       {isWarning && (
-        <WarnDialog
-          name={message.author.name}
+        <ReasonDialog
+          description={MODVIEW_COPY.warnLead.replace('{name}', message.author.name)}
+          placeholder={MODVIEW_COPY.warnPlaceholder}
+          confirmLabel={MODVIEW_COPY.warnConfirm}
           onConfirm={(reason) => onAct({ kind: 'warn', chatterId, reason })}
           onClose={() => setWarning(false)}
         />
