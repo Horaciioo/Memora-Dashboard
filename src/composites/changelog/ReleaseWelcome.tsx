@@ -25,11 +25,11 @@ export interface ReleaseWelcomeProps {
 
 export const ReleaseWelcome = ({ isAlways = false }: ReleaseWelcomeProps) => {
   const router = useRouter()
-  const { release, isFresh, markSeen } = useFreshRelease()
+  const { release, isNewVersion, markSeen } = useFreshRelease()
   const [isClosed, setIsClosed] = useState(false)
   const isSplashDone = useSplashDone()
 
-  if (!release?.hasShowcase || !(isFresh || isAlways)) return null
+  if (!release?.hasShowcase || !(isNewVersion || isAlways)) return null
 
   const close = () => {
     setIsClosed(true)

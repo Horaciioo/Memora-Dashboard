@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { changelogFor, releaseSeenKey } from '@/declarations/changelog/helpers'
+import { changelogFor, isVersionSeen, releaseSeenKey } from '@/declarations/changelog/helpers'
 import type { ChangelogRelease } from '@/declarations/changelog/releases'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 
@@ -14,12 +14,14 @@ import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
  * @typedef {Object} FreshRelease
  * @property {ChangelogRelease | null} release - Latest readable note
  * @property {boolean} isFresh - Not read yet
+ * @property {boolean} isNewVersion - Version never met, a new snapshot of it does not count
  * @property {() => void} markSeen - Store as read
  */
 
 export interface FreshRelease {
   release: ChangelogRelease | null
   isFresh: boolean
+  isNewVersion: boolean
   markSeen: () => void
 }
 
@@ -37,6 +39,7 @@ export const useFreshRelease = (): FreshRelease => {
   const seen = seenNow ?? session?.seenReleaseVersion ?? null
   const key = release ? releaseSeenKey(release) : null
   const isFresh = release !== null && seen !== key
+  const isNewVersion = isFresh && release !== null && !isVersionSeen(seen, release)
 
   const markSeen = useCallback(() => {
     if (!key || seenNow === key) return
@@ -48,5 +51,5 @@ export const useFreshRelease = (): FreshRelease => {
       .catch(() => setSeenNow(null))
   }, [key, seenNow, router])
 
-  return { release, isFresh, markSeen }
+  return { release, isFresh, isNewVersion, markSeen }
 }

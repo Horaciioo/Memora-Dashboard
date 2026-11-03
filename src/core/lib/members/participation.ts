@@ -117,17 +117,17 @@ export const mergeParticipation = ({
   const trained = promotions
     .filter((row) => !row.trainers.some((seat) => seat.forgottenAt))
     .map((row): MemberParticipation => ({
-    id: row.id,
-    kind: 'academy',
-    title: promotionTitles.get(row.id) ?? row.id,
-    startsAt: row.startsAt.toISOString(),
-    endsAt: row.endsAt?.toISOString() ?? null,
-    roles: ['trainer'],
-    led: 0,
-    observed: 0,
-    canOpen: canOpen.academy,
-    ...temporaryState(row.trainers),
-  }))
+      id: row.id,
+      kind: 'academy',
+      title: promotionTitles.get(row.id) ?? row.id,
+      startsAt: row.startsAt.toISOString(),
+      endsAt: row.endsAt?.toISOString() ?? null,
+      roles: ['trainer'],
+      led: 0,
+      observed: 0,
+      canOpen: canOpen.academy,
+      ...temporaryState(row.trainers),
+    }))
 
   return [...campaigns, ...trained].sort((left, right) =>
     right.startsAt.localeCompare(left.startsAt)

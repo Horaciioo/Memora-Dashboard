@@ -70,6 +70,19 @@ export const releaseSeenKey = (release: ChangelogRelease): string => {
 }
 
 /**
+ * Tell if a read mark already covers the version of a note, whatever its snapshot
+ * @param {string | null} seen - Stored read mark
+ * @param {ChangelogRelease} release - Note
+ * @return {boolean} - Version already met
+ */
+
+export const isVersionSeen = (seen: string | null, release: ChangelogRelease): boolean => {
+  const parts = seen ? parseVersion(seen) : null
+
+  return parts !== null && baseVersion(parts) === release.version
+}
+
+/**
  * Notes a member may read
  * @param {Pick<PermissionHelpers, 'can' | 'isResponsable'>} access - Permission check and level
  * @return {ChangelogRelease[]} - Filtered notes

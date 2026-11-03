@@ -163,17 +163,16 @@ export const readFullPerimeter = async (
 export const readFullScope = async (
   viewer: SessionUser,
   access: PermissionHelpers
-): Promise<AccessScope> =>
-  ({
-    ...(access.isGlobal
-      ? { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
-      : {
-          isGlobal: false,
-          youtuberIds: await readFullPerimeter(viewer, access),
-          activeYoutuberId: null,
-        }),
-    ...(await readSeats(viewer, access)),
-  })
+): Promise<AccessScope> => ({
+  ...(access.isGlobal
+    ? { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
+    : {
+        isGlobal: false,
+        youtuberIds: await readFullPerimeter(viewer, access),
+        activeYoutuberId: null,
+      }),
+  ...(await readSeats(viewer, access)),
+})
 
 /**
  * Narrow a query to the creators in perimeter
