@@ -17,7 +17,7 @@ import {
   RECRUITMENT_STATUS_REGISTRY,
 } from '@/declarations/recruitment/registries'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
-import { MemberRoles } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
 import { RecruitmentStatuses } from '@/utils/constants/recruitment'
 
 const { shortTextMaxLength, longTextMaxLength, markdownMaxLength, noteMaxLength } = FORM_SETTINGS
@@ -166,20 +166,53 @@ export const sessionFields = async (
 }
 
 /**
- * Members who may lead an interview of a session: its recruiters and its responsables
- * @param {string} youtuberId - Creator of the session
+ * Members seated on a session as recruiter or responsable, whatever their creators
+ * @param {string} sessionId - Session identifier
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-const sessionRecruiterOptions = async (youtuberId: string): Promise<FieldOption[]> => {
+const seatedOptions = async (sessionId: string): Promise<FieldOption[]> => {
+  const where = { sessionId, revokedAt: null, forgottenAt: null }
   const [recruiters, responsables] = await Promise.all([
+    prisma.recruitmentRecruiter.findMany({ where, select: { accountId: true } }),
+    prisma.recruitmentResponsable.findMany({ where: { sessionId }, select: { accountId: true } }),
+  ])
+  const ids = [...new Set([...recruiters, ...responsables].map((seat) => seat.accountId))]
+  if (ids.length === 0) return []
+
+  const rows = await prisma.account.findMany({
+    where: { id: { in: ids }, status: { notIn: GONE_MEMBER_STATUSES } },
+    orderBy: { displayName: 'asc' },
+    select: { id: true, displayName: true, avatarUrl: true },
+  })
+
+  return rows.map((row) => ({
+    value: row.id,
+    label: row.displayName,
+    image: row.avatarUrl ?? undefined,
+  }))
+}
+
+/**
+ * Members who may lead an interview of a session: its recruiters and its responsables
+ * @param {string} youtuberId - Creator of the session
+ * @param {string} [sessionId] - Session whose seated members qualify without belonging to the creator
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+const sessionRecruiterOptions = async (
+  youtuberId: string,
+  sessionId?: string
+): Promise<FieldOption[]> => {
+  const [recruiters, responsables, seated] = await Promise.all([
     teamOptions({ functionName: RECRUITER_FUNCTION, youtuberId, withGlobal: true }),
     teamOptions({ role: MemberRoles.Responsable, youtuberId }),
+    sessionId ? seatedOptions(sessionId) : [],
   ])
 
   const seen = new Set<string>()
 
-  return [...recruiters, ...responsables].filter((option) => {
+  return [...recruiters, ...responsables, ...seated].filter((option) => {
     if (seen.has(option.value)) return false
     seen.add(option.value)
     return true
@@ -190,12 +223,14 @@ const sessionRecruiterOptions = async (youtuberId: string): Promise<FieldOption[
  * Declarations of the candidate form
  * @param {string} [youtuberId] - Creator of the session, narrowing the recruiters to its team
  * @param {string[]} [keptObservers] - Observers already seated, kept valid
+ * @param {string} [sessionId] - Session, whose seated recruiters qualify too
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
 export const candidateFields = async (
   youtuberId?: string,
-  keptObservers: string[] = []
+  keptObservers: string[] = [],
+  sessionId?: string
 ): Promise<FieldDefinition[]> => {
   const [members, observers, outcomes, recruiters] = await Promise.all([
     memberOptions(),
@@ -204,7 +239,7 @@ export const candidateFields = async (
       where: { archived: false },
       orderBy: { position: 'asc' },
     }),
-    youtuberId ? sessionRecruiterOptions(youtuberId) : null,
+    youtuberId ? sessionRecruiterOptions(youtuberId, sessionId) : null,
   ])
 
   // Observers may sit in even while absent

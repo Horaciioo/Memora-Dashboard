@@ -13,6 +13,6 @@ export const GET = createProtectedRoute({
       select: { youtuberId: true },
     })
 
-    return candidateFields(session.youtuberId, await observerIdsOf(params.id))
+    return candidateFields(session.youtuberId, await observerIdsOf(params.id), sessionId)
   },
 })

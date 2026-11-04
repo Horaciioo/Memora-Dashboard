@@ -19,6 +19,7 @@ export const CANDIDATE_COPY = {
   nextPart: 'Partie suivante : {part}',
   observe: 'Observer ce candidat',
   observing: 'Tu observes ce candidat !',
+  showQuestionnaire: 'Afficher le questionnaire',
   observeStopTitle: 'Tu ne souhaites plus observer ce candidat ?',
   observeStopYes: 'Oui',
   observeStopNo: 'Non',
