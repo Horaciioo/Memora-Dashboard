@@ -227,7 +227,7 @@ export const DatePicker = ({
                 isAnchored={picking.isAnchored}
                 onHover={picking.hover}
                 onTitle={() => setPickingYear(true)}
-                onPick={range ? (next) => picking.step(next) && onChange([]) : pick}
+                onPick={range ? picking.step : pick}
               />
             )}
 

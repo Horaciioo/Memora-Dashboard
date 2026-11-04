@@ -25,7 +25,7 @@ const { shortTextMaxLength, longTextMaxLength, markdownMaxLength, noteMaxLength 
 import 'server-only'
 
 /**
- * Members holding the Observateurs function, plus those already seated who stay valid
+ * Members holding the Observateurs function
  * @param {string[]} kept - Observers already in the file
  * @return {Promise<FieldOption[]>} - Select options
  */
@@ -41,7 +41,7 @@ const observerOptions = async (kept: string[]): Promise<FieldOption[]> => {
     select: { id: true, displayName: true, avatarUrl: true },
   })
 
-  // Seated before they lost the function, they can leave but nobody new joins
+  // Seated before they lost the function
   return [
     ...options,
     ...rows.map((row) => ({
@@ -56,8 +56,8 @@ const observerOptions = async (kept: string[]): Promise<FieldOption[]> => {
 /**
  * Declarations of the session form
  * @param {AccessScope} scope - Perimeter
- * @param {string} [youtuberId] - Creator of an existing session, narrowing the team pickers
- * @param {string[]} [keptObservers] - Observers already seated, kept valid
+ * @param {string} [youtuberId] - Creator of an existing session
+ * @param {string[]} [keptObservers] - Observers already seated
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
@@ -70,7 +70,7 @@ export const sessionFields = async (
     youtuberOptions(scope),
     activeFunctions(),
     teamOptions({ role: MemberRoles.Responsable, youtuberId, withGlobal: true }),
-    teamOptions({ functionName: RECRUITER_FUNCTION, youtuberId, withGlobal: true }),
+    teamOptions({ functionName: RECRUITER_FUNCTION, withGlobal: true }),
     observerOptions(keptObservers),
     prisma.youtuberFunction.findMany({ select: { youtuberId: true, functionId: true } }),
   ])
@@ -145,8 +145,8 @@ export const sessionFields = async (
       name: 'recruiterIds',
       kind: 'multiselect',
       label: RECRUITMENT_FIELD_COPY.recruiters,
+      // Recruiters lend a hand across creators, no team narrowing
       options: recruiters,
-      ownerField: 'youtuberId',
       mark: 'avatar',
     },
     {

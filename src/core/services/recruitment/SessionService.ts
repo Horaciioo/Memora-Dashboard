@@ -169,6 +169,52 @@ export const createSession = async (
 }
 
 /**
+ * Carry a moved period to the steps and the promotion it feeds
+ * @param {Object} before - Session anchors before the edit
+ * @param {Date | null} opensAt - New opening day
+ * @param {Date | null} closesAt - New closing day
+ * @return {Promise<void>} - Resolves once dates follow
+ */
+
+const moveWithPeriod = async (
+  before: { id: string; academySessionId: string | null; opensAt: Date | null },
+  opensAt: Date | null,
+  closesAt: Date | null
+): Promise<void> => {
+  if (before.academySessionId && (closesAt ?? opensAt)) {
+    await prisma.academySession.update({
+      where: { id: before.academySessionId },
+      data: { startsAt: (closesAt ?? opensAt) as Date },
+    })
+  }
+
+  if (before.opensAt?.getTime() === opensAt?.getTime()) return
+
+  // Only steps still on their computed day follow, hand-set days stay
+  const steps = await prisma.recruitmentStep.findMany({
+    where: { sessionId: before.id },
+    select: { id: true, offset: true, scheduledAt: true },
+  })
+  const dayOf = (from: Date | null, offset: number) =>
+    from ? from.getTime() + offset * DAY_MS : null
+
+  await prisma.$transaction(
+    steps
+      .filter(
+        (step) => (step.scheduledAt?.getTime() ?? null) === dayOf(before.opensAt, step.offset)
+      )
+      .map((step) => {
+        const next = dayOf(opensAt, step.offset)
+
+        return prisma.recruitmentStep.update({
+          where: { id: step.id },
+          data: { scheduledAt: next === null ? null : new Date(next) },
+        })
+      })
+  )
+}
+
+/**
  * Edit a session
  * @param {string} id - Session identifier
  * @param {FormValues} values - Parsed body
@@ -181,7 +227,7 @@ export const updateSession = async (
   values: FormValues,
   scope: AccessScope
 ): Promise<RecruitmentSummary> => {
-  await reachableSession(id, scope)
+  const before = await reachableSession(id, scope)
 
   const { opensAt, closesAt } = readPeriod(values)
 
@@ -234,6 +280,7 @@ export const updateSession = async (
     ])
     .catch(rethrow)
 
+  await moveWithPeriod(before, opensAt, closesAt)
   await syncProgramProject(id)
 
   const attended = await prisma.recruitmentCandidate.count({
