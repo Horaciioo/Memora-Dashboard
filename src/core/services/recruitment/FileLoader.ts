@@ -74,7 +74,7 @@ export const loadRecruitment = async (
   ]
 
   const [candidate, step, sessionForm, activity] = await Promise.all([
-    candidateFields(String(detail.summary.values.youtuberId), keptObservers),
+    candidateFields(String(detail.summary.values.youtuberId), keptObservers, id),
     stepFields(),
     sessionFields(perimeter, String(detail.summary.values.youtuberId), keptObservers),
     canReadLogs
