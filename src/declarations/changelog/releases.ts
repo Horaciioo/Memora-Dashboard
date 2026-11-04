@@ -290,6 +290,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentObserve,
+        text: 'Ajout de la possibilité de lire le questionnaire d’un candidat que tu observes : « Afficher le questionnaire » apparaît sous « Tu observes ce candidat ! », dans une carte qui s’agrandit en douceur.',
+      },
+      {
+        tag: ChangelogTags.Added,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
         text: 'Ajout d’une fenêtre « Concept » dans chaque jeu de « Memora Play » : trois courtes animations expliquent comment se déroule une partie.',
@@ -427,6 +433,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         page: ROUTES.calendar,
         text: 'Amélioration du « Calendrier » sur téléphone : chaque évènement d’un jour du mois devient une pastille de couleur, les jours sont plus compacts et le sélecteur de mois disparaît.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Correction d’un bug dans « Recrutements » : un recruteur placé sur une session sans faire partie de l’équipe du créateur n’apparaissait pas dans la liste des recruteurs d’un candidat.',
       },
       {
         tag: ChangelogTags.Fixed,
