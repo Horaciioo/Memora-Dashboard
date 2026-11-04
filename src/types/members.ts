@@ -253,13 +253,18 @@ export type ParticipationRole = 'responsable' | 'recruiter' | 'observer' | 'trai
  * Session a member took part in, whatever their roles
  * @typedef {Object} MemberParticipation
  * @property {string} id - Session identifier
- * @property {'recruitment' | 'academy'} kind - Session family
+ * @property {'recruitment' | 'academy' | 'coordination'} kind - Session family
  * @property {string} title - Session or promotion name
  * @property {string} startsAt - First day, ISO
  * @property {string | null} endsAt - Last day, ISO
  * @property {ParticipationRole[]} roles - Parts played
  * @property {number} led - Interviews led
  * @property {number} observed - Interviews sat in on
+ * @property {string | null} youtuberName - Creator the session belongs to
+ * @property {string | null} youtuberAvatar - Creator portrait
+ * @property {string[]} juniors - Juniors the member trains in the promotion
+ * @property {number} spentSeconds - Time spent coordinating the live
+ * @property {number} actions - Moderation gestures made on the live
  * @property {boolean} canOpen - Viewer may open the session
  * @property {boolean} isTemporary - Held through a temporary function, its access can be taken back
  * @property {boolean} isRevoked - Access to the session taken back, the participation stays
@@ -267,13 +272,18 @@ export type ParticipationRole = 'responsable' | 'recruiter' | 'observer' | 'trai
 
 export interface MemberParticipation {
   id: string
-  kind: 'recruitment' | 'academy'
+  kind: 'recruitment' | 'academy' | 'coordination'
   title: string
   startsAt: string
   endsAt: string | null
   roles: ParticipationRole[]
   led: number
   observed: number
+  youtuberName: string | null
+  youtuberAvatar: string | null
+  juniors: string[]
+  spentSeconds: number
+  actions: number
   canOpen: boolean
   isTemporary: boolean
   isRevoked: boolean

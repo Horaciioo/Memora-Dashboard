@@ -1,6 +1,31 @@
 import type { MemberParticipation, ParticipationRole } from '@/types/members'
 
 /**
+ * Creator a session belongs to
+ * @typedef {Object} CreatorMark
+ * @property {string} name - Creator name
+ * @property {string | null} avatarUrl - Creator portrait
+ */
+
+export interface CreatorMark {
+  name: string
+  avatarUrl: string | null
+}
+
+/**
+ * Creator fields of a line
+ * @param {CreatorMark | null} creator - Creator, none when unknown
+ * @return {Pick<MemberParticipation, 'youtuberName' | 'youtuberAvatar'>} - Name and portrait
+ */
+
+const creatorOf = (
+  creator: CreatorMark | null
+): Pick<MemberParticipation, 'youtuberName' | 'youtuberAvatar'> => ({
+  youtuberName: creator?.name ?? null,
+  youtuberAvatar: creator?.avatarUrl ?? null,
+})
+
+/**
  * State of a temporary seat
  * @typedef {Object} SeatFlags
  * @property {Date | null} revokedAt - Access taken back
@@ -20,6 +45,7 @@ export interface SeatFlags {
 export interface RecruitmentParticipationRow {
   id: string
   name: string
+  youtuber: CreatorMark
   opensAt: Date | null
   closesAt: Date | null
   createdAt: Date
@@ -39,6 +65,32 @@ export interface AcademyParticipationRow {
   startsAt: Date
   endsAt: Date | null
   trainers: SeatFlags[]
+  juniors: string[]
+  youtuber: CreatorMark | null
+}
+
+/**
+ * Live a member coordinated
+ * @typedef {Object} CoordinationParticipationRow
+ */
+
+export interface CoordinationParticipationRow {
+  id: string
+  title: string
+  startsAt: Date
+  endsAt: Date | null
+  youtuber: CreatorMark
+  spentSeconds: number
+  actions: number
+}
+
+// Counters of the lines that carry none
+const NO_EXTRAS = {
+  led: 0,
+  observed: 0,
+  juniors: [] as string[],
+  spentSeconds: 0,
+  actions: 0,
 }
 
 /**
@@ -78,21 +130,24 @@ const temporaryState = (
  * @param {Object} input - Rows read
  * @param {RecruitmentParticipationRow[]} input.recruitments - Campaigns
  * @param {AcademyParticipationRow[]} input.promotions - Promotions trained
+ * @param {CoordinationParticipationRow[]} [input.coordinations] - Lives coordinated
  * @param {Map<string, string>} input.promotionTitles - Title by promotion
- * @param {{ recruitment: boolean, academy: boolean }} input.canOpen - Viewer reach
+ * @param {{ recruitment: boolean, academy: boolean, live?: boolean }} input.canOpen - Viewer reach
  * @return {MemberParticipation[]} - Latest first
  */
 
 export const mergeParticipation = ({
   recruitments,
   promotions,
+  coordinations = [],
   promotionTitles,
   canOpen,
 }: {
   recruitments: RecruitmentParticipationRow[]
   promotions: AcademyParticipationRow[]
+  coordinations?: CoordinationParticipationRow[]
   promotionTitles: Map<string, string>
-  canOpen: { recruitment: boolean; academy: boolean }
+  canOpen: { recruitment: boolean; academy: boolean; live?: boolean }
 }): MemberParticipation[] => {
   // Archives deleted leave the file of the member
   const kept = recruitments.filter(
@@ -102,6 +157,7 @@ export const mergeParticipation = ({
   )
 
   const campaigns = kept.map((row): MemberParticipation => ({
+    ...NO_EXTRAS,
     id: row.id,
     kind: 'recruitment',
     title: row.name,
@@ -110,6 +166,7 @@ export const mergeParticipation = ({
     roles: recruitmentRoles(row),
     led: row.candidates.filter((candidate) => candidate.recruiters.length > 0).length,
     observed: row.candidates.filter((candidate) => candidate.observers.length > 0).length,
+    ...creatorOf(row.youtuber),
     canOpen: canOpen.recruitment,
     ...temporaryState([...row.recruiters, ...row.observers]),
   }))
@@ -123,13 +180,30 @@ export const mergeParticipation = ({
       startsAt: row.startsAt.toISOString(),
       endsAt: row.endsAt?.toISOString() ?? null,
       roles: ['trainer'],
-      led: 0,
-      observed: 0,
+      ...NO_EXTRAS,
+      ...creatorOf(row.youtuber),
+      juniors: row.juniors,
       canOpen: canOpen.academy,
       ...temporaryState(row.trainers),
     }))
 
-  return [...campaigns, ...trained].sort((left, right) =>
+  const coordinated = coordinations.map((row): MemberParticipation => ({
+    id: row.id,
+    kind: 'coordination',
+    title: row.title,
+    startsAt: row.startsAt.toISOString(),
+    endsAt: row.endsAt?.toISOString() ?? null,
+    roles: [],
+    ...NO_EXTRAS,
+    ...creatorOf(row.youtuber),
+    spentSeconds: row.spentSeconds,
+    actions: row.actions,
+    canOpen: canOpen.live ?? false,
+    isTemporary: false,
+    isRevoked: false,
+  }))
+
+  return [...campaigns, ...trained, ...coordinated].sort((left, right) =>
     right.startsAt.localeCompare(left.startsAt)
   )
 }

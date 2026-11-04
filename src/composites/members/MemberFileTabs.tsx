@@ -633,6 +633,7 @@ export const MemberFileTabs = ({
       canManageSeats={adminState !== null}
       absences={file.absences}
       participations={participations}
+      functions={summary.functions.map((fn) => fn.label)}
       playPresence={playPresence}
       onNavigate={setTab}
     />

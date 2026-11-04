@@ -464,9 +464,11 @@ export const PARTICIPATION_BOX = {
   // Access taken back, the glass turns red
   revoked: 'card-danger',
   head: 'flex items-center gap-3',
+  body: 'flex min-w-0 flex-col gap-1.5',
+  tabs: 'mb-4',
   title: 'min-w-0 truncate font-semibold',
   period: 'text-sm font-normal text-[var(--color-ink-subtle)]',
-  facts: 'flex flex-col gap-0.5 pl-12 text-sm text-[var(--color-ink-subtle)]',
+  facts: 'flex flex-col gap-1 text-sm text-[var(--color-ink-subtle)]',
   fact: 'flex gap-1.5',
   factLabel: 'font-semibold text-[var(--color-ink)]',
 } as const

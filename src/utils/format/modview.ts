@@ -1,3 +1,4 @@
+import { MEMBER_COPY } from '@/declarations/members/copy'
 import { MODVIEW_DURATION_COPY, MODVIEW_SPAN_COPY } from '@/declarations/modview/copy'
 import { DATE_LOCALE } from '@/declarations/ui/dates'
 import { DAY_SECONDS, HOUR_SECONDS } from '@/utils/constants/time'
@@ -70,4 +71,21 @@ export const formatExactSpan = (seconds: number): string => {
     .filter(([count]) => count !== 0)
     .map(([count, unit]) => `${count} ${unit}`)
     .join(' ')
+}
+
+/**
+ * Say a time spent in hours and minutes
+ * @param {number} seconds - Length
+ * @return {string} - Spoken length
+ */
+
+export const formatSpent = (seconds: number): string => {
+  const minutes = Math.round(seconds / MINUTE)
+  const hours = Math.floor(minutes / MINUTE)
+
+  return hours > 0
+    ? MEMBER_COPY.spentHours
+        .replace('{hours}', String(hours))
+        .replace('{minutes}', String(minutes % MINUTE).padStart(2, '0'))
+    : MEMBER_COPY.spentMinutes.replace('{minutes}', String(minutes))
 }

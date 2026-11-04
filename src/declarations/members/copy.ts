@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
 import type { ParticipationRole } from '@/types/members'
 
@@ -95,6 +96,13 @@ export const MEMBER_COPY = {
   participationRole: 'Rôle',
   participationLed: 'Entretiens menés',
   participationObserved: 'Entretiens observés',
+  participationJuniors: 'Juniors',
+  participationJuniorsEmpty: 'Aucun Junior pris en charge',
+  participationSpent: 'Temps passé',
+  participationActions: 'Actions effectuées',
+  participationTabs: 'Participation par fonction',
+  spentHours: '{hours} h {minutes}',
+  spentMinutes: '{minutes} min',
   journeyTitle: 'Son parcours',
   journeyLead: 'Du recrutement au rôle de Responsable, ce qu’il a traversé et où il en est.',
   stageRecruitment: 'Recrutement',
@@ -201,3 +209,18 @@ export const PARTICIPATION_ROLE_COPY: Record<ParticipationRole, string> = {
   observer: RECRUITMENT_FIELD_COPY.observer,
   trainer: 'Formateur',
 }
+
+/**
+ * Tabs of the participation box, each shown to the holders of its functions
+ * @type {readonly ParticipationTab[]}
+ */
+
+export const PARTICIPATION_TABS = [
+  {
+    value: 'recruitment',
+    label: MEMBER_COPY.stageRecruitment,
+    functions: [FunctionNames.Recruiters, FunctionNames.Observers],
+  },
+  { value: 'academy', label: MEMBER_COPY.stageAcademy, functions: [FunctionNames.Trainers] },
+  { value: 'coordination', label: 'Coordination', functions: [FunctionNames.Coordinator] },
+] as const

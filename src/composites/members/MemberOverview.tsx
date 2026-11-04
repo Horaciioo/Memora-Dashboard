@@ -19,6 +19,7 @@ export interface MemberOverviewProps {
   canManageSeats: boolean
   absences: MemberAbsence[]
   participations: Participation[]
+  functions: string[]
   playPresence: PlayPresence | null
   onNavigate: (tab: string) => void
 }
@@ -30,6 +31,7 @@ export interface MemberOverviewProps {
  * @param {boolean} canManageSeats - Viewer may act on their temporary seats
  * @param {MemberAbsence[]} absences - Time off
  * @param {Participation[]} participations - Sessions joined
+ * @param {string[]} functions - Names of the functions held
  * @param {PlayPresence | null} playPresence - Game they sit in
  * @param {(tab: string) => void} onNavigate - Opens another tab
  * @return {JSX.Element}
@@ -40,6 +42,7 @@ export const MemberOverview = ({
   canManageSeats,
   absences,
   participations,
+  functions,
   playPresence,
   onNavigate,
 }: MemberOverviewProps) => {
@@ -109,6 +112,7 @@ export const MemberOverview = ({
       <MemberParticipation
         member={member}
         participations={participations}
+        functions={functions}
         canManageSeats={canManageSeats}
         onNavigate={onNavigate}
       />
