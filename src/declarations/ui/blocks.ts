@@ -391,6 +391,14 @@ export const OBSERVE_SUCCESS = {
   markPop: 'observe-pop',
   glyph: 'size-5',
   textReveal: 'observe-reveal',
+  // Green card, its rows share one padding so the divider sits centred between both texts
+  box: 'overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-success)] text-sm font-semibold text-[var(--color-on-solid)] md:rounded-[1.25rem]',
+  rowButton:
+    'flex w-full items-center justify-center px-4 py-2.5 transition-[filter] duration-[var(--motion-duration-fast)] hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--color-focus)]',
+  fold: 'grid grid-rows-[0fr] transition-[grid-template-rows] duration-[var(--motion-duration-slow)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  foldOpen: 'grid-rows-[1fr]',
+  clip: 'min-h-0 overflow-hidden',
+  divider: 'border-t border-[color-mix(in_srgb,var(--color-on-solid)_35%,transparent)]',
 } as const
 
 /**

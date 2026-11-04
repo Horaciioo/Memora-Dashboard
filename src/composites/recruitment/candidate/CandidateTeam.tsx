@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/elements/actions/Button'
-import { CheckGlyph } from '@/components/elements/display/glyphs/BrandGlyphs'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { EditableDetailGrid } from '@/components/structures/inline/EditableDetailGrid'
 import type { EditableEntry } from '@/components/structures/inline/EditableDetailGrid'
+import { ObserveBox } from '@/composites/recruitment/candidate/ObserveBox'
 import { useStartInterview } from '@/composites/recruitment/file/useStartInterview'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { useClock } from '@/core/hooks/interaction/state/useClock'
@@ -19,8 +19,6 @@ import { candidateStates, progressOf } from '@/core/lib/recruitment/candidateTim
 import { isInterviewLocked } from '@/core/lib/recruitment/interviewLock'
 import { CANDIDATE_COPY } from '@/declarations/recruitment/candidateCopy'
 import { ROUTES } from '@/declarations/navigation'
-import { OBSERVE_SUCCESS } from '@/declarations/ui/blocks'
-import { cn } from '@/utils/classnames'
 import { RECRUITMENT_COPY, RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
 import type { CandidateView } from '@/types/recruitment'
 
@@ -131,24 +129,17 @@ export const CandidateTeam = ({ candidate, record }: CandidateTeamProps) => {
           {lead.label}
         </Button>
       )}
-      {!isRecruiter && !isBarred && can.canObserve && (
-        <Button
-          variant={joined ? 'success' : 'secondary'}
-          onClick={joined ? () => setIsAsking(true) : () => void toggle()}
-        >
-          {joined ? (
-            <span className={OBSERVE_SUCCESS.row} role="status">
-              <span className={cn(OBSERVE_SUCCESS.mark, justJoined && OBSERVE_SUCCESS.markPop)}>
-                <CheckGlyph className={OBSERVE_SUCCESS.glyph} />
-              </span>
-              <span className={cn(justJoined && OBSERVE_SUCCESS.textReveal)}>
-                {CANDIDATE_COPY.observing}
-              </span>
-            </span>
-          ) : (
-            CANDIDATE_COPY.observe
-          )}
+      {!isRecruiter && !isBarred && can.canObserve && !joined && (
+        <Button variant="secondary" onClick={() => void toggle()}>
+          {CANDIDATE_COPY.observe}
         </Button>
+      )}
+      {!isRecruiter && !isBarred && can.canObserve && joined && (
+        <ObserveBox
+          justJoined={justJoined}
+          onStop={() => setIsAsking(true)}
+          onQuestionnaire={() => router.push(ROUTES.interview(detail.summary.id, candidate.id))}
+        />
       )}
       <ConfirmDialog
         open={isAsking}
