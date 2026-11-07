@@ -8,6 +8,7 @@ import {
   WORKER_HEADERS,
 } from './src/declarations/system/security/securityHeaders'
 import { WORKER_FILE } from './src/declarations/pwa/worker'
+import { LEGACY_REDIRECTS } from './src/declarations/system/redirects'
 import { displayVersion } from './src/utils/format/version'
 
 // Single version source
@@ -25,6 +26,8 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
   // Exposed to the browser
   env: { NEXT_PUBLIC_APP_VERSION: displayVersion(version, stageOfBranch(deployedBranch)) },
+  // Old French addresses keep working
+  redirects: async () => LEGACY_REDIRECTS.map((entry) => ({ ...entry, permanent: false })),
   // The content security policy carries a per-request nonce
   headers: async () => [
     { source: '/:path*', headers: STATIC_SECURITY_HEADERS },

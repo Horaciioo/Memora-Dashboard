@@ -8,7 +8,7 @@ import { SANCTION_PANEL_REGISTRY } from '@/declarations/sanctions/registries'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
-  permission: Permissions.SanctionRead,
+  permission: [Permissions.SanctionRead, Permissions.SanctionDiscordRead],
   descriptor: { summary: 'Read a creator sanction panel', tags: ['sanctions'] },
   handler: async ({ query, scope }) => {
     const { youtuberId, panel } = readTarget(query)
