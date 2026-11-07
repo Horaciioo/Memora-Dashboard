@@ -107,6 +107,7 @@ export const PlaySetupDrawer = ({
     <Drawer
       open={open}
       onClose={onClose}
+      isFullScreen
       title={isEditing ? PLAY_HUB_COPY.rulesHost : copy.title}
       icon="play"
       subheader={

@@ -130,7 +130,7 @@ enum TrainingStatus {
   ABANDONED
 }
 
-// Outcome a Formateur proposes at the end of a voice check-in
+// Outcome a Référent proposes at the end of a voice check-in
 enum ReviewAdvice {
   PASS
   BONUS
@@ -304,6 +304,8 @@ model Account {
   anonymisedAt          DateTime?
   // Access shut until lifted
   frozenAt              DateTime?
+  // Play bot level, null for a member
+  botKind               PlayBotKind?
   languages             String[]     @default([])
   timezone              String?
   theme                 String?
@@ -398,8 +400,16 @@ model Account {
   ludoPlayers           LudoPlayer[]
   ludoMoves             LudoMove[]
   playMessages          PlayMessage[]
+  navalPlayers          NavalPlayer[]
   playInvitesSent       PlayInvite[]             @relation("PlayInviteFrom")
   playInvitesReceived   PlayInvite[]             @relation("PlayInviteTo")
+  playFollows           PlayFollow[]
+  playGroupsHosted      PlayGroup[]              @relation("PlayGroupHost")
+  playGroupMembers      PlayGroupMember[]
+  playGroupMessages     PlayGroupMessage[]
+  playGroupInvites      PlayGroupInvite[]
+  playGroupProposals    PlayGroupProposal[]
+  playNotices           PlayNotice[]
   activityAsSubject     ActivityLog[]            @relation("LogSubject")
   activityAsActor       ActivityLog[]            @relation("LogActor")
   notificationsReceived Notification[]           @relation("NotificationRecipient")
@@ -2753,6 +2763,20 @@ enum PlayGame {
   GOLF
   BOMB
   LUDO
+  NAVAL
+}
+
+// Play bot level
+enum PlayBotKind {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// Who finds a game in the lists
+enum PlayVisibility {
+  PUBLIC
+  PRIVATE
 }
 
 // Life of a game or a tournament
@@ -2797,6 +2821,9 @@ model PlaySession {
   tournamentIndex Int?
   // Game this one replays with the same table
   rematchOfId     String?           @unique
+  // Private games hide from the lists and open with a code
+  visibility      PlayVisibility    @default(PUBLIC)
+  joinCode        String?           @unique
   // Choices of the host, shaped by the game
   settings        Json
   startedAt       DateTime?
@@ -2804,23 +2831,29 @@ model PlaySession {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  host        Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
-  tournament  PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  rematchOf   PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
-  rematch     PlaySession?        @relation("PlayRematch")
-  seats       PlaySeat[]
-  bacRounds   BaccalaureatRound[]
-  bombGame    BombGame?
-  bombSeats   BombPlayer[]
-  bombMoves   BombMove[]
-  golfGame    GolfGame?
-  golfPlayers GolfPlayer[]
-  golfMoves   GolfMove[]
-  ludoGame    LudoGame?
-  ludoPlayers LudoPlayer[]
-  ludoMoves   LudoMove[]
-  messages    PlayMessage[]
-  invites     PlayInvite[]
+  host         Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+  tournament   PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  rematchOf    PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
+  rematch      PlaySession?        @relation("PlayRematch")
+  seats        PlaySeat[]
+  bacRounds    BaccalaureatRound[]
+  bombGame     BombGame?
+  bombSeats    BombPlayer[]
+  bombMoves    BombMove[]
+  golfGame     GolfGame?
+  golfPlayers  GolfPlayer[]
+  golfMoves    GolfMove[]
+  ludoGame     LudoGame?
+  ludoPlayers  LudoPlayer[]
+  ludoMoves    LudoMove[]
+  navalGame    NavalGame?
+  navalPlayers NavalPlayer[]
+  navalMatches NavalMatch[]
+  navalShots   NavalShot[]
+  messages     PlayMessage[]
+  invites      PlayInvite[]
+  follows      PlayFollow[]
+  notices      PlayNotice[]
 
   @@index([status, game])
   @@index([tournamentId, tournamentIndex])
@@ -2840,6 +2873,8 @@ model PlaySeat {
   joinedAt  DateTime     @default(now())
   leftAt    DateTime?
   kickedAt  DateTime?
+  // Set once the player confirms in the lobby
+  readyAt   DateTime?
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
@@ -2900,6 +2935,43 @@ model PlayInvite {
   @@map("play_invites")
 }
 
+// What a followed game tells its follower
+enum PlayNoticeKind {
+  STARTED
+  FINISHED
+}
+
+// A member following a game, told when it starts and ends
+model PlayFollow {
+  id        String   @id @default(cuid())
+  accountId String
+  sessionId String
+  createdAt DateTime @default(now())
+
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, sessionId])
+  @@index([sessionId])
+  @@map("play_follows")
+}
+
+// A followed game news waiting for a member, deleted once closed
+model PlayNotice {
+  id        String         @id @default(cuid())
+  accountId String
+  sessionId String
+  kind      PlayNoticeKind
+  createdAt DateTime       @default(now())
+
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, sessionId, kind])
+  @@index([accountId])
+  @@map("play_notices")
+}
+
 // Totals of one player on one game, the global ones are their sum
 model PlayGameStat {
   id                String   @id @default(cuid())
@@ -2930,13 +3002,15 @@ model PlayGameStat {
 
 // Global side of a player, outside any game
 model PlayProfile {
-  accountId String    @id
+  accountId  String    @id
   // XP given on the global line alone
-  bonusXp   Int       @default(0)
-  bannedAt  DateTime?
-  banReason String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  bonusXp    Int       @default(0)
+  bannedAt   DateTime?
+  banReason  String?
+  // Last time the member left Play, for "recently online"
+  lastSeenAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
@@ -3217,6 +3291,103 @@ model LudoMove {
   @@map("play_ludo_moves")
 }
 
+// Stage of a naval battle
+enum NavalPhase {
+  PLACEMENT
+  BATTLE
+  OVER
+}
+
+// Life of one match of a naval battle
+enum NavalMatchStatus {
+  WAITING
+  LIVE
+  DONE
+}
+
+// What a shell did
+enum NavalShotResult {
+  MISS
+  HIT
+  SUNK
+}
+
+// Naval table: stage, clocks and the revision of the newest change
+model NavalGame {
+  sessionId   String     @id
+  phase       NavalPhase @default(PLACEMENT)
+  startsAt    DateTime
+  phaseEndsAt DateTime
+  // Bumped on every change, the newest board wins
+  rev         Int        @default(0)
+  updatedAt   DateTime   @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_naval_games")
+}
+
+// A captain, their secret fleet and their standing
+model NavalPlayer {
+  id           String    @id @default(cuid())
+  sessionId    String
+  accountId    String
+  // Seat order, fixes the turn order
+  slot         Int
+  // Ships placed, never sent to another player
+  fleet        Json?
+  readyAt      DateTime?
+  eliminatedAt DateTime?
+  place        Int?
+  // Turns lost to the clock in a row
+  strikes      Int       @default(0)
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@map("play_naval_players")
+}
+
+// One fight: the whole table in a melee, a pair in a duel or a bracket
+model NavalMatch {
+  id         String           @id @default(cuid())
+  sessionId  String
+  round      Int
+  slot       Int
+  fighters   String[]
+  status     NavalMatchStatus @default(WAITING)
+  turnId     String?
+  startsAt   DateTime
+  turnEndsAt DateTime
+  winnerId   String?
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round, slot])
+  @@map("play_naval_matches")
+}
+
+// One shell fired at one square
+model NavalShot {
+  id        String          @id @default(cuid())
+  sessionId String
+  matchId   String
+  rev       Int
+  shooterId String
+  targetId  String
+  x         Int
+  y         Int
+  result    NavalShotResult
+  createdAt DateTime        @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, rev])
+  @@index([matchId])
+  @@map("play_naval_shots")
+}
+
 // Level a share hands out, the owner stands above all of them
 enum PageAccessLevel {
   FULL
@@ -3375,4 +3546,86 @@ model PageComment {
   @@index([pageId, createdAt])
   @@index([parentId])
   @@map("page_comments")
+}
+
+// A lasting circle of players, led by its host
+model PlayGroup {
+  id        String   @id @default(cuid())
+  name      String
+  hostId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  host      Account             @relation("PlayGroupHost", fields: [hostId], references: [id], onDelete: Cascade)
+  members   PlayGroupMember[]
+  invites   PlayGroupInvite[]
+  proposals PlayGroupProposal[]
+  messages  PlayGroupMessage[]
+
+  @@index([hostId])
+  @@map("play_groups")
+}
+
+// A player in a group, as many groups as wanted
+model PlayGroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  accountId String
+  joinedAt  DateTime @default(now())
+
+  group   PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  account Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, accountId])
+  @@index([groupId])
+  @@index([accountId])
+  @@map("play_group_members")
+}
+
+// A call from the host to join a group
+model PlayGroupInvite {
+  id        String   @id @default(cuid())
+  groupId   String
+  inviteeId String
+  createdAt DateTime @default(now())
+
+  group   PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  invitee Account   @relation(fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, inviteeId])
+  @@index([inviteeId])
+  @@map("play_group_invites")
+}
+
+// A game a member would like to play with the group
+model PlayGroupProposal {
+  id        String   @id @default(cuid())
+  groupId   String
+  accountId String
+  game      PlayGame
+  createdAt DateTime @default(now())
+
+  group   PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  account Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, accountId, game])
+  @@map("play_group_proposals")
+}
+
+// A line of the group chat
+model PlayGroupMessage {
+  id        String   @id @default(cuid())
+  groupId   String
+  accountId String
+  body      String
+  // Game this line invites to, with its table
+  game      PlayGame?
+  sessionId String?
+  createdAt DateTime @default(now())
+
+  group   PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  account Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, createdAt])
+  @@map("play_group_messages")
 }

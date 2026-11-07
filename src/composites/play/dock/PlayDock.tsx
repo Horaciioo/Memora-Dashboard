@@ -11,12 +11,12 @@ import { PlayDockStats } from '@/composites/play/dock/PlayDockStats'
 import { PlayDockTrophies } from '@/composites/play/dock/PlayDockTrophies'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/useOutsideDismiss'
 import { ROUTES } from '@/declarations/navigation'
-import { PLAY_HUB_COPY } from '@/declarations/play'
+import { PLAY_HISTORY_COPY, PLAY_HUB_COPY } from '@/declarations/play'
 import { beaconProps, PLAY_FEED_BEACON } from '@/declarations/ui/beacons'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { PLAY_DOCK } from '@/declarations/ui/variants'
-import type { PlayInviteView, PlayPresence, PlayProfileView } from '@/types/play'
+import type { PlayNoticeView, PlayPresence, PlayProfileView } from '@/types/play'
 import { cn } from '@/utils/classnames'
 
 // Thought bubbles down to the key, on a slight arc, shrinking
@@ -40,8 +40,9 @@ type DockKey = 'trophies' | 'stats' | 'player' | 'feed'
 export interface PlayDockProps {
   profile: PlayProfileView
   player: { name: string; avatarUrl: string | null }
-  invites: PlayInviteView[]
+  invites: PlayNoticeView[]
   presence: PlayPresence | null
+  groupCalls: number
 }
 
 /**
@@ -112,6 +113,12 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
 
   const toggle = (key: DockKey) => setOpen((current) => (current === key ? null : key))
 
+  const tip = (label: string) => (
+    <span role="tooltip" className={PLAY_DOCK.tip}>
+      {label}
+    </span>
+  )
+
   const iconKey = (key: DockKey, icon: IconName, label: string, extra?: string) => {
     const Icon = ICONS[icon]
 
@@ -126,6 +133,7 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
         onClick={() => toggle(key)}
       >
         <Icon className={PLAY_DOCK.icon} />
+        {tip(label)}
       </button>
     )
   }
@@ -134,6 +142,7 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
   // Keys right of the avatar bend the arc the other way
   const arc = open && MIRRORED.includes(open) ? -1 : 1
   const OpenIcon = ICONS.playOpen
+  const HistoryIcon = ICONS.playHistory
   const BackIcon = ICONS.playLeave
 
   return (
@@ -174,6 +183,14 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
 
         {iconKey('trophies', 'playTrophy', PLAY_HUB_COPY.dockTrophies)}
         {iconKey('stats', 'playStats', PLAY_HUB_COPY.dockStats)}
+        <AppLink
+          href={ROUTES.playHistory()}
+          aria-label={PLAY_HISTORY_COPY.title}
+          className={PLAY_DOCK.button}
+        >
+          <HistoryIcon className={PLAY_DOCK.icon} />
+          {tip(PLAY_HISTORY_COPY.title)}
+        </AppLink>
         <button
           data-dock="player"
           type="button"
@@ -189,6 +206,7 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
             className={PLAY_DOCK.avatarRing}
           />
           <span className={PLAY_DOCK.level}>{profile.global.level.level}</span>
+          {tip(PLAY_HUB_COPY.dockPlayer)}
         </button>
         {iconKey(
           'feed',
@@ -200,10 +218,10 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
         <AppLink
           href={ROUTES.dashboard}
           aria-label={PLAY_HUB_COPY.backToDashboard}
-          title={PLAY_HUB_COPY.backToDashboard}
           className={PLAY_DOCK.button}
         >
           <BackIcon className={PLAY_DOCK.icon} />
+          {tip(PLAY_HUB_COPY.backToDashboard)}
         </AppLink>
       </div>
     </nav>

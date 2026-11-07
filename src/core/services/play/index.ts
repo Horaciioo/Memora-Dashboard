@@ -5,17 +5,21 @@ export {
   settleSession,
   startSession,
 } from '@/core/services/play/GameService'
+export { touchPlaySeen } from '@/core/services/play/SeenService'
 export { voteInLobby } from '@/core/services/play/PlayVoteService'
 export {
   cancelSession,
   createSession,
+  joinByCode,
   joinSession,
   kickPlayer,
   leaveSession,
   listLobbies,
   rematchSession,
+  setVisibility,
   updateSettings,
 } from '@/core/services/play/LobbyService'
+export { readPlaySheet } from '@/core/services/play/SheetService'
 export {
   readLeaderboards,
   readPlayPlayer,
@@ -43,6 +47,23 @@ export {
   answerInvite,
   inviteCandidates,
   inviteToSession,
-  listInvites,
 } from '@/core/services/play/PlayInviteService'
-export { listSpectators, setSeatRole } from '@/core/services/play/PlaySeatService'
+export { closeNotice, setFollow } from '@/core/services/play/PlayFollowService'
+export { listNotices } from '@/core/services/play/PlayNoticeService'
+export { listSpectators, setReady, setSeatRole } from '@/core/services/play/PlaySeatService'
+export { listPlayHistory } from '@/core/services/play/HistoryService'
+export { addBots } from '@/core/services/play/bots/BotSeatService'
+export { sendGroupMessage } from '@/core/services/play/GroupChatService'
+export {
+  answerGroupInvite,
+  createPlayGroup,
+  dissolvePlayGroup,
+  dropGroupProposal,
+  invitePlayGroup,
+  listGroupCandidates,
+  launchGroupGame,
+  proposeGroupGame,
+  readPlayGroup,
+  removeFromGroup,
+  renamePlayGroup,
+} from '@/core/services/play/GroupService'

@@ -8,9 +8,19 @@ export const PlayGames = {
   Golf: 'GOLF',
   Bomb: 'BOMB',
   Ludo: 'LUDO',
+  Naval: 'NAVAL',
 } as const
 
 export type PlayGameName = (typeof PlayGames)[keyof typeof PlayGames]
+
+// Play bot levels
+export const PlayBotKinds = {
+  Easy: 'EASY',
+  Medium: 'MEDIUM',
+  Hard: 'HARD',
+} as const
+
+export type PlayBotKindName = (typeof PlayBotKinds)[keyof typeof PlayBotKinds]
 
 /**
  * Life of a game
@@ -60,6 +70,33 @@ export const PlayInviteRoles = {
 } as const
 
 export type PlayInviteRoleName = (typeof PlayInviteRoles)[keyof typeof PlayInviteRoles]
+
+/**
+ * Kinds of Play notice
+ * @type {Record<string, string>}
+ */
+
+export const PlayNoticeKinds = {
+  Invite: 'invite',
+  Spectate: 'spectate',
+  Rematch: 'rematch',
+  Started: 'started',
+  Finished: 'finished',
+} as const
+
+export type PlayNoticeKindName = (typeof PlayNoticeKinds)[keyof typeof PlayNoticeKinds]
+
+/**
+ * Who finds a game in the lists
+ * @type {Record<string, string>}
+ */
+
+export const PlayVisibilities = {
+  Public: 'PUBLIC',
+  Private: 'PRIVATE',
+} as const
+
+export type PlayVisibilityName = (typeof PlayVisibilities)[keyof typeof PlayVisibilities]
 
 /**
  * What a chat line is
@@ -145,3 +182,42 @@ export const GolfSurfaces = {
 } as const
 
 export type GolfSurfaceName = (typeof GolfSurfaces)[keyof typeof GolfSurfaces]
+
+/**
+ * Ways to play a naval battle
+ * @type {Record<string, string>}
+ */
+
+export const NavalModes = {
+  Duel: 'duel',
+  Bracket: 'bracket',
+  Melee: 'melee',
+} as const
+
+export type NavalModeName = (typeof NavalModes)[keyof typeof NavalModes]
+
+/**
+ * Stage of a naval battle
+ * @type {Record<string, string>}
+ */
+
+export const NavalPhases = {
+  Placement: 'PLACEMENT',
+  Battle: 'BATTLE',
+  Over: 'OVER',
+} as const
+
+export type NavalPhaseName = (typeof NavalPhases)[keyof typeof NavalPhases]
+
+/**
+ * What a shell did
+ * @type {Record<string, string>}
+ */
+
+export const NavalResults = {
+  Miss: 'MISS',
+  Hit: 'HIT',
+  Sunk: 'SUNK',
+} as const
+
+export type NavalResultName = (typeof NavalResults)[keyof typeof NavalResults]

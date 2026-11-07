@@ -28,7 +28,7 @@ const resumeOnGesture = (context: AudioContext): void => {
  * @return {AudioContext | null} - Context, none on the server
  */
 
-const contextOf = (): AudioContext | null => {
+export const contextOf = (): AudioContext | null => {
   if (typeof window === 'undefined' || !('AudioContext' in window)) return null
   if (!audio) {
     audio = new AudioContext()

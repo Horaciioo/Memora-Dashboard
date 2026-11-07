@@ -24,6 +24,7 @@ export interface LudoPlatesProps {
   turns: number
   // Player holding the die, null during the countdown
   turnId: string | null
+  viewerId: string
   clock: { clock: number; isAlert: boolean }
   die: ReactNode
 }
@@ -34,7 +35,7 @@ export interface LudoPlatesProps {
  * @return {JSX.Element}
  */
 
-export const LudoPlates = ({ seats, turns, turnId, clock, die }: LudoPlatesProps) => (
+export const LudoPlates = ({ seats, turns, turnId, viewerId, clock, die }: LudoPlatesProps) => (
   <>
     {LUDO_SLOTS.map((place, slot) => {
       const seat = seats.find((entry) => (entry.corner + turns) % LUDO_CORNERS.length === slot)
@@ -54,6 +55,7 @@ export const LudoPlates = ({ seats, turns, turnId, clock, die }: LudoPlatesProps
               },
             }}
             turn={isTurn ? clock : null}
+            isMine={seat.accountId === viewerId}
             die={isTurn && die}
           />
         </div>

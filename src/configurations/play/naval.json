@@ -1,0 +1,27 @@
+{
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "modes": {
+    "duel": { "min": 2, "max": 2 },
+    "bracket": { "min": 2, "max": 8 },
+    "melee": { "min": 3, "max": 8 }
+  },
+  "mode": "duel",
+  "countdownSeconds": 4,
+  "placementSeconds": { "default": 75, "min": 30, "max": 180 },
+  "turnSeconds": { "default": 25, "min": 10, "max": 60 },
+  "graceSeconds": 1,
+  "formats": {
+    "compact": { "size": 8, "fleet": [4, 3, 3, 2, 2] },
+    "classic": { "size": 10, "fleet": [5, 4, 3, 3, 2] }
+  },
+  "format": "compact",
+  "rules": { "hitReplay": true, "spacedShips": false },
+  "strikesToForfeit": 3,
+  "flightMs": 1500,
+  "impactMs": 900,
+  "sunkMs": 1500,
+  "roundPauseSeconds": 5,
+  "alertSeconds": 5,
+  "winnerXp": { "melee": 2, "bracket": 3 }
+}

@@ -117,6 +117,29 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
       ))}
     </>
   ),
+  sea: (tone) => (
+    <>
+      <circle cx="500" cy="96" r="150" {...tint('--play-naval-fire', 0.22)} />
+      <circle cx="500" cy="96" r="54" {...tint('--play-naval-fire', 0.55)} />
+      <path d="M0 200h640v120H0z" {...tint(`${tone}-deep`, 0.85)} />
+      <path
+        d="M0 200c80-8 140 8 220 0s140-8 200 0 140 8 220 0v14H0z"
+        {...tint(`${tone}-glow`, 0.35)}
+      />
+      {/* Warships on the horizon */}
+      <g {...tint('--play-naval-night', 0.9)}>
+        <path d="M330 200h150l-14 22H348z" />
+        <rect x="380" y="176" width="46" height="24" rx="3" />
+        <rect x="396" y="150" width="12" height="26" />
+        <path d="M110 205h90l-8 14H120z" />
+        <rect x="140" y="188" width="26" height="17" rx="2" />
+      </g>
+      <path d="M360 190l-30-44M372 188l-6-60" stroke="white" strokeOpacity="0.5" strokeWidth="3" />
+      <circle cx="330" cy="140" r="16" {...tint('--play-naval-hit', 0.9)} />
+      <circle cx="330" cy="140" r="8" fill="white" opacity="0.85" />
+      <path d="M452 230c4-30 2-52-6-68 18 14 28 40 22 68z" fill="white" opacity="0.75" />
+    </>
+  ),
   board: (tone) => (
     <LudoBoardArt
       tone={tone}

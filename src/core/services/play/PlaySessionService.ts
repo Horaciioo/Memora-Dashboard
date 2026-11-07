@@ -10,7 +10,9 @@ import { PLAY_ENGINES } from '@/core/engines/play'
 import type { PlayEngine } from '@/core/engines/play'
 import { isPresent, SESSION_INCLUDE } from '@/core/lib/play/session'
 import type { LoadedSeat, LoadedSession } from '@/core/lib/play/session'
+import { makeJoinCode } from '@/core/lib/play/joinCode'
 import { isPlayBanned } from '@/core/services/play/ProfileService'
+import { PlayVisibilities } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 // Client inside or outside a transaction
@@ -147,10 +149,27 @@ export const ensureAllowed = async (
 }
 
 /**
+ * Code no game wears yet
+ * @param {PlayClient} client - Database client
+ * @return {Promise<string>} - Free code
+ */
+
+export const freeJoinCode = async (client: PlayClient): Promise<string> => {
+  const code = makeJoinCode()
+  const taken = await client.playSession.findUnique({
+    where: { joinCode: code },
+    select: { id: true },
+  })
+
+  return taken ? freeJoinCode(client) : code
+}
+
+/**
  * New lobby with the same table and settings
  * @param {Prisma.TransactionClient} tx - Transaction
  * @param {LoadedSession} session - Game replayed
  * @param {Prisma.PlaySessionUncheckedCreateInput} link - Tournament or rematch link
+ * @param {{ hostId: string }} [only] - Seat this player alone, bots kept
  * @return {Promise<string>} - New game
  */
 
@@ -160,18 +179,28 @@ export const cloneTable = async (
   link: Pick<
     Prisma.PlaySessionUncheckedCreateInput,
     'tournamentId' | 'tournamentIndex' | 'rematchOfId'
-  >
+  >,
+  only?: { hostId: string }
 ): Promise<string> => {
-  const present = session.seats.filter(isPresent)
-  const hostId = present.some((seat) => seat.accountId === session.hostId)
-    ? session.hostId
-    : (present[0]?.accountId ?? session.hostId)
+  const present = session.seats
+    .filter(isPresent)
+    .filter((seat) => !only || seat.accountId === only.hostId || seat.account.botKind)
+  // A member hosts, never a bot
+  const hostId =
+    only?.hostId ??
+    (present.some((seat) => seat.accountId === session.hostId)
+      ? session.hostId
+      : (present.find((seat) => !seat.account.botKind)?.accountId ?? session.hostId))
 
+  // A private table stays private, with its own code
+  const isPrivate = session.visibility === PlayVisibilities.Private
   const next = await tx.playSession.create({
     data: {
       ...link,
       game: session.game,
       hostId,
+      visibility: session.visibility,
+      joinCode: isPrivate ? await freeJoinCode(tx) : null,
       settings: session.settings as Prisma.InputJsonValue,
       seats: { create: present.map((seat) => ({ accountId: seat.accountId, color: seat.color })) },
     },

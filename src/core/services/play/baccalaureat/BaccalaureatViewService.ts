@@ -4,6 +4,7 @@ import { prisma } from '@/core/lib/db'
 import {
   BaccalaureatPhases,
   baccalaureatSettingsOf,
+  finishedVoters,
   isCustomCategory,
   roundPhase,
 } from '@/core/lib/play/baccalaureat'
@@ -179,6 +180,7 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
   return {
     settings,
     done,
+    voted: finishedVoters(round?.answers ?? [], session.players),
     feed: sessionFeed(rounds, totals, settings.categories.length),
     roundsTotal: settings.rounds,
     history: rounds.map((entry) => ({

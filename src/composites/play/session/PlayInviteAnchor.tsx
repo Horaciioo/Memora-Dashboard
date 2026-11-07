@@ -11,6 +11,8 @@ import { PLAY_INVITE } from '@/declarations/ui/variants'
 export interface PlayInviteAnchorProps extends Omit<PlayInvitePickerProps, 'onDone'> {
   // Trigger, told how to open the picker
   trigger: (toggle: () => void, isOpen: boolean) => ReactNode
+  // Picker already open on arrival
+  isOpenAtStart?: boolean
 }
 
 /**
@@ -19,8 +21,13 @@ export interface PlayInviteAnchorProps extends Omit<PlayInvitePickerProps, 'onDo
  * @return {JSX.Element}
  */
 
-export const PlayInviteAnchor = ({ trigger, inline, ...picker }: PlayInviteAnchorProps) => {
-  const [isOpen, setOpen] = useState(false)
+export const PlayInviteAnchor = ({
+  trigger,
+  inline,
+  isOpenAtStart = false,
+  ...picker
+}: PlayInviteAnchorProps) => {
+  const [isOpen, setOpen] = useState(isOpenAtStart)
   const box = useRef<HTMLDivElement>(null)
   const close = useCallback(() => setOpen(false), [])
   useOutsideDismiss(isOpen, box, close)

@@ -26,11 +26,9 @@
   },
   "submitGraceSeconds": 2,
   "reviewSeconds": 60,
-  "rejectShare": 0.5,
   "points": {
-    "solo": 15,
     "unique": 10,
-    "sharedDivisor": 2,
+    "sharedRule": "half",
     "stopBonus": 5
   },
   "letters": "ABCDEFGHIJLMNOPRSTV",

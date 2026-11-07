@@ -6,6 +6,7 @@ import { readBodyText } from '@/core/lib/play'
 import {
   BaccalaureatPhases,
   baccalaureatSettingsOf,
+  finishedVoters,
   fitsLetter,
   keepsAnswer,
   roundPhase,
@@ -38,12 +39,20 @@ export const castVote = async (
     throw conflict(PLAY_ERRORS.notReviewing)
   if (answer.accountId === accountId) throw forbidden(PLAY_ERRORS.ownAnswer)
 
-  const accepted = raw.accepted !== false
-  await prisma.baccalaureatVote.upsert({
-    where: { answerId_voterId: { answerId, voterId: accountId } },
-    create: { answerId, voterId: accountId, accepted },
-    update: { accepted },
+  // First vote stands
+  const { count } = await prisma.baccalaureatVote.createMany({
+    data: [{ answerId, voterId: accountId, accepted: raw.accepted !== false }],
+    skipDuplicates: true,
   })
+  if (!count) throw conflict(PLAY_ERRORS.alreadyVoted)
+
+  // Everyone voted, count now
+  const answers = await prisma.baccalaureatAnswer.findMany({
+    where: { roundId: answer.roundId },
+    select: { accountId: true, votes: { select: { voterId: true } } },
+  })
+  const isComplete = finishedVoters(answers, session.players).length === session.players.length
+  if (isComplete) await scoreRound(session, answer.roundId)
 
   return { changed: true, finished: false, deadline: null }
 }
@@ -71,17 +80,19 @@ export const scoreRound = async (session: EngineSession, roundId: string): Promi
 
     // Verdict of the others still seated
     const judged = round.answers.map((answer) => {
-      const voters = session.players.filter((player) => player !== answer.accountId).length
-      const rejects = answer.votes.filter(
-        (vote) => !vote.accepted && vote.voterId !== answer.accountId
-      ).length
+      const votes = answer.votes.filter((vote) => vote.voterId !== answer.accountId)
+      const rejects = votes.filter((vote) => !vote.accepted).length
 
       return {
         ...answer,
-        valid: keepsAnswer({ fits: fitsLetter(answer.word, round.letter), rejects, voters }),
+        valid: keepsAnswer({
+          fits: fitsLetter(answer.word, round.letter),
+          accepts: votes.length - rejects,
+          rejects,
+        }),
       }
     })
-    const points = scoreAnswers(judged)
+    const points = scoreAnswers(judged, baccalaureatSettingsOf(session.settings).sharedRule)
 
     // Answers grouped by result
     const groups = Map.groupBy(judged, (answer) => `${answer.valid}:${points.get(answer.id) ?? 0}`)

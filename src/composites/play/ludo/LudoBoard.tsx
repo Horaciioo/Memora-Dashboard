@@ -13,6 +13,7 @@ import type { LudoSeatFace } from '@/composites/play/ludo/LudoPlates'
 import { LudoResult } from '@/composites/play/ludo/LudoResult'
 import { useLudoCues } from '@/composites/play/ludo/useLudoCues'
 import { useLudoMotion } from '@/composites/play/ludo/useLudoMotion'
+import type { LudoMotion } from '@/composites/play/ludo/useLudoMotion'
 import { useLudoBoard } from '@/core/hooks/data/play/useLudoBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
@@ -49,7 +50,6 @@ export interface LudoBoardProps {
   board: LudoBoardView
   faces: LudoFace[]
   viewerId: string
-  isSeated: boolean
 }
 
 /**
@@ -64,6 +64,23 @@ const statusOf = (board: LudoBoardState, name: string): string => {
   if (board.isMyTurn) return isRoll ? LUDO_BOARD_COPY.yourRoll : LUDO_BOARD_COPY.yourMove
 
   return fillPlayMessage(isRoll ? LUDO_BOARD_COPY.theirRoll : LUDO_BOARD_COPY.theirMove, { name })
+}
+
+/**
+ * Sentence told while a pawn is eaten, who ate whom
+ * @param {LudoMotion['strike']} strike - Pawn being eaten
+ * @param {LudoSeatFace[]} seats - Colours with their names
+ * @return {string | null} - Status, null when nothing is eaten
+ */
+
+const strikeOf = (strike: LudoMotion['strike'], seats: LudoSeatFace[]): string | null => {
+  if (!strike) return null
+  const name = (accountId: string) => seats.find((seat) => seat.accountId === accountId)?.name ?? ''
+
+  return fillPlayMessage(LUDO_BOARD_COPY.eating, {
+    name: name(strike.captorId),
+    victim: name(strike.accountId),
+  })
 }
 
 /**
@@ -91,19 +108,14 @@ const seatsOf = (board: LudoBoardState, faces: LudoFace[]): LudoSeatFace[] =>
  * @return {JSX.Element}
  */
 
-export const LudoBoard = ({
-  sessionId,
-  board: initial,
-  faces,
-  viewerId,
-  isSeated,
-}: LudoBoardProps) => {
+export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBoardProps) => {
   const board = useLudoBoard(sessionId, initial)
   const now = useServerNow(initial.serverTime)
   const motion = useLudoMotion(board, viewerId, sessionId)
   const { act, isSaving } = usePlayAct(sessionId)
   // Revision a move was sent on: the board stays shut until a newer one is pushed
   const [sentRev, setSentRev] = useState<number | null>(null)
+  const [call, setCall] = useState({ was: false, count: 0 })
   const send = async (body: Record<string, unknown>) => {
     setSentRev(board.rev)
     if (await act(body)) window.setTimeout(() => setSentRev(null), PUSH_WAIT_MS)
@@ -121,9 +133,14 @@ export const LudoBoard = ({
   const isStill = !motion.isBusy && !isSaving && sentRev !== board.rev && countdown === 0
   const msLeft = Math.max(0, board.turnEndsAt - now)
   const isRoll = board.dice === null
+  const isMyRoll = isStill && board.isMyTurn && isRoll
+  // The call over the board comes each time the roll turns to the viewer
+  if (call.was !== isMyRoll) setCall({ was: isMyRoll, count: call.count + Number(isMyRoll) })
+  const tone = { '--pawn-tone': `var(--play-ludo-${LUDO_CORNERS[me?.corner ?? 0]})` }
   const row = {
     seats,
     turns,
+    viewerId,
     // The die stays with its thrower while the move plays
     turnId: countdown > 0 ? null : motion.isBusy ? motion.rollerId : board.turnId,
     clock: {
@@ -154,7 +171,10 @@ export const LudoBoard = ({
       )}
       <LudoPlates {...row} />
 
-      <div className={LUDO_BOARD.frame}>
+      <div
+        className={cn(LUDO_BOARD.frame, board.isMyTurn && countdown === 0 && LUDO_BOARD.frameMine)}
+        style={tone as CSSProperties}
+      >
         <div
           className={LUDO_BOARD.surface}
           style={{ '--cells': LUDO_LAYOUT.size } as CSSProperties}
@@ -168,18 +188,22 @@ export const LudoBoard = ({
             viewerId={viewerId}
             movable={isStill ? board.movable : []}
             hop={motion.hop}
+            strike={motion.strike}
             onPick={(pawn) => void send({ type: 'move', pawn })}
           />
+          {isMyRoll && call.count > 0 && (
+            <div key={call.count} className={LUDO_BOARD.banner} aria-hidden="true">
+              <span className={LUDO_BOARD.bannerText}>{LUDO_BOARD_COPY.yourTurn}</span>
+            </div>
+          )}
         </div>
       </div>
       <p
         className={cn(LUDO_BOARD.status, board.isMyTurn && LUDO_BOARD.statusCall)}
         aria-live="polite"
       >
-        {statusOf(board, holder?.name ?? '')}
+        {strikeOf(motion.strike, seats) ?? statusOf(board, holder?.name ?? '')}
       </p>
-
-      {!isSeated && <p className={LUDO_BOARD.spectating}>{LUDO_BOARD_COPY.spectating}</p>}
     </div>
   )
 }

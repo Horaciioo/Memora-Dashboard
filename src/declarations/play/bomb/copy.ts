@@ -11,10 +11,11 @@ export const BOMB_BOARD_COPY = {
   letters: 'Lettres bonus',
   lettersHint: 'Utilise-les toutes pour gagner un cœur.',
   out: 'Éliminé',
+  lifeGained: '+1',
+  lifeMax: 'Max',
   lives: '{count} vies',
   words: '{count} mots',
   ranking: 'Classement',
-  spectating: 'Tu regardes la partie.',
 } as const
 
 /**
@@ -56,10 +57,12 @@ export const BOMB_SETUP_COPY = {
   dictionaryValue: 'Français',
   dictionaryHint: 'Les mots sont vérifiés dans le dictionnaire français, accents ignorés.',
   difficulty: 'Difficulté des syllabes',
-  difficultyHint: 'Nombre de mots du dictionnaire qui contiennent au moins la syllabe tirée.',
+  difficultyHint: 'Plus une syllabe se trouve dans de mots, plus elle est facile à jouer.',
   beginner: 'Débutant',
+  easy: 'Facile',
   medium: 'Moyen',
   hard: 'Difficile',
+  extreme: 'Très difficile',
   custom: 'Personnalisé',
   wordsPerPrompt: '{count}+ mots',
   customCount: 'Mots par syllabe',

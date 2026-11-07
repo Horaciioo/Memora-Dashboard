@@ -1,0 +1,110 @@
+{
+  "callsigns": [
+    "Alpha",
+    "Bravo",
+    "Charlie",
+    "Delta",
+    "Echo",
+    "Foxtrot",
+    "Golf",
+    "Hotel",
+    "India",
+    "Juliett",
+    "Kilo",
+    "Lima",
+    "Mike",
+    "November",
+    "Oscar",
+    "Papa",
+    "Quebec",
+    "Romeo",
+    "Sierra",
+    "Tango",
+    "Uniform",
+    "Victor",
+    "Whiskey",
+    "X-ray",
+    "Yankee",
+    "Zulu"
+  ],
+  "ludo": {
+    "thinkMs": {
+      "min": 700,
+      "max": 1600
+    }
+  },
+  "bomb": {
+    "thinkMs": {
+      "min": 1400,
+      "max": 3800
+    },
+    "failRate": {
+      "EASY": 0.3,
+      "MEDIUM": 0.12,
+      "HARD": 0.03
+    }
+  },
+  "baccalaureat": {
+    "holeRate": {
+      "EASY": 0.55,
+      "MEDIUM": 0.3,
+      "HARD": 0.1
+    },
+    "writeAt": {
+      "EASY": {
+        "min": 0.75,
+        "max": 0.95
+      },
+      "MEDIUM": {
+        "min": 0.6,
+        "max": 0.85
+      },
+      "HARD": {
+        "min": 0.45,
+        "max": 0.7
+      }
+    },
+    "typoRate": {
+      "EASY": 0.14,
+      "MEDIUM": 0.06,
+      "HARD": 0.02
+    },
+    "blunderRate": {
+      "EASY": 0.06,
+      "MEDIUM": 0.025,
+      "HARD": 0.005
+    },
+    "voteMs": {
+      "min": 1200,
+      "max": 4000
+    }
+  },
+  "golf": {
+    "thinkMs": {
+      "min": 1500,
+      "max": 3500
+    },
+    "candidates": 48,
+    "angleNoise": {
+      "EASY": 0.16,
+      "MEDIUM": 0.07,
+      "HARD": 0.025
+    },
+    "powerNoise": {
+      "EASY": 0.25,
+      "MEDIUM": 0.12,
+      "HARD": 0.05
+    }
+  },
+  "naval": {
+    "thinkMs": {
+      "min": 900,
+      "max": 2200
+    },
+    "mistakeRate": {
+      "EASY": 0.5,
+      "MEDIUM": 0.15,
+      "HARD": 0.0
+    }
+  }
+}

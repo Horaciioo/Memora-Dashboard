@@ -1,8 +1,9 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Tip } from '@/components/elements/feedback/Tip'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
-import { BAC_SESSION_COPY } from '@/declarations/play'
+import { BAC_SESSION_COPY, fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_CHAT_UI } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 /**
  * Faces of one group, name on hover
@@ -17,12 +18,16 @@ const FaceGroup = ({ label, faces }: { label: string; faces: PlayFace[] }) => (
     <span className={PLAY_CHAT_UI.peopleLabel}>{label}</span>
     <div className={PLAY_CHAT_UI.peopleStack}>
       {faces.map((face) => (
-        <Tip key={face.id} label={face.name} floating>
+        <Tip
+          key={face.id}
+          label={face.isAway ? fillPlayMessage(PLAY_HUB_COPY.away, { name: face.name }) : face.name}
+          floating
+        >
           <Avatar
             name={face.name}
             src={face.avatarUrl}
             size="xs"
-            className={PLAY_CHAT_UI.peopleFace}
+            className={cn(PLAY_CHAT_UI.peopleFace, face.isAway && PLAY_CHAT_UI.peopleAway)}
           />
         </Tip>
       ))}

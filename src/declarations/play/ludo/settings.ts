@@ -82,10 +82,6 @@ const RULES = {
     path: 'play/ludo.rules.safeSquares',
     fallback: true,
   }),
-  exactFinish: readBoolean(rules.exactFinish, {
-    path: 'play/ludo.rules.exactFinish',
-    fallback: true,
-  }),
 }
 
 export type LudoRuleName = keyof typeof RULES
@@ -135,7 +131,6 @@ export const LUDO_SETTINGS = {
   }),
   stepMs: readInteger(ludo.stepMs, { path: 'play/ludo.stepMs', fallback: 280, min: 40 }),
   rollMs: readInteger(ludo.rollMs, { path: 'play/ludo.rollMs', fallback: 700, min: 100 }),
-  shuffleMs: readInteger(ludo.shuffleMs, { path: 'play/ludo.shuffleMs', fallback: 80, min: 20 }),
   alertSeconds: readInteger(ludo.alertSeconds, {
     path: 'play/ludo.alertSeconds',
     fallback: 5,

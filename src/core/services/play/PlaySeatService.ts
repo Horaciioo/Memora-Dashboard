@@ -2,7 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden } from '@/core/lib/errors'
-import { pickSeatColor, readBodyText } from '@/core/lib/play'
+import { pickSeatColor, readBodyText, seatBoundsOf } from '@/core/lib/play'
 import { isPresent } from '@/core/lib/play/session'
 import { signalPlay } from '@/core/lib/play/signal'
 import { presenceOf } from '@/core/lib/realtime/server/presence'
@@ -13,7 +13,7 @@ import {
   requireHost,
   requireSeat,
 } from '@/core/services/play/PlaySessionService'
-import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
+import { PLAY_ERRORS } from '@/declarations/play'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { PlayInviteRoles, PlayStatuses } from '@/utils/constants/play'
 import type { PlayCandidate } from '@/types/play'
@@ -51,7 +51,7 @@ export const setSeatRole = async (
       if (!seat || seat.kickedAt) throw forbidden(PLAY_ERRORS.notSeated)
       if (isPresent(seat)) return
       const present = session.seats.filter(isPresent)
-      if (present.length >= PLAY_GAMES.get(session.game).maxPlayers) {
+      if (present.length >= seatBoundsOf(session.game, session.settings).max) {
         throw conflict(PLAY_ERRORS.full)
       }
       await ensureAllowed(tx, accountId)
@@ -79,3 +79,29 @@ export const listSpectators = (sessionId: string, seated: string[]): PlayCandida
     .filter((member) => member.status !== 'left' && !seated.includes(member.accountId))
     .map(({ accountId, name, image }) => ({ id: accountId, displayName: name, avatarUrl: image }))
     .toSorted((left, right) => left.displayName.localeCompare(right.displayName))
+
+/**
+ * Player says ready or not in the lobby
+ * @param {string} sessionId - Game
+ * @param {string} accountId - Player
+ * @param {Record<string, unknown>} raw - ready flag
+ * @return {Promise<void>} - Saved
+ */
+
+export const setReady = async (
+  sessionId: string,
+  accountId: string,
+  raw: Record<string, unknown>
+): Promise<void> => {
+  await prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, sessionId)
+    requireSeat(session, accountId)
+    if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
+
+    await tx.playSeat.update({
+      where: { sessionId_accountId: { sessionId, accountId } },
+      data: { readyAt: raw.ready === false ? null : new Date() },
+    })
+  })
+  await signalPlay(sessionId, true)
+}

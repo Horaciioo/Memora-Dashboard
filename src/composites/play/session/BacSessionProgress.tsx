@@ -7,14 +7,23 @@ import { BAC_SESSION } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 /**
- * Players in a row, a check once their round is filled
+ * Players in a row, a check once their step is done
  * @param {Object} props - Progress
  * @param {PlayFace[]} props.players - Seated
  * @param {string[]} props.done - Finished players
+ * @param {{ done: string, pending: string }} props.labels - Tooltip endings
  * @return {JSX.Element}
  */
 
-export const BacSessionProgress = ({ players, done }: { players: PlayFace[]; done: string[] }) => {
+export const BacSessionProgress = ({
+  players,
+  done,
+  labels,
+}: {
+  players: PlayFace[]
+  done: string[]
+  labels: { done: string; pending: string }
+}) => {
   const DoneIcon = ICONS.playTick
   const WritingIcon = ICONS.playWriting
 
@@ -26,10 +35,7 @@ export const BacSessionProgress = ({ players, done }: { players: PlayFace[]; don
 
         return (
           <li key={player.id} className={BAC_SESSION.progressItem}>
-            <Tip
-              label={`${player.name} ${isDone ? BAC_SESSION_COPY.done : BAC_SESSION_COPY.writing}`}
-              floating
-            >
+            <Tip label={`${player.name} ${isDone ? labels.done : labels.pending}`} floating>
               <Avatar name={player.name} src={player.avatarUrl} size="md" />
               <span
                 className={cn(

@@ -23,12 +23,13 @@ export const PLAY_LIVE = {
   name: 'truncate text-sm font-extrabold text-[var(--play-ink)]',
   stage: 'text-xs font-bold text-[var(--play-ink-soft)]',
   stageLive: 'text-[var(--play-live)]',
-  bottom: 'flex flex-wrap items-center justify-between gap-x-3 gap-y-2.5',
+  bottom: 'flex flex-col gap-3',
   faces: 'flex items-center -space-x-2',
   face: 'ring-2 ring-[var(--play-panel-strong)]',
   more: 'grid size-7 place-items-center rounded-full bg-[var(--play-chip)] text-[0.65rem] font-extrabold text-[var(--play-ink)] ring-2 ring-[var(--play-panel-strong)]',
   count: 'ml-3 whitespace-nowrap text-xs font-semibold tabular-nums text-[var(--play-ink-soft)]',
-  actions: 'ml-auto flex shrink-0 items-center gap-2',
+  actions: 'flex w-full items-center gap-2',
+  action: 'h-11 w-full min-w-0 flex-1',
 } as const
 
 /**
@@ -73,30 +74,19 @@ export const PLAY_VOTE: VoteLook = {
 }
 
 /**
- * Concept window of a game hub: a clip player, its steps, the golf powers
+ * Concept window of a game hub: its steps, the golf powers
  * @type {Record<string, string>}
  */
 
 export const PLAY_CONCEPT_UI = {
   root: 'flex flex-col gap-4',
-  player:
-    'flex flex-col overflow-hidden rounded-2xl bg-[var(--play-panel-strong)] ring-1 ring-[var(--play-line)]',
-  // Clip in the game colour, a 16:9 screen
-  screen:
-    'concept-screen relative aspect-video w-full overflow-hidden bg-[linear-gradient(135deg,var(--play-key),color-mix(in_srgb,var(--play-key)_55%,black))]',
-  bar: 'flex items-center gap-3 bg-[rgb(0_0_0/0.75)] px-3 py-2',
-  barPlay: 'size-3 shrink-0 bg-white [clip-path:polygon(0_0,100%_50%,0_100%)]',
-  track: 'h-1.5 flex-1 overflow-hidden rounded-full bg-white/25',
-  progress: 'concept-progress block h-full rounded-full bg-[var(--play-key)]',
-  caption: 'flex flex-col gap-1 p-4',
-  stepTitle: 'text-lg font-extrabold tracking-tight text-[var(--play-ink)]',
-  stepText: 'text-sm text-[var(--play-ink-soft)]',
-  steps: 'grid gap-2 sm:grid-cols-3',
-  stepKey:
-    'flex items-center gap-2 rounded-xl bg-[var(--play-chip)] px-3 py-2.5 text-left text-sm font-extrabold text-[var(--play-ink-soft)] transition-colors hover:text-[var(--play-ink)]',
-  stepKeyOn: 'bg-[var(--play-key)] text-[var(--play-key-ink)] hover:text-[var(--play-key-ink)]',
+  list: 'flex flex-col gap-2',
+  step: 'flex gap-3 rounded-2xl bg-[var(--play-panel-strong)] p-4 ring-1 ring-[var(--play-line)]',
   stepNumber:
-    'grid size-6 shrink-0 place-items-center rounded-full bg-black/15 text-xs tabular-nums',
+    'grid size-8 shrink-0 place-items-center rounded-full bg-[var(--play-key)] text-sm font-extrabold text-[var(--play-key-ink)] tabular-nums',
+  stepBody: 'flex min-w-0 flex-col gap-1',
+  stepTitle: 'text-base font-extrabold tracking-tight text-[var(--play-ink)]',
+  stepText: 'text-sm text-[var(--play-ink-soft)]',
   powers: 'flex flex-col gap-3 pt-2',
   powersTitle: 'text-sm font-extrabold tracking-wide text-[var(--play-ink)] uppercase',
   powerGrid: 'grid gap-2 sm:grid-cols-2',

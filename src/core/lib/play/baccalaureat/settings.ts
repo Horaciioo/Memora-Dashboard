@@ -9,7 +9,9 @@ import {
   PLAY_ERRORS,
   fillPlayMessage,
   isBaccalaureatCategory,
+  isSharingKey,
 } from '@/declarations/play'
+import type { BaccalaureatSharingKey } from '@/declarations/play'
 
 /**
  * One category of a game
@@ -37,6 +39,8 @@ export interface BaccalaureatGameSettings {
   // Stop called for the first player done
   autoStop: boolean
   flash: boolean
+  // Points of a word written twice
+  sharedRule: BaccalaureatSharingKey
 }
 
 // Prefix of host-written categories
@@ -87,6 +91,7 @@ export const baccalaureatDefaults = (): BaccalaureatGameSettings => ({
   stop: BACCALAUREAT_SETTINGS.stop.enabled,
   autoStop: false,
   flash: false,
+  sharedRule: BACCALAUREAT_SETTINGS.points.sharedRule,
 })
 
 /**
@@ -204,6 +209,7 @@ export const readBaccalaureatSettings = (
     stop: typeof raw.stop === 'boolean' ? raw.stop : current.stop,
     autoStop: typeof raw.autoStop === 'boolean' ? raw.autoStop : current.autoStop,
     flash,
+    sharedRule: isSharingKey(raw.sharedRule) ? raw.sharedRule : current.sharedRule,
   }
 
   return settings as unknown as Prisma.InputJsonObject

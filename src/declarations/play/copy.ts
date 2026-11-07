@@ -27,6 +27,7 @@ export const PLAY_ERRORS = {
   roundMissing: 'Aucune manche en cours.',
   notReviewing: 'Les votes sont fermés.',
   ownAnswer: 'Tu ne votes pas sur tes propres mots.',
+  alreadyVoted: 'Ton vote est déjà enregistré.',
   stopIncomplete: 'Remplis toutes les catégories avant de dire stop.',
   stopDisabled: 'Le stop est désactivé dans cette partie.',
   notCountdown: 'Le joker se joue pendant le compte à rebours.',
@@ -39,6 +40,9 @@ export const PLAY_ERRORS = {
   longMessage: 'Ton message dépasse {max} caractères.',
   inviteRole: 'Choisis joueur ou spectateur.',
   inviteMissing: 'Cette invitation n’existe plus.',
+  botLevel: 'Choisis un niveau de bot.',
+  codeUnknown: 'Aucune partie ne porte ce code.',
+  privateGame: 'Cette partie est privée, il faut une invitation.',
   sessionClosed: 'Cette partie est terminée.',
   notYourTurn: 'Ce n’est pas ton tour.',
   tooLate: 'La bombe a explosé avant ton mot.',
@@ -54,6 +58,10 @@ export const PLAY_ERRORS = {
   alreadyRolled: 'Tu as déjà lancé le dé, choisis un pion.',
   rollFirst: 'Lance le dé d’abord.',
   badPawn: 'Ce pion ne peut pas bouger.',
+  badSquare: 'Tu as déjà tiré sur cette case.',
+  badFleet: 'Cette flotte n’est pas valable.',
+  notPlacing: 'Le placement est terminé.',
+  notFighting: 'Aucun combat en cours pour toi.',
 } as const
 
 /**

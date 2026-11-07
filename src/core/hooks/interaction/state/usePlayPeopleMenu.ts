@@ -17,6 +17,7 @@ import type { PlayStatusName } from '@/utils/constants/play'
  * @property {boolean} isSeated - Holds a seat now
  * @property {boolean} hasSeat - Sat once, perhaps left
  * @property {boolean} isHost - Hosts the game
+ * @property {boolean} [isBot] - Play bot
  */
 
 export interface PlayPerson {
@@ -24,6 +25,7 @@ export interface PlayPerson {
   isSeated: boolean
   hasSeat: boolean
   isHost: boolean
+  isBot?: boolean
 }
 
 export interface PlayPeopleTable {
@@ -107,8 +109,8 @@ export const usePlayPeopleMenu = ({
       },
     ]
 
-    // A divider opens each group after the first
-    return [manage, stats, profile]
+    // A divider opens each group after the first, a bot has no page
+    return (person.isBot ? [manage] : [manage, stats, profile])
       .filter((group) => group.length)
       .flatMap((group, index) =>
         group.map((item, at) => ({ ...item, separatorBefore: index > 0 && at === 0 }))

@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/elements/actions/Button'
 import { PlayVolumeKey } from '@/composites/play/session/PlayVolumeKey'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { usePlayStageStore } from '@/core/store/playStage'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
@@ -18,8 +19,11 @@ import { cn } from '@/utils/classnames'
 
 export const PlayStageKeys = ({ game }: { game: PlayGameName }) => {
   const { isFullscreen, isChatOpen, toggleFullscreen, toggleChat } = usePlayStageStore()
+  const isMobile = useIsMobileShell()
   const FullscreenIcon = isFullscreen ? ICONS.playWindowed : ICONS.playFullscreen
   const ChatIcon = ICONS.playChat
+  // Phone: the gear holds them
+  if (isMobile) return null
 
   return (
     <div

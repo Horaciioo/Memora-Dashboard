@@ -1,12 +1,19 @@
 import 'server-only'
 
+import { PlayNoticeKind } from '@prisma/client'
+
 import { prisma } from '@/core/lib/db'
-import { conflict } from '@/core/lib/errors'
+import { seatBoundsOf } from '@/core/lib/play/seats'
+import { conflict, notFound } from '@/core/lib/errors'
+import { mayEnter } from '@/core/lib/play/access'
 import { signalPlay } from '@/core/lib/play/signal'
 import { clearSessionTimers, scheduleDeadline } from '@/core/lib/play/timers'
-import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
+import { PLAY_ERRORS } from '@/declarations/play'
 import type { EngineStep } from '@/core/engines/play'
+import { driveBots } from '@/core/engines/play/players/BotDriver'
+import { logger } from '@/core/lib/logger'
 import { noteAction } from '@/core/services/play/PlayIdleService'
+import { tellFollowers } from '@/core/services/play/PlayFollowService'
 import { finishSession } from '@/core/services/play/RewardService'
 import { tournamentStandings } from '@/core/services/play/TournamentService'
 import {
@@ -38,6 +45,12 @@ const applyStep = async (sessionId: string, step: EngineStep): Promise<void> => 
 
   // A running table draws from its board alone, the page moves at the end
   if (step.changed || step.finished) await signalPlay(sessionId, step.finished, !step.finished)
+  // Bots answer the new board
+  if (step.changed && !step.finished) {
+    void driveBots(sessionId, playMove).catch((error: unknown) =>
+      logger.warn('[play] bots stalled', error)
+    )
+  }
 }
 
 /**
@@ -84,6 +97,8 @@ const nextGameId = async (session: LoadedSession): Promise<string | null> => {
 
 export const readSession = async (sessionId: string, viewerId: string) => {
   const session = await settleSession(sessionId)
+  // Private games stay shut to the uninvited
+  if (!(await mayEnter(prisma, session, viewerId))) throw notFound(PLAY_ERRORS.sessionMissing)
   const isStarted = session.status !== PlayStatuses.Lobby
   const engine = engineOf(session.game)
 
@@ -109,7 +124,7 @@ export const startSession = async (sessionId: string, hostId: string): Promise<v
     const locked = await lockSession(tx, sessionId)
     requireHost(locked, hostId)
     if (locked.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
-    if (locked.seats.filter(isPresent).length < PLAY_GAMES.get(locked.game).minPlayers) {
+    if (locked.seats.filter(isPresent).length < seatBoundsOf(locked.game, locked.settings).min) {
       throw conflict(PLAY_ERRORS.tooFewPlayers)
     }
 
@@ -134,6 +149,7 @@ export const startSession = async (sessionId: string, hostId: string): Promise<v
   }
   noteAction(sessionId)
   await signalPlay(sessionId, true)
+  await tellFollowers(sessionId, PlayNoticeKind.STARTED)
 }
 
 /**
@@ -149,11 +165,27 @@ export const actInSession = async (
   accountId: string,
   raw: Record<string, unknown>
 ): Promise<void> => {
+  noteAction(sessionId)
+  await playMove(sessionId, accountId, raw)
+}
+
+/**
+ * Checked engine move, bots included
+ * @param {string} sessionId - Game
+ * @param {string} accountId - Player
+ * @param {Record<string, unknown>} raw - Action body
+ * @return {Promise<void>} - Played
+ */
+
+const playMove = async (
+  sessionId: string,
+  accountId: string,
+  raw: Record<string, unknown>
+): Promise<void> => {
   const session = await settleSession(sessionId)
   if (session.status !== PlayStatuses.Running) throw conflict(PLAY_ERRORS.notRunning)
   requireSeat(session, accountId)
 
-  noteAction(sessionId)
   await applyStep(
     sessionId,
     await engineOf(session.game).act(toEngineSession(session), accountId, raw)

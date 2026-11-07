@@ -20,8 +20,8 @@ export const GOLF_BOARD = {
   boardFull: 'min-h-0 flex-1 pb-0!',
   loading: 'absolute inset-0 grid place-items-center text-sm font-bold text-[var(--play-ink-soft)]',
   // Top row: hole card, players, view keys
-  top: 'golf-block-drop pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-3',
-  hole: `${GLASS} pointer-events-auto flex w-[40rem] max-w-full items-center gap-4 px-6 py-3.5 md:order-2`,
+  top: 'golf-block-drop pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-3 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:flex-wrap max-md:pr-[3.75rem]',
+  hole: `${GLASS} pointer-events-auto flex w-[40rem] max-w-full items-center gap-4 px-6 py-3.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:order-2`,
   holeBlock: 'flex min-w-0 flex-1 basis-0 items-baseline justify-center gap-2',
   caption: CAPTION,
   figure: FIGURE,
@@ -33,13 +33,19 @@ export const GOLF_BOARD = {
   view: ROUND,
   viewOn: 'bg-[var(--play-chip)]',
   viewIcon: 'size-5',
+  // Phone: the gear and the chat bar hold these
+  viewDesktop: 'max-md:hidden',
   // Keys and the settings card hanging under them
-  keys: 'pointer-events-auto relative md:order-3',
-  settings: `${GLASS} absolute top-full right-0 z-10 mt-3 flex w-72 flex-col gap-1 p-3`,
+  keys: 'pointer-events-auto relative max-md:ml-auto md:order-3',
+  settings: `${GLASS} absolute top-full right-0 z-10 mt-3 flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-1 p-3`,
   setting:
     'flex items-center justify-between gap-3 px-1 py-1.5 text-left text-base font-extrabold text-[var(--play-ink)]',
   soundRow: 'flex flex-col gap-1 px-1 py-1.5 text-base font-extrabold text-[var(--play-ink)]',
   volume: 'min-w-0 flex-1 cursor-pointer accent-[var(--play-accent)]',
+  // Spectator picker over the hole
+  watch: `${GLASS} pointer-events-auto absolute bottom-24 left-1/2 flex -translate-x-1/2 touch-pan-y items-center gap-1 p-1.5 md:bottom-32`,
+  watchFace: 'rounded-full p-0.5 opacity-60 transition-opacity hover:opacity-100',
+  watchFaceOn: 'opacity-100 ring-[3px] ring-[var(--play-accent)]',
   // Players strip
   players: `${GLASS} pointer-events-auto hidden items-center gap-3 px-3 py-2 md:order-1 md:flex`,
   player: 'relative flex flex-col items-center gap-1',
@@ -51,14 +57,14 @@ export const GOLF_BOARD = {
   playerGone: 'opacity-40 grayscale',
   // Bottom row: power slot, status and gauge, strokes
   bottom:
-    'golf-block-drop pointer-events-none absolute inset-x-5 bottom-5 flex flex-wrap items-end justify-between gap-4 md:inset-x-7 md:bottom-7',
+    'golf-block-drop pointer-events-none absolute inset-x-3 bottom-3 flex flex-wrap items-end justify-between gap-3 md:inset-x-7 md:bottom-7 md:gap-4',
   // Hand: rounded cases, bottom right
   handBox: 'pointer-events-auto flex flex-col items-end gap-2',
-  hand: 'flex items-end gap-3',
-  slot: 'group/slot pointer-events-auto relative grid size-[4.75rem] place-items-center text-[var(--play-on-art)] transition-transform hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-60',
+  hand: 'flex items-end gap-2 md:gap-3',
+  slot: 'group/slot pointer-events-auto relative grid size-14 place-items-center md:size-[4.75rem] text-[var(--play-on-art)] transition-transform hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-60',
   // Grey cube, nothing to play
   slotEmpty: 'cursor-default opacity-60 hover:translate-y-0',
-  slotOrb: 'size-[4.75rem]',
+  slotOrb: 'size-14 md:size-[4.75rem]',
   // Name and effect, on hover only
   slotTip: `${GLASS} pointer-events-none absolute right-0 bottom-full mb-3 flex w-56 flex-col gap-1 p-3 text-left opacity-0 transition-opacity group-hover/slot:opacity-100 group-focus-visible/slot:opacity-100`,
   slotKind:

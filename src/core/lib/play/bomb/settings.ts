@@ -74,6 +74,22 @@ export const wordsNeeded = (settings: BombGameSettings): number =>
     : BOMB_SETTINGS.wordsPerPrompt[settings.difficulty]
 
 /**
+ * Words a prompt may fit, levels never overlap
+ * @param {BombGameSettings} settings - Game settings
+ * @return {{ min: number, max: number }} - Bounds, max excluded
+ */
+
+export const wordsRange = (settings: BombGameSettings): { min: number; max: number } => {
+  const min = wordsNeeded(settings)
+  if (settings.difficulty === 'custom') return { min, max: Infinity }
+
+  // Next easier level opens the band above
+  const easier = Object.values(BOMB_SETTINGS.wordsPerPrompt).filter((count) => count > min)
+
+  return { min, max: Math.min(...easier) }
+}
+
+/**
  * Settings asked by the host
  * @param {Record<string, unknown>} raw - Body
  * @param {Prisma.JsonValue} stored - Current settings

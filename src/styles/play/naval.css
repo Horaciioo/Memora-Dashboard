@@ -1,0 +1,821 @@
+/* Naval ground: night sea, a burning glow on the horizon */
+.play-room:has(.play-sea) {
+  background:
+    radial-gradient(
+      70rem 26rem at 50% 108%,
+      color-mix(in srgb, var(--play-naval-hit) 26%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-naval-night) 0%, var(--play-naval-deep) 100%);
+}
+
+.play-room:has(.play-sea)::before,
+.play-room:has(.play-sea) .play-floor {
+  display: none;
+}
+
+/* A sea: dark water, slow swell, square grid on top */
+.naval-sea {
+  position: relative;
+  aspect-ratio: 1;
+  container-type: inline-size;
+  --cell: calc(100cqi / var(--size));
+  border-radius: 0.9rem;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent 40%),
+    repeating-linear-gradient(172deg, transparent 0 1.1rem, var(--play-naval-wave) 1.1rem 1.2rem),
+    linear-gradient(160deg, var(--play-naval-sea) 0%, var(--play-naval-sea-deep) 100%);
+  box-shadow:
+    0 0 0 0.18rem rgb(255 255 255 / 0.08),
+    0 1.2rem 2.4rem rgb(0 0 0 / 0.45);
+  touch-action: manipulation;
+}
+
+.naval-sea-live {
+  background-size:
+    100% 100%,
+    100% 200%,
+    100% 100%;
+  animation: naval-swell 14s linear infinite;
+}
+
+.naval-sea[data-mine='true'] {
+  box-shadow:
+    0 0 0 0.18rem rgb(255 255 255 / 0.08),
+    0 0.8rem 1.6rem rgb(0 0 0 / 0.4);
+}
+
+.naval-cells {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--size), 1fr);
+  grid-template-rows: repeat(var(--size), 1fr);
+}
+
+.naval-cell {
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid var(--play-naval-line);
+  background: transparent;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.naval-cell[data-open='true'] {
+  cursor: crosshair;
+}
+
+@media (hover: hover) {
+  .naval-cell[data-open='true']:hover {
+    background: rgb(143 216 255 / 0.2);
+    box-shadow: inset 0 0 0 0.12rem var(--play-naval-glow);
+  }
+}
+
+/* Splash left in the water: foam ring and a dot */
+.naval-cell[data-mark='miss']::after {
+  content: '';
+  position: absolute;
+  inset: 26%;
+  border: max(2px, 0.07 * var(--cell)) solid var(--play-naval-foam);
+  border-radius: 50%;
+  opacity: 0.75;
+}
+
+.naval-cell[data-mark='miss']::before {
+  content: '';
+  position: absolute;
+  inset: 44%;
+  border-radius: 50%;
+  background: var(--play-naval-foam);
+  opacity: 0.85;
+}
+
+/* Fire on a struck square */
+.naval-cell[data-mark='hit']::after {
+  content: '';
+  position: absolute;
+  inset: 10%;
+  border-radius: 50% 50% 46% 46%;
+  background:
+    radial-gradient(circle at 50% 66%, #fff6c9 0 14%, transparent 15%),
+    radial-gradient(circle at 50% 64%, var(--play-naval-fire) 0 34%, transparent 36%),
+    radial-gradient(circle at 50% 62%, var(--play-naval-hit) 0 62%, transparent 66%);
+  filter: drop-shadow(0 0 0.35rem var(--play-naval-hit));
+}
+
+.naval-sea-live .naval-cell[data-mark='hit']::after {
+  animation: naval-flame 0.9s ease-in-out infinite alternate;
+}
+
+.naval-cell[data-fresh='true']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 0.14rem var(--play-naval-reticle);
+  opacity: 0.8;
+}
+
+/* Reticle: four corners that breathe */
+.naval-cell[data-aim='true'] {
+  z-index: 3;
+}
+
+.naval-cell[data-aim='true']::before {
+  content: '';
+  position: absolute;
+  inset: -6%;
+  --stroke: var(--play-naval-reticle);
+  background:
+    linear-gradient(var(--stroke), var(--stroke)) top left / 38% 3px no-repeat,
+    linear-gradient(var(--stroke), var(--stroke)) top left / 3px 38% no-repeat,
+    linear-gradient(var(--stroke), var(--stroke)) top right / 38% 3px no-repeat,
+    linear-gradient(var(--stroke), var(--stroke)) top right / 3px 38% no-repeat,
+    linear-gradient(var(--stroke), var(--stroke)) bottom left / 38% 3px no-repeat,
+    linear-gradient(var(--stroke), var(--stroke)) bottom left / 3px 38% no-repeat,
+    linear-gradient(var(--stroke), var(--stroke)) bottom right / 38% 3px no-repeat,
+    linear-gradient(var(--stroke), var(--stroke)) bottom right / 3px 38% no-repeat;
+  filter: drop-shadow(0 0 0.3rem var(--play-naval-reticle));
+  animation: naval-reticle 0.8s ease-in-out infinite alternate;
+}
+
+.naval-cell[data-aim='true'] {
+  background: rgb(255 226 122 / 0.14);
+}
+
+/* Placement preview */
+.naval-cell[data-ghost='ok'] {
+  background: rgb(143 216 255 / 0.32);
+}
+
+.naval-cell[data-ghost='bad'] {
+  background: rgb(255 59 59 / 0.38);
+}
+
+/* Ships sit under the cells, lit from the top */
+.naval-ship {
+  position: absolute;
+  left: calc(var(--x) * var(--cell));
+  top: calc(var(--y) * var(--cell));
+  width: calc(var(--length) * var(--cell));
+  height: var(--cell);
+  transform-origin: 0 0;
+  filter: drop-shadow(0 0.15rem 0.12rem rgb(0 0 0 / 0.5));
+  transition:
+    opacity 0.2s ease,
+    filter 0.4s ease;
+}
+
+.naval-ship[data-vertical='true'] {
+  transform: translateX(var(--cell)) rotate(90deg);
+}
+
+.naval-ship[data-ghost='true'] {
+  opacity: 0.7;
+}
+
+.naval-ship[data-wreck='true'] {
+  filter: grayscale(1) brightness(0.5) sepia(0.6) hue-rotate(-30deg)
+    drop-shadow(0 0.1rem 0.1rem rgb(0 0 0 / 0.6));
+}
+
+.naval-ship[data-picked='true'] {
+  filter: drop-shadow(0 0 0.5rem var(--play-naval-reticle));
+}
+
+.naval-ship-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.naval-ship-hull {
+  fill: var(--play-naval-hull);
+}
+
+.naval-ship-deck {
+  fill: var(--play-naval-deck);
+}
+
+.naval-ship-edge {
+  fill: none;
+  stroke: var(--play-naval-hull-deep);
+  stroke-width: 3;
+}
+
+.naval-ship-top {
+  fill: var(--play-naval-mine);
+}
+
+.naval-ship-dark {
+  fill: var(--play-naval-hull-deep);
+}
+
+/* Smoke rising from a wreck */
+.naval-smoke {
+  position: absolute;
+  left: calc((var(--x) + 0.5) * var(--cell));
+  top: calc((var(--y) + 0.5) * var(--cell));
+  width: calc(var(--cell) * 0.9);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--play-naval-smoke) 0 40%, transparent 70%);
+  opacity: 0;
+  animation: naval-smoke 3.6s ease-out infinite;
+  animation-delay: var(--delay);
+}
+
+/* Shell falling on a square, with its shadow and mark */
+.naval-shell {
+  position: absolute;
+  left: calc((var(--x) + 0.5) * var(--cell));
+  top: calc((var(--y) + 0.5) * var(--cell));
+  width: calc(var(--cell) * 0.5);
+  aspect-ratio: 1 / 2;
+  translate: -50% -50%;
+  border-radius: 45% 45% 50% 50%;
+  background: linear-gradient(90deg, #7d8996, #f4f8fb 45%, #6b7682);
+  box-shadow: 0 0 0.6rem 0.1rem rgb(255 176 46 / 0.8);
+  animation: naval-fall var(--flight) cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
+}
+
+.naval-shell::before {
+  content: '';
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: 100%;
+  height: calc(var(--cell) * 2.4);
+  background: linear-gradient(to top, rgb(255 190 80 / 0.9), transparent);
+  filter: blur(1px);
+}
+
+.naval-lock {
+  position: absolute;
+  left: calc(var(--x) * var(--cell));
+  top: calc(var(--y) * var(--cell));
+  width: var(--cell);
+  height: var(--cell);
+}
+
+.naval-lock::before {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border: 2px solid var(--play-naval-danger);
+  border-radius: 50%;
+  animation: naval-lock var(--flight) ease-in forwards;
+}
+
+.naval-lock::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(0 0 0 / 0.55), transparent 65%);
+  animation: naval-shadow var(--flight) ease-in forwards;
+}
+
+/* Impact: flash, shock ring and sparks */
+.naval-blast {
+  position: absolute;
+  left: calc((var(--x) + 0.5) * var(--cell));
+  top: calc((var(--y) + 0.5) * var(--cell));
+  width: calc(var(--cell) * var(--span, 1));
+  aspect-ratio: 1;
+  translate: -50% -50%;
+}
+
+.naval-blast::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fff 0 12%,
+    var(--play-naval-fire) 30%,
+    var(--play-naval-hit) 52%,
+    transparent 70%
+  );
+  animation: naval-flash var(--impact) ease-out forwards;
+}
+
+.naval-blast::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 3px solid rgb(255 220 160 / 0.9);
+  border-radius: 50%;
+  animation: naval-ring var(--impact) ease-out forwards;
+}
+
+.naval-spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 50%;
+  background: var(--play-naval-fire);
+  animation: naval-spark var(--impact) ease-out forwards;
+  transform: rotate(var(--angle)) translateX(0);
+}
+
+.naval-splash {
+  position: absolute;
+  left: calc((var(--x) + 0.5) * var(--cell));
+  top: calc((var(--y) + 0.5) * var(--cell));
+  width: var(--cell);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+}
+
+.naval-splash::before,
+.naval-splash::after {
+  content: '';
+  position: absolute;
+  inset: 10%;
+  border: 2px solid var(--play-naval-foam);
+  border-radius: 50%;
+  animation: naval-ripple var(--impact) ease-out forwards;
+}
+
+.naval-splash::after {
+  animation-delay: 0.18s;
+}
+
+.naval-geyser {
+  position: absolute;
+  left: 38%;
+  right: 38%;
+  bottom: 40%;
+  height: 130%;
+  border-radius: 40% 40% 10% 10%;
+  background: linear-gradient(to top, rgb(232 247 255 / 0.9), rgb(232 247 255 / 0));
+  transform-origin: bottom;
+  animation: naval-geyser var(--impact) ease-out forwards;
+}
+
+/* The shaken sea, and the red edge of an incoming shell */
+.naval-shake {
+  animation: naval-shake 0.42s linear;
+}
+
+.naval-danger {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 45%, rgb(255 40 40 / 0.55) 100%);
+  animation: naval-danger var(--flight) ease-in forwards;
+}
+
+.naval-callout {
+  animation: naval-callout 1.6s ease-out forwards;
+}
+
+/* Clock: a bar that empties */
+.naval-clock-fill {
+  transform-origin: left;
+  transform: scaleX(var(--left));
+  transition: transform 0.25s linear;
+}
+
+.naval-chip-turn {
+  box-shadow: 0 0 0 0.13rem var(--play-naval-glow);
+}
+
+.naval-chip-hit {
+  animation: naval-chip-hit 0.6s ease-out;
+}
+
+.naval-dock-ship:disabled {
+  cursor: default;
+}
+
+@keyframes naval-swell {
+  to {
+    background-position:
+      0 0,
+      0 -2.3rem,
+      0 0;
+  }
+}
+
+@keyframes naval-flame {
+  from {
+    transform: scale(0.92) rotate(-3deg);
+  }
+  to {
+    transform: scale(1.06) rotate(3deg);
+  }
+}
+
+@keyframes naval-reticle {
+  from {
+    transform: scale(1.08);
+    opacity: 0.75;
+  }
+  to {
+    transform: scale(0.94);
+    opacity: 1;
+  }
+}
+
+@keyframes naval-smoke {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  20% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-120%) scale(1.8);
+  }
+}
+
+@keyframes naval-fall {
+  0% {
+    opacity: 0;
+    transform: translate(calc(var(--lean) * 6), -520%) scale(0.35);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1.1);
+  }
+}
+
+@keyframes naval-lock {
+  from {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes naval-shadow {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+@keyframes naval-flash {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  35% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes naval-ring {
+  from {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+  to {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+
+@keyframes naval-spark {
+  to {
+    transform: rotate(var(--angle)) translateX(calc(var(--cell) * 1.6));
+    opacity: 0;
+  }
+}
+
+@keyframes naval-ripple {
+  from {
+    transform: scale(0.2);
+    opacity: 0.95;
+  }
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes naval-geyser {
+  0% {
+    transform: scaleY(0);
+    opacity: 1;
+  }
+  35% {
+    transform: scaleY(1);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scaleY(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes naval-shake {
+  0%,
+  100% {
+    transform: translate(0);
+  }
+  15% {
+    transform: translate(-5px, 3px);
+  }
+  30% {
+    transform: translate(5px, -3px);
+  }
+  45% {
+    transform: translate(-4px, -2px);
+  }
+  60% {
+    transform: translate(3px, 3px);
+  }
+  80% {
+    transform: translate(-1px, 1px);
+  }
+}
+
+@keyframes naval-danger {
+  0% {
+    opacity: 0;
+  }
+  70% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes naval-callout {
+  0% {
+    opacity: 0;
+    transform: translateY(0.8rem) scale(0.85);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+  25% {
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-0.6rem);
+  }
+}
+
+@keyframes naval-chip-hit {
+  0% {
+    background: rgb(255 59 59 / 0.55);
+  }
+  100% {
+    background: var(--play-naval-panel);
+  }
+}
+
+/* Hub scene: a fleet at war, layers drifting at their own speed */
+.naval-scene svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.naval-wave-a {
+  animation: naval-drift 38s linear infinite;
+}
+
+.naval-wave-b {
+  animation: naval-drift 24s linear infinite reverse;
+}
+
+.naval-wave-c {
+  animation: naval-drift 15s linear infinite;
+}
+
+.naval-bob {
+  animation: naval-bob 6s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.naval-bob-slow {
+  animation-duration: 9s;
+  animation-delay: -3s;
+}
+
+.naval-beam {
+  transform-box: fill-box;
+  transform-origin: 0 100%;
+  animation: naval-beam 11s ease-in-out infinite alternate;
+}
+
+.naval-fire {
+  animation: naval-glow 1.6s ease-in-out infinite alternate;
+}
+
+.naval-fire-b {
+  animation-duration: 2.3s;
+  animation-delay: -0.7s;
+}
+
+.naval-muzzle {
+  opacity: 0;
+  animation: naval-muzzle 7s linear infinite;
+}
+
+.naval-muzzle-b {
+  animation-delay: -3.4s;
+}
+
+.naval-tracer {
+  stroke-dasharray: 60 900;
+  stroke-dashoffset: 960;
+  animation: naval-tracer 7s linear infinite;
+}
+
+.naval-tracer-b {
+  animation-delay: -3.4s;
+}
+
+.naval-plume {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: naval-plume 9s ease-out infinite;
+}
+
+.naval-plume-b {
+  animation-delay: -4.5s;
+}
+
+.naval-hub-geyser {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  opacity: 0;
+  animation: naval-hub-geyser 8s ease-out infinite;
+}
+
+.naval-hub-geyser-b {
+  animation-delay: -2.7s;
+}
+
+.naval-hub-geyser-c {
+  animation-delay: -5.2s;
+}
+
+@keyframes naval-drift {
+  to {
+    transform: translateX(-800px);
+  }
+}
+
+@keyframes naval-bob {
+  from {
+    transform: rotate(-0.6deg) translateY(0);
+  }
+  to {
+    transform: rotate(0.7deg) translateY(4px);
+  }
+}
+
+@keyframes naval-beam {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes naval-glow {
+  from {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes naval-muzzle {
+  0%,
+  6%,
+  100% {
+    opacity: 0;
+  }
+  1% {
+    opacity: 1;
+  }
+  3% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes naval-tracer {
+  0% {
+    stroke-dashoffset: 960;
+    opacity: 0;
+  }
+  2% {
+    opacity: 1;
+  }
+  32% {
+    stroke-dashoffset: -60;
+    opacity: 1;
+  }
+  34%,
+  100% {
+    stroke-dashoffset: -60;
+    opacity: 0;
+  }
+}
+
+@keyframes naval-plume {
+  0% {
+    transform: scale(0.2, 0.1);
+    opacity: 0;
+  }
+  8% {
+    transform: scale(1, 1);
+    opacity: 0.95;
+  }
+  60% {
+    transform: scale(1.5, 2.2) translateY(-12px);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(2, 3) translateY(-30px);
+    opacity: 0;
+  }
+}
+
+@keyframes naval-hub-geyser {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  6% {
+    transform: scaleY(1);
+    opacity: 0.9;
+  }
+  30% {
+    transform: scaleY(0.7);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .naval-sea-live,
+  .naval-wave-a,
+  .naval-wave-b,
+  .naval-wave-c,
+  .naval-bob,
+  .naval-beam,
+  .naval-fire,
+  .naval-muzzle,
+  .naval-tracer,
+  .naval-plume,
+  .naval-hub-geyser,
+  .naval-smoke,
+  .naval-cell[data-aim='true']::before,
+  .naval-sea-live .naval-cell[data-mark='hit']::after {
+    animation: none;
+  }
+
+  .naval-shake,
+  .naval-danger {
+    animation: none;
+    opacity: 0;
+  }
+}

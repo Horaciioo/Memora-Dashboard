@@ -1,35 +1,39 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
-import { Button } from '@/components/elements/actions/Button'
+import { PlayInviteSection } from '@/composites/play/session/PlayInviteSection'
+import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { usePlayInvites } from '@/core/hooks/data/play/usePlayInvites'
-import type { PlayInviteTarget } from '@/core/hooks/data/play/usePlayInvites'
+import { groupCandidates, PlayInviteGroups } from '@/core/lib/play/inviteGroups'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_INVITE } from '@/declarations/ui/variants'
-import type { PlayCandidate } from '@/types/play'
+import type { PlayInviteCandidate } from '@/types/play'
 import { cn } from '@/utils/classnames'
 import { PlayInviteRoles } from '@/utils/constants/play'
-import type { PlayInviteRoleName } from '@/utils/constants/play'
 import { foldText } from '@/utils/format/strings'
 
 export interface PlayInvitePickerProps {
   sessionId: string
-  candidates: PlayCandidate[]
+  candidates: PlayInviteCandidate[]
   // Players can still sit down
   canSeat: boolean
   onDone: () => void
   alignEnd?: boolean
+  // Centred under its trigger
+  centered?: boolean
   // Opens over its trigger, at the foot of a column
   above?: boolean
   // Sits in the flow instead of floating
   inline?: boolean
+  // Lobby tools under the list
+  extras?: ReactNode
 }
 
 /**
- * Invite all of Memora, or chosen people, as players or spectators
+ * Search then one tap invites a member, online ones first
  * @param {PlayInvitePickerProps} props - Game and candidates
  * @return {JSX.Element}
  */
@@ -40,74 +44,73 @@ export const PlayInvitePicker = ({
   canSeat,
   onDone,
   alignEnd,
+  centered,
   above,
   inline,
+  extras,
 }: PlayInvitePickerProps) => {
   const { isSaving, invite } = usePlayInvites()
-  const [role, setRole] = useState<PlayInviteRoleName>(
-    canSeat ? PlayInviteRoles.Player : PlayInviteRoles.Spectator
-  )
-  const [isPicking, setPicking] = useState(false)
+  const online = usePlayOnline()
+  const [isSpectator, setSpectator] = useState(!canSeat)
   const [query, setQuery] = useState('')
-  const [chosen, setChosen] = useState<string[]>([])
+  const [sent, setSent] = useState<string[]>([])
 
+  const groups = useMemo(
+    () => groupCandidates(candidates, new Set(online.map((member) => member.accountId))),
+    [candidates, online]
+  )
+  // Live members first, then the lately seen ones
+  const sections = [
+    {
+      title: PLAY_HUB_COPY.inviteOnline,
+      people: [...groups[PlayInviteGroups.Online], ...groups[PlayInviteGroups.Recent]],
+    },
+    { title: PLAY_HUB_COPY.invitePlayedWith, people: groups[PlayInviteGroups.PlayedWith] },
+  ]
   const matches = useMemo(
     () => candidates.filter((entry) => foldText(entry.displayName).includes(foldText(query))),
     [candidates, query]
   )
-  const send = async (target: PlayInviteTarget) => {
-    if (await invite(sessionId, role, target)) onDone()
-  }
-  const flip = (id: string) =>
-    setChosen((current) =>
-      current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id]
-    )
-  const roles = [
-    ...(canSeat ? [{ value: PlayInviteRoles.Player, label: PLAY_HUB_COPY.inviteAsPlayer }] : []),
-    { value: PlayInviteRoles.Spectator, label: PLAY_HUB_COPY.inviteAsSpectator },
-  ]
+  const role = isSpectator ? PlayInviteRoles.Spectator : PlayInviteRoles.Player
   const EveryoneIcon = ICONS.playCall
-  const PeopleIcon = ICONS.playPlayers
-  const CheckIcon = ICONS.playTick
+  const CloseIcon = ICONS.playClose
+  const TickIcon = ICONS.playTick
+  const SpectatorIcon = ICONS.playSpectators
+
+  const send = async (id: string) => {
+    if (sent.includes(id)) return
+    if (await invite(sessionId, role, { accountIds: [id] })) setSent((current) => [...current, id])
+  }
+  const everyone = async () => {
+    if (await invite(sessionId, role, { everyone: true })) onDone()
+  }
 
   return (
-    <div
-      ref={(node) => {
-        if (!node || !inline) return
-        const trigger = node.previousElementSibling?.getBoundingClientRect()
-        const box = node.getBoundingClientRect()
-        if (trigger)
-          node.style.setProperty('--arrow-x', `${trigger.left + trigger.width / 2 - box.left}px`)
-        node.scrollIntoView({ block: 'nearest' })
-      }}
-      className={
-        inline
-          ? PLAY_INVITE.panelInline
-          : above
-            ? PLAY_INVITE.panelDock
-            : cn(PLAY_INVITE.panel, alignEnd && PLAY_INVITE.panelEnd)
-      }
-    >
-      {inline && <span aria-hidden="true" className={PLAY_INVITE.arrow} />}
-      <div className={PLAY_INVITE.roles}>
-        {roles.map((entry) => (
-          <button
-            key={entry.value}
-            type="button"
-            aria-pressed={role === entry.value}
-            className={cn(PLAY_INVITE.role, role === entry.value && PLAY_INVITE.roleOn)}
-            onClick={() => setRole(entry.value)}
-          >
-            {entry.label}
-          </button>
-        ))}
-      </div>
-
-      {isPicking ? (
-        <>
-          <button type="button" className={PLAY_INVITE.back} onClick={() => setPicking(false)}>
-            {PLAY_HUB_COPY.inviteBack}
-          </button>
+    <>
+      {!above && <div aria-hidden="true" className={PLAY_INVITE.scrim} onClick={onDone} />}
+      <div
+        ref={(node) => {
+          if (!node || !inline) return
+          const trigger = node.previousElementSibling?.getBoundingClientRect()
+          const box = node.getBoundingClientRect()
+          if (trigger)
+            node.style.setProperty('--arrow-x', `${trigger.left + trigger.width / 2 - box.left}px`)
+          node.scrollIntoView({ block: 'nearest' })
+        }}
+        className={
+          inline
+            ? PLAY_INVITE.panelInline
+            : above
+              ? PLAY_INVITE.panelDock
+              : cn(
+                  PLAY_INVITE.panel,
+                  alignEnd && PLAY_INVITE.panelEnd,
+                  centered && PLAY_INVITE.panelCentered
+                )
+        }
+      >
+        {!above && <span aria-hidden="true" className={PLAY_INVITE.arrow} />}
+        <div className={PLAY_INVITE.head}>
           <input
             autoFocus
             value={query}
@@ -116,54 +119,70 @@ export const PlayInvitePicker = ({
             className={PLAY_INVITE.search}
             onChange={(event) => setQuery(event.target.value)}
           />
-          <div className={PLAY_INVITE.people}>
-            {matches.length === 0 && (
-              <p className={PLAY_INVITE.empty}>{PLAY_HUB_COPY.inviteNobody}</p>
-            )}
-            {matches.map((entry) => {
-              const isOn = chosen.includes(entry.id)
-
-              return (
-                <button
-                  key={entry.id}
-                  type="button"
-                  aria-pressed={isOn}
-                  className={cn(PLAY_INVITE.person, isOn && PLAY_INVITE.personOn)}
-                  onClick={() => flip(entry.id)}
-                >
-                  <Avatar name={entry.displayName} src={entry.avatarUrl} size="xs" />
-                  {entry.displayName}
-                  {isOn && <CheckIcon className={PLAY_INVITE.check} />}
-                </button>
-              )
-            })}
-          </div>
-          <Button
-            variant="arcade"
-            disabled={chosen.length === 0}
-            isLoading={isSaving}
-            onClick={() => void send({ accountIds: chosen })}
-          >
-            {PLAY_HUB_COPY.inviteSend}
-          </Button>
-        </>
-      ) : (
-        <>
           <button
             type="button"
-            className={PLAY_INVITE.choice}
-            disabled={isSaving}
-            onClick={() => void send({ everyone: true })}
+            className={cn(PLAY_INVITE.close, PLAY_INVITE.closeMobile)}
+            aria-label={PLAY_HUB_COPY.inviteClose}
+            onClick={onDone}
           >
-            <EveryoneIcon className={PLAY_INVITE.choiceIcon} />
-            {PLAY_HUB_COPY.inviteEveryoneOption}
+            <CloseIcon className={PLAY_INVITE.closeIcon} aria-hidden="true" />
           </button>
-          <button type="button" className={PLAY_INVITE.choice} onClick={() => setPicking(true)}>
-            <PeopleIcon className={PLAY_INVITE.choiceIcon} />
-            {PLAY_HUB_COPY.invitePeopleOption}
-          </button>
-        </>
-      )}
-    </div>
+        </div>
+
+        <div className={PLAY_INVITE.people}>
+          {query.trim() !== '' ? (
+            <>
+              <PlayInviteSection people={matches} sent={sent} onSend={send} />
+              {matches.length === 0 && (
+                <p className={PLAY_INVITE.empty}>{PLAY_HUB_COPY.inviteNobody}</p>
+              )}
+            </>
+          ) : (
+            <>
+              {sections.map(({ title, people }) => (
+                <PlayInviteSection
+                  key={title}
+                  title={title}
+                  people={people}
+                  sent={sent}
+                  onSend={send}
+                />
+              ))}
+              {sections.every(({ people }) => people.length === 0) && (
+                <p className={PLAY_INVITE.empty}>{PLAY_HUB_COPY.inviteHint}</p>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className={PLAY_INVITE.foot}>
+          <div className={PLAY_INVITE.footGroup}>
+            <h3 className={PLAY_INVITE.sectionTitle}>{PLAY_HUB_COPY.inviteOptionsTitle}</h3>
+            <button
+              type="button"
+              className={PLAY_INVITE.choice}
+              disabled={isSaving}
+              onClick={everyone}
+            >
+              <EveryoneIcon className={PLAY_INVITE.choiceIcon} />
+              {PLAY_HUB_COPY.inviteEveryoneOption}
+            </button>
+            {canSeat && (
+              <button
+                type="button"
+                aria-pressed={isSpectator}
+                className={PLAY_INVITE.choice}
+                onClick={() => setSpectator((current) => !current)}
+              >
+                <SpectatorIcon className={PLAY_INVITE.choiceIcon} />
+                {PLAY_HUB_COPY.inviteSpectatorOption}
+                {isSpectator && <TickIcon className={PLAY_INVITE.check} />}
+              </button>
+            )}
+          </div>
+          {extras}
+        </div>
+      </div>
+    </>
   )
 }

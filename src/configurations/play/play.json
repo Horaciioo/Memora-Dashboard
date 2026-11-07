@@ -17,15 +17,33 @@
   },
   "rewards": {
     "minPlayers": 1,
-    "minSeconds": 60
+    "minSeconds": 60,
+    "botXpRatio": 0.4
   },
   "lobbyIdleMinutes": 30,
+  "group": {
+    "nameMax": 40,
+    "sizeMax": 12,
+    "perPlayerMax": 5,
+    "messageMax": 500,
+    "messagesShown": 60
+  },
+  "privateGames": {
+    "codeLength": 6,
+    "recentDays": 14
+  },
   "idle": {
     "gameMinutes": 15,
-    "emptyTableMinutes": 3
+    "emptyTableMinutes": 3,
+    "awaySeconds": 20,
+    "lostNoticeSeconds": 3
   },
   "seatColors": 15,
   "leaderboardSize": 20,
+  "historySize": 30,
+  "historyPage": 15,
+  "profileRecent": 5,
+  "profileTopGames": 3,
   "invites": {
     "pollSeconds": 60,
     "gapPx": 14,

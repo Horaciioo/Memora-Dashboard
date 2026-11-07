@@ -62,7 +62,7 @@ export const GolfViewKeys = ({
         </button>
         <button
           type="button"
-          className={cn(GOLF_BOARD.view, isFullscreen && GOLF_BOARD.viewOn)}
+          className={cn(GOLF_BOARD.view, GOLF_BOARD.viewDesktop, isFullscreen && GOLF_BOARD.viewOn)}
           aria-label={isFullscreen ? GOLF_BOARD_COPY.windowed : GOLF_BOARD_COPY.fullscreen}
           aria-pressed={isFullscreen}
           onClick={toggleFullscreen}
@@ -72,7 +72,7 @@ export const GolfViewKeys = ({
         {isFullscreen && (
           <button
             type="button"
-            className={cn(GOLF_BOARD.view, isChatOpen && GOLF_BOARD.viewOn)}
+            className={cn(GOLF_BOARD.view, GOLF_BOARD.viewDesktop, isChatOpen && GOLF_BOARD.viewOn)}
             aria-label={isChatOpen ? GOLF_BOARD_COPY.hideChat : GOLF_BOARD_COPY.showChat}
             aria-pressed={isChatOpen}
             onClick={toggleChat}

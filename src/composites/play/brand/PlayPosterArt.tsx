@@ -31,6 +31,14 @@ const SPARKS = [
   [332, 62, 5],
 ]
 
+// Sparkles around the notebook
+const STARS = [
+  [40, 60, 14],
+  [330, 90, 10],
+  [320, 330, 12],
+  [30, 400, 9],
+]
+
 // Rays behind the bomb
 const RAYS = Array.from({ length: 12 }, (_, index) => index * 30)
 
@@ -45,6 +53,52 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
         {Array.from({ length: 12 }, (_, index) => (
           <rect key={`h${index}`} x="0" y={index * 40} width="360" height="2" />
         ))}
+      </g>
+      <g transform="rotate(-6 180 250)">
+        <rect
+          x="46"
+          y="64"
+          width="268"
+          height="360"
+          rx="14"
+          {...tint(`${tone}-deep`, 0.5)}
+          transform="translate(0 10)"
+        />
+        <rect x="46" y="64" width="268" height="360" rx="14" fill="white" opacity="0.92" />
+        {Array.from({ length: 11 }, (_, index) => (
+          <rect
+            key={`l${index}`}
+            x="62"
+            y={108 + index * 28}
+            width="236"
+            height="2"
+            {...tint(`${tone}-glow`, 0.55)}
+          />
+        ))}
+        <rect x="86" y="64" width="2.5" height="360" {...tint('--play-alert', 0.55)} />
+        {[0, 1, 2, 3, 4, 5, 6].map((index) => (
+          <circle
+            key={`h${index}`}
+            cx="58"
+            cy={92 + index * 46}
+            r="5"
+            {...tint(`${tone}-deep`, 0.5)}
+          />
+        ))}
+      </g>
+      {STARS.map(([x, y, r]) => (
+        <path
+          key={`${x}-${y}`}
+          d={`M${x} ${y - r}L${x + r * 0.3} ${y - r * 0.3}L${x + r} ${y}L${x + r * 0.3} ${y + r * 0.3}L${x} ${y + r}L${x - r * 0.3} ${y + r * 0.3}L${x - r} ${y}L${x - r * 0.3} ${y - r * 0.3}z`}
+          {...tint('--play-gold', 0.9)}
+        />
+      ))}
+      <g transform="rotate(38 300 372)">
+        <rect x="236" y="362" width="128" height="22" rx="4" {...tint('--play-gold')} />
+        <rect x="236" y="362" width="128" height="7" rx="3" fill="white" opacity="0.4" />
+        <path d="M236 362L206 373L236 384z" fill="#f4d9b0" />
+        <path d="M218 369L206 373L218 377z" {...tint(`${tone}-deep`)} />
+        <rect x="350" y="362" width="22" height="22" rx="5" {...tint('--play-alert')} />
       </g>
       {TILES.map((tile) => (
         <g key={tile.letter} transform={`rotate(${tile.r} ${tile.x} ${tile.y})`}>
@@ -80,14 +134,36 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
   ),
   turf: (tone) => (
     <>
+      <g fill="white" opacity="0.85">
+        <ellipse cx="86" cy="86" rx="46" ry="15" />
+        <ellipse cx="116" cy="74" rx="30" ry="16" />
+        <ellipse cx="52" cy="76" rx="24" ry="12" />
+        <ellipse cx="190" cy="164" rx="34" ry="10" opacity="0.7" />
+      </g>
       <circle cx="270" cy="110" r="64" {...tint('--play-gold', 0.95)} />
       <circle cx="270" cy="110" r="96" {...tint('--play-gold', 0.18)} />
       <path d="M0 270C90 220 200 250 360 200V480H0z" {...tint(`${tone}-glow`, 0.55)} />
+      {[28, 70, 118].map((x) => (
+        <g key={x}>
+          <rect x={x - 3} y={236 - x / 14} width="6" height="22" rx="2" {...tint(`${tone}-deep`)} />
+          <circle cx={x} cy={228 - x / 14} r="18" {...tint(`${tone}-deep`, 0.9)} />
+          <circle cx={x - 5} cy={222 - x / 14} r="7" {...tint(`${tone}-glow`, 0.5)} />
+        </g>
+      ))}
       <path d="M0 320C120 280 230 330 360 280V480H0z" {...tint(tone)} />
+      <g {...tint(`${tone}-glow`, 0.22)}>
+        <path d="M30 322L90 306L130 344L36 360z" />
+        <path d="M150 316L214 330L240 372L130 388z" />
+        <path d="M250 296L330 292L360 340L270 352z" />
+      </g>
       <path d="M0 400C140 370 230 410 360 380V480H0z" {...tint(`${tone}-deep`, 0.7)} />
       <ellipse cx="236" cy="318" rx="52" ry="12" {...tint(`${tone}-deep`)} />
+      <ellipse cx="236" cy="316" rx="40" ry="8" fill="black" opacity="0.45" />
       <path d="M238 318V150" stroke="white" strokeWidth="7" strokeLinecap="round" />
       <path d="M241 152h82l-24 26 24 26h-82z" {...tint('--play-ludo')} />
+      <path d="M241 152h82l-8 8.7h-74z" fill="white" opacity="0.35" />
+      <path d="M241 196l82 0-8 8h-74z" fill="black" opacity="0.18" />
+      <circle cx="238" cy="148" r="5" {...tint('--play-gold')} />
       <path
         d="M70 360Q120 200 220 312"
         stroke="white"
@@ -99,6 +175,26 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
       />
       <ellipse cx="70" cy="378" rx="22" ry="6" fill="black" opacity="0.25" />
       <circle cx="70" cy="360" r="17" fill="white" />
+      <circle cx="64" cy="354" r="5" fill="black" opacity="0.08" />
+      <circle cx="76" cy="366" r="2.5" fill="black" opacity="0.14" />
+      <circle cx="63" cy="353" r="4" fill="white" />
+    </>
+  ),
+  sea: (tone) => (
+    <>
+      <circle cx="260" cy="170" r="150" {...tint('--play-naval-fire', 0.25)} />
+      <circle cx="260" cy="170" r="52" {...tint('--play-naval-fire', 0.6)} />
+      <path d="M0 270h360v210H0z" {...tint(`${tone}-deep`, 0.9)} />
+      <path d="M0 270c50-10 90 8 140 0s100-8 160 0l60 4v12H0z" {...tint(`${tone}-glow`, 0.35)} />
+      <g {...tint('--play-naval-night', 0.92)}>
+        <path d="M90 268h200l-18 30H112z" />
+        <rect x="160" y="236" width="70" height="32" rx="4" />
+        <rect x="186" y="198" width="16" height="38" />
+        <rect x="116" y="248" width="34" height="20" rx="3" />
+      </g>
+      <circle cx="110" cy="236" r="22" {...tint('--play-naval-hit', 0.9)} />
+      <circle cx="110" cy="236" r="11" fill="white" opacity="0.85" />
+      <path d="M270 330c6-44 3-76-8-98 26 20 40 58 32 98z" fill="white" opacity="0.7" />
     </>
   ),
   fuse: (tone) => (
@@ -110,7 +206,18 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
       </g>
       <circle cx="180" cy="300" r="150" {...tint(`${tone}-glow`, 0.2)} />
       <circle cx="180" cy="310" r="118" {...tint('--play-night')} />
+      <ellipse cx="180" cy="440" rx="104" ry="14" fill="black" opacity="0.3" />
+      <path
+        d="M100 300A84 84 0 0 1 150 232"
+        stroke="white"
+        strokeWidth="14"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.22"
+      />
       <circle cx="136" cy="268" r="28" fill="white" opacity="0.16" />
+      <path d="M236 372l-24-30 18 4-12-28 26 32-18-4z" {...tint('--play-gold', 0.9)} />
+      <circle cx="180" cy="310" r="118" fill="none" stroke="white" strokeWidth="2" opacity="0.1" />
       <rect
         x="186"
         y="170"
@@ -119,6 +226,16 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
         rx="10"
         {...tint('--play-night')}
         transform="rotate(28 214 192)"
+      />
+      <rect
+        x="180"
+        y="176"
+        width="64"
+        height="12"
+        rx="6"
+        transform="rotate(28 214 192)"
+        fill="white"
+        opacity="0.22"
       />
       <path
         d="M236 176C260 120 306 108 322 142"

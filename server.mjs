@@ -8,7 +8,7 @@ import { parseArgs } from 'node:util'
 import next from 'next'
 import { WebSocketServer } from 'ws'
 
-import realtime from './src/configurations/system/temps-reel.json' with { type: 'json' }
+import realtime from './src/configurations/system/realtime.json' with { type: 'json' }
 
 // Hub handed over by instrumentation, inside the Next bundle
 const HUB_WAIT_MS = 5000

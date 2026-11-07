@@ -5,24 +5,22 @@ import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/elements/actions/Button'
 import { BacPodium } from '@/composites/play/baccalaureat/BacPodium'
-import { BacRanking } from '@/composites/play/baccalaureat/BacRanking'
+import { BacScores } from '@/composites/play/baccalaureat/BacScores'
+import { BacHeader } from '@/composites/play/baccalaureat/BacHeader'
 import { BacReview } from '@/composites/play/baccalaureat/BacReview'
-import { BacStopBanner } from '@/composites/play/baccalaureat/BacStopBanner'
+import { BacVoteStatus } from '@/composites/play/baccalaureat/BacVoteStatus'
 import { BacWriting } from '@/composites/play/baccalaureat/BacWriting'
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
-import { secondsTo } from '@/composites/play/baccalaureat/types'
+import { BacSessionProgress } from '@/composites/play/session/BacSessionProgress'
+import { secondsTo, spanSeconds } from '@/composites/play/baccalaureat/types'
 import type { BacBoardView, BacPlayer } from '@/composites/play/baccalaureat/types'
 import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
 import { BaccalaureatPhases } from '@/core/lib/play/baccalaureat/phase'
-import { BAC_BOARD_COPY, BACCALAUREAT_SETTINGS, fillPlayMessage } from '@/declarations/play'
+import { BAC_BOARD_COPY, BAC_SESSION_COPY, BACCALAUREAT_SETTINGS } from '@/declarations/play'
 import { BAC_BOARD } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
 import { PlayGames } from '@/utils/constants/play'
-
-// Clock turns red under this
-const LOW_SECONDS = 10
 
 export interface BaccalaureatBoardProps {
   sessionId: string
@@ -72,31 +70,27 @@ export const BaccalaureatBoard = ({
 
   if (!round) return null
 
-  const stopper = players.find((player) => player.accountId === round.stoppedById)
+  const phase = round.phase
+  const stopper = players.find((player) => player.accountId === round.stoppedById) ?? null
+  const clockTotal =
+    phase === BaccalaureatPhases.Writing
+      ? spanSeconds(round.startsAt, round.endsAt)
+      : BACCALAUREAT_SETTINGS.reviewSeconds
+  const isClockOn =
+    left !== null && (phase === BaccalaureatPhases.Writing || phase === BaccalaureatPhases.Review)
+  const faces = players.map((player) => ({
+    id: player.accountId,
+    name: player.name,
+    avatarUrl: player.avatarUrl,
+  }))
   const header = (
-    <div className={BAC_BOARD.bar}>
-      <div className={BAC_BOARD.letterRow}>
-        {round.phase !== BaccalaureatPhases.Countdown && (
-          <span className={BAC_BOARD.letter}>{round.letter}</span>
-        )}
-        <span className={BAC_BOARD.round}>
-          {fillPlayMessage(BAC_BOARD_COPY.round, {
-            index: round.index + 1,
-            total: board.roundsTotal,
-          })}
-        </span>
-      </div>
-      {stopper && round.phase === BaccalaureatPhases.Writing ? (
-        <BacStopBanner stopper={stopper} />
-      ) : (
-        left !== null &&
-        round.phase !== BaccalaureatPhases.Countdown && (
-          <span className={cn(BAC_BOARD.clock, left <= LOW_SECONDS && BAC_BOARD.clockLow)}>
-            {left}
-          </span>
-        )
-      )}
-    </div>
+    <BacHeader
+      index={round.index}
+      total={board.roundsTotal}
+      letter={phase === BaccalaureatPhases.Countdown ? null : round.letter}
+      clock={isClockOn ? { left: left ?? 0, total: clockTotal } : null}
+      stopper={phase === BaccalaureatPhases.Writing ? stopper : null}
+    />
   )
 
   if (board.recap) {
@@ -108,7 +102,7 @@ export const BaccalaureatBoard = ({
     )
   }
 
-  if (round.phase === BaccalaureatPhases.Countdown) {
+  if (phase === BaccalaureatPhases.Countdown) {
     return (
       <div className={BAC_BOARD.board}>
         {header}
@@ -133,39 +127,73 @@ export const BaccalaureatBoard = ({
     )
   }
 
-  if (round.phase === BaccalaureatPhases.Writing) {
+  if (phase === BaccalaureatPhases.Writing) {
     return (
       <div className={BAC_BOARD.board}>
         {header}
-        <BacWriting
-          key={round.index}
-          sessionId={sessionId}
-          round={round}
-          settings={board.settings}
-          isSeated={me.isSeated}
+        <BacSessionProgress
+          players={faces}
+          done={board.done}
+          labels={{ done: BAC_SESSION_COPY.done, pending: BAC_SESSION_COPY.writing }}
         />
+        {!me.isSeated ? (
+          <div className={BAC_BOARD.wait}>
+            <p className={BAC_BOARD.waitLead}>{BAC_BOARD_COPY.watchWriting}</p>
+            <p className={BAC_BOARD.waitNote}>{BAC_BOARD_COPY.watchPatience}</p>
+          </div>
+        ) : (
+          <BacWriting
+            key={round.index}
+            sessionId={sessionId}
+            round={round}
+            settings={board.settings}
+            isSeated
+          />
+        )}
       </div>
     )
   }
 
-  const isScored = round.phase === BaccalaureatPhases.Scored
+  const isScored = phase === BaccalaureatPhases.Scored
+  const isLastRound = round.index + 1 >= board.roundsTotal
+  const review = (
+    <BacReview
+      sessionId={sessionId}
+      round={round}
+      settings={board.settings}
+      players={players}
+      viewerId={viewerId}
+      isScored={isScored}
+      canVote={me.isSeated}
+    />
+  )
 
   return (
-    <div className={BAC_BOARD.board}>
+    <div key={phase} className={BAC_BOARD.board}>
       {header}
-      <p className={BAC_BOARD.lead}>
-        {isScored ? BAC_BOARD_COPY.scores : BAC_BOARD_COPY.reviewLead}
-      </p>
-      <BacReview
-        sessionId={sessionId}
-        round={round}
-        settings={board.settings}
-        players={players}
-        viewerId={viewerId}
-        isScored={isScored}
-        canVote={me.isSeated}
-      />
-      {isScored && <BacRanking history={board.history} players={players} />}
+      {isScored ? (
+        <>
+          <BacScores history={board.history} players={players} roundIndex={round.index} />
+          <h3 className={BAC_BOARD.categoryName}>{BAC_BOARD_COPY.words}</h3>
+          {review}
+        </>
+      ) : (
+        <>
+          <BacSessionProgress
+            players={faces}
+            done={board.voted}
+            labels={{ done: BAC_SESSION_COPY.voted, pending: BAC_SESSION_COPY.voting }}
+          />
+          <p className={BAC_BOARD.lead}>{BAC_BOARD_COPY.voteLead}</p>
+          {review}
+          <BacVoteStatus
+            players={players}
+            voted={board.voted}
+            viewerId={viewerId}
+            isSeated={me.isSeated}
+          />
+        </>
+      )}
       <div className={BAC_BOARD.actions}>
         {me.isHost && (
           <Button
@@ -173,7 +201,11 @@ export const BaccalaureatBoard = ({
             isLoading={isSaving}
             onClick={() => void act({ type: isScored ? 'next' : 'count' })}
           >
-            {isScored ? BAC_BOARD_COPY.next : BAC_BOARD_COPY.count}
+            {isScored
+              ? isLastRound
+                ? BAC_BOARD_COPY.finish
+                : BAC_BOARD_COPY.next
+              : BAC_BOARD_COPY.count}
           </Button>
         )}
         {!me.isHost && isScored && (

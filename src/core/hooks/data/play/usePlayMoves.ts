@@ -7,9 +7,11 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { queueRefresh } from '@/core/lib/realtime/refresh'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { ROUTES } from '@/declarations/navigation'
+import { PLAY_BOT_COPY } from '@/declarations/play/bots'
 import { PLAY_HUB_COPY } from '@/declarations/play/hub'
+import { PLAY_FOLLOW_COPY } from '@/declarations/play/invites'
 import { GolfVoteActions } from '@/declarations/play/golf/vote'
-import type { PlayInviteRoleName } from '@/utils/constants/play'
+import type { PlayBotKindName, PlayInviteRoleName } from '@/utils/constants/play'
 
 /**
  * Player gestures of the Play pages
@@ -40,6 +42,18 @@ export const usePlayMoves = () => {
       go(
         () => apiPost<{ id: string }>(API_ROUTES.playSessions, { ...setup, game }),
         PLAY_HUB_COPY.created,
+        (session) => ROUTES.playSessionInvite(session.id)
+      ),
+    visibility: (id: string, isPrivate: boolean) =>
+      go(
+        () => apiPost(API_ROUTES.playVisibility(id), { isPrivate }),
+        isPrivate ? PLAY_HUB_COPY.madePrivate : PLAY_HUB_COPY.madePublic,
+        null
+      ),
+    joinCode: (code: string) =>
+      go(
+        () => apiPost<{ id: string }>(API_ROUTES.playJoinCode, { code }),
+        PLAY_HUB_COPY.joined,
         (session) => ROUTES.playSession(session.id)
       ),
     join: (id: string) =>
@@ -47,6 +61,12 @@ export const usePlayMoves = () => {
         () => apiPost(API_ROUTES.playJoin(id), {}),
         PLAY_HUB_COPY.joined,
         () => ROUTES.playSession(id)
+      ),
+    follow: (id: string, isFollowing: boolean) =>
+      go(
+        () => apiPost(API_ROUTES.playFollow(id), { follow: isFollowing }),
+        isFollowing ? PLAY_FOLLOW_COPY.followed : PLAY_FOLLOW_COPY.unfollowed,
+        null
       ),
     start: (id: string) =>
       go(() => apiPost(API_ROUTES.playStart(id), {}), PLAY_HUB_COPY.started, null),
@@ -69,6 +89,14 @@ export const usePlayMoves = () => {
         PLAY_HUB_COPY.cancelled,
         () => ROUTES.playGame(gameSlug)
       ),
+    bots: (id: string, level: PlayBotKindName, fill = false) =>
+      go(
+        () => apiPost(API_ROUTES.playBots(id), { level, fill }),
+        fill ? PLAY_BOT_COPY.filled : PLAY_BOT_COPY.added,
+        null
+      ),
+    // Quiet, the signal it raises refreshes the page
+    ready: (id: string, ready: boolean) => run(() => apiPost(API_ROUTES.playReady(id), { ready })),
     kick: (id: string, accountId: string) =>
       go(() => apiPost(API_ROUTES.playKick(id), { accountId }), PLAY_HUB_COPY.kicked, null),
     place: (id: string, accountId: string, role: PlayInviteRoleName) =>

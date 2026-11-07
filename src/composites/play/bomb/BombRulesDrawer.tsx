@@ -22,7 +22,7 @@ export const BombRulesDrawer = ({ open, onClose, settings }: BombRulesDrawerProp
     { label: BOMB_RULES_COPY.dictionary, value: BOMB_SETUP_COPY.dictionaryValue },
     {
       label: BOMB_RULES_COPY.difficulty,
-      value: `${BOMB_SETUP_COPY[settings.difficulty]} - ${fillPlayMessage(BOMB_SETUP_COPY.wordsPerPrompt, { count: wordsNeeded(settings) })}`,
+      value: `${BOMB_SETUP_COPY[settings.difficulty]} - ${fillPlayMessage(BOMB_SETUP_COPY.wordsPerPrompt, { count: wordsNeeded(settings).toLocaleString('fr-FR') })}`,
     },
     {
       label: BOMB_RULES_COPY.lives,

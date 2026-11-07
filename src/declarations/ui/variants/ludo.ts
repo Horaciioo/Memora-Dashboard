@@ -19,11 +19,17 @@ export const LUDO_BOARD = {
   // The viewer's turn: blue text, no box
   statusCall: 'text-[var(--play-ludo-call)]',
   frame: 'ludo-frame w-full [grid-area:board] lg:w-[min(36rem,calc(100dvh-13rem))]',
+  // The viewer's turn: the frame lights in their colour
+  frameMine: 'ludo-frame-mine',
+  // Call over the board as the turn comes
+  banner: 'ludo-banner',
+  bannerText: 'ludo-banner-text',
   surface: 'ludo-board',
   grid: 'absolute inset-0 size-full',
   starCell: 'ludo-star-cell',
   starLit: 'ludo-star-lit',
-  spectating: 'col-span-full text-center text-sm font-semibold text-[var(--play-ink-soft)]',
+  starShape: 'ludo-star-shape',
+  starShapeLit: 'ludo-star-shape-lit',
 } as const
 
 /**
@@ -44,7 +50,12 @@ export const LUDO_SLOTS = [
  */
 
 export const LUDO_PLATE = {
-  plate: 'flex min-w-0 flex-col gap-1.5 transition-opacity duration-[var(--motion-duration-panel)]',
+  plate:
+    'ludo-plate flex min-w-0 flex-col gap-1.5 transition-opacity duration-[var(--motion-duration-panel)]',
+  // Player on turn: lifted, ringed in their colour, tagged
+  plateTurn: 'ludo-plate-turn',
+  tagSlot: 'flex h-6 items-center',
+  tag: 'ludo-turn-tag',
   plateRight: 'ludo-plate-right items-end',
   off: 'opacity-45 grayscale',
   row: 'flex items-center gap-3',
@@ -72,7 +83,10 @@ export const LUDO_PLATE = {
  */
 
 export const LUDO_PIECES = {
-  die: 'ludo-die shrink-0',
+  dieStage: 'ludo-die-stage',
+  die: 'ludo-die',
+  dieFace: 'ludo-die-face',
+  dieShadow: 'ludo-die-shadow',
   dieReady: 'ludo-die-ready',
   dieRolling: 'ludo-die-rolling',
   pip: 'ludo-pip',
@@ -82,10 +96,26 @@ export const LUDO_PIECES = {
   pawnPick: 'ludo-pawn-pick',
   pawnArt: 'ludo-pawn-art',
   pawnHop: 'ludo-pawn-hop',
+  pawnHit: 'ludo-pawn-hit',
+  pawnFly: 'ludo-pawn-fly',
+  rank: 'ludo-rank',
+  rankLeft: 'ludo-rank-left',
   trail: 'ludo-trail',
   ghost: 'ludo-ghost',
   pawnButton:
     'block w-full rounded-full focus-visible:outline-2 focus-visible:outline-[var(--play-ludo-board)]',
+} as const
+
+/**
+ * Burst where a pawn is eaten
+ * @type {Record<string, string>}
+ */
+
+export const LUDO_IMPACT = {
+  burst: 'ludo-burst',
+  ring: 'ludo-burst-ring',
+  spark: 'ludo-burst-spark',
+  label: 'ludo-burst-label',
 } as const
 
 /**

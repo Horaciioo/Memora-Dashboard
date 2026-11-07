@@ -150,9 +150,42 @@
   --play-bomb-cap-deep: #34303d;
   --play-bomb-cord: #d8b77a;
   --play-heart: #ff4d5e;
+  --play-heart-gold: #ffc53d;
+  /* Bomb difficulty buttons, easiest to hardest */
+  --play-level-beginner: #2f7de1;
+  --play-level-easy: #2e9e5b;
+  --play-level-medium: #f2c230;
+  --play-level-hard: #f08a24;
+  --play-level-extreme: #e5484d;
+  --play-level-light-ink: #ffffff;
+  --play-level-dark-ink: #2b2110;
   /* Ember night of the bomb hub */
   --play-ember-night: #160906;
   --play-ember-dusk: #3a1206;
+  /* Naval battle: steel sea at dusk, fire and smoke */
+  --play-naval: #1f7aa8;
+  --play-naval-deep: #07253d;
+  --play-naval-glow: #8fd8ff;
+  --play-naval-night: #04111d;
+  --play-naval-sea: #0e4465;
+  --play-naval-sea-deep: #072a45;
+  --play-naval-wave: rgb(150 214 255 / 0.2);
+  --play-naval-line: rgb(150 214 255 / 0.22);
+  --play-naval-hull: #b4bfca;
+  --play-naval-hull-deep: #6c7a88;
+  --play-naval-deck: #8d9aa8;
+  --play-naval-mine: #d7e2ec;
+  --play-naval-mine-deep: #7e93a6;
+  --play-naval-wreck: #4a2a2a;
+  --play-naval-hit: #ff5a36;
+  --play-naval-fire: #ffb02e;
+  --play-naval-smoke: #2b2e33;
+  --play-naval-foam: #e8f7ff;
+  --play-naval-reticle: #ffe27a;
+  --play-naval-danger: #ff3b3b;
+  --play-naval-ink: #eaf6ff;
+  --play-naval-ink-soft: #a9c6dc;
+  --play-naval-panel: rgb(5 24 40 / 0.72);
   --play-ludo: #c9425a;
   --play-ludo-deep: #6b1631;
   --play-ludo-glow: #ffb0c0;
@@ -221,16 +254,27 @@
   --play-glass-solid: var(--play-night);
   --play-line: rgb(255 255 255 / 0.08);
   --play-ink: #ffffff;
+  /* Leaderboard medals, top to bottom of each box */
+  --play-medal-gold: #ffe58a, #e6b422;
+  --play-medal-silver: #f4f6fa, #aab2c0;
+  --play-medal-bronze: #f0bb8c, #b87238;
   --play-ink-soft: rgb(236 232 255 / 0.68);
   --play-ink-faint: rgb(236 232 255 / 0.42);
-  --play-key: var(--color-brand-500);
-  --play-key-deep: #b9466d;
+  --play-key: #e0709f;
+  --play-key-deep: #c94f85;
   --play-key-ink: var(--play-on-art);
   --play-core: var(--play-night);
   --play-track: rgb(0 0 0 / 0.35);
   --play-chip: rgb(0 0 0 / 0.35);
   --play-ring: var(--play-dusk);
   --play-gold: #ffcf4a;
+  /* Podium boxes */
+  --play-medal-gold: #f6c744;
+  --play-medal-silver: #cdd3dc;
+  --play-medal-bronze: #d9985a;
+  --play-medal-ink: #1f1a12;
+  /* Unread dot */
+  --play-alert: #f0384a;
   --play-gold-deep: #b37a00;
   /* Gold and blue as text */
   --play-gold-ink: var(--play-gold);

@@ -7,7 +7,7 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { ROUTES } from '@/declarations/navigation'
-import { fillPlayMessage, PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
+import { fillPlayMessage, PLAY_FOLLOW_COPY, PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_LIVE } from '@/declarations/ui/variants'
 import type { PlayLobbyCard } from '@/types/play'
 import { cn } from '@/utils/classnames'
@@ -107,28 +107,42 @@ export const PlayLiveTables = ({
                   {isMine ? (
                     <Button
                       variant="arcadeSmall"
+                      icon="playResume"
+                      className={PLAY_LIVE.action}
+                      aria-label={PLAY_HUB_COPY.resume}
                       onClick={() => router.push(ROUTES.playSession(table.id))}
-                    >
-                      {PLAY_HUB_COPY.resume}
-                    </Button>
+                    />
                   ) : (
                     <>
+                      <Button
+                        variant="arcadeGhostSmall"
+                        icon={table.isFollowed ? 'playUnfollow' : 'playFeed'}
+                        className={PLAY_LIVE.action}
+                        aria-label={
+                          table.isFollowed ? PLAY_FOLLOW_COPY.unfollow : PLAY_FOLLOW_COPY.follow
+                        }
+                        aria-pressed={table.isFollowed}
+                        isLoading={moves.isSaving}
+                        onClick={() => void moves.follow(table.id, !table.isFollowed)}
+                      />
                       {isRunning && (
                         <Button
                           variant="arcadeGhostSmall"
+                          icon="playSpectators"
+                          className={PLAY_LIVE.action}
+                          aria-label={PLAY_HUB_COPY.watch}
                           onClick={() => router.push(ROUTES.playSession(table.id))}
-                        >
-                          {PLAY_HUB_COPY.watch}
-                        </Button>
+                        />
                       )}
                       <Button
                         variant="arcadeSmall"
+                        icon="playInvite"
+                        className={PLAY_LIVE.action}
+                        aria-label={PLAY_HUB_COPY.join}
                         disabled={isLocked || isFull}
                         isLoading={moves.isSaving}
                         onClick={() => void moves.join(table.id)}
-                      >
-                        {PLAY_HUB_COPY.join}
-                      </Button>
+                      />
                     </>
                   )}
                 </div>

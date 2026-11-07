@@ -12,10 +12,24 @@ import type { PlayGameName } from '@/utils/constants/play'
 export const SESSION_INCLUDE = {
   seats: {
     orderBy: { joinedAt: 'asc' },
-    include: { account: { select: { id: true, displayName: true, avatarUrl: true } } },
+    include: {
+      account: { select: { id: true, displayName: true, avatarUrl: true, botKind: true } },
+    },
   },
   tournament: true,
-  rematch: { select: { id: true, status: true } },
+  rematch: {
+    select: {
+      id: true,
+      status: true,
+      hostId: true,
+      // Who was called and who sat down since
+      invites: {
+        where: { inviteeId: { not: null } },
+        select: { id: true, inviteeId: true, answeredAt: true },
+      },
+      seats: { select: { accountId: true, leftAt: true, kickedAt: true } },
+    },
+  },
 } as const satisfies Prisma.PlaySessionInclude
 
 export type LoadedSession = Prisma.PlaySessionGetPayload<{ include: typeof SESSION_INCLUDE }>

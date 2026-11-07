@@ -1,9 +1,6 @@
-'use client'
-
-import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 
-import { LUDO_PIPS } from '@/declarations/play/ludo/board'
+import { LUDO_DIE_FACES, LUDO_PIPS } from '@/declarations/play/ludo/board'
 import { LUDO_BOARD_COPY } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { LUDO_PIECES } from '@/declarations/ui/variants'
@@ -23,36 +20,14 @@ export interface LudoDieProps {
 }
 
 /**
- * Face shown while the die tumbles, a new one each beat
- * @param {boolean} isRolling - Tumbling
- * @return {number} - Face
- */
-
-const useShuffledFace = (isRolling: boolean): number => {
-  const [face, setFace] = useState(FACES[0])
-
-  useEffect(() => {
-    if (!isRolling) return
-    const timer = window.setInterval(
-      () => setFace(FACES[Math.floor(Math.random() * FACES.length)]),
-      LUDO_SETTINGS.shuffleMs
-    )
-
-    return () => window.clearInterval(timer)
-  }, [isRolling])
-
-  return face
-}
-
-/**
- * Flat white die with pips, jumping and spinning onto the face rolled
+ * White cube thrown in high, tumbling on every axis before it settles on the face rolled
  * @param {LudoDieProps} props - Die
  * @return {JSX.Element}
  */
 
 export const LudoDie = ({ face, isRolling, canRoll, onRoll }: LudoDieProps) => {
-  const shuffled = useShuffledFace(isRolling)
-  const shown = isRolling ? shuffled : (face ?? FACES[FACES.length - 1])
+  const shown = face ?? FACES[FACES.length - 1]
+  const [turnX, turnY] = LUDO_DIE_FACES[shown].turn
 
   return (
     <button
@@ -63,20 +38,39 @@ export const LudoDie = ({ face, isRolling, canRoll, onRoll }: LudoDieProps) => {
       className={cn(LUDO_PIECES.dieButton, canRoll && LUDO_PIECES.dieReady)}
     >
       <span
-        className={cn(LUDO_PIECES.die, isRolling && LUDO_PIECES.dieRolling)}
+        className={cn(LUDO_PIECES.dieStage, isRolling && LUDO_PIECES.dieRolling)}
         style={{ '--roll': `${LUDO_SETTINGS.rollMs}ms` } as CSSProperties}
       >
-        {PIP_CELLS.map((cell) =>
-          LUDO_PIPS[shown].includes(cell) ? (
+        <span className={LUDO_PIECES.dieShadow} />
+        <span
+          className={LUDO_PIECES.die}
+          style={{ '--turn-x': `${turnX}deg`, '--turn-y': `${turnY}deg` } as CSSProperties}
+        >
+          {FACES.map((side) => (
             <span
-              key={cell}
-              className={LUDO_PIECES.pip}
-              style={{
-                gridArea: `${Math.ceil(cell / PIP_SIDE)} / ${((cell - 1) % PIP_SIDE) + 1}`,
-              }}
-            />
-          ) : null
-        )}
+              key={side}
+              className={LUDO_PIECES.dieFace}
+              style={
+                {
+                  transform: LUDO_DIE_FACES[side].place,
+                  '--shade': LUDO_DIE_FACES[side].shade,
+                } as CSSProperties
+              }
+            >
+              {PIP_CELLS.map((cell) =>
+                LUDO_PIPS[side].includes(cell) ? (
+                  <span
+                    key={cell}
+                    className={LUDO_PIECES.pip}
+                    style={{
+                      gridArea: `${Math.ceil(cell / PIP_SIDE)} / ${((cell - 1) % PIP_SIDE) + 1}`,
+                    }}
+                  />
+                ) : null
+              )}
+            </span>
+          ))}
+        </span>
       </span>
     </button>
   )

@@ -13,10 +13,19 @@ import { BOMB_BOARD } from '@/declarations/ui/variants'
  * @param {Object} props - Field
  * @param {string} props.sessionId - Game
  * @param {string} props.initial - Text already typed
+ * @param {string | null} props.refused - Word just refused
  * @return {JSX.Element}
  */
 
-export const BombInput = ({ sessionId, initial }: { sessionId: string; initial: string }) => {
+export const BombInput = ({
+  sessionId,
+  initial,
+  refused,
+}: {
+  sessionId: string
+  initial: string
+  refused: string | null
+}) => {
   const { act, isSaving } = usePlayAct(sessionId)
   // Typing runs apart, the button never spins on it
   const typing = usePlayAct(sessionId)
@@ -26,6 +35,18 @@ export const BombInput = ({ sessionId, initial }: { sessionId: string; initial: 
 
   // Focus as the bomb lands
   useEffect(() => field.current?.focus(), [])
+
+  // Refused word wiped as it lands
+  const [wiped, setWiped] = useState<string | null>(null)
+  if (refused && refused !== wiped) {
+    setWiped(refused)
+    setText('')
+  }
+
+  // Ready to retype
+  useEffect(() => {
+    if (refused) field.current?.focus()
+  }, [refused])
 
   // Drop the queued keystroke on leave
   useEffect(

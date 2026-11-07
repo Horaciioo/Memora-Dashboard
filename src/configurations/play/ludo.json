@@ -18,14 +18,12 @@
     "captureReplay": true,
     "homeReplay": true,
     "forcedCapture": false,
-    "safeSquares": true,
-    "exactFinish": true
+    "safeSquares": true
   },
   "maxSixes": 3,
   "graceSeconds": 1,
   "stepMs": 280,
   "rollMs": 700,
-  "shuffleMs": 80,
   "alertSeconds": 5,
   "feedSize": 40
 }

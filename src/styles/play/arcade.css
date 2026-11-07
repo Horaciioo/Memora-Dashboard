@@ -48,90 +48,6 @@
   mask-image: linear-gradient(to top, black 10%, transparent 85%);
 }
 
-/* Chunky key with its own depth */
-.play-key {
-  border-radius: 1rem;
-  background: var(--play-key);
-  color: var(--play-key-ink);
-  box-shadow:
-    0 0.3rem 0 var(--play-key-deep),
-    inset 0 1px 0 rgb(255 255 255 / 0.45);
-  transition:
-    transform var(--motion-duration-fast) ease-out,
-    box-shadow var(--motion-duration-fast) ease-out;
-}
-
-.play-key:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    0 0.4rem 0 var(--play-key-deep),
-    inset 0 1px 0 rgb(255 255 255 / 0.45);
-}
-
-.play-key:active {
-  transform: translateY(0.25rem);
-  box-shadow: 0 0.05rem 0 var(--play-key-deep);
-}
-
-.play-key-ghost {
-  background: var(--play-panel-strong);
-  color: var(--play-ink);
-  box-shadow:
-    0 0.25rem 0 rgb(0 0 0 / 0.35),
-    inset 0 0 0 1px var(--play-line);
-}
-
-.play-key-ghost:hover {
-  box-shadow:
-    0 0.35rem 0 rgb(0 0 0 / 0.35),
-    inset 0 0 0 1px var(--play-line);
-}
-
-/* Hero key, same depth, just larger */
-.play-key-hero:disabled {
-  background: var(--play-panel-strong);
-  color: var(--play-ink-faint);
-  box-shadow: inset 0 0 0 1px var(--play-line);
-}
-
-/* Invite key, orange with the same depth */
-.play-key-orange {
-  background: var(--play-bomb);
-  color: var(--play-on-art);
-  box-shadow:
-    0 0.3rem 0 var(--play-bomb-deep),
-    inset 0 1px 0 rgb(255 255 255 / 0.35);
-}
-
-.play-key-orange:hover {
-  box-shadow:
-    0 0.4rem 0 var(--play-bomb-deep),
-    inset 0 1px 0 rgb(255 255 255 / 0.35);
-}
-
-.play-key-orange:active {
-  box-shadow: 0 0.05rem 0 var(--play-bomb-deep);
-}
-
-/* Destructive key, same depth as the others */
-.play-key-danger {
-  background: var(--color-danger);
-  color: var(--color-on-solid);
-  box-shadow:
-    0 0.3rem 0 color-mix(in srgb, var(--color-danger) 62%, black),
-    inset 0 1px 0 rgb(255 255 255 / 0.35);
-}
-
-.play-key-danger:hover {
-  box-shadow:
-    0 0.4rem 0 color-mix(in srgb, var(--color-danger) 62%, black),
-    inset 0 1px 0 rgb(255 255 255 / 0.35);
-}
-
-.play-key-danger:active {
-  box-shadow: 0 0.05rem 0 color-mix(in srgb, var(--color-danger) 62%, black);
-}
-
 /* Game card lifts and its art drifts */
 .play-card {
   transition:
@@ -161,7 +77,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .play-key,
+  .key,
   .play-card,
   .play-card .play-art {
     transition: none;
@@ -397,26 +313,26 @@
 
 /* Vote: cards pop in one by one, leave on a pick, the band and titles wipe in */
 .golf-vote-card {
-  animation: golf-vote-in 460ms cubic-bezier(0.3, 1.4, 0.5, 1) calc(var(--i, 0) * 70ms) both;
+  animation: golf-vote-in 460ms cubic-bezier(0.3, 1.4, 0.5, 1) calc(var(--i, 0) * 70ms) backwards;
 }
 
 .golf-vote-band {
   transform-origin: center;
-  animation: golf-vote-band 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: golf-vote-band 520ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
 
 .golf-vote-title {
-  animation: golf-vote-title 480ms cubic-bezier(0.3, 1.3, 0.5, 1) both;
+  animation: golf-vote-title 480ms cubic-bezier(0.3, 1.3, 0.5, 1) backwards;
 }
 
 .golf-vote-slide {
-  animation: golf-vote-slide 520ms linear both;
+  animation: golf-vote-slide 520ms linear backwards;
 }
 
 .golf-vote-arc {
   display: block;
   transform-origin: bottom center;
-  animation: golf-vote-arc 520ms linear both;
+  animation: golf-vote-arc 520ms linear backwards;
 }
 
 .golf-vote-float {
@@ -499,11 +415,11 @@
     color-mix(in srgb, var(--play-golf-frost) 78%, transparent) 100%
   );
   box-shadow: inset 0 0 4rem 0.4rem color-mix(in srgb, var(--play-golf-ice-deep) 55%, transparent);
-  animation: golf-frost-in 900ms ease-out both;
+  animation: golf-frost-in 900ms ease-out backwards;
 }
 
 .golf-frost-melt {
-  animation: golf-frost-out 3s ease-in both;
+  animation: golf-frost-out 3s ease-in backwards;
 }
 
 @keyframes golf-frost-in {
@@ -528,7 +444,7 @@
 
 /* Victory of a holed ball: white flash, turning rays, trophy slam, flying squares */
 .golf-cheer-flash {
-  animation: golf-cheer-flash 700ms ease-out both;
+  animation: golf-cheer-flash 700ms ease-out backwards;
 }
 
 .golf-cheer-rays {
@@ -540,15 +456,15 @@
   mask-image: radial-gradient(circle, black 0 20%, transparent 68%);
   animation:
     golf-cheer-rays var(--cheer-ms) linear both,
-    golf-cheer-life var(--cheer-ms) ease-out both;
+    golf-cheer-life var(--cheer-ms) ease-out backwards;
 }
 
 .golf-cheer-card {
-  animation: golf-cheer-card var(--cheer-ms) var(--motion-ease-out) both;
+  animation: golf-cheer-card var(--cheer-ms) var(--motion-ease-out) backwards;
 }
 
 .golf-cheer-spark {
-  animation: golf-cheer-spark 1100ms var(--motion-ease-out) var(--delay) both;
+  animation: golf-cheer-spark 1100ms var(--motion-ease-out) var(--delay) backwards;
 }
 
 @keyframes golf-cheer-flash {
@@ -675,6 +591,27 @@
   animation-delay: 160ms;
 }
 
+/* Each phase of a round rises in */
+.play-phase {
+  animation: play-rise-content var(--motion-duration-panel) var(--motion-ease-out) backwards;
+}
+
+/* Score rows rise in turn, their bar grows from the old total */
+.play-score-row {
+  animation: play-rise-content var(--motion-duration-panel) var(--motion-ease-out) backwards;
+  animation-delay: calc(var(--row, 0) * 90ms);
+}
+
+.play-score-bar {
+  animation: play-score-bar 1100ms var(--motion-ease-out) 400ms backwards;
+}
+
+@keyframes play-score-bar {
+  from {
+    scale: var(--bar-from, 0) 1;
+  }
+}
+
 /* Thought bubbles pop from the key upwards */
 .play-pop {
   animation: play-pop 220ms var(--motion-ease-out) backwards;
@@ -753,6 +690,9 @@
 @media (prefers-reduced-motion: reduce) {
   .play-rise,
   .play-rise-item,
+  .play-phase,
+  .play-score-row,
+  .play-score-bar,
   .play-side-in,
   .play-side-out,
   .play-pop {
@@ -781,7 +721,7 @@
 
 /* Each new number drops in and settles */
 .play-tick {
-  animation: play-tick 700ms var(--motion-ease-out) both;
+  animation: play-tick 700ms var(--motion-ease-out) backwards;
 }
 
 @keyframes play-tick {
@@ -809,7 +749,7 @@
 
 /* XP won floats up and fades the higher it goes */
 .play-xp {
-  animation: play-xp 2600ms ease-out both;
+  animation: play-xp 2600ms ease-out backwards;
   translate: -50% 0;
 }
 
@@ -830,7 +770,7 @@
 
 /* Level up bursts in, holds, then fades */
 .play-level {
-  animation: play-level 3200ms var(--motion-ease-out) both;
+  animation: play-level 3200ms var(--motion-ease-out) backwards;
 }
 
 @keyframes play-level {
@@ -863,11 +803,11 @@
 
 /* Power icon spins up and fades out */
 .golf-cue {
-  animation: golf-cue 1600ms var(--motion-ease-out) both;
+  animation: golf-cue 1600ms var(--motion-ease-out) backwards;
 }
 
 .golf-cue > :nth-child(2) {
-  animation: golf-cue-spin 1600ms var(--motion-ease-out) both;
+  animation: golf-cue-spin 1600ms var(--motion-ease-out) backwards;
 }
 
 @keyframes golf-cue {
@@ -938,7 +878,7 @@
 
 /* The STOP shout lands hard */
 .play-stop {
-  animation: play-stop 520ms var(--motion-ease-spring) both;
+  animation: play-stop 520ms var(--motion-ease-spring) backwards;
 }
 
 @keyframes play-stop {
@@ -961,7 +901,7 @@
   height: var(--h);
   background: var(--tone);
   border-radius: 2px;
-  animation: play-confetti var(--dur) var(--delay) cubic-bezier(0.2, 0.6, 0.35, 1) both;
+  animation: play-confetti var(--dur) var(--delay) cubic-bezier(0.2, 0.6, 0.35, 1) backwards;
 }
 
 @keyframes play-confetti {
@@ -1101,14 +1041,43 @@
   filter: drop-shadow(0 0 0.5rem var(--play-bomb));
 }
 
-/* The bomb breathes, faster on the edge */
+/* The bomb breathes, faster and wider as it heats */
 .play-bomb {
-  animation: play-bomb-breathe 1.6s ease-in-out infinite;
+  animation: play-bomb-breathe calc(1.6s - 1.15s * var(--heat, 0)) ease-in-out infinite;
 }
 
 @keyframes play-bomb-breathe {
   50% {
-    scale: 1.04;
+    scale: calc(1.03 + 0.07 * var(--heat, 0));
+  }
+}
+
+/* Shell glowing hot */
+.play-bomb-heat {
+  opacity: calc(var(--heat, 0) * 0.6);
+}
+
+/* Spark swelling with the heat */
+.play-bomb-spark-grow {
+  transform-box: fill-box;
+  transform-origin: center;
+  scale: calc(1 + var(--heat, 0) * 0.9);
+  transition: scale 200ms linear;
+}
+
+/* Last stretch: the shell shivers */
+.play-bomb-tremble {
+  animation: play-bomb-tremble 90ms linear infinite alternate;
+}
+
+@keyframes play-bomb-tremble {
+  from {
+    translate: calc(var(--heat, 0) * -2px) 0;
+    rotate: -1.4deg;
+  }
+  to {
+    translate: calc(var(--heat, 0) * 2px) calc(var(--heat, 0) * 1.5px);
+    rotate: 1.4deg;
   }
 }
 
@@ -1173,6 +1142,180 @@
   }
 }
 
+/* Shockwave ring and flying sparks */
+.play-bomb-shockwave,
+.play-bomb-shockwave::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 0.4rem solid var(--play-bomb-glow);
+  pointer-events: none;
+  animation: play-bomb-wave 950ms var(--motion-ease-out) forwards;
+}
+
+.play-bomb-shockwave::after {
+  border-color: var(--play-bomb);
+  animation-delay: 140ms;
+  opacity: 0;
+}
+
+@keyframes play-bomb-wave {
+  from {
+    opacity: 1;
+    scale: 0.3;
+  }
+  to {
+    opacity: 0;
+    scale: 2.6;
+  }
+}
+
+.play-bomb-debris {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.5rem;
+  height: 1.3rem;
+  margin: -0.65rem 0 0 -0.25rem;
+  border-radius: 9999px;
+  background: linear-gradient(var(--play-bomb-glow), var(--play-bomb));
+  pointer-events: none;
+  animation: play-bomb-fly 850ms var(--motion-ease-out) forwards;
+}
+
+@keyframes play-bomb-fly {
+  from {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(-1.5rem);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-9rem) scaleY(0.3);
+  }
+}
+
+/* Red pulse behind the player hit */
+.play-bomb-hit::after {
+  content: '';
+  position: absolute;
+  inset: -0.5rem;
+  z-index: -1;
+  border-radius: 9999px;
+  background: radial-gradient(circle, var(--color-danger) 0%, transparent 70%);
+  pointer-events: none;
+  animation: play-bomb-hit 1100ms var(--motion-ease-out) forwards;
+}
+
+@keyframes play-bomb-hit {
+  from {
+    opacity: 0.9;
+    scale: 0.6;
+  }
+  to {
+    opacity: 0;
+    scale: 1.8;
+  }
+}
+
+/* Heart won: pop, ring and a floating tag */
+.play-heart-gain {
+  animation: play-heart-pop 900ms var(--motion-ease-out);
+}
+
+@keyframes play-heart-pop {
+  0% {
+    scale: 0.2;
+  }
+  35% {
+    scale: 1.8;
+    rotate: -12deg;
+  }
+  60% {
+    scale: 0.9;
+    rotate: 6deg;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+.play-heart-lose {
+  animation: play-heart-break 480ms var(--motion-ease-out);
+}
+
+@keyframes play-heart-break {
+  from {
+    scale: 1.35;
+  }
+}
+
+.play-heart-burst {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid var(--play-heart);
+  pointer-events: none;
+  animation: play-heart-burst 750ms var(--motion-ease-out) forwards;
+}
+
+@keyframes play-heart-burst {
+  from {
+    opacity: 1;
+    scale: 0.5;
+  }
+  to {
+    opacity: 0;
+    scale: 2.8;
+  }
+}
+
+.play-heart-tag {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  translate: -50% 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--play-heart);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+  pointer-events: none;
+  animation: play-heart-tag 1500ms var(--motion-ease-out) forwards;
+}
+
+@keyframes play-heart-tag {
+  from {
+    opacity: 1;
+    translate: -50% 0.4rem;
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: -50% -0.9rem;
+  }
+}
+
+/* Ceiling reached: golden hearts, glowing */
+.play-hearts-max svg,
+.play-hearts-max .play-heart-tag {
+  color: var(--play-heart-gold);
+}
+
+.play-hearts-max {
+  animation: play-hearts-glow 1800ms ease-in-out infinite alternate;
+}
+
+@keyframes play-hearts-glow {
+  from {
+    filter: drop-shadow(0 0 0.1rem var(--play-heart-gold));
+  }
+  to {
+    filter: drop-shadow(0 0 0.55rem var(--play-heart-gold));
+  }
+}
+
 /* The player hit shakes */
 .play-bomb-shake {
   animation: play-bomb-shake 480ms ease-in-out;
@@ -1195,6 +1338,15 @@
   .play-bomb-spark,
   .play-bomb-blast,
   .play-bomb-blast::after,
+  .play-bomb-tremble,
+  .play-bomb-shockwave,
+  .play-bomb-shockwave::after,
+  .play-bomb-debris,
+  .play-bomb-hit::after,
+  .play-heart-gain,
+  .play-heart-lose,
+  .play-heart-burst,
+  .play-hearts-max,
   .play-bomb-shake {
     animation: none;
   }
@@ -1362,4 +1514,52 @@
 
 ::view-transition-old(play-room) {
   display: none;
+}
+
+/* Phone tab change: the page slides from the tab side */
+@utility play-slide-right {
+  --play-slide-from: 30%;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: play-slide 260ms var(--motion-ease-out) backwards;
+  }
+}
+
+@utility play-slide-left {
+  --play-slide-from: -30%;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: play-slide 260ms var(--motion-ease-out) backwards;
+  }
+}
+
+@utility play-slide-up {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: play-rise-content 220ms var(--motion-ease-out) backwards;
+  }
+}
+
+@keyframes play-slide {
+  from {
+    opacity: 0;
+    translate: var(--play-slide-from) 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Heavy decor cut from the Play settings */
+.play-room[data-light] :is(.play-floor, .play-floor *, .play-art, .play-art *) {
+  animation: none !important;
+}
+
+/* Page title: Minecraft-style block letters, a short depth rising behind the face */
+.play-title {
+  width: 100%;
+  padding-top: 0.1em;
+  text-shadow:
+    0 -0.025em 0 color-mix(in srgb, var(--play-key) 55%, black),
+    0 -0.05em 0 color-mix(in srgb, var(--play-key) 45%, black),
+    0 -0.075em 0 color-mix(in srgb, var(--play-key) 35%, black),
+    0 0.05em 0.08em rgb(0 0 0 / 0.2);
 }

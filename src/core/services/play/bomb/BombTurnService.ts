@@ -12,7 +12,7 @@ import {
   isTableOver,
   missOf,
   nextTurn,
-  wordsNeeded,
+  wordsRange,
 } from '@/core/lib/play/bomb'
 import type { BombGameSettings } from '@/core/lib/play/bomb'
 import { drawPrompt } from '@/core/lib/play/bomb/prompts'
@@ -77,7 +77,7 @@ const withTable = (
 
 export const openTable = async (session: EngineSession): Promise<EngineStep> => {
   const settings = bombSettingsOf(session.settings)
-  const prompt = await drawPrompt(wordsNeeded(settings))
+  const prompt = await drawPrompt(wordsRange(settings))
   const startsAt = countdownEnd(new Date(), BOMB_SETTINGS.countdownSeconds)
   const explodesAt = after(startsAt, fuseSeconds(BOMB_SETTINGS.fuseSeconds))
 
@@ -199,7 +199,7 @@ const blast = async (table: BombTable): Promise<EngineStep> => {
   return passBomb(
     table,
     {
-      prompt: isStale ? await drawPrompt(wordsNeeded(settings), table.table.prompt) : undefined,
+      prompt: isStale ? await drawPrompt(wordsRange(settings), table.table.prompt) : undefined,
       promptAge: isStale ? 0 : age,
       explodesAt: after(now, fuseSeconds(BOMB_SETTINGS.fuseSeconds)),
       blastAt: now,
@@ -299,7 +299,7 @@ export const submitWord = (
     }
 
     return passBomb(table, {
-      prompt: await drawPrompt(wordsNeeded(settings), table.table.prompt),
+      prompt: await drawPrompt(wordsRange(settings), table.table.prompt),
       promptAge: 0,
       explodesAt: fuseForNext(table),
     })

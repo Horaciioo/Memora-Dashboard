@@ -171,12 +171,14 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
               fill={`url(#${gold})`}
               className={cn(LUDO_BOARD.starCell, isLit && LUDO_BOARD.starLit)}
             />
+            {/* Outline when free; gilded and swollen when held, its points left showing around the pawn */}
             <polygon
               points={starPoints(x, y)}
-              fill="none"
+              fill={isLit ? `url(#${gold})` : 'none'}
               stroke={isLit ? 'var(--play-ludo-star-lit-line)' : 'var(--play-ludo-star)'}
-              strokeWidth="0.045"
+              strokeWidth={isLit ? 0.06 : 0.045}
               strokeLinejoin="round"
+              className={cn(LUDO_BOARD.starShape, isLit && LUDO_BOARD.starShapeLit)}
             />
           </g>
         )

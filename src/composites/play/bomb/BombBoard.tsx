@@ -7,9 +7,10 @@ import { BombLetters } from '@/composites/play/bomb/BombLetters'
 import { BombResult } from '@/composites/play/bomb/BombResult'
 import { BombTable } from '@/composites/play/bomb/BombTable'
 import type { BombBoardView, BombFace } from '@/composites/play/bomb/types'
-import { useBombSounds } from '@/composites/play/bomb/useBombSounds'
+import { blastOf, useBombSounds } from '@/composites/play/bomb/useBombSounds'
 import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
+import { bombHeat } from '@/core/lib/play/bomb/table'
 import { BOMB_BOARD_COPY, BOMB_SETTINGS, fillPlayMessage } from '@/declarations/play'
 import { BOMB_BOARD } from '@/declarations/ui/variants'
 import { PlayGames } from '@/utils/constants/play'
@@ -45,15 +46,17 @@ export const BombBoard = ({
   })
 
   const countdown = secondsTo(board.startsAt, now)
-  useBombSounds(board, countdown)
+  // Lit at the start, again at each blast
+  const litAt = Math.max(new Date(board.startsAt).getTime(), blastOf(board))
+  const heat = countdown === 0 ? bombHeat(now - litAt, BOMB_SETTINGS.fuseSeconds.max) : 0
+  useBombSounds(board, countdown, heat)
 
   if (board.isOver) return <BombResult seats={seats} />
 
   const holder = seats.find((seat) => seat.accountId === board.turnId)
   // Viewer's letters, the holder's when watching
   const reader = seats.find((seat) => seat.accountId === viewerId) ?? holder
-  const isBlasting =
-    board.blast !== null && now - new Date(board.blast.at).getTime() < BOMB_SETTINGS.blastFlashMs
+  const isBlasting = board.blast !== null && now - blastOf(board) < BOMB_SETTINGS.blastFlashMs
   const isMyTurn = board.isMyTurn && countdown === 0
 
   return (
@@ -78,6 +81,7 @@ export const BombBoard = ({
           draft={board.draft}
           miss={board.miss}
           blastId={isBlasting ? (board.blast?.accountId ?? null) : null}
+          heat={heat}
           maxLives={board.settings.maxLives}
         />
 
@@ -91,12 +95,12 @@ export const BombBoard = ({
         {isMyTurn && (
           <BombInput
             // Same key whether the board came as a page or a push
-            key={`${board.prompt}:${board.blast ? new Date(board.blast.at).getTime() : ''}`}
+            key={`${board.prompt}:${blastOf(board) || ''}`}
             sessionId={sessionId}
             initial={board.draft}
+            refused={board.miss?.word ?? null}
           />
         )}
-        {!isSeated && <p className={BOMB_BOARD.lead}>{BOMB_BOARD_COPY.spectating}</p>}
       </div>
     </div>
   )

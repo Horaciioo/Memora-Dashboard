@@ -6,7 +6,9 @@ import { Button } from '@/components/elements/actions/Button'
 import type { BacBoardView, BacRoundView } from '@/composites/play/baccalaureat/types'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { BAC_BOARD_COPY, fillPlayMessage } from '@/declarations/play'
+import { ICONS } from '@/declarations/ui/icons'
 import { BAC_BOARD } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 // Pause before a draft is saved
 const SAVE_DELAY_MS = 600
@@ -49,6 +51,9 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
 
   const isStopped = Boolean(round.stoppedById)
   const isFull = settings.categories.every((entry) => words[entry.id]?.trim())
+  // Button only when the host switched manual stop on
+  const hasStopButton = settings.stop && !settings.autoStop
+  const DoneIcon = ICONS.playTick
   const stop = async () => {
     await drafts.act({ type: 'write', answers: words })
     await act({ type: 'stop' })
@@ -57,25 +62,38 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
   return (
     <div className={BAC_BOARD.board}>
       <div className={BAC_BOARD.fields}>
-        {settings.categories.map((entry) => (
-          <label key={entry.id} className={BAC_BOARD.field}>
-            <span className={BAC_BOARD.fieldLabel}>{entry.label}</span>
-            <input
-              className={BAC_BOARD.input}
-              value={words[entry.id] ?? ''}
-              disabled={!isSeated || isStopped}
-              autoComplete="off"
-              placeholder={fillPlayMessage(BAC_BOARD_COPY.wordPlaceholder, {
-                letter: round.letter,
-              })}
-              onChange={(event) =>
-                setWords((current) => ({ ...current, [entry.id]: event.target.value }))
-              }
-            />
-          </label>
-        ))}
+        {settings.categories.map((entry, index) => {
+          const isFilled = Boolean(words[entry.id]?.trim())
+
+          return (
+            <label key={entry.id} className={BAC_BOARD.field}>
+              <span className={cn(BAC_BOARD.fieldIndex, isFilled && BAC_BOARD.fieldDone)}>
+                {isFilled ? (
+                  <DoneIcon className={BAC_BOARD.fieldIcon} aria-hidden="true" />
+                ) : (
+                  index + 1
+                )}
+              </span>
+              <span className={BAC_BOARD.fieldBody}>
+                <span className={BAC_BOARD.fieldLabel}>{entry.label}</span>
+                <input
+                  className={BAC_BOARD.input}
+                  value={words[entry.id] ?? ''}
+                  disabled={!isSeated || isStopped}
+                  autoComplete="off"
+                  placeholder={fillPlayMessage(BAC_BOARD_COPY.wordPlaceholder, {
+                    letter: round.letter,
+                  })}
+                  onChange={(event) =>
+                    setWords((current) => ({ ...current, [entry.id]: event.target.value }))
+                  }
+                />
+              </span>
+            </label>
+          )
+        })}
       </div>
-      {isSeated && settings.stop && !isStopped && (
+      {isSeated && hasStopButton && !isStopped && (
         <div className={BAC_BOARD.actions}>
           <Button
             variant="arcade"

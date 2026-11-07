@@ -13,8 +13,8 @@ import {
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
 import type { BombGameSettings } from '@/core/lib/play/bomb/settings'
 import { BOMB_SETTINGS, BOMB_SETUP_COPY, fillPlayMessage, PLAY_ERRORS } from '@/declarations/play'
-import type { BombDifficulty } from '@/declarations/play'
-import { BOMB_SETUP, FIELD_STYLES } from '@/declarations/ui/variants'
+import type { BombDifficulty, BombLevel } from '@/declarations/play'
+import { BOMB_LEVEL_CHIPS, BOMB_SETUP, FIELD_STYLES } from '@/declarations/ui/variants'
 
 // Tabs of the drawer
 const TABS = [
@@ -24,10 +24,15 @@ const TABS = [
 ]
 
 // Levels as chips, their threshold under the name
-const DIFFICULTIES: { value: BombDifficulty; label: string }[] = [
-  ...Object.entries(BOMB_SETTINGS.wordsPerPrompt).map(([value, count]) => ({
-    value: value as BombDifficulty,
-    label: `${BOMB_SETUP_COPY[value as keyof typeof BOMB_SETTINGS.wordsPerPrompt]} - ${fillPlayMessage(BOMB_SETUP_COPY.wordsPerPrompt, { count })}`,
+const DIFFICULTIES: {
+  value: BombDifficulty
+  label: string
+  classes?: { idle: string; on: string }
+}[] = [
+  ...(Object.keys(BOMB_SETTINGS.wordsPerPrompt) as BombLevel[]).map((value) => ({
+    value,
+    label: `${BOMB_SETUP_COPY[value]} - ${fillPlayMessage(BOMB_SETUP_COPY.wordsPerPrompt, { count: BOMB_SETTINGS.wordsPerPrompt[value].toLocaleString('fr-FR') })}`,
+    classes: BOMB_LEVEL_CHIPS[value],
   })),
   { value: 'custom', label: BOMB_SETUP_COPY.custom },
 ]

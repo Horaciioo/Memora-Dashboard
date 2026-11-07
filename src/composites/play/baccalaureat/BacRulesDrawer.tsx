@@ -3,7 +3,12 @@
 import { clockLabel } from '@/composites/play/baccalaureat/clockLabel'
 import { PlayRulesDrawer } from '@/composites/play/rules/PlayRulesDrawer'
 import type { BaccalaureatGameSettings } from '@/core/lib/play/baccalaureat/settings'
-import { BAC_RULES_COPY, BACCALAUREAT_SETTINGS, fillPlayMessage } from '@/declarations/play'
+import {
+  BAC_RULES_COPY,
+  BACCALAUREAT_SETTINGS,
+  BACCALAUREAT_SHARING,
+  fillPlayMessage,
+} from '@/declarations/play'
 
 export interface BacRulesDrawerProps {
   open: boolean
@@ -45,6 +50,7 @@ export const BacRulesDrawer = ({
     { label: BAC_RULES_COPY.rounds, value: String(settings.rounds) },
     { label: BAC_RULES_COPY.roundSeconds, value: clockLabel(settings.roundSeconds) },
     { label: BAC_RULES_COPY.stop, value: stop },
+    { label: BAC_RULES_COPY.sharing, value: BACCALAUREAT_SHARING[settings.sharedRule].label },
     {
       label: BAC_RULES_COPY.type,
       value: tournamentGames

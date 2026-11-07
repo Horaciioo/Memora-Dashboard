@@ -6,7 +6,7 @@ import { BOMB_SETTINGS } from '@/declarations/play'
 // Survives dev hot reloads
 const globalForPrompts = globalThis as unknown as {
   bombPrompts?: Promise<Map<string, number>>
-  bombPools?: Map<number, string[]>
+  bombPools?: Map<string, string[]>
 }
 
 /**
@@ -33,35 +33,49 @@ const countSyllables = (words: Set<string>): Map<string, number> => {
 }
 
 /**
- * Syllables fitting enough words
- * @param {number} minWords - Threshold
+ * Words a syllable may fit
+ * @typedef {Object} PromptRange
+ */
+
+export interface PromptRange {
+  min: number
+  // Excluded
+  max: number
+}
+
+/**
+ * Syllables fitting a band of words
+ * @param {PromptRange} range - Bounds
  * @return {Promise<string[]>} - Pool
  */
 
-const poolOf = async (minWords: number): Promise<string[]> => {
+const poolOf = async ({ min, max }: PromptRange): Promise<string[]> => {
   const pools = (globalForPrompts.bombPools ??= new Map())
-  const cached = pools.get(minWords)
+  const key = `${min}-${max}`
+  const cached = pools.get(key)
   if (cached) return cached
 
   const counts = await (globalForPrompts.bombPrompts ??= frenchWords().then(countSyllables))
-  const pool = [...counts].filter(([, count]) => count >= minWords).map(([slice]) => slice)
-  pools.set(minWords, pool)
+  const pool = [...counts]
+    .filter(([, count]) => count >= min && count < max)
+    .map(([slice]) => slice)
+  pools.set(key, pool)
 
   return pool
 }
 
 /**
  * Draw a syllable other than the last one
- * @param {number} minWords - Threshold
+ * @param {PromptRange} range - Word band
  * @param {string} [previous] - Prompt to avoid
  * @return {Promise<string>} - Syllable
  */
 
-export const drawPrompt = async (minWords: number, previous?: string): Promise<string> => {
-  const pool = await poolOf(minWords)
+export const drawPrompt = async (range: PromptRange, previous?: string): Promise<string> => {
+  const pool = await poolOf(range)
   const choices = pool.length > 1 ? pool.filter((slice) => slice !== previous) : pool
-  // Easiest syllable when the threshold is out of reach
-  if (!choices.length) return (await poolOf(1))[0]
+  // Any syllable when the band is empty
+  if (!choices.length) return (await poolOf({ min: 1, max: Infinity }))[0]
 
   return choices[Math.floor(Math.random() * choices.length)]
 }

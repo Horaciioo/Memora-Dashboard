@@ -54,7 +54,18 @@ export const clearDeadline = (sessionId: string): void => {
  * @return {string} - Key
  */
 
-export const timerKey = (kind: 'idle' | 'away', sessionId: string): string => `${kind}:${sessionId}`
+export const timerKey = (kind: 'idle' | 'away' | 'bot', sessionId: string): string =>
+  `${kind}:${sessionId}`
+
+/**
+ * Bot move timer key
+ * @param {string} sessionId - Game
+ * @param {string} botId - Bot
+ * @return {string} - Key
+ */
+
+export const botTimerKey = (sessionId: string, botId: string): string =>
+  `${timerKey('bot', sessionId)}:${botId}`
 
 /**
  * Drop every pending timer of a game
@@ -66,4 +77,7 @@ export const clearSessionTimers = (sessionId: string): void => {
   clearDeadline(sessionId)
   clearDeadline(timerKey('idle', sessionId))
   clearDeadline(timerKey('away', sessionId))
+  // Every bot of the table
+  const bots = `${timerKey('bot', sessionId)}:`
+  for (const key of [...timers.keys()]) if (key.startsWith(bots)) clearDeadline(key)
 }

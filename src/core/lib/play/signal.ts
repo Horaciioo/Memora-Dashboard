@@ -49,14 +49,28 @@ export const signalChat = async (sessionId: string, message: PlayMessageView): P
 
 /**
  * Tell members their invitations moved
- * @param {string[] | null} inviteeIds - Members, null for all of Memora
+ * @param {string[] | null} accountIds - Members, null for all of Memora
  * @return {Promise<void>} - Sent
  */
 
-export const signalInvites = async (inviteeIds: string[] | null): Promise<void> => {
-  await publishLive(PLAY_TOPICS.invites, {
+export const signalNotices = async (accountIds: string[] | null): Promise<void> => {
+  await publishLive(PLAY_TOPICS.notices, {
     type: PLAY_STREAM_EVENTS.changed,
-    inviteeIds,
+    accountIds,
+    at: Date.now(),
+  })
+}
+
+/**
+ * Tell group members their group moved
+ * @param {string[]} accountIds - Members and invited
+ * @return {Promise<void>} - Sent
+ */
+
+export const signalGroups = async (accountIds: string[]): Promise<void> => {
+  await publishLive(PLAY_TOPICS.groups, {
+    type: PLAY_STREAM_EVENTS.changed,
+    accountIds,
     at: Date.now(),
   })
 }

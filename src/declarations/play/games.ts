@@ -5,6 +5,8 @@ import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { LUDO_FELT } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
+import { NAVAL_SEA } from '@/declarations/play/naval/copy'
+import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { PLAY_PAPER } from '@/declarations/play/paper'
 import { BACCALAUREAT_SETTINGS } from '@/declarations/play/settings'
 import { PlayGames } from '@/utils/constants/play'
@@ -90,6 +92,18 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: LUDO_FELT.ground,
     minPlayers: LUDO_SETTINGS.minPlayers,
     maxPlayers: LUDO_SETTINGS.maxPlayers,
+    playable: true,
+  },
+  [PlayGames.Naval]: {
+    label: 'Bataille navale',
+    slug: 'bataille-navale',
+    tagline: 'Place ta flotte, devine où l’ennemi se cache, coule-le avant qu’il te coule.',
+    tone: '--play-naval',
+    logo: 'playNaval',
+    backdrop: 'sea',
+    ground: NAVAL_SEA.ground,
+    minPlayers: NAVAL_SETTINGS.minPlayers,
+    maxPlayers: NAVAL_SETTINGS.maxPlayers,
     playable: true,
   },
 })

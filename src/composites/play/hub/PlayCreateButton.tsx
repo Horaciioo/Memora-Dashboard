@@ -1,10 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-
 import { Button } from '@/components/elements/actions/Button'
 import { Tip } from '@/components/elements/feedback/Tip'
-import { PLAY_SETUP_DRAWERS } from '@/composites/play/registry'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_HUB } from '@/declarations/ui/variants'
@@ -17,6 +14,8 @@ export interface PlayCreateButtonProps {
   // Said on hover while locked
   lockedReason?: string | null
   className?: string
+  // Words of the button, create by default
+  label?: string
 }
 
 /**
@@ -30,21 +29,20 @@ export const PlayCreateButton = ({
   disabled,
   lockedReason,
   className,
+  label = PLAY_HUB_COPY.create,
 }: PlayCreateButtonProps) => {
   const moves = usePlayMoves()
-  const [isSetupOpen, setSetupOpen] = useState(false)
 
-  // Games with rules ask them first
-  const Setup = PLAY_SETUP_DRAWERS[game]
+  // Default rules, the lobby lets the host tune them
   const button = (
     <Button
       variant="arcade"
       className={className}
       disabled={disabled}
       isLoading={moves.isSaving}
-      onClick={() => (Setup ? setSetupOpen(true) : void moves.create(game))}
+      onClick={() => void moves.create(game)}
     >
-      {PLAY_HUB_COPY.create}
+      {label}
     </Button>
   )
 
@@ -56,14 +54,6 @@ export const PlayCreateButton = ({
         </Tip>
       ) : (
         button
-      )}
-      {Setup && (
-        <Setup
-          open={isSetupOpen}
-          isSaving={moves.isSaving}
-          onClose={() => setSetupOpen(false)}
-          onSubmit={(setup) => void moves.create(game, { ...setup })}
-        />
       )}
     </>
   )

@@ -5,18 +5,19 @@ import type { CSSProperties } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { PlayInviteSentence } from '@/composites/play/invites/PlayInviteSentence'
-import { usePlayInviteAnswer } from '@/core/hooks/data/play/usePlayInviteAnswer'
+import { usePlayNoticeAnswer } from '@/core/hooks/data/play/usePlayNoticeAnswer'
 import { useBellSpot } from '@/core/hooks/interaction/layout/useBellSpot'
+import { noticeLabels } from '@/core/lib/play/notices'
 import { playKeysOf } from '@/declarations/play/games'
 import { PLAY_INVITE_COPY, PLAY_INVITE_SETTINGS } from '@/declarations/play/invites'
 import { PLAY_INVITE_CALL } from '@/declarations/ui/variants'
-import type { PlayInviteView } from '@/types/play'
+import type { PlayNoticeView } from '@/types/play'
 import { cn } from '@/utils/classnames'
 
 /**
  * Invitation springing from the notifications bell, accept to go straight to the game
  * @param {Object} props - Bubble
- * @param {PlayInviteView} props.invite - Invitation
+ * @param {PlayNoticeView} props.invite - Invitation
  * @param {string} [props.beacon] - Key aimed at, the bell by default
  * @param {string} [props.className] - Extra classes
  * @return {JSX.Element | null}
@@ -27,12 +28,13 @@ export const PlayInviteBubble = ({
   beacon,
   className,
 }: {
-  invite: PlayInviteView
+  invite: PlayNoticeView
   beacon?: string
   className?: string
 }) => {
   const spot = useBellSpot(true, beacon)
-  const { isSaving, accept, decline } = usePlayInviteAnswer(invite)
+  const { isSaving, accept, decline } = usePlayNoticeAnswer(invite)
+  const labels = noticeLabels(invite)
   // Without a bell on screen (fullscreen game), pinned top centre
   const place: Record<string, string | number> = spot
     ? {
@@ -62,14 +64,14 @@ export const PlayInviteBubble = ({
         <div className={PLAY_INVITE_CALL.body}>
           <span className={PLAY_INVITE_CALL.eyebrow}>{PLAY_INVITE_COPY.eyebrow}</span>
           <p className={PLAY_INVITE_CALL.text}>
-            <PlayInviteSentence invite={invite} nameClassName={PLAY_INVITE_CALL.name} />
+            <PlayInviteSentence notice={invite} nameClassName={PLAY_INVITE_CALL.name} />
           </p>
           <div className={PLAY_INVITE_CALL.actions}>
             <Button variant="arcadeSmall" isLoading={isSaving} onClick={() => void accept()}>
-              {PLAY_INVITE_COPY.accept}
+              {labels.accept}
             </Button>
             <Button variant="arcadeGhostSmall" disabled={isSaving} onClick={decline}>
-              {PLAY_INVITE_COPY.decline}
+              {labels.decline}
             </Button>
           </div>
         </div>

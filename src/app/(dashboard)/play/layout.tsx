@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { PlayShell } from '@/composites/play/hub/PlayShell'
-import { listInvites, readPlayPresence, readPlayProfile } from '@/core/services/play'
+import { listNotices, readPlayGroup, readPlayPresence, readPlayProfile } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -14,10 +14,11 @@ import { Permissions } from '@/utils/constants/permissions'
 
 export default async function PlayLayout({ children }: { children: ReactNode }) {
   const { session } = await requirePermission(Permissions.PlayAccess)
-  const [profile, invites, presence] = await Promise.all([
+  const [profile, invites, presence, group] = await Promise.all([
     readPlayProfile(session.id),
-    listInvites(session.id),
+    listNotices(session.id),
     readPlayPresence(session.id),
+    readPlayGroup(session.id),
   ])
 
   return (
@@ -26,6 +27,7 @@ export default async function PlayLayout({ children }: { children: ReactNode }) 
         profile,
         invites,
         presence,
+        groupCalls: group.invitations.length,
         player: { name: session.displayName, avatarUrl: session.avatarUrl },
       }}
     >

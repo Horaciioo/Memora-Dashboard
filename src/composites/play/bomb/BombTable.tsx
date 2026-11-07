@@ -21,6 +21,8 @@ export interface BombTableProps {
   miss: { word: string; reason: BombMissReason } | null
   // Player the bomb just went off on
   blastId: string | null
+  // Zero to one
+  heat: number
   maxLives: number
 }
 
@@ -37,6 +39,7 @@ export const BombTable = ({
   draft,
   miss,
   blastId,
+  heat,
   maxLives,
 }: BombTableProps) => {
   const index = seats.findIndex((seat) => seat.accountId === turnId)
@@ -54,7 +57,12 @@ export const BombTable = ({
           aria-hidden="true"
         />
       )}
-      <BombDrawing prompt={prompt} isBlasting={Boolean(blastId)} className={BOMB_BOARD.center} />
+      <BombDrawing
+        prompt={prompt}
+        heat={heat}
+        isBlasting={Boolean(blastId)}
+        className={BOMB_BOARD.center}
+      />
 
       {seats.map((seat, place) => {
         const isTurn = seat.accountId === turnId

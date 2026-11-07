@@ -4,9 +4,11 @@ import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
-import { pickSeatColor, readBodyInteger, readBodyText } from '@/core/lib/play'
+import { mayEnter } from '@/core/lib/play/access'
+import { cleanJoinCode } from '@/core/lib/play/joinCode'
+import { pickSeatColor, readBodyInteger, readBodyText, seatBoundsOf } from '@/core/lib/play'
 import { clearSessionTimers } from '@/core/lib/play/timers'
-import { signalLobbies, signalPlay } from '@/core/lib/play/signal'
+import { signalNotices, signalLobbies, signalPlay } from '@/core/lib/play/signal'
 import { PLAY_ERRORS, PLAY_GAMES, PLAY_JOURNAL, PLAY_SETTINGS } from '@/declarations/play'
 import { announceInChat } from '@/core/services/play/PlayChatService'
 import { sweepIdleGames } from '@/core/services/play/PlayIdleService'
@@ -16,6 +18,7 @@ import {
   currentSessionId,
   engineOf,
   ensureAllowed,
+  freeJoinCode,
   openSessionIds,
   lockSession,
   requireHost,
@@ -23,8 +26,15 @@ import {
 } from '@/core/services/play/PlaySessionService'
 import { isPresent, SESSION_INCLUDE } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
+import { followedAmong } from '@/core/services/play/PlayFollowService'
 import { toLobbyCard } from '@/core/lib/play/views'
-import { PlayMessageKinds, PlayStatuses } from '@/utils/constants/play'
+import {
+  PLAY_OPEN_STATUSES,
+  PlayInviteRoles,
+  PlayMessageKinds,
+  PlayStatuses,
+  PlayVisibilities,
+} from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { MINUTE_MS } from '@/utils/constants/time'
 
@@ -74,9 +84,11 @@ export const createSession = async (accountId: string, raw: Record<string, unkno
   const game = gameNamed(readBodyText(raw, 'game', PLAY_ERRORS.unknownGame))
   const settings = engineOf(game).readSettings(settingsOf(raw), null)
   const games = tournamentLength(raw)
+  const isPrivate = raw.visibility === PlayVisibilities.Private
 
   const session = await prisma.$transaction(async (tx) => {
     await ensureAllowed(tx, accountId)
+    const joinCode = isPrivate ? await freeJoinCode(tx) : null
     const tournament = games
       ? await tx.playTournament.create({ data: { game, hostId: accountId, gamesCount: games } })
       : null
@@ -86,6 +98,8 @@ export const createSession = async (accountId: string, raw: Record<string, unkno
         game,
         hostId: accountId,
         settings,
+        visibility: isPrivate ? PlayVisibilities.Private : PlayVisibilities.Public,
+        joinCode,
         tournamentId: tournament?.id,
         tournamentIndex: tournament ? 0 : null,
         seats: { create: { accountId, color: pickSeatColor([]) } },
@@ -106,6 +120,9 @@ export const createSession = async (accountId: string, raw: Record<string, unkno
 
   return session
 }
+
+// Private games never show in the lists
+const OPEN_TO_ALL = { visibility: PlayVisibilities.Public } as const
 
 /**
  * Lobbies waiting for players, and the reader's own game
@@ -128,21 +145,35 @@ export const listLobbies = async (accountId: string, game?: string | null) => {
   // Running games welcome spectators
   const [lobbies, running, current] = await Promise.all([
     prisma.playSession.findMany({
-      where: { status: PlayStatuses.Lobby, ...(game && { game: gameNamed(game) }) },
+      where: { ...OPEN_TO_ALL, status: PlayStatuses.Lobby, ...(game && { game: gameNamed(game) }) },
       orderBy: { createdAt: 'desc' },
       include: SESSION_INCLUDE,
     }),
     prisma.playSession.findMany({
-      where: { status: PlayStatuses.Running, ...(game && { game: gameNamed(game) }) },
+      where: {
+        ...OPEN_TO_ALL,
+        status: PlayStatuses.Running,
+        ...(game && { game: gameNamed(game) }),
+      },
       orderBy: { startedAt: 'desc' },
       include: SESSION_INCLUDE,
     }),
     currentSessionId(accountId, game ? gameNamed(game) : undefined),
   ])
 
+  // Tables the reader follows
+  const followed = await followedAmong(
+    accountId,
+    [...lobbies, ...running].map((table) => table.id)
+  )
+  const toCard = (table: (typeof lobbies)[number]) => ({
+    ...toLobbyCard(table),
+    isFollowed: followed.has(table.id),
+  })
+
   return {
-    lobbies: lobbies.map(toLobbyCard),
-    running: running.map(toLobbyCard),
+    lobbies: lobbies.map(toCard),
+    running: running.map(toCard),
     currentId: current,
   }
 }
@@ -163,10 +194,12 @@ export const joinSession = async (sessionId: string, accountId: string): Promise
     const seat = session.seats.find((entry) => entry.accountId === accountId)
     if (seat?.kickedAt) throw forbidden(PLAY_ERRORS.kicked)
     if (seat && isPresent(seat)) return null
+    if (!(await mayEnter(tx, session, accountId))) throw forbidden(PLAY_ERRORS.privateGame)
     if (session.status !== PlayStatuses.Lobby) return REQUESTED
 
     const present = session.seats.filter(isPresent)
-    if (present.length >= PLAY_GAMES.get(session.game).maxPlayers) throw conflict(PLAY_ERRORS.full)
+    if (present.length >= seatBoundsOf(session.game, session.settings).max)
+      throw conflict(PLAY_ERRORS.full)
     await ensureAllowed(tx, accountId)
 
     // Back in the lobby, or a new seat
@@ -224,7 +257,10 @@ const afterDeparture = async (
   session: LoadedSession,
   accountId: string
 ): Promise<void> => {
-  const remaining = session.seats.filter((seat) => isPresent(seat) && seat.accountId !== accountId)
+  // Bots alone never keep a table
+  const remaining = session.seats.filter(
+    (seat) => isPresent(seat) && seat.accountId !== accountId && !seat.account.botKind
+  )
 
   // Empty table, nothing left to play
   if (!remaining.length) {
@@ -280,6 +316,9 @@ export const leaveSession = async (
   })
   await announceInChat(sessionId, accountId, PlayMessageKinds.Left)
   await signalPlay(sessionId, true)
+  // A running game reacts at once, a forfeit counts now
+  const { settleSession } = await import('@/core/services/play/GameService')
+  await settleSession(sessionId).catch(() => undefined)
   if (!quiet) {
     await journalPlay({
       eventType: 'PlayLeft',
@@ -444,21 +483,24 @@ export const updateSettings = async (
         ...(await tournamentLink(tx, session, raw)),
       },
     })
+    // New rules, everyone confirms again
+    await tx.playSeat.updateMany({ where: { sessionId }, data: { readyAt: null } })
   })
   await signalPlay(sessionId, true)
 }
 
 /**
- * Host replays a finished game with the same table
+ * A player replays a finished game: they host the new table, the others are called to it
  * @param {string} sessionId - Finished game
- * @param {string} hostId - Host
+ * @param {string} accountId - Player proposing
  * @return {Promise<{ id: string }>} - New lobby
  */
 
-export const rematchSession = async (sessionId: string, hostId: string) => {
+export const rematchSession = async (sessionId: string, accountId: string) => {
+  let called: string[] = []
   const id = await prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, sessionId)
-    requireHost(session, hostId)
+    requireSeat(session, accountId)
     if (session.status !== PlayStatuses.Finished) throw conflict(PLAY_ERRORS.notFinished)
     if (session.tournamentId) throw conflict(PLAY_ERRORS.rematchTournament)
 
@@ -468,9 +510,93 @@ export const rematchSession = async (sessionId: string, hostId: string) => {
       select: { id: true },
     })
 
-    return known?.id ?? cloneTable(tx, session, { rematchOfId: sessionId })
+    if (known) return known.id
+
+    // Bots follow on their own, people answer
+    const next = await cloneTable(tx, session, { rematchOfId: sessionId }, { hostId: accountId })
+    called = session.seats
+      .filter((seat) => isPresent(seat) && !seat.account.botKind && seat.accountId !== accountId)
+      .map((seat) => seat.accountId)
+    await tx.playInvite.createMany({
+      data: called.map((inviteeId) => ({
+        sessionId: next,
+        inviterId: accountId,
+        inviteeId,
+        role: PlayInviteRoles.Player,
+      })),
+    })
+
+    return next
   })
   await signalPlay(sessionId, true)
+  await signalNotices(called)
 
   return { id }
+}
+
+/**
+ * Enter a private game with its code
+ * @param {string} accountId - Member
+ * @param {Record<string, unknown>} raw - Body with code
+ * @return {Promise<{ id: string }>} - Game to open
+ */
+
+export const joinByCode = async (accountId: string, raw: Record<string, unknown>) => {
+  const code = cleanJoinCode(readBodyText(raw, 'code', PLAY_ERRORS.codeUnknown))
+  const session = await prisma.playSession.findUnique({
+    where: { joinCode: code },
+    select: { id: true, status: true, hostId: true },
+  })
+  if (!session || !PLAY_OPEN_STATUSES.includes(session.status)) {
+    throw notFound(PLAY_ERRORS.codeUnknown)
+  }
+
+  // The code is the invitation: a seat in the lobby, a place to watch later
+  const isLobby = session.status === PlayStatuses.Lobby
+  await prisma.playInvite.upsert({
+    where: { sessionId_inviteeId: { sessionId: session.id, inviteeId: accountId } },
+    create: {
+      sessionId: session.id,
+      inviterId: session.hostId,
+      inviteeId: accountId,
+      role: isLobby ? PlayInviteRoles.Player : PlayInviteRoles.Spectator,
+      answeredAt: new Date(),
+    },
+    update: {},
+  })
+  if (isLobby) await joinSession(session.id, accountId)
+
+  return { id: session.id }
+}
+
+/**
+ * Host opens or closes a game to the lists
+ * @param {string} sessionId - Game
+ * @param {string} hostId - Host
+ * @param {Record<string, unknown>} raw - Body with isPrivate
+ * @return {Promise<void>} - Saved
+ */
+
+export const setVisibility = async (
+  sessionId: string,
+  hostId: string,
+  raw: Record<string, unknown>
+): Promise<void> => {
+  const isPrivate = raw.isPrivate === true
+  await prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, sessionId)
+    requireHost(session, hostId)
+    if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
+
+    // A code only lives with a private game
+    await tx.playSession.update({
+      where: { id: sessionId },
+      data: {
+        visibility: isPrivate ? PlayVisibilities.Private : PlayVisibilities.Public,
+        joinCode: isPrivate ? (session.joinCode ?? (await freeJoinCode(tx))) : null,
+      },
+    })
+  })
+  await signalPlay(sessionId, true)
+  await signalLobbies()
 }

@@ -3,7 +3,7 @@ import { BOMB_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 /**
- * Bonus letters in a column, the gathered ones lit
+ * Bonus letters in a column, the used ones struck
  * @param {Object} props - Letters
  * @param {string[]} props.alphabet - Letters to use
  * @param {string[]} props.gathered - Letters used
@@ -19,7 +19,10 @@ export const BombLetters = ({ alphabet, gathered }: { alphabet: string[]; gather
     {alphabet.map((letter) => (
       <span
         key={letter}
-        className={cn(BOMB_BOARD.letter, gathered.includes(letter) && BOMB_BOARD.letterOn)}
+        className={cn(
+          BOMB_BOARD.letter,
+          gathered.includes(letter) ? BOMB_BOARD.letterUsed : BOMB_BOARD.letterFree
+        )}
       >
         {letter}
       </span>

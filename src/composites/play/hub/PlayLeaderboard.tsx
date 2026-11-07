@@ -2,21 +2,18 @@
 
 import { useState } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { Button } from '@/components/elements/actions/Button'
+import { PlayLeaderRow } from '@/composites/play/hub/PlayLeaderRow'
 import {
-  fillPlayMessage,
   PLAY_HUB_COPY,
   PLAY_LEADER_DEFAULT,
   PLAY_LEADER_KEYS,
   PLAY_LEADER_METRICS,
 } from '@/declarations/play'
 import type { PlayLeaderMetric } from '@/declarations/play'
-import { PLAY_HUB } from '@/declarations/ui/variants'
+import { ICONS } from '@/declarations/ui/icons'
+import { PLAY_BOARD, PLAY_HUB } from '@/declarations/ui/variants'
 import type { PlayLeader } from '@/types/play'
-import { cn } from '@/utils/classnames'
-
-// Podium places
-const PODIUM = 3
 
 export interface PlayLeaderboardProps {
   // One list per measure
@@ -25,7 +22,7 @@ export interface PlayLeaderboardProps {
 }
 
 /**
- * Best players of a game by wins, levels or games played, the reader lit
+ * Best players: podium first, then the rest, the reader lit
  * @param {PlayLeaderboardProps} props - Leaders and reader
  * @return {JSX.Element}
  */
@@ -35,48 +32,33 @@ export const PlayLeaderboard = ({ leaders, meId }: PlayLeaderboardProps) => {
   const list = leaders[metric]
 
   return (
-    <div className={PLAY_HUB.section}>
-      <div className={PLAY_HUB.leaderTabs} role="group" aria-label={PLAY_HUB_COPY.leaderMetric}>
-        {PLAY_LEADER_KEYS.map((key) => (
-          <button
-            key={key}
-            type="button"
-            aria-pressed={key === metric}
-            className={cn(PLAY_HUB.leaderTab, key === metric && PLAY_HUB.leaderTabOn)}
-            onClick={() => setMetric(key)}
-          >
-            {PLAY_LEADER_METRICS[key].label}
-          </button>
-        ))}
+    <div className={PLAY_BOARD.root}>
+      <div className={PLAY_BOARD.tabs} role="group" aria-label={PLAY_HUB_COPY.leaderMetric}>
+        {PLAY_LEADER_KEYS.map((key) => {
+          const Icon = ICONS[PLAY_LEADER_METRICS[key].icon]
+
+          return (
+            <Button
+              key={key}
+              variant={key === metric ? 'arcade' : 'arcadeGhost'}
+              aria-pressed={key === metric}
+              aria-label={PLAY_LEADER_METRICS[key].label}
+              title={PLAY_LEADER_METRICS[key].label}
+              className={PLAY_BOARD.tab}
+              onClick={() => setMetric(key)}
+            >
+              <Icon className={PLAY_BOARD.tabIcon} aria-hidden="true" />
+            </Button>
+          )
+        })}
       </div>
 
       {list.length === 0 ? (
         <p className={PLAY_HUB.empty}>{PLAY_HUB_COPY.noLeader}</p>
       ) : (
-        <ol className={PLAY_HUB.leaders}>
+        <ol className={PLAY_BOARD.rows}>
           {list.map((leader) => (
-            <li
-              key={leader.accountId}
-              className={cn(PLAY_HUB.leader, leader.accountId === meId && PLAY_HUB.leaderMe)}
-            >
-              <span
-                className={cn(PLAY_HUB.leaderRank, leader.rank <= PODIUM && PLAY_HUB.leaderRankTop)}
-              >
-                {leader.rank}
-              </span>
-              <Avatar name={leader.name} src={leader.avatarUrl} />
-              <span className={PLAY_HUB.leaderText}>
-                <span className={PLAY_HUB.leaderName}>{leader.name}</span>
-                <span className={PLAY_HUB.leaderNote}>
-                  {fillPlayMessage(PLAY_LEADER_METRICS[metric].note, {
-                    wins: leader.wins,
-                    level: leader.level,
-                    xp: leader.xp,
-                    played: leader.played,
-                  })}
-                </span>
-              </span>
-            </li>
+            <PlayLeaderRow key={leader.accountId} leader={leader} metric={metric} meId={meId} />
           ))}
         </ol>
       )}

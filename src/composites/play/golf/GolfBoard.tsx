@@ -11,6 +11,7 @@ import { GolfCountdown } from '@/composites/play/golf/hud/GolfCountdown'
 import { GolfFooter } from '@/composites/play/golf/hud/GolfFooter'
 import { GolfFrost } from '@/composites/play/golf/hud/GolfFrost'
 import { GolfPowerCue } from '@/composites/play/golf/hud/GolfPowerCue'
+import { GolfWatchPicker } from '@/composites/play/golf/hud/GolfWatchPicker'
 import { GolfHud } from '@/composites/play/golf/hud/GolfHud'
 import { golfStatus } from '@/composites/play/golf/status'
 import type { GolfFace } from '@/composites/play/golf/types'
@@ -22,6 +23,7 @@ import { useGolfBoard } from '@/core/hooks/data/play/useGolfBoard'
 import { useGolfStroke } from '@/core/hooks/data/play/useGolfStroke'
 import { useGolfPowerCue } from '@/core/hooks/interaction/golf/useGolfPowerCue'
 import { useGolfPhase } from '@/core/hooks/interaction/golf/useGolfPhase'
+import { useGolfWatch } from '@/core/hooks/interaction/golf/useGolfWatch'
 import { useServerAlarm } from '@/core/hooks/interaction/state/useServerAlarm'
 import {
   canPlaceAt,
@@ -110,6 +112,17 @@ export const GolfBoard = ({
   const offset = board.serverTime - board.receivedAt
   const me = isSeated ? board.players.find((player) => player.accountId === viewerId) : undefined
   const isOpen = phase === GolfPhases.Playing && Boolean(me && !me.isDone)
+  // Own ball first, then anyone still playing
+  const ownFocusId =
+    me && !me.isDone
+      ? viewerId
+      : (board.players.find((player) => !player.isDone && !player.hasLeft)?.accountId ?? viewerId)
+  const watch = useGolfWatch(
+    board.players.filter((player) => !player.hasLeft).map((player) => player.accountId),
+    ownFocusId,
+    !isSeated
+  )
+  const focusId = isSeated ? ownFocusId : watch.focusId
   const card = {
     players: board.players,
     faces,
@@ -134,11 +147,6 @@ export const GolfBoard = ({
     playGolfSound(GOLF_POWER_SOUNDS[power] ?? 'power')
     void stroke.power({ slot, x, z })
   }
-  // Own ball first, then anyone still playing
-  const focusId =
-    me && !me.isDone
-      ? viewerId
-      : (board.players.find((player) => !player.isDone && !player.hasLeft)?.accountId ?? viewerId)
 
   return (
     <div className={cn(GOLF_BOARD.board, isFullscreen && GOLF_BOARD.boardFull)}>
@@ -202,6 +210,14 @@ export const GolfBoard = ({
           onCancelPlace={() => table.setPlacing(null)}
         />
         {table.isStatsOpen && <GolfStats {...card} onClose={() => table.setStatsOpen(false)} />}
+        {!isSeated && (
+          <GolfWatchPicker
+            faces={faces.filter((face) =>
+              board.players.some((player) => player.accountId === face.accountId && !player.hasLeft)
+            )}
+            watch={watch}
+          />
+        )}
         <GolfCheer />
         <GolfPowerCue cue={cue} />
         {phase === GolfPhases.Countdown && (

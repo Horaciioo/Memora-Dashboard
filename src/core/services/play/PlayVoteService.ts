@@ -3,6 +3,7 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
+import { seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict } from '@/core/lib/errors'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
@@ -10,7 +11,7 @@ import { signalPlay } from '@/core/lib/play/signal'
 import { clearDeadline, scheduleDeadline } from '@/core/lib/play/timers'
 import { voteAt, voteOf, voteRulesOf } from '@/core/lib/play/vote'
 import type { PlayVoteRules, PlayVoteState } from '@/core/lib/play/vote'
-import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
+import { PLAY_ERRORS } from '@/declarations/play'
 import { GolfVoteActions } from '@/declarations/play/golf/vote'
 import type { GolfVoteAction } from '@/declarations/play/golf/vote'
 import { startSession } from '@/core/services/play/GameService'
@@ -80,7 +81,7 @@ const open = async (context: VoteContext): Promise<VoteOutcome> => {
   const { session, vote, accountId, rules } = context
   requireHost(session, accountId)
   if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
-  if (session.seats.filter(isPresent).length < PLAY_GAMES.get(session.game).minPlayers) {
+  if (session.seats.filter(isPresent).length < seatBoundsOf(session.game, session.settings).min) {
     throw conflict(PLAY_ERRORS.tooFewPlayers)
   }
   if (!vote)
