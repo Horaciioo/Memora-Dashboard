@@ -13,7 +13,6 @@ export const TOUR_COPY = {
   inputPlaceholder: 'Écris à Memora…',
   inputWaiting: 'La suite arrive…',
   inputLabel: 'Ton message à Memora',
-  inputSend: 'Envoyer le message',
   send: 'Envoyer',
   yes: 'Yep, je veux bien',
   no: 'Non, je ne préfère pas.',

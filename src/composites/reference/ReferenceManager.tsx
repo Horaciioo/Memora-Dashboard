@@ -122,7 +122,7 @@ export const ReferenceManager = ({
       },
     },
     // A creator goes with everything of theirs, however much they are used
-    section.key === 'youtubeurs'
+    section.key === 'creators'
       ? {
           id: 'delete',
           label: REFERENCE_COPY.eraseMenu,
@@ -160,7 +160,7 @@ export const ReferenceManager = ({
           </Button>
         }
       />
-    ) : section.key === 'identifiants-discord' ? (
+    ) : section.key === 'discord-identifiers' ? (
       <DiscordIdentifierList
         rows={rows}
         canManage={canManage}
@@ -172,7 +172,7 @@ export const ReferenceManager = ({
         }}
         onCreate={openCreate}
       />
-    ) : section.key === 'youtubeurs' ? (
+    ) : section.key === 'creators' ? (
       <div
         className={cn(
           'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3',
@@ -239,7 +239,7 @@ export const ReferenceManager = ({
               />
             )}
             {row.image !== undefined &&
-              (section.key === 'reseaux-sociaux' && hasNetworkLogo(row.label) ? (
+              (section.key === 'socials' && hasNetworkLogo(row.label) ? (
                 <NetworkLogo network={row.label} className="h-8 w-8" />
               ) : section.key === 'divisions' && divisionTier(row.label) !== null ? (
                 <DivisionLogo label={row.label} className="h-9 w-9" />
@@ -331,7 +331,7 @@ export const ReferenceManager = ({
         onClose={() => setEditing(null)}
       />
 
-      {pendingDeletion && section.key === 'youtubeurs' && (
+      {pendingDeletion && section.key === 'creators' && (
         <EraseYoutuberDialog
           name={pendingDeletion.label}
           isPending={isSaving}
@@ -344,7 +344,7 @@ export const ReferenceManager = ({
       )}
 
       <ConfirmDialog
-        open={pendingDeletion !== null && section.key !== 'youtubeurs'}
+        open={pendingDeletion !== null && section.key !== 'creators'}
         title={REFERENCE_COPY.deleteTitle}
         description={REFERENCE_COPY.deleteDescription}
         pending={isSaving}

@@ -20,32 +20,24 @@ export const COPY_VALUE = {
 
 export const BUTTON_STYLES = {
   base: 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 text-sm font-semibold md:min-h-0 transition-[background-color,border-color,color,filter] duration-[var(--motion-duration-fast)] disabled:pointer-events-none disabled:opacity-50',
-  primary:
-    'rounded-[var(--radius-md)] md:rounded-full bg-[var(--color-brand-600)] px-4 py-2 text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
-  secondary:
-    'rounded-[var(--radius-md)] md:rounded-full border border-[var(--color-border-strong)] bg-[var(--color-background)] px-3 py-2 hover:bg-[var(--color-surface-sunken)]',
-  ghost:
-    'rounded-[var(--radius-md)] md:rounded-full px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
-  // Hover deepens
-  success:
-    'rounded-[var(--radius-md)] md:rounded-full bg-[var(--color-success)] px-4 py-2 text-[var(--color-on-solid)] hover:brightness-90',
-  danger:
-    'rounded-[var(--radius-md)] md:rounded-full bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-solid)] hover:brightness-90',
+  primary: 'key px-4 py-2',
+  secondary: 'key key-slate px-3 py-2',
+  ghost: 'key key-slate px-3 py-2',
+  success: 'key key-success px-4 py-2',
+  danger: 'key key-danger px-4 py-2',
   // 44px hit area on touch
-  icon: 'h-9 w-9 min-h-11 min-w-11 rounded-full p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] md:min-h-0 md:min-w-0',
+  icon: 'key key-slate h-9 w-9 min-h-11 min-w-11 p-0 md:min-h-0 md:min-w-0',
   link: 'min-h-0 p-0 text-[var(--color-ink-accent)] underline-offset-2 hover:underline',
   // Memora Play keys, painted in play/arcade.css
-  arcade: 'play-key px-5 py-3 text-base! font-bold!',
-  arcadeGhost: 'play-key play-key-ghost px-5 py-3 text-base! font-bold!',
+  arcade: 'key px-5 py-3 text-base! font-bold!',
+  arcadeGhost: 'key key-slate px-5 py-3 text-base! font-bold!',
   // Compact keys of the dock bubbles
-  arcadeSmall: 'play-key px-3.5 py-1.5 text-sm! font-bold!',
-  arcadeGhostSmall: 'play-key play-key-ghost px-3.5 py-1.5 text-sm! font-bold!',
-  // No fill, no depth: text on the room
-  arcadeText:
-    'rounded-full px-5 py-3 text-base! font-bold! text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
-  arcadeHero: 'play-key play-key-hero px-6 py-4 text-lg! font-extrabold!',
-  arcadeOrange: 'play-key play-key-orange px-5 py-3 text-base! font-bold!',
-  arcadeDanger: 'play-key play-key-danger px-5 py-3 text-base! font-bold!',
+  arcadeSmall: 'key px-3.5 py-1.5 text-sm! font-bold!',
+  arcadeGhostSmall: 'key key-slate px-3.5 py-1.5 text-sm! font-bold!',
+  arcadeText: 'key key-slate px-5 py-3 text-base! font-bold!',
+  arcadeHero: 'key px-6 py-4 text-lg! font-extrabold!',
+  arcadeOrange: 'key key-orange px-5 py-3 text-base! font-bold!',
+  arcadeDanger: 'key key-danger px-5 py-3 text-base! font-bold!',
   // Square footprint for a label-less button
   square: 'h-9 w-9 min-h-11 min-w-11 shrink-0 p-0 md:min-h-0 md:min-w-0',
 } as const
@@ -66,14 +58,24 @@ export const isArcadeVariant = (variant: ButtonVariant): boolean => variant.star
  */
 
 export const SEGMENTED_STYLES = {
-  group:
-    'flex max-w-full items-center gap-1 overflow-x-auto rounded-[var(--radius-lg)] glass-soft p-1',
-  option:
-    'min-h-11 shrink-0 rounded-[calc(var(--radius-lg)-0.25rem)] px-2.5 py-1.5 text-xs font-semibold md:min-h-0 md:px-3 whitespace-nowrap transition-colors',
+  group: 'flex max-w-full items-center gap-2 overflow-x-auto px-0.5 pt-0.5 pb-1.5',
+  option: 'key min-h-11 shrink-0 px-3 py-1.5 text-xs whitespace-nowrap md:min-h-0 md:px-3.5',
   full: 'w-full',
   optionFull: 'flex-1 text-center',
-  selected: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
-  idle: 'text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  selected: '',
+  idle: 'key-slate',
+} as const
+
+/**
+ * Segmented switch of Memora Play: one key per choice, the pick in colour
+ * @type {Record<string, string>}
+ */
+
+export const SEGMENTED_PLAY = {
+  group: 'flex w-full items-center gap-2 pb-1.5',
+  option: 'key min-h-11 flex-1 px-3 py-2 text-center text-sm whitespace-nowrap',
+  selected: '',
+  idle: 'key-slate',
 } as const
 
 /**
@@ -248,6 +250,10 @@ export const SELECT_MENU_STYLES = {
   // No field box, a hover wash only
   triggerBare:
     'flex min-w-0 items-center gap-2 rounded-[var(--radius-lg)] px-2 py-1.5 text-left text-sm text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)] disabled:pointer-events-none disabled:opacity-60',
+  // Arcade field: chip fill like the other play inputs
+  triggerPlay:
+    'flex min-h-11 w-full min-w-0 items-center gap-2 rounded-xl bg-[var(--play-chip)] px-3 text-left text-sm font-semibold text-[var(--play-ink)] transition-colors hover:bg-[var(--play-panel-strong)] focus-visible:outline-3 focus-visible:outline-[var(--play-key)] disabled:pointer-events-none disabled:opacity-60',
+  chevronPlay: 'text-[var(--play-ink-faint)]',
   invalid: 'border-[var(--color-danger)]',
   // Chevron trails the text
   value: 'flex min-w-0 items-center gap-2 truncate',
@@ -276,6 +282,8 @@ export const SELECT_MENU_STYLES = {
   // Cell holding the check or the mark
   lead: 'flex shrink-0 items-center justify-center',
   leadGlyph: 'h-4 w-4',
+  // Game logo cell
+  leadLogo: 'size-6',
   leadPortrait: 'h-6 w-6',
   leadPortraitLarge: 'h-8 w-8',
   empty: 'px-3 py-4 text-center text-xs text-[var(--color-ink-subtle)]',

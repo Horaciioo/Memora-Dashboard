@@ -271,7 +271,7 @@ export interface JuniorObjectiveView {
  * @property {string | null} authorAvatar - Portrait of who wrote it
  * @property {string | null} feeling - Overall feeling
  * @property {string} summary - What moves
- * @property {ReviewAdviceName} advice - Outcome proposed by the Formateur
+ * @property {ReviewAdviceName} advice - Outcome proposed by the Référent
  * @property {ReviewStatusName} status - Lifecycle of the check-in
  * @property {string | null} decidedByName - Who decided
  * @property {string | null} decidedAt - ISO decision date

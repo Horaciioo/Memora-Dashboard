@@ -1,32 +1,32 @@
-import twoFactor from '@/configurations/system/a2f.json'
+import twoFactor from '@/configurations/system/two-factor.json'
 import application from '@/configurations/system/application.json'
 import absences from '@/configurations/system/absences.json'
 import agenda from '@/configurations/system/agenda.json'
-import home from '@/configurations/system/accueil.json'
+import home from '@/configurations/system/home.json'
 import legacy from '@/configurations/system/legacy.json'
 import academy from '@/configurations/system/academy.json'
-import authentication from '@/configurations/system/authentification.json'
+import authentication from '@/configurations/system/authentication.json'
 import cache from '@/configurations/system/cache.json'
-import calendar from '@/configurations/system/calendrier.json'
-import colours from '@/configurations/system/couleurs.json'
-import timeouts from '@/configurations/system/delais.json'
-import retention from '@/configurations/system/conservation.json'
-import exercises from '@/configurations/system/exercices.json'
+import calendar from '@/configurations/system/calendar.json'
+import colours from '@/configurations/system/colours.json'
+import timeouts from '@/configurations/system/timeouts.json'
+import retention from '@/configurations/system/retention.json'
+import exercises from '@/configurations/system/exercises.json'
 import emojis from '@/configurations/system/emojis.json'
-import failures from '@/configurations/system/erreurs.json'
-import files from '@/configurations/system/fichiers.json'
+import failures from '@/configurations/system/failures.json'
+import files from '@/configurations/system/files.json'
 import forms from '@/configurations/system/forms.json'
-import gestures from '@/configurations/system/gestes.json'
-import rateLimits from '@/configurations/system/limitation.json'
+import gestures from '@/configurations/system/gestures.json'
+import rateLimits from '@/configurations/system/rate-limits.json'
 import livecon from '@/configurations/system/livecon.json'
 import lives from '@/configurations/system/lives.json'
 import notifications from '@/configurations/system/notifications.json'
 import pagination from '@/configurations/system/pagination.json'
-import perimeter from '@/configurations/system/perimetre.json'
+import perimeter from '@/configurations/system/perimeter.json'
 import responsive from '@/configurations/system/responsive.json'
 import sanctions from '@/configurations/system/sanctions.json'
 import search from '@/configurations/system/search.json'
-import tour from '@/configurations/system/visite.json'
+import tour from '@/configurations/system/tour.json'
 import {
   readBoolean,
   readChoice,
@@ -570,7 +570,7 @@ export const SANCTION_SETTINGS = {
 
 export const SCOPE_SETTINGS = {
   includeUnassigned: readBoolean(perimeter.includeUnassigned, {
-    path: 'system/perimetre.includeUnassigned',
+    path: 'system/perimeter.includeUnassigned',
     fallback: true,
   }),
 }
@@ -582,17 +582,17 @@ export const SCOPE_SETTINGS = {
 
 export const FILE_SETTINGS = {
   maxBytes: readInteger(files.maxBytes, {
-    path: 'system/fichiers.maxBytes',
+    path: 'system/files.maxBytes',
     fallback: 2_097_152,
     min: 1,
   }),
   bodyMaxBytes: readInteger(files.bodyMaxBytes, {
-    path: 'system/fichiers.bodyMaxBytes',
+    path: 'system/files.bodyMaxBytes',
     fallback: 4_194_304,
     min: 1,
   }),
   allowedTypes: readStringList(files.allowedTypes, {
-    path: 'system/fichiers.allowedTypes',
+    path: 'system/files.allowedTypes',
     fallback: ['image/png', 'image/jpeg', 'image/webp'],
   }),
 }
@@ -804,7 +804,7 @@ export const ACADEMY_SETTINGS = {
 }
 
 const dayEndHour = readInteger(calendar.dayEndHour, {
-  path: 'system/calendrier.dayEndHour',
+  path: 'system/calendar.dayEndHour',
   fallback: 23,
   min: 1,
   max: 23,
@@ -818,53 +818,53 @@ const dayEndHour = readInteger(calendar.dayEndHour, {
 export const CALENDAR_SETTINGS = {
   dayEndHour,
   dayStartHour: readInteger(calendar.dayStartHour, {
-    path: 'system/calendrier.dayStartHour',
+    path: 'system/calendar.dayStartHour',
     fallback: 7,
     min: 0,
     max: dayEndHour,
   }),
   maxEntriesPerDay: readInteger(calendar.maxEntriesPerDay, {
-    path: 'system/calendrier.maxEntriesPerDay',
+    path: 'system/calendar.maxEntriesPerDay',
     fallback: 3,
     min: 1,
   }),
   maxEntriesPerDayMobile: readInteger(calendar.maxEntriesPerDayMobile, {
-    path: 'system/calendrier.maxEntriesPerDayMobile',
+    path: 'system/calendar.maxEntriesPerDayMobile',
     fallback: 4,
     min: 1,
   }),
   rollCallReminderLeadDays: readInteger(calendar.rollCallReminderLeadDays, {
-    path: 'system/calendrier.rollCallReminderLeadDays',
+    path: 'system/calendar.rollCallReminderLeadDays',
     fallback: 1,
     min: 0,
   }),
   rollCallReminderHour: readInteger(calendar.rollCallReminderHour, {
-    path: 'system/calendrier.rollCallReminderHour',
+    path: 'system/calendar.rollCallReminderHour',
     fallback: 18,
     min: 0,
     max: 23,
   }),
   rollCallResponsesShared: readBoolean(calendar.rollCallResponsesShared, {
-    path: 'system/calendrier.rollCallResponsesShared',
+    path: 'system/calendar.rollCallResponsesShared',
     fallback: false,
   }),
   // Pointer snap
   stepMinutes: readInteger(calendar.stepMinutes, {
-    path: 'system/calendrier.stepMinutes',
+    path: 'system/calendar.stepMinutes',
     fallback: 15,
     min: 5,
     max: 60,
   }),
   // One grid row
   rowMinutes: readInteger(calendar.rowMinutes, {
-    path: 'system/calendrier.rowMinutes',
+    path: 'system/calendar.rowMinutes',
     fallback: 60,
     min: 15,
     max: 120,
   }),
   // Click-created length
   defaultDurationMinutes: readInteger(calendar.defaultDurationMinutes, {
-    path: 'system/calendrier.defaultDurationMinutes',
+    path: 'system/calendar.defaultDurationMinutes',
     fallback: 60,
     min: 5,
   }),
@@ -1037,11 +1037,11 @@ export const EMOJI_SETTINGS = {
 
 export const COLOUR_SETTINGS = {
   defaultAccent: readString(colours.defaultAccent, {
-    path: 'system/couleurs.defaultAccent',
+    path: 'system/colours.defaultAccent',
     fallback: 'var(--color-brand-600)',
   }),
   swatches: readStringList(colours.swatches, {
-    path: 'system/couleurs.swatches',
+    path: 'system/colours.swatches',
     fallback: [],
   }),
 }
@@ -1053,31 +1053,31 @@ export const COLOUR_SETTINGS = {
 
 export const AUTH_SETTINGS = {
   sessionDays: readInteger(authentication.sessionDays, {
-    path: 'system/authentification.sessionDays',
+    path: 'system/authentication.sessionDays',
     fallback: 14,
     min: 1,
     max: 90,
   }),
   stateTtlSeconds: readInteger(authentication.stateTtlSeconds, {
-    path: 'system/authentification.stateTtlSeconds',
+    path: 'system/authentication.stateTtlSeconds',
     fallback: 600,
     min: 60,
     max: 3600,
   }),
   avatarSize: readInteger(authentication.avatarSize, {
-    path: 'system/authentification.avatarSize',
+    path: 'system/authentication.avatarSize',
     fallback: 128,
     min: 16,
     max: 4096,
   }),
   bannerSize: readInteger(authentication.bannerSize, {
-    path: 'system/authentification.bannerSize',
+    path: 'system/authentication.bannerSize',
     fallback: 1024,
     min: 16,
     max: 4096,
   }),
   maxConcurrentSessions: readInteger(authentication.maxConcurrentSessions, {
-    path: 'system/authentification.maxConcurrentSessions',
+    path: 'system/authentication.maxConcurrentSessions',
     fallback: 10,
     min: 1,
   }),
@@ -1090,49 +1090,49 @@ export const AUTH_SETTINGS = {
 
 export const TWO_FACTOR_SETTINGS = {
   digits: readInteger(twoFactor.digits, {
-    path: 'system/a2f.digits',
+    path: 'system/two-factor.digits',
     fallback: 6,
     min: 6,
     max: 8,
   }),
   periodSeconds: readInteger(twoFactor.periodSeconds, {
-    path: 'system/a2f.periodSeconds',
+    path: 'system/two-factor.periodSeconds',
     fallback: 30,
     min: 15,
     max: 120,
   }),
   driftSteps: readInteger(twoFactor.driftSteps, {
-    path: 'system/a2f.driftSteps',
+    path: 'system/two-factor.driftSteps',
     fallback: 1,
     min: 0,
     max: 5,
   }),
   secretBytes: readInteger(twoFactor.secretBytes, {
-    path: 'system/a2f.secretBytes',
+    path: 'system/two-factor.secretBytes',
     fallback: 20,
     min: 16,
     max: 64,
   }),
   recoveryCodeCount: readInteger(twoFactor.recoveryCodeCount, {
-    path: 'system/a2f.recoveryCodeCount',
+    path: 'system/two-factor.recoveryCodeCount',
     fallback: 10,
     min: 1,
     max: 32,
   }),
   recoveryCodeBytes: readInteger(twoFactor.recoveryCodeBytes, {
-    path: 'system/a2f.recoveryCodeBytes',
+    path: 'system/two-factor.recoveryCodeBytes',
     fallback: 5,
     min: 4,
     max: 16,
   }),
   unlockMinutes: readInteger(twoFactor.unlockMinutes, {
-    path: 'system/a2f.unlockMinutes',
+    path: 'system/two-factor.unlockMinutes',
     fallback: 15,
     min: 1,
     max: 720,
   }),
   enrolmentMinutes: readInteger(twoFactor.enrolmentMinutes, {
-    path: 'system/a2f.enrolmentMinutes',
+    path: 'system/two-factor.enrolmentMinutes',
     fallback: 10,
     min: 1,
     max: 60,
@@ -1159,7 +1159,7 @@ export interface RateLimitWindow {
  */
 
 export const readRateLimitWindow = (name: string, fallback: RateLimitWindow): RateLimitWindow => {
-  const path = `system/limitation.${name}`
+  const path = `system/rate-limits.${name}`
   const node = readNode((rateLimits as Record<string, unknown>)[name], path)
 
   return {
@@ -1179,47 +1179,47 @@ export const readRateLimitWindow = (name: string, fallback: RateLimitWindow): Ra
 
 export const RETENTION_SETTINGS = {
   expiredSessionDays: readInteger(retention.expiredSessionDays, {
-    path: 'system/conservation.expiredSessionDays',
+    path: 'system/retention.expiredSessionDays',
     fallback: 7,
     min: 1,
   }),
   readNotificationDays: readInteger(retention.readNotificationDays, {
-    path: 'system/conservation.readNotificationDays',
+    path: 'system/retention.readNotificationDays',
     fallback: 90,
     min: 1,
   }),
   pushDeliveryDays: readInteger(retention.pushDeliveryDays, {
-    path: 'system/conservation.pushDeliveryDays',
+    path: 'system/retention.pushDeliveryDays',
     fallback: 30,
     min: 1,
   }),
   activityLogDays: readInteger(retention.activityLogDays, {
-    path: 'system/conservation.activityLogDays',
+    path: 'system/retention.activityLogDays',
     fallback: 365,
     min: 30,
   }),
   moderationLogDays: readInteger(retention.moderationLogDays, {
-    path: 'system/conservation.moderationLogDays',
+    path: 'system/retention.moderationLogDays',
     fallback: 180,
     min: 7,
   }),
   rejectedCandidateDays: readInteger(retention.rejectedCandidateDays, {
-    path: 'system/conservation.rejectedCandidateDays',
+    path: 'system/retention.rejectedCandidateDays',
     fallback: 180,
     min: 1,
   }),
   bannedCandidateDays: readInteger(retention.bannedCandidateDays, {
-    path: 'system/conservation.bannedCandidateDays',
+    path: 'system/retention.bannedCandidateDays',
     fallback: 730,
     min: 1,
   }),
   orphanFileHours: readInteger(retention.orphanFileHours, {
-    path: 'system/conservation.orphanFileHours',
+    path: 'system/retention.orphanFileHours',
     fallback: 24,
     min: 1,
   }),
   consentVersion: readInteger(retention.consentVersion, {
-    path: 'system/conservation.consentVersion',
+    path: 'system/retention.consentVersion',
     fallback: 1,
     min: 1,
   }),
@@ -1232,17 +1232,17 @@ export const RETENTION_SETTINGS = {
 
 export const TIMEOUT_SETTINGS = {
   readMs: readInteger(timeouts.readMs, {
-    path: 'system/delais.readMs',
+    path: 'system/timeouts.readMs',
     fallback: 20000,
     min: 1000,
   }),
   writeMs: readInteger(timeouts.writeMs, {
-    path: 'system/delais.writeMs',
+    path: 'system/timeouts.writeMs',
     fallback: 60000,
     min: 1000,
   }),
   externalMs: readInteger(timeouts.externalMs, {
-    path: 'system/delais.externalMs',
+    path: 'system/timeouts.externalMs',
     fallback: 10000,
     min: 1000,
   }),
@@ -1316,34 +1316,34 @@ export const GESTURE_SETTINGS = {
   swipeRatio: readNumber(gestures.swipeRatio, 0.18),
   flingVelocity: readNumber(gestures.flingVelocity, 0.5),
   startSlopPx: readInteger(gestures.startSlopPx, {
-    path: 'system/gestes.startSlopPx',
+    path: 'system/gestures.startSlopPx',
     fallback: 8,
     min: 0,
   }),
   barSolidAfterPx: readInteger(gestures.barSolidAfterPx, {
-    path: 'system/gestes.barSolidAfterPx',
+    path: 'system/gestures.barSolidAfterPx',
     fallback: 8,
     min: 0,
   }),
   barHideAfterPx: readInteger(gestures.barHideAfterPx, {
-    path: 'system/gestes.barHideAfterPx',
+    path: 'system/gestures.barHideAfterPx',
     fallback: 120,
     min: 0,
   }),
   barDirectionDeltaPx: readInteger(gestures.barDirectionDeltaPx, {
-    path: 'system/gestes.barDirectionDeltaPx',
+    path: 'system/gestures.barDirectionDeltaPx',
     fallback: 6,
     min: 0,
   }),
   countUpMs: readInteger(gestures.countUpMs, {
-    path: 'system/gestes.countUpMs',
+    path: 'system/gestures.countUpMs',
     fallback: 900,
     min: 0,
   }),
   readingLineRatio: readNumber(gestures.readingLineRatio, 0.3),
   tiltDegrees: readNumber(gestures.tiltDegrees, 7),
   tiltPerspectivePx: readInteger(gestures.tiltPerspectivePx, {
-    path: 'system/gestes.tiltPerspectivePx',
+    path: 'system/gestures.tiltPerspectivePx',
     fallback: 900,
     min: 1,
   }),
@@ -1424,27 +1424,27 @@ export const AGENDA_SETTINGS = {
 
 export const HOME_SETTINGS = {
   birthdayWindowDays: readInteger(home.birthdayWindowDays, {
-    path: 'system/accueil.birthdayWindowDays',
+    path: 'system/home.birthdayWindowDays',
     fallback: 30,
     min: 1,
   }),
   birthdayMax: readInteger(home.birthdayMax, {
-    path: 'system/accueil.birthdayMax',
+    path: 'system/home.birthdayMax',
     fallback: 4,
     min: 1,
   }),
   plannedWindowDays: readInteger(home.plannedWindowDays, {
-    path: 'system/accueil.plannedWindowDays',
+    path: 'system/home.plannedWindowDays',
     fallback: 30,
     min: 1,
   }),
   plannedMax: readInteger(home.plannedMax, {
-    path: 'system/accueil.plannedMax',
+    path: 'system/home.plannedMax',
     fallback: 5,
     min: 1,
   }),
   taskMax: readInteger(home.taskMax, {
-    path: 'system/accueil.taskMax',
+    path: 'system/home.taskMax',
     fallback: 4,
     min: 1,
   }),
@@ -1457,93 +1457,93 @@ export const HOME_SETTINGS = {
 
 export const TOUR_SETTINGS = {
   newcomerDays: readInteger(tour.newcomerDays, {
-    path: 'system/visite.newcomerDays',
+    path: 'system/tour.newcomerDays',
     fallback: 14,
     min: 1,
   }),
   typingMsPerChar: readInteger(tour.typingMsPerChar, {
-    path: 'system/visite.typingMsPerChar',
+    path: 'system/tour.typingMsPerChar',
     fallback: 28,
     min: 1,
   }),
   typingMinMs: readInteger(tour.typingMinMs, {
-    path: 'system/visite.typingMinMs',
+    path: 'system/tour.typingMinMs',
     fallback: 600,
     min: 0,
   }),
   typingMaxMs: readInteger(tour.typingMaxMs, {
-    path: 'system/visite.typingMaxMs',
+    path: 'system/tour.typingMaxMs',
     fallback: 1800,
     min: 0,
   }),
   sendPauseMs: readInteger(tour.sendPauseMs, {
-    path: 'system/visite.sendPauseMs',
+    path: 'system/tour.sendPauseMs',
     fallback: 350,
     min: 0,
   }),
   loadingMs: readInteger(tour.loadingMs, {
-    path: 'system/visite.loadingMs',
+    path: 'system/tour.loadingMs',
     fallback: 3200,
     min: 0,
   }),
   demoStepMs: readInteger(tour.demoStepMs, {
-    path: 'system/visite.demoStepMs',
+    path: 'system/tour.demoStepMs',
     fallback: 1800,
     min: 200,
   }),
   demoBeats: readInteger(tour.demoBeats, {
-    path: 'system/visite.demoBeats',
+    path: 'system/tour.demoBeats',
     fallback: 3,
     min: 1,
   }),
   stageHoldMs: readInteger(tour.stageHoldMs, {
-    path: 'system/visite.stageHoldMs',
+    path: 'system/tour.stageHoldMs',
     fallback: 4000,
     min: 0,
   }),
   paneInsetPx: readInteger(tour.paneInsetPx, {
-    path: 'system/visite.paneInsetPx',
+    path: 'system/tour.paneInsetPx',
     fallback: 12,
     min: 0,
   }),
   photoSharePercent: readInteger(tour.photoSharePercent, {
-    path: 'system/visite.photoSharePercent',
+    path: 'system/tour.photoSharePercent',
     fallback: 40,
     min: 20,
     max: 60,
   }),
   ringPaddingPx: readInteger(tour.ringPaddingPx, {
-    path: 'system/visite.ringPaddingPx',
+    path: 'system/tour.ringPaddingPx',
     fallback: 8,
     min: 0,
   }),
   bubbleGapPx: readInteger(tour.bubbleGapPx, {
-    path: 'system/visite.bubbleGapPx',
+    path: 'system/tour.bubbleGapPx',
     fallback: 16,
     min: 0,
   }),
   bubbleWidthPx: readInteger(tour.bubbleWidthPx, {
-    path: 'system/visite.bubbleWidthPx',
+    path: 'system/tour.bubbleWidthPx',
     fallback: 352,
     min: 200,
   }),
   bubbleHeightPx: readInteger(tour.bubbleHeightPx, {
-    path: 'system/visite.bubbleHeightPx',
+    path: 'system/tour.bubbleHeightPx',
     fallback: 220,
     min: 100,
   }),
   minAgeYears: readInteger(tour.minAgeYears, {
-    path: 'system/visite.minAgeYears',
+    path: 'system/tour.minAgeYears',
     fallback: 12,
     min: 0,
   }),
   maxAgeYears: readInteger(tour.maxAgeYears, {
-    path: 'system/visite.maxAgeYears',
+    path: 'system/tour.maxAgeYears',
     fallback: 90,
     min: 1,
   }),
   graceMs: readInteger(tour.graceMs, {
-    path: 'system/visite.graceMs',
+    path: 'system/tour.graceMs',
     fallback: 700,
     min: 0,
   }),
@@ -1556,22 +1556,22 @@ export const TOUR_SETTINGS = {
 
 export const FAILURE_SETTINGS = {
   traceMaxLength: readInteger(failures.traceMaxLength, {
-    path: 'system/erreurs.traceMaxLength',
+    path: 'system/failures.traceMaxLength',
     fallback: 2000,
     min: 200,
   }),
   messageMaxLength: readInteger(failures.messageMaxLength, {
-    path: 'system/erreurs.messageMaxLength',
+    path: 'system/failures.messageMaxLength',
     fallback: 300,
     min: 50,
   }),
   repeatWindowSeconds: readInteger(failures.repeatWindowSeconds, {
-    path: 'system/erreurs.repeatWindowSeconds',
+    path: 'system/failures.repeatWindowSeconds',
     fallback: 300,
     min: 10,
   }),
   repeatKeysMax: readInteger(failures.repeatKeysMax, {
-    path: 'system/erreurs.repeatKeysMax',
+    path: 'system/failures.repeatKeysMax',
     fallback: 200,
     min: 10,
   }),
@@ -1584,42 +1584,42 @@ export const FAILURE_SETTINGS = {
 
 export const EXERCISE_SETTINGS = {
   linkTtlMinutes: readInteger(exercises.linkTtlMinutes, {
-    path: 'system/exercices.linkTtlMinutes',
+    path: 'system/exercises.linkTtlMinutes',
     fallback: 120,
     min: 5,
   }),
   maxPlays: readInteger(exercises.maxPlays, {
-    path: 'system/exercices.maxPlays',
+    path: 'system/exercises.maxPlays',
     fallback: 3,
     min: 1,
   }),
   revealMs: readInteger(exercises.revealMs, {
-    path: 'system/exercices.revealMs',
+    path: 'system/exercises.revealMs',
     fallback: 1600,
     min: 400,
   }),
   shuffleMs: readInteger(exercises.shuffleMs, {
-    path: 'system/exercices.shuffleMs',
+    path: 'system/exercises.shuffleMs',
     fallback: 1000,
     min: 0,
   }),
   shuffleStepMs: readInteger(exercises.shuffleStepMs, {
-    path: 'system/exercices.shuffleStepMs',
+    path: 'system/exercises.shuffleStepMs',
     fallback: 90,
     min: 30,
   }),
   sceneLineMs: readInteger(exercises.sceneLineMs, {
-    path: 'system/exercices.sceneLineMs',
+    path: 'system/exercises.sceneLineMs',
     fallback: 2200,
     min: 500,
   }),
   defaultStepSeconds: readInteger(exercises.defaultStepSeconds, {
-    path: 'system/exercices.defaultStepSeconds',
+    path: 'system/exercises.defaultStepSeconds',
     fallback: 30,
     min: 5,
   }),
   pollSeconds: readInteger(exercises.pollSeconds, {
-    path: 'system/exercices.pollSeconds',
+    path: 'system/exercises.pollSeconds',
     fallback: 6,
     min: 2,
   }),

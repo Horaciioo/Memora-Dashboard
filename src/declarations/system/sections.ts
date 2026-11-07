@@ -40,7 +40,11 @@ export const PRESENCE_SECTIONS: readonly PresenceSection[] = [
   { id: 'legacy', prefix: ROUTES.legacy, permissions: [Permissions.LegacyRead] },
   { id: 'calendar', prefix: ROUTES.calendar, permissions: [Permissions.CalendarRead] },
   { id: 'lives', prefix: ROUTES.lives, permissions: [Permissions.LiveRead] },
-  { id: 'moderation', prefix: '/moderation', permissions: [Permissions.SanctionRead] },
+  {
+    id: 'moderation',
+    prefix: '/moderation',
+    permissions: [Permissions.SanctionRead, Permissions.SanctionDiscordRead],
+  },
 ]
 
 // Prefix of one section's topic

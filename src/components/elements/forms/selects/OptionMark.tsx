@@ -2,6 +2,7 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { CountryFlag } from '@/components/elements/display/marks/CountryFlag'
 import { DivisionLogo } from '@/components/elements/display/marks/DivisionLogo'
 import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/marks/NetworkLogo'
+import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { ROLE_EMBLEMS } from '@/declarations/members/profiles'
 import { FIXED_PRIORITIES } from '@/declarations/reference/fixed'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
@@ -11,6 +12,7 @@ import type { AvatarSize } from '@/declarations/ui/variants/surfaces'
 import type { FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
+import type { PlayGameName } from '@/utils/constants/play'
 import { isHexColour } from '@/utils/format/colour'
 
 // Bars drawn, rising left to right
@@ -84,6 +86,13 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
     const Emblem = ROLE_EMBLEMS[option.value as MemberRoleName]?.glyph
 
     return Emblem ? <Emblem className="h-6 w-6 shrink-0" /> : null
+  }
+
+  // Logo of a Play game, named by the option icon
+  if (mark === 'playGame') {
+    return option.icon ? (
+      <PlayGameLogo game={option.icon as PlayGameName} className="size-6" />
+    ) : null
   }
 
   // Official logo of a division

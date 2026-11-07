@@ -1,4 +1,4 @@
-import dispositifs from '@/configurations/reference/dispositifs.json'
+import dispositifs from '@/configurations/reference/schemes.json'
 import eventTemplates from '@/configurations/reference/eventTemplates.json'
 import networks from '@/configurations/reference/networks.json'
 import platforms from '@/configurations/reference/platforms.json'

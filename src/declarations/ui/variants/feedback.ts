@@ -247,8 +247,7 @@ export const NOTIFICATION_STYLES = {
   footer: 'flex shrink-0 flex-col gap-3 px-3 pb-3',
   // Rule stopping short of the box edges
   footerRule: 'mx-3 block h-px bg-[var(--color-border)]',
-  footerLink:
-    'flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-brand-600)] px-5 py-3 text-base font-bold text-[var(--color-on-brand)] transition-colors hover:bg-[var(--color-brand-700)]',
+  footerLink: 'key flex min-h-12 w-full items-center justify-center gap-2 px-5 py-3 text-base',
   footerIcon: 'h-4 w-4',
   list: 'flex flex-col',
   // Inset rule between two rows
@@ -293,8 +292,7 @@ export const NOTIFICATION_STYLES = {
 
 export const CRITICAL_ERROR_STYLES = {
   body: 'bg-[var(--color-background)] text-[var(--color-ink)] antialiased',
-  action:
-    'rounded-[var(--radius-md)] bg-[var(--color-brand-600)] px-4 py-2 text-sm font-semibold text-[var(--color-on-brand)] transition-colors hover:bg-[var(--color-brand-700)]',
+  action: 'key px-4 py-2 text-sm',
 } as const
 
 /**

@@ -56,7 +56,7 @@ export const ASSISTANT_OFFERS = {
     ask: 'On s’occupe d’un Junior ?',
     href: ROUTES.academy,
     scenario: 'junior',
-    nudges: ['Un Junior à suivre ?', 'Tes étapes de formateur ? Je te les rappelle.'],
+    nudges: ['Un Junior à suivre ?', 'Tes étapes de référent ? Je te les rappelle.'],
   },
   taskUpdate: {
     ask: 'On met à jour une tâche ?',

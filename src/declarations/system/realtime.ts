@@ -1,8 +1,8 @@
-import realtime from '@/configurations/system/temps-reel.json'
+import realtime from '@/configurations/system/realtime.json'
 import { readInteger, readString } from '@/declarations/configurations/readers'
 
 // Config path of a key
-const at = (key: string) => `system/temps-reel.${key}`
+const at = (key: string) => `system/realtime.${key}`
 
 // Positive integer setting
 const integer = (key: keyof typeof realtime, fallback: number, min = 1) =>
@@ -15,7 +15,7 @@ const integer = (key: keyof typeof realtime, fallback: number, min = 1) =>
 
 export const REALTIME_SETTINGS = {
   // Upgrade route, outside the App Router
-  path: readString(realtime.path, { path: at('path'), fallback: '/api/temps-reel' }),
+  path: readString(realtime.path, { path: at('path'), fallback: '/api/realtime' }),
   ticketSeconds: readInteger(realtime.ticketSeconds, {
     path: at('ticketSeconds'),
     fallback: 30,

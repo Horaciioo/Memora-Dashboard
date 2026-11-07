@@ -21,7 +21,7 @@ import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
 import { PlayNotice } from '@/composites/play/hub/PlayNotice'
 import { PlayInviteNotice } from '@/composites/play/invites/PlayInviteNotice'
 import { usePlayNotice } from '@/core/hooks/interaction/layout/usePlayNotice'
-import { usePendingInvite } from '@/core/store/playInvites'
+import { usePendingNotice } from '@/core/store/playNotices'
 import { useCalendarRail } from '@/core/hooks/interaction/calendar/useCalendarRail'
 import { useCalendarRailView } from '@/core/hooks/interaction/calendar/useCalendarRailView'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
@@ -110,7 +110,7 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   // One bubble at a time, Play first until it is dismissed
   const [isPlayDismissed] = usePlayNotice()
   // A waiting invitation comes before both
-  const hasInvite = usePendingInvite() !== null
+  const hasInvite = usePendingNotice() !== null
   const hasPlayNotice = playAt >= 0 && !isPlayDismissed
   // Pointer under the middle of a box
   const pointAt = (index: number) => (index + 0.5) / shortcuts.length

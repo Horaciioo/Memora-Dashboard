@@ -48,6 +48,7 @@ export const Permissions = {
   LiveFocus: 'live:focus',
   SanctionRead: 'sanction:read',
   SanctionManage: 'sanction:manage',
+  SanctionDiscordRead: 'sanction:discord:read',
   RecruitmentRead: 'recruitment:read',
   RecruitmentManage: 'recruitment:manage',
   RecruitmentObserve: 'recruitment:observe',
@@ -514,15 +515,22 @@ export const PermissionsList: PermissionMeta[] = [
     group: PermissionGroups.Live,
     displayName: 'Mode Focus',
     description:
-      'Suivre en temps réel les actions de Mod. d’un modérateur et agir à sa place. Un Formateur ne suit que les Juniors.',
+      'Suivre en temps réel les actions de Mod. d’un modérateur et agir à sa place. Un Référent ne suit que les Juniors.',
     important: true,
     parent: Permissions.LiveRead,
   },
   {
     name: Permissions.SanctionRead,
     group: PermissionGroups.Sanctions,
-    displayName: 'Voir le panel de sanctions',
-    description: 'Consulter le barème des sanctions d’un YouTubeur.',
+    displayName: 'Voir le panel Twitch',
+    description: 'Consulter le barème des sanctions Twitch d’un YouTubeur.',
+    important: false,
+  },
+  {
+    name: Permissions.SanctionDiscordRead,
+    group: PermissionGroups.Sanctions,
+    displayName: 'Voir le panel Discord',
+    description: 'Consulter le barème des sanctions Discord d’un YouTubeur.',
     important: false,
   },
   {

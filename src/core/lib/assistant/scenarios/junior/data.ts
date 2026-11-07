@@ -63,7 +63,7 @@ export const readDossier = (id: string): Promise<JuniorDossier> =>
 
 export const readFollow = (trainerId?: string, juniorId?: string): Promise<Follow> => {
   const query = new URLSearchParams()
-  if (trainerId) query.set('formateur', trainerId)
+  if (trainerId) query.set('trainer', trainerId)
   if (juniorId) query.set('junior', juniorId)
 
   return apiGet<Follow>(`${API_ROUTES.academyFollow}?${query.toString()}`)

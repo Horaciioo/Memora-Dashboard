@@ -12,7 +12,7 @@ import type { Environment } from '@/types/infrastructure'
  * @type {string}
  */
 
-export const SIGN_IN_ERROR_PARAM = 'erreur'
+export const SIGN_IN_ERROR_PARAM = 'error'
 
 /**
  * Why a sign-in attempt was refused

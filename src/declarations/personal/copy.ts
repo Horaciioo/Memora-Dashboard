@@ -74,15 +74,15 @@ export const PERSONAL_TASK_COPY = {
   liveReportDescription:
     'Tu n’étais pas là pour ce live. Ouvre son bilan pour voir comment il s’est passé.',
   mentionDescription: 'Un commentaire du recrutement te cite. Va jeter un œil.',
-  assignTrainer: 'Attribuer un Formateur',
+  assignTrainer: 'Attribuer un Référent',
   assignTrainerDescription:
-    'Ce junior a confirmé sa fiche. Choisis le Formateur qui le suivra pendant toute sa PIM.',
+    'Ce junior a confirmé sa fiche. Choisis le Référent qui le suivra pendant toute sa PIM.',
   launchPim: 'Lancer la PIM quand même',
   launchPimDescription:
     'Certains Juniors ont fini leur formulaire, d’autres non. La PIM se lance seule quand tout le monde a fini ; tu peux aussi la lancer maintenant, les retardataires partiront dès qu’ils auront fini.',
   declareKickoff: 'Déclarer le début de PIM',
   declareKickoffDescription:
-    'Le Formateur est attribué. Déclare le début de la PIM : le lien d’intégration s’ouvre pour cette personne.',
+    'Le Référent est attribué. Déclare le début de la PIM : le lien d’intégration s’ouvre pour cette personne.',
   reviewDue: {
     REVIEW_ONE: 'Faire le bilan de 1ère phase',
     REVIEW_FINAL: 'Faire le bilan de 2e phase',
@@ -91,7 +91,7 @@ export const PERSONAL_TASK_COPY = {
   reviewDueDescription:
     'Rédige le bilan, note chaque compétence, puis dépose-le : le Responsable tranche ensuite.',
   decision: '{trainer} a déposé son bilan pour {junior}',
-  decisionDescription: 'Lis le bilan et l’avis du Formateur, puis tranche depuis l’onglet Bilans.',
+  decisionDescription: 'Lis le bilan et l’avis du Référent, puis tranche depuis l’onglet Bilans.',
   secondPeriod: 'Lancer la période 2',
   secondPeriodDescription:
     'Des passages sont accordés, d’autres attendent encore. La période 2 se lance seule quand tout le monde est décidé ; tu peux aussi la lancer maintenant.',

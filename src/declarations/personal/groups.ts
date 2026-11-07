@@ -75,9 +75,9 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     pim: true,
   },
   assignTrainer: {
-    one: 'Tu dois attribuer {n} Formateur',
-    other: 'Tu dois attribuer {n} Formateurs',
-    title: 'Formateurs à attribuer',
+    one: 'Tu dois attribuer {n} Référent',
+    other: 'Tu dois attribuer {n} Référents',
+    title: 'Référents à attribuer',
     icon: 'tasks',
     pim: true,
   },

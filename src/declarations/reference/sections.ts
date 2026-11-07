@@ -8,22 +8,22 @@ import type { PermissionName } from '@/utils/constants/permissions'
  */
 
 export const REFERENCE_KEYS = [
-  'youtubeurs',
+  'creators',
   'divisions',
-  'plateformes',
-  'reseaux-sociaux',
-  'etats',
-  'priorites',
-  'evenements',
-  'formations',
+  'platforms',
+  'socials',
+  'states',
+  'priorities',
+  'events',
+  'trainings',
   'livecon',
-  'dispositifs',
-  'categories-competences',
-  'competences',
+  'schemes',
+  'skill-categories',
+  'skills',
   'sanctions',
-  'etapes-recrutement',
-  'issues-recrutement',
-  'identifiants-discord',
+  'recruitment-steps',
+  'recruitment-outcomes',
+  'discord-identifiers',
 ] as const
 
 /**
@@ -123,7 +123,7 @@ export interface ReferenceSection {
 
 export const REFERENCE_SECTIONS: ReferenceSection[] = [
   {
-    key: 'youtubeurs',
+    key: 'creators',
     group: 'organisation',
     label: 'YouTubeurs',
     singular: 'YouTubeur',
@@ -151,7 +151,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Crée Junior, puis les squads, en montant par rang.',
   },
   {
-    key: 'plateformes',
+    key: 'platforms',
     group: 'organisation',
     label: 'Plateformes',
     singular: 'Plateforme',
@@ -164,7 +164,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Ajoute Discord, YouTube, ou toute autre plateforme utilisée.',
   },
   {
-    key: 'reseaux-sociaux',
+    key: 'socials',
     group: 'organisation',
     label: 'Réseaux sociaux',
     singular: 'Réseau social',
@@ -178,7 +178,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Ajoute Instagram, Twitch ou YouTube pour les proposer à l’intégration.',
   },
   {
-    key: 'etats',
+    key: 'states',
     group: 'pilotage',
     label: 'États',
     singular: 'État',
@@ -192,7 +192,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Crée les colonnes de tes tableaux, une par étape du flux.',
   },
   {
-    key: 'priorites',
+    key: 'priorities',
     group: 'pilotage',
     label: 'Priorités',
     singular: 'Priorité',
@@ -206,7 +206,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Ajoute tes niveaux d’urgence, du plus léger au plus lourd.',
   },
   {
-    key: 'evenements',
+    key: 'events',
     group: 'pilotage',
     label: 'Modèles d’évènement',
     singular: 'Modèle d’évènement',
@@ -220,7 +220,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Prépare tes lives et tes réunions récurrents pour les poser en un clic.',
   },
   {
-    key: 'formations',
+    key: 'trainings',
     group: 'academy',
     label: 'Formations',
     singular: 'Formation',
@@ -262,7 +262,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Déclare les mesures avant de bâtir un panel de sanctions.',
   },
   {
-    key: 'dispositifs',
+    key: 'schemes',
     group: 'academy',
     label: 'Dispositifs',
     singular: 'Dispositif',
@@ -276,7 +276,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Crée ATRIA et PULSE pour pouvoir y intégrer des juniors.',
   },
   {
-    key: 'categories-competences',
+    key: 'skill-categories',
     group: 'academy',
     label: 'Catégories de compétences',
     singular: 'Catégorie de compétence',
@@ -290,7 +290,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Crée Savoir-être, Technique, Rédaction, avant d’y ranger des compétences.',
   },
   {
-    key: 'competences',
+    key: 'skills',
     group: 'academy',
     label: 'Compétences',
     singular: 'Compétence',
@@ -304,7 +304,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Déclare les premières compétences d’une catégorie.',
   },
   {
-    key: 'etapes-recrutement',
+    key: 'recruitment-steps',
     group: 'recrutement',
     label: 'Étapes de recrutement',
     singular: 'Étape de recrutement',
@@ -318,7 +318,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Déclare la trame avant d’ouvrir une session de recrutement.',
   },
   {
-    key: 'issues-recrutement',
+    key: 'recruitment-outcomes',
     group: 'recrutement',
     label: 'Statuts de recrutement',
     singular: 'Statut de recrutement',
@@ -332,7 +332,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Déclare les statuts pour ouvrir le tableau de résultats.',
   },
   {
-    key: 'identifiants-discord',
+    key: 'discord-identifiers',
     group: 'discord',
     label: 'Identifiants Discord',
     singular: 'Identifiant Discord',

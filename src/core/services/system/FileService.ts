@@ -36,7 +36,7 @@ export interface StoredFile {
  * @return {string} - Public path
  */
 
-export const fileUrl = (id: string): string => `/api/fichiers/${id}`
+export const fileUrl = (id: string): string => `/api/files/${id}`
 
 /**
  * Build the validator of one stored entry

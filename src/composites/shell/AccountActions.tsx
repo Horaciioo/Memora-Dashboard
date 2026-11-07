@@ -2,7 +2,7 @@
 
 import Link from '@/components/elements/navigation/AppLink'
 import { ThemeCycle } from '@/components/elements/actions/ThemeCycle'
-import { logout } from '@/app/connexion/actions'
+import { logout } from '@/app/login/actions'
 import { RoleSwitch } from '@/composites/shell/RoleSwitch'
 import { ROUTES } from '@/declarations/navigation'
 import { ACCOUNT_SHEET } from '@/declarations/ui/blocks'

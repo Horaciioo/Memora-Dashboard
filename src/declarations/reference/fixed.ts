@@ -74,7 +74,7 @@ export const FunctionNames = {
   JuniorLives: 'Junior Lives',
   JuniorAnimators: 'Junior Animateurs',
   Recruiters: 'Recruteurs',
-  Trainers: 'Formateurs',
+  Trainers: 'Référents',
   Observers: 'Observateurs',
   Coordinator: 'Coordinateur de Live',
 } as const

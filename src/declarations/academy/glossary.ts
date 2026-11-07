@@ -31,9 +31,9 @@ const GLOSSARY_MAP = {
     definition: 'Modérateur en période d’intégration, rattaché à une session.',
   },
   trainer: {
-    label: 'Formateur référent',
+    label: 'Référent',
     definition:
-      'Formateur responsable du suivi principal d’un Junior. Il rédige les bilans de ses étapes.',
+      'Responsable du suivi principal d’un Junior. Il rédige les bilans de ses étapes.',
   },
   lead: {
     label: 'Responsable',
@@ -62,7 +62,7 @@ const GLOSSARY_MAP = {
   review: {
     label: 'Bilan',
     definition:
-      'Compte-rendu d’étape rédigé par le Formateur après un point vocal, puis évalué par un Responsable.',
+      'Compte-rendu d’étape rédigé par le Référent après un point vocal, puis évalué par un Responsable.',
   },
   objective: {
     label: 'Objectif',
@@ -72,7 +72,7 @@ const GLOSSARY_MAP = {
   bonus: {
     label: 'Période bonus',
     definition:
-      'Rallonge facultative accordée par décision commune du Responsable et du Formateur, bornée en lives supplémentaires.',
+      'Rallonge facultative accordée par décision commune du Responsable et du Référent, bornée en lives supplémentaires.',
   },
 } satisfies Record<string, GlossaryEntry>
 

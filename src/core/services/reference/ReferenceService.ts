@@ -1599,22 +1599,22 @@ const recruitmentOutcomes: ReferenceResource = {
  */
 
 const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
-  youtubeurs: youtubers,
+  creators: youtubers,
   divisions,
-  plateformes: platforms,
-  'reseaux-sociaux': socialNetworks,
-  etats: workflowStates,
-  priorites: priorities,
-  evenements: eventTemplates,
-  formations: trainings,
+  platforms,
+  socials: socialNetworks,
+  states: workflowStates,
+  priorities,
+  events: eventTemplates,
+  trainings,
   livecon: liveconLevels,
-  dispositifs,
-  'categories-competences': skillCategories,
-  competences: skills,
+  schemes: dispositifs,
+  'skill-categories': skillCategories,
+  skills,
   sanctions: sanctionMeasures,
-  'etapes-recrutement': recruitmentStepTemplates,
-  'issues-recrutement': recruitmentOutcomes,
-  'identifiants-discord': discordIdentifiers,
+  'recruitment-steps': recruitmentStepTemplates,
+  'recruitment-outcomes': recruitmentOutcomes,
+  'discord-identifiers': discordIdentifiers,
 }
 
 /**

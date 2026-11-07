@@ -2,7 +2,7 @@
 
 import { useCallback, useTransition } from 'react'
 
-import { logout } from '@/app/connexion/actions'
+import { logout } from '@/app/login/actions'
 import { wipeOfflinePages } from '@/core/lib/pages/offline/store'
 
 /**

@@ -63,7 +63,7 @@ export const SEAT_COPY = {
   fieldLabel: {
     recruiter: 'Session des Recruteurs',
     observer: 'Session des Observateurs',
-    trainer: 'Session des Formateurs',
+    trainer: 'Session des Référents',
   },
   fieldInfo: 'Cette fonction ne dure que le temps d’une session, elle n’ouvre que celle-ci.',
   currentGroup: 'Sessions actuelles',
@@ -72,7 +72,7 @@ export const SEAT_COPY = {
   unidentified: {
     recruiter: 'Recruteur non identifié',
     observer: 'Observateur non identifié',
-    trainer: 'Formateur non identifié',
+    trainer: 'Référent non identifié',
   },
   menuTitle: 'Participation',
   revoke: 'Enlever ses accès',

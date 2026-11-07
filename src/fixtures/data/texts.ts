@@ -8,7 +8,7 @@ export const MEMBER_NOTES = [
   'Un peu en retrait en vocal mais très efficace à l’écrit.',
   'A géré seul la vague de spam du dernier subathon, bravo.',
   'Deux oublis de passation cette semaine, à surveiller.',
-  'Candidat naturel pour Formateur, il explique bien aux juniors.',
+  'Candidat naturel pour Référent, il explique bien aux juniors.',
   'Conflit léger avec un autre modo réglé en point individuel.',
   'Demande à passer plus de temps sur les lives que sur Discord.',
   'Connaît le lore de la communauté par cœur, précieux pour repérer les trolls récurrents.',
@@ -87,7 +87,7 @@ export const MEETING_TOPICS: [string, string, string][] = [
   ['🧰', 'Outils', 'On garde le bot actuel, le second génère trop de faux positifs.'],
   ['💡', 'Idées de la communauté', 'Les viewers demandent un salon dédié aux clips.'],
   ['⚖️', 'Harmonisation des sanctions', 'Relire le barème ensemble pour les insultes légères.'],
-  ['🎓', 'Academy', 'Deux formateurs volontaires pour la prochaine session.'],
+  ['🎓', 'Academy', 'Deux référents volontaires pour la prochaine session.'],
 ]
 
 // Announcement bodies
@@ -163,7 +163,7 @@ export const JUNIOR_NOTES_NEGATIVE = [
 export const JUNIOR_OBJECTIVES: [string, string][] = [
   ['Tenir trois lives complets', 'Rester du début à la fin sur trois lives de soirée.'],
   ['Appliquer le barème sans aide', 'Choisir seul la sanction sur les cas courants.'],
-  ['Rédiger une annonce', 'Écrire et publier une annonce relue par un formateur.'],
+  ['Rédiger une annonce', 'Écrire et publier une annonce relue par un référent.'],
   ['Mener une passation', 'Faire la passation de fin de live à l’oral.'],
 ]
 

@@ -125,7 +125,7 @@ const CandidateBody = ({
               render: () => <CandidateManagementTab candidate={candidate} record={record} />,
             },
             {
-              value: 'bilan',
+              value: 'report',
               label: CANDIDATE_COPY.tabBilan,
               icon: 'note',
               render: () => <CandidateBilanTab candidate={candidate} />,

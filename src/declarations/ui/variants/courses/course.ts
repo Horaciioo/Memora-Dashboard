@@ -36,8 +36,7 @@ export const COURSE_CATALOG = {
   stageSteps: 'flex gap-1',
   stageStep: 'h-1.5 flex-1 rounded-full bg-[var(--color-border-strong)]',
   stageStepDone: 'bg-[var(--color-ink)]',
-  stageAction:
-    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-full)] bg-[var(--color-brand-600)] px-5 py-2.5 text-body font-bold text-[var(--color-on-brand)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
+  stageAction: 'key inline-flex items-center justify-center gap-2 px-5 py-2.5 text-body',
   actionIcon: 'size-4 transition-transform group-hover:translate-x-0.5',
   // Heading of a group, with what it is for
   groupLead: 'text-body text-[var(--color-ink-subtle)]',
@@ -95,8 +94,7 @@ export const COURSE_UNLOCK = {
     'flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-full)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   closeIcon: 'size-4',
   text: 'text-sm text-[var(--color-ink-subtle)]',
-  action:
-    'self-start rounded-[var(--radius-full)] bg-[var(--color-brand-600)] px-5 py-2.5 text-sm font-bold text-[var(--color-on-brand)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  action: 'key self-start px-5 py-2.5 text-sm',
 } as const
 
 /**

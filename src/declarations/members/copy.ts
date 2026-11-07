@@ -207,7 +207,7 @@ export const PARTICIPATION_ROLE_COPY: Record<ParticipationRole, string> = {
   responsable: 'Responsable de session',
   recruiter: RECRUITMENT_FIELD_COPY.recruiter,
   observer: RECRUITMENT_FIELD_COPY.observer,
-  trainer: 'Formateur',
+  trainer: 'Référent',
 }
 
 /**

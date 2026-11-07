@@ -54,7 +54,7 @@ const PROFILE_MAP: Record<ModViewProfileName, ModViewProfileOption> = {
     hidden: ['community'],
   },
   trainer: {
-    label: 'Formateur',
+    label: 'Référent',
     windows: FLOOR,
     columns: FLOOR_COLUMNS,
     widths: [1.7, 1],

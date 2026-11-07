@@ -445,7 +445,7 @@ const writeJunior = async (
         decidedById: status === 'VALIDATED' ? (validator?.id ?? null) : null,
         decidedAt: status === 'VALIDATED' ? plusMinutes(heldAt, 1440) : null,
         decisionNote:
-          status === 'VALIDATED' && chance(0.5) ? 'Validé en réunion des formateurs.' : null,
+          status === 'VALIDATED' && chance(0.5) ? 'Validé en réunion des référents.' : null,
       },
     })
   }

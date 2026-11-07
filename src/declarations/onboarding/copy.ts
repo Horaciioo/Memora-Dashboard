@@ -16,7 +16,7 @@ export const ONBOARDING_COPY = {
   pending: 'Envoi…',
   successTitle: 'C’est enregistré',
   successAdmittedDescription:
-    'Ta fiche est confirmée. Un Formateur va t’être attribué, et ta PIM démarre dès que ton Responsable la lance.',
+    'Ta fiche est confirmée. Un Référent va t’être attribué, et ta PIM démarre dès que ton Responsable la lance.',
   successDescription: 'Ton compte est ouvert, tu peux te connecter au dashboard avec Discord.',
   successPendingDescription:
     'Ton dossier part à ton Responsable, il ouvre ton accès dès qu’il l’a validé.',

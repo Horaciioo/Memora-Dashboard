@@ -164,7 +164,7 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       ],
     },
     // Trainers follow their juniors only
-    functions: { Formateurs: [Permissions.LiveFocus] },
+    functions: { [FunctionNames.Trainers]: [Permissions.LiveFocus] },
   },
   {
     key: 'work-deletion',
@@ -261,13 +261,13 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     key: 'trainers-calendar-off',
     grants: {},
     // Planning stays with the Responsables for now
-    functionRevokes: { Formateurs: [Permissions.CalendarManage] },
+    functionRevokes: { [FunctionNames.Trainers]: [Permissions.CalendarManage] },
   },
   {
     key: 'trainers-open-academy',
     grants: {},
     // Moderators holding the function open the Academy
-    functions: { Formateurs: [Permissions.AcademyRead] },
+    functions: { [FunctionNames.Trainers]: [Permissions.AcademyRead] },
   },
   {
     key: 'leads-see-youtubers',
@@ -278,6 +278,27 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
         Permissions.TeamRead,
         Permissions.TeamManage,
       ],
+    },
+  },
+  {
+    key: 'sanction-panels-by-function',
+    grants: {
+      [MemberRoles.Admin]: [Permissions.SanctionDiscordRead],
+      [MemberRoles.Employe]: [Permissions.SanctionDiscordRead],
+      [MemberRoles.Responsable]: [Permissions.SanctionDiscordRead],
+    },
+    // Each trade opens its own panel
+    functions: {
+      [FunctionNames.Lives]: [Permissions.SanctionRead],
+      [FunctionNames.JuniorLives]: [Permissions.SanctionRead],
+      [FunctionNames.Discord]: [Permissions.SanctionDiscordRead],
+      [FunctionNames.JuniorDiscord]: [Permissions.SanctionDiscordRead],
+    },
+    denies: {
+      [FunctionNames.Discord]: [Permissions.SanctionRead],
+      [FunctionNames.JuniorDiscord]: [Permissions.SanctionRead],
+      [FunctionNames.Animators]: [Permissions.SanctionRead],
+      [FunctionNames.JuniorAnimators]: [Permissions.SanctionRead],
     },
   },
   {

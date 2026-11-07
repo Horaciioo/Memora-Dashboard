@@ -209,7 +209,7 @@ export const launchPromotion = async (id: string): Promise<void> => {
 }
 
 /**
- * Refuse to launch a promotion while a confirmed junior still has no Formateur
+ * Refuse to launch a promotion while a confirmed junior still has no Référent
  * @param {string} id - Session identifier
  * @return {Promise<void>} - Throws when a trainer is missing
  */

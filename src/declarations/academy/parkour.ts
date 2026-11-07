@@ -48,8 +48,8 @@ export interface ParkourPhaseOption {
 
 export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
   needsTrainer: {
-    label: 'Formateur à attribuer',
-    lead: 'Un Formateur doit être attribué.',
+    label: 'Référent à attribuer',
+    lead: 'Un Référent doit être attribué.',
     tone: 'caution',
     icon: 'functionTrainer',
   },
@@ -79,7 +79,7 @@ export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
   },
   reviewOneDue: {
     label: 'Bilan de 1ère phase à faire',
-    lead: 'Le Formateur remplit le bilan.',
+    lead: 'Le Référent remplit le bilan.',
     tone: 'warning',
     icon: 'sheet',
   },
@@ -103,7 +103,7 @@ export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
   },
   reviewTwoDue: {
     label: 'Bilan de 2e phase à faire',
-    lead: 'Le Formateur donne son avis.',
+    lead: 'Le Référent donne son avis.',
     tone: 'warning',
     icon: 'sheet',
   },
@@ -121,7 +121,7 @@ export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
   },
   finalReviewDue: {
     label: 'Bilan définitif à faire',
-    lead: 'Le Formateur fait le bilan définitif.',
+    lead: 'Le Référent fait le bilan définitif.',
     tone: 'warning',
     icon: 'sheet',
   },
@@ -193,7 +193,7 @@ export const PARKOUR_DECISION_CONFIRM: Record<ReviewAdviceName, string> = {
 
 export const PARKOUR_COPY = {
   title: PARKOUR_NAME,
-  assignTrainer: 'Attribuer un Formateur',
+  assignTrainer: 'Attribuer un Référent',
   declareKickoff: 'Déclarer le début de la PIM',
   kickoffDeclared: 'Début de PIM déclaré',
   integrationLink: 'Lien d’intégration',
@@ -207,7 +207,7 @@ export const PARKOUR_COPY = {
   submitFirst: 'Bilan de 1ère phase réalisé',
   submit: 'Déposer le bilan',
   submitIncomplete: 'Remplis le compte rendu et note chaque compétence avant de déposer le bilan.',
-  bounce: 'Renvoyer au Formateur',
+  bounce: 'Renvoyer au Référent',
   decided: 'Décision enregistrée',
   deadline: 'Date limite de la 3e période',
   deadlineHint: 'Le bilan définitif tombe ce jour-là.',

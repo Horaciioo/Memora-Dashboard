@@ -4,9 +4,9 @@
  */
 
 export const SANCTION_PARAMS = {
-  creator: 'youtubeur',
-  panel: 'vue',
-  level: 'niveau',
-  replace: 'remplacer',
+  creator: 'creator',
+  panel: 'view',
+  level: 'level',
+  replace: 'replace',
   yes: '1',
 } as const

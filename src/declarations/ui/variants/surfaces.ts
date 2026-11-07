@@ -216,6 +216,9 @@ export const DRAWER_STYLES = {
     'drawer-enter fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
   // Wider footprint from md
   wide: 'md:w-[var(--drawer-page-wide-w)]',
+  // Page of its own on a phone
+  fullScreen:
+    'max-md:inset-0 max-md:h-dvh max-md:rounded-none max-md:border-0 max-md:pt-[env(safe-area-inset-top)] max-md:pb-[env(safe-area-inset-bottom)]',
   // Form on the left, live result on the right, same width and height
   split:
     'flex min-h-full flex-col gap-6 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-x-8',
@@ -251,21 +254,21 @@ export const DRAWER_ACTIONS = {
   stepLabel: 'hidden min-w-0 truncate md:block',
   stepIcon: 'h-5 w-5 shrink-0 text-[var(--color-ink-accent)] md:h-4 md:w-4',
   // Filled gestures
-  line: 'flex size-11 shrink-0 items-center justify-center gap-2.5 rounded-full text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60 md:size-auto md:w-full md:rounded-[var(--radius-md)] md:px-4 md:py-3',
+  line: 'key flex size-11 shrink-0 items-center justify-center gap-2.5 text-sm disabled:pointer-events-none disabled:opacity-60 md:size-auto md:w-full',
   lineLabel: 'hidden md:inline',
   // No glyph: the label stays, the line keeps its width on a phone
   linePlain:
     '!size-auto min-w-0 flex-1 !rounded-[var(--radius-md)] px-4 py-3 md:w-full md:flex-none',
   lineLabelPlain: 'inline',
-  save: 'bg-[var(--color-success)] !text-[var(--color-on-solid)]',
-  cancel: 'bg-[var(--color-danger)] !text-[var(--color-on-solid)]',
-  neutral: 'bg-[var(--color-hover)] !text-[var(--color-ink)]',
+  save: 'key-success',
+  cancel: 'key-danger',
+  neutral: 'key-slate',
   icon: 'h-5 w-5 shrink-0 md:h-4.5 md:w-4.5',
   // One slim row of glyphs at every width, leaves the room to a wide form
   slimStack: 'flex items-center justify-end gap-2 p-1',
   slimSteps: 'contents',
   slimLine:
-    'flex size-11 shrink-0 items-center justify-center rounded-full text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60',
+    'key flex size-11 shrink-0 items-center justify-center disabled:pointer-events-none disabled:opacity-60',
   slimIcon: 'h-5 w-5 shrink-0',
   divider: 'mx-1 hidden h-px bg-[var(--color-border)] md:block',
   note: 'mb-4 text-sm text-[var(--color-ink-subtle)]',
@@ -614,7 +617,7 @@ export const PAGE_OPTIONS = {
   backdrop: 'fixed inset-0 z-[55] bg-[var(--color-scrim)]/30 backdrop-blur-sm md:hidden',
   icon: 'size-4',
   panel:
-    'popover-enter glass-panel absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex w-72 flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
+    'popover-enter glass-panel absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
   title:
     'px-2.5 pt-1.5 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   row: 'flex items-center justify-between gap-4 rounded-[var(--radius-md)] px-2.5 py-2 font-semibold',

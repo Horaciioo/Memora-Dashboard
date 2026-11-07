@@ -42,7 +42,16 @@ export type FieldKind =
  */
 
 export type OptionMark =
-  'dot' | 'avatar' | 'priority' | 'emoji' | 'glyph' | 'network' | 'division' | 'role' | 'flag'
+  | 'dot'
+  | 'avatar'
+  | 'priority'
+  | 'emoji'
+  | 'glyph'
+  | 'network'
+  | 'division'
+  | 'role'
+  | 'flag'
+  | 'playGame'
 
 /**
  * Value a blank creation form starts from

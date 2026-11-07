@@ -2,11 +2,7 @@
 
 import { useActionState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import {
-  acceptConsent,
-  refuseConsent,
-  type ConsentState,
-} from '@/app/(dashboard)/consentement/actions'
+import { acceptConsent, refuseConsent, type ConsentState } from '@/app/(dashboard)/consent/actions'
 import { HISTORY_CONSENT } from '@/declarations/system/security/privacy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { CONSENT_STYLES } from '@/declarations/ui/variants'

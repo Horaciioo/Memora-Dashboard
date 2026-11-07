@@ -3,6 +3,7 @@ import 'server-only'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
 
+import { botFilterExtension } from '@/core/lib/play/botFilter'
 import { changeSignalExtension } from '@/core/lib/system/changeSignal'
 
 // Survives dev hot reloads
@@ -16,7 +17,9 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 const createClient = (): PrismaClient =>
   new PrismaClient({
     adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
-  }).$extends(changeSignalExtension) as unknown as PrismaClient
+  })
+    .$extends(changeSignalExtension)
+    .$extends(botFilterExtension) as unknown as PrismaClient
 
 /**
  * Prisma client
