@@ -108,7 +108,6 @@ export interface ChangelogComment {
  * @property {string} description - Why the changes were made
  * @property {ChangelogItem[]} items - Change lines
  * @property {ChangelogComment[]} [comments] - Team words
- * @property {boolean} [hasShowcase] - Animated tour on top
  */
 
 export interface ChangelogRelease {
@@ -119,7 +118,6 @@ export interface ChangelogRelease {
   description: string
   items: ChangelogItem[]
   comments?: ChangelogComment[]
-  hasShowcase?: boolean
 }
 
 /**
@@ -136,7 +134,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       'Memora te parle maintenant : demande-lui une absence ou une mise à jour, elle s’en occupe. Et tes notes ont enfin leur place, rien qu’à toi ou partagées.',
     description:
       'Déclarer une absence ou mettre à jour un dossier obligeait à retrouver la bonne page, puis le bon formulaire, et les notes personnelles vivaient en dehors de Memora. Cette version ajoute un assistant qui mène la discussion pas à pas et des pages privées en blocs, à partager avec qui tu veux. Les réglages, les sanctions, les lives terminés et la page de statut gagnent aussi en clarté au passage, et les fiches de « Recrutements » se rangent mieux, avec un onglet de gestion et la blacklist.',
-    hasShowcase: true,
     items: [
       {
         tag: ChangelogTags.Added,
@@ -216,14 +213,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.members,
         permission: Permissions.MemberRead,
         audience: ChangelogAudiences.Responsables,
-        text: 'Ajout de la possibilité de retirer, de rendre ou de supprimer les accès d’un Recruteur, d’un Observateur ou d’un Formateur à une session, d’un clic droit sur sa ligne dans la « Participation » de sa fiche.',
+        text: 'Ajout de la possibilité de retirer, de rendre ou de supprimer les accès d’un Recruteur, d’un Observateur ou d’un Référent à une session, d’un clic droit sur sa ligne dans la « Participation » de sa fiche.',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.members,
         permission: Permissions.MemberRead,
         audience: ChangelogAudiences.Responsables,
-        text: 'Ajout d’un onglet par fonction dans la « Participation » de la fiche d’un modérateur : « Recrutement », « Académie » pour les Formateurs avec les Juniors pris en charge, et « Coordination » avec le temps passé et les actions effectuées en live.',
+        text: 'Ajout d’un onglet par fonction dans la « Participation » de la fiche d’un modérateur : « Recrutement », « Académie » pour les Référents avec les Juniors pris en charge, et « Coordination » avec le temps passé et les actions effectuées en live.',
       },
       {
         tag: ChangelogTags.Added,
@@ -574,7 +571,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       'Memora te parle maintenant : demande-lui une absence ou une mise à jour, elle s’en occupe. Et tes notes ont enfin leur place, rien qu’à toi ou partagées.',
     description:
       'Déclarer une absence ou mettre à jour un dossier obligeait à retrouver la bonne page, puis le bon formulaire, et les notes personnelles vivaient en dehors de Memora. Cette version ajoute un assistant qui mène la discussion pas à pas et des pages privées en blocs, à partager avec qui tu veux. Les réglages, les sanctions, les lives terminés et la page de statut gagnent aussi en clarté au passage, et les fiches de « Recrutements » se rangent mieux, avec un onglet de gestion et la blacklist.',
-    hasShowcase: true,
     items: [
       {
         tag: ChangelogTags.Added,
@@ -822,7 +818,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       'Memora te parle maintenant : demande-lui une absence ou une mise à jour, elle s’en occupe. Et tes notes ont enfin leur place, rien qu’à toi ou partagées.',
     description:
       'Déclarer une absence ou mettre à jour un dossier obligeait à retrouver la bonne page, puis le bon formulaire, et les notes personnelles vivaient en dehors de Memora. Cette version ajoute un assistant qui mène la discussion pas à pas et des pages privées en blocs, à partager avec qui tu veux. Les réglages, les sanctions, les lives terminés et la page de statut gagnent aussi en clarté au passage.',
-    hasShowcase: true,
     items: [
       {
         tag: ChangelogTags.Added,
@@ -1987,14 +1982,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.calendar,
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.CalendarManage,
-        text: 'Ajout des modèles d’entrevues « Junior <> Formateurs » : on choisit la session, les formateurs de la session sont convoqués et les Responsables des équipes du YouTubeur sont les Responsables de l’entrevue',
+        text: 'Ajout des modèles d’entrevues « Junior <> Référents » : on choisit la session, les référents de la session sont convoqués et les Responsables des équipes du YouTubeur sont les Responsables de l’entrevue',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.calendar,
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.CalendarManage,
-        text: 'Ajout des « Bilans de fin de période » créés automatiquement sept jours avant la fin d’une période, visibles des Responsables et des Formateurs, et disponibles dans les modèles seulement pendant cette fenêtre',
+        text: 'Ajout des « Bilans de fin de période » créés automatiquement sept jours avant la fin d’une période, visibles des Responsables et des Référents, et disponibles dans les modèles seulement pendant cette fenêtre',
       },
       {
         tag: ChangelogTags.Added,
@@ -2333,13 +2328,13 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         page: ROUTES.academy,
         permission: Permissions.AcademyRead,
-        text: 'Amélioration de l’accès à « Academy » : les Formateurs l’ouvrent désormais depuis le menu',
+        text: 'Amélioration de l’accès à « Academy » : les Référents l’ouvrent désormais depuis le menu',
       },
       {
         tag: ChangelogTags.Fixed,
         page: ROUTES.calendar,
         permission: Permissions.CalendarManage,
-        text: 'Correction d’un bug où un Modérateur pouvait créer n’importe quel évènement dans le « Calendrier » : seuls les Responsables le peuvent, et les Formateurs ne planifient plus dans le « Calendrier » pour le moment',
+        text: 'Correction d’un bug où un Modérateur pouvait créer n’importe quel évènement dans le « Calendrier » : seuls les Responsables le peuvent, et les Référents ne planifient plus dans le « Calendrier » pour le moment',
       },
       {
         tag: ChangelogTags.Fixed,
@@ -2836,7 +2831,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.lives,
         permission: Permissions.LiveRead,
-        text: 'Ajout d’une disposition de départ propre à chaque poste de la « Mod View » : Modérateur, Formateur, Responsable et Admin, mémorisée séparément',
+        text: 'Ajout d’une disposition de départ propre à chaque poste de la « Mod View » : Modérateur, Référent, Responsable et Admin, mémorisée séparément',
       },
       {
         tag: ChangelogTags.Added,
@@ -3087,7 +3082,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.calendar,
         permission: Permissions.AcademyRead,
-        text: 'Ajout des entretiens de formateur, des entretiens de panel et des bilans de l’Academy dans le « Calendrier », avec le formateur concerné',
+        text: 'Ajout des entretiens de référent, des entretiens de panel et des bilans de l’Academy dans le « Calendrier », avec le référent concerné',
       },
       {
         tag: ChangelogTags.Added,
@@ -3181,7 +3176,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Fixed,
         page: ROUTES.academy,
         permission: Permissions.AcademyRead,
-        text: 'Correction d’un bug qui privait les Formateurs de leurs accès initiaux',
+        text: 'Correction d’un bug qui privait les Référents de leurs accès initiaux',
       },
       {
         tag: ChangelogTags.Fixed,
@@ -3749,7 +3744,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         page: ROUTES.projects,
         permission: Permissions.ProjectRead,
-        text: 'Amélioration des droits des modérateurs : ils consultent leurs « Tâches » sans pouvoir les modifier, et les pages « Formations » et « Recrutement » restent aux formateurs et recruteurs',
+        text: 'Amélioration des droits des modérateurs : ils consultent leurs « Tâches » sans pouvoir les modifier, et les pages « Formations » et « Recrutement » restent aux référents et recruteurs',
       },
       {
         tag: ChangelogTags.Improved,
