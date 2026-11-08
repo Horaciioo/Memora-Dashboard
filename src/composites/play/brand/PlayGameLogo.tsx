@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { PLAY_GAMES } from '@/declarations/play'
+import { PLAY_GAMES } from '@/declarations/play/games'
 import { PLAY_BRAND } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'

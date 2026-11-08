@@ -4,7 +4,7 @@ import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import Link from '@/components/elements/navigation/AppLink'
 import { usePlayNotice } from '@/core/hooks/interaction/layout/usePlayNotice'
 import { ROUTES } from '@/declarations/navigation'
-import { PLAY_HUB_COPY } from '@/declarations/play'
+import { PLAY_HUB_COPY } from '@/declarations/play/hub'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_NOTICE } from '@/declarations/ui/variants'
 
