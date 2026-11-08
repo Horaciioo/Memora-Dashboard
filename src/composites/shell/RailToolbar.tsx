@@ -1,14 +1,20 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { CommandPalette } from '@/composites/search/CommandPalette'
 import { ROUTES } from '@/declarations/navigation'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import type { IconName } from '@/declarations/ui/icons'
 import { railIcon } from '@/declarations/ui/railIcons'
 import { cn } from '@/utils/classnames'
+
+// Loaded on first search
+const CommandPalette = dynamic(
+  () => import('@/composites/search/CommandPalette').then((module) => module.CommandPalette),
+  { ssr: false }
+)
 
 export interface RailToolbarProps {
   isCompact: boolean

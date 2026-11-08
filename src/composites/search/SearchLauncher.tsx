@@ -1,14 +1,20 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
-import { CommandPalette } from '@/composites/search/CommandPalette'
 import { useAssistantDock } from '@/core/store/assistantDock'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { SEARCH_LAUNCHER } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { BUTTON_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+
+// Loaded on first search
+const CommandPalette = dynamic(
+  () => import('@/composites/search/CommandPalette').then((module) => module.CommandPalette),
+  { ssr: false }
+)
 
 export interface SearchLauncherProps {
   // Overrides the standard glyph button
