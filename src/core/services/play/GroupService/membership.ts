@@ -1,146 +1,25 @@
 import 'server-only'
-
 import type { Prisma } from '@prisma/client'
-
 import { prisma } from '@/core/lib/db'
-import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
-import { readBodyList, readBodyText } from '@/core/lib/play'
+import { conflict, forbidden, notFound } from '@/core/lib/errors'
+import { readBodyList } from '@/core/lib/play'
 import { signalGroups } from '@/core/lib/play/signal'
-import { createSession } from '@/core/services/play/LobbyService'
-import { inviteToSession } from '@/core/services/play/PlayInviteService'
 import {
   fillPlayMessage,
-  PLAY_GAMES,
   PLAY_GROUP_COPY,
   PLAY_GROUP_ERRORS,
   PLAY_SETTINGS,
 } from '@/declarations/play'
-import type { PlayGroupState, PlayGroupView } from '@/types/play'
-import { PlayInviteRoles, PlayVisibilities } from '@/utils/constants/play'
-import type { PlayGameName } from '@/utils/constants/play'
-
-const PERSON = { select: { id: true, displayName: true, avatarUrl: true } } as const
-
-const GROUP_INCLUDE = (shown: number) =>
-  ({
-    members: { orderBy: { joinedAt: 'asc' }, include: { account: PERSON } },
-    invites: { orderBy: { createdAt: 'asc' }, include: { invitee: PERSON } },
-    proposals: { orderBy: { createdAt: 'asc' }, include: { account: PERSON } },
-    messages: { orderBy: { createdAt: 'desc' }, take: shown, include: { account: PERSON } },
-  }) satisfies Prisma.PlayGroupInclude
-
-const loadGroup = (id: string) =>
-  prisma.playGroup.findUnique({
-    where: { id },
-    include: GROUP_INCLUDE(PLAY_SETTINGS.group.messagesShown),
-  })
-
-type LoadedGroup = NonNullable<Awaited<ReturnType<typeof loadGroup>>>
-
-/**
- * Group where a member sits, refusing a stranger
- * @param {string} accountId - Member
- * @param {string} groupId - Group
- * @return {Promise<LoadedGroup>} - Group
- */
-
-export const requireGroup = async (accountId: string, groupId: string): Promise<LoadedGroup> => {
-  const group = await loadGroup(groupId)
-  if (!group) throw notFound(PLAY_GROUP_ERRORS.missing)
-  if (!group.members.some((member) => member.accountId === accountId)) {
-    throw notFound(PLAY_GROUP_ERRORS.notMember)
-  }
-
-  return group
-}
-
-/**
- * Group of a member, refusing anyone but its host
- * @param {string} accountId - Member
- * @param {string} groupId - Group
- * @return {Promise<LoadedGroup>} - Group
- */
-
-const requireHostGroup = async (accountId: string, groupId: string): Promise<LoadedGroup> => {
-  const group = await requireGroup(accountId, groupId)
-  if (group.hostId !== accountId) throw forbidden(PLAY_GROUP_ERRORS.hostOnly)
-
-  return group
-}
-
-/**
- * Tell everyone a group touches to read it again
- * @param {LoadedGroup} group - Group
- * @param {string[]} [extra] - Others to tell, a member just removed
- * @return {Promise<void>} - Sent
- */
-
-export const tellGroup = (group: LoadedGroup, extra: string[] = []): Promise<void> =>
-  signalGroups([
-    ...group.members.map((member) => member.accountId),
-    ...group.invites.map((invite) => invite.inviteeId),
-    ...extra,
-  ])
-
-/**
- * Name as typed, trimmed and bounded
- * @param {Record<string, unknown>} raw - Body
- * @return {string} - Name
- */
-
-const nameOf = (raw: Record<string, unknown>): string => {
-  const name = readBodyText(raw, 'name', PLAY_GROUP_ERRORS.name)
-  if (name.length > PLAY_SETTINGS.group.nameMax) {
-    throw invalidInput([{ field: 'name', message: PLAY_GROUP_ERRORS.nameLong }])
-  }
-
-  return name
-}
-
-/**
- * Group as the viewer reads it
- * @param {LoadedGroup} group - Group
- * @param {string} accountId - Viewer
- * @return {PlayGroupView} - View
- */
-
-const toView = (group: LoadedGroup, accountId: string): PlayGroupView => ({
-  id: group.id,
-  name: group.name,
-  isHost: group.hostId === accountId,
-  members: group.members.map(({ account }) => ({
-    accountId: account.id,
-    name: account.displayName,
-    avatarUrl: account.avatarUrl,
-    isHost: account.id === group.hostId,
-    isMe: account.id === accountId,
-  })),
-  invited: group.invites.map(({ invitee }) => ({
-    accountId: invitee.id,
-    name: invitee.displayName,
-    avatarUrl: invitee.avatarUrl,
-  })),
-  proposals: group.proposals.map((proposal) => ({
-    id: proposal.id,
-    game: proposal.game,
-    by: { name: proposal.account.displayName, avatarUrl: proposal.account.avatarUrl },
-    isMine: proposal.accountId === accountId,
-  })),
-  // Stored newest first, read oldest first
-  messages: [...group.messages].reverse().map((message) => ({
-    id: message.id,
-    body: message.body,
-    createdAt: message.createdAt.toISOString(),
-    game: message.game,
-    sessionId: message.sessionId,
-    author: {
-      accountId: message.account.id,
-      name: message.account.displayName,
-      avatarUrl: message.account.avatarUrl,
-    },
-    isMine: message.accountId === accountId,
-  })),
-})
+import type { PlayGroupState } from '@/types/play'
+import {
+  GROUP_INCLUDE,
+  PERSON,
+  nameOf,
+  requireGroup,
+  requireHostGroup,
+  tellGroup,
+  toView,
+} from '@/core/services/play/GroupService/shared'
 
 /**
  * Groups and invitations of a member
@@ -338,105 +217,6 @@ export const dissolvePlayGroup = async (accountId: string, groupId: string): Pro
   const group = await requireHostGroup(accountId, groupId)
   await prisma.playGroup.delete({ where: { id: group.id } })
   await tellGroup(group)
-}
-
-/**
- * Propose a game to the group, or take the proposal back
- * @param {string} accountId - Member
- * @param {string} groupId - Group
- * @param {Record<string, unknown>} raw - Body with the game
- * @return {Promise<void>} - Toggled
- */
-
-export const proposeGroupGame = async (
-  accountId: string,
-  groupId: string,
-  raw: Record<string, unknown>
-): Promise<void> => {
-  const group = await requireGroup(accountId, groupId)
-  const game = gameOf(raw)
-  const where = { groupId_accountId_game: { groupId: group.id, accountId, game } }
-  if (await prisma.playGroupProposal.findUnique({ where })) {
-    await prisma.playGroupProposal.delete({ where })
-  } else {
-    await prisma.playGroupProposal.create({ data: { groupId: group.id, accountId, game } })
-  }
-  await tellGroup(group)
-}
-
-/**
- * Game named in a body, playable only
- * @param {Record<string, unknown>} raw - Body
- * @return {PlayGameName} - Game
- */
-
-const gameOf = (raw: Record<string, unknown>): PlayGameName => {
-  const name = readBodyText(raw, 'game', PLAY_GROUP_ERRORS.notProposed)
-  const game = PLAY_GAMES.keys.find((key) => key === name)
-  if (!game || !PLAY_GAMES.get(game).playable) throw notFound(PLAY_GROUP_ERRORS.notProposed)
-
-  return game
-}
-
-/**
- * Drop a proposal, by its author or the host
- * @param {string} accountId - Member
- * @param {string} groupId - Group
- * @param {string} proposalId - Proposal
- * @return {Promise<void>} - Dropped
- */
-
-export const dropGroupProposal = async (
-  accountId: string,
-  groupId: string,
-  proposalId: string
-): Promise<void> => {
-  const group = await requireGroup(accountId, groupId)
-  const proposal = group.proposals.find((entry) => entry.id === proposalId)
-  if (!proposal) throw notFound(PLAY_GROUP_ERRORS.notProposed)
-  if (proposal.accountId !== accountId && group.hostId !== accountId) {
-    throw forbidden(PLAY_GROUP_ERRORS.hostOnly)
-  }
-  await prisma.playGroupProposal.delete({ where: { id: proposalId } })
-  await tellGroup(group)
-}
-
-/**
- * Open a private table for the group, call everyone in and post it in the chat
- * @param {string} accountId - Member
- * @param {string} groupId - Group
- * @param {Record<string, unknown>} raw - Body with the game
- * @return {Promise<{ id: string }>} - Table
- */
-
-export const launchGroupGame = async (
-  accountId: string,
-  groupId: string,
-  raw: Record<string, unknown>
-): Promise<{ id: string }> => {
-  const group = await requireGroup(accountId, groupId)
-  const game = gameOf(raw)
-  const session = await createSession(accountId, { game, visibility: PlayVisibilities.Private })
-  const others = group.members.map((member) => member.accountId).filter((id) => id !== accountId)
-  if (others.length > 0) {
-    await inviteToSession(session.id, accountId, {
-      role: PlayInviteRoles.Player,
-      accountIds: others,
-    })
-  }
-  await prisma.playGroupProposal.deleteMany({ where: { groupId: group.id, game } })
-  await prisma.playGroupMessage.create({
-    data: {
-      groupId: group.id,
-      accountId,
-      body: PLAY_GROUP_COPY.invitedToPlay,
-      game,
-      sessionId: session.id,
-    },
-  })
-  await tellGroup(group)
-
-  return session
 }
 
 /**
