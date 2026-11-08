@@ -4,7 +4,7 @@ import { useNavalSkinStore } from '@/core/store/play/navalSkin'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SKINS } from '@/declarations/play/naval/skins'
 import type { NavalSkinName } from '@/declarations/play/naval/skins'
-import { NAVAL_PLACE } from '@/declarations/ui/variants/naval'
+import { NAVAL_PLACE } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 
 /**

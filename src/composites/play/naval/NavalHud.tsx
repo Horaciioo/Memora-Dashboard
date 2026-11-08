@@ -1,7 +1,7 @@
 'use client'
 
 import { NavalClock } from '@/composites/play/naval/NavalClock'
-import { NAVAL_HUD } from '@/declarations/ui/variants/naval'
+import { NAVAL_HUD } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 
 /**

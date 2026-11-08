@@ -1,4 +1,4 @@
-import type { VoteLook } from '@/declarations/ui/variants/golf'
+import type { VoteLook } from '@/declarations/ui/variants/games/golf'
 
 // Glass of the Play boxes
 const GLASS = 'play-glass rounded-3xl'

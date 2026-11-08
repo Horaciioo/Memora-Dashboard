@@ -3,7 +3,7 @@ import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { NAVAL_BOARD_COPY, NAVAL_ROUND_COPY } from '@/declarations/play/naval/copy'
-import { NAVAL_BRACKET } from '@/declarations/ui/variants/naval'
+import { NAVAL_BRACKET } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 
 /**

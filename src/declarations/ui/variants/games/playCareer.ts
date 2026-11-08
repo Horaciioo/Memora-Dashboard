@@ -1,4 +1,4 @@
-import { PLAY_PANEL } from '@/declarations/ui/variants/play'
+import { PLAY_PANEL } from '@/declarations/ui/variants/games/play'
 
 /**
  * Own stats page: rank card, record, form, mastery

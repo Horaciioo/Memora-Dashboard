@@ -16,7 +16,7 @@ import { marksOf } from '@/core/lib/play/naval/sea'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
 import { NAVAL_BOARD_COPY, NAVAL_MODE_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
-import { NAVAL_BOARD, NAVAL_PLACE } from '@/declarations/ui/variants/naval'
+import { NAVAL_BOARD, NAVAL_PLACE } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 
 /**

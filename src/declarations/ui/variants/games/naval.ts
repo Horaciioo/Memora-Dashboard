@@ -1,4 +1,4 @@
-import { setupStyles } from '@/declarations/ui/variants/play'
+import { setupStyles } from '@/declarations/ui/variants/games/play'
 
 // Glass card over the sea
 const PANEL =

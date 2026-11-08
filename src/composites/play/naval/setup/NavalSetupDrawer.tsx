@@ -14,7 +14,7 @@ import { NAVAL_MODE_COPY, NAVAL_RULE_COPY, NAVAL_SETUP_COPY } from '@/declaratio
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import type { NavalFormatName, NavalRuleName } from '@/declarations/play/naval/settings'
 import { FIELD_STYLES } from '@/declarations/ui/variants'
-import { NAVAL_SETUP } from '@/declarations/ui/variants/naval'
+import { NAVAL_SETUP } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 import { NavalModes } from '@/utils/constants/play'
 

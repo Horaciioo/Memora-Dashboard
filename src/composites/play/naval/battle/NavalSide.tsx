@@ -2,7 +2,7 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
-import { NAVAL_BOARD, NAVAL_RESULT } from '@/declarations/ui/variants/naval'
+import { NAVAL_BOARD, NAVAL_RESULT } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 
 /**

@@ -26,7 +26,7 @@ import { NavalCodes } from '@/core/lib/play/naval/state'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
 import { NAVAL_MODE_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
-import { NAVAL_BOARD } from '@/declarations/ui/variants/naval'
+import { NAVAL_BOARD } from '@/declarations/ui/variants/games/naval'
 import { NavalModes, NavalPhases } from '@/utils/constants/play'
 
 /**

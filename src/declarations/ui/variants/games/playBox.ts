@@ -1,4 +1,4 @@
-import { PLAY_PANEL } from '@/declarations/ui/variants/play'
+import { PLAY_PANEL } from '@/declarations/ui/variants/games/play'
 
 /**
  * Play box: every block of a page sits in one

@@ -12,7 +12,7 @@ import type { useNavalAim } from '@/composites/play/naval/battle/useNavalAim'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
-import { NAVAL_BOARD, NAVAL_CALLOUT } from '@/declarations/ui/variants/naval'
+import { NAVAL_BOARD, NAVAL_CALLOUT } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 
 export interface NavalTargetSeaProps {

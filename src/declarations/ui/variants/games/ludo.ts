@@ -1,4 +1,4 @@
-import { setupStyles } from '@/declarations/ui/variants/play'
+import { setupStyles } from '@/declarations/ui/variants/games/play'
 
 // Name under a player plate
 const NAME = 'max-w-[9rem] truncate text-base font-extrabold text-[var(--play-ink)] drop-shadow-sm'

@@ -6,7 +6,7 @@ import type { OceanStrike } from '@/composites/play/naval/ocean/paint/strike'
 import { useOceanCamera } from '@/composites/play/naval/ocean/useOceanCamera'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
-import { NAVAL_BOARD } from '@/declarations/ui/variants/naval'
+import { NAVAL_BOARD } from '@/declarations/ui/variants/games/naval'
 
 /**
  * The viewer's own fleet, small and flat, with the strikes that fall on it

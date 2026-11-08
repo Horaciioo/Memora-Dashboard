@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { GOLF_VOTE } from '@/declarations/ui/variants'
-import type { VoteLook } from '@/declarations/ui/variants/golf'
+import type { VoteLook } from '@/declarations/ui/variants/games/golf'
 
 // Hops above which a jump stops climbing higher
 const MAX_LIFT = 4

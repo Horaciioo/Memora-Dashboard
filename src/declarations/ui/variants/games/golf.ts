@@ -1,4 +1,4 @@
-import { setupStyles } from '@/declarations/ui/variants/play'
+import { setupStyles } from '@/declarations/ui/variants/games/play'
 
 // Putt Party pixel slab over the course
 const GLASS = 'golf-block'

@@ -14,7 +14,7 @@ import type { SeaMark } from '@/core/lib/play/naval/sea'
 import { useNavalSkinStore } from '@/core/store/play/navalSkin'
 import { NAVAL_SKINS } from '@/declarations/play/naval/skins'
 import { NAVAL_VIEW } from '@/declarations/play/naval/view'
-import { NAVAL_OCEAN } from '@/declarations/ui/variants/naval'
+import { NAVAL_OCEAN } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 
 export interface NavalOceanProps extends OceanHandlers {
