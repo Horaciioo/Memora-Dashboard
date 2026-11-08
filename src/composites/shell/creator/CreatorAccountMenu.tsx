@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { AccountActions } from '@/composites/shell/AccountActions'
-import { AccountNotifications } from '@/composites/shell/AccountNotifications'
+import { AccountActions } from '@/composites/shell/account/AccountActions'
+import { AccountNotifications } from '@/composites/shell/account/AccountNotifications'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { CREATOR_MENU, RAIL_POPOVER } from '@/declarations/ui/blocks'

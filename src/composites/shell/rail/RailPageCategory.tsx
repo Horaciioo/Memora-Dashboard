@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { InlineText } from '@/components/structures/inline/InlineText'
-import { RailPageNode } from '@/composites/shell/RailPageNode'
+import { RailPageNode } from '@/composites/shell/rail/RailPageNode'
 import { CATEGORY_ORIGIN } from '@/core/hooks/data/pages'
 import type { PageCategories } from '@/core/hooks/data/pages'
 import type { DragAndDrop } from '@/core/hooks/interaction/gestures/useDragAndDrop'

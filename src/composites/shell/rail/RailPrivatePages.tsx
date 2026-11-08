@@ -3,8 +3,8 @@
 import { useState } from 'react'
 
 import Link from '@/components/elements/navigation/AppLink'
-import { RailPageNode } from '@/composites/shell/RailPageNode'
-import { RailPageCategory } from '@/composites/shell/RailPageCategory'
+import { RailPageNode } from '@/composites/shell/rail/RailPageNode'
+import { RailPageCategory } from '@/composites/shell/rail/RailPageCategory'
 import {
   LOOSE_CONTAINER,
   usePageActions,
