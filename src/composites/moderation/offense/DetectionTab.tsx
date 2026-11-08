@@ -3,7 +3,7 @@
 import { DetectionTester } from '@/composites/moderation/offense/DetectionTester'
 import { KeywordField } from '@/composites/moderation/offense/KeywordField'
 import { PhraseList } from '@/composites/moderation/offense/PhraseList'
-import { useSavedTerms } from '@/core/hooks/interaction/state/useSavedTerms'
+import { useSavedTerms } from '@/core/hooks/interaction/state/saved/useSavedTerms'
 import { termsOf } from '@/core/lib/modview/terms'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'
 import { SANCTION_DETECTION_COPY } from '@/declarations/sanctions/detection'

@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react'
 
-import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
+import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import { NAVAL_HUD } from '@/declarations/ui/variants/naval'
 import { cn } from '@/utils/classnames'
 import { SECOND_MS } from '@/utils/constants/time'

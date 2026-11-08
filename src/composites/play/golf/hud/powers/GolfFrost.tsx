@@ -1,6 +1,6 @@
 'use client'
 
-import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
+import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import { isEffectActive } from '@/core/lib/play/golf'
 import type { GolfBoardState } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'

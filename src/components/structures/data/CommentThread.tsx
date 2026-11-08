@@ -3,7 +3,7 @@
 import { Byline } from '@/components/elements/display/Byline'
 import { useState } from 'react'
 
-import { useHotComments } from '@/core/hooks/interaction/state/useHotComments'
+import { useHotComments } from '@/core/hooks/interaction/state/moderation/useHotComments'
 import { CommentComposer } from '@/components/structures/data/CommentComposer'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { AddRow } from '@/components/structures/inline/AddRow'

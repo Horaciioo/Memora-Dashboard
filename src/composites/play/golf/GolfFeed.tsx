@@ -3,7 +3,7 @@
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlaySessionFeed } from '@/composites/play/session/PlaySessionFeed'
 import { useGolfBoard } from '@/core/hooks/data/play/useGolfBoard'
-import { useServerAlarm } from '@/core/hooks/interaction/state/useServerAlarm'
+import { useServerAlarm } from '@/core/hooks/interaction/state/time/useServerAlarm'
 import type { GolfBoardView } from '@/core/lib/play/golf'
 import { GOLF_FEED_COPY } from '@/declarations/play/golf/copy'
 

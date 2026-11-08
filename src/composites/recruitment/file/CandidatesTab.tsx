@@ -16,7 +16,7 @@ import { ACTION_COPY } from '@/declarations/ui/copy'
 import { RowList, type RowListGroup, type RowListItem } from '@/components/structures/data/RowList'
 import { Section } from '@/components/structures/page/Section'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { useCandidateView } from '@/core/hooks/interaction/state/useCandidateView'
+import { useCandidateView } from '@/core/hooks/interaction/state/recruitment/useCandidateView'
 import {
   CANDIDATE_SORTS,
   type CandidateSort,

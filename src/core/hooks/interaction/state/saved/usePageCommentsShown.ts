@@ -1,6 +1,6 @@
 'use client'
 
-import { usePersistedFlag } from '@/core/hooks/interaction/state/usePersistedFlag'
+import { usePersistedFlag } from '@/core/hooks/interaction/state/saved/usePersistedFlag'
 
 /**
  * Comment rail shown beside pages

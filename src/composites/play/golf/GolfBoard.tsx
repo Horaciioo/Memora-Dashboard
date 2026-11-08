@@ -25,7 +25,7 @@ import { useGolfStroke } from '@/core/hooks/data/play/useGolfStroke'
 import { useGolfPowerCue } from '@/core/hooks/interaction/golf/useGolfPowerCue'
 import { useGolfPhase } from '@/core/hooks/interaction/golf/useGolfPhase'
 import { useGolfWatch } from '@/core/hooks/interaction/golf/useGolfWatch'
-import { useServerAlarm } from '@/core/hooks/interaction/state/useServerAlarm'
+import { useServerAlarm } from '@/core/hooks/interaction/state/time/useServerAlarm'
 import {
   canPlaceAt,
   canTeleportTo,

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { NudgeBubble } from '@/composites/notifications/NudgeBubble'
-import { isIdentityAlert, useIdentityAlert } from '@/core/hooks/interaction/state/useIdentityAlert'
+import { isIdentityAlert, useIdentityAlert } from '@/core/hooks/interaction/state/recruitment/useIdentityAlert'
 import { useBeaconSpot } from '@/core/hooks/interaction/layout/useBeaconSpot'
 import { useNotificationNudges } from '@/core/hooks/data/system/useNotificationNudges'
 import { apiPatch } from '@/core/lib/api/client'

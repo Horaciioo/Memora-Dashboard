@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 
 import { usePageTree } from '@/core/hooks/data/pages'
-import { useVisitedPaths } from '@/core/hooks/interaction/state/useVisitedPaths'
+import { useVisitedPaths } from '@/core/hooks/interaction/state/saved/useVisitedPaths'
 import { pathLine } from '@/core/lib/favorites/lines'
 import type { FavoriteLine } from '@/core/lib/favorites/lines'
 import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'

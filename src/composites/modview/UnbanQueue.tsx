@@ -1,8 +1,8 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { useUnbanQueue } from '@/core/hooks/interaction/state/useUnbanQueue'
-import type { UnbanOrder } from '@/core/hooks/interaction/state/useUnbanQueue'
+import { useUnbanQueue } from '@/core/hooks/interaction/state/moderation/useUnbanQueue'
+import type { UnbanOrder } from '@/core/hooks/interaction/state/moderation/useUnbanQueue'
 import { MODVIEW_UNBAN_COPY as COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_UNBAN } from '@/declarations/ui/variants'

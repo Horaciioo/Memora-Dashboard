@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 
-import { useVisitedPaths } from '@/core/hooks/interaction/state/useVisitedPaths'
+import { useVisitedPaths } from '@/core/hooks/interaction/state/saved/useVisitedPaths'
 import { ROUTES } from '@/declarations/navigation'
 
 /**

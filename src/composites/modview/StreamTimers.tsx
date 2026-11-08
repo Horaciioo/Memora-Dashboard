@@ -1,6 +1,6 @@
 'use client'
 
-import { useClock } from '@/core/hooks/interaction/state/useClock'
+import { useClock } from '@/core/hooks/interaction/state/time/useClock'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_STREAM } from '@/declarations/ui/variants'

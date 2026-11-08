@@ -3,7 +3,7 @@
 import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { WindowEmpty } from '@/composites/modview/ModWindow'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
-import type { Watchlist } from '@/core/hooks/interaction/state/useWatchlist'
+import type { Watchlist } from '@/core/hooks/interaction/state/moderation/useWatchlist'
 import { MODVIEW_WATCH_COPY as COPY } from '@/declarations/modview/watch'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'

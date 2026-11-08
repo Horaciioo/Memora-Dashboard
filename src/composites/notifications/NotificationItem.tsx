@@ -1,7 +1,7 @@
 import Link from '@/components/elements/navigation/AppLink'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { isIdentityAlert } from '@/core/hooks/interaction/state/useIdentityAlert'
+import { isIdentityAlert } from '@/core/hooks/interaction/state/recruitment/useIdentityAlert'
 import { useAssistantDock } from '@/core/store/assistantDock'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
 import { NOTIFICATION_KIND_REGISTRY } from '@/declarations/notifications/registries'

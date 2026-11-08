@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 
 import { apiDelete, apiPost } from '@/core/lib/api/client'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { useSyncedState } from '@/core/hooks/interaction/state/useSyncedState'
+import { useSyncedState } from '@/core/hooks/interaction/state/saved/useSyncedState'
 import { entityFeedback } from '@/declarations/ui/copy'
 import type { CommentView } from '@/types/comments'
 import type { FieldIssue, FormValues } from '@/types/forms'
