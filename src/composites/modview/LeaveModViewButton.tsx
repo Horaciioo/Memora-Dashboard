@@ -29,13 +29,10 @@ export const LeaveModViewButton = ({ liveId }: LeaveModViewButtonProps) => {
   const router = useRouter()
   const ExitIcon = ICONS.signOut
 
-  // Leaving always keeps moderating, unless they stop
-  const leave = async (isStopping: boolean) => {
-    if (isStopping) {
-      const stopped = await run(() => apiPost(API_ROUTES.liveModStop(liveId), {}))
-      if (!stopped) return
-    }
-    router.push(ROUTES.dashboard)
+  // Stop moderating then leave
+  const stop = async () => {
+    const stopped = await run(() => apiPost(API_ROUTES.liveModStop(liveId), {}))
+    if (stopped) router.push(ROUTES.dashboard)
   }
 
   return (
@@ -60,7 +57,7 @@ export const LeaveModViewButton = ({ liveId }: LeaveModViewButtonProps) => {
               variant="success"
               className="w-full"
               disabled={isSaving}
-              onClick={() => void leave(false)}
+              onClick={() => setAsking(false)}
             >
               {MODVIEW_COPY.leaveKeep}
             </Button>
@@ -69,7 +66,7 @@ export const LeaveModViewButton = ({ liveId }: LeaveModViewButtonProps) => {
               variant="danger"
               className="w-full"
               isLoading={isSaving}
-              onClick={() => void leave(true)}
+              onClick={() => void stop()}
             >
               {MODVIEW_COPY.leaveStop}
             </Button>

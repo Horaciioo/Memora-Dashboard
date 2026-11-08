@@ -6,7 +6,7 @@
 export const MODVIEW_TABS = {
   list: 'relative flex min-w-0 flex-1 items-center gap-0.5',
   // Box gliding under the open tab
-  box: 'pointer-events-none absolute top-0 left-0 rounded-[var(--radius-md)] bg-[var(--color-hover)] opacity-0',
+  box: 'relative flex flex-col',
   tab: 'relative flex min-w-0 items-center gap-1.5 rounded-[var(--radius-md)] px-2 py-1 text-xs font-bold tracking-tight text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
   // Keeps its words whole when the window narrows
   tabFixed: 'shrink-0',
@@ -46,7 +46,7 @@ export const MODVIEW_SUGGEST = {
   list: 'flex flex-col gap-2',
   card: 'flex flex-col gap-2 rounded-[var(--radius-lg)] bg-[var(--twitch-head)] p-3',
   who: 'cursor-pointer self-start text-xs font-bold uppercase hover:underline',
-  tag: 'shrink-0 font-bold',
+  tag: 'shrink-0 text-xs font-bold',
   why: 'min-w-0 font-semibold',
   quote: 'border-l-2 border-[var(--color-border-strong)] pl-2.5 text-sm leading-snug break-words',
   divider: 'h-px bg-[color-mix(in_oklab,var(--color-ink)_22%,transparent)]',
@@ -116,7 +116,7 @@ export const MODVIEW_DOSSIER = {
   dotOn: 'bg-[var(--color-danger)]',
   dotNext: 'bg-[var(--color-brand-400)]',
   next: 'text-xs text-[var(--twitch-muted)]',
-  box: 'flex flex-col rounded-[var(--radius-md)] bg-[var(--twitch-head)] px-3 py-1',
+  box: 'relative flex flex-col',
   rowTitle: 'min-w-0 text-sm font-bold',
   rowFoot: 'flex items-center justify-between gap-2',
   history:
@@ -221,27 +221,39 @@ export const MODVIEW_UNBAN = {
  */
 
 export const MODVIEW_TEAM_CHAT = {
-  list: 'flex max-h-[40dvh] min-h-24 flex-col gap-2 overflow-y-auto px-2 py-1',
-  row: 'flex items-start gap-2',
-  rowMentioned:
-    'rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--color-gold-400)_14%,transparent)]',
-  body: 'min-w-0 flex-1 text-sm break-words',
-  author: 'text-xs font-bold',
-  time: 'ml-2 text-xs font-normal text-[var(--color-ink-subtle)] tabular-nums',
-  mention: 'font-semibold text-[var(--color-ink-accent)]',
+  box: 'relative flex flex-col',
+  list: 'flex max-h-[64dvh] min-h-[50dvh] flex-col overflow-y-auto px-1 py-1.5',
+  row: 'mt-3 flex gap-2 rounded-lg px-2 pt-1.5 pb-0 first:mt-0hover:bg-[var(--color-hover)]',
+  follow:
+    'rounded-lg py-px pr-2 pl-10 text-[0.8125rem] leading-snug break-words whitespace-pre-wrap hover:bg-[var(--color-hover)]',
+  rowMentioned: 'bg-[color-mix(in_srgb,var(--color-gold-400)_14%,transparent)]',
+  body: 'flex min-w-0 flex-1 flex-col text-[0.8125rem] leading-snug break-words whitespace-pre-wrap',
+  meta: 'flex items-baseline gap-1.5',
+  author: 'truncate text-[0.8125rem] font-bold',
+  time: 'text-[0.65rem] font-medium text-[var(--color-ink-subtle)] tabular-nums',
+  mention:
+    'rounded bg-[color-mix(in_srgb,var(--color-ink)_14%,transparent)] px-1 font-semibold text-[var(--color-ink)]',
   older: 'self-center text-xs font-semibold text-[var(--color-ink-accent)] hover:underline',
-  empty: 'px-3 py-4 text-center text-sm text-[var(--color-ink-subtle)]',
-  composer: 'flex flex-col gap-2 border-t border-[var(--color-border)] p-2',
-  mentions: 'flex flex-wrap gap-1',
+  empty: 'px-3 py-4 text-center text-xs text-[var(--color-ink-subtle)]',
+  composer: 'flex flex-col border-t border-[var(--color-border-strong)]',
+  mentions:
+    'flex flex-wrap items-center gap-1.5 border-b border-[var(--color-border-strong)] px-3 py-2.5',
   mentionButton:
-    'cursor-pointer rounded-[var(--radius-md)] px-2 py-1 text-xs font-semibold text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+    'cursor-pointer rounded-md bg-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] px-2 py-0.5 text-[0.7rem] font-semibold whitespace-nowrap text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]',
+  inputBar: 'flex items-center gap-2 px-3 py-2',
   field:
-    'min-h-9 w-full resize-none rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-sm outline-none focus-visible:border-[var(--color-focus)]',
+    'block max-h-28 min-h-9 min-w-0 flex-1 resize-none rounded-full bg-[color-mix(in_srgb,var(--color-ink)_12%,transparent)] px-4 py-2 text-[0.8125rem] placeholder:text-[var(--color-ink-subtle)] focus:bg-[color-mix(in_srgb,var(--color-ink)_16%,transparent)] focus:outline-none',
+  suggest:
+    'popover-enter glass-panel absolute right-2 bottom-full left-2 z-10 mb-1 flex flex-col overflow-hidden rounded-xl border border-[var(--color-border-strong)] p-1 shadow-[var(--shadow-lg)]',
+  suggestItem:
+    'flex w-full cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[0.8125rem] font-semibold',
+  suggestOn: 'bg-[var(--color-hover)] text-[var(--color-ink)]',
+  send: 'grid size-9 shrink-0 cursor-pointer place-items-center rounded-full bg-[color-mix(in_srgb,var(--color-ink)_12%,transparent)] text-[var(--color-ink)] hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-40',
   // Unread point on the glyph
   unread:
     'pointer-events-none absolute top-1.5 right-1.5 size-2.5 rounded-full bg-[var(--color-danger)]',
   // Mention bubble beside the glyph
-  bubble:
+  popup:
     'popover-enter glass-panel absolute left-full z-[60] ml-4 flex w-64 cursor-pointer flex-col gap-0.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3 text-left text-sm shadow-[var(--shadow-lg)]',
   bubbleTitle: 'text-xs font-bold text-[var(--color-ink-accent)]',
   bubbleBody: 'line-clamp-3 break-words',

@@ -26,7 +26,6 @@ export const MODVIEW_WATCH_COPY = {
 export const MODVIEW_DOSSIER_COPY = {
   title: 'Dossier',
   ladderEmpty: 'Aucune infraction du panel enregistrée.',
-  ladderTitle: 'Sanctions à mettre',
   positionTitle: 'Où il en est dans le panel',
   step: 'Palier {n} sur {total}',
   next: 'Prochain : {measure}',
@@ -44,7 +43,6 @@ export const MODVIEW_DOSSIER_COPY = {
   historyEmpty: 'Aucune sanction passée sur cette chaîne.',
   loading: 'Chargement du dossier',
   watching: 'Sous surveillance',
-  window: 'Sur les {days} derniers jours',
 } as const
 
 /**

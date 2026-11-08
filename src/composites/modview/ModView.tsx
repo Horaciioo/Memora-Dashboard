@@ -53,6 +53,7 @@ import type { SanctionPanelView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
 import { LivePlatforms } from '@/utils/constants/lives'
 import { SanctionKinds } from '@/utils/constants/moderation'
+import { twitchViewerCardUrl } from '@/utils/format/modview'
 import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
@@ -390,6 +391,7 @@ export const ModView = ({
         isWorkspace ? (isCardGrown ? Math.max(side.width, CARD_MIN_WIDTH) : side.width) : undefined
       }
       onClose={() => setPicked(null)}
+      twitchUrl={twitchViewerCardUrl(state.embedUrl, shownCard.login)}
       isWatched={watchlist.watched.some((entry) => entry.id === shownCard.id)}
       onWatch={() =>
         watchlist.watched.some((entry) => entry.id === shownCard.id)

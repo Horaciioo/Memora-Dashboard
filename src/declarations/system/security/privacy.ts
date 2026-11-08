@@ -153,7 +153,7 @@ const PROCESSING_MAP = {
     retention: inDays(RETENTION_POLICIES.moderationLogs),
   },
   chatMessages: {
-    label: 'Retrouver ce qu\'un viewer a écrit dans le chat',
+    label: "Retrouver ce qu'un viewer a écrit dans le chat",
     categories: 'Pseudo, identifiant de plateforme, texte du message, date, live',
     legalBasis: 'Intérêt légitime à modérer le chat du créateur',
     retention: inDays(RETENTION_POLICIES.chatMessages),

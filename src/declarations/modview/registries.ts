@@ -198,13 +198,12 @@ export const TIER_BADGE_ICONS: Partial<Record<ChatTier, IconName>> = {
 
 /**
  * Default lengths of the chat gestures
- * @type {{ quickTimeout: number, slowMode: number, messagesPerPage: number }}
+ * @type {{ quickTimeout: number, slowMode: number }}
  */
 
 export const MODVIEW_DEFAULTS = {
   quickTimeout: 600,
   slowMode: 30,
-  messagesPerPage: 5,
 }
 
 /**
