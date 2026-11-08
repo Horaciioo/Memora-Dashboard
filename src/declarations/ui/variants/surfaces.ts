@@ -254,22 +254,27 @@ export const DRAWER_ACTIONS = {
   stepLabel: 'hidden min-w-0 truncate md:block',
   stepIcon: 'h-5 w-5 shrink-0 text-[var(--color-ink-accent)] md:h-4 md:w-4',
   // Filled gestures
-  line: 'key flex size-11 shrink-0 items-center justify-center gap-2.5 text-sm disabled:pointer-events-none disabled:opacity-60 md:size-auto md:w-full',
+  line: 'flex size-11 shrink-0 items-center justify-center gap-2.5 rounded-full text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60 md:size-auto md:w-full md:rounded-[var(--radius-md)] md:px-4 md:py-3',
   lineLabel: 'hidden md:inline',
   // No glyph: the label stays, the line keeps its width on a phone
   linePlain:
     '!size-auto min-w-0 flex-1 !rounded-[var(--radius-md)] px-4 py-3 md:w-full md:flex-none',
   lineLabelPlain: 'inline',
-  save: 'key-success',
-  cancel: 'key-danger',
-  neutral: 'key-slate',
+  save: 'bg-[var(--color-success)] !text-[var(--color-on-solid)]',
+  cancel: 'bg-[var(--color-danger)] !text-[var(--color-on-solid)]',
+  neutral: 'bg-[var(--color-hover)] !text-[var(--color-ink)]',
   icon: 'h-5 w-5 shrink-0 md:h-4.5 md:w-4.5',
   // One slim row of glyphs at every width, leaves the room to a wide form
   slimStack: 'flex items-center justify-end gap-2 p-1',
   slimSteps: 'contents',
   slimLine:
-    'key flex size-11 shrink-0 items-center justify-center disabled:pointer-events-none disabled:opacity-60',
+    'flex size-11 shrink-0 items-center justify-center rounded-full text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60',
   slimIcon: 'h-5 w-5 shrink-0',
+  // One row at every width: steps, then save and cancel always there
+  compactStack: 'flex items-center gap-2 p-1',
+  compactSteps: 'flex flex-1 items-center gap-2',
+  compactLine:
+    'flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-full px-3 text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60 md:px-4',
   divider: 'mx-1 hidden h-px bg-[var(--color-border)] md:block',
   note: 'mb-4 text-sm text-[var(--color-ink-subtle)]',
 } as const

@@ -38,9 +38,11 @@ const STAGE_COPY: Record<string, string> = {
  */
 
 export default async function PlaySessionPage({ params }: PlaySessionPageProps) {
-  const { session } = await requirePermission(Permissions.PlayAccess)
+  const { session, access } = await requirePermission(Permissions.PlayAccess)
   const { id } = await params
-  const game = await readSession(id, session.id).catch(() => null)
+  const game = await readSession(id, session.id, access.can(Permissions.PlayManage)).catch(
+    () => null
+  )
   if (!game) notFound()
 
   const meta = PLAY_GAMES.get(game.game)
@@ -106,6 +108,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
       spectators,
       viewerId: session.id,
       me: game.me,
+      canInspect: access.can(Permissions.PlayManage),
     })
 
     return (

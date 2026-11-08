@@ -25,6 +25,8 @@ export interface PlayLobbyCard {
   gamesCount: number | null
   // Followed by the reader
   isFollowed?: boolean
+  // Private game an admin watches unseen
+  isOverseen?: boolean
 }
 
 /**

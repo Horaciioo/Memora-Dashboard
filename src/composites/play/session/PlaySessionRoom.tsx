@@ -178,7 +178,9 @@ export const PlaySessionRoom = ({
 
       {isMobile ? (
         <>
-          <PlayGameMenu sessionId={chat.sessionId} gameSlug={gameSlug} isSeated={me.isSeated} />
+          {hasKeys && (
+            <PlayGameMenu sessionId={chat.sessionId} gameSlug={gameSlug} isSeated={me.isSeated} />
+          )}
           <PlayGameChatBar
             chat={chat}
             crowd={{ players: faces, spectators: crowd.spectators }}

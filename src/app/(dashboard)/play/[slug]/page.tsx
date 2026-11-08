@@ -73,19 +73,19 @@ export async function generateMetadata({ params }: PlayGamePageProps): Promise<M
 }
 
 /**
- * Hub of one game: logo, divider and actions in the middle of its own ground
+ * Hub of one game
  * @param {PlayGamePageProps} props - Game segment
  * @return {Promise<JSX.Element>} - Hub page
  */
 
 export default async function PlayGamePage({ params }: PlayGamePageProps) {
-  const { session } = await requirePermission(Permissions.PlayAccess)
+  const { session, access } = await requirePermission(Permissions.PlayAccess)
   const game = openGameOfSlug((await params).slug)
   if (!game) notFound()
 
   const [profile, tables, presence, leaders] = await Promise.all([
     readPlayProfile(session.id),
-    listLobbies(session.id, game),
+    listLobbies(session.id, game, access.can(Permissions.PlayManage)),
     readPlayPresence(session.id, game),
     readLeaderboards(game),
   ])

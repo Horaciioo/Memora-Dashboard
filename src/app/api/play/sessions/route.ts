@@ -5,7 +5,8 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.PlayAccess,
   descriptor: { summary: 'List the open lobbies and my current game', tags: ['play'] },
-  handler: async ({ session, query }) => listLobbies(session.id, query.get('game')),
+  handler: async ({ session, query, access }) =>
+    listLobbies(session.id, query.get('game'), access.can(Permissions.PlayManage)),
 })
 
 export const POST = createProtectedRoute({

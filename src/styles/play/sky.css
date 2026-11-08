@@ -1,87 +1,19 @@
-/* Room without a game ground: bright cartoon sky, dark ink */
-.play-room:not(:has(.play-paper, .play-fuse, .play-turf, .play-ludo, .play-sea)) {
-  --play-ink: #1d1a3a;
-  --play-ink-soft: rgb(29 26 58 / 0.7);
-  --play-ink-faint: rgb(29 26 58 / 0.46);
-  --play-panel: rgb(255 255 255 / 0.82);
-  --play-panel-strong: #ffffff;
-  --play-line: rgb(29 26 58 / 0.1);
-  --play-core: #f4f6ff;
-  --play-track: rgb(29 26 58 / 0.1);
-  --play-chip: rgb(29 26 58 / 0.07);
-  --play-glass: rgb(255 255 255 / 0.8);
-  --play-glass-solid: #ffffff;
-  --play-ring: #ffffff;
-  --play-gold-ink: #9a6400;
-  --play-blue-ink: #2f5fc2;
-  --play-accent: var(--play-gold-ink);
-  background:
-    radial-gradient(
-      70rem 26rem at 50% 108%,
-      color-mix(in srgb, var(--play-sky-peach) 90%, transparent),
-      transparent 72%
-    ),
-    radial-gradient(36rem 20rem at 86% 4%, rgb(255 255 255 / 0.55), transparent 70%),
-    linear-gradient(
-      180deg,
-      var(--play-sky-top) 0%,
-      var(--play-sky-mid) 52%,
-      var(--play-sky-low) 100%
-    );
+/* Neutral Play backdrop */
+.play-room:not(:has(.play-game-hub, .play-paper, .play-fuse, .play-turf, .play-ludo, .play-sea)) {
+  background: var(--play-core);
 }
 
-/* Puffy flat clouds drifting, confetti specks over them */
-.play-room:not(:has(.play-paper, .play-fuse, .play-turf, .play-ludo, .play-sea))::before {
-  opacity: 1;
-  background-image:
-    radial-gradient(circle at 50% 60%, #fff 0 2.6rem, transparent 2.65rem),
-    radial-gradient(circle at 50% 60%, #fff 0 3.4rem, transparent 3.45rem),
-    radial-gradient(circle at 50% 60%, #fff 0 2.2rem, transparent 2.25rem),
-    radial-gradient(0.35rem 0.35rem at 18% 22%, var(--play-sky-confetti-a) 98%, transparent),
-    radial-gradient(0.3rem 0.3rem at 64% 14%, var(--play-sky-confetti-b) 98%, transparent),
-    radial-gradient(0.3rem 0.3rem at 82% 58%, var(--play-sky-confetti-c) 98%, transparent),
-    radial-gradient(0.35rem 0.35rem at 34% 74%, var(--play-sky-confetti-b) 98%, transparent);
-  background-size:
-    46rem 18rem,
-    46rem 18rem,
-    46rem 18rem,
-    38rem 34rem,
-    31rem 41rem,
-    45rem 29rem,
-    36rem 47rem;
-  background-position:
-    4rem 3rem,
-    8.5rem 1.6rem,
-    13.5rem 3.4rem,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
-  background-repeat: repeat-x, repeat-x, repeat-x, repeat, repeat, repeat, repeat;
-  animation: play-sky-drift 140s linear infinite;
-}
-
-.play-room:not(:has(.play-paper, .play-fuse, .play-turf, .play-ludo, .play-sea)) .play-floor {
+.play-room:not(
+    :has(.play-game-hub, .play-paper, .play-fuse, .play-turf, .play-ludo, .play-sea)
+  )::before,
+.play-room:not(:has(.play-game-hub, .play-paper, .play-fuse, .play-turf, .play-ludo, .play-sea))
+  .play-floor {
   display: none;
 }
 
-@keyframes play-sky-drift {
-  to {
-    background-position:
-      50rem 3rem,
-      54.5rem 1.6rem,
-      59.5rem 3.4rem,
-      24rem 12rem,
-      -24rem 24rem,
-      24rem -12rem,
-      0 24rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .play-room:not(:has(.play-paper, .play-fuse, .play-turf, .play-ludo, .play-sea))::before {
-    animation: none;
-  }
+.play-room:has(.play-game-hub, .play-paper, .play-fuse, .play-turf, .play-ludo, .play-sea)
+  .play-scene-banner {
+  display: none;
 }
 
 /* Live dot of the tables being played */

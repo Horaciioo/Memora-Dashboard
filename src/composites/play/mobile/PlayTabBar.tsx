@@ -2,31 +2,35 @@
 
 import { usePathname } from 'next/navigation'
 
+import { PlayNote } from '@/composites/play/hub/PlayNote'
+import { usePlayNote } from '@/core/hooks/interaction/state/usePlayNote'
 import AppLink from '@/components/elements/navigation/AppLink'
-import { PlayBarPlayer } from '@/composites/play/mobile/PlayBarPlayer'
+import { PlayMeMenu } from '@/composites/play/mobile/PlayMeMenu'
 import { PlayTabGlyph } from '@/composites/play/mobile/PlayTabGlyphs'
-import { PLAY_TAB_LABELS, PLAY_TAB_ORDER, playTabIndexOf } from '@/composites/play/mobile/tabs'
+import {
+  PLAY_ME_AFTER,
+  PLAY_TAB_LABELS,
+  PLAY_TAB_ORDER,
+  playTabIndexOf,
+} from '@/composites/play/mobile/tabs'
 import type { PlayTab } from '@/composites/play/mobile/tabs'
 import { PLAY_HUB_COPY, PLAY_MOBILE_COPY } from '@/declarations/play'
 import { PLAY_TABS } from '@/declarations/ui/variants'
 import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
-import type { PlayNoticeView, PlayPresence, PlayTotalsView } from '@/types/play'
+import type { PlayNoticeView, PlayPresence } from '@/types/play'
 import { cn } from '@/utils/classnames'
 
 // Pages where a game fills the screen
 const SESSION_PREFIX = '/play/sessions/'
 
 export interface PlayTabBarProps {
+  player: { name: string; avatarUrl: string | null }
+  level: number
   invites: PlayNoticeView[]
   presence: PlayPresence | null
   groupCalls: number
-  player: { name: string; avatarUrl: string | null }
-  totals: PlayTotalsView
 }
-
-// Tabs left of the desktop player
-const LEFT_TABS = 3
 
 /**
  * Phone tab bar: the open tab widens and lifts
@@ -34,8 +38,9 @@ const LEFT_TABS = 3
  * @return {JSX.Element | null}
  */
 
-export const PlayTabBar = ({ invites, presence, groupCalls, player, totals }: PlayTabBarProps) => {
+export const PlayTabBar = ({ player, level, invites, presence, groupCalls }: PlayTabBarProps) => {
   const path = usePathname()
+  const { note, show } = usePlayNote()
   if (path.startsWith(SESSION_PREFIX)) return null
 
   const current = playTabIndexOf(path)
@@ -66,13 +71,30 @@ export const PlayTabBar = ({ invites, presence, groupCalls, player, totals }: Pl
   const link = (tab: PlayTab, index: number) => {
     const isOn = index === current
 
+    if (tab.key === 'stats') {
+      return (
+        <button
+          key={tab.key}
+          type="button"
+          aria-label={PLAY_MOBILE_COPY.tabStatsFull}
+          className={cn(PLAY_TABS.tab, isOn && PLAY_TABS.tabOn)}
+          onClick={() => show(PLAY_HUB_COPY.statsConstruction)}
+        >
+          {body(tab, isOn)}
+        </button>
+      )
+    }
+
     return (
       <AppLink
         key={tab.key}
         href={tab.href}
         aria-current={isOn ? 'page' : undefined}
-        aria-label={tab.key === 'stats' ? PLAY_MOBILE_COPY.tabStatsFull : undefined}
-        className={cn(PLAY_TABS.tab, isOn && PLAY_TABS.tabOn)}
+        className={cn(
+          PLAY_TABS.tab,
+          isOn && PLAY_TABS.tabOn,
+          tab.isDesktopOnly && PLAY_TABS.tabDesktop
+        )}
       >
         {body(tab, isOn)}
       </AppLink>
@@ -80,10 +102,14 @@ export const PlayTabBar = ({ invites, presence, groupCalls, player, totals }: Pl
   }
 
   return (
-    <nav aria-label={PLAY_MOBILE_COPY.tabs} className={PLAY_TABS.bar}>
-      {PLAY_TAB_ORDER.slice(0, LEFT_TABS).map((tab, index) => link(tab, index))}
-      <PlayBarPlayer player={player} totals={totals} />
-      {PLAY_TAB_ORDER.slice(LEFT_TABS).map((tab, index) => link(tab, index + LEFT_TABS))}
+    <>
+      <nav aria-label={PLAY_MOBILE_COPY.tabs} className={PLAY_TABS.bar}>
+        {PLAY_TAB_ORDER.flatMap((tab, index) =>
+          tab.key === PLAY_ME_AFTER
+            ? [link(tab, index), <PlayMeMenu key="me" player={player} level={level} />]
+            : [link(tab, index)]
+        )}
+      </nav>
       <AppLink
         href={ROUTES.dashboard}
         aria-label={PLAY_HUB_COPY.backToDashboard}
@@ -92,6 +118,7 @@ export const PlayTabBar = ({ invites, presence, groupCalls, player, totals }: Pl
       >
         <ExitIcon className={PLAY_TABS.exitIcon} />
       </AppLink>
-    </nav>
+      <PlayNote text={note} />
+    </>
   )
 }

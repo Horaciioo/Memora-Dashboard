@@ -10,7 +10,7 @@ const EASE = 'duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
  */
 
 export const PLAY_TABS = {
-  bar: `fixed inset-x-0 bottom-0 z-50 flex items-stretch gap-1 border-t border-white/70 ${SILVER} px-1.5 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] shadow-[0_-0.25rem_1rem_rgb(0_0_0/0.18)] md:inset-x-auto md:bottom-4 md:left-1/2 md:w-[min(42rem,calc(100%-2rem))] md:-translate-x-1/2 md:rounded-3xl md:border md:pb-1.5`,
+  bar: `fixed inset-x-0 bottom-0 z-50 flex items-stretch gap-1 border-t border-white/70 ${SILVER} px-1.5 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] shadow-[0_-0.25rem_1rem_rgb(0_0_0/0.18)] md:inset-x-auto md:bottom-4 md:left-1/2 md:w-[min(48rem,calc(100%-9.5rem))] md:-translate-x-1/2 md:rounded-3xl md:border md:pb-1.5`,
   // Open tab takes more width, the others share the rest, a divider between each
   tab: `group relative flex min-h-16 min-w-0 flex-1 flex-col items-center justify-center rounded-2xl transition-[flex-grow] ${EASE} before:absolute before:inset-0 before:rounded-2xl before:opacity-0 before:transition-opacity before:duration-500 before:ease-[cubic-bezier(0.22,1,0.36,1)] before:bg-[linear-gradient(180deg,var(--play-key),color-mix(in_srgb,var(--play-key)_70%,var(--play-night)))] before:shadow-[inset_0_2px_0_rgb(255_255_255/0.35),0_0.2rem_0_rgb(0_0_0/0.4)] after:absolute after:top-3 after:-right-0.5 after:bottom-3 after:w-px after:bg-black/15 last:after:hidden has-[+[aria-current=page]]:after:hidden has-[+[aria-expanded=true]]:after:hidden active:scale-95 disabled:opacity-50`,
   tabOn: 'grow-[1.7] before:opacity-100 after:hidden',
@@ -23,23 +23,24 @@ export const PLAY_TABS = {
     'absolute -top-0.5 -right-0.5 size-3 rounded-full bg-[var(--play-alert)] ring-2 ring-white',
   label: `relative z-10 max-h-4 text-[0.65rem] leading-none font-extrabold tracking-wide text-white uppercase transition-[max-height,opacity,translate] ${EASE}`,
   labelRest: `relative z-10 max-h-0 tracking-wide text-white uppercase translate-y-1 overflow-hidden text-[0.65rem] leading-none font-extrabold opacity-0 transition-[max-height,opacity,translate] ${EASE}`,
-  // Desktop only: the player at the centre
-  player: 'relative mx-1 -my-5 flex items-center max-md:hidden',
-  playerButton:
-    'relative rounded-full transition-transform duration-300 hover:-translate-y-0.5 active:scale-95',
-  playerRing: 'rounded-full ring-4 ring-white',
-  playerLevel:
-    'absolute -right-1 -bottom-1 grid min-w-7 place-items-center rounded-full bg-[var(--play-gold)] px-1.5 py-0.5 text-xs font-extrabold tabular-nums text-[var(--play-night)] ring-2 ring-white',
-  playerBubble:
-    'play-glass play-rise absolute bottom-full left-1/2 mb-6 flex w-72 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 flex-col gap-3 rounded-2xl p-4 text-[var(--play-ink)]',
-  playerHead: 'flex items-center justify-between gap-3',
-  playerName: 'truncate text-sm font-extrabold tracking-wide uppercase',
-  playerOpen:
-    'grid size-8 shrink-0 place-items-center rounded-full text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
-  playerOpenIcon: 'size-4',
-  // Dashboard key at the right end, desktop only
-  exit: 'group relative flex min-h-16 w-14 shrink-0 items-center justify-center rounded-2xl text-[var(--play-night)] transition-transform duration-300 hover:-translate-y-0.5 active:scale-95 max-md:hidden',
-  exitIcon: 'size-6',
+  tabDesktop: 'max-md:hidden',
+  // Profile in the middle, desktop only, raised over the bar
+  me: 'relative -mt-7 hidden w-24 shrink-0 items-end justify-center md:flex',
+  meButton: 'group relative rounded-full',
+  meAvatar:
+    'rounded-full ring-4 ring-[#f4f4f6] shadow-[0_0.3rem_0_rgb(0_0_0/0.3)] transition-transform duration-300 group-hover:-translate-y-0.5 group-active:scale-95 group-aria-expanded:ring-[var(--play-key)]',
+  meLevel:
+    'absolute -right-1 -bottom-1 grid min-w-7 place-items-center rounded-full bg-[var(--play-gold)] px-1.5 py-0.5 text-xs font-extrabold tabular-nums text-[var(--play-night)] ring-2 ring-[#f4f4f6]',
+  // Box opened over the avatar
+  meMenu:
+    'play-glass play-rise absolute bottom-full left-1/2 z-10 mb-4 flex w-64 -translate-x-1/2 flex-col gap-1 rounded-2xl p-2 text-[var(--play-ink)]',
+  meItem:
+    'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold transition-colors hover:bg-[var(--play-chip)]',
+  meItemDanger: 'text-[var(--color-danger)]',
+  meIcon: 'size-5 shrink-0',
+  // Bare red glyph outside the bar, centred on its height, desktop only
+  exit: 'group fixed bottom-4 left-[calc(50%+min(24rem,50%-4.75rem)+0.75rem)] z-50 flex h-[4.8rem] w-10 items-center justify-center text-[var(--color-danger)] transition-transform duration-300 hover:scale-110 active:scale-95 max-md:hidden',
+  exitIcon: 'size-6 drop-shadow-[0_0.15rem_0_rgb(0_0_0/0.25)]',
   // Page swap, slid from the tab side
   slide: 'flex min-h-full w-full flex-col gap-8',
   slideRight: 'max-md:play-slide-right',
@@ -56,7 +57,7 @@ export const PLAY_HUB_BAR = {
   bar: 'mt-auto flex flex-col gap-3 rounded-3xl border border-white/40 bg-[linear-gradient(180deg,#5f636b,#a3a7ae_55%,#e8eaee)] p-4 shadow-[0_0.5rem_1.5rem_rgb(0_0_0/0.3),inset_0_2px_0_rgb(255_255_255/0.35)] md:hidden',
   divider: 'h-px w-full border-0 bg-black/25 shadow-[0_1px_0_rgb(255_255_255/0.45)]',
   strip: 'flex items-stretch gap-2',
-  segment: 'key group grid min-h-12 min-w-0 flex-1 place-items-center px-0 py-2',
+  segment: 'play-key group grid min-h-12 min-w-0 flex-1 place-items-center px-0 py-2',
   icon: 'size-7 drop-shadow-[0_2px_0_rgb(0_0_0/0.3)] transition-transform duration-150 group-active:scale-90',
 } as const
 
@@ -69,9 +70,9 @@ export const PLAY_TOP = {
   bar: 'relative z-30 -mt-4 mb-1 flex items-center justify-between gap-2 md:hidden',
   keys: 'flex items-center gap-2',
   // Same key as the red back key, in slate
-  key: 'key key-slate relative grid size-11 min-h-0 place-items-center rounded-2xl p-0 transition-transform active:scale-95',
+  key: 'play-key play-key-ghost relative grid size-11 min-h-0 place-items-center rounded-2xl p-0 transition-transform active:scale-95',
   // Red back key, no words
-  back: 'key key-danger grid size-11 min-h-0 place-items-center rounded-2xl p-0 transition-transform active:scale-95',
+  back: 'play-key play-key-danger grid size-11 min-h-0 place-items-center rounded-2xl p-0 transition-transform active:scale-95',
   backIcon: 'size-5',
   keyIcon: 'size-6',
   dot: 'absolute top-1.5 right-1.5 size-2.5 rounded-full bg-[var(--color-success)] ring-2 ring-[var(--play-panel-strong)]',
@@ -136,7 +137,7 @@ export const PLAY_ONLINE = {
   actions: 'play-pop grid gap-2 px-3 pb-3',
   primary: 'play-chunk flex min-h-11 items-center justify-center rounded-xl text-sm font-bold',
   action:
-    'key key-slate flex min-h-11 items-center justify-center rounded-xl border border-[var(--color-border)] text-sm font-bold text-[var(--color-ink)]',
+    'play-key play-key-ghost flex min-h-11 items-center justify-center rounded-xl border border-[var(--color-border)] text-sm font-bold text-[var(--color-ink)]',
   settings: 'flex flex-col gap-5',
   setting: 'flex flex-col gap-2',
   settingTitle: 'text-xs font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
@@ -149,9 +150,6 @@ export const PLAY_ONLINE = {
  */
 
 export const PLAY_HISTORY = {
-  tabs: 'play-glass grid grid-cols-2 gap-1 rounded-full p-1',
-  tab: 'flex min-h-10 items-center justify-center rounded-full text-sm font-extrabold text-[var(--play-ink-soft)] transition-colors',
-  tabOn: 'bg-[var(--play-panel-strong)] text-[var(--play-ink)] shadow',
   list: 'flex flex-col gap-2',
   empty: 'play-glass rounded-2xl p-5 text-sm text-[var(--play-ink-soft)] italic',
   chips: 'flex gap-2 overflow-x-auto pb-1',

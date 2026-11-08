@@ -129,14 +129,15 @@ export const GolfPowers = {
   Ghost: 'ghost',
   Gust: 'gust',
   Fart: 'fart',
-  Turbo: 'turbo',
   Flash: 'flash',
   Steady: 'steady',
   Twist: 'twist',
   Mirror: 'mirror',
   Blind: 'blind',
   Lob: 'lob',
-  Swap: 'swap',
+  BumperMan: 'bumperMan',
+  BoingBoing: 'boingBoing',
+  Teleport: 'teleport',
 } as const
 
 export type GolfPowerName = (typeof GolfPowers)[keyof typeof GolfPowers]

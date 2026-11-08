@@ -104,7 +104,7 @@ export const PlayLiveTables = ({
                 </div>
 
                 <div className={PLAY_LIVE.actions}>
-                  {isMine ? (
+                  {isMine && (
                     <Button
                       variant="arcadeSmall"
                       icon="playResume"
@@ -112,7 +112,17 @@ export const PlayLiveTables = ({
                       aria-label={PLAY_HUB_COPY.resume}
                       onClick={() => router.push(ROUTES.playSession(table.id))}
                     />
-                  ) : (
+                  )}
+                  {!isMine && table.isOverseen && (
+                    <Button
+                      variant="arcadeGhostSmall"
+                      icon="playSpectators"
+                      className={PLAY_LIVE.action}
+                      aria-label={PLAY_HUB_COPY.oversee}
+                      onClick={() => router.push(ROUTES.playSession(table.id))}
+                    />
+                  )}
+                  {!isMine && !table.isOverseen && (
                     <>
                       <Button
                         variant="arcadeGhostSmall"

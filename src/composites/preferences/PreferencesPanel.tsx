@@ -1,5 +1,6 @@
 'use client'
 
+import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import { FileTabs } from '@/components/structures/page/FileTabs'
@@ -51,9 +52,12 @@ export const PreferencesPanel = ({
   dock,
   sessions,
 }: PreferencesPanelProps) => {
+  const params = useSearchParams()
   const state = useProfile(initialProfile)
   const { profile } = state
-  const [tab, setTab] = useState<string>('information')
+  const [tab, setTab] = useState<string>(() =>
+    params.get('tab') === 'play' && play ? 'play' : 'information'
+  )
 
   // One tab of the strip, its panel framed the same way
   const entry = (name: SettingsTabName, render: () => React.ReactNode) => ({

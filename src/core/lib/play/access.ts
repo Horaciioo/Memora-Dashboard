@@ -1,6 +1,6 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 
-import { PlayVisibilities } from '@/utils/constants/play'
+import { PlayGames, PlayStatuses, PlayVisibilities } from '@/utils/constants/play'
 
 /**
  * Whether a member may open a game
@@ -26,3 +26,13 @@ export const mayEnter = async (
 
   return Boolean(invite)
 }
+
+/**
+ * Running golf game an admin may watch without an invite, unseen and read only
+ * @param {{ game: string, status: string }} session - Game
+ * @param {boolean} canManage - Holds the Play management right
+ * @return {boolean} - Oversight allowed
+ */
+
+export const mayOversee = (session: { game: string; status: string }, canManage: boolean): boolean =>
+  canManage && session.game === PlayGames.Golf && session.status === PlayStatuses.Running

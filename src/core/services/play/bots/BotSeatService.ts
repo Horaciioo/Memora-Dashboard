@@ -9,12 +9,7 @@ import { pickSeatColor } from '@/core/lib/play'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { signalPlay } from '@/core/lib/play/signal'
-import {
-  botLevelsOf,
-  PLAY_BOT_AVATARS,
-  PLAY_BOT_SETTINGS,
-  PLAY_ERRORS,
-} from '@/declarations/play'
+import { botLevelsOf, PLAY_BOT_AVATARS, PLAY_BOT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
 import { announceInChat } from '@/core/services/play/PlayChatService'
 import { lockSession, requireHost } from '@/core/services/play/PlaySessionService'
 import { PlayMessageKinds, PlayStatuses } from '@/utils/constants/play'

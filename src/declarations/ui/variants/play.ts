@@ -1,4 +1,5 @@
 import { PROPERTY_LABEL, PROPERTY_SPACING } from '@/declarations/ui/variants/controls'
+import { BOTTOM_SHEET } from '@/declarations/ui/variants/surfaces'
 
 /**
  * Play blocks of a moderator file
@@ -62,10 +63,19 @@ export const PLAY_REWARD = {
 export const PLAY_SHELL = {
   room: 'play-room fixed inset-0 z-40 flex flex-col overflow-hidden',
   floor: 'play-floor',
-  bar: 'relative z-10 flex w-full shrink-0 items-center justify-end gap-3 px-4 pt-5 sm:px-8 xl:px-12',
   // Pages scroll here, the room itself never does
   content:
-    'relative z-10 flex min-h-0 w-full flex-1 flex-col gap-8 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pt-6 pb-36 sm:px-8 xl:px-12',
+    'relative z-10 flex min-h-0 w-full flex-1 flex-col gap-8 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pt-8 pb-36 sm:px-8 xl:px-12',
+} as const
+
+/**
+ * Illustrated backdrop of the room, full screen
+ * @type {Readonly<{ root: string; art: string }>}
+ */
+
+export const PLAY_SCENE_BANNER = {
+  root: 'play-scene-banner pointer-events-none fixed inset-0 z-0 overflow-hidden',
+  art: 'absolute inset-0 size-full object-cover object-center',
 } as const
 
 /**
@@ -90,9 +100,8 @@ export const PLAY_BRAND = {
 export const PLAY_HUB = {
   section: 'flex flex-col gap-4',
   heading: HEADING,
-  // Blocky title, extruded upward
-  title:
-    'play-title text-center text-4xl leading-none font-black tracking-wide text-white uppercase sm:text-5xl',
+  // Same title as the Dashboard navigation sheet
+  title: `${BOTTOM_SHEET.figureTitle} w-full text-center text-[var(--color-on-media)]`,
   headRow: 'flex flex-wrap items-end justify-between gap-3',
   callout: `${PANEL} flex flex-wrap items-center justify-between gap-3 bg-[var(--play-panel-strong)] px-5 py-4 text-sm font-semibold text-[var(--play-ink)]`,
   // Game cards
@@ -111,9 +120,9 @@ export const PLAY_HUB = {
   cardTagline:
     'line-clamp-3 text-sm text-[var(--play-on-art)]/85 max-md:line-clamp-2 max-md:text-xs',
   skeleton:
-    'animate-pulse rounded-[1.75rem] bg-[var(--play-panel-strong)] motion-reduce:animate-none',
+    'min-h-64 animate-pulse rounded-[1.75rem] bg-[var(--play-panel-strong)] motion-reduce:animate-none',
   // Game hub, centred and fitted to the room: logo | divider | actions, never scrolling
-  page: 'relative flex min-h-0 flex-1 flex-col',
+  page: 'play-game-hub relative flex min-h-0 flex-1 flex-col',
   hub: 'relative flex min-h-0 flex-1 items-center justify-center max-sm:overflow-y-auto',
   hubSplit: 'flex flex-col items-center gap-8 lg:flex-row lg:gap-14 xl:gap-20',
   hubLive: 'w-full max-w-md shrink-0 lg:max-h-[min(36rem,calc(100dvh-14rem))] lg:w-[26rem]',
@@ -317,17 +326,12 @@ export const PLAY_NOTICE = {
  */
 
 export const PLAY_CROSS = {
-  // Games stacked left, a divider at the centre, who is playing right
-  stage:
-    'mx-auto grid w-full max-w-[96rem] items-start gap-8 pb-28 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-stretch lg:gap-10',
-  divider: 'w-px self-stretch bg-[var(--play-line)] max-lg:hidden',
-  // Live tables, then the online box
-  side: 'flex min-h-0 min-w-0 flex-col justify-center gap-6 max-md:hidden lg:mx-auto lg:w-full lg:max-w-sm lg:self-center',
+  stage: 'mx-auto flex w-full max-w-6xl flex-col gap-8 pb-28',
   games: 'flex min-w-0 flex-col items-center gap-6',
   heading: `${HEADING} text-center max-md:sr-only sm:text-3xl`,
-  // Two by two, posters as tall as the screen leaves room for
-  cross: 'grid w-full gap-3 md:gap-5 md:grid-cols-2 lg:mx-auto lg:max-w-xs lg:grid-cols-1 lg:gap-3',
-  card: 'min-h-0! md:aspect-[4/3]! lg:aspect-[2/1]! lg:rounded-2xl! lg:[&_h3]:text-xl lg:[&_p]:text-xs lg:[&_p]:line-clamp-2 lg:[&>div]:gap-1 lg:[&>div]:p-4',
+  // Three by three on desktop, one column on a phone
+  cross: 'grid w-full gap-4 md:grid-cols-3 md:gap-6',
+  card: 'min-h-0! md:aspect-[4/3]!',
   live: 'min-h-0 shrink',
   online: 'min-h-0 shrink-0',
 } as const
@@ -704,6 +708,28 @@ export const BAC_BOARD = {
  * @type {Record<string, string>}
  */
 
+/**
+ * Row of lives shared by the games: hearts that pop when won and empty when lost
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_HEARTS = {
+  hearts: 'relative flex items-center gap-0.5',
+  heartsMax: 'play-hearts-max',
+  heartCell: 'relative grid',
+  heartShine: 'play-heart-shine',
+  heartGain: 'play-heart-gain',
+  heartLose: 'play-heart-lose',
+  heartBurst: 'play-heart-burst',
+  heartTag: 'play-heart-tag',
+  heart: 'size-6 drop-shadow-[0_2px_4px_rgb(0_0_0/0.35)]',
+  heartOn: 'text-[var(--play-heart)]',
+  heartOff: 'text-[var(--play-ink-faint)] opacity-50',
+  // Small row under a golf bumper
+  heartsSmall: 'pointer-events-none select-none',
+  heartSmall: 'size-4 drop-shadow-[0_1px_2px_rgb(0_0_0/0.35)]',
+}
+
 export const BOMB_BOARD = {
   board: 'relative grid items-start gap-6 sm:grid-cols-[auto_minmax(0,1fr)]',
   figure:
@@ -738,17 +764,7 @@ export const BOMB_BOARD = {
   seatOut: 'opacity-40 grayscale',
   seatBlast: 'play-bomb-shake play-bomb-hit',
   seatNote: NOTE,
-  hearts: 'relative flex items-center gap-0.5',
-  heartsMax: 'play-hearts-max',
-  heartCell: 'relative grid',
-  heartShine: 'play-heart-shine',
-  heartGain: 'play-heart-gain',
-  heartLose: 'play-heart-lose',
-  heartBurst: 'play-heart-burst',
-  heartTag: 'play-heart-tag',
-  heart: 'size-6 drop-shadow-[0_2px_4px_rgb(0_0_0/0.35)]',
-  heartOn: 'text-[var(--play-heart)]',
-  heartOff: 'text-[var(--play-ink-faint)] opacity-50',
+  ...PLAY_HEARTS,
   // Live typing under the player on turn
   draft:
     'max-w-36 truncate rounded-lg bg-[var(--play-chip)] px-2 py-0.5 text-sm font-extrabold tracking-wide text-[var(--play-ink)] uppercase',
@@ -1084,8 +1100,8 @@ export const PLAY_PROFILE = {
   dot: 'size-2 rounded-full bg-[var(--play-ink-faint)]',
   dotOn: 'bg-[var(--play-gold)]',
   actions: 'flex flex-wrap gap-2',
-  key: 'key inline-flex items-center px-5 py-3 text-base font-bold',
-  keyGhost: 'key key-slate inline-flex items-center px-5 py-3 text-base font-bold',
+  key: 'play-key inline-flex items-center px-5 py-3 text-base font-bold',
+  keyGhost: 'play-key play-key-ghost inline-flex items-center px-5 py-3 text-base font-bold',
   more: 'w-fit text-sm font-extrabold text-[var(--play-accent)] underline-offset-4 hover:underline',
 } as const
 
@@ -1102,7 +1118,8 @@ export const PLAY_GROUP = {
   section: 'flex flex-col gap-3',
   heading: 'text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
   list: 'flex flex-col gap-2',
-  gameList: 'grid grid-cols-2 gap-3 xl:grid-cols-3',
+  // Game picker grid
+  gameRow: 'grid grid-cols-1 gap-3 sm:grid-cols-2',
   memberList: 'grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3',
   hint: 'text-sm text-[var(--play-ink-soft)]',
   // Banner box, the title sits bottom left
@@ -1114,7 +1131,9 @@ export const PLAY_GROUP = {
   gameArt: 'absolute inset-0 size-full object-cover',
   gameShade: 'absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent',
   gameTitle:
-    'absolute bottom-2.5 left-3.5 max-w-[55%] truncate text-base font-black text-white sm:text-lg lg:text-xl drop-shadow-[0_0.1rem_0.3rem_rgb(0_0_0/0.5)]',
+    'absolute bottom-7 left-3.5 max-w-[55%] truncate text-base font-bold text-white sm:text-lg drop-shadow-[0_0.1rem_0.3rem_rgb(0_0_0/0.5)]',
+  gamePlayers:
+    'absolute bottom-2.5 left-3.5 text-xs font-semibold text-white/90 drop-shadow-[0_0.1rem_0.3rem_rgb(0_0_0/0.5)]',
   // Pill on a banner, tells the host it opens a table
   gamePlay:
     'absolute right-2.5 bottom-2.5 rounded-full bg-white/90 px-2.5 py-1 text-xs font-black whitespace-nowrap text-black',
@@ -1124,6 +1143,7 @@ export const PLAY_GROUP = {
   rowNote: NOTE,
   rowOnline: 'size-2.5 shrink-0 rounded-full bg-[var(--play-gold)]',
   rowOffline: 'size-2.5 shrink-0 rounded-full bg-[var(--play-ink-faint)]',
+  presence: 'flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[var(--play-ink-soft)]',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
   link: 'text-xs font-extrabold text-[var(--play-ink-soft)] transition-colors hover:text-[var(--play-ink)] disabled:opacity-50',
   logo: 'size-10 shrink-0',
@@ -1135,4 +1155,13 @@ export const PLAY_GROUP = {
     'flex min-h-11 w-full items-center gap-3 rounded-xl px-2 text-left text-sm font-bold transition-colors hover:bg-[var(--play-chip)]',
   pickRowOn: 'bg-[var(--play-chip)] ring-1 ring-[var(--play-key)]',
   footer: 'flex flex-wrap gap-2 pt-2',
+} as const
+
+/**
+ * Floating note above the bottom bar
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_NOTE = {
+  note: 'play-glass fixed inset-x-4 bottom-28 z-50 mx-auto w-fit max-w-md rounded-2xl px-5 py-3 text-center text-sm font-semibold text-[var(--play-ink)] shadow-lg',
 } as const

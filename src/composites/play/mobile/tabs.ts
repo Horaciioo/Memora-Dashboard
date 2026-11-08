@@ -10,43 +10,48 @@ import type { PlayTabGlyphName } from '@/composites/play/mobile/PlayTabGlyphs'
 export interface PlayTab {
   key: PlayTabGlyphName
   href: string
+  // Left out of the phone bar
+  isDesktopOnly?: boolean
 }
 
 export const PLAY_TAB_ORDER: PlayTab[] = [
   { key: 'group', href: ROUTES.playGroup },
   { key: 'feed', href: ROUTES.playFeed },
   { key: 'home', href: ROUTES.play },
+  { key: 'lounge', href: ROUTES.playLounge, isDesktopOnly: true },
   { key: 'ranking', href: ROUTES.playRanking() },
-  { key: 'stats', href: ROUTES.playStatsHistory },
+  { key: 'stats', href: ROUTES.playStats },
 ]
+
+// Tabs of the phone bar
+export const PLAY_PHONE_TABS = PLAY_TAB_ORDER.filter((tab) => !tab.isDesktopOnly)
+
+// The profile sits right after this tab on desktop
+export const PLAY_ME_AFTER: PlayTabGlyphName = 'home'
 
 // Words of each tab
 export const PLAY_TAB_LABELS: Record<PlayTabGlyphName, string> = {
   group: PLAY_MOBILE_COPY.tabGroup,
   feed: PLAY_MOBILE_COPY.tabFeed,
   home: PLAY_MOBILE_COPY.tabHome,
+  lounge: PLAY_MOBILE_COPY.tabLounge,
   ranking: PLAY_MOBILE_COPY.tabRanking,
   stats: PLAY_MOBILE_COPY.tabStats,
 }
 
-// Stats and history share the last tab
-const STATS_INDEX = 4
-
-// Pages outside the tabs sit with the home
-const HOME_INDEX = 2
-
 /**
- * Tab index a page belongs to
+ * Tab index a page belongs to, stats and history sharing the last tab
  * @param {string} path - Current path
- * @return {number} - Index in PLAY_TAB_ORDER
+ * @param {PlayTab[]} [order] - Tabs to search
+ * @return {number} - Index in the order
  */
 
-export const playTabIndexOf = (path: string): number => {
-  if (path.startsWith(ROUTES.playHistory())) return STATS_INDEX
+export const playTabIndexOf = (path: string, order: PlayTab[] = PLAY_TAB_ORDER): number => {
+  if (path.startsWith(ROUTES.playHistory())) return order.findIndex((tab) => tab.key === 'stats')
 
-  const index = PLAY_TAB_ORDER.findIndex(
+  const index = order.findIndex(
     (tab) => tab.href !== ROUTES.play && path.startsWith(tab.href.split('?')[0])
   )
 
-  return index === -1 ? HOME_INDEX : index
+  return index === -1 ? order.findIndex((tab) => tab.key === 'home') : index
 }

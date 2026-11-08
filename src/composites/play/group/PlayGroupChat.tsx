@@ -104,9 +104,9 @@ export const PlayGroupChat = ({ group, onPlay }: { group: PlayGroupView; onPlay?
         {onPlay && (
           <Button
             variant="arcade"
-            icon="play"
-            className="lg:hidden"
+            icon="add"
             aria-label={PLAY_GROUP_COPY.pickGame}
+            className={PLAY_BOX.composeGame}
             onClick={onPlay}
           />
         )}

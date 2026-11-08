@@ -5,7 +5,7 @@ import { PlayNoticeKind } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict, notFound } from '@/core/lib/errors'
-import { mayEnter } from '@/core/lib/play/access'
+import { mayEnter, mayOversee } from '@/core/lib/play/access'
 import { signalPlay } from '@/core/lib/play/signal'
 import { clearSessionTimers, scheduleDeadline } from '@/core/lib/play/timers'
 import { PLAY_ERRORS } from '@/declarations/play'
@@ -92,13 +92,15 @@ const nextGameId = async (session: LoadedSession): Promise<string | null> => {
  * Read a game as one of its players
  * @param {string} sessionId - Game
  * @param {string} viewerId - Reader
+ * @param {boolean} [canManage] - Play management right, opens running golf games
  * @return {Promise<object>} - View
  */
 
-export const readSession = async (sessionId: string, viewerId: string) => {
+export const readSession = async (sessionId: string, viewerId: string, canManage = false) => {
   const session = await settleSession(sessionId)
-  // Private games stay shut to the uninvited
-  if (!(await mayEnter(prisma, session, viewerId))) throw notFound(PLAY_ERRORS.sessionMissing)
+  // Private games stay shut to the uninvited, admins aside
+  const isAllowed = mayOversee(session, canManage) || (await mayEnter(prisma, session, viewerId))
+  if (!isAllowed) throw notFound(PLAY_ERRORS.sessionMissing)
   const isStarted = session.status !== PlayStatuses.Lobby
   const engine = engineOf(session.game)
 

@@ -113,9 +113,6 @@ export const PlayGroupRoom = ({ group, viewerId, candidates }: PlayGroupRoomProp
               <div className={PLAY_BOX.root}>
                 <PlayGroupMembers group={group} />
               </div>
-              <div className={cn(PLAY_BOX.root, 'max-lg:hidden')}>
-                <PlayGroupGames group={group} />
-              </div>
             </div>
             <div className={cn(tab !== 'chat' && 'max-lg:hidden')}>
               <PlayGroupChat group={group} onPlay={() => setPicking(true)} />
@@ -124,8 +121,13 @@ export const PlayGroupRoom = ({ group, viewerId, candidates }: PlayGroupRoomProp
         </>
       )}
 
-      <Dialog open={isPicking} onClose={() => setPicking(false)} title={PLAY_GROUP_COPY.games}>
-        <PlayGroupGames group={group} isTitled={false} />
+      <Dialog
+        open={isPicking}
+        onClose={() => setPicking(false)}
+        title={PLAY_GROUP_COPY.games}
+        size="xl"
+      >
+        <PlayGroupGames group={group} onLaunched={() => setPicking(false)} />
       </Dialog>
     </section>
   )

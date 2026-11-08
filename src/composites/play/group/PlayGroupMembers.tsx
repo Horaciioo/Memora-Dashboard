@@ -31,14 +31,18 @@ export const PlayGroupMembers = ({ group }: { group: PlayGroupView }) => {
                 {member.name}
                 {member.isMe && ` (${PLAY_GROUP_COPY.you})`}
               </span>
-              {member.isHost && <span className={PLAY_GROUP.rowNote}>{PLAY_GROUP_COPY.host}</span>}
             </span>
-            <span
-              className={
-                onlineIds.has(member.accountId) ? PLAY_GROUP.rowOnline : PLAY_GROUP.rowOffline
-              }
-              aria-hidden="true"
-            />
+            <span className={PLAY_GROUP.presence}>
+              <span
+                className={
+                  onlineIds.has(member.accountId) ? PLAY_GROUP.rowOnline : PLAY_GROUP.rowOffline
+                }
+                aria-hidden="true"
+              />
+              {onlineIds.has(member.accountId)
+                ? PLAY_GROUP_COPY.statusOnline
+                : PLAY_GROUP_COPY.statusOffline}
+            </span>
             {group.isHost && !member.isHost && (
               <Button
                 variant="arcadeGhostSmall"

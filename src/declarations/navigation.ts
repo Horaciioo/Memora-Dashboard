@@ -72,8 +72,9 @@ export const ROUTES = {
   playGroup: '/play/group',
   playGroupRoom: (groupId: string) => `/play/group/${groupId}`,
   playFeed: '/play/feed',
+  playLounge: '/play/lounge',
   playStats: '/play/stats',
-  playStatsHistory: '/play/stats?tab=historique',
+  playStatsGame: (slug: string) => `/play/stats?game=${slug}`,
   playHistory: (game?: string, cursor?: string) => {
     const query = new URLSearchParams()
     if (game) query.set('game', game)
@@ -90,6 +91,7 @@ export const ROUTES = {
   playSessionInvite: (id: string) => `/play/sessions/${id}?${PLAY_INVITE_QUERY}=1`,
   playJoinCode: (code: string) => `/play/join/${code}`,
   preferences: '/preferences',
+  preferencesPlay: '/preferences?tab=play',
   settings: '/settings',
   teams: '/settings/creators',
   settingsSection: (section: string) => `/settings/${section}`,

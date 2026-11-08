@@ -6,7 +6,6 @@ import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { queueRefresh } from '@/core/lib/realtime/refresh'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { ROUTES } from '@/declarations/navigation'
 import { PLAY_GROUP_COPY } from '@/declarations/play/group'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -49,12 +48,10 @@ export const usePlayGroup = () => {
       again(() => apiDelete(API_ROUTES.playGroupProposal(groupId, proposalId))),
     say: (groupId: string, body: string) =>
       again(() => apiPost(API_ROUTES.playGroupMessages(groupId), { body })),
-    launch: async (groupId: string, game: PlayGameName) => {
-      const result = await run(
+    launch: (groupId: string, game: PlayGameName) =>
+      again(
         () => apiPost<{ id: string }>(API_ROUTES.playGroupLaunch(groupId), { game }),
         PLAY_GROUP_COPY.launched
-      )
-      if (result) router.push(ROUTES.playSession(result.id))
-    },
+      ),
   }
 }

@@ -5,7 +5,8 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.PlayAccess,
   descriptor: { summary: 'Read a game', tags: ['play'] },
-  handler: async ({ params, session }) => readSession(params.id, session.id),
+  handler: async ({ params, session, access }) =>
+    readSession(params.id, session.id, access.can(Permissions.PlayManage)),
 })
 
 export const PATCH = createProtectedRoute({

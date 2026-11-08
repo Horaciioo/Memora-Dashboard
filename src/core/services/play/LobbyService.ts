@@ -30,6 +30,7 @@ import { followedAmong } from '@/core/services/play/PlayFollowService'
 import { toLobbyCard } from '@/core/lib/play/views'
 import {
   PLAY_OPEN_STATUSES,
+  PlayGames,
   PlayInviteRoles,
   PlayMessageKinds,
   PlayStatuses,
@@ -128,10 +129,11 @@ const OPEN_TO_ALL = { visibility: PlayVisibilities.Public } as const
  * Lobbies waiting for players, and the reader's own game
  * @param {string} accountId - Reader
  * @param {string | null} [game] - Game filter
+ * @param {boolean} [canManage] - Play management right, private running golf games listed
  * @return {Promise<object>} - Lobbies
  */
 
-export const listLobbies = async (accountId: string, game?: string | null) => {
+export const listLobbies = async (accountId: string, game?: string | null, canManage = false) => {
   const idleSince = new Date(Date.now() - PLAY_SETTINGS.lobbyIdleMinutes * MINUTE_MS)
 
   // Forgotten lobbies close quietly
@@ -151,9 +153,9 @@ export const listLobbies = async (accountId: string, game?: string | null) => {
     }),
     prisma.playSession.findMany({
       where: {
-        ...OPEN_TO_ALL,
         status: PlayStatuses.Running,
         ...(game && { game: gameNamed(game) }),
+        OR: [OPEN_TO_ALL, ...(canManage ? [{ game: PlayGames.Golf }] : [])],
       },
       orderBy: { startedAt: 'desc' },
       include: SESSION_INCLUDE,
@@ -169,6 +171,8 @@ export const listLobbies = async (accountId: string, game?: string | null) => {
   const toCard = (table: (typeof lobbies)[number]) => ({
     ...toLobbyCard(table),
     isFollowed: followed.has(table.id),
+    // Shown to an admin only, watched unseen
+    isOverseen: table.visibility === PlayVisibilities.Private,
   })
 
   return {

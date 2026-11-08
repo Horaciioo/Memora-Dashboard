@@ -7,6 +7,8 @@ import { PLAY_PANEL } from '@/declarations/ui/variants/play'
 
 export const PLAY_BOX = {
   stack: 'mx-auto flex w-full max-w-2xl flex-col gap-4',
+  groupStack: 'mx-auto flex w-full max-w-5xl flex-col gap-4',
+  groupGrid: 'grid w-full grid-cols-1 gap-4 md:grid-cols-2',
   root: `${PLAY_PANEL} flex flex-col gap-4 p-4 shadow-[var(--shadow-sm)] sm:p-5`,
   // Dashed box that opens another one
   add: 'w-full',
@@ -37,9 +39,10 @@ export const PLAY_BOX = {
   lineName: 'text-xs font-extrabold text-[var(--play-ink-soft)]',
   lineText: 'text-sm break-words text-[var(--play-ink)]',
   compose: 'flex items-center gap-2',
+  composeGame: 'size-11! p-0!',
   // Group page: chat fills the column
   room: `${PLAY_PANEL} flex h-[calc(100dvh-19rem)] min-h-96 flex-col gap-3 lg:h-[calc(100dvh-16rem)] p-4 shadow-[var(--shadow-sm)] sm:p-5`,
-  roomStack: 'mx-auto flex w-full max-w-7xl flex-col gap-4',
+  roomStack: 'flex w-full flex-col gap-4',
   roomGrid: 'grid min-h-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_24rem]',
   roomHead: 'flex items-center gap-3',
   roomBack: 'shrink-0',

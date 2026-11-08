@@ -39,7 +39,7 @@ type DockKey = 'trophies' | 'stats' | 'player' | 'feed'
 
 export interface PlayDockProps {
   profile: PlayProfileView
-  player: { name: string; avatarUrl: string | null }
+  player: { id: string; name: string; avatarUrl: string | null }
   invites: PlayNoticeView[]
   presence: PlayPresence | null
   groupCalls: number
@@ -77,12 +77,12 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
     },
     stats: {
       title: PLAY_HUB_COPY.dockStats,
-      page: ROUTES.playStats,
+      page: null,
       body: <PlayDockStats games={profile.games} />,
     },
     player: {
       title: player.name,
-      page: ROUTES.playStats,
+      page: null,
       body: <PlayDockPlayer totals={profile.global} />,
     },
     feed: {

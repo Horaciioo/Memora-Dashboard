@@ -24,11 +24,13 @@ export const PlayGroupPanel = ({ state }: PlayGroupPanelProps) => {
   const AddIcon = ICONS.add
 
   return (
-    <div className={PLAY_BOX.stack}>
+    <div className={PLAY_BOX.groupStack}>
       <PlayGroupInvitations invitations={state.invitations} />
-      {state.groups.map((group) => (
-        <PlayGroupBox key={group.id} group={group} />
-      ))}
+      <div className={PLAY_BOX.groupGrid}>
+        {state.groups.map((group) => (
+          <PlayGroupBox key={group.id} group={group} />
+        ))}
+      </div>
       <Button
         variant="arcadeGhost"
         className={PLAY_BOX.add}

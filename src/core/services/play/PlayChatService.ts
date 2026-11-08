@@ -3,8 +3,9 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
-import { conflict, invalidInput } from '@/core/lib/errors'
+import { conflict, forbidden, invalidInput } from '@/core/lib/errors'
 import { readBodyText } from '@/core/lib/play'
+import { mayEnter } from '@/core/lib/play/access'
 import { signalChat } from '@/core/lib/play/signal'
 import { loadSession } from '@/core/services/play/PlaySessionService'
 import { fillPlayMessage, PLAY_ERRORS } from '@/declarations/play'
@@ -71,6 +72,8 @@ export const postMessage = async (
   }
   const session = await loadSession(sessionId)
   if (session.status === PlayStatuses.Abandoned) throw conflict(PLAY_ERRORS.sessionClosed)
+  // Admins watching a private game stay silent
+  if (!(await mayEnter(prisma, session, accountId))) throw forbidden(PLAY_ERRORS.privateGame)
 
   const row = await prisma.playMessage.create({
     data: { sessionId, accountId, body },

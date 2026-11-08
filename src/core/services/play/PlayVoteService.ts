@@ -124,6 +124,13 @@ const close = async (context: VoteContext): Promise<VoteOutcome> => {
     return { isStarting: false }
   }
 
+  // Draw over: the dealt settings are stored, the game starts
+  if (vote.dealtAt) {
+    await store(context, withVote(session.settings, null))
+
+    return { isStarting: true }
+  }
+
   const present = new Set(session.seats.filter(isPresent).map((seat) => seat.accountId))
   const picks = Object.fromEntries(
     Object.entries(vote.picks).filter(([voter]) => present.has(voter))
@@ -143,6 +150,22 @@ const close = async (context: VoteContext): Promise<VoteOutcome> => {
   // Last step: the winners become the rules, the game starts
   const asked = rules.settings(chosen, session.settings)
   const settled = engineOf(session.game).readSettings(asked, session.settings)
+  const dealt = rules.deal?.(settled as Prisma.JsonValue)
+  if (dealt) {
+    const now = Date.now()
+    await store(
+      context,
+      withVote(dealt.settings as Prisma.JsonValue, {
+        ...vote,
+        picks,
+        chosen,
+        endsAt: now + dealt.ms,
+        dealtAt: now,
+      })
+    )
+
+    return { isStarting: false }
+  }
   await store(context, withVote(settled as Prisma.JsonValue, null))
 
   return { isStarting: true }

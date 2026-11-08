@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 
 import type { PlayDockProps } from '@/composites/play/dock/PlayDock'
 
+import { PlayRoomBanner } from '@/composites/play/brand/PlayRoomBanner'
 import { PlaySignal } from '@/composites/play/hub/PlaySignal'
 import { PlayReward } from '@/composites/play/hub/PlayReward'
 import { PlayOnlineProvider } from '@/composites/play/mobile/PlayOnline'
@@ -33,18 +34,18 @@ export const PlayShell = ({ children, dock }: { children: ReactNode; dock: PlayD
     <PlayOnlineProvider sessionId={dock.presence?.sessionId ?? null}>
       <div className={PLAY_SHELL.room} data-light={isLight || undefined}>
         <div className={PLAY_SHELL.floor} aria-hidden="true" />
-        <header className={PLAY_SHELL.bar} />
+        <PlayRoomBanner />
         <div className={PLAY_SHELL.content}>
           <PlaySlide>{children}</PlaySlide>
         </div>
         <PlaySignal topic={PLAY_TOPICS.notices} />
         <PlaySignal topic={PLAY_TOPICS.groups} />
         <PlayTabBar
+          player={dock.player}
+          level={dock.profile.global.level.level}
           invites={dock.invites}
           presence={dock.presence}
           groupCalls={dock.groupCalls}
-          player={dock.player}
-          totals={dock.profile.global}
         />
         <PlayReward reward={reward} />
         <PlayInviteHost isPlay />

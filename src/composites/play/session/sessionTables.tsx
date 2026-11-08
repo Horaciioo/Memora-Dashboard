@@ -32,6 +32,8 @@ export interface PlayTableInput {
   spectators: PlayFace[]
   viewerId: string
   me: { isSeated: boolean; isHost: boolean }
+  // Play management right: inspection tools in the free view
+  canInspect?: boolean
 }
 
 /**
@@ -107,7 +109,7 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
-  [PlayGames.Golf]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+  [PlayGames.Golf]: ({ sessionId, board, seats, spectators, viewerId, me, canInspect }) => {
     const golf = board as GolfBoardView
 
     return {
@@ -122,6 +124,7 @@ export const PLAY_SESSION_TABLES: Partial<
             color: color ?? '',
           }))}
           viewerId={viewerId}
+          canInspect={Boolean(canInspect)}
           isSeated={me.isSeated}
         />
       ),

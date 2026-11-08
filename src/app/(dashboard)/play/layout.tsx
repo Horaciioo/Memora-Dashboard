@@ -28,7 +28,7 @@ export default async function PlayLayout({ children }: { children: ReactNode }) 
         invites,
         presence,
         groupCalls: group.invitations.length,
-        player: { name: session.displayName, avatarUrl: session.avatarUrl },
+        player: { id: session.id, name: session.displayName, avatarUrl: session.avatarUrl },
       }}
     >
       {children}
