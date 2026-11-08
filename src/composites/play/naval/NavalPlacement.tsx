@@ -43,7 +43,7 @@ export const NavalPlacement = ({
   const { act, isSaving } = usePlayAct(sessionId)
   const sea = { ...board.sea, isSpaced: board.settings.rules.spacedShips }
   const placement = useNavalPlacement(sea, board.you?.fleet ?? [])
-  const [camera, setCamera] = useOceanCamera(sea.size, 'placement')
+  const [camera, setCamera] = useOceanCamera(sea.size, 'placement', sea.size)
   const box = useRef<HTMLDivElement>(null)
   const isReady = Boolean(board.you?.isReady)
   const isPlacing = viewer >= 0 && !isReady
@@ -143,7 +143,7 @@ export const NavalPlacement = ({
             <span className={NAVAL_BOARD.title}>{NAVAL_BOARD_COPY.skin}</span>
             <NavalSkinPicker />
           </div>
-          <div className={NAVAL_BOARD.panel}>
+          <div className={cn(NAVAL_BOARD.panel, NAVAL_PLACE.roster)}>
             <div className={NAVAL_PLACE.ready}>
               {captains.map((captain) => (
                 <span

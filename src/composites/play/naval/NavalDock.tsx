@@ -63,10 +63,12 @@ export const NavalDock = ({
     }
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onUp)
 
     return () => {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onUp)
     }
   }, [box])
 
@@ -76,6 +78,7 @@ export const NavalDock = ({
         <button
           key={id}
           type="button"
+          aria-label={NAVAL_SHIP_NAMES[length]}
           className={cn(
             NAVAL_PLACE.ship,
             heldId === id && NAVAL_PLACE.shipOn,
@@ -92,7 +95,7 @@ export const NavalDock = ({
               <i key={cell} className={NAVAL_PLACE.cellBlock} />
             ))}
           </span>
-          {NAVAL_SHIP_NAMES[length]}
+          <span className={NAVAL_PLACE.shipName}>{NAVAL_SHIP_NAMES[length]}</span>
         </button>
       ))}
     </div>

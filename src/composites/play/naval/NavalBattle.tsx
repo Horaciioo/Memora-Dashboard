@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   afloatToward,
@@ -81,6 +81,10 @@ export const NavalBattle = ({
   })
   useNavalCues({ isMyTurn: Boolean(isMyTurn) && !playback.isBusy, event })
 
+  // Placement may leave the page scrolled
+  const root = useRef<HTMLDivElement>(null)
+  useEffect(() => root.current?.scrollIntoView({ block: 'start' }), [])
+
   if (board.phase === NavalPhases.Over && !playback.isBusy) {
     const sunkBy = (seat: number) =>
       board.shots.filter((shot) => shot[2] === seat && shot[6] === NavalCodes.Sunk).length
@@ -113,7 +117,7 @@ export const NavalBattle = ({
       : null
 
   return (
-    <div className={NAVAL_BOARD.root}>
+    <div ref={root} className={NAVAL_BOARD.root}>
       {match && <NavalStartCountdown startsAt={match.startsAt} serverTime={board.serverTime} />}
       <div className={NAVAL_BOARD.battle}>
         <div className={NAVAL_BOARD.hud}>
