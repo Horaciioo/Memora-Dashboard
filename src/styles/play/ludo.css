@@ -329,118 +329,65 @@
   }
 }
 
-/* Die: a white cube, tilted a little so three faces show */
-.ludo-die-stage {
-  --die: 3.4rem;
-  --half: calc(var(--die) / 2);
-  position: relative;
-  display: block;
-  width: var(--die);
-  height: var(--die);
-  perspective: 16rem;
-}
-
+/* Die: a flat white square seen from above, its thickness under it like the pawns */
 .ludo-die {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  transform: rotateX(-18deg) rotateY(22deg) rotateX(var(--turn-x)) rotateY(var(--turn-y))
-    rotateZ(0deg);
-}
-
-.ludo-die-face {
-  position: absolute;
-  inset: 0;
   display: grid;
   grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-  padding: 15%;
-  border-radius: 20%;
-  backface-visibility: hidden;
-  background: color-mix(in srgb, var(--play-ludo-die), black calc((1 - var(--shade)) * 100%));
-  box-shadow: inset 0 0 0 0.08rem var(--play-ludo-die-side);
+  width: var(--die, 3.25rem);
+  height: var(--die, 3.25rem);
+  padding: 16%;
+  border-radius: 22%;
+  background: var(--play-ludo-die);
+  box-shadow:
+    0 0.28rem 0 var(--play-ludo-die-side),
+    0 0.3rem 0 0.06rem var(--play-ludo-pawn-rim),
+    0 0.7rem 0.9rem var(--play-ludo-shadow);
 }
 
 .ludo-pip {
-  width: 78%;
+  width: 74%;
   aspect-ratio: 1;
   place-self: center;
   border-radius: 9999px;
   background: var(--play-ludo-pip);
 }
 
-/* Shadow on the board, shrinking as the die flies */
-.ludo-die-shadow {
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: -14%;
-  height: 22%;
-  border-radius: 9999px;
-  background: var(--play-ludo-shadow);
-  filter: blur(0.15rem);
-}
-
-/* Thrown in: the stage arcs, bounces and settles while the cube tumbles on every axis */
+/* The die is thrown in: high and spinning, it lands, bounces twice and settles */
 .ludo-die-rolling {
   animation: ludo-toss var(--roll) cubic-bezier(0.25, 0.7, 0.35, 1) both;
 }
 
-.ludo-die-rolling .ludo-die {
-  animation: ludo-tumble var(--roll) cubic-bezier(0.15, 0.6, 0.25, 1) both;
-}
-
-.ludo-die-rolling .ludo-die-shadow {
-  animation: ludo-die-shadow var(--roll) ease-out both;
-}
-
-@keyframes ludo-tumble {
-  from {
-    transform: rotateX(-18deg) rotateY(22deg) rotateX(calc(var(--turn-x) + 900deg))
-      rotateY(calc(var(--turn-y) + 1260deg)) rotateZ(220deg);
-  }
-}
-
 @keyframes ludo-toss {
   0% {
-    translate: var(--throw-x, -2.5rem) -3.4rem;
+    translate: var(--throw-x, -2.5rem) -3.2rem;
+    rotate: -540deg;
     scale: 0.7;
+    box-shadow: 0 2.2rem 1.2rem rgb(0 0 0 / 0.08);
   }
   42% {
     translate: 0 0;
-    scale: 1.1 0.92;
+    rotate: -40deg;
+    scale: 1.08 0.9;
   }
   58% {
-    translate: 0.3rem -1.1rem;
+    translate: 0.35rem -1rem;
+    rotate: -12deg;
     scale: 1;
   }
   72% {
-    translate: 0.1rem 0;
-    scale: 1.05 0.96;
+    translate: 0.15rem 0;
+    rotate: 6deg;
+    scale: 1.05 0.95;
   }
   84% {
     translate: 0 -0.3rem;
+    rotate: -2deg;
     scale: 1;
   }
   100% {
     translate: 0 0;
+    rotate: 0deg;
     scale: 1;
-  }
-}
-
-@keyframes ludo-die-shadow {
-  0% {
-    scale: 0.4;
-    opacity: 0.2;
-  }
-  42%,
-  72%,
-  100% {
-    scale: 1;
-    opacity: 1;
-  }
-  58% {
-    scale: 0.65;
-    opacity: 0.5;
   }
 }
 
@@ -449,34 +396,11 @@
   --throw-x: 2.5rem;
 }
 
-/* Waiting for the player to roll: the cube hops in place and the button rings */
+/* Waiting for the player to roll */
 .ludo-die-ready {
   cursor: pointer;
   border-radius: 24%;
   animation: ludo-call 1.2s ease-in-out infinite;
-}
-
-.ludo-die-ready .ludo-die-stage {
-  animation: ludo-nudge 1.2s ease-in-out infinite;
-}
-
-.ludo-die-ready:hover .ludo-die-stage {
-  animation-play-state: paused;
-  scale: 1.1;
-}
-
-@keyframes ludo-nudge {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  35% {
-    translate: 0 -0.45rem;
-  }
-  55% {
-    translate: 0 0;
-    scale: 1.06 0.94;
-  }
 }
 
 @keyframes ludo-call {
@@ -629,10 +553,7 @@
   .ludo-burst-spark,
   .ludo-pawn-pick .ludo-pawn-art,
   .ludo-die-rolling,
-  .ludo-die-rolling .ludo-die,
-  .ludo-die-rolling .ludo-die-shadow,
   .ludo-die-ready,
-  .ludo-die-ready .ludo-die-stage,
   .ludo-frame-mine,
   .ludo-turn-tag,
   .ludo-turn-tag::before,

@@ -87,23 +87,6 @@ export const LUDO_PIPS: Record<number, readonly number[]> = {
 }
 
 /**
- * Cube faces: where each sits on the cube, the turn showing it, its light
- * @type {Record<number, { place: string, turn: readonly [number, number], shade: number }>}
- */
-
-export const LUDO_DIE_FACES: Record<
-  number,
-  { place: string; turn: readonly [x: number, y: number]; shade: number }
-> = {
-  1: { place: 'translateZ(var(--half))', turn: [0, 0], shade: 1 },
-  2: { place: 'rotateY(90deg) translateZ(var(--half))', turn: [0, -90], shade: 0.93 },
-  3: { place: 'rotateX(90deg) translateZ(var(--half))', turn: [-90, 0], shade: 0.97 },
-  4: { place: 'rotateX(-90deg) translateZ(var(--half))', turn: [90, 0], shade: 0.88 },
-  5: { place: 'rotateY(-90deg) translateZ(var(--half))', turn: [0, 90], shade: 0.9 },
-  6: { place: 'rotateY(180deg) translateZ(var(--half))', turn: [0, 180], shade: 0.88 },
-}
-
-/**
  * Spots of pawns sharing a square, cell units, by crowd
  * @type {Record<number, readonly LudoCell[]>}
  */

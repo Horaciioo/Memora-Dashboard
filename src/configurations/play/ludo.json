@@ -24,6 +24,7 @@
   "graceSeconds": 1,
   "stepMs": 280,
   "rollMs": 700,
+  "shuffleMs": 80,
   "alertSeconds": 5,
   "feedSize": 40
 }

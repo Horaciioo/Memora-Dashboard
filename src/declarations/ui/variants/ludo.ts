@@ -83,10 +83,7 @@ export const LUDO_PLATE = {
  */
 
 export const LUDO_PIECES = {
-  dieStage: 'ludo-die-stage',
   die: 'ludo-die',
-  dieFace: 'ludo-die-face',
-  dieShadow: 'ludo-die-shadow',
   dieReady: 'ludo-die-ready',
   dieRolling: 'ludo-die-rolling',
   pip: 'ludo-pip',
