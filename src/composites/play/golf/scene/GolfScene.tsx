@@ -127,6 +127,8 @@ const GolfScene = ({
   )
   const { showPlayers, hasMist, hasSpecks, isLight } = useGolfPrefsStore()
   const isLite = isSlow || isLight
+  // Bumped to draw a fresh canvas after a lost graphics context
+  const [epoch, setEpoch] = useState(0)
   const lawn = useRef<Group>(null)
   const serverNow = useCallback(() => Date.now() + serverOffset, [serverOffset])
   const seatOf = useCallback(
@@ -164,7 +166,14 @@ const GolfScene = ({
 
   return (
     <Canvas
-      key={String(isLite)}
+      key={`${isLite}-${epoch}`}
+      onCreated={({ gl }) => {
+        // Lost context stays blank, so redraw on a new canvas
+        gl.domElement.addEventListener('webglcontextlost', (event) => {
+          event.preventDefault()
+          setEpoch((value) => value + 1)
+        })
+      }}
       className={GOLF_SCENE_UI.canvas}
       dpr={[1, isLite ? render.liteDpr : render.maxDpr]}
       shadows={isLite ? false : 'soft'}
