@@ -15,11 +15,15 @@ export type IconShapes = [string, Record<string, unknown>][]
 
 /**
  * Phosphor icon holding only its used weights
+ * @param {string} name - Display name
  * @param {Partial<Record<IconWeight, IconShapes>>} drawings - Shapes per weight
  * @return {Icon} - Icon
  */
 
-export const phosphorIcon = (drawings: Partial<Record<IconWeight, IconShapes>>): Icon => {
+export const phosphorIcon = (
+  name: string,
+  drawings: Partial<Record<IconWeight, IconShapes>>
+): Icon => {
   const weights = new Map(
     Object.entries(drawings).map(([weight, shapes]) => [
       weight as IconWeight,
@@ -31,7 +35,10 @@ export const phosphorIcon = (drawings: Partial<Record<IconWeight, IconShapes>>):
     ])
   )
 
-  return forwardRef<SVGSVGElement, IconProps>((props, ref) =>
+  const Drawn = forwardRef<SVGSVGElement, IconProps>((props, ref) =>
     createElement(SSRBase, { ...props, ref, weights } as IconBaseProps)
-  ) as Icon
+  )
+  Drawn.displayName = name
+
+  return Drawn as Icon
 }

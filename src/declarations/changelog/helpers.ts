@@ -1,4 +1,3 @@
-import { APP_VERSION } from '@/declarations/app'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import {
   CHANGELOG_RELEASES,
@@ -13,11 +12,10 @@ import type {
   ChangelogRelease,
   ChangelogTag,
 } from '@/declarations/changelog/releases'
-import { NAVIGATION, ROUTES, SEGMENT_LABELS } from '@/declarations/navigation'
+import { NAVIGATION, SEGMENT_LABELS } from '@/declarations/navigation'
 import type { IconName } from '@/declarations/ui/icons'
 import type { PermissionHelpers } from '@/types/auth'
 import type { PermissionName } from '@/utils/constants/permissions'
-import { baseVersion, parseVersion } from '@/utils/format/version'
 
 export { changelogPath, isVersionSeen, releaseSeenKey } from '@/declarations/changelog/versions'
 
