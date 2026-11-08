@@ -1,8 +1,8 @@
 'use client'
 
-import { GolfVictory } from '@/composites/play/golf/hud/GolfVictory'
-import { GolfScorecard } from '@/composites/play/golf/hud/GolfScorecard'
-import type { GolfScorecardProps } from '@/composites/play/golf/hud/GolfScorecard'
+import { GolfVictory } from '@/composites/play/golf/hud/results/GolfVictory'
+import { GolfScorecard } from '@/composites/play/golf/hud/results/GolfScorecard'
+import type { GolfScorecardProps } from '@/composites/play/golf/hud/results/GolfScorecard'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
 import { holeWinners } from '@/core/lib/play/golf'

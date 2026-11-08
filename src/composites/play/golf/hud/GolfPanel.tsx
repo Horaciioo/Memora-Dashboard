@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { GolfLog } from '@/composites/play/golf/hud/GolfLog'
-import { GolfRoundTable } from '@/composites/play/golf/hud/GolfRoundTable'
+import { GolfRoundTable } from '@/composites/play/golf/hud/results/GolfRoundTable'
 import type { GolfFace } from '@/composites/play/golf/types'
 import type { GolfBoardState } from '@/core/lib/play/golf'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'

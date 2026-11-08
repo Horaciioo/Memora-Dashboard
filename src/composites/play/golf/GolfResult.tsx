@@ -1,5 +1,5 @@
-import { GolfScorecard } from '@/composites/play/golf/hud/GolfScorecard'
-import type { GolfScorecardProps } from '@/composites/play/golf/hud/GolfScorecard'
+import { GolfScorecard } from '@/composites/play/golf/hud/results/GolfScorecard'
+import type { GolfScorecardProps } from '@/composites/play/golf/hud/results/GolfScorecard'
 import { PlayPodium } from '@/composites/play/results/PlayPodium'
 import { PlayStageKeys } from '@/composites/play/session/PlayStageKeys'
 import { usePlayStageStore } from '@/core/store/playStage'

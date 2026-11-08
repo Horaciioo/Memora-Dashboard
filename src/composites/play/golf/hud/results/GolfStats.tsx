@@ -2,9 +2,9 @@
 
 import { Button } from '@/components/elements/actions/Button'
 import { GolfPixelEdge } from '@/composites/play/golf/hud/GolfPixelEdge'
-import { GolfScorecard } from '@/composites/play/golf/hud/GolfScorecard'
-import type { GolfScorecardProps } from '@/composites/play/golf/hud/GolfScorecard'
-import { GolfTrophy } from '@/composites/play/golf/hud/GolfTrophy'
+import { GolfScorecard } from '@/composites/play/golf/hud/results/GolfScorecard'
+import type { GolfScorecardProps } from '@/composites/play/golf/hud/results/GolfScorecard'
+import { GolfTrophy } from '@/composites/play/golf/hud/results/GolfTrophy'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_SCORECARD } from '@/declarations/ui/variants'
 
