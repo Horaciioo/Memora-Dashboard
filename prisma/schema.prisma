@@ -3624,14 +3624,14 @@ model PlayGroupProposal {
 
 // A line of the group chat
 model PlayGroupMessage {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   groupId   String
   accountId String
   body      String
   // Game this line invites to, with its table
   game      PlayGame?
   sessionId String?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   group   PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
   account Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)

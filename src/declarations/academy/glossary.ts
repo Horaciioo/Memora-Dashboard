@@ -32,8 +32,7 @@ const GLOSSARY_MAP = {
   },
   trainer: {
     label: 'Référent',
-    definition:
-      'Responsable du suivi principal d’un Junior. Il rédige les bilans de ses étapes.',
+    definition: 'Responsable du suivi principal d’un Junior. Il rédige les bilans de ses étapes.',
   },
   lead: {
     label: 'Responsable',

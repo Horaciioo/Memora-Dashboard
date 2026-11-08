@@ -68,8 +68,7 @@ export const API_ROUTES = {
   playGroupMember: (groupId: string, id: string) => `/api/play/group/${groupId}/members/${id}`,
   playGroupInvitation: (id: string) => `/api/play/group/invitations/${id}`,
   playGroupProposals: (groupId: string) => `/api/play/group/${groupId}/proposals`,
-  playGroupProposal: (groupId: string, id: string) =>
-    `/api/play/group/${groupId}/proposals/${id}`,
+  playGroupProposal: (groupId: string, id: string) => `/api/play/group/${groupId}/proposals/${id}`,
   playGroupLaunch: (groupId: string) => `/api/play/group/${groupId}/launch`,
   playGroupMessages: (groupId: string) => `/api/play/group/${groupId}/messages`,
   playFollow: (id: string) => `/api/play/sessions/${id}/follow`,
