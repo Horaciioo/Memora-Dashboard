@@ -163,7 +163,10 @@ export const syncAdmission = async (candidateId: string, isClosing = false): Pro
   if (candidate.admission?.confirmedAt) return
 
   if (!admitted) {
-    if (candidate.admission) await withdrawAdmission(candidate.admission)
+    // Kept while still accepted
+    if (candidate.admission && candidate.outcome?.admits !== true) {
+      await withdrawAdmission(candidate.admission)
+    }
     return
   }
 

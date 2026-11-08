@@ -26,6 +26,7 @@ import type { AcademySessionStatusName } from '@/utils/constants/hierarchy'
 import { IntegrationLinkKinds } from '@/utils/constants/integration'
 import { listJuniors } from '@/core/services/academy/juniors/JuniorService'
 import { sessionInScope } from '@/core/services/academy/lookups'
+import { listAwaiting } from '@/core/services/academy/awaiting'
 import { SESSION_SHAPE, sessionNumbers, toSummary } from '@/core/services/academy/sessionView'
 
 /**
@@ -296,8 +297,11 @@ export const readSession = async (id: string, scope: AcademyScope): Promise<Sess
   if (!row) throw notFound()
 
   const juniors = await listJuniors(id, row.functionId, scope)
+  // Only the broad view
+  const awaiting = scope === OPEN_SCOPE ? await listAwaiting(id) : []
 
   return {
+    awaiting,
     summary: toSummary(
       await sessionNumbers(),
       row,

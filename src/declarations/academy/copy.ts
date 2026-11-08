@@ -41,6 +41,8 @@ export const ACADEMY_COPY = {
   tabTimeline: 'Timeline',
   tabCalendar: 'Calendrier',
   juniorAdd: 'Ajouter un junior',
+  awaitingTitle: 'En attente d’activation',
+  awaitingTrail: 'Compte à activer',
   juniorEmptyTitle: 'Aucun junior',
   juniorEmptyDescription: 'Rattache un modérateur existant pour démarrer son suivi.',
   juniorDeleteTitle: 'Retirer ce junior ?',
