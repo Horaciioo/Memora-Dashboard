@@ -72,8 +72,7 @@ export const rollCup = (world: GolfWorld, body: GolfBody): void => {
   // Nearest hole the ball is over
   const { cups } = world.input.hole
   const near = cups.reduce(
-    (best, spot, index) =>
-      cupDistance(spot, body) < cupDistance(cups[best], body) ? index : best,
+    (best, spot, index) => (cupDistance(spot, body) < cupDistance(cups[best], body) ? index : best),
     Math.max(0, body.cupIndex)
   )
   const spot = cups[near]

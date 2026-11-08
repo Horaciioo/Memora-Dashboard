@@ -34,5 +34,8 @@ export const mayEnter = async (
  * @return {boolean} - Oversight allowed
  */
 
-export const mayOversee = (session: { game: string; status: string }, canManage: boolean): boolean =>
+export const mayOversee = (
+  session: { game: string; status: string },
+  canManage: boolean
+): boolean =>
   canManage && session.game === PlayGames.Golf && session.status === PlayStatuses.Running

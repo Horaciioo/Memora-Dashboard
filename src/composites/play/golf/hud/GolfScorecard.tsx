@@ -41,7 +41,13 @@ const gapText = (gap: number): string => (gap === 0 ? 'E' : gap > 0 ? `+${gap}` 
  * @return {JSX.Element}
  */
 
-export const GolfScorecard = ({ players, faces, holes, pars = [], viewerId }: GolfScorecardProps) => {
+export const GolfScorecard = ({
+  players,
+  faces,
+  holes,
+  pars = [],
+  viewerId,
+}: GolfScorecardProps) => {
   const ranked = rankCards(players)
   const columns = Array.from({ length: holes }, (_, index) => index)
 
@@ -99,7 +105,9 @@ export const GolfScorecard = ({ players, faces, holes, pars = [], viewerId }: Go
                       className={cn(
                         GOLF_SCORECARD.cell,
                         strokes === undefined && GOLF_SCORECARD.cellPending,
-                        strokes !== undefined && versus(strokes, pars[index]) < 0 && GOLF_SCORECARD.cellUnder
+                        strokes !== undefined &&
+                          versus(strokes, pars[index]) < 0 &&
+                          GOLF_SCORECARD.cellUnder
                       )}
                       title={
                         strokes !== undefined && pars[index] != null
@@ -114,7 +122,9 @@ export const GolfScorecard = ({ players, faces, holes, pars = [], viewerId }: Go
                 <td className={GOLF_SCORECARD.total}>
                   {cardCell(player.total)}
                   {pars.some((par) => par !== null) && (
-                    <span className={GOLF_SCORECARD.gap}>{gapText(cardVersusPar(player.card, pars))}</span>
+                    <span className={GOLF_SCORECARD.gap}>
+                      {gapText(cardVersusPar(player.card, pars))}
+                    </span>
                   )}
                 </td>
               </tr>

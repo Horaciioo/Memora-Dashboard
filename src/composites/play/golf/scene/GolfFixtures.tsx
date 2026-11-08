@@ -96,7 +96,13 @@ export const GolfFixtures = ({
   <>
     <GolfBoosts hole={hole} paint={paint} motionRef={motionRef} />
     {hole.bumpers.map((entry) => (
-      <GolfFixedBumper key={entry.id} entry={entry} hole={hole} paint={paint} motionRef={motionRef} />
+      <GolfFixedBumper
+        key={entry.id}
+        entry={entry}
+        hole={hole}
+        paint={paint}
+        motionRef={motionRef}
+      />
     ))}
     {hole.spinners.map((entry, index) => (
       <GolfSpinner

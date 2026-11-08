@@ -27,7 +27,8 @@ export const PATCH = createProtectedRoute({
     const juniors = await updateJunior(params.id, academyScope(session, access), parsed.values)
 
     // A last Référent may launch
-    if (!junior.referentId && parsed.values.referentId) await afterReferentAssigned(junior.sessionId)
+    if (!junior.referentId && parsed.values.referentId)
+      await afterReferentAssigned(junior.sessionId)
 
     return juniors
   },

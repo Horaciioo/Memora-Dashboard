@@ -7,14 +7,7 @@ import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
  */
 
 export type GolfParName =
-  | 'ace'
-  | 'albatross'
-  | 'eagle'
-  | 'birdie'
-  | 'par'
-  | 'bogey'
-  | 'double'
-  | 'over'
+  'ace' | 'albatross' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double' | 'over'
 
 /**
  * Par of a hole: drawn in the layout, else read from the distance tee to cup, none for points holes

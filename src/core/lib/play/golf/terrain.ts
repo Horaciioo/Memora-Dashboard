@@ -11,7 +11,15 @@ const EPSILON = 1e-6
  * @return {GolfPad} - Physics slab
  */
 
-export const toPad = ({ at, size, height = 0, rise, surface, push, hidden }: GolfPadLayout): GolfPad => {
+export const toPad = ({
+  at,
+  size,
+  height = 0,
+  rise,
+  surface,
+  push,
+  hidden,
+}: GolfPadLayout): GolfPad => {
   const slope = rise ? (rise.to - height) / (rise.axis === 'x' ? size[0] : size[1]) : 0
 
   return {

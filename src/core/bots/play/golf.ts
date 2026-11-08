@@ -1,7 +1,14 @@
 import 'server-only'
 
 import { latest, noise, pauseAfter } from '@/core/bots/play/random'
-import { canTeleportTo, cupPoints, holeFor, holesOf, simulateShot, teleportReach } from '@/core/lib/play/golf'
+import {
+  canTeleportTo,
+  cupPoints,
+  holeFor,
+  holesOf,
+  simulateShot,
+  teleportReach,
+} from '@/core/lib/play/golf'
 import type { GolfHole, GolfShotInput } from '@/core/lib/play/golf'
 import type { golfView } from '@/core/services/play/golf/GolfViewService'
 import { PLAY_BOT_SETTINGS } from '@/declarations/play/bots'

@@ -144,7 +144,10 @@ const sideWalls = (
     if (rise > GOLF_SETTINGS.physics.stepUp) cliffs.push(wallOn(pad, side, span, rise))
   })
 
-  return [...(isOpen ? [] : free.map((span) => wallOn(pad, side, span, null, isGlass, isBouncy))), ...cliffs]
+  return [
+    ...(isOpen ? [] : free.map((span) => wallOn(pad, side, span, null, isGlass, isBouncy))),
+    ...cliffs,
+  ]
 }
 
 /**

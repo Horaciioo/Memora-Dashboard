@@ -67,7 +67,8 @@ export const useMemoraSpeech = (): MemoraSpeech => {
   )
 
   const show = useCallback(
-    () => setThread((lines) => [...lines, { from: 'memora', scene: 'identity', stage: SPEECH_STAGE }]),
+    () =>
+      setThread((lines) => [...lines, { from: 'memora', scene: 'identity', stage: SPEECH_STAGE }]),
     []
   )
 

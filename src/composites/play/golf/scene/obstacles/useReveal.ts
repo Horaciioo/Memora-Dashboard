@@ -32,7 +32,9 @@ export const useReveal = (
     const isNear = [...motion.tracks.values()].some((track) => {
       const { x, z } = trackSpot(track, now)
 
-      return x > zone.x0 - REACH && x < zone.x1 + REACH && z > zone.z0 - REACH && z < zone.z1 + REACH
+      return (
+        x > zone.x0 - REACH && x < zone.x1 + REACH && z > zone.z0 - REACH && z < zone.z1 + REACH
+      )
     })
     if (!isHit && !isNear) return
     done.current = true

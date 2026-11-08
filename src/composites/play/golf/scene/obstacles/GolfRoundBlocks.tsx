@@ -16,7 +16,12 @@ import type { GolfHole } from '@/core/lib/play/golf'
 
 export const GolfRoundBlocks = ({ hole, paint }: { hole: GolfHole; paint: GolfPaint }) => {
   const geometry = useMemo(
-    () => roundBlocks(hole.blocks.filter((block) => !block.isHidden), paint.obstacle, paint['obstacle-top']),
+    () =>
+      roundBlocks(
+        hole.blocks.filter((block) => !block.isHidden),
+        paint.obstacle,
+        paint['obstacle-top']
+      ),
     [hole, paint]
   )
   useEffect(() => () => geometry?.dispose(), [geometry])

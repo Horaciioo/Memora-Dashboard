@@ -271,7 +271,8 @@ export const bindPointer = (
     event.preventDefault()
     const rig = input.current.rigRef.current
     // Free flight: the wheel sets the speed
-    if (rig.isFree) rig.free.speed = clampFreeSpeed(rig.free.speed * Math.exp(-event.deltaY * freeCamera.wheel))
+    if (rig.isFree)
+      rig.free.speed = clampFreeSpeed(rig.free.speed * Math.exp(-event.deltaY * freeCamera.wheel))
     else rig.distance = clampDistance(rig.distance * Math.exp(event.deltaY * camera.zoomStep))
   }
   const handlers: [string, (event: PointerEvent) => void][] = [

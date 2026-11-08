@@ -31,7 +31,11 @@ export const readTemporaryValues = async (
     prisma.academySessionReferent.findFirst({ ...query, ...select }),
   ])
 
-  const rows: Record<TemporaryKind, { sessionId: string } | null> = { recruiter, observer, referent }
+  const rows: Record<TemporaryKind, { sessionId: string } | null> = {
+    recruiter,
+    observer,
+    referent,
+  }
 
   return Object.fromEntries(
     TEMPORARY_KINDS.map((kind) => [TEMPORARY_SEATS[kind].field, rows[kind]?.sessionId ?? null])

@@ -173,7 +173,12 @@ export const GolfCourse = ({ hole, paint, lawnRef, ice, serverNow }: GolfCourseP
         <meshToonMaterial color={paint.wall} side={DoubleSide} />
       </mesh>
       <mesh geometry={geometry.glass}>
-        <meshToonMaterial color={paint.wall} transparent opacity={glass.opacity} side={DoubleSide} />
+        <meshToonMaterial
+          color={paint.wall}
+          transparent
+          opacity={glass.opacity}
+          side={DoubleSide}
+        />
       </mesh>
       <mesh geometry={geometry.cushions} castShadow receiveShadow>
         <meshToonMaterial color={paint.bumper} side={DoubleSide} />

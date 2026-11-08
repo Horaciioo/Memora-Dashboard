@@ -124,12 +124,11 @@
 }
 
 .dock-alert .speech-bubble {
-  background:
-    linear-gradient(
-      150deg,
-      color-mix(in srgb, var(--color-danger) 20%, var(--color-surface-raised)),
-      color-mix(in srgb, var(--color-danger) 8%, var(--color-surface-raised))
-    );
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--color-danger) 20%, var(--color-surface-raised)),
+    color-mix(in srgb, var(--color-danger) 8%, var(--color-surface-raised))
+  );
   -webkit-backdrop-filter: blur(var(--glass-thick-blur)) saturate(var(--glass-thick-saturate));
   backdrop-filter: blur(var(--glass-thick-blur)) saturate(var(--glass-thick-saturate));
   border-color: color-mix(in srgb, var(--color-danger) 42%, transparent);

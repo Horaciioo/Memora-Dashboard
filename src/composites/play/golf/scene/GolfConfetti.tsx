@@ -116,11 +116,7 @@ export const GolfConfetti = ({
         />
         <meshBasicMaterial color={paint.boost} transparent depthWrite={false} side={DoubleSide} />
       </mesh>
-      <mesh
-        ref={ring}
-        rotation={[-Math.PI / 2, 0, 0]}
-        visible={false}
-      >
+      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
         <ringGeometry args={[1 - confetti.ring.width, 1, 48]} />
         <meshBasicMaterial color={paint.pole} transparent depthWrite={false} />
       </mesh>
