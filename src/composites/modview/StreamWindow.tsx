@@ -1,8 +1,11 @@
 'use client'
 
+import { useRef } from 'react'
+
 import { StreamTimers } from '@/composites/modview/StreamTimers'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
 import { useWindowChrome } from '@/composites/modview/workspace/WindowChrome'
+import { useTwitchLatency } from '@/core/hooks/interaction/state/useTwitchLatency'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_STREAM } from '@/declarations/ui/variants'
@@ -25,18 +28,37 @@ export interface StreamWindowProps {
 export const StreamWindow = ({ state, isLit, isTitleLit }: StreamWindowProps) => {
   const isTiled = useWindowChrome() !== null
   const ViewerIcon = ICONS.viewer
+  const playerRef = useRef<HTMLDivElement>(null)
+  const channel = state.embedUrl ? new URL(state.embedUrl).searchParams.get('channel') : null
+  const { lag, failed, round, reload } = useTwitchLatency(playerRef, channel)
 
   return (
-    <ModWindow title={MODVIEW_COPY.stream} isLit={isLit || isTitleLit} flush={isTiled}>
+    <ModWindow
+      title={MODVIEW_COPY.stream}
+      isLit={isLit || isTitleLit}
+      flush={isTiled}
+      actions={
+        <StreamTimers
+          streamStartedAt={state.streamStartedAt}
+          lag={lag}
+          onRefresh={state.embedUrl ? reload : undefined}
+        />
+      }
+    >
       <div className={isTiled ? MODVIEW_STREAM.fill : MODVIEW_STREAM.frame}>
         {state.embedUrl ? (
-          <iframe
-            src={state.embedUrl}
-            title={MODVIEW_COPY.stream}
-            className={MODVIEW_STREAM.embed}
-            allow="autoplay; fullscreen"
-            allowFullScreen
-          />
+          failed ? (
+            <iframe
+              key={round}
+              src={state.embedUrl}
+              title={MODVIEW_COPY.stream}
+              className={MODVIEW_STREAM.embed}
+              allow="autoplay; fullscreen"
+              allowFullScreen
+            />
+          ) : (
+            <div ref={playerRef} className={MODVIEW_STREAM.embed} />
+          )
         ) : (
           <WindowEmpty
             icon="streamOff"
@@ -67,7 +89,6 @@ export const StreamWindow = ({ state, isLit, isTitleLit }: StreamWindowProps) =>
             </ul>
           )}
         </div>
-        <StreamTimers streamStartedAt={state.streamStartedAt} liveStartedAt={state.liveStartedAt} />
         {typeof state.viewers === 'number' && (
           <p className={MODVIEW_STREAM.viewers} title={MODVIEW_COPY.viewers}>
             <ViewerIcon className={MODVIEW_STREAM.viewersIcon} aria-hidden="true" />

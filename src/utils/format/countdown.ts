@@ -13,6 +13,20 @@ export const formatCountdown = (seconds: number): string => {
 }
 
 /**
+ * Delay rounded to its biggest unit
+ * @param {number} seconds - Delay in seconds
+ * @return {string} - "5 s", "2 min", "1 h"
+ */
+
+export const formatLag = (seconds: number): string => {
+  const whole = Math.max(0, Math.round(seconds))
+  if (whole >= HOUR_SECONDS) return `${Math.round(whole / HOUR_SECONDS)} h`
+  if (whole >= MINUTE_SECONDS) return `${Math.round(whole / MINUTE_SECONDS)} min`
+
+  return `${whole} s`
+}
+
+/**
  * Elapsed seconds as a stopwatch
  * @param {number} seconds - Seconds elapsed
  * @return {string} - "1:02:05"

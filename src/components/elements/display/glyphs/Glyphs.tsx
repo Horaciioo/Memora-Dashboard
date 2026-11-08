@@ -79,3 +79,29 @@ export const BriefcaseGlyph = ({ className }: GlyphProps) => (
     <path d="M3.5 13h17" />
   </Stroke>
 )
+
+/**
+ * Rising line glyph
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const ClimbGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={2}>
+    <path d="M5 18 9 11 12 13.5 18 6" />
+    <path d="M12 6h6v6" />
+  </Stroke>
+)
+
+/**
+ * Falling line glyph with a rebound
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const LagGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={2}>
+    <path d="M3.5 5 8.5 11 11.5 8 18 17" />
+    <path d="M18 11.5V17h-5.5" />
+  </Stroke>
+)

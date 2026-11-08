@@ -233,7 +233,12 @@ import {
   ObserverFunctionGlyph,
   EmployeGlyph,
 } from '@/components/elements/display/glyphs/BrandGlyphs'
-import { BriefcaseGlyph, CrownGlyph, FlameGlyph } from '@/components/elements/display/glyphs/Glyphs'
+import {
+  BriefcaseGlyph,
+  CrownGlyph,
+  FlameGlyph,
+  LagGlyph,
+} from '@/components/elements/display/glyphs/Glyphs'
 import {
   CoordinatorGlyph,
   LiveDotGlyph,
@@ -461,6 +466,7 @@ export const ICONS = {
   shieldOutline: phosphor(Shield),
   // Role glyphs, kept as drawn
   flame: FlameGlyph,
+  lag: LagGlyph,
   crown: CrownGlyph,
   trophy: phosphor(Trophy),
   settingsLine: phosphor(Sliders),

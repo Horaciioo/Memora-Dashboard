@@ -5,41 +5,63 @@ import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_STREAM } from '@/declarations/ui/variants'
 import { SECOND_MS } from '@/utils/constants/time'
-import { formatStopwatch } from '@/utils/format/countdown'
+import { cn } from '@/utils/classnames'
+import { formatLag, formatStopwatch } from '@/utils/format/countdown'
 
 export interface StreamTimersProps {
   streamStartedAt?: string | null
-  liveStartedAt?: string | null
+  lag?: number | null
+  onRefresh?: () => void
 }
 
 /**
- * Twitch stream and Memora live stopwatches
- * @param {StreamTimersProps} props - Start moments
+ * Twitch stream time and how far behind the live the player is
+ * @param {StreamTimersProps} props - Stream start and player delay
  * @return {JSX.Element | null}
  */
 
-export const StreamTimers = ({ streamStartedAt, liveStartedAt }: StreamTimersProps) => {
+export const StreamTimers = ({ streamStartedAt, lag, onRefresh }: StreamTimersProps) => {
   const now = useClock(SECOND_MS)
-  const rows = [
-    {
-      key: 'stream',
-      icon: ICONS.twitch,
-      startedAt: streamStartedAt,
-      label: MODVIEW_COPY.streamTimer,
-    },
-    { key: 'live', icon: ICONS.clock, startedAt: liveStartedAt, label: MODVIEW_COPY.liveTimer },
-  ].filter((row) => row.startedAt)
-  if (rows.length === 0) return null
+  const TwitchIcon = ICONS.twitch
+  const LagIcon = ICONS.lag
+  const RefreshIcon = ICONS.refresh
+  if (!streamStartedAt && lag == null && !onRefresh) return null
+  // No gap left once rounded to the second
+  const isSynced = lag != null && Math.round(lag) === 0
 
   return (
     <div className={MODVIEW_STREAM.timers}>
-      {rows.map(({ key, icon: Icon, startedAt, label }) => (
-        <p key={key} className={MODVIEW_STREAM.timer} title={label}>
-          <Icon className={MODVIEW_STREAM.viewersIcon} aria-hidden="true" />
-          <span>{formatStopwatch((now - Date.parse(startedAt!)) / SECOND_MS)}</span>
-          <span className="sr-only">{label}</span>
+      {streamStartedAt && (
+        <p
+          className={cn(MODVIEW_STREAM.timer, isSynced && MODVIEW_STREAM.timerSynced)}
+          title={MODVIEW_COPY.streamTimer}
+        >
+          <TwitchIcon className={MODVIEW_STREAM.viewersIcon} aria-hidden="true" />
+          <span>{formatStopwatch((now - Date.parse(streamStartedAt)) / SECOND_MS)}</span>
+          <span className="sr-only">{MODVIEW_COPY.streamTimer}</span>
         </p>
-      ))}
+      )}
+      {lag != null && (
+        <p
+          className={cn(MODVIEW_STREAM.timer, isSynced && MODVIEW_STREAM.timerSynced)}
+          title={MODVIEW_COPY.lag}
+        >
+          {!isSynced && <LagIcon className={MODVIEW_STREAM.viewersIcon} aria-hidden="true" />}
+          <span>{isSynced ? MODVIEW_COPY.synced : formatLag(lag)}</span>
+          <span className="sr-only">{MODVIEW_COPY.lag}</span>
+        </p>
+      )}
+      {onRefresh && (
+        <button
+          type="button"
+          onClick={onRefresh}
+          className={MODVIEW_STREAM.timerRefresh}
+          title={MODVIEW_COPY.refreshStream}
+          aria-label={MODVIEW_COPY.refreshStream}
+        >
+          <RefreshIcon className={MODVIEW_STREAM.viewersIcon} aria-hidden="true" />
+        </button>
+      )}
     </div>
   )
 }
