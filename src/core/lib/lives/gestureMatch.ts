@@ -1,3 +1,5 @@
+import { SECOND_MS } from '@/utils/constants/time'
+
 /**
  * Fields that tell whether two log lines are the same gesture
  * @typedef {Object} GestureKey
@@ -38,7 +40,7 @@ export const isSameGesture = (
   if (memora.actorPlatformUserId !== platform.actorPlatformUserId) return false
   if (
     Math.abs(memora.occurredAt.getTime() - platform.occurredAt.getTime()) >
-    windowSeconds * 1000
+    windowSeconds * SECOND_MS
   ) {
     return false
   }

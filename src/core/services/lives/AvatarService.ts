@@ -7,6 +7,7 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { conflict } from '@/core/lib/errors'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Pictures kept, none when the account has not one
 const avatarCache = new Map<string, { url: string | null; until: number }>()
@@ -44,7 +45,7 @@ export const readLiveAvatars = async (
     const fresh = await readAvatars(found.seat, missing).catch(() => null)
     if (fresh) {
       if (avatarCache.size > CACHE_LIMIT) avatarCache.clear()
-      const until = now + LIVE_SETTINGS.avatarCacheSeconds * 1000
+      const until = now + LIVE_SETTINGS.avatarCacheSeconds * SECOND_MS
       for (const id of missing) avatarCache.set(id, { url: fresh.get(id) ?? null, until })
     }
   }

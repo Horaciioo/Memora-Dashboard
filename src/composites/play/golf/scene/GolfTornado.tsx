@@ -12,6 +12,7 @@ import { floorHeight, hazardSpot } from '@/core/lib/play/golf'
 import type { GolfHazard, GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { tornado } = GOLF_SCENE
 const { radius } = GOLF_SETTINGS.powers.tornado
@@ -51,9 +52,9 @@ const lean = (height: number, seconds: number, phase: number): [number, number] 
  */
 
 const presence = (hazard: GolfHazard, now: number): number => {
-  const grown = Math.min(1, Math.max(0, (now - (hazard.laidAt ?? now)) / 1000 / tornado.grow))
+  const grown = Math.min(1, Math.max(0, (now - (hazard.laidAt ?? now)) / SECOND_MS / tornado.grow))
   const left =
-    hazard.until === undefined ? 1 : Math.min(1, (hazard.until - now) / 1000 / tornado.fade)
+    hazard.until === undefined ? 1 : Math.min(1, (hazard.until - now) / SECOND_MS / tornado.fade)
 
   return Math.max(0, grown * left)
 }

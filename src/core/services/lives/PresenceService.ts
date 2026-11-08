@@ -8,6 +8,7 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { FunctionNames } from '@/declarations/reference/fixed'
 import type { SessionUser } from '@/types/auth'
 import { ADMIN_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Verdicts per live and member, until when they hold
 const countCache = new Map<string, { allowed: boolean; until: number }>()
@@ -52,7 +53,10 @@ export const mayCountTime = async (liveId: string, member: SessionUser): Promise
 
   const allowed = await judgeCount(liveId, member)
   if (countCache.size >= COUNT_CACHE_LIMIT) countCache.clear()
-  countCache.set(key, { allowed, until: Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * 1000 })
+  countCache.set(key, {
+    allowed,
+    until: Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * SECOND_MS,
+  })
 
   return allowed
 }
@@ -175,7 +179,7 @@ export const closeLivePresences = async (liveId: string): Promise<void> => {
  */
 
 export const sweepStalePresences = async (): Promise<number> => {
-  const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * 1000)
+  const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * SECOND_MS)
   const stale = await prisma.modViewPresence.findMany({
     where: { closedAt: null, lastBeatAt: { lt: horizon } },
     select: { id: true, lastBeatAt: true, liveId: true, accountId: true },
@@ -213,7 +217,7 @@ export const connectedMemberIds = async (liveId: string): Promise<string[]> =>
  */
 
 export const connectedArrivals = async (liveId: string): Promise<Record<string, string>> => {
-  const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * 1000)
+  const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * SECOND_MS)
   const rows = await prisma.modViewPresence.findMany({
     where: { liveId, closedAt: null, lastBeatAt: { gte: horizon } },
     select: { accountId: true, openedAt: true },

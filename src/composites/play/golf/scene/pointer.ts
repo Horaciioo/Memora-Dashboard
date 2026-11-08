@@ -15,6 +15,7 @@ import type { GolfPowerName } from '@/utils/constants/play'
 import { useGolfAimStore } from '@/core/store/golfAim'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { aim, camera, freeCamera, physics } = GOLF_SETTINGS
 
@@ -133,7 +134,7 @@ const pull = (context: PointerContext, event: PointerEvent): void => {
 export const aimedAngle = (
   shot: NonNullable<GolfPointerState['shot']>,
   powers: Set<GolfPowerName>
-): number => aimOf({ ...shot, seconds: (performance.now() - shot.since) / 1000 }, powers)
+): number => aimOf({ ...shot, seconds: (performance.now() - shot.since) / SECOND_MS }, powers)
 
 /**
  * Drop the pull being aimed

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { TOUR_COPY } from '@/declarations/tour/copy'
 import { TOUR_CHAT } from '@/declarations/ui/variants'
+import { SECOND_MS } from '@/utils/constants/time'
 
 export interface ChatTimerProps {
   // Wait it counts down
@@ -17,7 +18,7 @@ export interface ChatTimerProps {
  */
 
 export const ChatTimer = ({ ms }: ChatTimerProps) => {
-  const [seconds, setSeconds] = useState(Math.ceil(ms / 1000))
+  const [seconds, setSeconds] = useState(Math.ceil(ms / SECOND_MS))
   const [isRunning, setRunning] = useState(false)
 
   // The ring starts on the next frame so it animates

@@ -1,4 +1,5 @@
 import type { baccalaureatView } from '@/core/services/play/baccalaureat/BaccalaureatViewService'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Board sent by the engine
 export type BacBoardView = Awaited<ReturnType<typeof baccalaureatView>>
@@ -33,7 +34,7 @@ export interface BacRanked extends BacPlayer {
  */
 
 export const secondsTo = (to: Date | string, now: number): number =>
-  Math.max(0, Math.ceil((new Date(to).getTime() - now) / 1000))
+  Math.max(0, Math.ceil((new Date(to).getTime() - now) / SECOND_MS))
 
 /**
  * Seconds between two dates
@@ -43,7 +44,7 @@ export const secondsTo = (to: Date | string, now: number): number =>
  */
 
 export const spanSeconds = (from: Date | string, to: Date | string): number =>
-  Math.max(0, Math.round((new Date(to).getTime() - new Date(from).getTime()) / 1000))
+  Math.max(0, Math.round((new Date(to).getTime() - new Date(from).getTime()) / SECOND_MS))
 
 /**
  * Totals of the scored rounds, best first

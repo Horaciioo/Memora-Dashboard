@@ -10,6 +10,7 @@ import type { GolfStageSpot } from '@/composites/play/golf/scene/stage'
 import type { GolfRig } from '@/composites/play/golf/scene/rig'
 import { playGolfSound } from '@/composites/play/golf/sound'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { transition: look } = GOLF_SCENE
 
@@ -58,7 +59,7 @@ export const GolfStageTransition = ({
 
   useFrame(() => {
     const rig = rigRef.current
-    const seconds = closedAt === null ? -1 : (serverNow() - closedAt) / 1000
+    const seconds = closedAt === null ? -1 : (serverNow() - closedAt) / SECOND_MS
     // Held until the next hole arrives, so the balls wait on the tee
     const isOn = !isLast && !isStill.current && seconds >= 0
     if (!isOn) {

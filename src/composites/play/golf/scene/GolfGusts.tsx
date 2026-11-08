@@ -12,6 +12,7 @@ import { floorHeight, gustFans, isEffectActive } from '@/core/lib/play/golf'
 import type { GolfHazard, GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GolfPowers } from '@/utils/constants/play'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { gust, propeller } = GOLF_SCENE
 
@@ -30,9 +31,12 @@ interface GustProps {
  */
 
 const presenceOf = (hazard: GolfHazard, now: number): number => {
-  const grown = Math.min(1, Math.max(0, (now - (hazard.laidAt ?? now)) / 1000 / propeller.grow))
+  const grown = Math.min(
+    1,
+    Math.max(0, (now - (hazard.laidAt ?? now)) / SECOND_MS / propeller.grow)
+  )
   const left =
-    hazard.until === undefined ? 1 : Math.min(1, (hazard.until - now) / 1000 / propeller.fade)
+    hazard.until === undefined ? 1 : Math.min(1, (hazard.until - now) / SECOND_MS / propeller.fade)
 
   return Math.max(0, grown * left)
 }

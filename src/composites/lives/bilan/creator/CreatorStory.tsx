@@ -11,6 +11,7 @@ import type { IconName } from '@/declarations/ui/icons'
 import { CREATOR_BILAN } from '@/declarations/ui/variants'
 import { formatHourMark } from '@/utils/format/dates'
 import { formatSpan } from '@/utils/format/modview'
+import { SECOND_MS } from '@/utils/constants/time'
 
 export interface CreatorStoryProps {
   report: LiveReport
@@ -57,7 +58,7 @@ const Card = ({ title, icon, tone, children }: CardProps) => {
 
 export const CreatorStory = ({ report, start, end }: CreatorStoryProps) => {
   const team = report.moderators.filter((row) => row.isMember)
-  const seconds = Math.max(0, Math.round((Date.parse(end) - Date.parse(start)) / 1000))
+  const seconds = Math.max(0, Math.round((Date.parse(end) - Date.parse(start)) / SECOND_MS))
 
   return (
     <div className={CREATOR_BILAN.storyGrid}>

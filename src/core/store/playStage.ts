@@ -5,6 +5,9 @@ import { create } from 'zustand'
 
 import { MEDIA } from '@/declarations/ui/responsive'
 
+// Stuck view transition fallback
+const MORPH_FALLBACK_MS = 1000
+
 /**
  * Play stage store, a table taking the whole screen with its chat laid over it
  * @typedef {Object} PlayStageStore
@@ -46,7 +49,7 @@ export const morphStage = (change: () => void) => {
   morph.ready.catch(() => {})
   morph.updateCallbackDone.catch(() => {})
   // Callback never ran: change anyway
-  window.setTimeout(apply, 1000)
+  window.setTimeout(apply, MORPH_FALLBACK_MS)
 }
 
 interface PlayStageStore {

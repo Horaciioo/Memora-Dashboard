@@ -1,3 +1,5 @@
+import { SECOND_MS } from '@/utils/constants/time'
+
 /**
  * Where a presence stands before a beat
  * @typedef {Object} PresenceTally
@@ -30,7 +32,7 @@ export const tallyBeat = (
 ): PresenceTally => {
   const elapsed = Math.max(
     0,
-    Math.min(capSeconds, Math.round((beat.at.getTime() - tally.lastBeatAt.getTime()) / 1000))
+    Math.min(capSeconds, Math.round((beat.at.getTime() - tally.lastBeatAt.getTime()) / SECOND_MS))
   )
 
   return {
@@ -50,4 +52,4 @@ export const tallyBeat = (
  */
 
 export const isStale = (lastBeatAt: Date, now: Date, staleSeconds: number): boolean =>
-  now.getTime() - lastBeatAt.getTime() > staleSeconds * 1000
+  now.getTime() - lastBeatAt.getTime() > staleSeconds * SECOND_MS

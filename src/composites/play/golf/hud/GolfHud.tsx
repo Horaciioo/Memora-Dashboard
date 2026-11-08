@@ -18,6 +18,7 @@ import { cn } from '@/utils/classnames'
 import { formatCountdown } from '@/utils/format/countdown'
 import { GolfPhases } from '@/utils/constants/play'
 import type { GolfPhaseName } from '@/utils/constants/play'
+import { SECOND_MS } from '@/utils/constants/time'
 
 export interface GolfHudProps {
   board: GolfBoardState
@@ -53,7 +54,7 @@ export const GolfHud = ({
   isSeated,
 }: GolfHudProps) => {
   const now = useServerNow(new Date(board.serverTime))
-  const left = phase === GolfPhases.Playing ? (board.endsAt - now) / 1000 : 0
+  const left = phase === GolfPhases.Playing ? (board.endsAt - now) / SECOND_MS : 0
   useGolfClockSound(left)
   const DoneIcon = ICONS.golfFlag
 
@@ -95,7 +96,7 @@ export const GolfHud = ({
             )}
           >
             {formatCountdown(
-              phase === GolfPhases.Countdown ? (board.endsAt - board.startsAt) / 1000 : left
+              phase === GolfPhases.Countdown ? (board.endsAt - board.startsAt) / SECOND_MS : left
             )}
           </span>
         </div>

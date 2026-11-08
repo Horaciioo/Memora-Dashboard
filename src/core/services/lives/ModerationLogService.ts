@@ -9,7 +9,7 @@ import type { PlatformLogEntry } from '@/core/lib/platforms/twitch/logEntry'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import type { ModViewIntent } from '@/types/modview'
 import type { LivePlatformName } from '@/utils/constants/lives'
-import { DAY_MS } from '@/utils/constants/time'
+import { DAY_MS, SECOND_MS } from '@/utils/constants/time'
 
 // Seconds a platform line may precede the Memora one it belongs to
 const EARLY_ECHO_SECONDS = 15
@@ -81,7 +81,7 @@ const findEarlyEcho = async (
       origin: 'PLATFORM',
       kind,
       actorPlatformUserId: input.actorPlatformUserId,
-      occurredAt: { gte: new Date(now.getTime() - EARLY_ECHO_SECONDS * 1000) },
+      occurredAt: { gte: new Date(now.getTime() - EARLY_ECHO_SECONDS * SECOND_MS) },
     },
     orderBy: { occurredAt: 'desc' },
     select: {
@@ -259,7 +259,7 @@ export const logPlatformGesture = async (input: {
         kind: entry.kind,
         externalEventId: null,
         actorPlatformUserId: entry.actorPlatformUserId,
-        occurredAt: { gte: new Date(occurredAt.getTime() - ECHO_WINDOW_SECONDS * 1000) },
+        occurredAt: { gte: new Date(occurredAt.getTime() - ECHO_WINDOW_SECONDS * SECOND_MS) },
       },
       orderBy: { occurredAt: 'desc' },
       select: {

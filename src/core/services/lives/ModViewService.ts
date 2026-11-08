@@ -52,6 +52,7 @@ import type {
 } from '@/types/modview'
 import { LivePlatforms, LiveStatuses } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * What a Mod View opens on
@@ -162,7 +163,7 @@ const seatOf = async (
 
 const retryAfter = (error: PlatformError): number =>
   error.resetAt
-    ? Math.max(1, Math.ceil((error.resetAt - Date.now()) / 1000))
+    ? Math.max(1, Math.ceil((error.resetAt - Date.now()) / SECOND_MS))
     : LIVE_SETTINGS.rateLimitRetrySeconds
 
 /**
@@ -229,7 +230,7 @@ export const channelAccess = async (
     return { allowed: false, notice: (await translateRefusal(error, viewerId)).message }
   }
   pruneCache(moderatorCache, (until) => until)
-  moderatorCache.set(key, Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * 1000)
+  moderatorCache.set(key, Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * SECOND_MS)
 
   return { allowed: true, found }
 }
@@ -496,7 +497,7 @@ export const readLiveEmotes = async (
     let base = emoteCache.get(seat.broadcasterId)
     if (!base || base.until <= Date.now()) {
       base = {
-        until: Date.now() + LIVE_SETTINGS.emoteCacheSeconds * 1000,
+        until: Date.now() + LIVE_SETTINGS.emoteCacheSeconds * SECOND_MS,
         emotes: await readEmotes(seat),
       }
       pruneCache(emoteCache, (entry) => entry.until)
@@ -507,7 +508,7 @@ export const readLiveEmotes = async (
     let owned = ownedCache.get(ownedKey)
     if (!owned || owned.until <= Date.now()) {
       owned = {
-        until: Date.now() + LIVE_SETTINGS.ownedEmoteCacheSeconds * 1000,
+        until: Date.now() + LIVE_SETTINGS.ownedEmoteCacheSeconds * SECOND_MS,
         owned: await readOwnedEmoteIds(seat),
       }
       pruneCache(ownedCache, (entry) => entry.until)

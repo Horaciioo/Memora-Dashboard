@@ -2,6 +2,7 @@ import type { GolfBody } from '@/core/lib/play/golf/body'
 import { segmentDistance } from '@/core/lib/play/golf/colliders/hit'
 import type { GolfWorld } from '@/core/lib/play/golf/world'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { orbs, render } = GOLF_SETTINGS
 
@@ -50,7 +51,7 @@ export const pickOrbs = (world: GolfWorld, body: GolfBody, at: number): void => 
       world.fullHands.add(key)
       return
     }
-    world.orbs[index] = at + orbs.respawnSeconds * 1000
+    world.orbs[index] = at + orbs.respawnSeconds * SECOND_MS
     body.canPick = false
     world.pickups.push({ id: body.id, orb: index, at })
     world.emit('orb', body.id)

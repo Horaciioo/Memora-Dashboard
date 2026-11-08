@@ -3,6 +3,7 @@ import { fragmentsOf } from '@/core/lib/platforms/twitch/fragments'
 import { twitchChatter } from '@/core/lib/platforms/twitch/helix'
 import { TWITCH_EVENT_COPY } from '@/declarations/platforms/copy'
 import type { ChatBadge, ChatReply, ModAct, ModActKind } from '@/types/modview'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * What one notification means for Memora
@@ -171,7 +172,7 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
             targetId: target.id || null,
             reason: text(detail.reason) || null,
             durationSeconds: Number.isFinite(expiresAt)
-              ? Math.max(1, Math.round((expiresAt - Date.parse(at)) / 1000))
+              ? Math.max(1, Math.round((expiresAt - Date.parse(at)) / SECOND_MS))
               : null,
           }),
         }),

@@ -6,6 +6,7 @@ import type { GolfFan, GolfHazard, GolfHole, GolfPoint } from '@/core/lib/play/g
 import type { GolfWorld } from '@/core/lib/play/golf/world'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPowers, GolfSurfaces } from '@/utils/constants/play'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { obstacles, powers } = GOLF_SETTINGS
 
@@ -18,7 +19,7 @@ const { obstacles, powers } = GOLF_SETTINGS
 
 export const hazardSpot = (hazard: GolfHazard, at: number): { x: number; z: number } => {
   if (hazard.power !== GolfPowers.Tornado || hazard.laidAt === undefined) return hazard
-  const seconds = Math.max(0, at - hazard.laidAt) / 1000
+  const seconds = Math.max(0, at - hazard.laidAt) / SECOND_MS
   const vx = hazard.vx ?? 0
   const vz = hazard.vz ?? 0
   // Sideways swing across the heading

@@ -9,6 +9,7 @@ import {
   TWITCH_SEAT_REVOCATIONS,
   TWITCH_SUBSCRIPTIONS,
 } from '@/declarations/platforms/twitch'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Where a session stands
@@ -300,7 +301,7 @@ export class EventSubSession {
    */
 
   private silenceLimit(): number {
-    return (this.options.keepaliveSeconds + KEEPALIVE_SLACK_SECONDS) * 1000
+    return (this.options.keepaliveSeconds + KEEPALIVE_SLACK_SECONDS) * SECOND_MS
   }
 
   /**
@@ -340,7 +341,7 @@ export class EventSubSession {
     this.retry = setTimeout(() => {
       this.retry = null
       this.start()
-    }, delay * 1000)
+    }, delay * SECOND_MS)
   }
 
   /**

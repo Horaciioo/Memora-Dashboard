@@ -7,6 +7,7 @@ import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { SanctionPanelView } from '@/types/sanctions'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Sanctions panel of a live, reread while it runs so an edit reaches the suggestions
@@ -28,7 +29,7 @@ export const useLivePanel = (initial: SanctionPanelView | null): SanctionPanelVi
       ),
     initialData: initial ?? undefined,
     enabled: initial !== null,
-    refetchInterval: LIVE_SETTINGS.focusPollSeconds * 1000,
+    refetchInterval: LIVE_SETTINGS.focusPollSeconds * SECOND_MS,
   })
 
   return data ?? initial

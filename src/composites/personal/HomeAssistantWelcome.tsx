@@ -8,6 +8,7 @@ import { ASSISTANT_WELCOMES } from '@/declarations/assistant/copy'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { instantToWall } from '@/utils/format/zone'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Set once per page load, a refresh starts it again
 let isWelcomed = false
@@ -29,7 +30,7 @@ export const HomeAssistantWelcome = () => {
     const hour = Number(instantToWall(new Date()).slice(11, 13))
     say(pickForHour(ASSISTANT_WELCOMES, hour).text.replace('{name}', name))
     // Not cleared on unmount, so a dev remount keeps the line
-    setTimeout(() => say(null), ASSISTANT_SETTINGS.nudgeShowSeconds * 1000)
+    setTimeout(() => say(null), ASSISTANT_SETTINGS.nudgeShowSeconds * SECOND_MS)
   }, [name, say])
 
   return null

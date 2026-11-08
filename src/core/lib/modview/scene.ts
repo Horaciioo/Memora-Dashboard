@@ -14,6 +14,7 @@ import type {
   PinnedMessage,
   UnbanRequest,
 } from '@/types/modview'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * One thing a scene makes happen
@@ -91,7 +92,7 @@ const clearerOf = (acts: ModAct[], chatterId: string): string | null => {
     (line) =>
       CLEARING_ACTS.has(line.kind) &&
       line.targetId === chatterId &&
-      Math.abs(Date.now() - Date.parse(line.at)) <= CORRELATION_SECONDS * 1000
+      Math.abs(Date.now() - Date.parse(line.at)) <= CORRELATION_SECONDS * SECOND_MS
   )
 
   return act?.moderator ?? null

@@ -18,6 +18,7 @@ import { boostId } from '@/core/lib/play/golf/terrain'
 import type { GolfWorld } from '@/core/lib/play/golf/world'
 import { pairKey } from '@/core/lib/play/golf/world'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { physics } = GOLF_SETTINGS
 
@@ -222,7 +223,7 @@ const hitBalls = (world: GolfWorld): void => {
  */
 
 export const contactsOf = (world: GolfWorld, at: number): void => {
-  const seconds = (at - world.input.holeStart) / 1000
+  const seconds = (at - world.input.holeStart) / SECOND_MS
   for (const body of world.bodies) {
     if (!body.isMoving || !isInPlay(body) || body.isGhost) continue
     hitWalls(world, body)

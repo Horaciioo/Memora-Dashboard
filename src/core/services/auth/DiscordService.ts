@@ -13,6 +13,7 @@ import {
 } from '@/declarations/access/discord'
 import { SIGN_IN_ERRORS } from '@/declarations/access/signIn'
 import { TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Grant returned by the token endpoint
@@ -120,7 +121,7 @@ const readGrant = async (response: Response): Promise<DiscordGrant> => {
     accessToken: access_token,
     refreshToken: refresh_token,
     scope: scope ?? DISCORD_SCOPES.join(' '),
-    expiresAt: new Date(Date.now() + expires_in * 1000),
+    expiresAt: new Date(Date.now() + expires_in * SECOND_MS),
   }
 }
 

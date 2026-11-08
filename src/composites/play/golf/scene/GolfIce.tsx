@@ -18,6 +18,7 @@ import { padByArea, padHeight } from '@/core/lib/play/golf'
 import type { GolfHazard, GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GolfSurfaces } from '@/utils/constants/play'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { ice } = GOLF_SCENE
 
@@ -60,7 +61,7 @@ export const iceSurfaces = (geometry: ReturnType<typeof courseGeometry>): Buffer
 const meltOf = (hazard: GolfHazard, now: number): number =>
   hazard.until === undefined
     ? 0
-    : 1 - Math.min(1, Math.max(0, (hazard.until - now) / 1000 / ice.melt))
+    : 1 - Math.min(1, Math.max(0, (hazard.until - now) / SECOND_MS / ice.melt))
 
 /**
  * Sheet of ice over the whole course: cracked glossy slab spreading from the caster, sparkles on top, melting at the end
@@ -154,7 +155,7 @@ export const GolfIce = ({
 
   useFrame(({ clock }) => {
     const now = serverNow()
-    const since = Math.max(0, now - (hazard.laidAt ?? now)) / 1000
+    const since = Math.max(0, now - (hazard.laidAt ?? now)) / SECOND_MS
     const melt = meltOf(hazard, now)
     const front = since * ice.front
     live.current.uFront.value = front

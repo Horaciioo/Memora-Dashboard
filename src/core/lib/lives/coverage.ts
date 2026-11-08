@@ -1,3 +1,5 @@
+import { SECOND_MS } from '@/utils/constants/time'
+
 /**
  * Stretch of a live
  * @typedef {Object} CoverageSpan
@@ -38,7 +40,7 @@ export const blindSpans = (
   }
   if (cursor < end.getTime()) gaps.push({ from: new Date(cursor), to: end })
 
-  return gaps.filter((gap) => gap.to.getTime() - gap.from.getTime() >= minSeconds * 1000)
+  return gaps.filter((gap) => gap.to.getTime() - gap.from.getTime() >= minSeconds * SECOND_MS)
 }
 
 /**
@@ -48,7 +50,9 @@ export const blindSpans = (
  */
 
 export const spanSeconds = (spans: CoverageSpan[]): number =>
-  Math.round(spans.reduce((sum, span) => sum + (span.to.getTime() - span.from.getTime()), 0) / 1000)
+  Math.round(
+    spans.reduce((sum, span) => sum + (span.to.getTime() - span.from.getTime()), 0) / SECOND_MS
+  )
 
 /**
  * Coverage of a live: where the log could not see

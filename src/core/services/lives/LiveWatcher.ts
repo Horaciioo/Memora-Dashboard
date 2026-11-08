@@ -31,7 +31,7 @@ import { isTwitchConfigured } from '@/declarations/platforms/twitch'
 import { runtime } from '@/managers/infrastructure/Core/runtime'
 import { CoordinationStatuses, LivePlatforms, LiveStatuses } from '@/utils/constants/lives'
 import type { LiveStatusName } from '@/utils/constants/lives'
-import { MINUTE_MS } from '@/utils/constants/time'
+import { MINUTE_MS, SECOND_MS } from '@/utils/constants/time'
 
 /**
  * One live being watched
@@ -86,7 +86,7 @@ const cachedLivecon = async (youtuberId: string): Promise<number | null> => {
   const level = await liveconLevelOf(youtuberId)
   watcher.livecon.set(youtuberId, {
     level,
-    until: Date.now() + LIVE_SETTINGS.liveconCacheSeconds * 1000,
+    until: Date.now() + LIVE_SETTINGS.liveconCacheSeconds * SECOND_MS,
   })
 
   return level
@@ -476,7 +476,7 @@ export const startLiveWatcher = (): void => {
     )
 
   run()
-  watcher.timer = setInterval(run, LIVE_SETTINGS.watchSyncSeconds * 1000)
+  watcher.timer = setInterval(run, LIVE_SETTINGS.watchSyncSeconds * SECOND_MS)
   logger.info('[watcher] watching open Twitch lives')
 }
 

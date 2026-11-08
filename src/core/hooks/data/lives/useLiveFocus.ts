@@ -10,6 +10,7 @@ import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MODVIEW_INSPECT_COPY } from '@/declarations/modview/copy'
 import type { LiveFocusView } from '@/types/lives'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Focus open on a live and the two gestures
@@ -38,7 +39,7 @@ export const useLiveFocus = (liveId: string | null): LiveFocusState => {
     queryKey: QUERY_KEYS.liveFocus(liveId ?? ''),
     queryFn: ({ signal }) => apiGet<LiveFocusView[]>(API_ROUTES.liveFocus(liveId ?? ''), signal),
     enabled: liveId !== null,
-    refetchInterval: LIVE_SETTINGS.focusPollSeconds * 1000,
+    refetchInterval: LIVE_SETTINGS.focusPollSeconds * SECOND_MS,
   })
 
   const start = useCallback(

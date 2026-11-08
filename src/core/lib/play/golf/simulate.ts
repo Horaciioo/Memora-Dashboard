@@ -11,6 +11,7 @@ import type { GolfWorld } from '@/core/lib/play/golf/world'
 import { createWorld } from '@/core/lib/play/golf/world'
 import type { GolfShotInput, GolfShotResult } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { physics } = GOLF_SETTINGS
 
@@ -51,12 +52,12 @@ const record = (world: GolfWorld): void => {
 
 const advance = (world: GolfWorld, step: number): void => {
   const dt = 1 / physics.stepHz
-  const at = world.input.at + step * dt * 1000
+  const at = world.input.at + step * dt * SECOND_MS
   const context = {
     hazards: world.hazards,
     hole: world.input.hole,
     at,
-    seconds: (at - world.input.holeStart) / 1000,
+    seconds: (at - world.input.holeStart) / SECOND_MS,
   }
   const moving = world.bodies.filter((body) => body.isMoving)
   for (const body of moving) pushBody(body, context, dt)
@@ -172,7 +173,7 @@ export const simulateShot = (input: GolfShotInput): GolfShotResult => {
   for (const body of world.bodies) if (body.isMoving) halt(body)
 
   return {
-    frameMs: (1000 * physics.frameEvery) / physics.stepHz,
+    frameMs: (SECOND_MS * physics.frameEvery) / physics.stepHz,
     frames: world.frames,
     paths: Object.fromEntries(
       world.bodies.filter((body) => body.hasMoved).map((body) => [body.id, body.path])

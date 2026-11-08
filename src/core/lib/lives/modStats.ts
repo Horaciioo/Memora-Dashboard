@@ -1,7 +1,7 @@
 import type { ModerationKind } from '@prisma/client'
 
 import type { LiveLogLine, LiveModTime } from '@/types/lives'
-import { HOUR_SECONDS, MINUTE_MS } from '@/utils/constants/time'
+import { HOUR_SECONDS, MINUTE_MS, SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Figures of the actions of one moderator, or of the whole team
@@ -62,7 +62,7 @@ export const modStats = (
 ): ModStat => {
   const done = lines.filter((line) => line.status === 'SUCCEEDED')
   const times = done.map((line) => Date.parse(line.occurredAt)).sort((left, right) => left - right)
-  const gaps = times.slice(1).map((time, index) => (time - times[index]) / 1000)
+  const gaps = times.slice(1).map((time, index) => (time - times[index]) / SECOND_MS)
   gaps.sort((left, right) => left - right)
 
   // Slices from the live start

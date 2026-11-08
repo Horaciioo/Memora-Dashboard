@@ -22,6 +22,9 @@ import { BAC_BOARD_COPY, BAC_SESSION_COPY, BACCALAUREAT_SETTINGS } from '@/decla
 import { BAC_BOARD } from '@/declarations/ui/variants'
 import { PlayGames } from '@/utils/constants/play'
 
+// Server settles first
+const DEADLINE_REFRESH_MS = 1200
+
 export interface BaccalaureatBoardProps {
   sessionId: string
   board: BacBoardView
@@ -63,7 +66,7 @@ export const BaccalaureatBoard = ({
   // The server moves on at the deadline, read it again then
   useEffect(() => {
     if (left !== 0) return
-    const timer = window.setTimeout(() => router.refresh(), 1200)
+    const timer = window.setTimeout(() => router.refresh(), DEADLINE_REFRESH_MS)
 
     return () => window.clearTimeout(timer)
   }, [left, router])

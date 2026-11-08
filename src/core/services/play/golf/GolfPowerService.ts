@@ -40,6 +40,7 @@ import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import type { EngineSession, EngineStep } from '@/types/play'
 import { GolfPowers } from '@/utils/constants/play'
 import type { GolfPowerName } from '@/utils/constants/play'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Lasting part of a power, from the settings
@@ -54,7 +55,7 @@ const lastingOf = (power: GolfPowerName, at: number) => {
   >
 
   return {
-    until: tuning.seconds === undefined ? undefined : at + tuning.seconds * 1000,
+    until: tuning.seconds === undefined ? undefined : at + tuning.seconds * SECOND_MS,
     shots: tuning.shots,
     // Boing Boing shares its bounces as lives
     lives: tuning.lives ?? tuning.bounces,

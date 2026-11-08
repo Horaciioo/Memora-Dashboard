@@ -1,5 +1,6 @@
 import { pathAt, pathLength } from '@/core/lib/play/golf/frames'
 import type { GolfBallMotion, GolfShotResult } from '@/core/lib/play/golf/types'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Stroke still rolling, as stored
@@ -37,7 +38,7 @@ export const motionAt = (
   const after = Math.min(last, frame + 1)
   const from = pathAt(path, before)
   const to = pathAt(path, after)
-  const seconds = ((after - before) * shot.track.frameMs) / 1000
+  const seconds = ((after - before) * shot.track.frameMs) / SECOND_MS
 
   return {
     x: spot.x,

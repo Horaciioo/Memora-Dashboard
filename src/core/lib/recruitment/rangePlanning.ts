@@ -3,9 +3,7 @@ import { PLANNING_LAYOUT } from '@/declarations/recruitment/planning'
 import type { CandidateView } from '@/types/recruitment'
 import { rangeGrid, type CalendarDay } from '@/utils/format/calendar'
 import { addDays, formatDayKey, parseDay, startOfWeek } from '@/utils/format/days'
-
-// Milliseconds in a day
-const DAY_MS = 86_400_000
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * One interview drawn on a day

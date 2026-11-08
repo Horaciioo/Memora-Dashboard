@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 
 import { TWO_FACTOR_SETTINGS } from '@/declarations/configurations/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // RFC 4648 alphabet
 const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
@@ -100,7 +101,7 @@ const codeAt = (secret: string, step: number): string => {
  */
 
 export const stepAt = (at: number = Date.now()): number =>
-  Math.floor(at / 1000 / TWO_FACTOR_SETTINGS.periodSeconds)
+  Math.floor(at / SECOND_MS / TWO_FACTOR_SETTINGS.periodSeconds)
 
 /**
  * Verify a code

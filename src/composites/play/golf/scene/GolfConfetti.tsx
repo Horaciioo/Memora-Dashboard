@@ -11,6 +11,7 @@ import { seededRandom } from '@/composites/play/golf/scene/random'
 import { CUP_PULSE, cupNear } from '@/core/lib/play/golf'
 import type { GolfHole, GolfMotion } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { confetti } = GOLF_SCENE
 
@@ -71,7 +72,7 @@ export const GolfConfetti = ({
     const spot = at ? cupNear(hole, at.x, at.z) : hole.cups[0]
     const cupFloor = spot.floor
     const firedAt = motionRef.current.pulses.get(CUP_PULSE)
-    const age = firedAt === undefined ? Infinity : (performance.now() - firedAt) / 1000
+    const age = firedAt === undefined ? Infinity : (performance.now() - firedAt) / SECOND_MS
     mesh.visible = age < confetti.seconds
     // Pillar rises and thins, ring spreads and fades
     const pillar = Math.max(0, 1 - age / confetti.beam.seconds)

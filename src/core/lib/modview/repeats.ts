@@ -1,4 +1,5 @@
 import type { ModAct } from '@/types/modview'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 // Acts that sanction a viewer
 const COUNTED_KINDS = ['delete', 'warn', 'timeout', 'ban']
@@ -19,7 +20,7 @@ const targetKey = (act: ModAct): string | null => act.targetId ?? act.target?.to
  */
 
 export const repeatRanks = (acts: ModAct[], windowMinutes: number): Map<string, number> => {
-  const span = windowMinutes * 60_000
+  const span = windowMinutes * MINUTE_MS
   const seen = new Map<string, number[]>()
   const ranks = new Map<string, number>()
 

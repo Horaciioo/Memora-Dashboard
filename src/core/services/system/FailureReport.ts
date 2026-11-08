@@ -9,6 +9,7 @@ import { ACTIVITY_COPY } from '@/declarations/activity/copy'
 import { FAILURE_SETTINGS } from '@/declarations/configurations/settings'
 import { ErrorCodes } from '@/utils/constants/errors'
 import { Prisma } from '@prisma/client'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Moments each failure was last kept
 const lastKept = new Map<string, number>()
@@ -25,7 +26,8 @@ const STACK_LINE = /^\s+at /
 const isRecent = (key: string): boolean => {
   const now = Date.now()
   const last = lastKept.get(key)
-  if (last !== undefined && now - last < FAILURE_SETTINGS.repeatWindowSeconds * 1000) return true
+  if (last !== undefined && now - last < FAILURE_SETTINGS.repeatWindowSeconds * SECOND_MS)
+    return true
 
   // Keep the table small
   if (lastKept.size >= FAILURE_SETTINGS.repeatKeysMax) {

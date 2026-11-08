@@ -8,13 +8,14 @@ import { ROUTES } from '@/declarations/navigation'
 import { IDEMPOTENCY_HEADER } from '@/declarations/system/security/idempotency'
 import type { ScenarioChoice, ScenarioMove, ScenarioStep } from '@/types/scenario'
 import { fillTemplate } from '@/utils/format/strings'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 // Lengths offered when the model has no usual one
 const LENGTHS = [30, 60, 90]
 
 // A wall clock moment moved by minutes
 const endOf = (start: string, minutes: number): string =>
-  new Date(Date.parse(`${start}:00Z`) + minutes * 60_000).toISOString().slice(0, 16)
+  new Date(Date.parse(`${start}:00Z`) + minutes * MINUTE_MS).toISOString().slice(0, 16)
 
 // A wall clock moment in words, read as is
 const whenOf = (wall: string): string =>

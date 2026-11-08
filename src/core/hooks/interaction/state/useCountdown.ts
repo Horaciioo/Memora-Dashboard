@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Refresh rate of the clock
 const TICK_MS = 200
@@ -32,10 +33,10 @@ export const useCountdown = (
   useEffect(() => {
     if (seconds === null || !isRunning) return
 
-    const endsAt = Date.now() + seconds * 1000
+    const endsAt = Date.now() + seconds * SECOND_MS
     const timer = setInterval(() => {
       const remaining = Math.max(0, endsAt - Date.now())
-      setReading({ run: runKey, left: Math.ceil(remaining / 1000) })
+      setReading({ run: runKey, left: Math.ceil(remaining / SECOND_MS) })
 
       if (remaining === 0) {
         clearInterval(timer)

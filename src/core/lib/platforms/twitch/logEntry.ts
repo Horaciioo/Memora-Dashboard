@@ -1,4 +1,5 @@
 import type { ModerationKind } from '@prisma/client'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * One moderation gesture as Twitch reports it
@@ -128,7 +129,7 @@ export const logEntryOf = (
     targetPlatformUserId: text(detail.user_id),
     targetLogin: text(detail.user_login),
     durationSeconds: Number.isFinite(expiresAt)
-      ? Math.max(1, Math.round((expiresAt - Date.parse(meta.at)) / 1000))
+      ? Math.max(1, Math.round((expiresAt - Date.parse(meta.at)) / SECOND_MS))
       : action === 'slow'
         ? Number(detail.wait_time_seconds) || null
         : null,

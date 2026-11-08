@@ -1,3 +1,5 @@
+import { SECOND_MS } from '@/utils/constants/time'
+
 // Degrees in a full turn
 const TURN = 360
 
@@ -35,4 +37,4 @@ const HEAT_CURVE = 0.7
  */
 
 export const bombHeat = (elapsedMs: number, longestSeconds: number): number =>
-  Math.min(1, Math.max(0, elapsedMs / (longestSeconds * 1000))) ** HEAT_CURVE
+  Math.min(1, Math.max(0, elapsedMs / (longestSeconds * SECOND_MS))) ** HEAT_CURVE

@@ -1,4 +1,5 @@
 import { TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Failure answered by a platform
@@ -79,7 +80,7 @@ const readBucket = (key: string, headers: Headers): void => {
   const reset = Number(headers.get('ratelimit-reset'))
   if (!Number.isFinite(remaining) || !Number.isFinite(reset) || reset === 0) return
 
-  buckets.set(key, { remaining, resetAt: reset * 1000 })
+  buckets.set(key, { remaining, resetAt: reset * SECOND_MS })
 }
 
 /**
@@ -135,7 +136,8 @@ export const platformRequest = async <T>(request: PlatformRequest): Promise<T | 
     if (response.status === 429 && attempt < MAX_RETRIES) {
       buckets.set(request.bucket, {
         remaining: 0,
-        resetAt: Number(response.headers.get('ratelimit-reset')) * 1000 || Date.now() + BACKOFF_MS,
+        resetAt:
+          Number(response.headers.get('ratelimit-reset')) * SECOND_MS || Date.now() + BACKOFF_MS,
       })
       continue
     }
@@ -148,7 +150,7 @@ export const platformRequest = async <T>(request: PlatformRequest): Promise<T | 
 
     if (!response.ok) {
       const payload = (await response.json().catch(() => null)) as { message?: string } | null
-      const reset = Number(response.headers.get('ratelimit-reset')) * 1000
+      const reset = Number(response.headers.get('ratelimit-reset')) * SECOND_MS
       throw new PlatformError(
         response.status,
         payload?.message ?? response.statusText,
