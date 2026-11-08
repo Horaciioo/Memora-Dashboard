@@ -2,26 +2,97 @@
   "minPlayers": 2,
   "maxPlayers": 8,
   "modes": {
-    "duel": { "min": 2, "max": 2 },
-    "bracket": { "min": 2, "max": 8 },
-    "melee": { "min": 3, "max": 8 }
+    "duel": {
+      "min": 2,
+      "max": 2
+    },
+    "bracket": {
+      "min": 2,
+      "max": 8
+    },
+    "melee": {
+      "min": 3,
+      "max": 8
+    }
   },
   "mode": "duel",
   "countdownSeconds": 4,
-  "placementSeconds": { "default": 75, "min": 30, "max": 180 },
-  "turnSeconds": { "default": 25, "min": 10, "max": 60 },
+  "placementSeconds": {
+    "default": 75,
+    "min": 30,
+    "max": 180
+  },
+  "turnSeconds": {
+    "default": 25,
+    "min": 10,
+    "max": 60
+  },
   "graceSeconds": 1,
   "formats": {
-    "compact": { "size": 8, "fleet": [4, 3, 3, 2, 2] },
-    "classic": { "size": 10, "fleet": [5, 4, 3, 3, 2] }
+    "quick": {
+      "size": 10,
+      "fleet": [5, 4, 3, 3, 2]
+    },
+    "standard": {
+      "size": 12,
+      "fleet": [5, 4, 3, 3, 2]
+    },
+    "vast": {
+      "size": 36,
+      "fleet": [5, 4, 3, 3, 2]
+    }
   },
-  "format": "compact",
-  "rules": { "hitReplay": true, "spacedShips": false },
+  "format": "vast",
+  "rules": {
+    "hitReplay": true,
+    "spacedShips": false
+  },
+  "weapons": {
+    "cannon": {
+      "shape": "point",
+      "reach": 0,
+      "cost": 0,
+      "weight": 0
+    },
+    "airstrike": {
+      "shape": "line",
+      "reach": 7,
+      "cost": 4,
+      "weight": 2
+    },
+    "broadside": {
+      "shape": "cross",
+      "reach": 2,
+      "cost": 3,
+      "weight": 3
+    },
+    "flare": {
+      "shape": "square",
+      "reach": 3,
+      "cost": 2,
+      "weight": 3
+    },
+    "torpedo": {
+      "shape": "ray",
+      "reach": 0,
+      "cost": 3,
+      "weight": 2
+    }
+  },
+  "offerSize": 2,
+  "ammo": {
+    "start": 2,
+    "perTurn": 1,
+    "max": 8
+  },
   "strikesToForfeit": 3,
   "flightMs": 1500,
   "impactMs": 900,
   "sunkMs": 1500,
   "roundPauseSeconds": 5,
   "alertSeconds": 5,
-  "winnerXp": { "melee": 2, "bracket": 3 }
+  "winnerXp": {
+    "melee": 2,
+    "bracket": 3
+  }
 }

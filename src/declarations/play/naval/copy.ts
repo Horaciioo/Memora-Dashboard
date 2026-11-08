@@ -130,6 +130,8 @@ export const NAVAL_FEED_COPY = {
   MISS: 'a *tiré* dans l’eau en {square}',
   HIT: 'a *touché* {victim} en {square}',
   SUNK: 'a *coulé* un navire de {victim} en {square}',
+  SPOTTED: 'a *repéré* un navire de {victim} en {square}',
+  CLEAR: 'a *éclairé* l’eau de {victim} en {square}',
   OUT: 'a *éliminé* {victim}',
 } as const
 
@@ -150,8 +152,9 @@ export const NAVAL_SETUP_COPY = {
   more: 'Plus',
   mode: 'Mode',
   format: 'Mer',
-  compact: 'Compacte 8 x 8',
-  classic: 'Classique 10 x 10',
+  quick: 'Rapide 10 x 10',
+  standard: 'Standard 12 x 12',
+  vast: 'Océan 36 x 36',
   turn: 'Temps de tir',
   turnHint: 'Au bout du temps, un tir au hasard part à ta place.',
   placement: 'Temps de placement',

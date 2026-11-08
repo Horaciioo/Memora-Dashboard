@@ -1,10 +1,16 @@
 import 'server-only'
 
 import { latest, pauseAfter } from '@/core/bots/play/random'
-import { chooseSquare, indexOf, randomFleet } from '@/core/lib/play/naval'
+import { chooseSquare, chooseWeapon, indexOf, randomFleet } from '@/core/lib/play/naval'
 import type { NavalKnowledge } from '@/core/lib/play/naval'
 import type { NavalBoardView } from '@/core/lib/play/naval/state'
-import { shotsToward, sunkToward } from '@/core/lib/play/naval/state'
+import {
+  NavalCodes,
+  isFlareCode,
+  isHitCode,
+  shotsToward,
+  sunkToward,
+} from '@/core/lib/play/naval/state'
 import { PLAY_BOT_SETTINGS } from '@/declarations/play/bots'
 import type { PlayBotStrategy } from '@/types/play'
 import { NavalPhases } from '@/utils/constants/play'
@@ -35,12 +41,17 @@ const knowledgeOf = (board: NavalBoardView, matchIndex: number, target: number):
   const remaining = [...fleet]
   for (const ship of sunk) remaining.splice(remaining.indexOf(ship.length), 1)
 
+  const struck = shots.filter(([, , code]) => !isFlareCode(code) || code === NavalCodes.Clear)
+
   return {
     size,
-    fired: new Set(shots.map(([x, y]) => indexOf(x, y, size))),
+    fired: new Set(struck.map(([x, y]) => indexOf(x, y, size))),
+    spotted: new Set(
+      shots.filter(([, , code]) => code === NavalCodes.Spotted).map(([x, y]) => indexOf(x, y, size))
+    ),
     wounds: new Set(
       shots
-        .filter(([, , code]) => code > 0)
+        .filter(([, , code]) => isHitCode(code))
         .map(([x, y]) => indexOf(x, y, size))
         .filter((cell) => !sunkCells.has(cell))
     ),
@@ -98,6 +109,11 @@ export const NAVAL_BOT: PlayBotStrategy = {
     })
     if (square === null) return null
     const { size } = board.sea
+    const arms = chooseWeapon({
+      knowledge: pick.knowledge,
+      level,
+      arms: { ammo: board.you?.ammo ?? 0, offer: board.you?.offer ?? [] },
+    })
 
     return {
       key: `fire:${board.rev}`,
@@ -106,6 +122,7 @@ export const NAVAL_BOT: PlayBotStrategy = {
         target: board.players[pick.target].accountId,
         x: square % size,
         y: Math.floor(square / size),
+        ...arms,
       },
       at: pauseAfter(latest(now, new Date(match.readyAt), new Date(match.startsAt)), think),
     }

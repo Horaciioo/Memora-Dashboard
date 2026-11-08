@@ -20,8 +20,38 @@ export interface NavalShotView {
   target: number
   x: number
   y: number
-  code: 0 | 1 | 2
+  code: NavalShotCode
+  weapon: number
+  orientation: number
 }
+
+// Miss, hit, sunk, then the two flare marks
+export type NavalShotCode = 0 | 1 | 2 | 3 | 4
+
+/**
+ * Wire codes of a result
+ * @type {Record<string, NavalShotCode>}
+ */
+
+export const NavalCodes = { Miss: 0, Hit: 1, Sunk: 2, Spotted: 3, Clear: 4 } as const
+
+/**
+ * Code that struck a ship
+ * @param {number} code - Result code
+ * @return {boolean} - Hit or sunk
+ */
+
+export const isHitCode = (code: number): boolean =>
+  code === NavalCodes.Hit || code === NavalCodes.Sunk
+
+/**
+ * Code that came from a flare
+ * @param {number} code - Result code
+ * @return {boolean} - Lit only
+ */
+
+export const isFlareCode = (code: number): boolean =>
+  code === NavalCodes.Spotted || code === NavalCodes.Clear
 
 /**
  * Board held by a screen, times in milliseconds
@@ -85,14 +115,16 @@ export const isNewerNaval = (
  */
 
 export const shotViewsOf = (shots: NavalBoardView['shots']): NavalShotView[] =>
-  shots.map(([rev, match, shooter, target, x, y, code]) => ({
+  shots.map(([rev, match, shooter, target, x, y, code, weapon, orientation]) => ({
     rev,
     match,
     shooter,
     target,
     x,
     y,
-    code: code as 0 | 1 | 2,
+    code: code as NavalShotCode,
+    weapon,
+    orientation,
   }))
 
 /**

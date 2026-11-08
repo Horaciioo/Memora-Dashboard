@@ -218,6 +218,38 @@ export const NavalResults = {
   Miss: 'MISS',
   Hit: 'HIT',
   Sunk: 'SUNK',
+  Spotted: 'SPOTTED',
+  Clear: 'CLEAR',
 } as const
 
 export type NavalResultName = (typeof NavalResults)[keyof typeof NavalResults]
+
+/**
+ * Weapons of a naval battle, in catalogue order
+ * @type {Record<string, string>}
+ */
+
+export const NavalWeapons = {
+  Cannon: 'cannon',
+  Airstrike: 'airstrike',
+  Broadside: 'broadside',
+  Flare: 'flare',
+  Torpedo: 'torpedo',
+} as const
+
+export type NavalWeaponName = (typeof NavalWeapons)[keyof typeof NavalWeapons]
+
+/**
+ * Footprint of a weapon on the sea
+ * @type {Record<string, string>}
+ */
+
+export const NavalShapes = {
+  Point: 'point',
+  Line: 'line',
+  Cross: 'cross',
+  Square: 'square',
+  Ray: 'ray',
+} as const
+
+export type NavalShapeName = (typeof NavalShapes)[keyof typeof NavalShapes]

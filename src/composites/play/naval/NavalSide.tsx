@@ -11,7 +11,13 @@ import { cn } from '@/utils/classnames'
 const FEED_SIZE = 8
 
 // Feed template of each result code
-const LINES = [NAVAL_FEED_COPY.MISS, NAVAL_FEED_COPY.HIT, NAVAL_FEED_COPY.SUNK] as const
+const LINES = [
+  NAVAL_FEED_COPY.MISS,
+  NAVAL_FEED_COPY.HIT,
+  NAVAL_FEED_COPY.SUNK,
+  NAVAL_FEED_COPY.SPOTTED,
+  NAVAL_FEED_COPY.CLEAR,
+] as const
 
 /**
  * Line of the log for a shot

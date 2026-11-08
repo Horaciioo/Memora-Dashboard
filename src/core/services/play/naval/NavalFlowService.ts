@@ -4,6 +4,7 @@ import type { NavalMatch } from '@prisma/client'
 
 import { completeFleet, firstRound, nextRound, placeOfLoser } from '@/core/lib/play/naval'
 import type { BracketPair } from '@/core/lib/play/naval'
+import { armCaptain } from '@/core/services/play/naval/NavalArmsService'
 import { autoFire, passTurn } from '@/core/services/play/naval/NavalFireService'
 import {
   closeBattle,
@@ -65,6 +66,7 @@ const openRound = async (
       },
     })
     table.matches.push(match)
+    if (match.turnId) await armCaptain(table, match.turnId, true)
   }
   table.isDirty = true
 }

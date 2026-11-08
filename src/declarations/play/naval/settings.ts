@@ -5,6 +5,7 @@ import {
   readInteger,
   readNode,
 } from '@/declarations/configurations/readers'
+import { NAVAL_WEAPONS } from '@/declarations/play/naval/weapons'
 import { readRange } from '@/declarations/play/settings'
 import { NavalModes } from '@/utils/constants/play'
 import type { NavalModeName } from '@/utils/constants/play'
@@ -14,6 +15,7 @@ const modes = readNode(naval.modes, 'play/naval.modes')
 const formats = readNode(naval.formats, 'play/naval.formats')
 const rules = readNode(naval.rules, 'play/naval.rules')
 const winnerXp = readNode(naval.winnerXp, 'play/naval.winnerXp')
+const ammo = readNode(naval.ammo, 'play/naval.ammo')
 
 /**
  * Seats a mode accepts
@@ -72,7 +74,7 @@ const readFormat = (key: string, fallback: NavalFormat): NavalFormat => {
     path: `play/naval.formats.${key}.size`,
     fallback: fallback.size,
     min: 6,
-    max: 12,
+    max: 36,
   })
 
   return {
@@ -94,8 +96,9 @@ const readFormat = (key: string, fallback: NavalFormat): NavalFormat => {
  */
 
 const FORMATS = {
-  compact: readFormat('compact', { size: 8, fleet: [4, 3, 3, 2, 2] }),
-  classic: readFormat('classic', { size: 10, fleet: [5, 4, 3, 3, 2] }),
+  quick: readFormat('quick', { size: 10, fleet: [5, 4, 3, 3, 2] }),
+  standard: readFormat('standard', { size: 12, fleet: [5, 4, 3, 3, 2] }),
+  vast: readFormat('vast', { size: 36, fleet: [5, 4, 3, 3, 2] }),
 }
 
 export type NavalFormatName = keyof typeof FORMATS
@@ -132,10 +135,17 @@ export const NAVAL_SETTINGS = {
   formats: FORMATS,
   format: readChoice<NavalFormatName>(naval.format, {
     path: 'play/naval.format',
-    fallback: 'compact',
+    fallback: 'vast',
     allowed: Object.keys(FORMATS) as NavalFormatName[],
   }),
   rules: RULES,
+  weapons: NAVAL_WEAPONS,
+  offerSize: readInteger(naval.offerSize, { path: 'play/naval.offerSize', fallback: 2, min: 0 }),
+  ammo: {
+    start: readInteger(ammo.start, { path: 'play/naval.ammo.start', fallback: 2, min: 0 }),
+    perTurn: readInteger(ammo.perTurn, { path: 'play/naval.ammo.perTurn', fallback: 1, min: 0 }),
+    max: readInteger(ammo.max, { path: 'play/naval.ammo.max', fallback: 8, min: 0 }),
+  },
   countdownSeconds: readInteger(naval.countdownSeconds, {
     path: 'play/naval.countdownSeconds',
     fallback: 4,

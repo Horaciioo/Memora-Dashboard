@@ -5,7 +5,7 @@ import type { NavalGame, NavalMatch, NavalShot, Prisma } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import type { NavalShip } from '@/core/lib/play/naval'
-import { navalSea, navalSettingsOf, shipsAfloat } from '@/core/lib/play/naval'
+import { isDamage, navalSea, navalSettingsOf, shipsAfloat } from '@/core/lib/play/naval'
 import type { NavalGameSettings, NavalSea } from '@/core/lib/play/naval'
 import { holdSession } from '@/core/services/play/PlaySessionService'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
@@ -25,6 +25,8 @@ export interface NavalCaptain {
   eliminatedAt: Date | null
   place: number | null
   strikes: number
+  ammo: number
+  offer: string[]
 }
 
 /**
@@ -143,7 +145,7 @@ export const aliveIn = (table: NavalTable, match: NavalMatch): string[] =>
   })
 
 /**
- * Squares a match fired at one captain
+ * Squares a match struck on one captain, flares apart
  * @param {NavalTable} table - Table
  * @param {string} matchId - Match
  * @param {string} targetId - Captain fired at
@@ -151,7 +153,22 @@ export const aliveIn = (table: NavalTable, match: NavalMatch): string[] =>
  */
 
 export const shotsAt = (table: NavalTable, matchId: string, targetId: string): NavalShot[] =>
-  table.shots.filter((shot) => shot.matchId === matchId && shot.targetId === targetId)
+  table.shots.filter(
+    (shot) => shot.matchId === matchId && shot.targetId === targetId && isDamage(shot.result)
+  )
+
+/**
+ * Squares a match lit on one captain
+ * @param {NavalTable} table - Table
+ * @param {string} matchId - Match
+ * @param {string} targetId - Captain lit
+ * @return {NavalShot[]} - Flare marks
+ */
+
+export const seenAt = (table: NavalTable, matchId: string, targetId: string): NavalShot[] =>
+  table.shots.filter(
+    (shot) => shot.matchId === matchId && shot.targetId === targetId && !isDamage(shot.result)
+  )
 
 /**
  * Write a captain and keep the table in step

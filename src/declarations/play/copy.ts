@@ -59,6 +59,7 @@ export const PLAY_ERRORS = {
   rollFirst: 'Lance le dé d’abord.',
   badPawn: 'Ce pion ne peut pas bouger.',
   badSquare: 'Tu as déjà tiré sur cette case.',
+  badWeapon: 'Cette arme n’est pas disponible.',
   badFleet: 'Cette flotte n’est pas valable.',
   notPlacing: 'Le placement est terminé.',
   notFighting: 'Aucun combat en cours pour toi.',

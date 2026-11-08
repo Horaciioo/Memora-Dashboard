@@ -1,7 +1,9 @@
 import { indexOf } from '@/core/lib/play/naval/fleet'
 import type { Rng } from '@/core/lib/play/naval/fleet'
-import { PlayBotKinds } from '@/utils/constants/play'
-import type { PlayBotKindName } from '@/utils/constants/play'
+import { canWield, turnsOf } from '@/core/lib/play/naval/weapons'
+import { NAVAL_WEAPONS } from '@/declarations/play/naval/weapons'
+import { NavalShapes, NavalWeapons, PlayBotKinds } from '@/utils/constants/play'
+import type { NavalWeaponName, PlayBotKindName } from '@/utils/constants/play'
 
 /**
  * What a captain knows of one sea
@@ -10,6 +12,7 @@ import type { PlayBotKindName } from '@/utils/constants/play'
  * @property {Set<number>} fired - Squares fired at
  * @property {Set<number>} wounds - Squares hit on ships still afloat
  * @property {number[]} remaining - Lengths of the ships afloat
+ * @property {Set<number>} [spotted] - Ship squares lit by a flare, not struck
  */
 
 export interface NavalKnowledge {
@@ -17,6 +20,17 @@ export interface NavalKnowledge {
   fired: Set<number>
   wounds: Set<number>
   remaining: number[]
+  spotted?: Set<number>
+}
+
+/**
+ * Weapon and heading a captain picks
+ * @typedef {Object} NavalArmsChoice
+ */
+
+export interface NavalArmsChoice {
+  weapon: NavalWeaponName
+  orientation: number
 }
 
 // Weight of a ship laid over a wound
@@ -123,6 +137,10 @@ export const chooseSquare = ({
   if (!free.length) return null
   if (level === PlayBotKinds.Easy || rng() < mistakeRate) return draw(free, rng)
 
+  // A lit ship is a sure hit
+  const lit = [...(knowledge.spotted ?? [])].filter((square) => !knowledge.fired.has(square))
+  if (lit.length) return draw(lit, rng)
+
   // Medium follows wounds, then hunts on a chessboard
   if (level === PlayBotKinds.Medium) {
     const near = besideWounds(knowledge)
@@ -144,4 +162,43 @@ export const chooseSquare = ({
     free.filter((square) => density[square] === best),
     rng
   )
+}
+
+/**
+ * Weapon a captain fires, the cannon when nothing better is held
+ * @param {Object} input - Choice
+ * @param {NavalKnowledge} input.knowledge - What is known
+ * @param {PlayBotKindName} input.level - Skill
+ * @param {{ ammo: number; offer: string[] }} input.arms - Ammo and weapons drawn
+ * @param {Rng} [input.rng] - Random source
+ * @return {NavalArmsChoice} - Weapon and orientation
+ */
+
+export const chooseWeapon = ({
+  knowledge,
+  level,
+  arms,
+  rng = Math.random,
+}: {
+  knowledge: NavalKnowledge
+  level: PlayBotKindName
+  arms: { ammo: number; offer: string[] }
+  rng?: Rng
+}): NavalArmsChoice => {
+  const held = NAVAL_WEAPONS.filter((weapon) => canWield(weapon.name, arms) && weapon.cost > 0)
+  const isTracking = knowledge.wounds.size > 0 || (knowledge.spotted?.size ?? 0) > 0
+  const cannon = { weapon: NavalWeapons.Cannon, orientation: 0 }
+  if (!held.length) return cannon
+
+  // Easy spends at random, the others hunt with zones and track with the cannon
+  const pick =
+    level === PlayBotKinds.Easy
+      ? held[Math.floor(rng() * held.length)]
+      : isTracking
+        ? held.find((weapon) => weapon.shape === NavalShapes.Cross)
+        : (held.find((weapon) => weapon.shape === NavalShapes.Square) ??
+          held.toSorted((a, b) => b.cost - a.cost)[0])
+  if (!pick) return cannon
+
+  return { weapon: pick.name, orientation: Math.floor(rng() * turnsOf(pick)) }
 }

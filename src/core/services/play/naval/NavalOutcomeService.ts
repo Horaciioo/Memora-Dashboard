@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { NavalMatch } from '@prisma/client'
 
-import { roundsFor, placeOfLoser, standingScore } from '@/core/lib/play/naval'
+import { isDamage, roundsFor, placeOfLoser, standingScore } from '@/core/lib/play/naval'
 import {
   aliveIn,
   captainOf,
@@ -78,7 +78,7 @@ export const finishMatch = async (
  */
 
 const tallyOf = (table: NavalTable, accountId: string) => {
-  const fired = table.shots.filter((shot) => shot.shooterId === accountId)
+  const fired = table.shots.filter((shot) => shot.shooterId === accountId && isDamage(shot.result))
 
   return {
     sunk: fired.filter((shot) => shot.result === NavalResults.Sunk).length,

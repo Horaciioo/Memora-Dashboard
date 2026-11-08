@@ -18,7 +18,13 @@ const MAX_BACKLOG = 4
 const EVENT_MS = 1700
 
 // Result of each shot code
-const RESULTS: NavalResultName[] = [NavalResults.Miss, NavalResults.Hit, NavalResults.Sunk]
+const RESULTS: NavalResultName[] = [
+  NavalResults.Miss,
+  NavalResults.Hit,
+  NavalResults.Sunk,
+  NavalResults.Spotted,
+  NavalResults.Clear,
+]
 
 /**
  * Shot on screen

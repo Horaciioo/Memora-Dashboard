@@ -3310,6 +3310,9 @@ enum NavalShotResult {
   MISS
   HIT
   SUNK
+  // Lit by a flare, nothing struck
+  SPOTTED
+  CLEAR
 }
 
 // Naval table: stage, clocks and the revision of the newest change
@@ -3341,6 +3344,10 @@ model NavalPlayer {
   place        Int?
   // Turns lost to the clock in a row
   strikes      Int       @default(0)
+  // Ammo for special weapons
+  ammo         Int       @default(0)
+  // Weapons drawn for the current turn
+  offer        String[]  @default([])
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
@@ -3370,16 +3377,19 @@ model NavalMatch {
 
 // One shell fired at one square
 model NavalShot {
-  id        String          @id @default(cuid())
-  sessionId String
-  matchId   String
-  rev       Int
-  shooterId String
-  targetId  String
-  x         Int
-  y         Int
-  result    NavalShotResult
-  createdAt DateTime        @default(now())
+  id          String          @id @default(cuid())
+  sessionId   String
+  matchId     String
+  rev         Int
+  shooterId   String
+  targetId    String
+  x           Int
+  y           Int
+  result      NavalShotResult
+  // Weapon fired, one strike shares its revision
+  weapon      String          @default("cannon")
+  orientation Int             @default(0)
+  createdAt   DateTime        @default(now())
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 

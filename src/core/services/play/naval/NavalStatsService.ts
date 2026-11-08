@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { isDamage } from '@/core/lib/play/naval'
 
 /**
  * Game counters per captain
@@ -21,7 +22,7 @@ export const navalStats = async (
     stats.set(accountId, { ...row, [key]: (row[key] ?? 0) + 1 })
   }
 
-  for (const shot of shots) {
+  for (const shot of shots.filter((entry) => isDamage(entry.result))) {
     add(shot.shooterId, 'shots')
     if (shot.result !== 'MISS') add(shot.shooterId, 'hits')
     if (shot.result === 'SUNK') {

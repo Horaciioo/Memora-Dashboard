@@ -1,7 +1,15 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { navalSea, navalSettingsOf, shipsAfloat, sunkShips } from '@/core/lib/play/naval'
+import {
+  isDamage,
+  navalSea,
+  navalSettingsOf,
+  readWeaponName,
+  shipsAfloat,
+  sunkShips,
+  weaponCode,
+} from '@/core/lib/play/naval'
 import type { NavalShip } from '@/core/lib/play/naval'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import type { EngineSession } from '@/types/play'
@@ -13,6 +21,8 @@ const RESULT_CODES = {
   [NavalResults.Miss]: 0,
   [NavalResults.Hit]: 1,
   [NavalResults.Sunk]: 2,
+  [NavalResults.Spotted]: 3,
+  [NavalResults.Clear]: 4,
 } as const
 
 /**
@@ -39,7 +49,9 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
   const fleetOf = (accountId: string) =>
     (rows.find((row) => row.accountId === accountId)?.fleet ?? []) as unknown as NavalShip[]
   const shotsAt = (matchId: string, targetId: string) =>
-    shots.filter((shot) => shot.matchId === matchId && shot.targetId === targetId)
+    shots.filter(
+      (shot) => shot.matchId === matchId && shot.targetId === targetId && isDamage(shot.result)
+    )
 
   // Latest match of each captain
   const latest = (accountId: string) =>
@@ -76,7 +88,12 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
     }),
     // Only the viewer's own ships, the rest shows at the end
     you: me
-      ? { fleet: (me.fleet ?? null) as unknown as NavalShip[] | null, isReady: Boolean(me.readyAt) }
+      ? {
+          fleet: (me.fleet ?? null) as unknown as NavalShip[] | null,
+          isReady: Boolean(me.readyAt),
+          ammo: me.ammo,
+          offer: me.offer.map(readWeaponName),
+        }
       : null,
     fleets:
       phase === NavalPhases.Over
@@ -99,7 +116,7 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
       ),
     })),
     myMatch: myMatch ? (matchIndex.get(myMatch.id) ?? -1) : -1,
-    // Rev, match, shooter, target, column, row, result
+    // Rev, match, shooter, target, column, row, result, weapon, orientation
     shots: shots.map((shot) => [
       shot.rev,
       matchIndex.get(shot.matchId) ?? -1,
@@ -108,6 +125,8 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
       shot.x,
       shot.y,
       RESULT_CODES[shot.result],
+      weaponCode(shot.weapon),
+      shot.orientation,
     ]),
     // Ships sent down, shown whole
     sunk: matches.flatMap((match, index) =>

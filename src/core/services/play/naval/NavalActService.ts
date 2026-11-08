@@ -2,7 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { conflict } from '@/core/lib/errors'
-import { isFleetValid, navalSettingsOf } from '@/core/lib/play/naval'
+import { isFleetValid, navalSettingsOf, readWeaponName } from '@/core/lib/play/naval'
 import { readBodyInteger } from '@/core/lib/play/parse'
 import { advance } from '@/core/services/play/naval/NavalFlowService'
 import { checkShot, fireShot } from '@/core/services/play/naval/NavalFireService'
@@ -29,7 +29,12 @@ export const openBattle = async (session: EngineSession): Promise<EngineStep> =>
 
   await prisma.$transaction([
     prisma.navalPlayer.createMany({
-      data: order.map((accountId, slot) => ({ sessionId: session.id, accountId, slot })),
+      data: order.map((accountId, slot) => ({
+        sessionId: session.id,
+        accountId,
+        slot,
+        ammo: NAVAL_SETTINGS.ammo.start,
+      })),
     }),
     prisma.navalGame.create({ data: { sessionId: session.id, startsAt, phaseEndsAt } }),
   ])
@@ -105,13 +110,18 @@ export const fire = (
 
     // Square and target checked
     const cell = { x: readBodyInteger(raw, 'x') ?? -1, y: readBodyInteger(raw, 'y') ?? -1 }
-    const targetId = checkShot(table, match, {
+    const ask = {
       shooterId: accountId,
-      targetId: typeof raw.target === 'string' ? raw.target : null,
       cell,
+      weapon: readWeaponName(raw.weapon),
+      orientation: readBodyInteger(raw, 'orientation') ?? 0,
+    }
+    const targetId = checkShot(table, match, {
+      ...ask,
+      targetId: typeof raw.target === 'string' ? raw.target : null,
     })
     await saveCaptain(table, accountId, { strikes: 0 })
-    await fireShot(table, match, { shooterId: accountId, targetId, cell })
+    await fireShot(table, match, { ...ask, targetId })
 
     return advance(table)
   })

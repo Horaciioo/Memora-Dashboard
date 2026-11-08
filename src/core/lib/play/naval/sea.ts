@@ -1,5 +1,6 @@
 import { cellsOf, indexOf } from '@/core/lib/play/naval/fleet'
 import type { NavalShip } from '@/core/lib/play/naval/fleet'
+import { NavalCodes, isHitCode } from '@/core/lib/play/naval/state'
 import { NAVAL_COLUMNS } from '@/declarations/play/naval/copy'
 
 /**
@@ -11,6 +12,7 @@ export const SeaMarks = {
   Unknown: 0,
   Miss: 1,
   Hit: 2,
+  Spotted: 3,
 } as const
 
 export type SeaMark = (typeof SeaMarks)[keyof typeof SeaMarks]
@@ -33,8 +35,14 @@ export const squareName = (x: number, y: number): string => `${NAVAL_COLUMNS[x] 
 
 export const marksOf = (size: number, shots: Array<[number, number, number]>): SeaMark[] => {
   const marks: SeaMark[] = Array.from({ length: size * size }, () => SeaMarks.Unknown)
-  for (const [x, y, code] of shots)
-    marks[indexOf(x, y, size)] = code > 0 ? SeaMarks.Hit : SeaMarks.Miss
+  for (const [x, y, code] of shots) {
+    const at = indexOf(x, y, size)
+    if (code === NavalCodes.Spotted) {
+      if (marks[at] === SeaMarks.Unknown) marks[at] = SeaMarks.Spotted
+      continue
+    }
+    marks[at] = isHitCode(code) ? SeaMarks.Hit : SeaMarks.Miss
+  }
 
   return marks
 }

@@ -61,7 +61,7 @@ export const cueShot = ({ result, flightMs, isAgainstMe, isFromMe, pan }: ShotCu
 
   // Impact in step with the animation
   const at = impact
-  if (result === NavalResults.Miss) {
+  if (result !== NavalResults.Hit && result !== NavalResults.Sunk) {
     splash(bus, at, { level: level * share, pan: pan * 0.6 })
 
     return
