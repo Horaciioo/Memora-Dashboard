@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { ChatterAvatar } from '@/composites/modview/ChatterAvatar'
 import { MODVIEW_COMMUNITY_GROUPS } from '@/declarations/modview/registries'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -69,6 +70,7 @@ export const CommunityList = ({ community, spotlight, skip = [], onPick }: Commu
                     className={MODVIEW_COMMUNITY.member}
                     onClick={() => onPick(chatter)}
                   >
+                    <ChatterAvatar chatter={chatter} className={MODVIEW_COMMUNITY.memberAvatar} />
                     {chatter.login}
                   </button>
                 ))

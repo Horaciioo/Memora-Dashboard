@@ -20,16 +20,20 @@ import { useLiveFocus } from '@/core/hooks/data/lives/useLiveFocus'
 import { SplitHandle } from '@/composites/modview/workspace/SplitHandle'
 import { useSideWidth } from '@/core/hooks/interaction/layout/useSideWidth'
 import { useBareShell } from '@/core/hooks/interaction/layout/useBareShell'
+import { useModPreferenceProfile } from '@/core/hooks/interaction/state/useModPreferences'
 import { useModLayout } from '@/core/hooks/interaction/layout/useModLayout'
 import { useModViewActions } from '@/core/hooks/interaction/state/useModViewActions'
 import { useSuggestions } from '@/core/hooks/interaction/state/useSuggestions'
 import { useWatchlist } from '@/core/hooks/interaction/state/useWatchlist'
 import type { PanelMemory } from '@/core/lib/modview/commands'
+import { colourLookup } from '@/core/lib/modview/chatterColours'
 import { windowsOf } from '@/core/lib/modview/gate'
 import { sanctionsOn } from '@/core/lib/modview/viewer'
 import { profileOfPermissions } from '@/core/lib/modview/profile'
 import type { Suggestion } from '@/core/lib/modview/suggest'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
+import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_WORKSPACE_COPY } from '@/declarations/modview/workspace'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
 import { roleOf } from '@/declarations/modview/roles'
@@ -38,7 +42,13 @@ import type { ModViewProfileName } from '@/declarations/modview/profiles'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_FRAME, MODVIEW_SPOTLIGHT, MODVIEW_WORKSPACE } from '@/declarations/ui/variants'
 import type { LivePerson } from '@/types/lives'
-import type { ActContext, ModViewDriver, ModViewIntent, ModViewWindow } from '@/types/modview'
+import type {
+  ActContext,
+  ModViewDriver,
+  ModAct,
+  ModViewIntent,
+  ModViewWindow,
+} from '@/types/modview'
 import type { SanctionPanelView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
 import { LivePlatforms } from '@/utils/constants/lives'
@@ -131,6 +141,7 @@ export const ModView = ({
   // Unban requests desk filling the stage, with the request opened first
   const [unbanDesk, setUnbanDesk] = useState<{ initialId: string | null } | null>(null)
   const focus = useLiveFocus(live?.id ?? null)
+  useModPreferenceProfile(live?.id ?? null)
   const following = live
     ? focus.focuses.find((entry) => entry.watcherId === live.viewerId)
     : undefined
@@ -210,9 +221,21 @@ export const ModView = ({
     : undefined
 
   const lit = (target: string) => spotlight === target
-  const pickByName = (name: string) => {
-    const found = actions.findChatter(name)
-    if (found) setPicked(found)
+  // Act target, in chat or not
+  const pickByAct = (act: ModAct) => {
+    if (!act.target) return
+    const found = actions.findChatter(act.target)
+    if (found) return setPicked(found)
+    if (!act.targetId) return
+
+    // Gone from the chat, rebuilt from the act
+    setPicked({
+      id: act.targetId,
+      login: act.target.toLowerCase(),
+      name: act.target,
+      colour: null,
+      badges: [],
+    })
   }
 
   // The panel line a suggestion stands for
@@ -230,6 +253,11 @@ export const ModView = ({
     )
   }
 
+  const colourOf = useMemo(
+    () => colourLookup(state.messages, state.community),
+    [state.messages, state.community]
+  )
+
   const windowFor = (id: ModViewWindow) => {
     switch (id) {
       case 'stream':
@@ -239,7 +267,8 @@ export const ModView = ({
           <ModActionsWindow
             acts={state.acts}
             isLit={lit('modActions')}
-            onPickTarget={pickByName}
+            onPickTarget={pickByAct}
+            colourOf={colourOf}
             focusLogin={following?.targetLogin ?? null}
             team={team}
           />
@@ -256,6 +285,7 @@ export const ModView = ({
             hasWatch={!isWorkspace}
             watchlist={watchlist}
             onPick={setPicked}
+            colourOf={colourOf}
           />
         )
       case 'chat':
@@ -335,6 +365,9 @@ export const ModView = ({
       onChange: () => model.toggleHidden(id),
     })),
     { id: 'reset', label: MODVIEW_WORKSPACE_COPY.reset, onSelect: model.reset },
+    ...(driver.reload
+      ? [{ id: 'reload', label: MODVIEW_COPY.reload, onSelect: driver.reload }]
+      : []),
     ...(onReread ? [{ id: 'reread', label: LIVE_PAGE_COPY.reread, onSelect: onReread }] : []),
   ]
 
@@ -390,6 +423,14 @@ export const ModView = ({
                     live.coordinatorIds.includes(live.viewerId)
                   ),
                   canReinforce: permissions.includes(Permissions.LiveAnnounce),
+                  chat: {
+                    viewerId: live.viewerId,
+                    seats: {
+                      members: live.members,
+                      coordinatorIds: live.coordinatorIds,
+                      designatedId: LIVE_SETTINGS.teamChatMentionAccountId,
+                    },
+                  },
                 }
               : undefined
           }

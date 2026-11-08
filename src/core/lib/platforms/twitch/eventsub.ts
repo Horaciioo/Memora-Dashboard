@@ -184,7 +184,10 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
       return [
         scene({
           kind: 'act',
-          act: actOf(id, 'unban', event, at, { target: target.name || target.login }),
+          act: actOf(id, 'unban', event, at, {
+            target: target.name || target.login,
+            targetId: target.id || null,
+          }),
         }),
       ]
     }

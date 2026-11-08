@@ -123,6 +123,8 @@ export const API_ROUTES = {
   liveModTime: (id: string, accountId: string) => `/api/lives/${id}/time/${accountId}`,
   liveModView: (id: string) => `/api/lives/${id}/modview`,
   liveEmotes: (id: string) => `/api/lives/${id}/emotes`,
+  liveAvatars: (id: string, ids: string[]) =>
+    `/api/lives/${id}/avatars?ids=${ids.map(encodeURIComponent).join(',')}`,
   liveFeed: (id: string) => `/api/lives/${id}/stream`,
   livePresence: (id: string) => `/api/lives/${id}/presence`,
   liveReinforcement: (id: string) => `/api/lives/${id}/reinforcement`,
@@ -139,7 +141,11 @@ export const API_ROUTES = {
   liveViewerChat: (id: string, viewerId: string, cursor?: string | null) =>
     `/api/lives/${id}/viewers/${viewerId}/chat${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
   liveInspect: (id: string, accountId: string) => `/api/lives/${id}/moderators/${accountId}`,
+  modViewPreferences: (liveId?: string | null) =>
+    `/api/modview/preferences${liveId ? `?live=${encodeURIComponent(liveId)}` : ''}`,
   liveFocus: (id: string) => `/api/lives/${id}/focus`,
+  liveTeamChat: (id: string, cursor?: string | null) =>
+    `/api/lives/${id}/team-chat${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
   sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>
     `/api/sanctions?${new URLSearchParams({
       [SANCTION_PARAMS.creator]: youtuberId,

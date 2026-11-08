@@ -3,9 +3,11 @@
 import { Button } from '@/components/elements/actions/Button'
 import { nextRung, thirdRung } from '@/core/lib/modview/commands'
 import { MODVIEW_PANEL_COPY } from '@/declarations/modview/copy'
-import { MODVIEW_SANCTIONS } from '@/declarations/ui/variants'
+import { measureTag } from '@/declarations/modview/suggestions'
+import { MODVIEW_RAIL, MODVIEW_VERDICT } from '@/declarations/ui/variants'
 import type { Chatter } from '@/types/modview'
 import type { SanctionOffenseCard, SanctionRungView } from '@/types/sanctions'
+import { cn } from '@/utils/classnames'
 
 export interface OffenseRailProps {
   offense: SanctionOffenseCard
@@ -16,19 +18,50 @@ export interface OffenseRailProps {
   onClose: () => void
 }
 
-/**
- * One rung read as text
- * @param {SanctionRungView} rung - Rung
- * @return {string} - Measures then condition
- */
+interface RungTagsProps {
+  rung: SanctionRungView
+  className?: string
+}
 
-const rungText = (rung: SanctionRungView): string =>
-  [rung.measures.map((measure) => measure.name).join(' + '), rung.condition]
-    .filter(Boolean)
-    .join(', ')
+// Measures of one rung
+const RungTags = ({ rung, className }: RungTagsProps) => (
+  <p className={className ?? MODVIEW_RAIL.tags}>
+    {rung.measures.map((measure) => (
+      <span key={measure.id} className={MODVIEW_VERDICT[measure.kind]?.text}>
+        {measureTag(measure)}
+      </span>
+    ))}
+  </p>
+)
+
+interface RungListProps {
+  rungs: SanctionRungView[]
+  applied: number[]
+  next: number | null
+}
+
+// Numbered ladder
+const LadderRungs = ({ rungs, applied, next }: RungListProps) => (
+  <ol className={MODVIEW_RAIL.ladder}>
+    {rungs.map((rung, index) => (
+      <li key={rung.id} className={MODVIEW_RAIL.step}>
+        {index < rungs.length - 1 && <span className={MODVIEW_RAIL.line} aria-hidden="true" />}
+        <span className={cn(MODVIEW_RAIL.number, index === next && MODVIEW_RAIL.numberNext)}>
+          {index + 1}
+        </span>
+        <div
+          className={cn(MODVIEW_RAIL.stepBody, applied.includes(index) && MODVIEW_RAIL.stepDone)}
+        >
+          <RungTags rung={rung} />
+          {rung.condition && <p className={MODVIEW_RAIL.condition}>{rung.condition}</p>}
+        </div>
+      </li>
+    ))}
+  </ol>
+)
 
 /**
- * Rail on the right showing the rungs of one offence
+ * Rail showing one offence ladder
  * @param {OffenseRailProps} props - Rail props
  * @return {JSX.Element}
  */
@@ -38,9 +71,9 @@ export const OffenseRail = ({ offense, target, applied, onPrefill, onClose }: Of
   const third = thirdRung(offense.rungs.length)
 
   return (
-    <aside className={MODVIEW_SANCTIONS.rail} aria-label={offense.name}>
-      <header className={MODVIEW_SANCTIONS.railHead}>
-        <h4 className={MODVIEW_SANCTIONS.offenseName}>{offense.name}</h4>
+    <aside className={MODVIEW_RAIL.root} aria-label={offense.name}>
+      <header className={MODVIEW_RAIL.head}>
+        <h4 className={MODVIEW_RAIL.title}>{offense.name}</h4>
         <Button
           variant="icon"
           icon="close"
@@ -49,25 +82,13 @@ export const OffenseRail = ({ offense, target, applied, onPrefill, onClose }: Of
         />
       </header>
 
-      {offense.rungs.map((rung, index) => (
-        <p
-          key={rung.id}
-          className={
-            applied.includes(index)
-              ? MODVIEW_SANCTIONS.rungDone
-              : target && index === next
-                ? MODVIEW_SANCTIONS.rungNext
-                : MODVIEW_SANCTIONS.rung
-          }
-        >
-          {`${MODVIEW_PANEL_COPY.rung.replace('{n}', String(index + 1))} : ${rungText(rung)}`}
-        </p>
-      ))}
-
-      {!target && <p className={MODVIEW_SANCTIONS.hint}>{MODVIEW_PANEL_COPY.pickTarget}</p>}
+      <div className={MODVIEW_RAIL.body}>
+        <LadderRungs rungs={offense.rungs} applied={applied} next={target ? next : null} />
+        {!target && <p className={MODVIEW_RAIL.hint}>{MODVIEW_PANEL_COPY.pickTarget}</p>}
+      </div>
 
       {target && next !== null && (
-        <div className={MODVIEW_SANCTIONS.actions}>
+        <footer className={MODVIEW_RAIL.foot}>
           <Button variant="primary" onClick={() => onPrefill(offense, next)}>
             {applied.length === 0
               ? MODVIEW_PANEL_COPY.prefill.replace('{name}', target.name)
@@ -78,7 +99,7 @@ export const OffenseRail = ({ offense, target, applied, onPrefill, onClose }: Of
               {MODVIEW_PANEL_COPY.third}
             </Button>
           )}
-        </div>
+        </footer>
       )}
     </aside>
   )

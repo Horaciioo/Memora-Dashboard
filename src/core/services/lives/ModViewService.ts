@@ -84,6 +84,7 @@ const baseState = (live: LiveView): ModViewState => ({
   connection: 'disconnected',
   notice: null,
   readOnly: false,
+  liveStartedAt: live.startedAt,
 })
 
 // Moderators confirmed lately, by seat
@@ -307,6 +308,7 @@ export const openModView = async (
       community: community ? { ...state.community, ...community } : state.community,
       title: stream?.title ?? state.title,
       viewers: stream?.viewers ?? null,
+      streamStartedAt: stream?.startedAt ?? null,
       pinned,
       channel: {
         ...state.channel,
@@ -436,6 +438,18 @@ export const actOnLive = async (input: {
     throw await translateRefusal(error, input.viewerId)
   }
   await settleGesture(logId, true)
+
+  // A warning takes its message down, logged once
+  if (input.intent.kind === 'warn' && input.intent.messageId) {
+    try {
+      await performOnTwitch(
+        { kind: 'delete', messageId: input.intent.messageId, chatterId: input.intent.chatterId },
+        found.seat
+      )
+    } catch (error) {
+      throw await translateRefusal(error, input.viewerId)
+    }
+  }
 
   // The pin shows at once
   if (input.intent.kind === 'pin' || input.intent.kind === 'unpin') {

@@ -3,6 +3,7 @@
 import { useReread } from '@/composites/lives/LiveGate'
 import { ModView } from '@/composites/modview/ModView'
 import type { ModViewLiveTools } from '@/composites/modview/ModView'
+import { AvatarProvider } from '@/core/hooks/data/lives/useAvatars'
 import { useLivePanel } from '@/core/hooks/data/lives/useLivePanel'
 import { useLiveModView } from '@/core/hooks/data/lives/useLiveModView'
 import { useModViewPresence } from '@/core/hooks/interaction/scenes/useModViewPresence'
@@ -39,14 +40,16 @@ export const LiveModView = ({
   const reread = useReread()
 
   return (
-    <ModView
-      driver={driver}
-      permissions={live.permissions}
-      panel={panel}
-      levelName={live.liveconLevel?.name ?? fallbackLevel?.name ?? null}
-      levelIcon={live.liveconLevel?.icon ?? fallbackLevel?.icon ?? null}
-      live={tools}
-      onReread={reread}
-    />
+    <AvatarProvider liveId={live.id}>
+      <ModView
+        driver={driver}
+        permissions={live.permissions}
+        panel={panel}
+        levelName={live.liveconLevel?.name ?? fallbackLevel?.name ?? null}
+        levelIcon={live.liveconLevel?.icon ?? fallbackLevel?.icon ?? null}
+        live={tools}
+        onReread={reread}
+      />
+    </AvatarProvider>
   )
 }

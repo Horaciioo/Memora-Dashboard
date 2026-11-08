@@ -1,5 +1,6 @@
 import type { LiveAccess } from '@/core/lib/lives/access'
 import type { ModerationKind, ModerationOrigin, ModerationStatus } from '@prisma/client'
+import type { TeamMentionKind } from '@/declarations/lives/teamChat'
 import type { IconName } from '@/declarations/ui/icons'
 import type { MemoraRank } from '@/types/modview'
 import type {
@@ -440,4 +441,34 @@ export interface LiveNote {
   viewerLogin: string
   body: string
   at: string
+}
+
+/**
+ * Message of the internal chat of a live
+ * @typedef {Object} LiveTeamMessage
+ * @property {string} id - Message
+ * @property {string} authorId - Author
+ * @property {string} body - Text
+ * @property {TeamMentionKind[]} mentions - Who it calls
+ * @property {string} createdAt - Sent moment
+ */
+
+export interface LiveTeamMessage {
+  id: string
+  authorId: string
+  body: string
+  mentions: TeamMentionKind[]
+  createdAt: string
+}
+
+/**
+ * Page of internal chat, oldest first
+ * @typedef {Object} LiveTeamPage
+ * @property {LiveTeamMessage[]} messages - Messages
+ * @property {string | null} nextCursor - Older page, none at the start
+ */
+
+export interface LiveTeamPage {
+  messages: LiveTeamMessage[]
+  nextCursor: string | null
 }

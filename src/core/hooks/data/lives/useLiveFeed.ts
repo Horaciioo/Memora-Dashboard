@@ -51,14 +51,14 @@ const readEvent = <T>(message: Event): T | null => {
  * @param {string} liveId - Live
  * @param {Dispatch<SetStateAction<ModViewState>>} setState - State setter
  * @param {(snapshot: FeedSnapshot) => ModViewState} shape - Snapshot to state
- * @return {void}
+ * @return {() => Promise<void>} - Resync, keeps the connection
  */
 
 export const useLiveFeed = (
   liveId: string,
   setState: Dispatch<SetStateAction<ModViewState>>,
   shape: (snapshot: FeedSnapshot) => ModViewState
-): void => {
+): (() => Promise<void>) => {
   const cursor = useRef<FeedCursor>({ seq: 0, queue: [], replay: null, frame: null })
 
   // Batches heard meanwhile join the snapshot, only the latest load lands
@@ -73,7 +73,7 @@ export const useLiveFeed = (
         cursor.current.seq = caught.seq
         setState(applySceneBatch(shape(snapshot), caught.events))
       })
-      .catch(() => null)
+      .catch(() => undefined)
       .finally(() => {
         if (cursor.current.replay === replay) cursor.current.replay = null
       })
@@ -130,4 +130,6 @@ export const useLiveFeed = (
       feed.frame = null
     }
   }, [liveId, load, flush, setState])
+
+  return load
 }

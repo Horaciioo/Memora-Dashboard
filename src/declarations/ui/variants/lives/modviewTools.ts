@@ -44,21 +44,46 @@ export const MODVIEW_WATCH = {
 
 export const MODVIEW_SUGGEST = {
   list: 'flex flex-col gap-2',
-  card: 'flex flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--twitch-head)] p-4',
-  who: 'cursor-pointer font-bold uppercase hover:underline',
-  why: 'text-sm font-semibold',
+  card: 'flex flex-col gap-2 rounded-[var(--radius-lg)] bg-[var(--twitch-head)] p-3',
+  who: 'cursor-pointer self-start text-xs font-bold uppercase hover:underline',
+  tag: 'shrink-0 font-bold',
+  why: 'min-w-0 font-semibold',
   quote: 'border-l-2 border-[var(--color-border-strong)] pl-2.5 text-sm leading-snug break-words',
   divider: 'h-px bg-[color-mix(in_oklab,var(--color-ink)_22%,transparent)]',
-  verdictBlock: 'flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5',
-  verdict: 'text-lg leading-tight font-bold tracking-tight text-[var(--color-ink)]',
-  step: 'text-xs text-[var(--twitch-muted)] italic',
+  verdictBlock: 'flex min-w-0 flex-col gap-0.5',
+  verdict: 'flex items-baseline gap-2 text-sm leading-tight text-[var(--color-ink)]',
+  step: 'text-micro text-[var(--twitch-muted)] italic',
   command:
     'font-[family-name:var(--font-mono)] text-xs text-[var(--twitch-muted)] break-words select-all',
   none: 'text-xs text-[var(--color-ink-subtle)] italic',
   actions: 'grid grid-cols-3 gap-1',
-  watch: 'h-10 w-full',
-  accept: 'h-10 w-full !text-[var(--color-success)]',
-  refuse: 'h-10 w-full !text-[var(--color-danger)]',
+  watch: 'h-7 min-h-0 w-full',
+  accept: 'h-7 min-h-0 w-full !text-[var(--color-success)]',
+  refuse: 'h-7 min-h-0 w-full !text-[var(--color-danger)]',
+} as const
+
+/**
+ * Offence rail
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_RAIL = {
+  root: 'surface-enter flex max-h-full min-h-0 w-72 shrink-0 flex-col self-start overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-md)]',
+  head: 'flex items-center justify-between gap-2 border-b border-[var(--color-border)] py-2 pr-2 pl-4',
+  title: 'min-w-0 text-base leading-tight font-bold tracking-tight',
+  body: 'flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4',
+  foot: 'flex flex-col gap-1.5 border-t border-[var(--color-border)] p-3',
+  tags: 'flex flex-wrap gap-x-2 text-sm font-bold',
+  condition: 'text-xs leading-snug text-[var(--color-ink-subtle)]',
+  hint: 'text-xs text-[var(--color-ink-subtle)] italic',
+  ladder: 'flex flex-col',
+  step: 'relative flex gap-3 pb-4 last:pb-0',
+  line: 'absolute top-7 bottom-1 left-3 w-px bg-[var(--color-border-strong)]',
+  number:
+    'z-10 flex size-6 shrink-0 items-center justify-center rounded-[var(--radius-xs)] bg-[var(--color-surface-sunken)] text-xs font-bold tabular-nums',
+  numberNext: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
+  stepBody: 'flex min-w-0 flex-col gap-0.5 pt-0.5',
+  stepDone: 'line-through opacity-50',
 } as const
 
 /**
@@ -188,4 +213,36 @@ export const MODVIEW_UNBAN = {
   footer: 'flex flex-col gap-3 border-t border-[var(--color-border)] p-3',
   request: 'border-l-2 border-[var(--color-ink-subtle)] pl-3 text-sm break-words',
   actions: 'flex flex-wrap gap-2',
+} as const
+
+/**
+ * Internal chat of a live
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_TEAM_CHAT = {
+  list: 'flex max-h-[40dvh] min-h-24 flex-col gap-2 overflow-y-auto px-2 py-1',
+  row: 'flex items-start gap-2',
+  rowMentioned:
+    'rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--color-gold-400)_14%,transparent)]',
+  body: 'min-w-0 flex-1 text-sm break-words',
+  author: 'text-xs font-bold',
+  time: 'ml-2 text-xs font-normal text-[var(--color-ink-subtle)] tabular-nums',
+  mention: 'font-semibold text-[var(--color-ink-accent)]',
+  older: 'self-center text-xs font-semibold text-[var(--color-ink-accent)] hover:underline',
+  empty: 'px-3 py-4 text-center text-sm text-[var(--color-ink-subtle)]',
+  composer: 'flex flex-col gap-2 border-t border-[var(--color-border)] p-2',
+  mentions: 'flex flex-wrap gap-1',
+  mentionButton:
+    'cursor-pointer rounded-[var(--radius-md)] px-2 py-1 text-xs font-semibold text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  field:
+    'min-h-9 w-full resize-none rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 text-sm outline-none focus-visible:border-[var(--color-focus)]',
+  // Unread point on the glyph
+  unread:
+    'pointer-events-none absolute top-1.5 right-1.5 size-2.5 rounded-full bg-[var(--color-danger)]',
+  // Mention bubble beside the glyph
+  bubble:
+    'popover-enter glass-panel absolute left-full z-[60] ml-4 flex w-64 cursor-pointer flex-col gap-0.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3 text-left text-sm shadow-[var(--shadow-lg)]',
+  bubbleTitle: 'text-xs font-bold text-[var(--color-ink-accent)]',
+  bubbleBody: 'line-clamp-3 break-words',
 } as const

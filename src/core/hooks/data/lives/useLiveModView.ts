@@ -38,6 +38,7 @@ const playerUrl = (login: string): string => {
     channel: login,
     parent: window.location.hostname,
     muted: 'true',
+    autoplay: 'true',
   }).toString()
 
   return url.toString()
@@ -62,7 +63,7 @@ export const useLiveModView = (live: LiveView): ModViewDriver => {
     }),
     []
   )
-  useLiveFeed(live.id, setState, shape)
+  const reload = useLiveFeed(live.id, setState, shape)
 
   // Gestures still on their way, a second click on the same one is dropped
   const inFlight = useRef(new Set<string>())
@@ -86,5 +87,5 @@ export const useLiveModView = (live: LiveView): ModViewDriver => {
     [live.id, run]
   )
 
-  return useMemo(() => ({ state, spotlight: null, act }), [state, act])
+  return useMemo(() => ({ state, spotlight: null, act, reload }), [state, act, reload])
 }

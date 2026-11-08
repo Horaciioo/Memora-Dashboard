@@ -63,8 +63,7 @@ export const SanctionsDrawer = ({
   const [topShare, setTopShare] = useState(0.5)
   const [column, setColumn] = useState<HTMLDivElement | null>(null)
 
-  const SuggestionIcon = ICONS.spark
-  const LevelIcon = levelIcon ? ICONS[levelIcon] : null
+  const LevelIcon = ICONS[levelIcon ?? 'livecon']
 
   const needle = search.trim().toLowerCase()
   const offenses = (panel?.offenses ?? []).filter(
@@ -92,29 +91,25 @@ export const SanctionsDrawer = ({
 
           <div className={MODVIEW_SANCTIONS.top}>
             <div className={MODVIEW_SANCTIONS.head}>
-              {LevelIcon && (
-                <LevelIcon className={MODVIEW_SANCTIONS.headGlyph} aria-hidden="true" />
-              )}
-              {levelName && <p className={MODVIEW_SANCTIONS.headName}>{levelName}</p>}
+              <LevelIcon
+                className={MODVIEW_SANCTIONS.headGlyph}
+                role="img"
+                aria-label={levelName ?? undefined}
+              />
+              <input
+                className={MODVIEW_SANCTIONS.search}
+                placeholder={MODVIEW_PANEL_COPY.search}
+                aria-label={MODVIEW_PANEL_COPY.search}
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
             </div>
-
-            <input
-              className={MODVIEW_SANCTIONS.search}
-              placeholder={MODVIEW_PANEL_COPY.search}
-              aria-label={MODVIEW_PANEL_COPY.search}
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
 
             {suggest && suggest.suggestions.length > 0 && (
               <section
                 className={MODVIEW_SANCTIONS.suggestion}
                 aria-label={MODVIEW_SUGGESTION_COPY.title}
               >
-                <h4 className={MODVIEW_SANCTIONS.suggestionTitle}>
-                  <SuggestionIcon className={MODVIEW_SANCTIONS.suggestionIcon} aria-hidden="true" />
-                  {MODVIEW_SUGGESTION_COPY.title}
-                </h4>
                 <SuggestionList {...suggest} />
               </section>
             )}

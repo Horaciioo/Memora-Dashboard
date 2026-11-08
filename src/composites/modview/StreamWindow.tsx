@@ -1,5 +1,6 @@
 'use client'
 
+import { StreamTimers } from '@/composites/modview/StreamTimers'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
 import { useWindowChrome } from '@/composites/modview/workspace/WindowChrome'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
@@ -33,6 +34,7 @@ export const StreamWindow = ({ state, isLit, isTitleLit }: StreamWindowProps) =>
             src={state.embedUrl}
             title={MODVIEW_COPY.stream}
             className={MODVIEW_STREAM.embed}
+            allow="autoplay; fullscreen"
             allowFullScreen
           />
         ) : (
@@ -65,6 +67,7 @@ export const StreamWindow = ({ state, isLit, isTitleLit }: StreamWindowProps) =>
             </ul>
           )}
         </div>
+        <StreamTimers streamStartedAt={state.streamStartedAt} liveStartedAt={state.liveStartedAt} />
         {typeof state.viewers === 'number' && (
           <p className={MODVIEW_STREAM.viewers} title={MODVIEW_COPY.viewers}>
             <ViewerIcon className={MODVIEW_STREAM.viewersIcon} aria-hidden="true" />

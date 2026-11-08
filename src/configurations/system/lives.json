@@ -40,6 +40,9 @@
   "focusPollSeconds": 10,
   "moderatorCacheSeconds": 60,
   "emoteCacheSeconds": 600,
+  "repeatWindowMinutes": 60,
+  "avatarCacheSeconds": 86400,
+  "avatarBatchMax": 100,
   "ownedEmoteCacheSeconds": 300,
   "memoryHours": 24,
   "memoryShareSeconds": 3,
@@ -48,5 +51,10 @@
   "chatFlushMs": 2000,
   "chatBatchMax": 200,
   "chatBufferMax": 20000,
-  "chatPageSize": 50
+  "chatPageSize": 50,
+  "preferenceSaveMs": 1500,
+  "teamChatPageSize": 50,
+  "teamChatMaxLength": 500,
+  "teamChatBubbleSeconds": 5,
+  "teamChatMentionAccountId": ""
 }

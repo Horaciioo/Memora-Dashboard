@@ -14,14 +14,10 @@ import type { Watchlist } from '@/core/hooks/interaction/state/useWatchlist'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
-import {
-  MODVIEW_FEED,
-  MODVIEW_MODES,
-  MODVIEW_SUGGEST,
-  MODVIEW_TABS,
-} from '@/declarations/ui/variants'
+import { MODVIEW_FEED, MODVIEW_SUGGEST, MODVIEW_TABS } from '@/declarations/ui/variants'
 import type { Chatter, HeldMessage, ModAct } from '@/types/modview'
 import { cn } from '@/utils/classnames'
+import { chatColour } from '@/utils/format/chatColour'
 import { formatSince } from '@/utils/format/dates'
 
 // Resolved lines kept under the queue
@@ -40,6 +36,8 @@ export interface AutoModWindowProps {
   hasWatch?: boolean
   watchlist: Watchlist
   onPick: (chatter: Chatter) => void
+  // Name colour of a viewer
+  colourOf: (id: string | null | undefined, name: string | null) => string | undefined
 }
 
 type AutoModTab = 'queue' | 'watch'
@@ -60,6 +58,7 @@ export const AutoModWindow = ({
   hasWatch = true,
   watchlist,
   onPick,
+  colourOf,
 }: AutoModWindowProps) => {
   const [choice, setChoice] = useState<AutoModTab>('queue')
   const { preferences, update } = useModPreferences()
@@ -98,17 +97,16 @@ export const AutoModWindow = ({
   const { listRef, boxRef } = useGlideBox<HTMLSpanElement>(`${tab}:${tabs.length}`)
 
   const keepToggle = tab === 'queue' && (
-    <button
-      type="button"
-      className={MODVIEW_MODES.trigger}
+    <Button
+      variant="ghost"
+      icon={preferences.keepResolved ? 'visible' : 'hidden'}
       aria-pressed={preferences.keepResolved}
+      aria-label={preferences.keepResolved ? MODVIEW_COPY.keepResolved : MODVIEW_COPY.dropResolved}
       title={
         preferences.keepResolved ? MODVIEW_COPY.keepResolvedHint : MODVIEW_COPY.dropResolvedHint
       }
       onClick={() => update({ keepResolved: !preferences.keepResolved })}
-    >
-      {preferences.keepResolved ? MODVIEW_COPY.keepResolved : MODVIEW_COPY.dropResolved}
-    </button>
+    />
   )
 
   return (
@@ -162,7 +160,19 @@ export const AutoModWindow = ({
         <ul className={MODVIEW_FEED.list}>
           {rows.map((row) => {
             const entry = row.held
-            if (!entry) return <ResolvedLine key={row.key} act={row.act} />
+            if (!entry) {
+              return (
+                <ResolvedLine
+                  key={row.key}
+                  act={row.act}
+                  colour={
+                    preferences.colouredNames
+                      ? colourOf(row.act.targetId, row.act.target)
+                      : undefined
+                  }
+                />
+              )
+            }
             const check = gate({ kind: 'automod', heldId: entry.id, approve: true })
 
             return (
@@ -173,6 +183,9 @@ export const AutoModWindow = ({
                     <button
                       type="button"
                       className={MODVIEW_FEED.whoLink}
+                      style={{
+                        color: preferences.colouredNames ? chatColour(entry.author) : undefined,
+                      }}
                       onClick={() => onPick(entry.author)}
                     >
                       {entry.author.name}
@@ -224,10 +237,11 @@ export const AutoModWindow = ({
 /**
  * A handled message kept in the queue, as Twitch keeps it
  * @param {ModAct} act - Accept or refusal of the held message
+ * @param {string} [colour] - Name colour
  * @return {JSX.Element}
  */
 
-const ResolvedLine = ({ act }: { act: ModAct }) => {
+const ResolvedLine = ({ act, colour }: { act: ModAct; colour?: string }) => {
   const isApproved = act.kind === 'automodApprove'
   const StatusIcon = ICONS[isApproved ? 'check' : 'close']
 
@@ -236,7 +250,9 @@ const ResolvedLine = ({ act }: { act: ModAct }) => {
       <div className={MODVIEW_FEED.main}>
         <span className={MODVIEW_FEED.category}>{MODVIEW_COPY.resolved}</span>
         <p>
-          <span className={MODVIEW_FEED.who}>{act.target}</span>
+          <span className={MODVIEW_FEED.who} style={{ color: colour }}>
+            {act.target}
+          </span>
           <DotMark />
           {formatSince(act.at)}
         </p>

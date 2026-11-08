@@ -42,6 +42,7 @@ export type SceneEvent =
       categoryArt?: string | null
       tags?: string[]
       viewers?: number | null
+      startedAt?: string | null
     }
   | { kind: 'pin'; pin: PinnedMessage | null }
   | { kind: 'chatOption'; option: ChatOptionName; enabled: boolean }
@@ -271,6 +272,7 @@ export const applySceneEvent = (
           ...view,
           title: event.title ?? view.title,
           viewers: event.viewers === undefined ? view.viewers : event.viewers,
+          streamStartedAt: event.startedAt === undefined ? view.streamStartedAt : event.startedAt,
           channel: {
             ...view.channel,
             ...(event.category === undefined ? {} : { category: event.category }),
@@ -367,6 +369,7 @@ export const applySceneIntent = (
       return applySceneEvent(state, {
         kind: 'act',
         act: act({ kind: 'warn', target: nameOf(view, intent.chatterId), reason: intent.reason }),
+        deleteMessageId: intent.messageId,
       })
     case 'timeout':
     case 'ban': {

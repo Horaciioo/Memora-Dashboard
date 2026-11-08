@@ -1,3 +1,7 @@
+import type { SanctionMeasureView } from '@/types/sanctions'
+import { SanctionKinds } from '@/utils/constants/moderation'
+import type { SanctionKindName } from '@/utils/constants/moderation'
+
 // Category used for a flagged chat line
 export const CHAT_FLAG_CATEGORY = 'blocked_term'
 
@@ -78,18 +82,38 @@ export const MODVIEW_SUGGESTION_COPY = {
   dossier: 'Dossier',
 } as const
 
-// Long measure words and their short forms
-const MEASURE_SHORT: [RegExp, string][] = [
-  [/avertissement/i, 'Averto'],
-  [/bannissement/i, 'Ban.'],
-  [/définitif/i, 'Déf'],
+// Short label by measure kind
+const MEASURE_TAG: Partial<Record<SanctionKindName, string>> = {
+  [SanctionKinds.Delete]: 'Supp.',
+  [SanctionKinds.Warn]: 'Warn',
+  [SanctionKinds.Timeout]: 'TO',
+  [SanctionKinds.Ban]: 'Ban',
+}
+
+// Duration units, largest first
+const DURATION_UNITS: [number, string][] = [
+  [1440, 'D'],
+  [60, 'H'],
+  [1, 'M'],
 ]
 
+// Largest unit that divides evenly
+const shortDuration = (minutes: number): string => {
+  const [size, unit] = DURATION_UNITS.find(([size]) => minutes % size === 0) ?? DURATION_UNITS[2]
+
+  return `${minutes / size}${unit}`
+}
+
 /**
- * Short measure name
- * @param {string} name - Measure name
- * @return {string} - Short name
+ * Compact measure tag
+ * @param {SanctionMeasureView} measure - Measure
+ * @return {string} - Tag like TO : 7D
  */
 
-export const shortMeasure = (name: string): string =>
-  MEASURE_SHORT.reduce((short, [word, replacement]) => short.replace(word, replacement), name)
+export const measureTag = (measure: SanctionMeasureView): string => {
+  const label = MEASURE_TAG[measure.kind] ?? measure.name
+
+  return measure.durationMinutes && !measure.permanent
+    ? `${label} : ${shortDuration(measure.durationMinutes)}`
+    : label
+}

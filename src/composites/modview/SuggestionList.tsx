@@ -5,9 +5,10 @@ import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { WindowEmpty } from '@/composites/modview/ModWindow'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import type { Suggestion } from '@/core/lib/modview/suggest'
-import { MODVIEW_SUGGESTION_COPY as COPY, shortMeasure } from '@/declarations/modview/suggestions'
+import { MODVIEW_SUGGESTION_COPY as COPY, measureTag } from '@/declarations/modview/suggestions'
 import { MODVIEW_SUGGEST, MODVIEW_VERDICT } from '@/declarations/ui/variants'
 import type { Chatter, ModViewIntent } from '@/types/modview'
+import { cn } from '@/utils/classnames'
 
 export interface SuggestionListProps {
   suggestions: Suggestion[]
@@ -70,22 +71,23 @@ export const SuggestionList = ({
               <li key={id} className={MODVIEW_SUGGEST.card}>
                 <div className={MODVIEW_SUGGEST.verdictBlock}>
                   <p className={MODVIEW_SUGGEST.verdict}>
-                    <span className={verdict.text}>
-                      {shortMeasure(measure?.name ?? offense?.name ?? COPY.title)}
-                    </span>
-                    {` ${COPY.link} `}
-                    <button
-                      type="button"
-                      className={MODVIEW_SUGGEST.who}
-                      onClick={() => onPick(source.chatter)}
-                    >
-                      {source.chatter.name}
-                    </button>
+                    {measure && (
+                      <span className={cn(MODVIEW_SUGGEST.tag, verdict.text)}>
+                        {measureTag(measure)}
+                      </span>
+                    )}
+                    <span className={MODVIEW_SUGGEST.why}>{offense?.name ?? source.category}</span>
                   </p>
                   {stepLabel && <p className={MODVIEW_SUGGEST.step}>{stepLabel}</p>}
                 </div>
 
-                {offense && <p className={MODVIEW_SUGGEST.why}>{offense.name}</p>}
+                <button
+                  type="button"
+                  className={MODVIEW_SUGGEST.who}
+                  onClick={() => onPick(source.chatter)}
+                >
+                  {source.chatter.name}
+                </button>
 
                 <p className={MODVIEW_SUGGEST.quote}>
                   <FlaggedText text={source.text} flagged={source.flagged} />

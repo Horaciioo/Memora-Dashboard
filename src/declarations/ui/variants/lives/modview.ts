@@ -93,6 +93,8 @@ export const MODVIEW_STREAM = {
   viewers:
     'flex shrink-0 items-center gap-1.5 text-sm font-bold tabular-nums text-[var(--color-danger)]',
   viewersIcon: 'h-4 w-4',
+  timers: 'flex shrink-0 flex-col items-end gap-0.5',
+  timer: 'flex items-center gap-1.5 text-xs font-bold tabular-nums text-[var(--color-ink-subtle)]',
   category: 'text-xs text-[var(--color-ink-subtle)]',
   tags: 'mt-1.5 flex flex-wrap gap-1',
   tag: 'rounded-[var(--radius-xs)] border border-[var(--color-border)] px-1.5 py-0.5 text-xs font-semibold',
@@ -116,6 +118,7 @@ export const MODVIEW_FEED = {
   main: 'flex min-w-0 flex-1 flex-col gap-0.5 text-sm',
   target: 'w-fit font-bold underline underline-offset-2 hover:text-[var(--color-brand-800)]',
   line: 'text-[var(--color-ink-subtle)]',
+  repeat: 'ml-1.5 text-xs font-bold text-[var(--color-danger)] tabular-nums',
   who: 'font-semibold text-[var(--color-ink)]',
   whoLink: 'cursor-pointer font-semibold text-[var(--color-ink)] hover:underline',
   quote:
@@ -171,6 +174,7 @@ export const MODVIEW_CHAT = {
   lineLit: 'bg-[color-mix(in_oklab,var(--color-caution)_18%,transparent)]',
   firstTag: 'mb-0.5 block text-xs font-semibold text-[var(--color-brand-800)]',
   badge: 'mr-1 inline-block h-4 w-4 align-[-2px]',
+  avatar: 'mr-1.5 inline-flex !h-5 !w-5 align-middle text-[0.5rem]',
   name: 'cursor-pointer font-bold hover:underline',
   deleted: 'text-[var(--color-ink-subtle)] italic',
   // Gestures, always at the start of the line
@@ -244,6 +248,8 @@ export const MODVIEW_CHAT = {
 export const MODVIEW_WARN = {
   body: 'flex flex-col gap-3',
   field: 'min-h-28 w-full',
+  quote:
+    'rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-3 py-2 text-sm text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -290,7 +296,9 @@ export const MODVIEW_COMMUNITY = {
   groupLit: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-pick)]',
   groupHead: 'flex items-center gap-2 py-1 text-sm font-bold',
   groupIcon: 'h-5 w-5 shrink-0',
-  member: 'w-fit cursor-pointer text-sm font-semibold hover:underline',
+  member:
+    'flex w-full cursor-pointer items-center gap-2 py-0.5 text-sm font-semibold hover:underline',
+  memberAvatar: 'shrink-0 !h-6 !w-6 text-[0.5rem]',
   empty: 'text-xs text-[var(--color-ink-subtle)] italic',
 } as const
 
@@ -371,8 +379,6 @@ export const MODVIEW_SANCTIONS = {
     'bg-[var(--twitch-head)] px-3 py-2 text-sm font-bold tracking-tight text-[var(--color-ink-accent)]',
   bottomBody: 'flex min-h-0 flex-1 flex-col overflow-y-auto',
   suggestion: 'my-3 flex flex-col gap-3',
-  suggestionTitle: 'flex items-center gap-2 text-base font-bold tracking-tight',
-  suggestionIcon: 'h-5 w-5 shrink-0',
   level: 'mb-3 flex items-center gap-2 text-xs font-bold tracking-wide uppercase',
   group: 'mb-4 flex flex-col gap-1.5',
   groupTitle: `${PROPERTY_LABEL} text-[var(--accent)]`,
@@ -389,11 +395,10 @@ export const MODVIEW_SANCTIONS = {
   hint: 'text-xs text-[var(--color-ink-subtle)] italic',
   empty: 'text-sm text-[var(--color-ink-subtle)] italic',
   // Second version: centred level, search, glyph tabs, then text boxes
-  head: 'flex flex-col items-center gap-1 pb-3 text-center',
-  headGlyph: 'h-8 w-8',
-  headName: 'text-sm font-bold tracking-wide uppercase',
+  head: 'flex items-center gap-2',
+  headGlyph: 'size-7 shrink-0',
   search:
-    'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
+    'min-w-0 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
   list: 'flex flex-col gap-2',
   title:
     'w-full cursor-pointer rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-3 py-2 text-left text-sm font-bold transition-colors hover:bg-[color-mix(in_oklab,var(--color-ink)_12%,var(--color-surface-sunken))]',

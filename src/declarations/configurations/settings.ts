@@ -300,7 +300,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number, chatFlushMs: number, chatBatchMax: number, chatBufferMax: number, chatPageSize: number }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, repeatWindowMinutes: number, avatarCacheSeconds: number, avatarBatchMax: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number, chatFlushMs: number, chatBatchMax: number, chatBufferMax: number, chatPageSize: number, preferenceSaveMs: number, teamChatPageSize: number, teamChatMaxLength: number, teamChatBubbleSeconds: number, teamChatMentionAccountId: string }}
  */
 
 export const LIVE_SETTINGS = {
@@ -384,6 +384,22 @@ export const LIVE_SETTINGS = {
     fallback: 600,
     min: 0,
   }),
+  repeatWindowMinutes: readInteger(lives.repeatWindowMinutes, {
+    path: 'system/lives.repeatWindowMinutes',
+    fallback: 60,
+    min: 1,
+  }),
+  avatarCacheSeconds: readInteger(lives.avatarCacheSeconds, {
+    path: 'system/lives.avatarCacheSeconds',
+    fallback: 86400,
+    min: 60,
+  }),
+  avatarBatchMax: readInteger(lives.avatarBatchMax, {
+    path: 'system/lives.avatarBatchMax',
+    fallback: 100,
+    min: 1,
+    max: 100,
+  }),
   ownedEmoteCacheSeconds: readInteger(lives.ownedEmoteCacheSeconds, {
     path: 'system/lives.ownedEmoteCacheSeconds',
     fallback: 300,
@@ -419,6 +435,29 @@ export const LIVE_SETTINGS = {
     fallback: 50,
     min: 10,
   }),
+  preferenceSaveMs: readInteger(lives.preferenceSaveMs, {
+    path: 'system/lives.preferenceSaveMs',
+    fallback: 1500,
+    min: 200,
+  }),
+  teamChatPageSize: readInteger(lives.teamChatPageSize, {
+    path: 'system/lives.teamChatPageSize',
+    fallback: 50,
+    min: 10,
+  }),
+  teamChatMaxLength: readInteger(lives.teamChatMaxLength, {
+    path: 'system/lives.teamChatMaxLength',
+    fallback: 500,
+    min: 50,
+  }),
+  teamChatBubbleSeconds: readInteger(lives.teamChatBubbleSeconds, {
+    path: 'system/lives.teamChatBubbleSeconds',
+    fallback: 5,
+    min: 1,
+  }),
+  // Member the designated mention reaches
+  teamChatMentionAccountId:
+    typeof lives.teamChatMentionAccountId === 'string' ? lives.teamChatMentionAccountId : '',
   rateLimitRetrySeconds: readInteger(lives.rateLimitRetrySeconds, {
     path: 'system/lives.rateLimitRetrySeconds',
     fallback: 5,

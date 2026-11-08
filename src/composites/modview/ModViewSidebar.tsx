@@ -1,18 +1,20 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import type { ReactNode } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import Link from '@/components/elements/navigation/AppLink'
 import { PageOptionsList } from '@/components/structures/page/PageOptionsList'
 import type { PageOption } from '@/components/structures/page/PageOptions'
+import { PanelButton } from '@/composites/modview/SidebarPanelButton'
 import { CommunityList } from '@/composites/modview/CommunityList'
 import { LiveReinforcementEditor } from '@/composites/lives/LiveReinforcementEditor'
 import { LeaveModViewButton } from '@/composites/modview/LeaveModViewButton'
 import { EndLiveButton } from '@/composites/modview/EndLiveButton'
+import { TeamChatEntry } from '@/composites/modview/TeamChatEntry'
 import { TeamPanel } from '@/composites/modview/TeamPanel'
 import type { TeamTools } from '@/composites/modview/memberMenu'
+import type { MentionSeats } from '@/core/lib/lives/teamChat'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/useOutsideDismiss'
 import { UnbanQueue } from '@/composites/modview/UnbanQueue'
 import { MODVIEW_COPY, MODVIEW_UNBAN_COPY } from '@/declarations/modview/copy'
@@ -22,7 +24,6 @@ import { MODVIEW_TEAM_COPY } from '@/declarations/modview/watch'
 import { ROUTES } from '@/declarations/navigation'
 import { PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_SIDEBAR, MODVIEW_UNBAN } from '@/declarations/ui/variants'
 import type { LiveFocusView } from '@/types/lives'
 import type { Chatter, ModViewState, UnbanRequest } from '@/types/modview'
@@ -40,6 +41,8 @@ export interface ModViewSidebarProps {
     // Seat the viewer holds, tints the glyph
     viewerRole: TeamRole | null
     canReinforce: boolean
+    // Internal chat, kept off outside a real live
+    chat: { viewerId: string; seats: MentionSeats }
   }
   // Live left through the exit, which asks whether they stop moderating
   leaveLiveId?: string
@@ -53,82 +56,10 @@ export interface ModViewSidebarProps {
   audience: { community: ModViewState['community']; onPick: (chatter: Chatter) => void }
 }
 
-type SidebarPanel = 'team' | 'community' | 'unban' | 'settings'
+type SidebarPanel = 'team' | 'chat' | 'community' | 'unban' | 'settings'
 
 // Channel team stays out
 const HIDDEN_GROUPS: (keyof ModViewState['community'])[] = ['broadcaster', 'moderators']
-
-interface PanelButtonProps {
-  icon: IconName
-  label: string
-  isOpen: boolean
-  onToggle: () => void
-  // Where the panel hangs
-  anchor: 'top' | 'bottom'
-  // Wider panel, for a list with its own controls
-  isWide?: boolean
-  // Colour class of the glyph
-  tone?: string
-  // Control at the far end of the title
-  action?: ReactNode
-  children: ReactNode
-}
-
-/**
- * Icon that opens a panel on its right
- * @param {PanelButtonProps} props - Button props
- * @return {JSX.Element}
- */
-
-const PanelButton = ({
-  icon,
-  label,
-  isOpen,
-  onToggle,
-  anchor,
-  isWide,
-  tone,
-  action,
-  children,
-}: PanelButtonProps) => {
-  const Icon = ICONS[icon]
-
-  return (
-    <div className={MODVIEW_SIDEBAR.group}>
-      <button
-        type="button"
-        className={cn(MODVIEW_SIDEBAR.button, isOpen && MODVIEW_SIDEBAR.buttonOpen)}
-        aria-label={label}
-        title={label}
-        aria-haspopup="true"
-        aria-expanded={isOpen}
-        onClick={onToggle}
-      >
-        <Icon className={cn(MODVIEW_SIDEBAR.icon, tone)} aria-hidden="true" />
-      </button>
-
-      {isOpen && <span className={MODVIEW_SIDEBAR.arrow} aria-hidden="true" />}
-
-      {isOpen && (
-        <div
-          role="group"
-          aria-label={label}
-          className={cn(
-            MODVIEW_SIDEBAR.panel,
-            anchor === 'top' ? MODVIEW_SIDEBAR.panelTop : MODVIEW_SIDEBAR.panelBottom,
-            isWide ? MODVIEW_SIDEBAR.panelWide : MODVIEW_SIDEBAR.panelNormal
-          )}
-        >
-          <div className={MODVIEW_SIDEBAR.titleRow}>
-            <p className={MODVIEW_SIDEBAR.title}>{label}</p>
-            {action}
-          </div>
-          {children}
-        </div>
-      )}
-    </div>
-  )
-}
 
 /**
  * Icons on the left of the Mod View: the way out, the team, and the settings
@@ -257,6 +188,16 @@ export const ModViewSidebar = ({
               }}
             />
           </PanelButton>
+        )}
+
+        {team && (
+          <TeamChatEntry
+            liveId={team.liveId}
+            viewerId={team.chat.viewerId}
+            seats={team.chat.seats}
+            isOpen={open === 'chat'}
+            onToggle={() => toggle('chat')}
+          />
         )}
 
         <div className={MODVIEW_SIDEBAR.divider} role="separator" />
