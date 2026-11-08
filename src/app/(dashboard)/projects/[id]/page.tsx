@@ -13,11 +13,7 @@ import {
 import { boardColumns } from '@/core/services/work/shared'
 import { creatableTaskFields, taskFields } from '@/core/services/work/TaskService'
 import { redactProject } from '@/core/services/work/redaction'
-import {
-  assertProjectVisible,
-  currentWorkViewer,
-  workViewer,
-} from '@/core/services/work/visibility'
+import { assertProjectVisible, workViewer } from '@/core/services/work/visibility'
 import { mentionOptions } from '@/core/services/work/DiscordDirectory'
 import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -25,6 +21,7 @@ import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { PROJECT_COPY } from '@/declarations/work/copy'
 import { Permissions } from '@/utils/constants/permissions'
 import { WorkflowPhases, WorkflowScopes } from '@/utils/constants/workflow'
+import { workFileMetadata } from '@/core/wrappers/workFileMetadata'
 
 /**
  * Name the browser tab after the project
@@ -40,18 +37,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params
 
-  try {
-    // A hidden file lends no title
-    const viewer = await currentWorkViewer()
-    if (!viewer) return { title: PROJECT_COPY.title }
-
+  return workFileMetadata(PROJECT_COPY.title, async (viewer) => {
     await assertProjectVisible(id, viewer)
-    const project = await readProject(id)
 
-    return { title: project.summary.title }
-  } catch {
-    return { title: PROJECT_COPY.title }
-  }
+    return (await readProject(id)).summary.title
+  })
 }
 
 /**

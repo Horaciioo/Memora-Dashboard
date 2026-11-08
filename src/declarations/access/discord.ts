@@ -1,4 +1,5 @@
 import { AUTH_SETTINGS } from '@/declarations/configurations/settings'
+import { optionalText } from '@/utils/format/strings'
 
 /**
  * Discord endpoints the sign-in flow talks to
@@ -58,26 +59,14 @@ export interface DiscordCredentials {
 }
 
 /**
- * Read one environment value
- * @param {string | undefined} raw - Environment value
- * @return {string | null} - Trimmed value
- */
-
-const readSecret = (raw: string | undefined): string | null => {
-  const value = raw?.trim() ?? ''
-
-  return value.length > 0 ? value : null
-}
-
-/**
  * Discord application credentials
  * @type {DiscordCredentials}
  */
 
 export const DISCORD_CREDENTIALS: DiscordCredentials = {
-  clientId: readSecret(process.env.DISCORD_CLIENT_ID),
-  clientSecret: readSecret(process.env.DISCORD_CLIENT_SECRET),
-  redirectUri: readSecret(process.env.DISCORD_REDIRECT_URI),
+  clientId: optionalText(process.env.DISCORD_CLIENT_ID),
+  clientSecret: optionalText(process.env.DISCORD_CLIENT_SECRET),
+  redirectUri: optionalText(process.env.DISCORD_REDIRECT_URI),
 }
 
 /**
@@ -85,7 +74,7 @@ export const DISCORD_CREDENTIALS: DiscordCredentials = {
  * @type {string | null}
  */
 
-export const DISCORD_PUBLIC_KEY = readSecret(process.env.DISCORD_PUBLIC_KEY)
+export const DISCORD_PUBLIC_KEY = optionalText(process.env.DISCORD_PUBLIC_KEY)
 
 /**
  * Check the application is wired

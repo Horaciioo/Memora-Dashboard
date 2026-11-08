@@ -1,25 +1,15 @@
 'use client'
 
 import { useCallback, useSyncExternalStore } from 'react'
+import { subscribeTo } from '@/utils/subscribeTo'
+import { readStoredFlag } from '@/utils/storedFlag'
 
 const STORAGE_KEY = 'memora:play-notice'
 const listeners = new Set<() => void>()
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener)
+const subscribe = subscribeTo(listeners)
 
-  return () => {
-    listeners.delete(listener)
-  }
-}
-
-const readDismissed = () => {
-  try {
-    return window.localStorage.getItem(STORAGE_KEY) === '1'
-  } catch {
-    return false
-  }
-}
+const readDismissed = () => readStoredFlag(STORAGE_KEY)
 
 /**
  * Play invitation under the rail, kept dismissed in the browser

@@ -4,35 +4,15 @@ import { useCallback, useMemo, useSyncExternalStore } from 'react'
 
 import { HOME_FAVORITES } from '@/declarations/ui/favorites'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
+import { subscribeTo } from '@/utils/subscribeTo'
+import { parseStringList } from '@/utils/format/arrays'
 
 // One entry per account
 const STORAGE_PREFIX = 'memora:visited-paths'
 const EMPTY = '[]'
 const listeners = new Set<() => void>()
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener)
-
-  return () => {
-    listeners.delete(listener)
-  }
-}
-
-/**
- * Paths stored in a raw entry
- * @param {string} raw - Stored text
- * @return {string[]} - Paths, none when corrupt
- */
-
-const parsePaths = (raw: string): string[] => {
-  try {
-    const parsed: unknown = JSON.parse(raw)
-
-    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : []
-  } catch {
-    return []
-  }
-}
+const subscribe = subscribeTo(listeners)
 
 /**
  * Last pages opened, kept in the browser per account
@@ -52,14 +32,14 @@ export const useVisitedPaths = () => {
   }, [storageKey])
 
   const raw = useSyncExternalStore(subscribe, readRaw, () => EMPTY)
-  const visited = useMemo(() => (session ? parsePaths(raw) : []), [raw, session])
+  const visited = useMemo(() => (session ? parseStringList(raw) : []), [raw, session])
 
   const remember = useCallback(
     (path: string) => {
       if (!session) return
 
       // Newest first, no duplicates
-      const next = [path, ...parsePaths(readRaw()).filter((item) => item !== path)]
+      const next = [path, ...parseStringList(readRaw()).filter((item) => item !== path)]
 
       try {
         window.localStorage.setItem(storageKey, JSON.stringify(next.slice(0, HOME_FAVORITES.kept)))

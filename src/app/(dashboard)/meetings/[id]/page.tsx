@@ -12,16 +12,13 @@ import {
   topicFields,
 } from '@/core/services/work/MeetingService'
 import { redactMeeting } from '@/core/services/work/redaction'
-import {
-  assertMeetingVisible,
-  currentWorkViewer,
-  workViewer,
-} from '@/core/services/work/visibility'
+import { assertMeetingVisible, workViewer } from '@/core/services/work/visibility'
 import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { MEETING_COPY } from '@/declarations/work/copy'
 import { Permissions } from '@/utils/constants/permissions'
+import { workFileMetadata } from '@/core/wrappers/workFileMetadata'
 
 /**
  * Name the browser tab after the meeting
@@ -37,18 +34,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params
 
-  try {
-    // A hidden file lends no title
-    const viewer = await currentWorkViewer()
-    if (!viewer) return { title: MEETING_COPY.title }
-
+  return workFileMetadata(MEETING_COPY.title, async (viewer) => {
     await assertMeetingVisible(id, viewer)
-    const meeting = await readMeeting(id)
 
-    return { title: meeting.summary.title }
-  } catch {
-    return { title: MEETING_COPY.title }
-  }
+    return (await readMeeting(id)).summary.title
+  })
 }
 
 /**

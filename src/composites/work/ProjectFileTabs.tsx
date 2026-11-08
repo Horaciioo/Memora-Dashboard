@@ -12,7 +12,6 @@ import { pickedOptions } from '@/core/lib/forms/options'
 import { OverdueMark } from '@/composites/work/OverdueMark'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
-import { ActivityTimeline } from '@/components/structures/data/ActivityTimeline'
 import { AddRow } from '@/components/structures/inline/AddRow'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import {
@@ -57,6 +56,7 @@ import { ANNOUNCEMENT_PARAM } from '@/declarations/work/announcements'
 import type { CommunicationEntry, MeetingSummary, ProjectDetail, TaskSummary } from '@/types/work'
 import { WorkflowPhases, WorkflowScopes } from '@/utils/constants/workflow'
 import { formatDay, formatDayTime } from '@/utils/format/time/dates'
+import { WorkLogsTab } from '@/composites/work/WorkLogsTab'
 
 export interface ProjectFileTabsProps {
   detail: ProjectDetail
@@ -529,24 +529,7 @@ export const ProjectFileTabs = ({
     </Section>
   )
 
-  const logsTab = () => (
-    <Section title={PROJECT_COPY.tabLogs} maturity="beta" bare>
-      <div className="flex flex-col gap-4">
-        {activity.length === 0 ? (
-          <EmptyState
-            figure="notes"
-            title={PROJECT_COPY.logsEmptyTitle}
-            description={PROJECT_COPY.logsEmptyDescription}
-            action={<Status label={PROJECT_COPY.tabLogs} tone="neutral" />}
-          />
-        ) : (
-          <div className={cn(SECTION_STYLES.panel, SECTION_STYLES.panelPadded)}>
-            <ActivityTimeline entries={activity} />
-          </div>
-        )}
-      </div>
-    </Section>
-  )
+  const logsTab = () => <WorkLogsTab copy={PROJECT_COPY} activity={activity} />
 
   return (
     <div className="flex flex-col gap-8">

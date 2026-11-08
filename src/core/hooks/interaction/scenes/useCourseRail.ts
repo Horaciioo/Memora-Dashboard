@@ -1,6 +1,7 @@
 'use client'
 
 import { useSyncExternalStore } from 'react'
+import { subscribeTo } from '@/utils/subscribeTo'
 
 /**
  * What the left sidebar shows while a course is open
@@ -46,11 +47,7 @@ export const publishCourseRail = (next: CourseRailState | null): void => {
   listeners.forEach((listener) => listener())
 }
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener)
-
-  return () => listeners.delete(listener)
-}
+const subscribe = subscribeTo(listeners)
 
 /**
  * Course open in the page

@@ -4,6 +4,7 @@ import { twitchChatter } from '@/core/lib/platforms/twitch/helix'
 import { TWITCH_EVENT_COPY } from '@/declarations/platforms/copy'
 import type { ChatBadge, ChatReply, ModAct, ModActKind } from '@/types/modview'
 import { SECOND_MS } from '@/utils/constants/time'
+import { child } from '@/core/lib/platforms/twitch/payload'
 
 /**
  * What one notification means for Memora
@@ -46,19 +47,6 @@ const MODE_ACTIONS = new Set([
  */
 
 const text = (value: unknown): string => (typeof value === 'string' ? value : '')
-
-/**
- * Read a nested object
- * @param {Payload} payload - Parent
- * @param {string} key - Field
- * @return {Payload} - Child
- */
-
-const child = (payload: Payload, key: string): Payload => {
-  const value = payload[key]
-
-  return value && typeof value === 'object' && !Array.isArray(value) ? (value as Payload) : {}
-}
 
 /**
  * Read a user of a payload

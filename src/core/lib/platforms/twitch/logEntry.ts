@@ -1,5 +1,6 @@
 import type { ModerationKind } from '@prisma/client'
 import { SECOND_MS } from '@/utils/constants/time'
+import { child } from '@/core/lib/platforms/twitch/payload'
 
 /**
  * One moderation gesture as Twitch reports it
@@ -36,13 +37,6 @@ const MODE_ACTIONS = new Set([
 
 // Read a string field
 const text = (value: unknown): string | null => (typeof value === 'string' && value ? value : null)
-
-// Read a nested object
-const child = (payload: Payload, key: string): Payload => {
-  const value = payload[key]
-
-  return value && typeof value === 'object' && !Array.isArray(value) ? (value as Payload) : {}
-}
 
 /**
  * Kind of a channel.moderate action

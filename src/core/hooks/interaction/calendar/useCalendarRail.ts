@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from 'react'
 
 import type { CalendarSidebarProps } from '@/composites/calendar/CalendarSidebar'
+import { subscribeTo } from '@/utils/subscribeTo'
 
 let rail: CalendarSidebarProps | null = null
 const listeners = new Set<() => void>()
@@ -18,11 +19,7 @@ export const publishCalendarRail = (next: CalendarSidebarProps | null): void => 
   listeners.forEach((listener) => listener())
 }
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener)
-
-  return () => listeners.delete(listener)
-}
+const subscribe = subscribeTo(listeners)
 
 /**
  * Calendar open in the page

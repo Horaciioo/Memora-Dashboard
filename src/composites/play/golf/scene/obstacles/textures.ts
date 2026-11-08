@@ -1,35 +1,12 @@
-import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three'
+import { CanvasTexture, RepeatWrapping } from 'three'
 
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
+import { canvasTexture } from '@/composites/play/golf/scene/canvasTexture'
 
 const { vortex } = GOLF_SCENE
 
 // Canvas pixels
 const SIZE = 256
-
-/**
- * Canvas texture from a drawing
- * @param {number} width - Pixels
- * @param {number} height - Pixels
- * @param {(context: CanvasRenderingContext2D) => void} draw - Drawing
- * @return {CanvasTexture} - Texture
- */
-
-const canvasTexture = (
-  width: number,
-  height: number,
-  draw: (context: CanvasRenderingContext2D) => void
-): CanvasTexture => {
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const context = canvas.getContext('2d')
-  if (context) draw(context)
-  const texture = new CanvasTexture(canvas)
-  texture.colorSpace = SRGBColorSpace
-
-  return texture
-}
 
 /**
  * Alpha fading across a band, solid at its line

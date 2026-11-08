@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
+import { subscribeTo } from '@/utils/subscribeTo'
 
 export interface CandidateViewState {
   recruiterId: string
@@ -13,13 +14,7 @@ const STORAGE_KEY = 'memora:candidate-view'
 const BLANK = '{}'
 const listeners = new Set<() => void>()
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener)
-
-  return () => {
-    listeners.delete(listener)
-  }
-}
+const subscribe = subscribeTo(listeners)
 
 const readRaw = () => {
   try {

@@ -19,6 +19,7 @@ import { TOUR_RAIL } from '@/declarations/ui/variants'
 import type { ViewContext } from '@/types/access'
 import { LiveStatuses } from '@/utils/constants/lives'
 import { cn } from '@/utils/classnames'
+import { withToggled } from '@/utils/format/arrays'
 
 export interface RailNavProps {
   groups: ReturnType<typeof visibleNavGroups>
@@ -58,16 +59,8 @@ export const RailNav = ({
   const [openedLive, setOpenedLive] = useState(false)
   const [liveAnchor, setLiveAnchor] = useState<HTMLElement | null>(null)
 
-  const toggleGroup = (label: string) => {
-    setCollapsedGroups((current) => {
-      const next = new Set(current)
-
-      if (next.has(label)) next.delete(label)
-      else next.add(label)
-
-      return next
-    })
-  }
+  const toggleGroup = (label: string) =>
+    setCollapsedGroups((current) => withToggled(current, label))
 
   // One lit entry at a time: deepest destination, favorites only when nothing else matches
   const reaches = (href: string) => pathname === href || pathname.startsWith(`${href}/`)

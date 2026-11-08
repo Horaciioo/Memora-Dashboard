@@ -1,17 +1,12 @@
 'use client'
 
 import { useCallback, useSyncExternalStore } from 'react'
+import { subscribeTo } from '@/utils/subscribeTo'
 
 const STORAGE_PREFIX = 'memora:interview-step:'
 const listeners = new Set<() => void>()
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener)
-
-  return () => {
-    listeners.delete(listener)
-  }
-}
+const subscribe = subscribeTo(listeners)
 
 /**
  * Step of an interview, kept in the browser per candidate

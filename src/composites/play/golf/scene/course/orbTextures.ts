@@ -1,32 +1,9 @@
-import { CanvasTexture, SRGBColorSpace } from 'three'
+import { CanvasTexture } from 'three'
 import type { Color } from 'three'
+import { canvasTexture } from '@/composites/play/golf/scene/canvasTexture'
 
 // Gradient and shade pixels
 const ORB_PIXELS = 64
-
-/**
- * Canvas texture from a drawing
- * @param {number} width - Pixels across
- * @param {number} height - Pixels down
- * @param {(context: CanvasRenderingContext2D) => void} paint - Drawing
- * @return {CanvasTexture} - Texture
- */
-
-const canvasTexture = (
-  width: number,
-  height: number,
-  paint: (context: CanvasRenderingContext2D) => void
-): CanvasTexture => {
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const context = canvas.getContext('2d')
-  if (context) paint(context)
-  const texture = new CanvasTexture(canvas)
-  texture.colorSpace = SRGBColorSpace
-
-  return texture
-}
 
 // Power card pixels across and down
 const CARD_WIDTH = 96
