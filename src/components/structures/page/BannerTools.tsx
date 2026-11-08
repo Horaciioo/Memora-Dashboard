@@ -4,7 +4,7 @@ import { useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { SectionPresence } from '@/components/structures/presence/SectionPresence'
 import { FavoriteToggle } from '@/components/structures/page/FavoriteToggle'
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { PAGE_OPTIONS_HOST_ID, TOP_BAR_TOOLS_HOST_ID } from '@/declarations/ui/banners'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 

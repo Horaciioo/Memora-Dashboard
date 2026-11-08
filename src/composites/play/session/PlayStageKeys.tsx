@@ -3,7 +3,7 @@
 import { Button } from '@/components/elements/actions/Button'
 import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { PlayVolumeKey } from '@/composites/play/session/PlayVolumeKey'
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlayStageStore } from '@/core/store/playStage'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'

@@ -1,7 +1,7 @@
 'use client'
 
 import { Markdown } from '@/components/elements/display/Markdown'
-import { useInView } from '@/core/hooks/interaction/layout/useInView'
+import { useInView } from '@/core/hooks/interaction/layout/measure/useInView'
 import type { ReadBlock, RoleRule, RoleSide } from '@/declarations/academy/curriculum/types'
 import { COURSE_READ, COURSE_RULES, COURSE_TONES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'

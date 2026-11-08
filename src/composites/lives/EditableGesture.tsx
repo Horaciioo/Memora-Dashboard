@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { InlineText } from '@/components/structures/inline/InlineText'
-import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
+import { useActionMenu } from '@/core/hooks/interaction/layout/overlay/useActionMenu'
 import { useLiveData } from '@/core/hooks/data/lives/useLiveData'
 import { LIVE_REPORT_COPY, MODERATION_KINDS } from '@/declarations/lives/moderation'
 import { LIVE_REPORT } from '@/declarations/ui/variants'

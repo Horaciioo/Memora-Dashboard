@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
+import { useActionMenu } from '@/core/hooks/interaction/layout/overlay/useActionMenu'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'
 import { SANCTION_DETECTION_COPY } from '@/declarations/sanctions/detection'

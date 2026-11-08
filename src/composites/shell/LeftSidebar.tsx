@@ -27,7 +27,7 @@ import { useCalendarRailView } from '@/core/hooks/interaction/calendar/useCalend
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
 import { canOwnPages } from '@/core/lib/pages'
 import { useCourseRail } from '@/core/hooks/interaction/scenes/useCourseRail'
-import { useRailCompact } from '@/core/hooks/interaction/layout/useRailCompact'
+import { useRailCompact } from '@/core/hooks/interaction/layout/rail/useRailCompact'
 import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
 import { ROUTES } from '@/declarations/navigation'
 import { beaconProps } from '@/declarations/ui/beacons'

@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 
 import { PlayInvitePicker } from '@/composites/play/session/PlayInvitePicker'
 import type { PlayInvitePickerProps } from '@/composites/play/session/PlayInvitePicker'
-import { useOutsideDismiss } from '@/core/hooks/interaction/layout/useOutsideDismiss'
+import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { PLAY_INVITE } from '@/declarations/ui/variants'
 
 export interface PlayInviteAnchorProps extends Omit<PlayInvitePickerProps, 'onDone'> {

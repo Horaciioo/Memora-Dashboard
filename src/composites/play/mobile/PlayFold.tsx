@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_FOLD, PLAY_STATS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'

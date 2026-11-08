@@ -3,8 +3,8 @@
 import type { CSSProperties, ReactNode } from 'react'
 
 import { MemoraMark } from '@/components/elements/display/marks/MemoraMark'
-import { useFocusTrap } from '@/core/hooks/interaction/layout/useFocusTrap'
-import { useScrollLock } from '@/core/hooks/interaction/layout/useScrollLock'
+import { useFocusTrap } from '@/core/hooks/interaction/layout/overlay/useFocusTrap'
+import { useScrollLock } from '@/core/hooks/interaction/layout/overlay/useScrollLock'
 import { TOUR_SETTINGS } from '@/declarations/configurations/settings'
 import { TOUR_CHAT } from '@/declarations/ui/variants'
 import type { TourCreator } from '@/types/tour'

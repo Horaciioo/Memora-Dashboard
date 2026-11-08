@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { findVisibleBeacon } from '@/core/lib/beacons'
 import { routeBeacon } from '@/declarations/ui/beacons'
 import { DEADLINE_BUBBLE } from '@/declarations/ui/variants'

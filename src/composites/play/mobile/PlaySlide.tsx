@@ -7,7 +7,7 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 
 import { playTabIndexOf, PLAY_PHONE_TABS } from '@/composites/play/mobile/tabs'
 import { useSwipe } from '@/core/hooks/interaction/gestures/useSwipe'
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { PLAY_TABS } from '@/declarations/ui/variants'
 
 // Pages where a game fills the screen

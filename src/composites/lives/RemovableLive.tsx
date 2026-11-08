@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
-import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
+import { useActionMenu } from '@/core/hooks/interaction/layout/overlay/useActionMenu'
 import type { LiveRemoval } from '@/core/hooks/data/lives/useLiveRemoval'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import type { ComponentProps, ReactNode } from 'react'
 
 import { PlayGameChatBar } from '@/composites/play/mobile/PlayGameChatBar'
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { cn } from '@/utils/classnames'
 import { PlayChat } from '@/composites/play/session/PlayChat'
 

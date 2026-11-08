@@ -1,7 +1,7 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_INVITE } from '@/declarations/ui/variants'

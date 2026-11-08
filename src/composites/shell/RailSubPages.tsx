@@ -3,7 +3,7 @@
 import Link from '@/components/elements/navigation/AppLink'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useRailSubPages, type RailSubPage } from '@/core/hooks/interaction/layout/useRailSubPages'
+import { useRailSubPages, type RailSubPage } from '@/core/hooks/interaction/layout/rail/useRailSubPages'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { cn } from '@/utils/classnames'
 

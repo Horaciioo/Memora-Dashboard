@@ -5,7 +5,7 @@ import type { DragEvent, PointerEvent, ReactNode } from 'react'
 
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
 import { CALENDAR_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { CALENDAR_SETTINGS } from '@/declarations/configurations/settings'
 import { ICONS } from '@/declarations/ui/icons'
 import { CALENDAR_GRID_STYLES } from '@/declarations/ui/variants'
