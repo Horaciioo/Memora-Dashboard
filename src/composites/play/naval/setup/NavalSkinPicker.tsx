@@ -1,6 +1,6 @@
 'use client'
 
-import { useNavalSkinStore } from '@/core/store/navalSkin'
+import { useNavalSkinStore } from '@/core/store/play/navalSkin'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SKINS } from '@/declarations/play/naval/skins'
 import type { NavalSkinName } from '@/declarations/play/naval/skins'

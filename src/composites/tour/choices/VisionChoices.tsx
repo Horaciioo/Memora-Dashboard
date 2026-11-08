@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/elements/actions/Button'
 import type { IntakeAnswers } from '@/core/lib/tour/chat'
-import { useColorVisionStore } from '@/core/store/colorVision'
+import { useColorVisionStore } from '@/core/store/appearance/colorVision'
 import { COLOR_VISION_REGISTRY } from '@/declarations/access/preferences'
 import { TOUR_COPY } from '@/declarations/tour/copy'
 import { TOUR_CHAT } from '@/declarations/ui/variants'

@@ -11,7 +11,7 @@ import type { OceanCell, OceanHandlers } from '@/composites/play/naval/ocean/use
 import { useOceanPainter } from '@/composites/play/naval/ocean/useOceanPainter'
 import type { NavalCamera } from '@/core/lib/play/naval/camera'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
-import { useNavalSkinStore } from '@/core/store/navalSkin'
+import { useNavalSkinStore } from '@/core/store/play/navalSkin'
 import { NAVAL_SKINS } from '@/declarations/play/naval/skins'
 import { NAVAL_VIEW } from '@/declarations/play/naval/view'
 import { NAVAL_OCEAN } from '@/declarations/ui/variants/naval'

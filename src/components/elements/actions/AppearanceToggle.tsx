@@ -6,7 +6,7 @@ import {
 } from '@/components/elements/actions/SegmentedControl'
 import { FONT_SCALE_REGISTRY, type FontScale } from '@/declarations/access/preferences'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import { useAppearanceStore } from '@/core/store/appearance'
+import { useAppearanceStore } from '@/core/store/appearance/appearance'
 
 // Compact captions
 const OPTIONS: SegmentedOption<FontScale>[] = FONT_SCALE_REGISTRY.keys.map((key) => ({

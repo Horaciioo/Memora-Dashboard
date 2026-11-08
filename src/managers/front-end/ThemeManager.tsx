@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-import { resolveTheme, useThemeStore } from '@/core/store/theme'
+import { resolveTheme, useThemeStore } from '@/core/store/appearance/theme'
 
 // Longer than the fade in base/theme.css
 const THEME_FADE_MS = 700

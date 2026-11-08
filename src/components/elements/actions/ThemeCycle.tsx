@@ -2,7 +2,7 @@
 
 import { THEME_REGISTRY } from '@/declarations/access/preferences'
 import { ICONS } from '@/declarations/ui/icons'
-import { useThemeStore } from '@/core/store/theme'
+import { useThemeStore } from '@/core/store/appearance/theme'
 
 // Plain icon per choice
 const THEME_ICONS = {

@@ -7,7 +7,7 @@ import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiDelete } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { isFollowedNotice } from '@/core/lib/play/notices'
-import { usePlayNoticeStore } from '@/core/store/playNotices'
+import { usePlayNoticeStore } from '@/core/store/play/playNotices'
 import { ROUTES } from '@/declarations/navigation'
 import type { PlayNoticeView } from '@/types/play'
 

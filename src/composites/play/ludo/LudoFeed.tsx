@@ -4,7 +4,7 @@ import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlaySessionFeed } from '@/composites/play/session/PlaySessionFeed'
 import { useLudoBoard } from '@/core/hooks/data/play/useLudoBoard'
 import type { LudoBoardView } from '@/core/lib/play/ludo/state'
-import { useLudoPlayedStore } from '@/core/store/ludoPlayed'
+import { useLudoPlayedStore } from '@/core/store/play/ludoPlayed'
 import { LUDO_FEED_COPY } from '@/declarations/play'
 
 /**

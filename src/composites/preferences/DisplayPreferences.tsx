@@ -1,8 +1,8 @@
 'use client'
 
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
-import { useAppearanceStore } from '@/core/store/appearance'
-import { useThemeStore } from '@/core/store/theme'
+import { useAppearanceStore } from '@/core/store/appearance/appearance'
+import { useThemeStore } from '@/core/store/appearance/theme'
 import { FONT_SCALE_REGISTRY, THEME_REGISTRY } from '@/declarations/access/preferences'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { ICONS } from '@/declarations/ui/icons'

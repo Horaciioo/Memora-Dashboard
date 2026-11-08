@@ -6,7 +6,7 @@ import { playBombSound, playBombTake, preloadBombSounds } from '@/composites/pla
 import type { BombBoardView } from '@/composites/play/bomb/types'
 import { loopSound } from '@/core/lib/play/sounds'
 import type { SoundLoop } from '@/core/lib/play/sounds'
-import { usePlaySoundStore, volumeOf } from '@/core/store/playSound'
+import { usePlaySoundStore, volumeOf } from '@/core/store/play/playSound'
 import { BOMB_MIX, BOMB_SOUNDS } from '@/declarations/play/bomb/sounds'
 import { PlayGames } from '@/utils/constants/play'
 

@@ -4,7 +4,7 @@ import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { toOptions } from '@/core/lib/forms/options'
 import { COLOR_VISION_REGISTRY, type ColorVisionMode } from '@/declarations/access/preferences'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import { useColorVisionStore } from '@/core/store/colorVision'
+import { useColorVisionStore } from '@/core/store/appearance/colorVision'
 
 /**
  * Selector for the color vision simulation mode

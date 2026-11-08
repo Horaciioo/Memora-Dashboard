@@ -2,7 +2,7 @@ import { loopSound, playSound, preloadSounds } from '@/core/lib/play/sounds'
 import type { SoundLoop } from '@/core/lib/play/sounds'
 import { isFlareCode, isHitCode, NavalCodes } from '@/core/lib/play/naval/state'
 import type { NavalStrikeView } from '@/core/lib/play/naval/state'
-import { playLevelOf } from '@/core/store/playSound'
+import { playLevelOf } from '@/core/store/play/playSound'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import {
   NAVAL_MIX,

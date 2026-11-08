@@ -1,7 +1,7 @@
 'use client'
 
 import { Picker } from '@/composites/preferences/DisplayPreferences'
-import { useColorVisionStore } from '@/core/store/colorVision'
+import { useColorVisionStore } from '@/core/store/appearance/colorVision'
 import { COLOR_VISION_REGISTRY } from '@/declarations/access/preferences'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { PICKER_CARD } from '@/declarations/ui/variants'

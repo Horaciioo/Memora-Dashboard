@@ -1,6 +1,6 @@
 'use client'
 
-import { usePlaySoundStore, volumeOf } from '@/core/store/playSound'
+import { usePlaySoundStore, volumeOf } from '@/core/store/play/playSound'
 import { PLAY_SOUND_COPY, PLAY_VOLUME } from '@/declarations/play/sounds'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_VOLUME_UI } from '@/declarations/ui/variants'

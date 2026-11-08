@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import type { RefObject } from 'react'
 
-import { stageSettled, usePlayStageStore } from '@/core/store/playStage'
+import { stageSettled, usePlayStageStore } from '@/core/store/play/playStage'
 
 /**
  * Keep the browser full screen in step with the play stage store

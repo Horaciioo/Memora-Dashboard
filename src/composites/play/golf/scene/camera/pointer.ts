@@ -12,7 +12,7 @@ import {
 import type { GolfRig } from '@/composites/play/golf/scene/camera/rig'
 import { aimOf, isAimHidden, shotVector } from '@/core/lib/play/golf'
 import type { GolfPowerName } from '@/utils/constants/play'
-import { useGolfAimStore } from '@/core/store/golfAim'
+import { useGolfAimStore } from '@/core/store/play/golfAim'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { SECOND_MS } from '@/utils/constants/time'

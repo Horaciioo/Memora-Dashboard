@@ -1,7 +1,7 @@
 'use client'
 
 import { GolfEmptyOrb, GolfPowerOrb } from '@/composites/play/golf/GolfPowerOrb'
-import { useGolfHandStore } from '@/core/store/golfHand'
+import { useGolfHandStore } from '@/core/store/play/golfHand'
 import { canCastPower, handSize } from '@/core/lib/play/golf'
 import type { GolfGameSettings } from '@/core/lib/play/golf/settings'
 import type { GolfPlayerState } from '@/core/lib/play/golf'

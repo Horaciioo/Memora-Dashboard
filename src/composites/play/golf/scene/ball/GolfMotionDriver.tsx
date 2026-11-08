@@ -6,8 +6,8 @@ import { useFrame } from '@react-three/fiber'
 import { playBoostSweep, playCupFanfare, playGolfSound } from '@/composites/play/golf/sound'
 import { CUP_PULSE, dueEvents, isTrackOver, trackSpot } from '@/core/lib/play/golf'
 import type { GolfMotion, GolfPlayerState, GolfShotEvent } from '@/core/lib/play/golf'
-import { useGolfCheerStore } from '@/core/store/golfCheer'
-import { useGolfHandStore } from '@/core/store/golfHand'
+import { useGolfCheerStore } from '@/core/store/play/golfCheer'
+import { useGolfHandStore } from '@/core/store/play/golfHand'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 // Quietest contact

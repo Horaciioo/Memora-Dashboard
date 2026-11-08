@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 
-import { useGolfAimStore } from '@/core/store/golfAim'
+import { useGolfAimStore } from '@/core/store/play/golfAim'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
 

@@ -2,8 +2,8 @@
 
 import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
-import { useGolfPrefsStore } from '@/core/store/golfPrefs'
-import type { GolfPrefs } from '@/core/store/golfPrefs'
+import { useGolfPrefsStore } from '@/core/store/play/golfPrefs'
+import type { GolfPrefs } from '@/core/store/play/golfPrefs'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_BOARD, GOLF_PANEL } from '@/declarations/ui/variants'
 import { PLAY_GAMES } from '@/declarations/play'

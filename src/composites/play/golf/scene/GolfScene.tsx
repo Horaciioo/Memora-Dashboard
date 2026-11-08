@@ -31,7 +31,7 @@ import { readPaint, seatColor } from '@/composites/play/golf/scene/decor/paint'
 import type { GolfRig } from '@/composites/play/golf/scene/camera/rig'
 import type { GolfFace } from '@/composites/play/golf/types'
 import { activePowers, courseAt, floorHeight } from '@/core/lib/play/golf'
-import { useGolfPrefsStore } from '@/core/store/golfPrefs'
+import { useGolfPrefsStore } from '@/core/store/play/golfPrefs'
 import type {
   GolfBoardState,
   GolfHazard,
