@@ -187,7 +187,7 @@ export const GOLF_BOT: PlayBotStrategy = {
     const cast = board.phase === GolfPhases.Playing ? powerFor(board, me) : null
     if (cast) {
       return {
-        key: `power:${board.hole}:${me.strokes}:${me.hand.join()}`,
+        key: `power:${board.hole}:${me.strokes}:${me.hand.join()}:${me.restsAt}`,
         raw: cast,
         at: pauseAfter(at, thinkMs),
       }
@@ -199,7 +199,7 @@ export const GOLF_BOT: PlayBotStrategy = {
     const power = aim.power * (1 + noise(powerNoise[level]))
 
     return {
-      key: `shot:${board.hole}:${me.strokes}`,
+      key: `shot:${board.hole}:${me.strokes}:${me.restsAt}`,
       raw: {
         type: 'shot',
         angle: aim.angle + noise(angleNoise[level]),
