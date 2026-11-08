@@ -1,5 +1,4 @@
 import 'server-only'
-
 import { prisma } from '@/core/lib/db'
 import { assertAllInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
 import { hideMeetingContent } from '@/core/services/work/redaction'
@@ -8,38 +7,18 @@ import type { WorkViewer } from '@/core/services/work/visibility'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
-import { emojiOrRandom, isBehindDeadline } from '@/core/lib/work'
+import { emojiOrRandom } from '@/core/lib/work'
 import {
-  AUTHORSHIP_INCLUDE,
   creatorLinks,
   defaultState,
   keptCreatorIds,
-  memberOptions,
   positionAt,
-  projectOptions,
   readCreatorIds,
-  stateOptions,
-  toAuthorship,
-  toCreatorTags,
-  toPerson,
-  toProjectTag,
-  toTag,
-  youtuberOptions,
-  YOUTUBERS_INCLUDE,
 } from '@/core/services/work/shared'
-import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
-import { FORM_GROUPS } from '@/declarations/ui/copy'
-import { MEETING_FIELD_COPY, MEETING_FIELD_INFO } from '@/declarations/work/copy'
+import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEETING_AUDIENCE_REGISTRY } from '@/declarations/work/registries'
-import { toOptions } from '@/core/lib/forms/options'
-import type { FieldDefinition, FormValues } from '@/types/forms'
-import type {
-  MeetingCalendarView,
-  MeetingDetail,
-  MeetingSummary,
-  MeetingTopicEntry,
-  WorkPerson,
-} from '@/types/work'
+import type { FormValues } from '@/types/forms'
+import type { MeetingCalendarView, MeetingDetail, MeetingSummary } from '@/types/work'
 import {
   AttendeeKinds,
   CalendarKinds,
@@ -47,239 +26,10 @@ import {
   WorkflowScopes,
 } from '@/utils/constants/workflow'
 import { instantToWall } from '@/utils/format/zone'
-import type { AttendeeKindName, MeetingAudienceName } from '@/utils/constants/workflow'
-import type { Prisma } from '@prisma/client'
+import type { MeetingAudienceName } from '@/utils/constants/workflow'
 import { MINUTE_MS } from '@/utils/constants/time'
-
-// Relations every meeting card needs
-export const MEETING_INCLUDE = {
-  state: true,
-  youtubers: YOUTUBERS_INCLUDE,
-  project: true,
-  attendees: { include: { account: true } },
-  ...AUTHORSHIP_INCLUDE,
-} satisfies Prisma.MeetingInclude
-
-type MeetingRow = Prisma.MeetingGetPayload<{ include: typeof MEETING_INCLUDE }>
-
-/**
- * Keep the attendees holding one seat kind
- * @param {MeetingRow} row - Meeting row with its attendees
- * @param {AttendeeKindName} kind - Seat kind
- * @return {WorkPerson[]} - Attendees
- */
-
-const seats = (row: MeetingRow, kind: AttendeeKindName): WorkPerson[] =>
-  row.attendees
-    .filter((attendee) => attendee.kind === kind)
-    .map((attendee) => toPerson(attendee.account))
-    .filter((person) => person !== null)
-
-/**
- * Map a meeting row to its card shape
- * @param {MeetingRow} row - Meeting row with its references
- * @return {MeetingSummary} - Board card
- */
-
-export const toMeetingSummary = (row: MeetingRow): MeetingSummary => ({
-  ...toAuthorship(row),
-  id: row.id,
-  title: row.title,
-  emoji: row.emoji,
-  introduction: row.introduction,
-  outro: row.outro,
-  minutes: row.minutes,
-  columnId: row.stateId,
-  state: toTag(row.state),
-  youtubers: toCreatorTags(row.youtubers),
-  project: toProjectTag(row.project),
-  scheduledAt: row.scheduledAt?.toISOString() ?? null,
-  isOverdue: isBehindDeadline(row.scheduledAt, row.state?.phase),
-  durationMin: row.durationMin,
-  audience: row.audience,
-  leads: seats(row, AttendeeKinds.Lead),
-  assistants: seats(row, AttendeeKinds.Assistant),
-  participants: seats(row, AttendeeKinds.Participant),
-  position: row.position,
-  values: {
-    title: row.title,
-    emoji: row.emoji,
-    scheduledAt: row.scheduledAt?.toISOString() ?? null,
-    durationMin: row.durationMin,
-    audience: row.audience,
-    stateId: row.stateId,
-    youtuberIds: row.youtubers.map((youtuber) => youtuber.id),
-    projectId: row.projectId,
-    leadIds: seats(row, AttendeeKinds.Lead).map((person) => person.id),
-    assistantIds: seats(row, AttendeeKinds.Assistant).map((person) => person.id),
-    participantIds: seats(row, AttendeeKinds.Participant).map((person) => person.id),
-    introduction: row.introduction,
-    outro: row.outro,
-    minutes: row.minutes,
-  },
-})
-
-/**
- * Build the meeting form declarations
- * @param {AccessScope} [scope] - Creator perimeter
- * @param {WorkViewer} [viewer] - Who reads
- * @return {Promise<FieldDefinition[]>} - Field declarations
- */
-
-export const meetingFields = async (
-  scope?: AccessScope,
-  viewer?: WorkViewer
-): Promise<FieldDefinition[]> => {
-  const [states, youtubers, projects, members] = await Promise.all([
-    stateOptions(WorkflowScopes.Meeting),
-    youtuberOptions(scope),
-    projectOptions(scope, viewer),
-    memberOptions(scope),
-  ])
-
-  return [
-    {
-      name: 'emoji',
-      kind: 'emoji',
-      label: MEETING_FIELD_COPY.emoji,
-      maxLength: EMOJI_SETTINGS.maxLength,
-      group: FORM_GROUPS.essentials,
-    },
-    {
-      name: 'title',
-      kind: 'text',
-      label: MEETING_FIELD_COPY.title,
-      info: MEETING_FIELD_INFO.title,
-      required: true,
-      glyph: 'emoji',
-      maxLength: FORM_SETTINGS.titleMaxLength,
-      group: FORM_GROUPS.essentials,
-    },
-    {
-      name: 'youtuberIds',
-      kind: 'multiselect',
-      label: MEETING_FIELD_COPY.youtubers,
-      info: MEETING_FIELD_INFO.youtubers,
-      placeholder: MEETING_FIELD_COPY.youtubersEmpty,
-      preset: 'default',
-      // The creator the member is viewing leads
-      options: youtubers.map((option) => ({
-        ...option,
-        isDefault: option.value === scope?.activeYoutuberId,
-      })),
-      mark: 'avatar',
-      group: FORM_GROUPS.essentials,
-    },
-    {
-      name: 'scheduledAt',
-      kind: 'datetime',
-      label: MEETING_FIELD_COPY.scheduledAt,
-      info: MEETING_FIELD_INFO.scheduledAt,
-      span: 'half',
-      group: FORM_GROUPS.essentials,
-    },
-    {
-      name: 'durationMin',
-      kind: 'number',
-      label: MEETING_FIELD_COPY.durationMin,
-      info: MEETING_FIELD_INFO.durationMin,
-      min: FORM_SETTINGS.meetingMinDuration,
-      max: FORM_SETTINGS.meetingMaxDuration,
-      span: 'half',
-      group: FORM_GROUPS.essentials,
-    },
-    {
-      name: 'audience',
-      kind: 'select',
-      label: MEETING_FIELD_COPY.audience,
-      info: MEETING_FIELD_INFO.audience,
-      required: true,
-      preset: 'default',
-      options: toOptions(MEETING_AUDIENCE_REGISTRY).map((option) => ({
-        ...option,
-        isDefault: option.value === MeetingAudiences.Custom,
-      })),
-      group: FORM_GROUPS.assignment,
-    },
-    {
-      name: 'leadIds',
-      kind: 'multiselect',
-      preset: 'actor',
-      label: MEETING_FIELD_COPY.leads,
-      info: MEETING_FIELD_INFO.leads,
-      placeholder: MEETING_FIELD_COPY.peopleEmpty,
-      options: members,
-      mark: 'avatar',
-      span: 'half',
-      group: FORM_GROUPS.assignment,
-    },
-    {
-      name: 'assistantIds',
-      kind: 'multiselect',
-      label: MEETING_FIELD_COPY.assistants,
-      info: MEETING_FIELD_INFO.assistants,
-      placeholder: MEETING_FIELD_COPY.peopleEmpty,
-      options: members,
-      mark: 'avatar',
-      span: 'half',
-      group: FORM_GROUPS.assignment,
-    },
-    {
-      name: 'participantIds',
-      kind: 'multiselect',
-      label: MEETING_FIELD_COPY.participants,
-      info: MEETING_FIELD_INFO.participants,
-      placeholder: MEETING_FIELD_COPY.peopleEmpty,
-      options: members,
-      mark: 'avatar',
-      group: FORM_GROUPS.assignment,
-    },
-    {
-      name: 'projectId',
-      kind: 'select',
-      mark: 'emoji',
-      label: MEETING_FIELD_COPY.project,
-      info: MEETING_FIELD_INFO.project,
-      options: projects,
-      group: FORM_GROUPS.assignment,
-    },
-    {
-      name: 'stateId',
-      kind: 'select',
-      label: MEETING_FIELD_COPY.state,
-      info: MEETING_FIELD_INFO.state,
-      preset: 'default',
-      options: states,
-      mark: 'dot',
-      span: 'half',
-      group: FORM_GROUPS.details,
-    },
-    {
-      name: 'introduction',
-      kind: 'markdown',
-      label: MEETING_FIELD_COPY.introduction,
-      info: MEETING_FIELD_INFO.introduction,
-      maxLength: FORM_SETTINGS.markdownMaxLength,
-      group: FORM_GROUPS.details,
-    },
-    {
-      name: 'outro',
-      kind: 'markdown',
-      label: MEETING_FIELD_COPY.outro,
-      info: MEETING_FIELD_INFO.outro,
-      maxLength: FORM_SETTINGS.markdownMaxLength,
-      group: FORM_GROUPS.details,
-    },
-    {
-      name: 'minutes',
-      kind: 'markdown',
-      label: MEETING_FIELD_COPY.minutes,
-      info: MEETING_FIELD_INFO.minutes,
-      maxLength: FORM_SETTINGS.markdownMaxLength,
-      group: FORM_GROUPS.details,
-    },
-  ]
-}
+import { MEETING_INCLUDE, toMeetingSummary } from '@/core/services/work/MeetingService/shape'
+import { toTopic } from '@/core/services/work/MeetingService/topics'
 
 /**
  * Read every meeting
@@ -539,49 +289,6 @@ export const removeMeeting = async (id: string, scope: AccessScope): Promise<voi
 }
 
 /**
- * Map a topic row to its display shape
- * @param {Prisma.MeetingTopicGetPayload<object>} row - Topic row
- * @return {MeetingTopicEntry} - Point covered
- */
-
-const toTopic = (row: Prisma.MeetingTopicGetPayload<object>): MeetingTopicEntry => ({
-  id: row.id,
-  emoji: row.emoji,
-  title: row.title,
-  body: row.body,
-  position: row.position,
-  values: { emoji: row.emoji, title: row.title, body: row.body },
-})
-
-/**
- * Build the topic form declarations
- * @return {FieldDefinition[]} - Field declarations
- */
-
-export const topicFields = (): FieldDefinition[] => [
-  {
-    name: 'emoji',
-    kind: 'emoji',
-    label: MEETING_FIELD_COPY.topicEmoji,
-    maxLength: EMOJI_SETTINGS.maxLength,
-  },
-  {
-    name: 'title',
-    kind: 'text',
-    label: MEETING_FIELD_COPY.topicTitle,
-    required: true,
-    glyph: 'emoji',
-    maxLength: FORM_SETTINGS.titleMaxLength,
-  },
-  {
-    name: 'body',
-    kind: 'markdown',
-    label: MEETING_FIELD_COPY.topicBody,
-    maxLength: FORM_SETTINGS.markdownMaxLength,
-  },
-]
-
-/**
  * Read one meeting file
  * @param {string} id - Meeting identifier
  * @return {Promise<MeetingDetail>} - Full file
@@ -655,81 +362,6 @@ export const readMeetingCalendar = async (
 }
 
 /**
- * Read the topics of one meeting
- * @param {string} meetingId - Meeting identifier
- * @return {Promise<MeetingTopicEntry[]>} - Points covered
- */
-
-export const listTopics = async (meetingId: string): Promise<MeetingTopicEntry[]> => {
-  const rows = await prisma.meetingTopic.findMany({
-    where: { meetingId },
-    orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
-  })
-
-  return rows.map(toTopic)
-}
-
-/**
- * Open a topic on a meeting
- * @param {string} meetingId - Meeting identifier
- * @param {FormValues} values - Parsed body
- * @return {Promise<MeetingTopicEntry>} - Created topic
- */
-
-export const addTopic = async (
-  meetingId: string,
-  values: FormValues
-): Promise<MeetingTopicEntry> => {
-  // Topics keep their own order inside the meeting
-  const last = await prisma.meetingTopic.aggregate({
-    where: { meetingId },
-    _max: { position: true },
-  })
-
-  const row = await prisma.meetingTopic.create({
-    data: {
-      meetingId,
-      emoji: readText(values, 'emoji') ?? '',
-      title: readText(values, 'title') ?? '',
-      body: readText(values, 'body'),
-      position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
-    },
-  })
-
-  return toTopic(row)
-}
-
-/**
- * Edit a topic
- * @param {string} id - Topic identifier
- * @param {FormValues} values - Parsed body
- * @return {Promise<MeetingTopicEntry>} - Updated topic
- */
-
-export const updateTopic = async (id: string, values: FormValues): Promise<MeetingTopicEntry> => {
-  const row = await prisma.meetingTopic.update({
-    where: { id },
-    data: {
-      emoji: readText(values, 'emoji') ?? '',
-      title: readText(values, 'title') ?? '',
-      body: readText(values, 'body'),
-    },
-  })
-
-  return toTopic(row)
-}
-
-/**
- * Drop a topic
- * @param {string} id - Topic identifier
- * @return {Promise<void>} - Removed
- */
-
-export const removeTopic = async (id: string): Promise<void> => {
-  await prisma.meetingTopic.delete({ where: { id } })
-}
-
-/**
  * Stamp a meeting as edited
  * @param {string} id - Meeting identifier
  * @param {string} actorId - Who edited it
@@ -738,32 +370,6 @@ export const removeTopic = async (id: string): Promise<void> => {
 
 export const touchMeeting = async (id: string, actorId: string): Promise<void> => {
   await prisma.meeting.update({ where: { id }, data: { updatedById: actorId } })
-}
-
-/**
- * Read the meeting a topic belongs to
- * @param {string} id - Topic identifier
- * @return {Promise<string>} - Meeting identifier
- */
-
-export const topicMeetingId = async (id: string): Promise<string> => {
-  const row = await prisma.meetingTopic.findUnique({ where: { id }, select: { meetingId: true } })
-  if (!row) throw notFound()
-
-  return row.meetingId
-}
-
-/**
- * Read one meeting topic
- * @param {string} id - Topic identifier
- * @return {Promise<MeetingTopicEntry>} - Point covered
- */
-
-export const readTopic = async (id: string): Promise<MeetingTopicEntry> => {
-  const row = await prisma.meetingTopic.findUnique({ where: { id } })
-  if (!row) throw notFound()
-
-  return toTopic(row)
 }
 
 /**
