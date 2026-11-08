@@ -45,6 +45,7 @@ export const RETENTION_POLICIES = {
   pushDeliveries: RETENTION_SETTINGS.pushDeliveryDays,
   activityLogs: RETENTION_SETTINGS.activityLogDays,
   moderationLogs: RETENTION_SETTINGS.moderationLogDays,
+  chatMessages: RETENTION_SETTINGS.chatMessageDays,
   rejectedCandidates: RETENTION_SETTINGS.rejectedCandidateDays,
   bannedCandidates: RETENTION_SETTINGS.bannedCandidateDays,
 }
@@ -150,6 +151,12 @@ const PROCESSING_MAP = {
       'Actions de Mod., modérateur, pseudo et extrait du message visé, temps de présence dans la Mod View',
     legalBasis: 'Intérêt légitime à encadrer la modération et à en rendre compte',
     retention: inDays(RETENTION_POLICIES.moderationLogs),
+  },
+  chatMessages: {
+    label: 'Retrouver ce qu\'un viewer a écrit dans le chat',
+    categories: 'Pseudo, identifiant de plateforme, texte du message, date, live',
+    legalBasis: 'Intérêt légitime à modérer le chat du créateur',
+    retention: inDays(RETENTION_POLICIES.chatMessages),
   },
   notifications: {
     label: 'Alerter sur ce qui te concerne',

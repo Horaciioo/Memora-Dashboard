@@ -44,5 +44,9 @@
   "memoryHours": 24,
   "memoryShareSeconds": 3,
   "rateLimitRetrySeconds": 5,
-  "suspensionMaxDays": 365
+  "suspensionMaxDays": 365,
+  "chatFlushMs": 2000,
+  "chatBatchMax": 200,
+  "chatBufferMax": 20000,
+  "chatPageSize": 50
 }

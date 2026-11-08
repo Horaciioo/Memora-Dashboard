@@ -300,7 +300,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number, chatFlushMs: number, chatBatchMax: number, chatBufferMax: number, chatPageSize: number }}
  */
 
 export const LIVE_SETTINGS = {
@@ -398,6 +398,26 @@ export const LIVE_SETTINGS = {
     path: 'system/lives.memoryShareSeconds',
     fallback: 3,
     min: 1,
+  }),
+  chatFlushMs: readInteger(lives.chatFlushMs, {
+    path: 'system/lives.chatFlushMs',
+    fallback: 2000,
+    min: 200,
+  }),
+  chatBatchMax: readInteger(lives.chatBatchMax, {
+    path: 'system/lives.chatBatchMax',
+    fallback: 200,
+    min: 10,
+  }),
+  chatBufferMax: readInteger(lives.chatBufferMax, {
+    path: 'system/lives.chatBufferMax',
+    fallback: 20000,
+    min: 100,
+  }),
+  chatPageSize: readInteger(lives.chatPageSize, {
+    path: 'system/lives.chatPageSize',
+    fallback: 50,
+    min: 10,
   }),
   rateLimitRetrySeconds: readInteger(lives.rateLimitRetrySeconds, {
     path: 'system/lives.rateLimitRetrySeconds',
@@ -1193,7 +1213,7 @@ export const readRateLimitWindow = (name: string, fallback: RateLimitWindow): Ra
 
 /**
  * How long each family of personal data is kept
- * @type {{ expiredSessionDays: number, readNotificationDays: number, activityLogDays: number, moderationLogDays: number, rejectedCandidateDays: number, bannedCandidateDays: number, orphanFileHours: number, consentVersion: number }}
+ * @type {{ expiredSessionDays: number, readNotificationDays: number, activityLogDays: number, moderationLogDays: number, chatMessageDays: number, rejectedCandidateDays: number, bannedCandidateDays: number, orphanFileHours: number, consentVersion: number }}
  */
 
 export const RETENTION_SETTINGS = {
@@ -1221,6 +1241,11 @@ export const RETENTION_SETTINGS = {
     path: 'system/retention.moderationLogDays',
     fallback: 180,
     min: 7,
+  }),
+  chatMessageDays: readInteger(retention.chatMessageDays, {
+    path: 'system/retention.chatMessageDays',
+    fallback: 180,
+    min: 1,
   }),
   rejectedCandidateDays: readInteger(retention.rejectedCandidateDays, {
     path: 'system/retention.rejectedCandidateDays',

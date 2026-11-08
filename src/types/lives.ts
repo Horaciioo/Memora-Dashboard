@@ -347,6 +347,46 @@ export interface ViewerComment {
 }
 
 /**
+ * One stored chat message
+ * @typedef {Object} ChatHistoryMessage
+ * @property {string} id - Identifier
+ * @property {string} body - Text
+ * @property {string} sentAt - ISO moment
+ * @property {string | null} liveId - Live it was sent in
+ * @property {'LIVE' | 'IMPORT'} source - Where it comes from
+ * @property {boolean} deleted - Removed by a moderator
+ */
+
+export interface ChatHistoryMessage {
+  id: string
+  body: string
+  sentAt: string
+  liveId: string | null
+  source: 'LIVE' | 'IMPORT'
+  deleted: boolean
+}
+
+/**
+ * Chat history of a viewer on a channel
+ * @typedef {Object} ViewerChatHistory
+ * @property {ChatHistoryMessage[]} messages - Newest first
+ * @property {string | null} nextCursor - Following page
+ * @property {number} total - Messages known
+ * @property {string | null} firstKnownAt - Earliest known message
+ * @property {'LIVE' | 'IMPORT' | null} firstSource - Source of the earliest one
+ * @property {boolean} isComplete - Nothing earlier exists
+ */
+
+export interface ViewerChatHistory {
+  messages: ChatHistoryMessage[]
+  nextCursor: string | null
+  total: number
+  firstKnownAt: string | null
+  firstSource: 'LIVE' | 'IMPORT' | null
+  isComplete: boolean
+}
+
+/**
  * Activity of one moderator on a live
  * @typedef {Object} ModeratorInspect
  * @property {string} accountId - Moderator

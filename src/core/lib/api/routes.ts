@@ -136,6 +136,8 @@ export const API_ROUTES = {
   liveBan: (id: string, viewerId: string) => `/api/lives/${id}/banned/${viewerId}`,
   liveViewerComments: (id: string, viewerId: string) =>
     `/api/lives/${id}/viewers/${viewerId}/comments`,
+  liveViewerChat: (id: string, viewerId: string, cursor?: string | null) =>
+    `/api/lives/${id}/viewers/${viewerId}/chat${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
   liveInspect: (id: string, accountId: string) => `/api/lives/${id}/moderators/${accountId}`,
   liveFocus: (id: string) => `/api/lives/${id}/focus`,
   sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>

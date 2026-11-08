@@ -11,6 +11,18 @@ export const LivePlatforms = {
 export type LivePlatformName = (typeof LivePlatforms)[keyof typeof LivePlatforms]
 
 /**
+ * Origin of a stored chat message
+ * @type {Record<string, string>}
+ */
+
+export const ChatSources = {
+  Live: 'LIVE',
+  Import: 'IMPORT',
+} as const
+
+export type ChatSourceName = (typeof ChatSources)[keyof typeof ChatSources]
+
+/**
  * Lifecycle of an announced live
  * @type {Record<string, string>}
  */

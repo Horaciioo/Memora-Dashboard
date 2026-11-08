@@ -12,6 +12,8 @@ import { EventSubSession } from '@/core/lib/platforms/twitch/session'
 import type { TwitchSignal } from '@/core/lib/platforms/twitch/eventsub'
 import { moveLiveFromPlatform } from '@/core/services/lives/LiveService'
 import { liveconLevelOf, logPlatformGesture } from '@/core/services/lives/ModerationLogService'
+import { chatRecordOf } from '@/core/lib/platforms/twitch/chatRecord'
+import { markChatDeleted, recordChatMessage } from '@/core/services/lives/ChatStoreService'
 import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
 import { forgetSampling, sampleViewers } from '@/core/services/lives/LiveSampler'
 import { sweepStalePresences } from '@/core/services/lives/PresenceService'
@@ -139,6 +141,43 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
 }
 
 /**
+ * Keep the chat traffic of a notification
+ * @param {Object} live - Live coordinates
+ * @param {string} live.id - Live
+ * @param {string} live.youtuberId - Creator
+ * @param {string} type - Subscription type
+ * @param {Record<string, unknown>} event - Event payload
+ * @param {string} at - Notification time
+ * @return {void}
+ */
+
+const keepChat = (
+  live: { id: string; youtuberId: string },
+  type: string,
+  event: Record<string, unknown>,
+  at: string
+): void => {
+  const record = chatRecordOf(type, event, at)
+  if (record) {
+    recordChatMessage({ ...record, youtuberId: live.youtuberId, liveId: live.id })
+    return
+  }
+
+  // Removals mark what was stored
+  const messageId = event.message_id
+  const chatterId = event.target_user_id
+  const removal =
+    type === 'channel.chat.message_delete' && typeof messageId === 'string'
+      ? { messageIds: [messageId] }
+      : type === 'channel.chat.clear_user_messages' && typeof chatterId === 'string'
+        ? { chatterId }
+        : null
+  if (removal) {
+    void markChatDeleted({ youtuberId: live.youtuberId, ...removal }).catch(() => null)
+  }
+}
+
+/**
  * Start watching one live with the first member able to carry it
  * @param {Object} live - Live coordinates
  * @return {Promise<void>} - Watching
@@ -207,6 +246,8 @@ const watch = async (live: {
       )
     },
     onNotification: (type, event, meta) => {
+      keepChat(live, type, event, meta.at)
+
       const entry = logEntryOf(type, event, meta)
       if (!entry) return
 
