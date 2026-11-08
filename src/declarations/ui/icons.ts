@@ -206,7 +206,7 @@ import {
   CloudSlash,
   CloudArrowUp,
   FolderSimplePlus,
-} from '@phosphor-icons/react/ssr'
+} from '@/declarations/ui/phosphor'
 import type { Icon, IconWeight } from '@phosphor-icons/react'
 import {
   DarkGlyph,
