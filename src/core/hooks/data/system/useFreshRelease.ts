@@ -2,10 +2,12 @@
 
 import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 
-import { apiPost } from '@/core/lib/api/client'
+import { apiGet, apiPost } from '@/core/lib/api/client'
+import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { changelogFor, isVersionSeen, releaseSeenKey } from '@/declarations/changelog/helpers'
+import { isVersionSeen, releaseSeenKey } from '@/declarations/changelog/versions'
 import type { ChangelogRelease } from '@/declarations/changelog/releases'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 
@@ -32,10 +34,18 @@ export interface FreshRelease {
 
 export const useFreshRelease = (): FreshRelease => {
   const router = useRouter()
-  const { session, can, isResponsable } = useAuthContext()
+  const { session } = useAuthContext()
   const [seenNow, setSeenNow] = useState<string | null>(null)
 
-  const release = session ? (changelogFor({ can, isResponsable })[0] ?? null) : null
+  // Notes stay out of the shell
+  const { data } = useQuery({
+    queryKey: QUERY_KEYS.latestRelease,
+    queryFn: ({ signal }) =>
+      apiGet<{ release: ChangelogRelease | null }>(API_ROUTES.seenRelease, signal),
+    enabled: Boolean(session),
+    staleTime: Infinity,
+  })
+  const release = data?.release ?? null
   const seen = seenNow ?? session?.seenReleaseVersion ?? null
   const key = release ? releaseSeenKey(release) : null
   const isFresh = release !== null && seen !== key

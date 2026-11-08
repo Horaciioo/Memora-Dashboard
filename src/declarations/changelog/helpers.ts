@@ -19,6 +19,8 @@ import type { PermissionHelpers } from '@/types/auth'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { baseVersion, parseVersion } from '@/utils/format/version'
 
+export { changelogPath, isVersionSeen, releaseSeenKey } from '@/declarations/changelog/versions'
+
 // Rail glyph per page
 const PAGE_ICONS = new Map<string, IconName>(
   NAVIGATION.flatMap((group) => group.items.map((item) => [item.href, item.icon] as const))
@@ -54,32 +56,6 @@ export const changelogPage = (page?: ChangelogPage): ChangelogPageMeta => {
     label: SEGMENT_LABELS[segment] ?? CHANGELOG_COPY.wholeApp,
     icon: PAGE_ICONS.get(page) ?? FALLBACK_ICON,
   }
-}
-
-/**
- * What a member marks as read: the shown version while its note is being built, so each
- * snapshot announces itself again
- * @param {ChangelogRelease} release - Note
- * @return {string} - Read key
- */
-
-export const releaseSeenKey = (release: ChangelogRelease): string => {
-  const shown = parseVersion(APP_VERSION)
-
-  return shown && baseVersion(shown) === release.version ? APP_VERSION : release.version
-}
-
-/**
- * Tell if a read mark already covers the version of a note, whatever its snapshot
- * @param {string | null} seen - Stored read mark
- * @param {ChangelogRelease} release - Note
- * @return {boolean} - Version already met
- */
-
-export const isVersionSeen = (seen: string | null, release: ChangelogRelease): boolean => {
-  const parts = seen ? parseVersion(seen) : null
-
-  return parts !== null && baseVersion(parts) === release.version
 }
 
 /**
@@ -207,15 +183,6 @@ export const groupByMonth = (releases: ChangelogRelease[]): ChangelogMonth[] => 
 
   return [...months.entries()].map(([key, list]) => ({ key, releases: list }))
 }
-
-/**
- * Address of one note
- * @param {string} version - Note version
- * @return {string} - Page address
- */
-
-export const changelogPath = (version: string): string =>
-  `${ROUTES.changelog}?version=${encodeURIComponent(version)}`
 
 /**
  * Note to open

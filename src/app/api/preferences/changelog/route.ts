@@ -2,10 +2,18 @@ import { prisma } from '@/core/lib/db'
 import { readText } from '@/core/lib/forms/values'
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
-import { releaseSeenKey } from '@/declarations/changelog/helpers'
+import { changelogFor, releaseSeenKey } from '@/declarations/changelog/helpers'
 import { CHANGELOG_RELEASES } from '@/declarations/changelog/releases'
 import { SEEN_RELEASE_FIELDS } from '@/declarations/changelog/fields'
+
+export const GET = createProtectedRoute({
+  descriptor: { summary: 'Read the latest release note', tags: ['preferences'] },
+  handler: async ({ session }) => ({
+    release: changelogFor(resolvePermissions(session))[0] ?? null,
+  }),
+})
 
 export const POST = createProtectedRoute({
   fields: SEEN_RELEASE_FIELDS,

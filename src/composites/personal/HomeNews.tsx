@@ -4,7 +4,7 @@ import Link from '@/components/elements/navigation/AppLink'
 
 import { useFreshRelease } from '@/core/hooks/data/system/useFreshRelease'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
-import { changelogPath } from '@/declarations/changelog/helpers'
+import { changelogPath } from '@/declarations/changelog/versions'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_FLOW } from '@/declarations/ui/variants'

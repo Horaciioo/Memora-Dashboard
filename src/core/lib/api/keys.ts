@@ -4,6 +4,7 @@
  */
 
 export const QUERY_KEYS = {
+  latestRelease: ['latestRelease'] as const,
   search: (term: string) => ['search', term] as const,
   assistant: (term: string, pathname: string) => ['assistant', term, pathname] as const,
   mentionable: (term: string) => ['mentionable', term] as const,
