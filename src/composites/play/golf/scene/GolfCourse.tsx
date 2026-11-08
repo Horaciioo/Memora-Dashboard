@@ -3,24 +3,25 @@
 import { useEffect, useMemo, useRef } from 'react'
 import type { Ref } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { DoubleSide } from 'three'
-import type { Group, Mesh } from 'three'
+import { DoubleSide, Shape, ShapeGeometry } from 'three'
+import type { Group } from 'three'
 
 import { patchTexture, sandTexture } from '@/composites/play/golf/scene/textures'
 import { holeSeed, seededRandom } from '@/composites/play/golf/scene/random'
-import { GolfIce } from '@/composites/play/golf/scene/GolfIce'
+import { GolfIce, iceSurfaces } from '@/composites/play/golf/scene/GolfIce'
+import { GolfCupPoints } from '@/composites/play/golf/scene/GolfCupPoints'
 import { GolfWater } from '@/composites/play/golf/scene/GolfWater'
+import { groundPatch } from '@/composites/play/golf/scene/grid'
 import { courseGeometry } from '@/composites/play/golf/scene/geometry'
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
-import { floorHeight } from '@/core/lib/play/golf'
-import type { GolfHazard, GolfHole } from '@/core/lib/play/golf'
+import type { GolfCup as GolfCupSpot, GolfHazard, GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfSurfaces } from '@/utils/constants/play'
 import type { GolfSurfaceName } from '@/utils/constants/play'
 
 const { render } = GOLF_SETTINGS
-const { cup, pole, flag, sink } = GOLF_SCENE
+const { cup, pole, flag, glass } = GOLF_SCENE
 
 // Surfaces that are not lawn
 const SURFACE_PAINT: Partial<Record<GolfSurfaceName, keyof GolfPaint>> = {
@@ -37,9 +38,18 @@ const SURFACE_PAINT: Partial<Record<GolfSurfaceName, keyof GolfPaint>> = {
  * @return {JSX.Element}
  */
 
-const GolfCup = ({ hole, paint }: { hole: GolfHole; paint: GolfPaint }) => {
-  const banner = useRef<Mesh>(null)
-  const floor = floorHeight(hole, hole.cup[0], hole.cup[1]) ?? 0
+const GolfCup = ({ spot, paint }: { spot: GolfCupSpot; paint: GolfPaint }) => {
+  const banner = useRef<Group>(null)
+  // Triangle pennant off the pole
+  const pennant = useMemo(() => {
+    const shape = new Shape()
+    shape.moveTo(0, flag.height / 2)
+    shape.lineTo(flag.width, 0)
+    shape.lineTo(0, -flag.height / 2)
+    shape.closePath()
+    return new ShapeGeometry(shape)
+  }, [])
+  useEffect(() => () => pennant.dispose(), [pennant])
   useFrame(({ clock }) => {
     if (banner.current) {
       banner.current.rotation.y = Math.sin(clock.elapsedTime * flag.swaySpeed) * flag.sway
@@ -47,20 +57,28 @@ const GolfCup = ({ hole, paint }: { hole: GolfHole; paint: GolfPaint }) => {
   })
 
   return (
-    <group position={[hole.cup[0], floor, hole.cup[1]]}>
+    <group position={[spot.x, spot.floor, spot.z]}>
       {/* Pole stands on the pit floor */}
-      <mesh position={[0, (render.flagHeight - sink.depth) / 2, 0]} castShadow>
+      <mesh position={[0, (render.flagHeight - GOLF_SETTINGS.cup.depth) / 2, 0]} castShadow>
         <cylinderGeometry
-          args={[pole.radius, pole.radius, render.flagHeight + sink.depth, pole.segments]}
+          args={[
+            pole.radius,
+            pole.radius,
+            render.flagHeight + GOLF_SETTINGS.cup.depth,
+            pole.segments,
+          ]}
         />
         <meshToonMaterial color={paint.pole} />
       </mesh>
       <group ref={banner} position={[0, render.flagHeight - flag.drop, 0]}>
-        <mesh position={[flag.width / 2, 0, 0]} castShadow>
-          <planeGeometry args={[flag.width, flag.height]} />
+        <mesh geometry={pennant} castShadow>
           <meshToonMaterial color={paint.flag} side={DoubleSide} />
         </mesh>
       </group>
+      <mesh position={[0, render.flagHeight, 0]}>
+        <sphereGeometry args={[flag.knob, 12, 8]} />
+        <meshToonMaterial color={paint.flag} />
+      </mesh>
     </group>
   )
 }
@@ -76,21 +94,15 @@ export interface GolfCourseProps {
 }
 
 /**
- * Floating course of one hole: lawn, slab sides, rails, boxes, cup
+ * Floating course of one hole: lawn, slab sides, rails, tilted boxes, cup
  * @param {GolfCourseProps} props - Hole and colours
  * @return {JSX.Element}
  */
 
 export const GolfCourse = ({ hole, paint, lawnRef, ice, serverNow }: GolfCourseProps) => {
   const geometry = useMemo(() => courseGeometry(hole), [hole])
-  // Floors the ice can cover
-  const iceTops = useMemo(
-    () =>
-      geometry.tops
-        .filter(({ surface }) => surface !== GolfSurfaces.Water)
-        .map(({ geometry }) => geometry),
-    [geometry]
-  )
+  // Everything the rink covers: every dry slab, rail tops and block tops
+  const iceTops = useMemo(() => iceSurfaces(geometry), [geometry])
   // Cubic colour patches of the walls
   const patches = useMemo(() => patchTexture(seededRandom(holeSeed(hole))), [hole])
   useEffect(() => () => patches.dispose(), [patches])
@@ -114,6 +126,8 @@ export const GolfCourse = ({ hole, paint, lawnRef, ice, serverNow }: GolfCourseP
       geometry.underside.dispose()
       geometry.rails.dispose()
       geometry.railSides.dispose()
+      geometry.glass.dispose()
+      geometry.cushions.dispose()
       geometry.blocks.dispose()
       geometry.blockTops.dispose()
       geometry.pit?.funnel.dispose()
@@ -137,6 +151,7 @@ export const GolfCourse = ({ hole, paint, lawnRef, ice, serverNow }: GolfCourseP
                 color={tint ? paint[tint] : paint.turf}
                 map={surface === GolfSurfaces.Sand ? grain : null}
                 side={DoubleSide}
+                onBeforeCompile={groundPatch}
               />
             </mesh>
           )
@@ -157,6 +172,12 @@ export const GolfCourse = ({ hole, paint, lawnRef, ice, serverNow }: GolfCourseP
       <mesh geometry={geometry.rails} castShadow receiveShadow>
         <meshToonMaterial color={paint.wall} side={DoubleSide} />
       </mesh>
+      <mesh geometry={geometry.glass}>
+        <meshToonMaterial color={paint.wall} transparent opacity={glass.opacity} side={DoubleSide} />
+      </mesh>
+      <mesh geometry={geometry.cushions} castShadow receiveShadow>
+        <meshToonMaterial color={paint.bumper} side={DoubleSide} />
+      </mesh>
       <mesh geometry={geometry.blocks} castShadow receiveShadow>
         <meshToonMaterial color={paint.obstacle} side={DoubleSide} />
       </mesh>
@@ -176,7 +197,13 @@ export const GolfCourse = ({ hole, paint, lawnRef, ice, serverNow }: GolfCourseP
           </mesh>
         </>
       )}
-      <GolfCup hole={hole} paint={paint} />
+      {hole.cups.map((spot) => (
+        <GolfCup key={`${spot.x}:${spot.z}`} spot={spot} paint={paint} />
+      ))}
+      {hole.isScoring &&
+        hole.cups.map((spot) => (
+          <GolfCupPoints key={`${spot.x}:${spot.z}`} spot={spot} paint={paint} />
+        ))}
     </group>
   )
 }

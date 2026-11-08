@@ -1,12 +1,12 @@
 'use client'
 
 import { GolfEmptyOrb, GolfPowerOrb } from '@/composites/play/golf/GolfPowerOrb'
-import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
-import { activePowers, canPlayPower, handSize } from '@/core/lib/play/golf'
+import { useGolfHandStore } from '@/core/store/golfHand'
+import { canCastPower, handSize } from '@/core/lib/play/golf'
 import type { GolfGameSettings } from '@/core/lib/play/golf/settings'
 import type { GolfPlayerState } from '@/core/lib/play/golf'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
-import { GOLF_POWERS } from '@/declarations/play/golf/powers'
+import { GOLF_POWER_KINDS, GOLF_POWERS } from '@/declarations/play/golf/powers'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { GolfPowerName } from '@/utils/constants/play'
@@ -15,10 +15,10 @@ export interface GolfPowerSlotProps {
   me: GolfPlayerState
   // Format, sets the hand size
   settings: Pick<GolfGameSettings, 'mode'>
-  // Server ms of the board
-  serverTime: number
-  // Hole in play, malus only once finished
+  // Hole in play
   canUse: boolean
+  // No hole after, a finished player keeps the bonus
+  isLastHole: boolean
   isSaving: boolean
   onUse: (power: GolfPowerName, slot: number) => void
 }
@@ -34,9 +34,10 @@ const GolfHandCase = ({
   slot,
   canUse,
   isDone,
+  isLastHole,
   isSaving,
   onUse,
-}: Omit<GolfPowerSlotProps, 'me' | 'serverTime' | 'settings'> & {
+}: Omit<GolfPowerSlotProps, 'me' | 'settings'> & {
   power: GolfPowerName | null
   slot: number
   isDone: boolean
@@ -55,7 +56,7 @@ const GolfHandCase = ({
     <button
       type="button"
       className={GOLF_BOARD.slot}
-      disabled={!canUse || !canPlayPower(power, isDone) || isSaving}
+      disabled={!canUse || !canCastPower(power, isDone, isLastHole) || isSaving}
       aria-label={`${GOLF_BOARD_COPY.use} ${meta.label}`}
       onClick={() => onUse(power, slot)}
     >
@@ -64,7 +65,7 @@ const GolfHandCase = ({
         <span
           className={cn(GOLF_BOARD.slotKind, meta.isBonus ? GOLF_BOARD.bonus : GOLF_BOARD.malus)}
         >
-          {meta.isBonus ? GOLF_BOARD_COPY.bonus : GOLF_BOARD_COPY.malus}
+          {GOLF_POWER_KINDS.find((kind) => kind.isBonus === meta.isBonus)?.label}
         </span>
         <span className={GOLF_BOARD.slotName}>{meta.label}</span>
         <span className={GOLF_BOARD.slotEffect}>{meta.effect}</span>
@@ -82,27 +83,24 @@ const GolfHandCase = ({
 export const GolfPowerSlot = ({
   me,
   settings,
-  serverTime,
   canUse,
+  isLastHole,
   isSaving,
   onUse,
 }: GolfPowerSlotProps) => {
-  const serverNow = useServerNow(new Date(serverTime))
   const cases = Array.from({ length: handSize(settings) }, (_, slot) => me.hand[slot] ?? null)
-  const worn = [...activePowers(me.effects, serverNow)]
+  // Fresh nudge restarts the shake
+  const fullAt = useGolfHandStore((state) => state.fullAt)
+  const isFull = fullAt !== null
 
   return (
     <div className={GOLF_BOARD.handBox}>
-      {worn.length > 0 && (
-        <div className={GOLF_BOARD.effects} aria-label={GOLF_BOARD_COPY.onYou}>
-          {worn.map((entry) => (
-            <span key={entry} title={GOLF_POWERS.label(entry)}>
-              <GolfPowerOrb power={entry} className={GOLF_BOARD.effect} />
-            </span>
-          ))}
-        </div>
+      {isFull && (
+        <span className={GOLF_BOARD.handFullTip} role="status">
+          {GOLF_BOARD_COPY.handFull}
+        </span>
       )}
-      <div className={GOLF_BOARD.hand}>
+      <div key={fullAt ?? 0} className={cn(GOLF_BOARD.hand, isFull && GOLF_BOARD.handFull)}>
         {cases.map((power, slot) => (
           <GolfHandCase
             key={slot}
@@ -110,6 +108,7 @@ export const GolfPowerSlot = ({
             slot={slot}
             canUse={canUse}
             isDone={me.isDone}
+            isLastHole={isLastHole}
             isSaving={isSaving}
             onUse={onUse}
           />

@@ -1,24 +1,23 @@
 'use client'
 
-import { useRef } from 'react'
 import type { RefObject } from 'react'
-import { useFrame } from '@react-three/fiber'
-import type { Group } from 'three'
 
 import { GolfBoosts } from '@/composites/play/golf/scene/GolfBoosts'
 import { GolfBumper } from '@/composites/play/golf/scene/GolfBumper'
+import { useReveal } from '@/composites/play/golf/scene/obstacles/useReveal'
 import { GolfOrb } from '@/composites/play/golf/scene/GolfOrb'
+import { GolfSpinner } from '@/composites/play/golf/scene/obstacles/GolfSpinner'
+import { GolfSplash } from '@/composites/play/golf/scene/obstacles/GolfSplash'
 import { GolfTornado } from '@/composites/play/golf/scene/GolfTornado'
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfFace } from '@/composites/play/golf/types'
 import { seatColor } from '@/composites/play/golf/scene/paint'
 import { isEffectActive } from '@/core/lib/play/golf'
 import type { GolfHazard, GolfHole, GolfMotion } from '@/core/lib/play/golf'
-import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPowers } from '@/utils/constants/play'
 
 const { powers } = GOLF_SETTINGS
-const { spinner } = GOLF_SCENE
 
 /**
  * What every fixture reads
@@ -34,47 +33,40 @@ interface FixtureProps {
 }
 
 /**
- * Turning bar on its post, on the server clock
- * @param {FixtureProps & { index: number, startsAt: number }} props - Bar
- * @return {JSX.Element}
+ * Bumper of the course, born only once a ball finds it when hidden
+ * @param {Object} props - Bumper and hole
+ * @return {JSX.Element | null}
  */
 
-const Spinner = ({
+const GolfFixedBumper = ({
+  entry,
   hole,
   paint,
-  index,
-  startsAt,
-  serverNow,
-}: Omit<FixtureProps, 'motionRef'> & { index: number; startsAt: number }) => {
-  const bar = useRef<Group>(null)
-  const entry = hole.spinners[index]
-  useFrame(() => {
-    // Same angle as the physics
-    const angle = entry.phase + entry.speed * ((serverNow() - startsAt) / 1000)
-    if (bar.current) bar.current.rotation.y = -angle
-  })
+  motionRef,
+}: {
+  entry: GolfHole['bumpers'][number]
+  hole: GolfHole
+  paint: GolfPaint
+  motionRef: RefObject<GolfMotion>
+}) => {
+  const zone = {
+    x0: entry.x - entry.r,
+    x1: entry.x + entry.r,
+    z0: entry.z - entry.r,
+    z1: entry.z + entry.r,
+  }
+  const isRevealed = useReveal(motionRef, zone, entry.id)
+  if (entry.isHidden && !isRevealed) return null
 
   return (
-    <group position={[entry.x, entry.floor, entry.z]}>
-      <group ref={bar}>
-        <mesh position={[0, spinner.height / 2, 0]} castShadow>
-          <boxGeometry
-            args={[entry.length, spinner.height, GOLF_SETTINGS.physics.spinnerThickness * 2]}
-          />
-          <meshStandardMaterial color={paint.obstacle} />
-        </mesh>
-        <mesh position={[0, spinner.height + spinner.stripe / 2, 0]}>
-          <boxGeometry
-            args={[
-              entry.length - spinner.stripe * 2,
-              spinner.stripe,
-              GOLF_SETTINGS.physics.spinnerThickness,
-            ]}
-          />
-          <meshStandardMaterial color={paint['obstacle-top']} />
-        </mesh>
-      </group>
-    </group>
+    <GolfBumper
+      id={entry.id}
+      spot={{ x: entry.x, z: entry.z, hole }}
+      radius={entry.r}
+      color={paint.bumper}
+      paint={paint}
+      motionRef={motionRef}
+    />
   )
 }
 
@@ -93,35 +85,29 @@ export const GolfFixtures = ({
   takenOrbs,
   hazards,
   seatOf,
+  faceOf,
 }: FixtureProps & {
   startsAt: number
   takenOrbs: number[]
   hazards: GolfHazard[]
   seatOf: (accountId: string) => string
+  faceOf: (accountId: string) => GolfFace | undefined
 }) => (
   <>
     <GolfBoosts hole={hole} paint={paint} motionRef={motionRef} />
     {hole.bumpers.map((entry) => (
-      <GolfBumper
-        key={entry.id}
-        {...entry}
-        radius={entry.r}
-        color={paint.bumper}
-        paint={paint}
-        motionRef={motionRef}
-        hole={hole}
-      />
+      <GolfFixedBumper key={entry.id} entry={entry} hole={hole} paint={paint} motionRef={motionRef} />
     ))}
-    {hole.spinners.map((_, index) => (
-      <Spinner
+    {hole.spinners.map((entry, index) => (
+      <GolfSpinner
         key={index}
-        hole={hole}
+        entry={entry}
         paint={paint}
-        index={index}
         startsAt={startsAt}
         serverNow={serverNow}
       />
     ))}
+    <GolfSplash motionRef={motionRef} paint={paint} />
     {hole.orbs.map((_, index) => (
       <GolfOrb
         key={index}
@@ -147,13 +133,13 @@ export const GolfFixtures = ({
           <GolfBumper
             key={hazard.id}
             id={hazard.id}
-            x={hazard.x}
-            z={hazard.z}
+            spot={{ x: hazard.x, z: hazard.z, hole }}
             radius={powers.bumper.radius}
             color={seatColor(seatOf(hazard.ownerId))}
             paint={paint}
             motionRef={motionRef}
-            hole={hole}
+            face={faceOf(hazard.ownerId)}
+            hearts={{ lives: hazard.lives ?? 0, max: powers.bumper.lives }}
           />
         )
       )}

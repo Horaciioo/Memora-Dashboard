@@ -1,8 +1,9 @@
 import type { GolfBody } from '@/core/lib/play/golf/body'
 import { speedOf } from '@/core/lib/play/golf/body'
+import { funnelPull } from '@/core/lib/play/golf/cup'
 import { isEffectActive } from '@/core/lib/play/golf/effects'
 import { gustPush, hazardSpot, isIced, obstaclePull } from '@/core/lib/play/golf/obstacles'
-import type { GolfHazard, GolfHole, GolfPad, GolfPoint } from '@/core/lib/play/golf/types'
+import type { GolfHazard, GolfHole, GolfPad } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPowers } from '@/utils/constants/play'
 
@@ -15,7 +16,7 @@ const { physics, surfaces } = GOLF_SETTINGS
  * @return {number} - Factor
  */
 
-const surfaceGrip = (pad: GolfPad | null, iced: boolean): number => {
+export const surfaceGrip = (pad: GolfPad | null, iced: boolean): number => {
   const grip = pad ? (surfaces[pad.surface as keyof typeof surfaces] ?? 1) : 1
 
   return iced ? Math.min(grip, GOLF_SETTINGS.powers.ice.grip) : grip
@@ -39,6 +40,8 @@ const slopePull = (pad: GolfPad | null): number =>
 
 export const canRest = (body: GolfBody, iced: boolean): boolean =>
   !body.isAirborne &&
+  body.cupStage !== 'rim' &&
+  body.cupStage !== 'falling' &&
   speedOf(body) < physics.restSpeed &&
   !body.pad?.push &&
   slopePull(body.pad) <= physics.rolling * surfaceGrip(body.pad, iced)
@@ -76,47 +79,34 @@ const tornadoPull = (body: GolfBody, hazards: GolfHazard[], at: number): [number
 }
 
 /**
- * Pull of the cup on a slow ball
- * @param {GolfBody} body - Body
- * @param {GolfPoint} cup - Cup
- * @return {[number, number]} - Acceleration
- */
-
-const cupPull = (body: GolfBody, cup: GolfPoint): [number, number] => {
-  const reach = physics.cupRadius * physics.cupPullReach
-  const dx = cup[0] - body.x
-  const dz = cup[1] - body.z
-  const distance = Math.hypot(dx, dz)
-  if (distance >= reach || distance < 1e-3) return [0, 0]
-  if (speedOf(body) > physics.captureSpeed * body.captureScale) return [0, 0]
-  const strength = physics.cupPull * (1 - distance / reach)
-
-  return [(dx / distance) * strength, (dz / distance) * strength]
-}
-
-/**
- * One step of slopes, boosts, winds, vortexes, cup and friction
+ * One step of slopes, boosts, winds, vortexes, funnel and friction
  * @param {GolfBody} body - Body
  * @param {Object} context - Course state
  * @param {GolfHazard[]} context.hazards - Laid powers
  * @param {GolfHole} context.hole - Hole
  * @param {number} context.at - Server ms
+ * @param {number} [context.seconds] - Hole clock
  * @param {number} dt - Seconds
  * @return {void}
  */
 
 export const pushBody = (
   body: GolfBody,
-  { hazards, hole, at }: { hazards: GolfHazard[]; hole: GolfHole; at: number },
+  {
+    hazards,
+    hole,
+    at,
+    seconds = 0,
+  }: { hazards: GolfHazard[]; hole: GolfHole; at: number; seconds?: number },
   dt: number
 ): void => {
   const pad = body.pad
-  const cup = hole.cup
-  // Gravity alone in the air
-  if (body.isAirborne) return
+  const cup = hole.cups[body.cupIndex] ?? hole.cups[0]
+  // Gravity alone in the air or the pit
+  if (body.isAirborne || body.cupStage === 'falling') return
   const [swirlX, swirlZ] = body.isGhost ? [0, 0] : tornadoPull(body, hazards, at)
-  const [cupX, cupZ] = cupPull(body, cup)
-  const [pullX, pullZ] = body.isGhost ? [0, 0] : obstaclePull(body, hole)
+  const [cupX, cupZ] = funnelPull(body, cup)
+  const [pullX, pullZ] = body.isGhost ? [0, 0] : obstaclePull(body, hole, seconds)
   const [gustX, gustZ] = gustPush(body, hazards, hole, at)
   const boost = pad?.push ? physics.boostAccel : 0
 

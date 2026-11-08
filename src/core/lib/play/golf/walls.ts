@@ -75,10 +75,19 @@ const cutSpan = (spans: Span[], [from, to]: Span): Span[] =>
  * @param {PadSide} side - Side
  * @param {Span} span - Part of the side
  * @param {number | null} cliff - Height of the slab above, rail when null
+ * @param {boolean} [isGlass] - Rail made of glass
+ * @param {boolean} [isBouncy] - Rail kicking the ball back
  * @return {GolfWall} - Wall
  */
 
-const wallOn = (pad: GolfPad, side: PadSide, [from, to]: Span, cliff: number | null): GolfWall => {
+const wallOn = (
+  pad: GolfPad,
+  side: PadSide,
+  [from, to]: Span,
+  cliff: number | null,
+  isGlass = false,
+  isBouncy = false
+): GolfWall => {
   const [ax, az] = side.point(from)
   const [bx, bz] = side.point(to)
 
@@ -93,6 +102,9 @@ const wallOn = (pad: GolfPad, side: PadSide, [from, to]: Span, cliff: number | n
     kind: cliff === null ? 'rail' : 'cliff',
     nx: side.normal[0],
     nz: side.normal[1],
+    ...(isGlass ? { isGlass } : {}),
+    ...(isBouncy ? { isBouncy } : {}),
+    ...(pad.isHidden ? { isHidden: true } : {}),
     cutA: from - side.span[0] > EPSILON,
     cutB: side.span[1] - to > EPSILON,
   }
@@ -104,10 +116,19 @@ const wallOn = (pad: GolfPad, side: PadSide, [from, to]: Span, cliff: number | n
  * @param {number} index - Slab guarded
  * @param {GolfEdge} edge - Side
  * @param {boolean} isOpen - No rail drawn
+ * @param {boolean} isGlass - Rail made of glass
+ * @param {boolean} isBouncy - Rail kicking the ball back
  * @return {GolfWall[]} - Walls
  */
 
-const sideWalls = (pads: GolfPad[], index: number, edge: GolfEdge, isOpen: boolean) => {
+const sideWalls = (
+  pads: GolfPad[],
+  index: number,
+  edge: GolfEdge,
+  isOpen: boolean,
+  isGlass: boolean,
+  isBouncy: boolean
+) => {
   const pad = pads[index]
   const side = sideOf(pad, edge)
   let free: Span[] = [side.span]
@@ -123,7 +144,7 @@ const sideWalls = (pads: GolfPad[], index: number, edge: GolfEdge, isOpen: boole
     if (rise > GOLF_SETTINGS.physics.stepUp) cliffs.push(wallOn(pad, side, span, rise))
   })
 
-  return [...(isOpen ? [] : free.map((span) => wallOn(pad, side, span, null))), ...cliffs]
+  return [...(isOpen ? [] : free.map((span) => wallOn(pad, side, span, null, isGlass, isBouncy))), ...cliffs]
 }
 
 /**
@@ -136,6 +157,13 @@ const sideWalls = (pads: GolfPad[], index: number, edge: GolfEdge, isOpen: boole
 export const edgeWalls = (layouts: GolfPadLayout[], pads: GolfPad[]): GolfWall[] =>
   pads.flatMap((_, index) =>
     (['n', 'e', 's', 'w'] as const).flatMap((edge) =>
-      sideWalls(pads, index, edge, Boolean(layouts[index].open?.includes(edge)))
+      sideWalls(
+        pads,
+        index,
+        edge,
+        Boolean(layouts[index].open?.includes(edge)),
+        Boolean(layouts[index].glass?.includes(edge)),
+        Boolean(layouts[index].bouncy?.includes(edge))
+      )
     )
   )

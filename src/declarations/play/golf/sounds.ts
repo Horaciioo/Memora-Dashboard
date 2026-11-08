@@ -21,6 +21,7 @@ export const GOLF_SOUNDS = {
   fall: `${EFFECTS}/sortie.mp3`,
   splash: `${EFFECTS}/eau.mp3`,
   orb: `${EFFECTS}/case.mp3`,
+  full: `${EFFECTS}/fin-effet.mp3`,
   portal: `${EFFECTS}/teleporteur.mp3`,
   vortex: `${EFFECTS}/trou-noir.mp3`,
   totem: `${EFFECTS}/totem.mp3`,
@@ -38,18 +39,35 @@ export const GOLF_SOUNDS = {
   voteConfirm: `${EFFECTS}/vote-valide.mp3`,
   voteBack: `${EFFECTS}/vote-retour.mp3`,
   voteSwitch: `${EFFECTS}/vote-transition.mp3`,
+  // End of a hole, before the balls leave
+  stage: `${EFFECTS}/vote-transition.mp3`,
 } as const satisfies Record<Exclude<GolfEventKind, 'boost'>, string> & Record<string, string>
 
 export type GolfSoundName = keyof typeof GOLF_SOUNDS
 
 /**
  * Own sound of some powers
- * @type {Partial<Record<GolfPowerName, GolfSoundName>>}
+ * @type {Record<GolfPowerName, GolfSoundName>}
  */
 
-export const GOLF_POWER_SOUNDS: Partial<Record<GolfPowerName, GolfSoundName>> = {
+export const GOLF_POWER_SOUNDS: Record<GolfPowerName, GolfSoundName> = {
   tornado: 'tornado',
+  sticky: 'land',
+  ice: 'ice',
+  giant: 'bumper',
+  mini: 'orb',
+  antiCollision: 'lip',
+  bumper: 'bumper',
+  ghost: 'reveal',
   gust: 'gust',
   fart: 'fart',
-  ice: 'ice',
+  flash: 'power',
+  steady: 'clock',
+  twist: 'spinner',
+  mirror: 'reveal',
+  blind: 'ended',
+  lob: 'hit',
+  bumperMan: 'bumper',
+  boingBoing: 'wall',
+  teleport: 'portal',
 }

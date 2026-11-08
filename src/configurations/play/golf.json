@@ -10,9 +10,10 @@
   "maxStrokes": { "default": 8, "min": 3, "max": 15 },
   "holes": { "default": 6, "min": 1, "max": 6 },
   "missPenalty": 1,
+  "par": { "shortTo": 12, "mediumTo": 22 },
   "voidPenalty": 1,
   "collisions": true,
-  "course": "prairie",
+  "course": "randomtown",
   "shotsKeptSeconds": 20,
   "lateShotMs": 1200,
   "restToleranceMs": 250,
@@ -23,8 +24,7 @@
     "stepHz": 120,
     "frameEvery": 4,
     "maxSeconds": 14,
-    "ballRadius": 0.12,
-    "cupRadius": 0.24,
+    "ballRadius": 0.1,
     "maxSpeed": 9.8,
     "layoutScale": 0.8,
     "minPower": 0.03,
@@ -37,12 +37,10 @@
     "ballBounce": 0.9,
     "bumperBounce": 1.2,
     "bumperKick": 4,
+    "cushionBounce": 1.1,
+    "cushionKick": 3.2,
     "spinnerBounce": 0.85,
     "spinnerThickness": 0.09,
-    "captureSpeed": 2.4,
-    "cupPull": 2,
-    "cupPullReach": 1.7,
-    "lipKeep": 0.82,
     "stepUp": 0.03,
     "hitSound": 0.6,
     "worldMargin": 1.5,
@@ -51,7 +49,9 @@
     "voidDepth": 3,
     "landKeep": 0.92,
     "hopSpeed": 1.2,
-    "groundBounce": 0.3
+    "groundBounce": 0.3,
+    "gridCell": 0.6,
+    "cup": { "radius": 0.24, "funnel": 0.1, "drop": 0.06, "depth": 0.3, "lipBounce": 0.45, "lipKeep": 0.75, "lipHold": 0.5 }
   },
   "surfaces": {
     "grass": 1,
@@ -60,7 +60,7 @@
     "boost": 1
   },
   "orbs": {
-    "radius": 0.32,
+    "radius": 0.15,
     "respawnSeconds": 10,
     "catchUp": 1
   },
@@ -76,26 +76,28 @@
       "meander": 0.9,
       "sway": 0.8
     },
-    "sticky": { "seconds": 25 },
+    "sticky": {},
     "ice": { "seconds": 30, "grip": 0.2 },
-    "giant": { "shots": 1, "scale": 1.5, "capture": 0.7 },
+    "giant": { "shots": 1, "scale": 1.5 },
     "mini": { "shots": 1, "scale": 0.6, "power": 0.75 },
     "antiCollision": { "seconds": 45 },
     "bumper": { "lives": 3, "radius": 0.38 },
     "ghost": { "shots": 1 },
     "gust": { "seconds": 9, "accel": 4, "fans": 6, "radius": 1.2, "boost": 6 },
     "fart": { "reach": 1.2, "tries": 12 },
-    "turbo": { "shots": 1, "power": 1.8 },
     "flash": { "shots": 1, "power": 4 },
     "steady": { "shots": 1 },
     "twist": { "shots": 1, "turn": 1.6 },
     "mirror": { "shots": 1 },
     "blind": { "shots": 1 },
     "lob": { "shots": 1, "lift": 0.55 },
-    "swap": {}
+    "bumperMan": { "shots": 2, "lives": 2, "scale": 2, "kick": 7 },
+    "boingBoing": { "shots": 2, "bounces": 6, "scale": 2, "hop": 3.2, "keep": 0.6 },
+    "teleport": { "cells": 50 }
   },
   "chaos": { "orbs": 4, "malus": 2, "hand": 5 },
   "hand": 3,
+  "grid": { "cell": 0.2 },
   "obstacles": {
     "portalRadius": 0.3,
     "vortexPull": 9,
@@ -123,6 +125,19 @@
     "keyZoom": 1.4,
     "fov": 50
   },
+  "freeCamera": {
+    "speed": 6,
+    "minSpeed": 1.5,
+    "maxSpeed": 24,
+    "accel": 8,
+    "wheel": 0.0015,
+    "pan": 0.03,
+    "pinch": 0.04,
+    "margin": 6,
+    "minHeight": 0.6,
+    "maxHeight": 30,
+    "blend": 4
+  },
   "aim": {
     "grabRadius": 1.1,
     "pullMeters": 2.6,
@@ -130,7 +145,11 @@
     "wobble": 0.35,
     "wobbleHz": 0.8,
     "guideMeters": 6,
-    "guideBounce": 1.4
+    "guideBounce": 1.4,
+    "curve": 1.3,
+    "fullMeters": 16.2,
+    "shortPull": 0.1,
+    "shortMeters": 0.05
   },
   "render": {
     "maxDpr": 1.75,
@@ -141,6 +160,6 @@
     "railWidth": 0.14,
     "blockHeight": 0.28,
     "flagHeight": 1.1,
-    "orbHover": 0.32
+    "orbHover": 0.2
   }
 }

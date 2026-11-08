@@ -23,6 +23,8 @@ export interface GolfGameSettings {
   maps: number
   // Courses of a tournament, drawn at the start
   plan?: string[]
+  // Plan already dealt on screen by the vote, kept at the start
+  dealt?: boolean
   holes: number
   holeSeconds: number
   maxStrokes: number
@@ -119,6 +121,12 @@ export const drawCourse = (
   settings: GolfGameSettings,
   random: () => number = Math.random
 ): GolfGameSettings => {
+  if (settings.dealt && settings.plan?.length) {
+    const kept = { ...settings }
+    delete kept.dealt
+
+    return kept
+  }
   const drawn =
     settings.course === GOLF_RANDOM_COURSE
       ? { ...settings, drawn: GOLF_COURSES.keys[Math.floor(random() * GOLF_COURSES.keys.length)] }
@@ -166,15 +174,28 @@ export const golfDefaults = (): GolfGameSettings => {
 }
 
 /**
+ * Powers an orb can give, the ones needing collisions dropped without them
+ * @param {GolfGameSettings} settings - Game settings
+ * @return {GolfPowerName[]} - Draw pool
+ */
+
+export const drawPool = (
+  settings: Pick<GolfGameSettings, 'powers' | 'collisions'>
+): GolfPowerName[] =>
+  settings.powers.filter((power) => settings.collisions || !GOLF_POWERS.get(power).needsCollisions)
+
+/**
  * Stored settings, typed
  * @param {Prisma.JsonValue} stored - Stored settings
  * @return {GolfGameSettings} - Settings
  */
 
-export const golfSettingsOf = (stored: Prisma.JsonValue): GolfGameSettings => ({
-  ...golfDefaults(),
-  ...(stored as Partial<GolfGameSettings> | null),
-})
+export const golfSettingsOf = (stored: Prisma.JsonValue): GolfGameSettings => {
+  const settings = { ...golfDefaults(), ...(stored as Partial<GolfGameSettings> | null) }
+
+  // Retired powers dropped
+  return { ...settings, powers: settings.powers.filter((power) => GOLF_POWERS.has(power)) }
+}
 
 /**
  * Holes played by a game, each map cut to its holes in a tournament

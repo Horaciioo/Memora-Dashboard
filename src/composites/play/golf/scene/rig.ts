@@ -1,9 +1,41 @@
 import { Vector3 } from 'three'
 
+import type { GolfStage } from '@/composites/play/golf/scene/stage'
 import type { GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
-const { camera } = GOLF_SETTINGS
+const { camera, freeCamera } = GOLF_SETTINGS
+
+/**
+ * Free flight state of the camera
+ * @typedef {Object} GolfFreeFlight
+ */
+
+export interface GolfFreeFlight {
+  position: Vector3
+  velocity: Vector3
+  // Held keys: x sideways, y up, z ahead
+  move: Vector3
+  speed: number
+  // Share of the free view, eased both ways
+  mix: number
+  // Flight box, map wide
+  box: GolfFreeBox
+}
+
+/**
+ * Box the free camera stays in
+ * @typedef {Object} GolfFreeBox
+ */
+
+export interface GolfFreeBox {
+  x0: number
+  x1: number
+  z0: number
+  z1: number
+  minY: number
+  maxY: number
+}
 
 /**
  * Camera and ball spots shared inside the canvas
@@ -26,6 +58,13 @@ export interface GolfRig {
   target: Vector3
   // Ball drawn spots, by player
   spots: Map<string, Vector3>
+  // Follow a ball, or fly anywhere
+  isFree: boolean
+  free: GolfFreeFlight
+  // End of hole sequence, balls flying to the next tee
+  stage: GolfStage | null
+  // Framing forced by the sequence, eased like the overview
+  pin: { center: Vector3; reach: number } | null
 }
 
 /**
@@ -53,6 +92,66 @@ export const createRig = (hole: GolfHole): GolfRig => ({
   climb: 0,
   target: new Vector3(hole.tee[0], 0, hole.tee[1]),
   spots: new Map(),
+  isFree: false,
+  free: {
+    position: new Vector3(),
+    velocity: new Vector3(),
+    move: new Vector3(),
+    speed: freeCamera.speed,
+    mix: 0,
+    box: freeBox([hole.bounds]),
+  },
+  stage: null,
+  pin: null,
+})
+
+/**
+ * Flight box over every hole of the map, with a margin
+ * @param {GolfHole['bounds'][]} rects - Holes, around the played one
+ * @return {GolfFreeBox} - Box
+ */
+
+export const freeBox = (rects: GolfHole['bounds'][]): GolfFreeBox => ({
+  x0: Math.min(...rects.map((rect) => rect.x0)) - freeCamera.margin,
+  x1: Math.max(...rects.map((rect) => rect.x1)) + freeCamera.margin,
+  z0: Math.min(...rects.map((rect) => rect.z0)) - freeCamera.margin,
+  z1: Math.max(...rects.map((rect) => rect.z1)) + freeCamera.margin,
+  minY: freeCamera.minHeight,
+  maxY: freeCamera.maxHeight,
+})
+
+/**
+ * Spot brought back inside the flight box
+ * @param {Vector3} position - Spot, written in place
+ * @param {GolfFreeBox} box - Box
+ * @return {Vector3} - Same spot
+ */
+
+export const clampFree = (position: Vector3, box: GolfFreeBox): Vector3 =>
+  position.set(
+    Math.min(box.x1, Math.max(box.x0, position.x)),
+    Math.min(box.maxY, Math.max(box.minY, position.y)),
+    Math.min(box.z1, Math.max(box.z0, position.z))
+  )
+
+/**
+ * Flight speed kept inside its bounds
+ * @param {number} speed - Asked speed
+ * @return {number} - Bounded speed
+ */
+
+export const clampFreeSpeed = (speed: number): number =>
+  Math.min(freeCamera.maxSpeed, Math.max(freeCamera.minSpeed, speed))
+
+/**
+ * Ahead and right of a yaw, flat on the ground
+ * @param {number} yaw - Look direction
+ * @return {{ ahead: [number, number], right: [number, number] }} - Unit x z
+ */
+
+export const flatAxes = (yaw: number): { ahead: [number, number]; right: [number, number] } => ({
+  ahead: [Math.sin(yaw), Math.cos(yaw)],
+  right: [-Math.cos(yaw), Math.sin(yaw)],
 })
 
 /**

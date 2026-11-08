@@ -66,6 +66,30 @@ const bounceOff = (
 }
 
 /**
+ * Restitution of a wall
+ * @param {GolfWall} wall - Wall
+ * @return {number} - Restitution
+ */
+
+export const wallBounce = (wall: GolfWall): number =>
+  wall.isBouncy ? GOLF_SETTINGS.physics.cushionBounce : GOLF_SETTINGS.physics.wallBounce
+
+/**
+ * Cushion leaving the ball with a minimum speed away from it
+ * @param {GolfBody} body - Ball
+ * @param {GolfWall} wall - Cushion
+ * @return {void}
+ */
+
+export const kickAway = (body: GolfBody, wall: GolfWall): void => {
+  const away = -(body.vx * wall.nx + body.vz * wall.nz)
+  const kick = GOLF_SETTINGS.physics.cushionKick
+  if (away >= kick) return
+  body.vx -= wall.nx * (kick - away)
+  body.vz -= wall.nz * (kick - away)
+}
+
+/**
  * Ball against a rail, a cliff or a box side
  * @param {GolfBody} body - Ball
  * @param {GolfWall} wall - Wall
@@ -74,12 +98,46 @@ const bounceOff = (
 
 export const collideWall = (body: GolfBody, wall: GolfWall): number => {
   const point = closestOn(body, [wall.ax, wall.az, wall.bx, wall.bz])
-  const floor = wall.fa + (wall.fb - wall.fa) * point.t
+  if (!isWallFacing(body, wall, point.t)) return 0
+
+  const impact = bounceOff(body, point, body.radius, wallBounce(wall))
+  if (impact && wall.isBouncy) kickAway(body, wall)
+
+  return impact
+}
+
+/**
+ * Wall standing at the ball's height
+ * @param {GolfBody} body - Ball
+ * @param {GolfWall} wall - Wall
+ * @param {number} [along] - Position along the wall
+ * @return {boolean} - Blocks it
+ */
+
+export const isWallFacing = (body: GolfBody, wall: GolfWall, along?: number): boolean => {
+  const t = along ?? closestOn(body, [wall.ax, wall.az, wall.bx, wall.bz]).t
+  const floor = wall.fa + (wall.fb - wall.fa) * t
 
   // Another floor, or clear over the top
-  if (body.y < floor - GOLF_SETTINGS.physics.stepUp || body.y >= floor + wall.top - CLEAR) return 0
+  return body.y >= floor - GOLF_SETTINGS.physics.stepUp && body.y < floor + wall.top - CLEAR
+}
 
-  return bounceOff(body, point, body.radius, GOLF_SETTINGS.physics.wallBounce)
+/**
+ * Speed reflected off a still surface
+ * @param {GolfBody} body - Ball
+ * @param {number} nx - Normal x
+ * @param {number} nz - Normal z
+ * @param {number} bounce - Restitution
+ * @return {number} - Impact speed
+ */
+
+export const reflectOff = (body: GolfBody, nx: number, nz: number, bounce: number): number => {
+  const normal = body.vx * nx + body.vz * nz
+  if (normal >= 0) return 0
+  body.vx -= (1 + bounce) * normal * nx
+  body.vz -= (1 + bounce) * normal * nz
+
+  return -normal
 }
 
 /**

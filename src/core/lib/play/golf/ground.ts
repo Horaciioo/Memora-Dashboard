@@ -1,6 +1,8 @@
 import type { GolfBody } from '@/core/lib/play/golf/body'
-import { halt, isInPlay, speedOf } from '@/core/lib/play/golf/body'
+import { halt, isInPlay } from '@/core/lib/play/golf/body'
+import { fallCup, rollCup } from '@/core/lib/play/golf/cup'
 import { crossObstacles } from '@/core/lib/play/golf/obstacles'
+import { pickOrbs } from '@/core/lib/play/golf/orbs'
 import { padHeight, padHolds, padUnder } from '@/core/lib/play/golf/terrain'
 import type { GolfPad } from '@/core/lib/play/golf/types'
 import type { GolfWorld } from '@/core/lib/play/golf/world'
@@ -21,57 +23,6 @@ const loseBall = (world: GolfWorld, body: GolfBody, kind: 'fall' | 'splash'): vo
   body.hasFallen = true
   halt(body)
   world.emit(kind, body.id)
-}
-
-/**
- * Cup takes a slow ball, a fast one lips out
- * @param {GolfWorld} world - Simulation
- * @param {GolfBody} body - Body
- * @return {void}
- */
-
-const reachCup = (world: GolfWorld, body: GolfBody): void => {
-  const [cupX, cupZ] = world.input.hole.cup
-  const isOver =
-    Math.hypot(body.x - cupX, body.z - cupZ) < physics.cupRadius &&
-    Math.abs(body.y - world.cupFloor) <= physics.stepUp
-  if (!isOver) {
-    body.inCup = false
-    return
-  }
-
-  if (speedOf(body) <= physics.captureSpeed * body.captureScale) {
-    body.x = cupX
-    body.z = cupZ
-    body.isHoled = true
-    halt(body)
-    world.emit('cup', body.id)
-  } else if (!body.inCup) {
-    body.inCup = true
-    body.vx *= physics.lipKeep
-    body.vz *= physics.lipKeep
-    world.emit('lip', body.id)
-  }
-}
-
-/**
- * Free hand takes an orb rolled over
- * @param {GolfWorld} world - Simulation
- * @param {GolfBody} body - Body
- * @param {number} at - Server ms
- * @return {void}
- */
-
-const pickOrbs = (world: GolfWorld, body: GolfBody, at: number): void => {
-  if (!body.canPick) return
-  world.input.hole.orbs.forEach(([orbX, orbZ], index) => {
-    if (!body.canPick || world.orbs[index] > at) return
-    if (Math.hypot(body.x - orbX, body.z - orbZ) > GOLF_SETTINGS.orbs.radius + body.radius) return
-    world.orbs[index] = at + GOLF_SETTINGS.orbs.respawnSeconds * 1000
-    body.canPick = false
-    world.pickups.push({ id: body.id, orb: index, at })
-    world.emit('orb', body.id)
-  })
 }
 
 /**
@@ -192,12 +143,13 @@ export const settleGround = (
   { at, dt }: { at: number; dt: number },
   isResting = false
 ): void => {
+  if (body.cupStage === 'falling') return fallCup(world, body, dt)
   if (!isInPlay(body)) return
   if (body.isGhost) floatGhost(world, body, isResting)
   else if (body.isAirborne) fly(world, body, dt)
   else roll(world, body)
   if (!isInPlay(body)) return
   crossObstacles(world, body)
-  if (!body.isAirborne) reachCup(world, body)
-  pickOrbs(world, body, at)
+  if (!body.isAirborne) rollCup(world, body)
+  if (isInPlay(body)) pickOrbs(world, body, at)
 }

@@ -37,6 +37,7 @@ export const useGolfTable = ({
   // Power waiting for a spot, with its slot in hand
   const [placing, setPlacing] = useState<{ power: GolfPowerName; slot: number } | null>(null)
   const [isStatsOpen, setStatsOpen] = useState(false)
+  const [isFree, setFreeState] = useState(false)
 
   // A new hole drops the view and the placement
   if (shownHole !== hole) {
@@ -77,6 +78,13 @@ export const useGolfTable = ({
     setPlacing,
     isStatsOpen,
     setStatsOpen,
+    isFree,
+    // Spectators fly anywhere or follow a player
+    setFree: (on: boolean) => {
+      rigRef.current.isFree = on
+      rigRef.current.free.move.set(0, 0, 0)
+      setFreeState(on)
+    },
     toggleView: () => {
       rigRef.current.isOverview = !rigRef.current.isOverview
       setOverview(rigRef.current.isOverview)

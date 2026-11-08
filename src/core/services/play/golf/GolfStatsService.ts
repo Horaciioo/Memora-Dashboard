@@ -14,11 +14,17 @@ const STAT_KEYS = { SHOT: 'strokes', HOLED: 'holes', POWER: 'powers', FALL: 'fal
 export const golfStats = async (
   sessionId: string
 ): Promise<Map<string, Record<string, number>>> => {
-  const [moves, aces] = await Promise.all([
+  const [moves, aces, replays] = await Promise.all([
     prisma.golfMove.groupBy({ by: ['accountId', 'kind'], where: { sessionId }, _count: true }),
     prisma.golfMove.groupBy({
       by: ['accountId'],
       where: { sessionId, kind: 'HOLED', strokes: 1 },
+      _count: true,
+    }),
+    // Replays after a malus are no stroke
+    prisma.golfMove.groupBy({
+      by: ['accountId'],
+      where: { sessionId, kind: 'SHOT', path: { path: ['replay'], equals: true } },
       _count: true,
     }),
   ])
@@ -26,6 +32,10 @@ export const golfStats = async (
   const entryOf = (accountId: string) => stats.get(accountId) ?? {}
   for (const move of moves)
     stats.set(move.accountId, { ...entryOf(move.accountId), [STAT_KEYS[move.kind]]: move._count })
+  for (const replay of replays) {
+    const entry = entryOf(replay.accountId)
+    stats.set(replay.accountId, { ...entry, strokes: (entry.strokes ?? 0) - replay._count })
+  }
   for (const ace of aces) stats.set(ace.accountId, { ...entryOf(ace.accountId), aces: ace._count })
 
   return stats

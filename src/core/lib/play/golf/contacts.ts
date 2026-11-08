@@ -1,3 +1,4 @@
+import { bounceBack, bouncerOf } from '@/core/lib/play/golf/bounce'
 import type { GolfBody } from '@/core/lib/play/golf/body'
 import { halt, isInPlay, speedOf } from '@/core/lib/play/golf/body'
 import {
@@ -6,13 +7,58 @@ import {
   collideSpinner,
   collideTotem,
   collideWall,
+  isWallFacing,
+  kickAway,
+  reflectOff,
+  wallBounce,
 } from '@/core/lib/play/golf/collide'
+import { collidersOf, queryGrid, sweepBox, sweepSegment } from '@/core/lib/play/golf/colliders'
+import type { GolfSweepHit } from '@/core/lib/play/golf/colliders'
 import { boostId } from '@/core/lib/play/golf/terrain'
 import type { GolfWorld } from '@/core/lib/play/golf/world'
 import { pairKey } from '@/core/lib/play/golf/world'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 const { physics } = GOLF_SETTINGS
+
+// Gap left at a swept contact
+const CONTACT_GAP = 1e-4
+
+/**
+ * Walls the substep move crossed, the first one met stops it there
+ * @param {GolfWorld} world - Simulation
+ * @param {GolfBody} body - Body
+ * @return {number[]} - Walls near the move
+ */
+
+const sweepWalls = (world: GolfWorld, body: GolfBody): number[] => {
+  const { walls, wallGrid } = collidersOf(world.input.hole)
+  const move = [body.lastX, body.lastZ, body.x - body.lastX, body.z - body.lastZ]
+  const near = queryGrid(wallGrid, sweepBox([body.lastX, body.lastZ, body.x, body.z], body.radius))
+  let first: (GolfSweepHit & { index: number }) | null = null
+  for (const index of near) {
+    const wall = walls[index]
+    if (!isWallFacing(body, wall)) continue
+    const hit = sweepSegment(move, [wall.ax, wall.az, wall.bx, wall.bz], body.radius)
+    if (hit && (!first || hit.t < first.t)) first = { ...hit, index }
+  }
+  if (!first) return near
+
+  // Back to the contact, a hair off
+  body.x = body.lastX + move[2] * first.t + first.nx * CONTACT_GAP
+  body.z = body.lastZ + move[3] * first.t + first.nz * CONTACT_GAP
+  const struck = walls[first.index]
+  const impact = reflectOff(body, first.nx, first.nz, wallBounce(struck))
+  if (impact && struck.isBouncy) kickAway(body, struck)
+  if (impact > physics.hitSound) world.emit('wall', body.id, impact)
+  if (body.isSticky) {
+    body.vx = 0
+    body.vz = 0
+    if (!body.isAirborne) halt(body)
+  }
+
+  return near
+}
 
 /**
  * Rails, cliffs and boxes, sticky walls hold the ball
@@ -22,8 +68,11 @@ const { physics } = GOLF_SETTINGS
  */
 
 const hitWalls = (world: GolfWorld, body: GolfBody): void => {
-  for (const wall of world.input.hole.walls) {
-    const impact = collideWall(body, wall)
+  const { walls } = collidersOf(world.input.hole)
+  const near = sweepWalls(world, body)
+  if (!body.isMoving) return
+  for (const index of near) {
+    const impact = collideWall(body, walls[index])
     if (!impact) continue
     if (impact > physics.hitSound) world.emit('wall', body.id, impact)
     if (!body.isSticky) continue
@@ -106,6 +155,41 @@ const hitTotems = (world: GolfWorld, body: GolfBody, seconds: number): void => {
 const isSolid = (body: GolfBody): boolean => isInPlay(body) && !body.isGhost && !body.isUntouchable
 
 /**
+ * Pairs of balls sharing a cell or its neighbours, one at least moving
+ * @param {GolfBody[]} bodies - Solid balls
+ * @return {[GolfBody, GolfBody][]} - Pairs, each once
+ */
+
+export const nearPairs = (bodies: GolfBody[]): [GolfBody, GolfBody][] => {
+  const cell = Math.max(physics.gridCell, 2 * Math.max(0, ...bodies.map((body) => body.radius)))
+  const keyOf = (col: number, row: number) => `${col}:${row}`
+  const cells = new Map<string, number[]>()
+  bodies.forEach((body, index) => {
+    const key = keyOf(Math.floor(body.x / cell), Math.floor(body.z / cell))
+    cells.set(key, [...(cells.get(key) ?? []), index])
+  })
+
+  // Moving balls look around them
+  const pairs: [GolfBody, GolfBody][] = []
+  bodies.forEach((body, index) => {
+    if (!body.isMoving) return
+    const col = Math.floor(body.x / cell)
+    const row = Math.floor(body.z / cell)
+    for (let dc = -1; dc <= 1; dc += 1) {
+      for (let dr = -1; dr <= 1; dr += 1) {
+        for (const other of cells.get(keyOf(col + dc, row + dr)) ?? []) {
+          // Moving pairs once, by index
+          if (other === index || (bodies[other].isMoving && other < index)) continue
+          pairs.push([body, bodies[other]])
+        }
+      }
+    }
+  })
+
+  return pairs
+}
+
+/**
  * Every pair of solid balls, one at least moving
  * @param {GolfWorld} world - Simulation
  * @return {void}
@@ -113,20 +197,21 @@ const isSolid = (body: GolfBody): boolean => isInPlay(body) && !body.isGhost && 
 
 const hitBalls = (world: GolfWorld): void => {
   const solid = world.bodies.filter(isSolid)
-  solid.forEach((left, index) => {
-    for (const right of solid.slice(index + 1)) {
-      if (!left.isMoving && !right.isMoving) continue
-      const key = pairKey(left, right)
-      // Pairs born touching wait to part
-      if (world.exempt.has(key)) {
-        const apart = Math.hypot(left.x - right.x, left.z - right.z) >= left.radius + right.radius
-        if (apart) world.exempt.delete(key)
-        continue
-      }
-      const impact = collideBalls(left, right)
-      if (impact > physics.hitSound) world.emit('ball', left.id, impact)
+  for (const [left, right] of nearPairs(solid)) {
+    const key = pairKey(left, right)
+    // Pairs born touching wait to part
+    if (world.exempt.has(key)) {
+      const apart = Math.hypot(left.x - right.x, left.z - right.z) >= left.radius + right.radius
+      if (apart) world.exempt.delete(key)
+      continue
     }
-  })
+    // Bumper ball sends the other back
+    const bouncer = bouncerOf(left, right)
+    const kept = bouncer && { vx: bouncer[0].vx, vz: bouncer[0].vz }
+    const impact = collideBalls(left, right)
+    if (bouncer && kept && impact > 0) bounceBack(world, bouncer[0], bouncer[1], kept)
+    else if (impact > physics.hitSound) world.emit('ball', left.id, impact)
+  }
 }
 
 /**

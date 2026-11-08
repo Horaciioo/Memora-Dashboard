@@ -25,6 +25,7 @@ export const GolfStartVote = ({
 
   return (
     <GolfVote
+      sessionId={sessionId}
       vote={vote}
       settings={golfSettingsOf(settings)}
       serverTime={serverTime}

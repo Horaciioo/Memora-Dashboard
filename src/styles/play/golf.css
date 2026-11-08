@@ -1,0 +1,46 @@
+/* Golf hand nudged by an orb met with a full hand */
+@utility golf-hand-full {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: golf-hand-full 420ms var(--motion-ease-out);
+  }
+}
+
+@keyframes golf-hand-full {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  20% {
+    translate: -0.35rem 0;
+  }
+  45% {
+    translate: 0.3rem 0;
+  }
+  70% {
+    translate: -0.15rem 0;
+  }
+}
+
+/* Active power sliding in from the right */
+@utility golf-active-in {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: golf-active-in 320ms var(--motion-ease-out) backwards;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: golf-active-fade 150ms ease-out backwards;
+  }
+}
+
+@keyframes golf-active-in {
+  from {
+    opacity: 0;
+    translate: 1.5rem 0;
+    scale: 0.6;
+  }
+}
+
+@keyframes golf-active-fade {
+  from {
+    opacity: 0;
+  }
+}

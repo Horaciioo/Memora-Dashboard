@@ -2,7 +2,7 @@ import type { GolfBody } from '@/core/lib/play/golf/body'
 import { halt, speedOf } from '@/core/lib/play/golf/body'
 import { isEffectActive } from '@/core/lib/play/golf/effects'
 import { padByArea, padHeight, padUnder } from '@/core/lib/play/golf/terrain'
-import type { GolfHazard, GolfHole, GolfPoint } from '@/core/lib/play/golf/types'
+import type { GolfFan, GolfHazard, GolfHole, GolfPoint } from '@/core/lib/play/golf/types'
 import type { GolfWorld } from '@/core/lib/play/golf/world'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPowers, GolfSurfaces } from '@/utils/constants/play'
@@ -32,13 +32,24 @@ export const hazardSpot = (hazard: GolfHazard, at: number): { x: number; z: numb
 }
 
 /**
+ * Fan blowing at a moment of the hole clock, always when it has no cycle
+ * @param {GolfFan} fan - Fan
+ * @param {number} seconds - Hole clock
+ * @return {boolean} - Blowing
+ */
+
+export const isFanBlowing = (fan: GolfFan, seconds: number): boolean =>
+  !fan.period || Math.sin((2 * Math.PI * seconds) / fan.period + (fan.phase ?? 0)) > 0
+
+/**
  * Pull of the vortexes and push of the fans
  * @param {GolfBody} body - Body
  * @param {GolfHole} hole - Hole
+ * @param {number} [seconds] - Hole clock
  * @return {[number, number]} - Acceleration
  */
 
-export const obstaclePull = (body: GolfBody, hole: GolfHole): [number, number] => {
+export const obstaclePull = (body: GolfBody, hole: GolfHole, seconds = 0): [number, number] => {
   let ax = 0
   let az = 0
   for (const vortex of hole.vortexes) {
@@ -52,6 +63,7 @@ export const obstaclePull = (body: GolfBody, hole: GolfHole): [number, number] =
   }
   for (const fan of hole.fans) {
     if (body.x < fan.x0 || body.x > fan.x1 || body.z < fan.z0 || body.z > fan.z1) continue
+    if (!isFanBlowing(fan, seconds)) continue
     ax += fan.push[0] * obstacles.fanAccel
     az += fan.push[1] * obstacles.fanAccel
   }

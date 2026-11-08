@@ -10,20 +10,27 @@ import { GolfCameraRig } from '@/composites/play/golf/scene/GolfCameraRig'
 import { GolfConfetti } from '@/composites/play/golf/scene/GolfConfetti'
 import { GolfControls } from '@/composites/play/golf/scene/GolfControls'
 import { GolfCourse } from '@/composites/play/golf/scene/GolfCourse'
+import { GolfCupCheer } from '@/composites/play/golf/scene/GolfCupCheer'
+import { GolfDecorCubes } from '@/composites/play/golf/scene/GolfDecorCubes'
 import { GolfFixtures } from '@/composites/play/golf/scene/GolfFixtures'
+import { GolfGridGlow } from '@/composites/play/golf/scene/GolfGridGlow'
 import { GolfGusts } from '@/composites/play/golf/scene/GolfGusts'
+import { GolfHitboxes } from '@/composites/play/golf/scene/GolfHitboxes'
 import { courseMap, neighboursOf, takenRects } from '@/composites/play/golf/scene/map'
 import { GolfNeighbours } from '@/composites/play/golf/scene/GolfNeighbours'
+import { GolfLowMist } from '@/composites/play/golf/scene/GolfLowMist'
 import { GolfMist } from '@/composites/play/golf/scene/GolfMist'
 import { GolfObstacles } from '@/composites/play/golf/scene/GolfObstacles'
+import { GolfProbe } from '@/composites/play/golf/scene/GolfProbe'
 import { GolfScenery } from '@/composites/play/golf/scene/GolfScenery'
 import { GolfMotionDriver } from '@/composites/play/golf/scene/GolfMotionDriver'
 import { GolfSpecks } from '@/composites/play/golf/scene/GolfSpecks'
+import { GolfStageTransition } from '@/composites/play/golf/scene/GolfStageTransition'
 import { GolfSun } from '@/composites/play/golf/scene/GolfSun'
 import { readPaint, seatColor } from '@/composites/play/golf/scene/paint'
 import type { GolfRig } from '@/composites/play/golf/scene/rig'
 import type { GolfFace } from '@/composites/play/golf/types'
-import { activePowers } from '@/core/lib/play/golf'
+import { activePowers, courseAt, floorHeight } from '@/core/lib/play/golf'
 import { useGolfPrefsStore } from '@/core/store/golfPrefs'
 import type {
   GolfBoardState,
@@ -39,7 +46,7 @@ import type { GolfThemeName } from '@/declarations/play/golf/themes'
 import { GOLF_SCENE_UI } from '@/declarations/ui/variants'
 import { GolfPowers } from '@/utils/constants/play'
 
-const { camera, render } = GOLF_SETTINGS
+const { camera, physics, render } = GOLF_SETTINGS
 
 // Ice power laid, if any
 const iceOf = (hazards: GolfHazard[]): GolfHazard | null =>
@@ -67,12 +74,18 @@ export interface GolfSceneProps {
   canShoot: boolean
   // Power being placed, its reach
   placeRadius: number | null
+  // Teleporter square half side
+  placeSquare: number | null
+  canPlace: (x: number, z: number) => boolean
   // Server minus local clock
   serverOffset: number
   onShoot: (angle: number, power: number) => void
   onPlace: (x: number, z: number) => void
   onCancel: () => void
   onOverview: () => void
+  // Admin free view: hitboxes and the ground spot looked at
+  isInspecting?: boolean
+  onProbe?: (spot: [number, number] | null) => void
 }
 
 /**
@@ -96,12 +109,22 @@ const GolfScene = ({
   rigRef,
   canShoot,
   placeRadius,
+  placeSquare,
   serverOffset,
+  isInspecting = false,
+  onProbe,
   ...handlers
 }: GolfSceneProps) => {
   const paint = useMemo(() => readPaint(coursePaint), [coursePaint])
   // Modest phones draw lighter
   const [isSlow] = useState(() => navigator.hardwareConcurrency <= render.liteCores)
+  const [isReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  // Dev wireframes on a query flag
+  const [hasHitboxes] = useState(
+    () =>
+      process.env.NODE_ENV === 'development' &&
+      new URLSearchParams(window.location.search).has(GOLF_SCENE.hitbox.query)
+  )
   const { showPlayers, hasMist, hasSpecks, isLight } = useGolfPrefsStore()
   const isLite = isSlow || isLight
   const lawn = useRef<Group>(null)
@@ -117,6 +140,17 @@ const GolfScene = ({
   const origin = courseMap(mapHoles)[mapIndex] ?? ORIGIN
   const neighbours = useMemo(() => neighboursOf(mapHoles, mapIndex), [mapHoles, mapIndex])
   const taken = useMemo(() => takenRects(neighbours), [neighbours])
+  // Tee of the next hole when it stands on this map
+  const nextTee = useMemo(() => {
+    const isSameMap =
+      board.hole + 1 < board.holes && courseAt(board.settings, board.hole + 1) === mapKey
+    const next = isSameMap ? neighbours.find(({ rank }) => rank === mapIndex + 1) : undefined
+    if (!next) return null
+    const [tx, tz] = next.hole.tee
+    const floor = floorHeight(next.hole, tx, tz) ?? 0
+
+    return { x: next.at[0] + tx, y: floor + physics.ballRadius, z: next.at[1] + tz }
+  }, [board.hole, board.holes, board.settings, mapKey, mapIndex, neighbours])
   const me = board.players.find((player) => player.accountId === viewerId)
   const myColor = useMemo(() => seatColor(seatOf(viewerId)), [seatOf, viewerId])
   const myPowers = () => activePowers(me?.effects ?? [], serverNow())
@@ -142,7 +176,13 @@ const GolfScene = ({
       <hemisphereLight args={[paint.sky, paint.side, light.hemisphere]} />
       <GolfSun hole={hole} hasShadows={!isLite} />
       <GolfScenery hole={hole} paint={paint} theme={theme} taken={taken} />
-      {hasMist && <GolfMist hole={hole} paint={paint} />}
+      <GolfDecorCubes hole={hole} paint={paint} taken={taken} />
+      {hasMist && (
+        <>
+          <GolfMist hole={hole} paint={paint} />
+          <GolfLowMist hole={hole} paint={paint} />
+        </>
+      )}
 
       <GolfCourse
         hole={hole}
@@ -162,10 +202,16 @@ const GolfScene = ({
         takenOrbs={board.orbs}
         hazards={board.hazards}
         seatOf={seatOf}
+        faceOf={(accountId) => faces.find((face) => face.accountId === accountId)}
       />
-      <GolfObstacles hole={hole} paint={paint} clock={clock} />
+      <GolfObstacles hole={hole} paint={paint} clock={clock} motionRef={motionRef} />
+      {isInspecting && onProbe && <GolfProbe lawn={lawn} onProbe={onProbe} />}
+      {(hasHitboxes || isInspecting) && (
+        <GolfHitboxes hole={hole} hazards={board.hazards} paint={paint} serverNow={serverNow} />
+      )}
       <GolfGusts hole={hole} paint={paint} hazards={board.hazards} serverNow={serverNow} />
       <GolfBalls
+        isFrozen={Boolean(iceOf(board.hazards))}
         players={board.players}
         faces={faces}
         viewerId={viewerId}
@@ -177,9 +223,29 @@ const GolfScene = ({
         paint={paint}
         serverNow={serverNow}
       />
+      <GolfGridGlow
+        players={board.players}
+        viewerId={viewerId}
+        motionRef={motionRef}
+        rigRef={rigRef}
+        origin={origin}
+        isStill={isReduced}
+      />
+      <GolfStageTransition
+        rigRef={rigRef}
+        closedAt={board.closedAt}
+        serverNow={serverNow}
+        playerIds={board.players
+          .filter((player) => !player.hasLeft)
+          .map((player) => player.accountId)}
+        nextTee={nextTee}
+        isLast={board.hole + 1 >= board.holes}
+      />
       <GolfMotionDriver motionRef={motionRef} players={board.players} viewerId={viewerId} />
       <GolfConfetti hole={hole} paint={paint} motionRef={motionRef} />
+      <GolfCupCheer hole={hole} faces={faces} paint={paint} />
       <GolfControls
+        isFrozen={Boolean(iceOf(board.hazards))}
         hole={hole}
         paint={paint}
         color={myColor}
@@ -190,9 +256,17 @@ const GolfScene = ({
         canShoot={canShootNow}
         isPlacing={placeRadius !== null}
         placeRadius={placeRadius ?? 0}
+        placeSquare={placeSquare}
         {...handlers}
       />
-      <GolfCameraRig rigRef={rigRef} hole={hole} focusId={focusId} map={mapKey} origin={origin} />
+      <GolfCameraRig
+        rigRef={rigRef}
+        hole={hole}
+        focusId={focusId}
+        map={mapKey}
+        origin={origin}
+        taken={taken}
+      />
     </Canvas>
   )
 }

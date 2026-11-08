@@ -14,15 +14,21 @@ import { cn } from '@/utils/classnames'
  * @param {Object} props - View
  * @param {boolean} props.isOverview - Whole hole shown
  * @param {() => void} props.onOverview - Switch view
+ * @param {string} props.sessionId - Session id
+ * @param {boolean} props.isSeated - Viewer plays
  * @return {JSX.Element}
  */
 
 export const GolfViewKeys = ({
   isOverview,
   onOverview,
+  sessionId,
+  isSeated,
 }: {
   isOverview: boolean
   onOverview: () => void
+  sessionId: string
+  isSeated: boolean
 }) => {
   const [isOpen, setOpen] = useState(false)
   const ViewIcon = isOverview ? ICONS.golfFollow : ICONS.golfOverview
@@ -81,7 +87,7 @@ export const GolfViewKeys = ({
           </button>
         )}
       </div>
-      {isOpen && <GolfSettings />}
+      {isOpen && <GolfSettings sessionId={sessionId} isSeated={isSeated} />}
     </div>
   )
 }

@@ -25,9 +25,13 @@ export interface GolfHudProps {
   phase: GolfPhaseName
   // Own strokes, none for spectators
   strokes: number | null
+  // Par of the hole, none for points holes
+  par?: number | null
   maxStrokes: number
   isOverview: boolean
   onOverview: () => void
+  sessionId: string
+  isSeated: boolean
 }
 
 /**
@@ -41,9 +45,12 @@ export const GolfHud = ({
   faces,
   phase,
   strokes,
+  par = null,
   maxStrokes,
   isOverview,
   onOverview,
+  sessionId,
+  isSeated,
 }: GolfHudProps) => {
   const now = useServerNow(new Date(board.serverTime))
   const left = phase === GolfPhases.Playing ? (board.endsAt - now) / 1000 : 0
@@ -59,6 +66,15 @@ export const GolfHud = ({
           </span>
         </div>
         <span className={GOLF_BOARD.divider} aria-hidden="true" />
+        {par !== null && (
+          <>
+            <div className={GOLF_BOARD.holeBlock}>
+              <span className={GOLF_BOARD.caption}>{GOLF_BOARD_COPY.par}</span>
+              <span className={GOLF_BOARD.figure}>{par}</span>
+            </div>
+            <span className={GOLF_BOARD.divider} aria-hidden="true" />
+          </>
+        )}
         {strokes !== null && (
           <>
             <div className={GOLF_BOARD.holeBlock}>
@@ -113,7 +129,12 @@ export const GolfHud = ({
         })}
       </ul>
 
-      <GolfViewKeys isOverview={isOverview} onOverview={onOverview} />
+      <GolfViewKeys
+        isOverview={isOverview}
+        onOverview={onOverview}
+        sessionId={sessionId}
+        isSeated={isSeated}
+      />
     </div>
   )
 }

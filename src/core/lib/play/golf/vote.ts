@@ -5,7 +5,8 @@ import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GOLF_VOTE_TIMING, GolfVoteSteps } from '@/declarations/play/golf/vote'
 import type { GolfVoteStep } from '@/declarations/play/golf/vote'
 import { GolfModes } from '@/utils/constants/play'
-import { holeRange } from '@/core/lib/play/golf/settings'
+import { deckDuration } from '@/core/lib/play/golf/deck'
+import { drawCourse, golfSettingsOf, holeRange } from '@/core/lib/play/golf/settings'
 import type { GolfGameSettings } from '@/core/lib/play/golf/settings'
 
 /**
@@ -22,6 +23,8 @@ export interface GolfVoteState {
   endsAt: number
   picks: Record<string, string>
   chosen: Partial<Record<GolfVoteStep, string>>
+  // Server ms the tournament draw started, the vote is over
+  dealtAt?: number
 }
 
 /**
@@ -128,3 +131,22 @@ export const golfVoteSettings = (
   holes: Math.min(settings.holes, holeRange(chosen.course ?? settings.course).max),
   ...(chosen.rounds && { maps: Number(chosen.rounds) }),
 })
+
+/**
+ * Tournament plan drawn when the vote ends, shown as a deck before the start
+ * @param {Prisma.JsonValue} settled - Settings the vote ended on
+ * @return {{ settings: Prisma.InputJsonObject, ms: number } | null} - Dealt settings and draw length, none outside a tournament
+ */
+
+export const golfDeal = (
+  settled: Prisma.JsonValue
+): { settings: Prisma.InputJsonObject; ms: number } | null => {
+  const settings = golfSettingsOf(settled)
+  if (settings.mode !== GolfModes.Tournament) return null
+  const drawn = { ...drawCourse({ ...settings, dealt: false }), dealt: true }
+
+  return {
+    settings: { ...(settled as Prisma.InputJsonObject), ...drawn } as Prisma.InputJsonObject,
+    ms: deckDuration(GOLF_COURSES.keys.length, drawn.plan?.length ?? 0),
+  }
+}

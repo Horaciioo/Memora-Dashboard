@@ -1,17 +1,18 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import { GolfResult } from '@/composites/play/golf/GolfResult'
 import { GolfStats } from '@/composites/play/golf/hud/GolfStats'
 import { GolfBreak } from '@/composites/play/golf/hud/GolfBreak'
-import { GolfCheer } from '@/composites/play/golf/hud/GolfCheer'
 import { GolfCountdown } from '@/composites/play/golf/hud/GolfCountdown'
 import { GolfFooter } from '@/composites/play/golf/hud/GolfFooter'
 import { GolfFrost } from '@/composites/play/golf/hud/GolfFrost'
 import { GolfPowerCue } from '@/composites/play/golf/hud/GolfPowerCue'
 import { GolfWatchPicker } from '@/composites/play/golf/hud/GolfWatchPicker'
+import { GolfActiveStack } from '@/composites/play/golf/hud/GolfActiveStack'
 import { GolfHud } from '@/composites/play/golf/hud/GolfHud'
 import { golfStatus } from '@/composites/play/golf/status'
 import type { GolfFace } from '@/composites/play/golf/types'
@@ -27,20 +28,23 @@ import { useGolfWatch } from '@/core/hooks/interaction/golf/useGolfWatch'
 import { useServerAlarm } from '@/core/hooks/interaction/state/useServerAlarm'
 import {
   canPlaceAt,
-  closestRival,
+  canTeleportTo,
   courseAt,
   holeFor,
   holesOf,
+  parOfLayout,
   strokeCeiling,
+  teleportReach,
 } from '@/core/lib/play/golf'
 import type { GolfBoardState, GolfBoardView } from '@/core/lib/play/golf'
+import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_COURSES } from '@/declarations/play/golf/courses'
 import { golfHudTones } from '@/declarations/play/golf/paint'
 import { GOLF_POWERS, GolfPowerTargets } from '@/declarations/play/golf/powers'
 import { GOLF_POWER_SOUNDS } from '@/declarations/play/golf/sounds'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
-import { GolfPhases } from '@/utils/constants/play'
+import { GolfPhases, GolfPowers } from '@/utils/constants/play'
 import type { GolfPowerName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
 
@@ -56,6 +60,8 @@ export interface GolfBoardProps {
   faces: GolfFace[]
   viewerId: string
   isSeated: boolean
+  // Hitboxes and ground spots in the free view
+  canInspect?: boolean
 }
 
 /**
@@ -92,6 +98,7 @@ export const GolfBoard = ({
   faces,
   viewerId,
   isSeated,
+  canInspect = false,
 }: GolfBoardProps) => {
   const live = useGolfBoard(sessionId, initial)
   const board = useSettledBall(live)
@@ -120,28 +127,34 @@ export const GolfBoard = ({
   const watch = useGolfWatch(
     board.players.filter((player) => !player.hasLeft).map((player) => player.accountId),
     ownFocusId,
-    !isSeated
+    !isSeated && !table.isFree
   )
   const focusId = isSeated ? ownFocusId : watch.focusId
+  // Course spot under the screen centre, for admins fixing a course
+  const [probe, setProbe] = useState<[number, number] | null>(null)
   const card = {
     players: board.players,
     faces,
     holes: layouts.length,
+    pars: layouts.map(parOfLayout),
     viewerId,
   }
   if (phase === GolfPhases.Over) return <GolfResult {...card} />
 
-  // Laid powers wait for a spot, a swap takes the best placed rival until the picker lands
+  // Laid powers wait for a spot
   const playPower = (power: GolfPowerName, slot: number) => {
-    const { target } = GOLF_POWERS.get(power)
-    if (target === GolfPowerTargets.Place) return table.setPlacing({ power, slot })
+    if (GOLF_POWERS.get(power).target === GolfPowerTargets.Place) {
+      return table.setPlacing({ power, slot })
+    }
     playGolfSound(GOLF_POWER_SOUNDS[power] ?? 'power')
-    const rival =
-      target === GolfPowerTargets.Player ? closestRival(board.players, hole, viewerId) : null
-    void stroke.power({ slot, ...(rival && { targetId: rival }) })
+    void stroke.power({ slot })
   }
+  // Teleporter lands near the ball, the server waits for the stop
+  const isTeleport = table.placing?.power === GolfPowers.Teleport
+  const canPlace = (x: number, z: number) =>
+    isTeleport ? me !== undefined && canTeleportTo(hole, me, { x, z }) : canPlaceAt(hole, x, z)
   const place = (x: number, z: number) => {
-    if (!table.placing || !canPlaceAt(hole, x, z)) return
+    if (!table.placing || !canPlace(x, z)) return
     const { power, slot } = table.placing
     table.setPlacing(null)
     playGolfSound(GOLF_POWER_SOUNDS[power] ?? 'power')
@@ -169,21 +182,41 @@ export const GolfBoard = ({
           rigRef={table.rigRef}
           canShoot={isOpen}
           placeRadius={table.placing ? (GOLF_POWERS.get(table.placing.power).reach ?? 0) : null}
+          placeSquare={isTeleport ? teleportReach() : null}
+          canPlace={canPlace}
           serverOffset={offset}
           onShoot={stroke.shoot}
           onPlace={place}
           onCancel={() => table.setPlacing(null)}
           onOverview={table.toggleView}
+          isInspecting={canInspect && table.isFree}
+          onProbe={setProbe}
         />
+        {canInspect && table.isFree && probe && (
+          <p className={GOLF_BOARD.probe}>
+            {fillPlayMessage(GOLF_BOARD_COPY.probe, {
+              x: probe[0].toFixed(2),
+              z: probe[1].toFixed(2),
+            })}
+          </p>
+        )}
         <GolfFrost board={board} />
         <GolfHud
           board={board}
           faces={faces}
           phase={phase}
           strokes={me?.strokes ?? null}
+          par={hole.par}
           maxStrokes={strokeCeiling(board.settings)}
           isOverview={table.isOverview}
           onOverview={table.toggleView}
+          sessionId={sessionId}
+          isSeated={isSeated}
+        />
+        <GolfActiveStack
+          board={board}
+          faces={faces}
+          viewerId={isSeated ? viewerId : (focusId ?? viewerId)}
         />
         <GolfFooter
           slot={
@@ -191,14 +224,14 @@ export const GolfBoard = ({
               ? {
                   me,
                   settings: board.settings,
-                  serverTime: board.serverTime,
                   canUse: phase === GolfPhases.Playing,
+                  isLastHole: board.hole + 1 >= board.holes,
                   isSaving: stroke.isSaving,
                   onUse: playPower,
                 }
               : null
           }
-          status={golfStatus({ me, phase })}
+          status={golfStatus({ me, phase, par: hole.par })}
           panel={{
             board,
             faces,
@@ -216,9 +249,11 @@ export const GolfBoard = ({
               board.players.some((player) => player.accountId === face.accountId && !player.hasLeft)
             )}
             watch={watch}
+            isFree={table.isFree}
+            onFree={table.setFree}
+            onRise={(sign) => table.rigRef.current.free.move.setY(sign)}
           />
         )}
-        <GolfCheer />
         <GolfPowerCue cue={cue} />
         {phase === GolfPhases.Countdown && (
           <GolfCountdown

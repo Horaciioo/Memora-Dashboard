@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { GolfPanorama } from '@/composites/play/golf/panorama/GolfPanorama'
+import { GolfTournamentDeck } from '@/composites/play/golf/vote/GolfTournamentDeck'
 import { GolfVoteDeck } from '@/composites/play/golf/vote/GolfVoteDeck'
 import { GolfVoteTimer } from '@/composites/play/golf/vote/GolfVoteTimer'
 import {
@@ -34,6 +35,8 @@ const GolfCourseShots = dynamic(() => import('@/composites/play/golf/panorama/Go
 const SHOTS = new Map<string, string>()
 
 export interface GolfVoteProps {
+  // Game id, seeds the tournament deck
+  sessionId: string
   vote: GolfVoteState
   settings: GolfGameSettings
   // Server ms at the page render
@@ -55,6 +58,7 @@ export interface GolfVoteProps {
  */
 
 export const GolfVote = ({
+  sessionId,
   vote,
   settings,
   serverTime,
@@ -109,47 +113,79 @@ export const GolfVote = ({
   }
   // Only the step on screen is built, the leader belongs to its cards
   const screen = screens[step]()
+  const isDealing = Boolean(vote.dealtAt && settings.plan?.length)
 
   return createPortal(
-    <div className={GOLF_VOTE.root} role="dialog" aria-label={screen.title}>
+    <div
+      className={GOLF_VOTE.root}
+      role="dialog"
+      aria-label={isDealing ? GOLF_VOTE_COPY.deckTitle : screen.title}
+    >
       <GolfPanorama
-        course={step === GolfVoteSteps.Course && leader !== GOLF_RANDOM_COURSE ? leader : undefined}
+        course={
+          !isDealing && step === GolfVoteSteps.Course && leader !== GOLF_RANDOM_COURSE
+            ? leader
+            : undefined
+        }
       />
-      <div className={GOLF_VOTE.stage}>
-        <div key={`head-${step}`} className={GOLF_VOTE.head}>
-          <h2 className={GOLF_VOTE.title}>{screen.title}</h2>
-          <p className={GOLF_VOTE.lead}>{screen.lead}</p>
+      {isDealing ? (
+        <div className={GOLF_VOTE.stage}>
+          <div className={GOLF_VOTE.head}>
+            <h2 className={GOLF_VOTE.title}>{GOLF_VOTE_COPY.deckTitle}</h2>
+            <p className={GOLF_VOTE.lead}>{GOLF_VOTE_COPY.deckLead}</p>
+          </div>
+          <GolfTournamentDeck
+            plan={settings.plan ?? []}
+            dealtAt={vote.dealtAt ?? 0}
+            endsAt={vote.endsAt}
+            serverTime={serverTime}
+            seed={sessionId}
+            shots={shots}
+            onDone={close}
+          />
         </div>
-        <GolfVoteDeck
-          key={step}
-          cards={screen.cards}
-          value={leader}
-          voters={voters}
-          isCourse={step === GolfVoteSteps.Course}
-          onPick={pick}
-        />
-        <p key={`hint-${leader}`} className={cn(GOLF_VOTE.hint, 'golf-vote-title')}>
-          {screen.hint}
-        </p>
-        <div className={GOLF_VOTE.actions}>
-          {isHost && (
-            <button type="button" className={GOLF_VOTE.button} onClick={back} disabled={isSaving}>
-              {GOLF_VOTE_COPY.back}
-            </button>
-          )}
-          <GolfVoteTimer key={step} endsAt={vote.endsAt} serverTime={serverTime} onExpire={close} />
-          {isHost && (
-            <button
-              type="button"
-              className={cn(GOLF_VOTE.button, GOLF_VOTE.buttonMain)}
-              onClick={validate}
-              disabled={isSaving}
-            >
-              {GOLF_VOTE_COPY.confirm}
-            </button>
-          )}
+      ) : (
+        <div className={GOLF_VOTE.stage}>
+          <div key={`head-${step}`} className={GOLF_VOTE.head}>
+            <h2 className={GOLF_VOTE.title}>{screen.title}</h2>
+            <p className={GOLF_VOTE.lead}>{screen.lead}</p>
+          </div>
+          <GolfVoteDeck
+            key={step}
+            cards={screen.cards}
+            value={leader}
+            voters={voters}
+            isCourse={step === GolfVoteSteps.Course}
+            onPick={pick}
+          />
+          <p key={`hint-${leader}`} className={cn(GOLF_VOTE.hint, 'golf-vote-title')}>
+            {screen.hint}
+          </p>
+          <div className={GOLF_VOTE.actions}>
+            {isHost && (
+              <button type="button" className={GOLF_VOTE.button} onClick={back} disabled={isSaving}>
+                {GOLF_VOTE_COPY.back}
+              </button>
+            )}
+            <GolfVoteTimer
+              key={step}
+              endsAt={vote.endsAt}
+              serverTime={serverTime}
+              onExpire={close}
+            />
+            {isHost && (
+              <button
+                type="button"
+                className={cn(GOLF_VOTE.button, GOLF_VOTE.buttonMain)}
+                onClick={validate}
+                disabled={isSaving}
+              >
+                {GOLF_VOTE_COPY.confirm}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
       <GolfCourseShots
         missing={missing}
         onShot={(course, url) => {

@@ -27,6 +27,30 @@ export const playPowerChime = (): void => {
   playChime(POWER_CHIME, playLevelOf(PlayGames.Golf))
 }
 
+// Air rushing past a ball dropping back
+const RESPAWN_WHOOSH = { from: 900, to: 180, seconds: 0.22 }
+
+/**
+ * Whoosh of a lost ball dropping back on its spot
+ * @return {void}
+ */
+
+export const playRespawnWhoosh = (): void => {
+  playSweep(RESPAWN_WHOOSH, playLevelOf(PlayGames.Golf))
+}
+
+// Shorter fanfare of an own ball holed
+const CUP_FANFARE = POWER_CHIME.slice(0, 3)
+
+/**
+ * Fanfare of an own ball holed
+ * @return {void}
+ */
+
+export const playCupFanfare = (): void => {
+  playChime(CUP_FANFARE, playLevelOf(PlayGames.Golf))
+}
+
 // Boost zip pitch and length
 const BOOST_SWEEP = { from: 220, to: 1400, seconds: 0.35 }
 
@@ -37,4 +61,18 @@ const BOOST_SWEEP = { from: 220, to: 1400, seconds: 0.35 }
 
 export const playBoostSweep = (): void => {
   playSweep(BOOST_SWEEP, playLevelOf(PlayGames.Golf))
+}
+
+// Card sliding across the felt, card snapped on the table
+const DECK_SLIDE = { from: 420, to: 1100, seconds: 0.12 }
+const DECK_DEAL = { from: 1500, to: 600, seconds: 0.07 }
+
+/**
+ * Swish of a card of the tournament deck
+ * @param {boolean} [isDeal] - Card dealt, else sliding
+ * @return {void}
+ */
+
+export const playDeckCard = (isDeal = false): void => {
+  playSweep(isDeal ? DECK_DEAL : DECK_SLIDE, playLevelOf(PlayGames.Golf) * 0.4)
 }

@@ -1,13 +1,15 @@
 import { createRegistry } from '@/core/lib/registry'
 import type { GolfHoleLayout } from '@/core/lib/play/golf/types'
-import { ESPACE_HOLES } from '@/declarations/play/golf/courses/espace'
-import { PLAGE_HOLES } from '@/declarations/play/golf/courses/plage'
-import { TROPICAL_HOLES } from '@/declarations/play/golf/courses/tropical'
 import type { GolfThemeName } from '@/declarations/play/golf/themes'
-import { CANYON_HOLES } from '@/declarations/play/golf/courses/canyon'
-import { scaleLayout } from '@/declarations/play/golf/courses/scale'
-import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
-import { PRAIRIE_HOLES } from '@/declarations/play/golf/courses/prairie'
+import { BOINGTOWN_HOLES } from '@/declarations/play/golf/courses/boingtown'
+import { CANDY_HOLES } from '@/declarations/play/golf/courses/candy'
+import { DROPPINHIT_HOLES } from '@/declarations/play/golf/courses/droppinhit'
+import { RANDOMTOWN_HOLES } from '@/declarations/play/golf/courses/randomtown'
+import { SINGLETOWN_HOLES } from '@/declarations/play/golf/courses/singletown'
+import { SLIDETOWN_HOLES } from '@/declarations/play/golf/courses/slidetown'
+import { ZARBLAND_HOLES } from '@/declarations/play/golf/courses/zarbland'
+import { SPEEDTOWN_HOLES } from '@/declarations/play/golf/courses/speedtown'
+import { ZIGZAG_HOLES } from '@/declarations/play/golf/courses/zigzag'
 
 /**
  * One course of holes
@@ -31,53 +33,72 @@ export interface GolfCourseMeta {
 export const GOLF_RANDOM_COURSE = 'random'
 
 /**
- * Holes drawn at the corridor width of the game
- * @param {GolfHoleLayout[]} holes - Drawn holes
- * @return {GolfHoleLayout[]} - Scaled holes
- */
-
-const narrowed = (holes: GolfHoleLayout[]): GolfHoleLayout[] =>
-  holes.map((hole) => scaleLayout(hole, GOLF_SETTINGS.physics.layoutScale))
-
-/**
  * Golf courses
  * @type {Registry<string, GolfCourseMeta>}
  */
 
 export const GOLF_COURSES = createRegistry<string, GolfCourseMeta>({
-  prairie: {
-    label: 'La Prairie',
-    tagline: 'Six trous pour apprendre le swing puis les pouvoirs.',
-    theme: 'prairie',
-    paint: '--play-golf-prairie',
-    holes: narrowed(PRAIRIE_HOLES),
+  randomtown: {
+    label: 'RandomTown',
+    tagline: 'Six descentes, cinq trous à points, beaucoup de hasard.',
+    theme: 'randomtown',
+    paint: '--play-golf-randomtown',
+    holes: RANDOMTOWN_HOLES,
   },
-  canyon: {
-    label: 'Le Canyon',
-    tagline: 'Six trous entre l’eau, les falaises et le tremplin.',
-    theme: 'canyon',
-    paint: '--play-golf-canyon',
-    holes: narrowed(CANYON_HOLES),
+  speedtown: {
+    label: 'SpeedTown',
+    tagline: 'Six parcours de plaques, où tout se joue sur la vitesse.',
+    theme: 'speedtown',
+    paint: '--play-golf-speedtown',
+    holes: SPEEDTOWN_HOLES,
   },
-  tropical: {
-    label: 'Les Tropiques',
-    tagline: 'Six trous sous les palmiers, entre ventilateurs et passerelles.',
-    theme: 'tropical',
-    paint: '--play-golf-tropical',
-    holes: narrowed(TROPICAL_HOLES),
+  boingtown: {
+    label: 'BoingTown',
+    tagline: 'Rampes, vides et rebonds : la puissance du tir fait le saut.',
+    theme: 'boingtown',
+    paint: '--play-golf-boingtown',
+    holes: BOINGTOWN_HOLES,
   },
-  espace: {
-    label: 'L’Espace',
-    tagline: 'Six trous en orbite, avec portails et trous noirs.',
-    theme: 'espace',
-    paint: '--play-golf-espace',
-    holes: narrowed(ESPACE_HOLES),
+  zigzag: {
+    label: 'ZigZag',
+    tagline: 'Six parcours à portails, difficiles mais jamais impossibles.',
+    theme: 'zigzag',
+    paint: '--play-golf-zigzag',
+    holes: ZIGZAG_HOLES,
   },
-  plage: {
-    label: 'La Plage',
-    tagline: 'Six trous de sable, de vagues et de bouées.',
-    theme: 'plage',
-    paint: '--play-golf-plage',
-    holes: narrowed(PLAGE_HOLES),
+  singletown: {
+    label: 'SingleTown',
+    tagline: 'Six trous, un seul tir décisif au-dessus du gouffre.',
+    theme: 'singletown',
+    paint: '--play-golf-singletown',
+    holes: SINGLETOWN_HOLES,
+  },
+  slidetown: {
+    label: 'SlideTown',
+    tagline: 'Six toboggans, six trous à points au pied de la pente.',
+    theme: 'slidetown',
+    paint: '--play-golf-slidetown',
+    holes: SLIDETOWN_HOLES,
+  },
+  zarbland: {
+    label: 'ZarbLand',
+    tagline: 'Six trous où le vent joue avec vous.',
+    theme: 'zarbland',
+    paint: '--play-golf-zarbland',
+    holes: ZARBLAND_HOLES,
+  },
+  droppinhit: {
+    label: 'DroppinHit',
+    tagline: 'Six trous de golf classique, un piège chacun.',
+    theme: 'droppinhit',
+    paint: '--play-golf-droppinhit',
+    holes: DROPPINHIT_HOLES,
+  },
+  candy: {
+    label: 'Candy Kingdom',
+    tagline: 'Six classiques sucrés, des bâtons de sucre au gâteau à étages.',
+    theme: 'candy',
+    paint: '--play-golf-candy',
+    holes: CANDY_HOLES,
   },
 })

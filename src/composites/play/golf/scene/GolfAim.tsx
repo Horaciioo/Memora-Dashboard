@@ -6,11 +6,14 @@ import { useFrame } from '@react-three/fiber'
 import { Object3D, Shape, ShapeGeometry } from 'three'
 import type { Color, Group, InstancedMesh, Mesh } from 'three'
 
+import { aimErased } from '@/composites/play/golf/scene/fx/aimErase'
+import type { GolfPowerClock } from '@/composites/play/golf/scene/fx/stage'
+import { GolfPencil } from '@/composites/play/golf/scene/fx/GolfPencil'
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
 import { aimedAngle } from '@/composites/play/golf/scene/pointer'
 import type { GolfPointerState } from '@/composites/play/golf/scene/pointer'
 import type { GolfRig } from '@/composites/play/golf/scene/rig'
-import { aimGuide, groundFrom, isAimHidden, shownAngle } from '@/core/lib/play/golf'
+import { aimGuide, groundFrom } from '@/core/lib/play/golf'
 import type { GolfHole, GolfPad, GolfPoint } from '@/core/lib/play/golf'
 import type { GolfPowerName } from '@/utils/constants/play'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
@@ -85,7 +88,25 @@ const layDots = (
 }
 
 /**
- * Aim of a pull: stretched arm and ring behind, chevrons ahead, dotted guide to the first bounce
+ * Hides the first dots of a guide, wiped by the pencil
+ * @param {InstancedMesh} dots - Dots
+ * @param {number} count - Dots hidden
+ * @return {void}
+ */
+
+const hideFirst = (dots: InstancedMesh, count: number): void => {
+  if (count <= 0) return
+  const holder = new Object3D()
+  holder.scale.setScalar(0)
+  holder.updateMatrix()
+  for (let index = 0; index < Math.min(count, dots.count); index += 1) {
+    dots.setMatrixAt(index, holder.matrix)
+  }
+  dots.instanceMatrix.needsUpdate = true
+}
+
+/**
+ * Aim of a pull
  * @param {Object} props - Aim
  * @param {RefObject<GolfPointerState>} props.pointer - Live pull
  * @param {RefObject<GolfRig>} props.rigRef - Ball spots
@@ -94,6 +115,7 @@ const layDots = (
  * @param {GolfPaint} props.paint - Colours
  * @param {Color} props.color - Player colour
  * @param {() => Set<GolfPowerName>} props.powers - Powers on the own ball
+ * @param {boolean} props.isFrozen - Rink laid, guide turns dark
  * @return {JSX.Element}
  */
 
@@ -105,6 +127,7 @@ export const GolfAim = ({
   paint,
   color,
   powers,
+  isFrozen,
 }: {
   pointer: RefObject<GolfPointerState>
   rigRef: RefObject<GolfRig>
@@ -113,6 +136,7 @@ export const GolfAim = ({
   paint: GolfPaint
   color: Color
   powers: () => Set<GolfPowerName>
+  isFrozen: boolean
 }) => {
   const group = useRef<Group>(null)
   const ahead = useRef<Group>(null)
@@ -120,6 +144,9 @@ export const GolfAim = ({
   const arm = useRef<Mesh>(null)
   const ring = useRef<Mesh>(null)
   const dots = useRef<InstancedMesh>(null)
+  const pencil = useRef<Group>(null)
+  const clock = useRef<GolfPowerClock>(new Map())
+  const isFirst = useRef(true)
   const chevron = useMemo(() => headGeometry(arrow.width, arrow.length), [])
   useEffect(() => () => chevron.dispose(), [chevron])
 
@@ -127,11 +154,14 @@ export const GolfAim = ({
     const ball = myId ? rigRef.current.spots.get(myId) : undefined
     const { shot, grip } = pointer.current
     const held = powers()
-    const isAiming = Boolean(ball && shot) && !isAimHidden(held)
+    // Blind aim wiped by the pencil, drawn back once over
+    const erased = aimErased(clock.current, held, isFirst.current)
+    isFirst.current = false
+    const isAiming = Boolean(ball && shot) && erased < 1
     if (group.current) group.current.visible = isAiming
     if (!ball || !shot || !group.current || !ahead.current) return
-    // Mirror draws the lie
-    const angle = shownAngle(aimedAngle(shot, held), held)
+    // Arrow tells the truth, the ball follows it
+    const angle = aimedAngle(shot, held)
     const floor = ball.y - physics.ballRadius
     const ground = floor + arrow.lift
 
@@ -157,8 +187,19 @@ export const GolfAim = ({
         holder.updateMatrix()
         chevrons.current.setMatrixAt(index, holder.matrix)
       }
+      // Wiped from the ball outward
+      const kept = Math.ceil(erased * count)
+      holder.scale.setScalar(0)
+      holder.updateMatrix()
+      for (let index = 0; index < kept; index += 1)
+        chevrons.current.setMatrixAt(index, holder.matrix)
       chevrons.current.count = count
       chevrons.current.instanceMatrix.needsUpdate = true
+    }
+    if (pencil.current) {
+      const reach = erased * (arrow.start + (count + arrow.dots) * arrow.gap)
+      pencil.current.visible = erased > 0
+      pencil.current.position.set(0, 0, reach)
     }
 
     // Arm stretched to the finger, ring under it
@@ -186,19 +227,26 @@ export const GolfAim = ({
       })
       const skip = arrow.start + arrow.chevrons * arrow.gap
       layDots(dots.current, line, { pads: hole.pads, floor, skip })
+      hideFirst(dots.current, Math.ceil(erased * dots.current.count))
     }
   })
 
   return (
     <group ref={group} visible={false}>
       <group ref={ahead}>
+        <group ref={pencil} visible={false}>
+          <GolfPencil paint={paint} />
+        </group>
         <instancedMesh
           ref={chevrons}
           args={[chevron, undefined, arrow.chevrons]}
           renderOrder={2}
           frustumCulled={false}
         >
-          <meshBasicMaterial color={paint.pole} depthWrite={false} />
+          <meshBasicMaterial
+            color={isFrozen ? paint['trail-frozen'] : paint.pole}
+            depthWrite={false}
+          />
         </instancedMesh>
       </group>
       <mesh ref={arm} castShadow>
@@ -214,7 +262,7 @@ export const GolfAim = ({
       <instancedMesh ref={dots} args={[undefined, undefined, arrow.dots]}>
         <circleGeometry args={[arrow.dot, 12]} />
         <meshBasicMaterial
-          color={paint.pole}
+          color={isFrozen ? paint['trail-frozen'] : paint.pole}
           transparent
           opacity={arrow.dotOpacity}
           depthWrite={false}

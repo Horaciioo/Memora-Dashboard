@@ -10,10 +10,10 @@
 @import './play/arcade.css';
 @import './play/ludo.css';
 @import './play/naval.css';
+@import './play/golf.css';
 @import './play/sky.css';
 @import './play/invites.css';
 @import './base/root.css';
-@import './base/key.css';
 @import './base/motion.css';
 @import './base/comfort.css';
 @import './base/theme.css';

@@ -1,22 +1,33 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Vector3 } from 'three'
-import type { Group, Mesh } from 'three'
+import type { Group, Mesh, MeshBasicMaterial, MeshStandardMaterial } from 'three'
 
 import { avatarTexture } from '@/composites/play/golf/scene/avatarTexture'
+import { GolfBumper } from '@/composites/play/golf/scene/GolfBumper'
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
 import { seatColor } from '@/composites/play/golf/scene/paint'
 import { dropLift, eventScale } from '@/composites/play/golf/scene/ballPop'
 import { GolfFlashSwarm } from '@/composites/play/golf/scene/GolfFlashSwarm'
+import { ballLook } from '@/composites/play/golf/scene/fx/ballLook'
+import { GolfCastBurst } from '@/composites/play/golf/scene/fx/GolfCastBurst'
+import { tickPowers } from '@/composites/play/golf/scene/fx/stage'
+import type { GolfPowerClock } from '@/composites/play/golf/scene/fx/stage'
+import { GolfRespawnWind } from '@/composites/play/golf/scene/GolfRespawnWind'
+import { lossOf, respawnAt } from '@/composites/play/golf/scene/respawn'
+import type { GolfLoss, GolfRespawnPose } from '@/composites/play/golf/scene/respawn'
 import { GolfTrail } from '@/composites/play/golf/scene/GolfTrail'
+import { applyCupRest } from '@/composites/play/golf/scene/cupRest'
 import { rollBall } from '@/composites/play/golf/scene/roll'
+import { stageBallSpot } from '@/composites/play/golf/scene/stage'
+import { playRespawnWhoosh, playGolfSound } from '@/composites/play/golf/sound'
 import { ballTexture } from '@/composites/play/golf/scene/textures'
 import type { GolfRig } from '@/composites/play/golf/scene/rig'
 import type { GolfFace } from '@/composites/play/golf/types'
-import { activePowers, ballScale, floorHeight, reachedEvent, trackSpot } from '@/core/lib/play/golf'
+import { activePowers, floorHeight, trackSpot } from '@/core/lib/play/golf'
 import type { GolfHole, GolfMotion, GolfPlayerState } from '@/core/lib/play/golf'
 import { useGolfPrefsStore } from '@/core/store/golfPrefs'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
@@ -24,7 +35,7 @@ import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPowers } from '@/utils/constants/play'
 
 const { physics } = GOLF_SETTINGS
-const { ball, sink, avatar, stack } = GOLF_SCENE
+const { ball, avatar } = GOLF_SCENE
 
 export interface GolfBallProps {
   player: GolfPlayerState
@@ -43,68 +54,8 @@ export interface GolfBallProps {
   isShown: boolean
   // More than one player, avatars show
   isCrowd: boolean
-}
-
-/**
- * Resting spot of a holed ball inside the cup, one per arrival order
- * @param {number} seat - Order it fell in
- * @return {[number, number, number]} - Offset from the cup centre
- */
-
-const stackSpot = (seat: number): [number, number, number] => {
-  const angle = seat * 2.4
-  const radius = Math.min(seat, 3) * stack.jitter
-  return [Math.cos(angle) * radius, seat * stack.gap, Math.sin(angle) * radius]
-}
-
-/**
- * Places a holed ball at its stacked resting spot, popping it away once free
- * @param {Object} args - Ball refs and timing
- * @return {void}
- */
-
-const applyCupRest = ({
-  body,
-  roller,
-  shield,
-  last,
-  restedAt,
-  spots,
-  id,
-  hole,
-  seat,
-  isWaiting,
-  hasLeft,
-  now,
-}: {
-  body: Group
-  roller: Mesh | null
-  shield: Mesh | null
-  last: RefObject<Vector3 | null>
-  restedAt: RefObject<number | null>
-  spots: Map<string, Vector3>
-  id: string
-  hole: GolfHole
-  seat: number
-  isWaiting: boolean
-  hasLeft: boolean
-  now: number
-}): void => {
-  restedAt.current ??= now
-  const cupFloor = floorHeight(hole, hole.cup[0], hole.cup[1]) ?? 0
-  const [ox, oy, oz] = stackSpot(seat)
-  const since = isWaiting ? 0 : now - restedAt.current
-  const pop = Math.min(1, since / stack.popMs)
-  body.position.set(
-    hole.cup[0] + ox,
-    cupFloor - sink.depth + physics.ballRadius + oy + pop * sink.depth * 2,
-    hole.cup[1] + oz
-  )
-  body.scale.setScalar(Math.max(1 - pop, 1e-3))
-  body.visible = !hasLeft && pop < 1
-  if (shield) shield.visible = false
-  if (roller) rollBall(roller, last, body.position, 1)
-  spots.set(id, (spots.get(id) ?? new Vector3()).copy(body.position))
+  // Rink laid, trails turn dark
+  isFrozen: boolean
 }
 
 /**
@@ -126,13 +77,18 @@ const GolfBall = ({
   isWaiting,
   isShown,
   isCrowd,
+  isFrozen,
 }: GolfBallProps) => {
   const hasTrails = useGolfPrefsStore((state) => state.hasTrails)
   const body = useRef<Group>(null)
   const roller = useRef<Mesh>(null)
   const shield = useRef<Mesh>(null)
   const last = useRef<Vector3 | null>(null)
-  const depth = useRef(0)
+  const loss = useRef<GolfLoss | null>(null)
+  const pose = useRef<GolfRespawnPose | null>(null)
+  const clock = useRef<GolfPowerClock>(new Map())
+  const isFirst = useRef(true)
+  const [isReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const restedAt = useRef<number | null>(null)
   const shownAt = useRef(0)
   const color = useMemo(() => seatColor(face?.color ?? ''), [face?.color])
@@ -158,12 +114,24 @@ const GolfBall = ({
     shownAt.current = performance.now()
   }, [hole])
   const id = player.accountId
+  const isTeed = player.strokes === 0 && !isMine
 
-  useFrame((_, delta) => {
+  useFrame(() => {
     if (!body.current) return
     const now = performance.now()
     const track = motionRef.current.tracks.get(id)
     const restsInCup = player.isHoled && !track
+
+    // End of the hole: hop, then fly to the next tee
+    const { stage } = rigRef.current
+    const from = stage?.from.get(id)
+    if (stage && from) {
+      const at = stageBallSpot(from, stage.to, stage.seconds, stage.ranks.get(id) ?? 0)
+      body.current.position.set(at.x, at.y, at.z)
+      body.current.visible = !player.hasLeft && isShown
+      rigRef.current.spots.get(id)?.copy(body.current.position)
+      return
+    }
 
     if (restsInCup) {
       applyCupRest({
@@ -175,6 +143,7 @@ const GolfBall = ({
         spots: rigRef.current.spots,
         id,
         hole,
+        at: player,
         seat,
         isWaiting,
         hasLeft: player.hasLeft || !isShown,
@@ -184,42 +153,93 @@ const GolfBall = ({
     }
 
     restedAt.current = null
-    const spot = track
-      ? trackSpot(track, now)
-      : { x: player.x, y: floorHeight(hole, player.x, player.z) ?? 0, z: player.z }
+    // Lost in the void or the water, it flies back
+    const lost = lossOf(track, id, now)
+    if (lost) loss.current = { at: now - lost.ageMs, from: lost.from, to: lost.to }
+    const back = respawnAt(loss.current, now, isReduced)
+    if (isShown && back?.phase !== pose.current?.phase) {
+      if (back?.phase === 'drop') playRespawnWhoosh()
+      if (back?.phase === 'bounce') playGolfSound('land')
+    }
+    pose.current = back
+    const spot =
+      back ??
+      (lost
+        ? lost.to
+        : track
+          ? trackSpot(track, now)
+          : { x: player.x, y: floorHeight(hole, player.x, player.z) ?? 0, z: player.z })
     const powers = activePowers(player.effects, serverNow())
-    const scale = ballScale(powers)
-    const drawn = scale * eventScale(track, id, now)
+    tickPowers(clock.current, powers, now, isFirst.current)
+    isFirst.current = false
+    const look = ballLook(clock.current, now, isReduced)
+    const scale = look.size
+    const drawn = scale * (back ? back.grow : eventScale(track, id, now))
+    const stretch = (back?.stretch ?? 1) * look.stretch
 
-    // Sinks in the cup or the water
-    const isSinking = Boolean(track && reachedEvent(track, id, ['cup', 'splash'], now))
-    depth.current = isSinking ? Math.min(sink.depth, depth.current + sink.speed * delta) : 0
-    const center =
-      spot.y + physics.ballRadius * drawn - depth.current + dropLift(now - shownAt.current)
+    const center = spot.y + physics.ballRadius * drawn * stretch + dropLift(now - shownAt.current)
     body.current.position.set(spot.x, center, spot.z)
-    body.current.scale.setScalar(Math.max(drawn, 1e-3))
+    const size = Math.max(drawn, 1e-3)
+    body.current.scale.set(size / Math.sqrt(stretch), size * stretch, size / Math.sqrt(stretch))
     body.current.visible = !player.hasLeft && isShown
-    if (shield.current) shield.current.visible = powers.has(GolfPowers.AntiCollision)
-    if (roller.current) rollBall(roller.current, last, body.current.position, scale)
+    body.current.rotation.y = look.spin
+    if (shield.current) {
+      shield.current.visible = look.bubble > 0
+      shield.current.scale.setScalar(Math.max(look.bubble, 1e-3))
+      ;(shield.current.material as MeshBasicMaterial).opacity = ball.ghost * look.bubbleOpacity
+    }
+    if (roller.current) {
+      rollBall(roller.current, last, body.current.position, scale)
+      const skinMaterial = roller.current.material as MeshStandardMaterial
+      const opacity = isTeed ? ball.tee : look.opacity
+      if (skinMaterial.transparent !== opacity < 1) {
+        skinMaterial.transparent = opacity < 1
+        skinMaterial.needsUpdate = true
+      }
+      skinMaterial.opacity = opacity
+    }
 
     // Camera follows the drawn spot
     const { spots } = rigRef.current
     spots.set(id, (spots.get(id) ?? new Vector3()).set(spot.x, center, spot.z))
   })
 
-  const isGhost = player.powers.includes(GolfPowers.Ghost)
-  const isTeed = player.strokes === 0 && !isMine
+  // Ball turned into a bumper, hitbox scale kept by the group
+  const bouncer = player.effects.find(
+    (effect) =>
+      (effect.power === GolfPowers.BumperMan || effect.power === GolfPowers.BoingBoing) &&
+      player.powers.includes(effect.power)
+  )
 
   return (
     <>
       <group ref={body}>
-        <mesh ref={roller} castShadow>
+        {bouncer && (
+          <group position={[0, -physics.ballRadius, 0]}>
+            <GolfBumper
+              id={id}
+              radius={physics.ballRadius}
+              height={physics.ballRadius * ball.bumperHeight}
+              color={color}
+              paint={paint}
+              motionRef={motionRef}
+              face={face}
+              hearts={{
+                lives: bouncer.lives ?? 0,
+                ...(bouncer.power === GolfPowers.BumperMan
+                  ? { max: GOLF_SETTINGS.powers.bumperMan.lives }
+                  : { max: GOLF_SETTINGS.powers.boingBoing.bounces, icon: 'golfBoing' as const }),
+              }}
+            />
+          </group>
+        )}
+        <mesh ref={roller} castShadow visible={!bouncer}>
           <sphereGeometry args={[physics.ballRadius, ball.segments, ball.segments / 2]} />
           <meshStandardMaterial
             map={skin}
             roughness={ball.roughness}
-            transparent={isGhost || isTeed}
-            opacity={isGhost ? ball.ghost : isTeed ? ball.tee : 1}
+            transparent={isTeed}
+            opacity={isTeed ? ball.tee : 1}
           />
         </mesh>
         <mesh ref={shield} visible={false}>
@@ -234,8 +254,12 @@ const GolfBall = ({
           </sprite>
         )}
       </group>
-      {isShown && hasTrails && <GolfTrail target={body} color={color} />}
+      {isShown && hasTrails && (
+        <GolfTrail target={body} color={color} frozen={isFrozen ? paint['trail-frozen'] : null} />
+      )}
       {isShown && <GolfFlashSwarm target={body} motionRef={motionRef} id={id} />}
+      {isShown && <GolfRespawnWind poseRef={pose} paint={paint} />}
+      {isShown && <GolfCastBurst target={body} clockRef={clock} paint={paint} />}
     </>
   )
 }

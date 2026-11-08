@@ -29,7 +29,13 @@ import { GolfPhases } from '@/utils/constants/play'
  * @typedef {Object} GolfTrack
  */
 
-export type GolfTrack = Pick<GolfShotResult, 'frameMs' | 'frames' | 'paths' | 'events' | 'flashId'>
+export type GolfTrack = Pick<
+  GolfShotResult,
+  'frameMs' | 'frames' | 'paths' | 'events' | 'flashId'
+> & {
+  // Rolling balls replayed after a malus, no stroke
+  replay?: boolean
+}
 
 /**
  * Locked course of a game

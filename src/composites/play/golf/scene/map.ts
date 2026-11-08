@@ -8,14 +8,17 @@ const { map } = GOLF_SCENE
 const placed = new WeakMap<GolfHoleLayout[], GolfPoint[]>()
 
 /**
- * Two course rectangles closer than the gap
+ * Two course rectangles closer than the chain gap
  * @param {GolfHole['bounds']} a - Rectangle
  * @param {GolfHole['bounds']} b - Rectangle
  * @return {boolean} - Too close
  */
 
 const isCrowded = (a: GolfHole['bounds'], b: GolfHole['bounds']): boolean =>
-  a.x0 < b.x1 + map.gap && b.x0 < a.x1 + map.gap && a.z0 < b.z1 + map.gap && b.z0 < a.z1 + map.gap
+  a.x0 < b.x1 + map.chainGap &&
+  b.x0 < a.x1 + map.chainGap &&
+  a.z0 < b.z1 + map.chainGap &&
+  b.z0 < a.z1 + map.chainGap
 
 /**
  * Rectangle moved to a spot
@@ -32,18 +35,36 @@ const moved = ({ x0, x1, z0, z1 }: GolfHole['bounds'], [ox, oz]: GolfPoint) => (
 })
 
 /**
- * Middle of rectangles
- * @param {GolfHole['bounds'][]} rects - Rectangles
- * @return {GolfPoint} - Average centre
+ * Spot of a hole whose tee lands closest to a cup, clear of the placed holes
+ * @param {GolfHole} hole - Hole to place
+ * @param {GolfPoint} cup - Previous cup, map spot
+ * @param {GolfHole['bounds'][]} rects - Placed holes
+ * @return {GolfPoint} - Origin of the hole
  */
 
-const centreOf = (rects: GolfHole['bounds'][]): GolfPoint => [
-  rects.reduce((sum, rect) => sum + (rect.x0 + rect.x1) / 2, 0) / rects.length,
-  rects.reduce((sum, rect) => sum + (rect.z0 + rect.z1) / 2, 0) / rects.length,
-]
+const chainedOrigin = (
+  hole: GolfHole,
+  [cx, cz]: GolfPoint,
+  rects: GolfHole['bounds'][]
+): GolfPoint => {
+  for (let reach = 0; reach <= map.maxReach; reach += map.step) {
+    const spot = map.turns
+      .map((turn): GolfPoint => {
+        const angle = turn * (Math.PI / 180)
+        return [
+          cx + Math.sin(angle) * reach - hole.tee[0],
+          cz + Math.cos(angle) * reach - hole.tee[1],
+        ]
+      })
+      .find((origin) => !rects.some((other) => isCrowded(moved(hole.bounds, origin), other)))
+    if (spot) return spot
+  }
+
+  return [rects.reduce((right, rect) => Math.max(right, rect.x1), 0) + map.gap - hole.bounds.x0, 0]
+}
 
 /**
- * Spots of every hole of a course, packed round the middle, never overlapping
+ * Spots of every hole of a course, each tee right by the cup before it, never overlapping
  * @param {GolfHoleLayout[]} layouts - Holes of the course
  * @return {GolfPoint[]} - Origin of each hole
  */
@@ -56,26 +77,10 @@ export const courseMap = (layouts: GolfHoleLayout[]): GolfPoint[] => {
   const origins: GolfPoint[] = [[0, 0]]
   const rects = [holes[0].bounds]
 
-  holes.slice(1).forEach((hole) => {
-    const [mx, mz] = centreOf(rects)
-    const [hx, hz] = centreOf([hole.bounds])
-    let origin: GolfPoint | null = null
-
-    // Tightest free ring round the middle of the map
-    for (let reach = 0; !origin && reach <= map.maxReach; reach += map.step) {
-      origin =
-        map.turns
-          .map((turn): GolfPoint => {
-            const angle = turn * (Math.PI / 180)
-            return [mx + Math.sin(angle) * reach - hx, mz + Math.cos(angle) * reach - hz]
-          })
-          .find((spot) => !rects.some((other) => isCrowded(moved(hole.bounds, spot), other))) ??
-        null
-    }
-    origin ??= [
-      rects.reduce((right, rect) => Math.max(right, rect.x1), 0) + map.gap - hole.bounds.x0,
-      0,
-    ]
+  holes.slice(1).forEach((hole, index) => {
+    const before = holes[index]
+    const [ox, oz] = origins[index]
+    const origin = chainedOrigin(hole, [ox + before.cup[0], oz + before.cup[1]], rects)
     origins.push(origin)
     rects.push(moved(hole.bounds, origin))
   })

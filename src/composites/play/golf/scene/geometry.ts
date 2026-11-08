@@ -3,7 +3,7 @@ import { BufferGeometry, Float32BufferAttribute } from 'three'
 import { holdsCup, holedTop, pitFaces } from '@/composites/play/golf/scene/cupPit'
 import { holeSeed, seededRandom } from '@/composites/play/golf/scene/random'
 import { padHeight } from '@/core/lib/play/golf'
-import type { GolfHole, GolfPad, GolfWall } from '@/core/lib/play/golf'
+import type { GolfBlock, GolfHole, GolfPad, GolfPoint, GolfWall } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfSurfaces } from '@/utils/constants/play'
@@ -147,8 +147,8 @@ const railFaces = (wall: GolfWall, bottom: number, index: number) => {
       [bx + ox, bz + oz],
       [ax + ox, az + oz],
     ],
-    // Own sliver of height, tops never coplanar
-    floors.map((floor) => floor + render.railHeight + index * 0.0007),
+    // Up to the cap axis, the round cap closes it; own sliver of height, tops never coplanar
+    floors.map((floor) => floor + render.railHeight - render.railWidth / 2 + index * 0.0007),
     floors.map(() => bottom)
   )
   // Third quad is the outer face, the one seen from outside
@@ -179,6 +179,15 @@ const undersideFaces = (pads: GolfPad[], floor: number): number[] => {
 }
 
 /**
+ * Block standing on level ground
+ * @param {GolfBlock} block - Block
+ * @return {boolean} - Level
+ */
+
+export const isFlatBlock = (block: GolfBlock): boolean =>
+  block.corners.every((corner) => Math.abs(corner - block.corners[0]) < 1e-4)
+
+/**
  * Meshes of a hole: lawn per surface, slab sides, rails and boxes
  * @param {GolfHole} hole - Hole
  * @return {Object} - Geometries
@@ -191,17 +200,24 @@ export const courseGeometry = (hole: GolfHole) => {
   const tops = new Map<GolfSurfaceName, number[]>()
   const shores: number[] = []
   const sides: number[] = []
-  const cupPad = hole.pads.find((pad) => holdsCup(pad, hole.cup))
+  // Slab holding each hole, opened where the funnel sinks
+  const cupOf = new Map<GolfPad, GolfPoint>()
+  for (const { x, z } of hole.cups) {
+    const holder = hole.pads.find((pad) => holdsCup(pad, [x, z]))
+    if (holder) cupOf.set(holder, [x, z])
+  }
+  const seen = hole.pads.filter((pad) => !pad.isHidden)
 
-  // One lawn per surface, the cup slab opened
-  for (const pad of hole.pads) {
+  // One lawn per surface, the cup slabs opened
+  for (const pad of seen) {
     const corners = padCorners(pad)
     const faces = prism(
       corners,
       corners.map(([x, z]) => padHeight(pad, x, z)),
       corners.map(() => floor)
     )
-    const top = pad === cupPad ? holedTop(pad, hole.cup) : faces.top
+    const centre = cupOf.get(pad)
+    const top = centre ? holedTop(pad, centre) : faces.top
     tops.set(pad.surface, [...(tops.get(pad.surface) ?? []), ...top])
     if (pad.surface === GolfSurfaces.Water) shores.push(...shoreOf(pad, top))
     sides.push(...faces.sides)
@@ -209,23 +225,40 @@ export const courseGeometry = (hole: GolfHole) => {
 
   // Rails and boxes
   // Rail faces drop straight down with the wall, no ledge
-  const rails = hole.walls
-    .filter((wall) => wall.kind === 'rail')
+  const seenRails = hole.walls.filter((wall) => wall.kind === 'rail' && !wall.isHidden)
+  const rails = seenRails
+    .filter((wall) => !wall.isGlass && !wall.isBouncy)
     .map((wall, index) => railFaces(wall, floor - GOLF_SCENE.island.depth, index))
-  const blocks = hole.blocks.map((block) =>
-    prism(
-      [
-        [block.x0, block.z0],
-        [block.x1, block.z0],
-        [block.x1, block.z1],
-        [block.x0, block.z1],
-      ],
-      block.corners.map((corner) => corner + render.blockHeight),
-      block.corners
+  const panes = seenRails
+    .filter((wall) => wall.isGlass)
+    .map((wall, index) => railFaces(wall, floor - GOLF_SCENE.island.depth, index))
+  const cushions = seenRails
+    .filter((wall) => wall.isBouncy)
+    .map((wall, index) => railFaces(wall, floor - GOLF_SCENE.island.depth, index))
+  // Flat blocks are rounded apart, tilted ones stay prisms
+  const blocks = hole.blocks
+    .filter((block) => !isFlatBlock(block) && !block.isHidden)
+    .map((block) =>
+      prism(
+        [
+          [block.x0, block.z0],
+          [block.x1, block.z0],
+          [block.x1, block.z1],
+          [block.x0, block.z1],
+        ],
+        block.corners.map((corner) => corner + render.blockHeight),
+        block.corners
+      )
     )
-  )
 
-  const pit = cupPad ? pitFaces(cupPad, hole.cup) : null
+  const pits = [...cupOf].map(([pad, centre]) => pitFaces(pad, centre))
+  const pit = pits.length
+    ? {
+        funnel: pits.flatMap((each) => each.funnel),
+        wall: pits.flatMap((each) => each.wall),
+        floor: pits.flatMap((each) => each.floor),
+      }
+    : null
 
   return {
     floor,
@@ -239,7 +272,11 @@ export const courseGeometry = (hole: GolfHole) => {
       geometry: groundGeometry(positions, surface === GolfSurfaces.Water ? shores : undefined),
     })),
     sides: geometryOf(sides, true),
-    underside: geometryOf(undersideFaces(hole.pads, floor), true),
+    underside: geometryOf(undersideFaces(seen, floor), true),
+    glass: geometryOf(panes.flatMap((faces) => [...faces.top, ...faces.inner, ...faces.outer])),
+    cushions: geometryOf(
+      cushions.flatMap((faces) => [...faces.top, ...faces.inner, ...faces.outer])
+    ),
     rails: geometryOf(rails.flatMap((faces) => [...faces.top, ...faces.inner])),
     railSides: geometryOf(
       rails.flatMap((faces) => faces.outer),
@@ -286,7 +323,7 @@ export const wallSpecks = (hole: GolfHole): GolfSpeck[] => {
   const random = seededRandom(holeSeed(hole))
 
   return hole.walls
-    .filter((wall) => wall.kind === 'rail')
+    .filter((wall) => wall.kind === 'rail' && !wall.isGlass && !wall.isHidden)
     .flatMap((wall) => {
       const length = Math.hypot(wall.bx - wall.ax, wall.bz - wall.az)
       return Array.from({ length: length < specks.twoFrom ? 1 : 1 + Math.round(random()) }, () => {

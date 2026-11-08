@@ -7,24 +7,28 @@ import type { GolfPlayer } from '@prisma/client'
 import { conflict, invalidInput } from '@/core/lib/errors'
 import {
   addToHand,
+  armingOf,
   canPlaceAt,
-  canPlayPower,
+  canTeleportTo,
+  drawPool,
   drawPower,
   handSize,
   standingShare,
-  isEffectActive,
+  isEffectKept,
   isHoleDone,
   malusWeight,
   scatterSpot,
   withEffect,
   strokeCeiling,
 } from '@/core/lib/play/golf'
-import type { GolfEffect, GolfShotResult } from '@/core/lib/play/golf'
-import { boardStep } from '@/core/services/play/golf/GolfTableService'
+import type { GolfArming, GolfEffect, GolfHazard, GolfShotResult } from '@/core/lib/play/golf'
+import { replayRolling } from '@/core/services/play/golf/GolfReplayService'
+import { boardStep, closeHole } from '@/core/services/play/golf/GolfTableService'
 import {
   asJson,
   effectsOf,
   hazardsOf,
+  isEveryoneDone,
   presentPlayers,
   requireBall,
   withGolf,
@@ -46,13 +50,14 @@ import type { GolfPowerName } from '@/utils/constants/play'
 
 const lastingOf = (power: GolfPowerName, at: number) => {
   const tuning = GOLF_SETTINGS.powers[power] as Partial<
-    Record<'seconds' | 'shots' | 'lives', number>
+    Record<'seconds' | 'shots' | 'lives' | 'bounces', number>
   >
 
   return {
     until: tuning.seconds === undefined ? undefined : at + tuning.seconds * 1000,
     shots: tuning.shots,
-    lives: tuning.lives,
+    // Boing Boing shares its bounces as lives
+    lives: tuning.lives ?? tuning.bounces,
   }
 }
 
@@ -69,7 +74,7 @@ export const grantPickups = async (
   players: GolfPlayer[],
   result: GolfShotResult
 ): Promise<GolfPlayer[]> => {
-  const pool = table.settings.powers
+  const pool = drawPool(table.settings)
   if (!pool.length || !result.pickups.length) return players
   const pickers = new Set(result.pickups.map((pickup) => pickup.id))
   const totalOf = (player: GolfPlayer) =>
@@ -83,7 +88,7 @@ export const grantPickups = async (
             where: { id: player.id },
             data: {
               powers: addToHand(
-                player.powers,
+                player.powers.filter((power) => GOLF_POWERS.has(power)),
                 drawPower(
                   pool,
                   standingShare(totals, totalOf(player)),
@@ -117,6 +122,23 @@ const readSpot = (table: GolfTable, raw: Record<string, unknown>) => {
 }
 
 /**
+ * Ball moved to a spot near it, no stroke counted
+ * @param {GolfTable} table - Locked course
+ * @param {GolfPlayer} player - Player
+ * @param {Record<string, unknown>} raw - Body
+ * @return {Promise<void>} - Moved
+ */
+
+const teleport = async (table: GolfTable, player: GolfPlayer, raw: Record<string, unknown>) => {
+  if (player.restsAt.getTime() > table.now.getTime()) throw conflict(PLAY_ERRORS.ballRolling)
+  const spot = { x: Number(raw.x), z: Number(raw.z) }
+  if (!canTeleportTo(table.hole, player, spot)) {
+    throw invalidInput([{ field: 'x', message: PLAY_ERRORS.badTeleport }], PLAY_ERRORS.badTeleport)
+  }
+  await table.tx.golfPlayer.update({ where: { id: player.id }, data: spot })
+}
+
+/**
  * Drift of a tornado or blow of a gust
  * @param {GolfPlayer} player - Player laying it
  * @param {GolfPowerName} power - Power
@@ -144,30 +166,37 @@ const motionOf = (player: GolfPlayer, power: GolfPowerName, spot: { x: number; z
  * Lay a power on the course, a frozen course renewing the one running
  * @param {GolfTable} table - Locked course
  * @param {GolfPlayer} player - Player
- * @param {GolfPowerName} power - Power
- * @param {{ x: number, z: number }} spot - Where it lands
+ * @param {Object} laid - Power laid
+ * @param {GolfPowerName} laid.power - Power
+ * @param {{ x: number, z: number }} laid.spot - Where it lands
+ * @param {GolfArming} [laid.armsOn] - Waits for the ball to stop
  * @return {Promise<void>} - Laid
  */
 
 const layPower = async (
   table: GolfTable,
   player: GolfPlayer,
-  power: GolfPowerName,
-  spot: { x: number; z: number }
+  {
+    power,
+    spot,
+    armsOn,
+  }: { power: GolfPowerName; spot: { x: number; z: number }; armsOn?: GolfArming }
 ): Promise<void> => {
   const at = table.now.getTime()
-  const hazards = [
+  const startsAt = armsOn && 'at' in armsOn ? armsOn.at : at
+  const hazards: GolfHazard[] = [
     ...hazardsOf(table.game.hazards).filter(
-      (hazard) => isEffectActive(hazard, at) && (power !== GolfPowers.Ice || hazard.power !== power)
+      (hazard) => isEffectKept(hazard, at) && (power !== GolfPowers.Ice || hazard.power !== power)
     ),
     {
       id: randomUUID(),
       power,
       ownerId: player.accountId,
       ...spot,
-      ...lastingOf(power, at),
-      laidAt: at,
+      ...lastingOf(power, startsAt),
+      laidAt: startsAt,
       ...motionOf(player, power, spot),
+      ...(armsOn && { armsOn }),
     },
   ]
   await table.tx.golfGame.update({
@@ -195,6 +224,28 @@ const castOn = async (table: GolfTable, targets: GolfPlayer[], effect: GolfEffec
 }
 
 /**
+ * Balls a rolling malus reaches, a cloud pushing them aside
+ * @param {GolfTable} table - Locked course
+ * @param {string} casterId - Power played by
+ * @param {GolfPowerName} power - Power
+ * @return {Parameters<typeof replayRolling>[2]} - Reach
+ */
+
+const rollingReach = (
+  table: GolfTable,
+  casterId: string,
+  power: GolfPowerName
+): Parameters<typeof replayRolling>[2] => {
+  const isOther = (player: GolfPlayer) => player.accountId !== casterId
+  if (power === GolfPowers.Fart) {
+    return { isTouched: isOther, moveTo: (player) => scatterSpot(table.hole, player.x, player.z) }
+  }
+  const spares = power === GolfPowers.Tornado || power === GolfPowers.Gust
+
+  return { isTouched: spares ? isOther : () => true }
+}
+
+/**
  * Push every other ball at rest to a spot nearby
  * @param {GolfTable} table - Locked course
  * @param {GolfPlayer[]} targets - Balls touched
@@ -213,39 +264,6 @@ const scatter = async (table: GolfTable, targets: GolfPlayer[]): Promise<void> =
 }
 
 /**
- * Trade places with the player picked, both balls at rest
- * @param {GolfTable} table - Locked course
- * @param {GolfPlayer} player - Player
- * @param {GolfPlayer[]} others - Players still on the hole
- * @param {Record<string, unknown>} raw - Body, the target account
- * @return {Promise<void>} - Swapped
- */
-
-const swap = async (
-  table: GolfTable,
-  player: GolfPlayer,
-  others: GolfPlayer[],
-  raw: Record<string, unknown>
-): Promise<void> => {
-  const now = table.now.getTime()
-  const target = others.find((other) => other.accountId === raw.targetId)
-  if (!target || target.restsAt.getTime() > now || player.restsAt.getTime() > now) {
-    throw invalidInput(
-      [{ field: 'targetId', message: PLAY_ERRORS.badTarget }],
-      PLAY_ERRORS.badTarget
-    )
-  }
-  await table.tx.golfPlayer.update({
-    where: { id: player.id },
-    data: { x: target.x, z: target.z },
-  })
-  await table.tx.golfPlayer.update({
-    where: { id: target.id },
-    data: { x: player.x, z: player.z },
-  })
-}
-
-/**
  * Slot of the hand asked, the oldest by default
  * @param {GolfPlayer} player - Player
  * @param {Record<string, unknown>} raw - Body
@@ -261,10 +279,90 @@ const slotOf = (player: GolfPlayer, raw: Record<string, unknown>): number => {
 }
 
 /**
+ * Cast context of the player, refused on the last hole for a bonus
+ * @param {GolfTable} table - Locked course
+ * @param {GolfPlayer} player - Player
+ * @param {GolfPowerName} power - Power
+ * @return {GolfArming | undefined} - Arming, none when it acts now
+ */
+
+const armingFor = (table: GolfTable, player: GolfPlayer, power: GolfPowerName) => {
+  const isDone = isHoleDone(player, strokeCeiling(table.settings))
+  const outcome = armingOf(power, {
+    at: table.now.getTime(),
+    restsAt: player.restsAt.getTime(),
+    isDone,
+    hole: table.game.hole,
+    holes: table.holes,
+  })
+  if (outcome.kind === 'refused') throw conflict(PLAY_ERRORS.lastHoleBonus)
+  const armsOn = outcome.kind === 'armed' ? outcome.armsOn : undefined
+  // A spot belongs to this hole
+  if (armsOn && 'hole' in armsOn && GOLF_POWERS.get(power).target === GolfPowerTargets.Place) {
+    throw conflict(PLAY_ERRORS.laidBonusDone)
+  }
+
+  return armsOn
+}
+
+// Malus that change a rolling ball's course
+const ROLLING_POWERS = new Set<GolfPowerName>([
+  GolfPowers.Tornado,
+  GolfPowers.Sticky,
+  GolfPowers.Ice,
+  GolfPowers.Gust,
+  GolfPowers.Fart,
+])
+
+/**
+ * Apply a power to the course or the balls
+ * @param {GolfTable} table - Locked course
+ * @param {GolfPlayer} player - Player
+ * @param {GolfPowerName} power - Power
+ * @param {Record<string, unknown>} raw - Body
+ * @return {Promise<void>} - Applied
+ */
+
+const applyPower = async (
+  table: GolfTable,
+  player: GolfPlayer,
+  power: GolfPowerName,
+  raw: Record<string, unknown>
+): Promise<void> => {
+  const at = table.now.getTime()
+  const armsOn = armingFor(table, player, power)
+  const startsAt = armsOn && 'at' in armsOn ? armsOn.at : at
+  const { target } = GOLF_POWERS.get(power)
+  const effect: GolfEffect = {
+    power,
+    from: player.accountId,
+    ...lastingOf(power, startsAt),
+    castAt: startsAt,
+    ...(armsOn && { armsOn }),
+  }
+  // Others still playing the hole
+  const others = presentPlayers(table).filter(
+    (other) => other.id !== player.id && !isHoleDone(other, strokeCeiling(table.settings))
+  )
+
+  if (power === GolfPowers.Teleport) return teleport(table, player, raw)
+  // The whole course freezes from the ball
+  if (power === GolfPowers.Ice) {
+    return layPower(table, player, { power, spot: { x: player.x, z: player.z } })
+  }
+  if (target === GolfPowerTargets.Place) {
+    return layPower(table, player, { power, spot: readSpot(table, raw), armsOn })
+  }
+  if (power === GolfPowers.Fart) return scatter(table, others)
+  const touched = { self: [player], others, all: [player, ...others] }[target]
+  await castOn(table, touched, effect)
+}
+
+/**
  * Play a power from the hand
  * @param {EngineSession} session - Game
  * @param {string} accountId - Player
- * @param {Record<string, unknown>} raw - Body: slot, point for a laid power, target for a swap
+ * @param {Record<string, unknown>} raw - Body: slot, point for a laid power
  * @return {Promise<EngineStep>} - Step
  */
 
@@ -277,29 +375,9 @@ export const playPower = (
     const player = requireBall(table, accountId, true)
     const slot = slotOf(player, raw)
     const power = player.powers[slot] as GolfPowerName
-    if (!canPlayPower(power, isHoleDone(player, strokeCeiling(table.settings)))) {
-      throw conflict(PLAY_ERRORS.holeDone)
-    }
-    const { target } = GOLF_POWERS.get(power)
-    const { until, shots } = lastingOf(power, table.now.getTime())
-    const effect = { power, from: accountId, until, shots }
+    await applyPower(table, player, power, raw)
 
-    // Others still playing the hole
-    const others = presentPlayers(table).filter(
-      (other) => other.id !== player.id && !isHoleDone(other, strokeCeiling(table.settings))
-    )
-    // The whole course freezes from the ball
-    if (power === GolfPowers.Ice) await layPower(table, player, power, { x: player.x, z: player.z })
-    else if (target === GolfPowerTargets.Place) {
-      await layPower(table, player, power, readSpot(table, raw))
-    } else if (target === GolfPowerTargets.Player) await swap(table, player, others, raw)
-    else if (power === GolfPowers.Fart) await scatter(table, others)
-    else {
-      const touched = { self: [player], others, all: [player, ...others] }[target]
-      await castOn(table, touched, effect)
-    }
-
-    // Hand only, the swap wrote the spot
+    // Hand, journal, then rolling balls replayed
     await table.tx.golfPlayer.update({
       where: { id: player.id },
       data: { powers: player.powers.filter((_, index) => index !== slot) },
@@ -307,10 +385,14 @@ export const playPower = (
     await table.tx.golfMove.create({
       data: { sessionId: session.id, accountId, kind: 'POWER', hole: table.game.hole, power },
     })
+    const players = ROLLING_POWERS.has(power)
+      ? await replayRolling(table, accountId, rollingReach(table, accountId, power))
+      : table.players
     await table.tx.golfGame.update({
       where: { sessionId: table.game.sessionId },
       data: { rev: { increment: 1 } },
     })
+    const after = { ...table, players }
 
-    return boardStep(table.game.endsAt)
+    return isEveryoneDone(after) ? closeHole(after) : boardStep(table.game.endsAt)
   })

@@ -6,20 +6,18 @@ import { GolfPowerPicker } from '@/composites/play/golf/setup/GolfPowerPicker'
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
 import { SetupChips, SetupSection, SetupStepper } from '@/composites/play/setup/PlaySetupFields'
-import { golfSettingsOf, holeRange } from '@/core/lib/play/golf'
+import { drawPool, golfSettingsOf, holeRange } from '@/core/lib/play/golf'
 import type { GolfGameSettings } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_SETUP_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_RANDOM_COURSE } from '@/declarations/play/golf/courses'
 import { GOLF_POWERS } from '@/declarations/play/golf/powers'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { GOLF_SETUP_TABS } from '@/declarations/play/golf/setup'
 import { GOLF_SETUP } from '@/declarations/ui/variants'
 
 // Tabs of the drawer
-const TABS = [
-  { value: 'rules', label: GOLF_SETUP_COPY.tabRules, icon: 'playRules' as const },
-  { value: 'powers', label: GOLF_SETUP_COPY.tabPowers, icon: 'golfBumper' as const },
-]
+const TABS = [...GOLF_SETUP_TABS]
 
 // Clock presets
 const CLOCKS = GOLF_SETTINGS.holeSecondsPresets.map((seconds) => ({
@@ -40,7 +38,7 @@ const CEILINGS = [
 ]
 
 /**
- * Rules and powers of a golf game, format and course are voted at launch
+ * Game, powers and rules of a golf game, format and course are voted at launch
  * @param {PlaySetupProps} props - Drawer state and handlers
  * @return {JSX.Element}
  */
@@ -62,14 +60,15 @@ export const GolfSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
         isSaving={isSaving}
         isEditing={Boolean(current)}
         canSubmit
+        isCompact
         copy={GOLF_SETUP_COPY}
         tabs={TABS}
         onClose={onClose}
-        onSubmit={() => onSubmit({ settings })}
+        onSubmit={() => onSubmit({ settings: { ...settings, powers: drawPool(settings) } })}
       >
         {(tab) => (
           <div className={GOLF_SETUP.body}>
-            {tab === 'rules' && (
+            {tab === 'game' && (
               <>
                 <SetupSection
                   styles={GOLF_SETUP}
@@ -97,6 +96,31 @@ export const GolfSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
                     onChange={set('holeSeconds')}
                   />
                 </SetupSection>
+              </>
+            )}
+            {tab === 'powers' && (
+              <SetupSection
+                styles={GOLF_SETUP}
+                title={GOLF_SETUP_COPY.powers}
+                hint={GOLF_SETUP_COPY.powersHint}
+                aside={
+                  <span className={GOLF_SETUP.count}>
+                    {fillPlayMessage(GOLF_SETUP_COPY.powersCount, {
+                      count: settings.powers.length,
+                      total: GOLF_POWERS.keys.length,
+                    })}
+                  </span>
+                }
+              >
+                <GolfPowerPicker
+                  value={settings.powers}
+                  collisions={settings.collisions}
+                  onChange={set('powers')}
+                />
+              </SetupSection>
+            )}
+            {tab === 'rules' && (
+              <>
                 <SetupSection
                   styles={GOLF_SETUP}
                   title={GOLF_SETUP_COPY.maxStrokes}
@@ -140,40 +164,6 @@ export const GolfSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
                   />
                 </SetupSection>
               </>
-            )}
-
-            {tab === 'powers' && (
-              <SetupSection
-                styles={GOLF_SETUP}
-                title={GOLF_SETUP_COPY.powers}
-                hint={GOLF_SETUP_COPY.powersHint}
-                aside={
-                  <span className={GOLF_SETUP.count}>
-                    {fillPlayMessage(GOLF_SETUP_COPY.powersCount, {
-                      count: settings.powers.length,
-                      total: GOLF_POWERS.keys.length,
-                    })}
-                  </span>
-                }
-              >
-                <GolfPowerPicker value={settings.powers} onChange={set('powers')} />
-                <div className={GOLF_SETUP.quick}>
-                  <button
-                    type="button"
-                    className={GOLF_SETUP.quickButton}
-                    onClick={() => set('powers')(GOLF_POWERS.keys)}
-                  >
-                    {GOLF_SETUP_COPY.all}
-                  </button>
-                  <button
-                    type="button"
-                    className={GOLF_SETUP.quickButton}
-                    onClick={() => set('powers')([])}
-                  >
-                    {GOLF_SETUP_COPY.none}
-                  </button>
-                </div>
-              </SetupSection>
             )}
           </div>
         )}

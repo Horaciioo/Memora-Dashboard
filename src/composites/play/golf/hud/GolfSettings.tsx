@@ -1,5 +1,6 @@
 'use client'
 
+import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
 import { useGolfPrefsStore } from '@/core/store/golfPrefs'
 import type { GolfPrefs } from '@/core/store/golfPrefs'
@@ -18,11 +19,14 @@ const SWITCHES: { key: keyof GolfPrefs; label: string }[] = [
 ]
 
 /**
- * Settings card: sound and display switches
+ * Settings card: sound, display switches, and on a phone the game exits
+ * @param {Object} props - Session
+ * @param {string} props.sessionId - Session id
+ * @param {boolean} props.isSeated - Viewer plays
  * @return {JSX.Element}
  */
 
-export const GolfSettings = () => {
+export const GolfSettings = ({ sessionId, isSeated }: { sessionId: string; isSeated: boolean }) => {
   const prefs = useGolfPrefsStore()
 
   return (
@@ -51,6 +55,16 @@ export const GolfSettings = () => {
           </span>
         </button>
       ))}
+      <div className="flex flex-col gap-1 md:hidden">
+        <div className={GOLF_BOARD.rule} role="separator" />
+        <PlayGameActions
+          sessionId={sessionId}
+          gameSlug={PlayGames.Golf}
+          isSeated={isSeated}
+          itemClass={cn(GOLF_BOARD.setting, 'justify-start')}
+          iconClass="size-5"
+        />
+      </div>
     </div>
   )
 }

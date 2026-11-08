@@ -2,7 +2,7 @@ import { recentEvent } from '@/core/lib/play/golf'
 import type { GolfEventKind, GolfMotionTrack } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 
-const { pop, reappear, vanish, drop } = GOLF_SCENE
+const { pop, reappear, drop } = GOLF_SCENE
 
 // Contact kinds and their gain
 const POP_GAINS: Partial<Record<GolfEventKind, number>> = {
@@ -13,9 +13,6 @@ const POP_GAINS: Partial<Record<GolfEventKind, number>> = {
   hit: pop.hit,
   land: pop.land,
 }
-
-// Kinds that make the ball vanish
-const VANISH_KINDS: GolfEventKind[] = ['fall']
 
 // Kinds that make it come back
 const REAPPEAR_KINDS: GolfEventKind[] = ['portal', 'vortex']
@@ -41,10 +38,6 @@ const recentContact = (track: GolfMotionTrack, id: string, now: number) =>
 
 export const eventScale = (track: GolfMotionTrack | undefined, id: string, now: number): number => {
   if (!track) return 1
-
-  // Falling out shrinks
-  const fallen = recentEvent(track, id, VANISH_KINDS, now, vanish.ms)
-  if (fallen) return Math.max(0, 1 - fallen.ageMs / vanish.ms)
 
   // Teleported grows back
   const moved = recentEvent(track, id, REAPPEAR_KINDS, now, reappear.ms)

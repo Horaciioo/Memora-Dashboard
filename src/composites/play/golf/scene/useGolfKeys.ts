@@ -26,6 +26,27 @@ const isWriting = (target: EventTarget | null): boolean =>
 const isKey = (keys: readonly string[], event: KeyboardEvent): boolean => keys.includes(event.code)
 
 /**
+ * Free flight keys: move flat, rise and sink
+ * @param {GolfRig} rig - Camera rig
+ * @param {KeyboardEvent} event - Key event
+ * @param {number} sign - One held, zero released
+ * @return {boolean} - Handled
+ */
+
+const flyKey = (rig: GolfRig, event: KeyboardEvent, sign: number): boolean => {
+  const { move } = rig.free
+  if (isKey(GOLF_KEYS.left, event)) move.x = -sign
+  else if (isKey(GOLF_KEYS.right, event)) move.x = sign
+  else if (isKey(GOLF_KEYS.zoomIn, event)) move.z = sign
+  else if (isKey(GOLF_KEYS.zoomOut, event)) move.z = -sign
+  else if (isKey(GOLF_KEYS.rise, event)) move.y = sign
+  else if (isKey(GOLF_KEYS.sink, event)) move.y = -sign
+  else return false
+
+  return true
+}
+
+/**
  * Keyboard of the course: turn, zoom, tilt, overview and cancel, never while writing
  * @param {RefObject<GolfRig>} rigRef - Camera rig
  * @param {Object} handlers - Gestures
@@ -48,6 +69,7 @@ export const useGolfKeys = (
       if (isWriting(event.target)) return
       const rig = rigRef.current
       const sign = isDown ? 1 : 0
+      if (rig.isFree && flyKey(rig, event, sign)) return event.preventDefault()
       if (isKey(GOLF_KEYS.left, event)) rig.turn = sign
       else if (isKey(GOLF_KEYS.right, event)) rig.turn = -sign
       else if (isKey(GOLF_KEYS.zoomIn, event)) rig.zoom = -sign
