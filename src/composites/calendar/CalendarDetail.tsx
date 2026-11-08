@@ -5,8 +5,8 @@ import { Markdown } from '@/components/elements/display/Markdown'
 import { Button } from '@/components/elements/actions/Button'
 import { AnnualSlotAdmin } from '@/composites/calendar/AnnualSlotAdmin'
 import type { AnnualSlotAdminProps } from '@/composites/calendar/AnnualSlotAdmin'
-import { AttendanceAnswer } from '@/composites/calendar/AttendanceAnswer'
-import { AttendanceRoster } from '@/composites/calendar/AttendanceRoster'
+import { AttendanceAnswer } from '@/composites/calendar/attendance/AttendanceAnswer'
+import { AttendanceRoster } from '@/composites/calendar/attendance/AttendanceRoster'
 import {
   ANNUAL_REVIEW_COPY,
   AUDIENCE_COPY,

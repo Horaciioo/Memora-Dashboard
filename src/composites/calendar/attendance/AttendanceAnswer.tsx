@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import AppLink from '@/components/elements/navigation/AppLink'
-import { AttendanceHoursDialog } from '@/composites/calendar/AttendanceHoursDialog'
+import { AttendanceHoursDialog } from '@/composites/calendar/attendance/AttendanceHoursDialog'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { accentVars } from '@/declarations/ui/theme'

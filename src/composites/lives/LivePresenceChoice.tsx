@@ -4,7 +4,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { AttendanceHoursDialog } from '@/composites/calendar/AttendanceHoursDialog'
+import { AttendanceHoursDialog } from '@/composites/calendar/attendance/AttendanceHoursDialog'
 import { PresenceUntilDialog } from '@/composites/lives/PresenceUntilDialog'
 import { gateState, suggestedUntil } from '@/core/lib/lives/gate'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
