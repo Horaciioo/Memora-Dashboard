@@ -1,7 +1,7 @@
 'use client'
 
 import { PlayGameCard } from '@/composites/play/hub/PlayGameCard'
-import { PlayNote } from '@/composites/play/hub/PlayNote'
+import { PlayNote } from '@/composites/play/hub/notices/PlayNote'
 import { usePlayNote } from '@/core/hooks/interaction/state/play/usePlayNote'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_CROSS } from '@/declarations/ui/variants'

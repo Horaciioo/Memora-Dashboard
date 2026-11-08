@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation'
 
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
-import { PlayLeaderboard } from '@/composites/play/hub/PlayLeaderboard'
-import type { PlayLeaderboardProps } from '@/composites/play/hub/PlayLeaderboard'
+import { PlayLeaderboard } from '@/composites/play/hub/leaderboard/PlayLeaderboard'
+import type { PlayLeaderboardProps } from '@/composites/play/hub/leaderboard/PlayLeaderboard'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_GAMES, PLAY_MOBILE_COPY } from '@/declarations/play'
 import { PLAY_BOX } from '@/declarations/ui/variants'

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 
-import { PlayNote } from '@/composites/play/hub/PlayNote'
+import { PlayNote } from '@/composites/play/hub/notices/PlayNote'
 import { usePlayNote } from '@/core/hooks/interaction/state/play/usePlayNote'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayMeMenu } from '@/composites/play/mobile/PlayMeMenu'

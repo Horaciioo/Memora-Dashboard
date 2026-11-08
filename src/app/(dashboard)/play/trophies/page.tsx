@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PlayTrophies } from '@/composites/play/member/stats/PlayTrophies'
 import { readPlayProfile } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'

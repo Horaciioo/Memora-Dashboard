@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
 import { PlayGroupRoom } from '@/composites/play/group/PlayGroupRoom'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { listGroupCandidates, readPlayGroup } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ROUTES } from '@/declarations/navigation'

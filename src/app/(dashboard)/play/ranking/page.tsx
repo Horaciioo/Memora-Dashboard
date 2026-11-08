@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
-import { PlayRankingBox } from '@/composites/play/hub/PlayRankingBox'
+import { PlayRankingBox } from '@/composites/play/hub/leaderboard/PlayRankingBox'
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { readCatalog, readLeaderboards } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_MOBILE_COPY, playGameOfSlug } from '@/declarations/play'

@@ -12,7 +12,7 @@ import {
 } from '@/composites/play/registry'
 import type { PlayRulesValue } from '@/composites/play/registry'
 import { PlayLobbyExtras } from '@/composites/play/hub/PlayLobbyExtras'
-import { PlayLobbyLink } from '@/composites/play/hub/PlayLobbyLink'
+import { PlayLobbyLink } from '@/composites/play/hub/lobby/PlayLobbyLink'
 import { PlayInviteSlot } from '@/composites/play/session/PlayInviteSlot'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'

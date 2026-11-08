@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 
-import { PlayCallouts } from '@/composites/play/hub/PlayCallouts'
+import { PlayCallouts } from '@/composites/play/hub/notices/PlayCallouts'
 import { PlayGameGrid } from '@/composites/play/hub/PlayGameGrid'
-import { PlayLiveTables } from '@/composites/play/hub/PlayLiveTables'
+import { PlayLiveTables } from '@/composites/play/hub/lobby/PlayLiveTables'
 import { PlayTopBar } from '@/composites/play/mobile/PlayTopBar'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { listLobbies, readCatalog, readPlayProfile } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'

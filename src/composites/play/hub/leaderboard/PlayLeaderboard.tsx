@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { PlayLeaderRow } from '@/composites/play/hub/PlayLeaderRow'
+import { PlayLeaderRow } from '@/composites/play/hub/leaderboard/PlayLeaderRow'
 import {
   PLAY_HUB_COPY,
   PLAY_LEADER_DEFAULT,

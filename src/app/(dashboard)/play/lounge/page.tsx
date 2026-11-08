@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 
-import { PlayLiveTables } from '@/composites/play/hub/PlayLiveTables'
+import { PlayLiveTables } from '@/composites/play/hub/lobby/PlayLiveTables'
 import { PlayOnlineBox } from '@/composites/play/hub/PlayOnlineBox'
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { listLobbies, readPlayProfile } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_HUB_COPY, PLAY_MOBILE_COPY } from '@/declarations/play'
