@@ -69,13 +69,18 @@ export const PLAY_SHELL = {
 } as const
 
 /**
- * Illustrated backdrop of the room, full screen
- * @type {Readonly<{ root: string; art: string }>}
+ * Painted backdrop of the room, plate plus drifting mist
+ * @type {Readonly<Record<string, string>>}
  */
 
 export const PLAY_SCENE_BANNER = {
   root: 'play-scene-banner pointer-events-none fixed inset-0 z-0 overflow-hidden',
-  art: 'absolute inset-0 size-full object-cover object-center',
+  plate: 'play-scene-plate',
+  art: 'absolute inset-0 size-full',
+  mists: 'play-scene-mists',
+  mist: 'play-scene-mist',
+  mistFar: 'play-scene-mist-far',
+  mistNear: 'play-scene-mist-near',
 } as const
 
 /**

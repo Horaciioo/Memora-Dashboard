@@ -86,3 +86,66 @@
     animation: none;
   }
 }
+
+/* Painted plate, cover-fitted to the screen whatever its ratio */
+.play-scene-banner {
+  container-type: size;
+}
+
+.play-scene-plate {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: max(100cqw, calc(100cqh * var(--plate-ratio)));
+  aspect-ratio: var(--plate-ratio);
+}
+
+.play-scene-plate:not(.hidden) {
+  --plate-ratio: 0.5625;
+}
+
+@media (min-width: 768px) {
+  .play-scene-plate {
+    --plate-ratio: 1.7778;
+  }
+}
+
+/* Mist stays in the middle depth, never over the framing pines */
+.play-scene-mists {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent 4%, #000 26%, #000 74%, transparent 96%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 26%, #000 74%, transparent 96%);
+  opacity: 0.7;
+}
+
+/* Mist strips, one plate wide each, doubled and slid by exactly one plate */
+.play-scene-mist {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 200%;
+  background-repeat: repeat-x;
+  background-size: 50% 100%;
+  animation: play-mist-drift 220s linear infinite;
+  will-change: transform;
+}
+
+.play-scene-mist-near {
+  animation-duration: 140s;
+  animation-direction: reverse;
+}
+
+@keyframes play-mist-drift {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-scene-mist {
+    animation: none;
+  }
+}
