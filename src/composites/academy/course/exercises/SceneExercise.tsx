@@ -32,7 +32,15 @@ export const SceneExercise = ({
   const { session } = useAuthContext()
   const record = asRecord(answer)
   const [index, setIndex] = useState(0)
+  const [lastResult, setLastResult] = useState(result)
   const question = block.questions[index]
+
+  // A failed check goes back to the first question missed, never stays on a right one
+  if (lastResult !== result) {
+    setLastResult(result)
+    const missed = block.questions.findIndex((entry) => result?.marks[entry.key] === false)
+    if (result && !result.passed && missed >= 0) setIndex(missed)
+  }
 
   return (
     <div className={COURSE_SCENE.wide}>
