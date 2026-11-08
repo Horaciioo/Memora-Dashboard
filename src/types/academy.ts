@@ -299,15 +299,33 @@ export interface AcademyReviewView {
 }
 
 /**
+ * Accepted candidate without a junior file yet
+ * @typedef {Object} AwaitingCandidate
+ * @property {string} id - Candidate identifier
+ * @property {string} sessionId - Recruitment session
+ * @property {string} name - Display name
+ * @property {string | null} avatarUrl - Portrait
+ */
+
+export interface AwaitingCandidate {
+  id: string
+  sessionId: string
+  name: string
+  avatarUrl: string | null
+}
+
+/**
  * Everything one session screen needs
  * @typedef {Object} SessionDetail
  * @property {SessionSummary} summary - Session header
  * @property {JuniorView[]} juniors - Juniors inside
+ * @property {AwaitingCandidate[]} awaiting - Accepted, not yet juniors
  */
 
 export interface SessionDetail {
   summary: SessionSummary
   juniors: JuniorView[]
+  awaiting: AwaitingCandidate[]
 }
 
 /**

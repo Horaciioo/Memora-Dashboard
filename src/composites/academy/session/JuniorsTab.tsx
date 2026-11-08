@@ -23,7 +23,8 @@ import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 
 export const JuniorsTab = () => {
   const router = useRouter()
-  const { session, can, hasCandidates, juniorForm, juniorMenu, openJunior } = useSessionState()
+  const { detail, session, can, hasCandidates, juniorForm, juniorMenu, openJunior } =
+    useSessionState()
 
   // One heading per outcome, where the junior stands on the right
   const groups: RowListGroup[] = ACADEMY_JUNIOR_STATUS_REGISTRY.keys
@@ -44,10 +45,27 @@ export const JuniorsTab = () => {
     }))
     .filter((group) => group.items.length > 0)
 
+  // Accepted, no file yet
+  if (detail.awaiting.length > 0) {
+    groups.push({
+      id: 'awaiting',
+      label: ACADEMY_COPY.awaitingTitle,
+      accent: 'neutral',
+      items: detail.awaiting.map((candidate) => ({
+        id: candidate.id,
+        title: candidate.name,
+        lead: <Avatar name={candidate.name} src={candidate.avatarUrl} size="md" />,
+        trail: ACADEMY_COPY.awaitingTrail,
+        menu: [],
+        onOpen: () => router.push(ROUTES.candidate(candidate.sessionId, candidate.id)),
+      })),
+    })
+  }
+
   return (
     <div {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.sessionJuniors }}>
       <Section bare>
-        {session.juniors.length === 0 ? (
+        {session.juniors.length === 0 && detail.awaiting.length === 0 ? (
           <EmptyState
             figure="academy"
             title={hasCandidates ? ACADEMY_COPY.juniorEmptyTitle : ACADEMY_COPY.noMembersTitle}
