@@ -75,6 +75,7 @@ export const viewerSanctions = async (
     kind: row.kind,
     durationSeconds: row.durationSeconds,
     reason: row.reason,
+    messageExcerpt: row.messageExcerpt,
     actorName:
       reader.seesAll || (row.actorAccountId && readable.has(row.actorAccountId))
         ? (row.actor?.displayName ?? row.actorLogin ?? '')

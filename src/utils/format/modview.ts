@@ -1,5 +1,6 @@
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { MODVIEW_DURATION_COPY, MODVIEW_SPAN_COPY } from '@/declarations/modview/copy'
+import { TWITCH_ENDPOINTS } from '@/declarations/platforms/twitch'
 import { DATE_LOCALE } from '@/declarations/ui/dates'
 import { DAY_SECONDS, HOUR_SECONDS } from '@/utils/constants/time'
 
@@ -88,4 +89,28 @@ export const formatSpent = (seconds: number): string => {
         .replace('{hours}', String(hours))
         .replace('{minutes}', String(minutes % MINUTE).padStart(2, '0'))
     : MEMBER_COPY.spentMinutes.replace('{minutes}', String(minutes))
+}
+
+/**
+ * Day and month of a moment, as 2/10
+ * @param {string} iso - Moment
+ * @return {string} - Short day
+ */
+
+export const formatShortDay = (iso: string): string =>
+  new Date(iso).toLocaleDateString(DATE_LOCALE, { day: 'numeric', month: 'numeric' })
+
+/**
+ * Viewer card of Twitch's mod view, from the stream embed
+ * @param {string | null} embedUrl - Embed address holding the channel
+ * @param {string} login - Viewer login
+ * @return {string | null} Address, none without a channel
+ */
+
+export const twitchViewerCardUrl = (embedUrl: string | null, login: string) => {
+  const channel = embedUrl ? new URL(embedUrl).searchParams.get('channel') : null
+
+  return channel
+    ? `${TWITCH_ENDPOINTS.site}/popout/${channel}/viewercard/${encodeURIComponent(login)}`
+    : null
 }

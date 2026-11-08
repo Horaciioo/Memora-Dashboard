@@ -30,6 +30,8 @@ export const QUERY_KEYS = {
   liveViewer: (liveId: string, viewerId: string) => ['lives', 'viewer', liveId, viewerId] as const,
   liveViewerComments: (liveId: string, viewerId: string) =>
     ['lives', 'viewer-comments', liveId, viewerId] as const,
+  liveViewerChat: (liveId: string, viewerId: string) =>
+    ['lives', 'viewer-chat', liveId, viewerId] as const,
   liveFocus: (liveId: string) => ['lives', 'focus', liveId] as const,
   livePanel: (youtuberId: string, panel: string, levelId: string | null) =>
     ['lives', 'panel', youtuberId, panel, levelId] as const,

@@ -252,7 +252,7 @@ export interface MemberModerationView {
  * @property {string | null} avatar - Avatar address
  * @property {AttendanceStatusName} status - Answer in force
  * @property {boolean} isJunior - Counted for a PIM
- * @property {string | null} plannedFrom - ISO hour they said they would be there, for Responsables
+ * @property {string | null} plannedFrom - ISO hour they said they would be there, for coordinators and Responsables
  * @property {boolean} isReinforcement - Called in on the day
  */
 
@@ -313,6 +313,7 @@ export interface LiveFocusView {
  * @property {ModerationKind} kind - Gesture
  * @property {number | null} durationSeconds - Timeout length
  * @property {string | null} reason - Reason
+ * @property {string | null} messageExcerpt - Message it answered
  * @property {string | null} actorName - Who did it, hidden from a Modo for a colleague
  * @property {string} liveTitle - Live it happened on
  * @property {boolean} fromPanel - Applied from the panel
@@ -326,6 +327,7 @@ export interface ViewerSanction {
   kind: ModerationKind
   durationSeconds: number | null
   reason: string | null
+  messageExcerpt: string | null
   actorName: string | null
   liveTitle: string
   fromPanel: boolean

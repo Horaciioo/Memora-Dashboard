@@ -3,7 +3,6 @@
 import { memo, useState } from 'react'
 
 import { ActSentence } from '@/composites/modview/ActSentence'
-import { ChatterAvatar } from '@/composites/modview/ChatterAvatar'
 import { ChatText } from '@/composites/modview/ChatText'
 import { ReasonDialog } from '@/composites/modview/ReasonDialog'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
@@ -20,7 +19,6 @@ import { MODVIEW_CHAT, MODVIEW_TIER, MODVIEW_WARN } from '@/declarations/ui/vari
 import type { ChatBadge, ChatMessage, Chatter, MemoraRank, ModViewIntent } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { chatColour } from '@/utils/format/chatColour'
-import { formatClock } from '@/utils/format/modview'
 
 // Badge glyphs
 const BADGE_ICONS: Record<ChatBadge, IconName> = {
@@ -192,12 +190,6 @@ const ChatLineBody = ({
         </span>
       )}
       {toolsPosition === 'left' && toolsNode}
-      {options.timestamps && (
-        <time className={MODVIEW_CHAT.time} dateTime={message.sentAt}>
-          {formatClock(message.sentAt)}
-        </time>
-      )}
-      <ChatterAvatar chatter={message.author} />
       {options.badges &&
         badgeIcons.map((icon) => {
           const Badge = ICONS[icon]
