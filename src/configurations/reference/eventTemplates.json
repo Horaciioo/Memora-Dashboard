@@ -130,14 +130,14 @@
   },
   {
     "name": "Entrevue Junior <> Référents",
-    "purpose": "TRAINER_INTERVIEW",
+    "purpose": "REFERENT_INTERVIEW",
     "kind": "EVENT",
     "summary": "Point entre un Junior et un Référent.",
     "accent": "#6a9bd1",
     "visibility": "RESPONSABLES",
     "defaultMinutes": 30,
     "allDay": false,
-    "icon": "functionTrainer",
+    "icon": "functionReferent",
     "category": "Academy",
     "linksTo": "ACADEMY"
   },

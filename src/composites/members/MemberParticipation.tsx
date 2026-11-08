@@ -82,12 +82,12 @@ const factsOf = (entry: Participation): [string, string][] => {
 /**
  * Seat the unidentified label of a session line stands for
  * @param {Participation} entry - Session line
- * @return {TemporaryKind} - Trainer, recruiter, or observer alone
+ * @return {TemporaryKind} - Referent, recruiter, or observer alone
  */
 
 const seatKindOf = (entry: Participation): TemporaryKind =>
   entry.kind === 'academy'
-    ? 'trainer'
+    ? 'referent'
     : entry.roles.includes('recruiter') || !entry.roles.includes('observer')
       ? 'recruiter'
       : 'observer'

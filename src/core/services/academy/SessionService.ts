@@ -115,6 +115,10 @@ const ensureSessionInvite = async (
 ): Promise<void> => {
   if (status !== AcademySessionStatuses.Open) return
 
+  // A campaign hands out its own link
+  const fed = await prisma.recruitmentSession.count({ where: { academySessionId: sessionId } })
+  if (fed > 0) return
+
   const existing = await prisma.integrationInvite.findFirst({
     where: { sessionId, expiresAt: { gt: new Date() } },
   })
@@ -147,7 +151,7 @@ export const createSession = async (values: FormValues): Promise<SessionSummary[
   const row = await prisma.academySession.create({
     data: {
       ...toSessionData(values),
-      trainers: { create: readList(values, 'trainerIds').map((accountId) => ({ accountId })) },
+      referents: { create: readList(values, 'referentIds').map((accountId) => ({ accountId })) },
     },
   })
 
@@ -177,12 +181,16 @@ export const updateSession = async (
 
   if (launching) await ensureLaunchable(id)
 
-  // The trainer seats are replaced wholesale
+  // Kept seats keep their state
+  const referentIds = readList(values, 'referentIds')
   await prisma.$transaction([
     prisma.academySession.update({ where: { id }, data }),
-    prisma.academySessionTrainer.deleteMany({ where: { sessionId: id } }),
-    prisma.academySessionTrainer.createMany({
-      data: readList(values, 'trainerIds').map((accountId) => ({ sessionId: id, accountId })),
+    prisma.academySessionReferent.deleteMany({
+      where: { sessionId: id, forgottenAt: null, accountId: { notIn: referentIds } },
+    }),
+    prisma.academySessionReferent.createMany({
+      data: referentIds.map((accountId) => ({ sessionId: id, accountId })),
+      skipDuplicates: true,
     }),
   ])
 
@@ -211,7 +219,7 @@ export const launchPromotion = async (id: string): Promise<void> => {
 /**
  * Refuse to launch a promotion while a confirmed junior still has no Référent
  * @param {string} id - Session identifier
- * @return {Promise<void>} - Throws when a trainer is missing
+ * @return {Promise<void>} - Throws when a referent is missing
  */
 
 const ensureLaunchable = async (id: string): Promise<void> => {
@@ -222,11 +230,11 @@ const ensureLaunchable = async (id: string): Promise<void> => {
       sessionId: id,
       status: AcademyJuniorStatuses.Active,
       confirmedAt: { not: null },
-      trainerId: null,
+      referentId: null,
     },
   })
 
-  if (orphans > 0) throw conflict(ACADEMY_COPY.launchMissingTrainer)
+  if (orphans > 0) throw conflict(ACADEMY_COPY.launchMissingReferent)
 
   // Nobody ready means nothing to launch
   const ready = await prisma.academyJunior.count({

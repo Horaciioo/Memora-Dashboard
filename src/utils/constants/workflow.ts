@@ -138,7 +138,7 @@ export type CalendarKindName = (typeof CalendarKinds)[keyof typeof CalendarKinds
  */
 
 export const EventPurposes = {
-  TrainerInterview: 'TRAINER_INTERVIEW',
+  ReferentInterview: 'REFERENT_INTERVIEW',
   PanelInterview: 'PANEL_INTERVIEW',
   ReviewOne: 'REVIEW_ONE',
   ReviewFinal: 'REVIEW_FINAL',

@@ -22,7 +22,7 @@ import type { ReviewAdviceName } from '@/utils/constants/hierarchy'
  * What a responsable sends on a check-in
  * @typedef {Object} ReviewDecisionInput
  * @property {ReviewAdviceName} [decision] - Outcome kept
- * @property {boolean} [bounce] - Sent back to the trainer
+ * @property {boolean} [bounce] - Sent back to the referent
  * @property {string} [deadlineAt] - Third period deadline
  * @property {string} [decisionNote] - Note
  */

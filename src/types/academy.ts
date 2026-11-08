@@ -108,7 +108,7 @@ export interface SessionRecruitment {
  * @property {string | null} endsAt - ISO end date
  * @property {AcademySessionStatusName} status - Lifecycle state
  * @property {string | null} secondPeriodAt - ISO moment the second period opened
- * @property {WorkPerson[]} trainers - Moderators holding the trainer seat
+ * @property {WorkPerson[]} referents - Moderators holding the referent seat
  * @property {number} juniorCount - Juniors inside
  * @property {string | null} inviteToken - Token of the active admission link
  * @property {ParkourPhase[]} phases - Phase of every junior, furthest along first
@@ -125,7 +125,7 @@ export interface SessionSummary {
   endsAt: string | null
   status: AcademySessionStatusName
   secondPeriodAt: string | null
-  trainers: WorkPerson[]
+  referents: WorkPerson[]
   juniorCount: number
   inviteToken: string | null
   phases: ParkourPhase[]
@@ -148,7 +148,7 @@ export interface SessionSummary {
  * @property {AcademyStageName} stage - Current phase of the PIM
  * @property {ParkourPhase} phase - Where the junior stands on the journey
  * @property {ParkourPhase} progress - Furthest phase reached, whatever the outcome
- * @property {WorkPerson | null} trainer - Trainer in charge
+ * @property {WorkPerson | null} referent - Referent in charge
  * @property {string} startedAt - ISO arrival date
  * @property {string | null} validatedAt - ISO validation date
  * @property {number} liveCount - Lives already covered
@@ -172,7 +172,7 @@ export interface JuniorView {
   stage: AcademyStageName
   phase: ParkourPhase
   progress: ParkourPhase
-  trainer: WorkPerson | null
+  referent: WorkPerson | null
   startedAt: string
   validatedAt: string | null
   liveCount: number

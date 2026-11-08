@@ -31,7 +31,7 @@ export const GET = createProtectedRoute({
         id: true,
         sessionId: true,
         account: { select: { displayName: true } },
-        trainer: { select: { displayName: true } },
+        referent: { select: { displayName: true } },
       },
       orderBy: { account: { displayName: 'asc' } },
       take: HITS_MAX,
@@ -41,7 +41,7 @@ export const GET = createProtectedRoute({
       juniorId: row.id,
       sessionId: row.sessionId,
       name: row.account.displayName,
-      hint: row.trainer?.displayName ?? null,
+      hint: row.referent?.displayName ?? null,
     }))
   },
 })

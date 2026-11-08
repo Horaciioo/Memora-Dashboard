@@ -125,7 +125,7 @@ export const CALENDAR_FIELD_COPY = {
   slotTo: 'Fermeture',
   recruitmentSession: 'Recrutement',
   junior: 'Junior',
-  trainer: 'Référent',
+  referent: 'Référent',
   responsables: 'Responsables',
 } as const
 
@@ -137,7 +137,7 @@ export const CALENDAR_FIELD_COPY = {
 export const ACADEMY_EVENT_COPY = {
   sessionInfo: 'La Session du Junior : les Référents et les Juniors proposés en dépendent.',
   juniorInfo: 'Le Junior que l’évènement concerne, il en est convoqué.',
-  trainerInfo: 'Le Référent qui reçoit le Junior, toi par défaut.',
+  referentInfo: 'Le Référent qui reçoit le Junior, toi par défaut.',
   responsablesInfo: 'Les Responsables du YouTubeur qui ne sont pas absents.',
   reviewDone: 'Bilan déjà réalisé',
   reviewOpensOn: 'Ouvert à partir du {date}',

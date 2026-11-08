@@ -30,7 +30,7 @@ const GLOSSARY_MAP = {
     label: 'Junior',
     definition: 'Modérateur en période d’intégration, rattaché à une session.',
   },
-  trainer: {
+  referent: {
     label: 'Référent',
     definition: 'Responsable du suivi principal d’un Junior. Il rédige les bilans de ses étapes.',
   },

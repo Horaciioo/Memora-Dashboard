@@ -32,18 +32,21 @@ export const OPEN_SCOPE: AcademyScope = { session: {}, juniors: {} }
  */
 
 export const academyScope = (viewer: SessionUser, access: PermissionHelpers): AcademyScope => {
-  if (access.isAdmin || access.isResponsable) return OPEN_SCOPE
+  // Référents look after everyone
+  if (access.isAdmin || access.isResponsable || access.can(Permissions.AcademyReviewWrite)) {
+    return OPEN_SCOPE
+  }
 
-  // A trainer follows their own juniors only, a junior sees nobody but themselves
+  // A junior sees themselves
   return {
     session: {
       OR: [
         { functionId: { in: viewer.functionIds } },
-        { juniors: { some: { OR: [{ accountId: viewer.id }, { trainerId: viewer.id }] } } },
-        { trainers: { some: { accountId: viewer.id } } },
+        { juniors: { some: { OR: [{ accountId: viewer.id }, { referentId: viewer.id }] } } },
+        { referents: { some: { accountId: viewer.id } } },
       ],
     },
-    juniors: { OR: [{ accountId: viewer.id }, { trainerId: viewer.id }] },
+    juniors: { OR: [{ accountId: viewer.id }, { referentId: viewer.id }] },
   }
 }
 

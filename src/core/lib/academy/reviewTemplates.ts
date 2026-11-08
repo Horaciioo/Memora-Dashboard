@@ -16,7 +16,7 @@ export interface ReviewTemplateJunior {
   reviews: { stage: AcademyStageName; status: ReviewStatusName }[]
 }
 
-// Check-ins a trainer deposited, a draft is still to do
+// Check-ins a referent deposited, a draft is still to do
 const DEPOSITED: ReviewStatusName[] = [ReviewStatuses.Submitted, ReviewStatuses.Validated]
 
 /**

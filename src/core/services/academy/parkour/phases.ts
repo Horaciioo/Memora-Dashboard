@@ -24,8 +24,7 @@ export const thresholds = () => ({
 export const toParkourJunior = (row: {
   status: string
   stage: string
-  trainerId: string | null
-  kickoffAt: Date | null
+  referentId: string | null
   confirmedAt: Date | null
   liveCount: number
   deadlineAt: Date | null
@@ -33,8 +32,7 @@ export const toParkourJunior = (row: {
 }): ParkourJunior => ({
   status: row.status as AcademyJuniorStatusName,
   stage: row.stage as AcademyStageName,
-  trainerId: row.trainerId,
-  kickoffAt: row.kickoffAt,
+  referentId: row.referentId,
   confirmedAt: row.confirmedAt,
   liveCount: row.liveCount,
   deadlineAt: row.deadlineAt,

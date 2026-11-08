@@ -88,7 +88,7 @@ export const toCampaign = (row: CampaignRow | null): SessionRecruitment | null =
 /**
  * Shape one session row
  * @param {Map<string, number>} numbers - Session ranks
- * @param {object} row - Session row with its trainers and counts
+ * @param {object} row - Session row with its referents and counts
  * @return {SessionSummary} - Session summary
  */
 
@@ -108,7 +108,7 @@ export const toSummary = (
       accent: string | null
       icon: string | null
     }
-    trainers: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
+    referents: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
     _count: { juniors: number }
     invites: { token: string; expiresAt: Date; maxUses: number | null; uses: number }[]
     recruitmentSession: CampaignRow | null
@@ -127,7 +127,7 @@ export const toSummary = (
     endsAt: row.endsAt?.toISOString() ?? null,
     status: row.status,
     secondPeriodAt: row.secondPeriodAt?.toISOString() ?? null,
-    trainers: row.trainers
+    referents: row.referents
       .map((seat) => toPerson(seat.account))
       .filter((person) => person !== null),
     juniorCount: row._count.juniors,
@@ -142,7 +142,7 @@ export const toSummary = (
         row.startsAt.toISOString().slice(0, 10),
         (row.endsAt ?? row.startsAt).toISOString().slice(0, 10),
       ],
-      trainerIds: row.trainers.map((seat) => seat.account.id),
+      referentIds: row.referents.map((seat) => seat.account.id),
     },
   }
 }
@@ -150,8 +150,12 @@ export const toSummary = (
 // Everything a session row needs to become a summary
 export const SESSION_SHAPE = {
   jobFunction: true,
-  trainers: { include: { account: true } },
+  referents: { include: { account: true } },
   _count: { select: { juniors: true } },
-  invites: { orderBy: { createdAt: 'desc' as const }, take: 1 },
+  invites: {
+    // Campaign link first
+    orderBy: { recruitmentSessionId: { sort: 'desc' as const, nulls: 'last' as const } },
+    take: 1,
+  },
   recruitmentSession: CAMPAIGN_SHAPE,
 } as const

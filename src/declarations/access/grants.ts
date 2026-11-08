@@ -163,8 +163,8 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
         Permissions.LiveFocus,
       ],
     },
-    // Trainers follow their juniors only
-    functions: { [FunctionNames.Trainers]: [Permissions.LiveFocus] },
+    // Referents follow their juniors only
+    functions: { [FunctionNames.Referents]: [Permissions.LiveFocus] },
   },
   {
     key: 'work-deletion',
@@ -228,19 +228,19 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
   {
     key: 'academy-recruitment-by-function',
     grants: {},
-    // Only trainers and recruiters open these pages
+    // Only referents and recruiters open these pages
     functions: {
-      [FunctionNames.Trainers]: [Permissions.AcademyRead],
+      [FunctionNames.Referents]: [Permissions.AcademyRead],
       [FunctionNames.Recruiters]: [Permissions.RecruitmentRead],
     },
     revokes: { [MemberRoles.Moderateur]: [Permissions.AcademyRead, Permissions.RecruitmentRead] },
   },
   {
-    key: 'trainers-recruiters-working-rights',
+    key: 'referents-recruiters-working-rights',
     grants: {},
     // They do their work without any Responsable access
     functions: {
-      [FunctionNames.Trainers]: [
+      [FunctionNames.Referents]: [
         Permissions.AcademyReviewRead,
         Permissions.AcademyReviewWrite,
         Permissions.AcademySkillWrite,
@@ -258,16 +258,16 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     functions: { Observateurs: [Permissions.RecruitmentObserve] },
   },
   {
-    key: 'trainers-calendar-off',
+    key: 'referents-calendar-off',
     grants: {},
     // Planning stays with the Responsables for now
-    functionRevokes: { [FunctionNames.Trainers]: [Permissions.CalendarManage] },
+    functionRevokes: { [FunctionNames.Referents]: [Permissions.CalendarManage] },
   },
   {
-    key: 'trainers-open-academy',
+    key: 'referents-open-academy',
     grants: {},
     // Moderators holding the function open the Academy
-    functions: { [FunctionNames.Trainers]: [Permissions.AcademyRead] },
+    functions: { [FunctionNames.Referents]: [Permissions.AcademyRead] },
   },
   {
     key: 'leads-see-youtubers',

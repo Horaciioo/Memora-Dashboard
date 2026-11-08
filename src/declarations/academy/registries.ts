@@ -89,7 +89,7 @@ export const ACADEMY_STAGE_REGISTRY = createRegistry(STAGE_MAP)
 
 const STEP_OWNER_MAP: Record<StepOwnerName, AcademyOption> = {
   [StepOwners.Responsable]: { label: 'Responsable', accent: 'warning', icon: 'flame' },
-  [StepOwners.Formateurs]: { label: 'Référents', accent: 'brand', icon: 'functionTrainer' },
+  [StepOwners.Referents]: { label: 'Référents', accent: 'brand', icon: 'functionReferent' },
   [StepOwners.Both]: { label: 'Responsable + Référents', accent: 'info', icon: 'teams' },
   [StepOwners.Junior]: { label: 'Junior', accent: 'success', icon: 'academy' },
 }

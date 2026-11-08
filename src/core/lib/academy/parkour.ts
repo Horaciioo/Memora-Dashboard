@@ -20,8 +20,7 @@ import type {
  */
 
 export type ParkourPhase =
-  | 'needsTrainer'
-  | 'needsKickoff'
+  | 'needsReferent'
   | 'awaitingInfo'
   | 'ready'
   | 'periodOne'
@@ -58,8 +57,7 @@ export interface ParkourReview {
 export interface ParkourJunior {
   status: AcademyJuniorStatusName
   stage: AcademyStageName
-  trainerId: string | null
-  kickoffAt: Date | null
+  referentId: string | null
   confirmedAt: Date | null
   liveCount: number
   deadlineAt: Date | null
@@ -176,8 +174,7 @@ export const resolvePhase = (
 
   // Before the PIM runs for this junior
   if (junior.stage === AcademyStages.Preparation) {
-    if (!junior.trainerId) return 'needsTrainer'
-    if (!junior.kickoffAt) return 'needsKickoff'
+    if (!junior.referentId) return 'needsReferent'
     if (!junior.confirmedAt) return 'awaitingInfo'
     return 'ready'
   }
@@ -215,7 +212,7 @@ export const resolvePhase = (
 }
 
 /**
- * Phases where a trainer owes a check-in
+ * Phases where a referent owes a check-in
  * @type {ParkourPhase[]}
  */
 
@@ -262,7 +259,7 @@ export const reviewStageOf = (stage: AcademyStageName): AcademyStageName | null 
   REVIEW_OF[stage] ?? null
 
 /**
- * Advices a trainer may give at a check-in
+ * Advices a referent may give at a check-in
  * @param {AcademyStageName} stage - Check-in stage
  * @return {ReviewAdviceName[]} - Advices
  */
@@ -327,7 +324,10 @@ export const readyToLaunch = (session: ParkourSession, juniors: ParkourJunior[])
 
   const seated = juniors.filter((junior) => junior.status === AcademyJuniorStatuses.Active)
 
-  return seated.length > 0 && seated.every((junior) => junior.confirmedAt !== null)
+  return (
+    seated.length > 0 &&
+    seated.every((junior) => junior.confirmedAt !== null && junior.referentId !== null)
+  )
 }
 
 /**

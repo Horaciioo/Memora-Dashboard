@@ -207,7 +207,7 @@ export const PARTICIPATION_ROLE_COPY: Record<ParticipationRole, string> = {
   responsable: 'Responsable de session',
   recruiter: RECRUITMENT_FIELD_COPY.recruiter,
   observer: RECRUITMENT_FIELD_COPY.observer,
-  trainer: 'Référent',
+  referent: 'Référent',
 }
 
 /**
@@ -221,6 +221,6 @@ export const PARTICIPATION_TABS = [
     label: MEMBER_COPY.stageRecruitment,
     functions: [FunctionNames.Recruiters, FunctionNames.Observers],
   },
-  { value: 'academy', label: MEMBER_COPY.stageAcademy, functions: [FunctionNames.Trainers] },
+  { value: 'academy', label: MEMBER_COPY.stageAcademy, functions: [FunctionNames.Referents] },
   { value: 'coordination', label: 'Coordination', functions: [FunctionNames.Coordinator] },
 ] as const

@@ -21,6 +21,8 @@ export const ROUTES = {
   privacy: '/privacy',
   offline: '/offline',
   integration: (token: string) => `/integration/${token}`,
+  welcome: '/welcome',
+  welcomeLink: (token: string) => `/welcome/${token}`,
   exercise: (token: string) => `/exercise/${token}`,
   dashboard: '/dashboard',
   members: '/members',

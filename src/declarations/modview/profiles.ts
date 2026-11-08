@@ -9,7 +9,7 @@ import type { ModViewWindow } from '@/types/modview'
 
 export const ModViewProfiles = {
   Moderator: 'moderator',
-  Trainer: 'trainer',
+  Referent: 'referent',
   Lead: 'lead',
   Admin: 'admin',
 } as const
@@ -53,7 +53,7 @@ const PROFILE_MAP: Record<ModViewProfileName, ModViewProfileOption> = {
     sizes: SIZES,
     hidden: ['community'],
   },
-  trainer: {
+  referent: {
     label: 'Référent',
     windows: FLOOR,
     columns: FLOOR_COLUMNS,

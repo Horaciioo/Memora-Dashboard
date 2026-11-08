@@ -158,7 +158,7 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
             meta: session.endsAt
               ? formatDayRange(session.startsAt, session.endsAt)
               : formatDay(session.startsAt),
-            people: session.trainers,
+            people: session.referents,
             muted: FINISHED_ACADEMY_SESSION_STATUSES.includes(session.status),
             menu: sessionMenu(session),
             onOpen: () => router.push(ROUTES.session(session.id)),

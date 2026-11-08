@@ -33,7 +33,7 @@ export const teardown = async (): Promise<number> => {
     () => prisma.recruitmentResponsable.deleteMany({ where: OWN }),
     () => prisma.recruitmentSession.deleteMany({ where: OWN }),
     () => prisma.academyJunior.deleteMany({ where: OWN }),
-    () => prisma.academySessionTrainer.deleteMany({ where: OWN }),
+    () => prisma.academySessionReferent.deleteMany({ where: OWN }),
     () => prisma.academySession.deleteMany({ where: OWN }),
     () => prisma.liveconEntry.deleteMany({ where: OWN }),
     () => prisma.absence.deleteMany({ where: OWN }),

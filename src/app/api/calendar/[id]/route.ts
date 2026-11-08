@@ -21,7 +21,7 @@ export const PATCH = createProtectedRoute({
   handler: async ({ params, raw, session, access }) => {
     const viewer = await calendarViewer(session, access)
     const perimeter = viewer.scope
-    // A trainer reaches their own entries only
+    // A referent reaches their own entries only
     const canManage = access.can(Permissions.CalendarManage) && access.isResponsable
     await assertEntriesReachable([params.id], viewer, canManage)
     const canAnnounceLive = access.can(Permissions.LiveAnnounce)

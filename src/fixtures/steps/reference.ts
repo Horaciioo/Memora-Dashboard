@@ -44,7 +44,7 @@ const FUNCTION_GRANTS: Record<FunctionKey, string[]> = {
   functionLive: ['livecon:read', 'livecon:update', 'sanction:read'],
   functionAnimator: ['calendar:read', 'calendar:manage', 'communication:write'],
   functionRecruiter: ['recruitment:read', 'recruitment:candidate:write'],
-  functionTrainer: [
+  functionReferent: [
     'academy:read',
     'academy:review:read',
     'academy:review:write',

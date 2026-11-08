@@ -66,7 +66,7 @@ const BASE_TINTS = {
     deepTo: '#134e4a',
     cut: '#f0fdfa',
   },
-  TRAINER: {
+  REFERENT: {
     fillFrom: '#4ade80',
     fillTo: '#16a34a',
     liftFrom: '#dcfce7',

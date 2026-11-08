@@ -18,7 +18,7 @@ export const SESSION_FILE_COPY = {
   responsables: 'Responsables',
   observers: 'Observateurs',
   recruiters: 'Recruteurs',
-  trainers: 'Référents',
+  referents: 'Référents',
   recruitment: 'Recrutement',
   promotion: 'PIM',
   description: 'Description',

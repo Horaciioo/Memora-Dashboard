@@ -21,9 +21,9 @@ export const JuniorDrawers = () => {
     <>
       <FormDrawer
         subject={FORM_SUBJECTS.junior}
-        open={dialog === 'trainer'}
-        title={PARKOUR_COPY.assignTrainer}
-        fields={fields.junior.filter((field) => field.name === 'trainerId')}
+        open={dialog === 'referent'}
+        title={PARKOUR_COPY.assignReferent}
+        fields={fields.junior.filter((field) => field.name === 'referentId')}
         initialValues={file.junior.values}
         issues={file.issues}
         isSaving={file.isSaving}

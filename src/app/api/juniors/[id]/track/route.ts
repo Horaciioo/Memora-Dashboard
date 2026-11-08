@@ -2,11 +2,7 @@ import { forbidden, invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { juniorAccount } from '@/core/services/academy/AcademyService'
-import {
-  declareKickoff,
-  readParkour,
-  resignJunior,
-} from '@/core/services/academy/parkour/ParkourService'
+import { readParkour, resignJunior } from '@/core/services/academy/parkour/ParkourService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { PARKOUR_COPY } from '@/declarations/academy/parkour'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
@@ -22,24 +18,14 @@ export const GET = createProtectedRoute({
 export const POST = createProtectedRoute({
   permission: Permissions.AcademyManage,
   descriptor: {
-    summary: 'Declare the PIM start of a junior, or record their resignation',
+    summary: 'Record the resignation of a junior',
     tags: ['academy'],
   },
   handler: async ({ params, raw, session, access }) => {
     const scope = academyScope(session, access)
     const { accountId } = await juniorAccount(params.id, scope)
 
-    if (raw.action === 'kickoff') {
-      await declareKickoff(params.id, scope)
-      await recordEvent({
-        eventType: 'ParkourMoved',
-        actorId: session.id,
-        subjectId: accountId,
-        targetType: 'junior',
-        targetId: params.id,
-        summary: PARKOUR_COPY.kickoffDeclared,
-      })
-    } else if (raw.action === 'resign') {
+    if (raw.action === 'resign') {
       // Only a responsable or above records a departure
       if (!access.isResponsable) throw forbidden()
 

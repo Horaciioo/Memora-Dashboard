@@ -20,9 +20,9 @@ const livesBar: Gestures = ({ parkour }) =>
     <LiveProgress count={parkour.liveCount} needed={parkour.livesNeeded} />
   ) : null
 
-// The trainer of the junior writes the check-in
+// The referent of the junior writes the check-in
 const reviewGesture: Gestures = ({ file, can, setFlow }) =>
-  file.junior.trainer?.id === can.viewerId && can.writeReviews ? (
+  file.junior.referent?.id === can.viewerId && can.writeReviews ? (
     <Button variant="primary" icon="sheet" onClick={() => setFlow('reviews')}>
       {PARKOUR_COPY.doReviews}
     </Button>
@@ -42,24 +42,13 @@ const decisionGesture: Gestures = ({ can, setFlow }) =>
  */
 
 const STEP_GESTURES: Record<string, Gestures> = {
-  trainer: ({ can, trainerForm }) =>
+  referent: ({ can, referentForm }) =>
     can.lead ? (
       <span {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.fsiEdit }}>
-        <Button variant="primary" icon="functionTrainer" onClick={trainerForm}>
-          {PARKOUR_COPY.assignTrainer}
+        <Button variant="primary" icon="functionReferent" onClick={referentForm}>
+          {PARKOUR_COPY.assignReferent}
         </Button>
       </span>
-    ) : null,
-  kickoff: ({ can, actions }) =>
-    can.lead ? (
-      <Button
-        variant="primary"
-        icon="link"
-        isLoading={actions.isSaving}
-        onClick={() => void actions.declareKickoff()}
-      >
-        {PARKOUR_COPY.declareKickoff}
-      </Button>
     ) : null,
   integration: ({ can, parkour }) =>
     can.lead && parkour?.integrationPath ? (
@@ -79,6 +68,7 @@ const STEP_GESTURES: Record<string, Gestures> = {
     ) : null,
   periodOne: livesBar,
   periodTwo: livesBar,
+  periodThree: livesBar,
   reviewOne: reviewGesture,
   reviewTwo: reviewGesture,
   finalReview: reviewGesture,

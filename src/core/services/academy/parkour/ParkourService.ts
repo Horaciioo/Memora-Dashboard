@@ -21,7 +21,7 @@ import { conflict, immutable, invalidInput, notFound } from '@/core/lib/errors'
 import { readDate } from '@/core/lib/forms/values'
 import { launchPromotion } from '@/core/services/academy/AcademyService'
 import { assertRecruitmentOver, awaitsRecruitment } from '@/core/services/academy/recruitmentGate'
-import { graduateAccount } from '@/core/services/academy/AdmissionService'
+import { graduateAccount, releaseAccount } from '@/core/services/academy/AdmissionService'
 import { readAnchors } from '@/core/services/auth/LeadService'
 import { clearVolunteeredDetails } from '@/core/services/members/MemberService'
 import { notify } from '@/core/services/system/NotificationService'
@@ -33,6 +33,7 @@ import {
   GRADUATE_DIVISION_RANK,
   PARKOUR_COPY,
 } from '@/declarations/academy/parkour'
+import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { tradeOfFunction } from '@/declarations/reference/fixed'
@@ -55,17 +56,15 @@ import type {
   DepartureKindName,
   ReviewAdviceName,
 } from '@/utils/constants/hierarchy'
-import { IntegrationLinkKinds } from '@/utils/constants/integration'
 import { CalendarKinds, EventPurposes, EventVisibilities } from '@/utils/constants/workflow'
 import { LiveStatuses } from '@/utils/constants/lives'
 import { addDays, startOfDay } from '@/utils/format/days'
 import type { Prisma } from '@prisma/client'
-import crypto from 'crypto'
 
 // Everything the parkour reads on a junior
 const PARKOUR_SHAPE = {
   account: {
-    select: { id: true, displayName: true, discordId: true, discordUsername: true },
+    select: { id: true, displayName: true, discordId: true, discordUsername: true, role: true },
   },
   reviews: { select: { stage: true, status: true } },
   session: {
@@ -139,36 +138,6 @@ const responsablesOf = async (row: ParkourRow): Promise<string[]> => {
 }
 
 /**
- * Integration link of a promotion
- * @param {string} sessionId - Promotion
- * @param {string} functionId - Function trained for
- * @return {Promise<string>} - Link path
- */
-
-const ensureKickoffInvite = async (sessionId: string, functionId: string): Promise<string> => {
-  const existing = await prisma.integrationInvite.findFirst({
-    where: { sessionId, expiresAt: { gt: new Date() } },
-    orderBy: { createdAt: 'desc' },
-    select: { token: true },
-  })
-  if (existing) return ROUTES.integration(existing.token)
-
-  const created = await prisma.integrationInvite.create({
-    data: {
-      kind: IntegrationLinkKinds.Academy,
-      sessionId,
-      functionId,
-      token: crypto.randomBytes(24).toString('base64url'),
-      expiresAt: addDays(new Date(), ACADEMY_SETTINGS.inviteExpiryDays),
-      maxUses: ACADEMY_SETTINGS.inviteMaxUses,
-    },
-    select: { token: true },
-  })
-
-  return ROUTES.integration(created.token)
-}
-
-/**
  * Read where a junior stands on the parkour
  * @param {string} juniorId - Junior identifier
  * @param {AcademyScope} scope - Visibility fragment
@@ -192,7 +161,10 @@ export const readParkour = async (juniorId: string, scope: AcademyScope): Promis
     phase === 'awaitingInfo'
       ? await prisma.integrationInvite.findFirst({
           where: { sessionId: row.sessionId, expiresAt: { gt: new Date() } },
-          orderBy: { createdAt: 'desc' },
+          orderBy: [
+            { recruitmentSessionId: { sort: 'desc', nulls: 'last' } },
+            { createdAt: 'desc' },
+          ],
           select: { token: true },
         })
       : null
@@ -202,7 +174,10 @@ export const readParkour = async (juniorId: string, scope: AcademyScope): Promis
     sessionId: row.sessionId,
     phase,
     liveCount: row.liveCount,
-    livesNeeded: livesBeforeReview(row.stage as AcademyStageName, thresholds()),
+    livesNeeded:
+      row.stage === AcademyStages.Bonus && row.bonusLives > 0
+        ? thresholds().firstPeriodLives + thresholds().secondPeriodLives + row.bonusLives
+        : livesBeforeReview(row.stage as AcademyStageName, thresholds()),
     deadlineAt: row.deadlineAt?.toISOString() ?? null,
     integrationPath: invite ? ROUTES.integration(invite.token) : null,
     canLaunchAnyway: isPlanned && phases.includes('ready'),
@@ -212,34 +187,18 @@ export const readParkour = async (juniorId: string, scope: AcademyScope): Promis
 }
 
 /**
- * Declare the PIM start of one junior
- * @param {string} juniorId - Junior identifier
- * @param {AcademyScope} scope - Visibility fragment
- * @return {Promise<string>} - Integration link path
- */
-
-export const declareKickoff = async (juniorId: string, scope: AcademyScope): Promise<string> => {
-  const row = await loadJunior(juniorId, scope)
-  if (phaseOf(row) !== 'needsKickoff') throw conflict()
-
-  await prisma.academyJunior.update({ where: { id: juniorId }, data: { kickoffAt: new Date() } })
-
-  return ensureKickoffInvite(row.sessionId, row.session.functionId)
-}
-
-/**
- * Tell the juniors and their trainers a promotion is running
+ * Tell the juniors and their referents a promotion is running
  * @param {string} sessionId - Promotion
  * @param {string | null} actorId - Who launched it
  * @return {Promise<void>} - Told
  */
 
-const announceLaunch = async (sessionId: string, actorId: string | null): Promise<void> => {
+export const announceLaunch = async (sessionId: string, actorId: string | null): Promise<void> => {
   const seats = await prisma.academyJunior.findMany({
     where: { sessionId, stage: { not: AcademyStages.Preparation } },
     select: {
       accountId: true,
-      trainerId: true,
+      referentId: true,
       session: { select: { summary: true, jobFunction: { select: { name: true } } } },
     },
   })
@@ -247,7 +206,7 @@ const announceLaunch = async (sessionId: string, actorId: string | null): Promis
 
   await notify({
     kind: 'PimLaunched',
-    recipients: seats.flatMap((seat) => [seat.accountId, seat.trainerId ?? '']),
+    recipients: seats.flatMap((seat) => [seat.accountId, seat.referentId ?? '']),
     actorId,
     target: 'home',
     subject: name,
@@ -279,6 +238,16 @@ export const launchAnyway = async (
     where: { sessionId, status: AcademyJuniorStatuses.Active, confirmedAt: { not: null } },
   })
   if (ready === 0) throw conflict(PARKOUR_COPY.launchNobodyReady)
+
+  const orphans = await prisma.academyJunior.count({
+    where: {
+      sessionId,
+      status: AcademyJuniorStatuses.Active,
+      confirmedAt: { not: null },
+      referentId: null,
+    },
+  })
+  if (orphans > 0) throw conflict(ACADEMY_COPY.launchMissingReferent)
 
   await launchPromotion(sessionId)
   await announceLaunch(sessionId, actorId)
@@ -327,6 +296,16 @@ export const afterRecruitmentClosed = async (recruitmentId: string): Promise<voi
 }
 
 /**
+ * Launch once staffed
+ * @param {string} sessionId - Promotion
+ * @return {Promise<void>} - Followed up
+ */
+
+export const afterReferentAssigned = async (sessionId: string): Promise<void> => {
+  await launchWhenReady(sessionId)
+}
+
+/**
  * Follow up a confirmed integration form: a late seat starts alone
  * @param {string} juniorId - Junior whose form came back
  * @return {Promise<void>} - Followed up
@@ -362,14 +341,14 @@ const REVIEW_PURPOSES_BY_STAGE = {
 } as const
 
 /**
- * Put a check-in falling due in its trainer's calendar
+ * Put a check-in falling due in its referent's calendar
  * @param {ParkourRow} row - Junior row
  * @param {AcademyStageName} stage - Check-in stage entered
  * @return {Promise<void>} - Planned
  */
 
 const planReview = async (row: ParkourRow, stage: AcademyStageName): Promise<void> => {
-  if (!row.trainerId) return
+  if (!row.referentId) return
 
   const purpose = REVIEW_PURPOSES_BY_STAGE[stage as keyof typeof REVIEW_PURPOSES_BY_STAGE]
   const template = purpose ? await prisma.eventTemplate.findUnique({ where: { purpose } }) : null
@@ -379,7 +358,7 @@ const planReview = async (row: ParkourRow, stage: AcademyStageName): Promise<voi
       title: PARKOUR_COPY.reviewDueTitle.replace('{name}', row.account.displayName),
       templateId: template?.id ?? null,
       kind: template?.kind ?? CalendarKinds.Event,
-      ownerId: row.trainerId,
+      ownerId: row.referentId,
       accountId: row.accountId,
       juniorId: row.id,
       sessionId: row.sessionId,
@@ -391,7 +370,7 @@ const planReview = async (row: ParkourRow, stage: AcademyStageName): Promise<voi
 
   await notify({
     kind: 'PimReviewDue',
-    recipients: [row.trainerId],
+    recipients: [row.referentId],
     actorId: null,
     target: 'junior',
     targetId: juniorTargetId(row.sessionId, row.id),
@@ -468,7 +447,7 @@ export const assertReviewComplete = async (reviewId: string): Promise<void> => {
 /**
  * Tell the responsables a check-in waits on their decision
  * @param {string} reviewId - Check-in
- * @param {string} actorId - Trainer who deposited it
+ * @param {string} actorId - Referent who deposited it
  * @return {Promise<void>} - Told
  */
 
@@ -544,6 +523,7 @@ const openSecondPeriod = async (sessionId: string, actorId: string | null): Prom
     where: { id: { in: granted.map((junior) => junior.id) } },
     data: { stage: AcademyStages.Practice },
   })
+  await syncStages(granted.map((junior) => junior.id))
 
   await notify({
     kind: 'PimSecondPeriod',
@@ -613,11 +593,12 @@ const graduate = async (row: ParkourRow): Promise<void> => {
   })
   await graduateAccount(row.accountId, row.session.functionId)
 
+  const isNewcomer = row.account.role === MemberRoles.Junior
   const division = await prisma.division.findUnique({
     where: { rank: GRADUATE_DIVISION_RANK },
     select: { id: true },
   })
-  if (division) {
+  if (division && isNewcomer) {
     await prisma.account.update({
       where: { id: row.accountId },
       data: { divisionId: division.id },
@@ -661,7 +642,45 @@ export const endParkour = async (
       },
       data: { status: ReviewStatuses.Rejected },
     }),
-    // Lives still to come no longer count on them
+  ])
+
+  // An existing member only leaves the team
+  if (row.account.role === MemberRoles.Junior) await closeNewcomer(row, kind, now)
+  else await releaseAccount(row.accountId, row.session.functionId)
+
+  await notify({
+    kind: 'PimDeparture',
+    recipients: await responsablesOf(row),
+    actorId,
+    target: 'home',
+    subject: row.account.displayName,
+  })
+
+  // A seat leaving may be the one the others were waiting on
+  if (row.session.status === AcademySessionStatuses.Running) {
+    await openSecondPeriodWhenReady(row.sessionId)
+  } else {
+    await launchWhenReady(row.sessionId)
+  }
+}
+
+/**
+ * Close a newcomer's account
+ * @param {ParkourRow} row - Junior row
+ * @param {DepartureKindName} kind - Departure kind
+ * @param {Date} now - Departure moment
+ * @return {Promise<void>} - Closed
+ */
+
+const closeNewcomer = async (
+  row: ParkourRow,
+  kind: DepartureKindName,
+  now: Date
+): Promise<void> => {
+  const dismissed = kind === DepartureKinds.Dismissal
+
+  // Future lives released
+  await prisma.$transaction([
     prisma.liveMember.deleteMany({
       where: { accountId: row.accountId, live: { status: LiveStatuses.Announced } },
     }),
@@ -701,21 +720,6 @@ export const endParkour = async (
       }),
     },
   })
-
-  await notify({
-    kind: 'PimDeparture',
-    recipients: await responsablesOf(row),
-    actorId,
-    target: 'home',
-    subject: row.account.displayName,
-  })
-
-  // A seat leaving may be the one the others were waiting on
-  if (row.session.status === AcademySessionStatuses.Running) {
-    await openSecondPeriodWhenReady(row.sessionId)
-  } else {
-    await launchWhenReady(row.sessionId)
-  }
 }
 
 /**
@@ -751,6 +755,7 @@ export const applyDecision = async (
           where: { id: row.id },
           data: { stage: AcademyStages.Practice },
         })
+        await syncStages([row.id])
         return
       }
       await openSecondPeriodWhenReady(row.sessionId)
@@ -829,8 +834,8 @@ export interface ParkourStanding {
   sessionName: string
   sessionRunning: boolean
   name: string
-  trainerId: string | null
-  trainerName: string | null
+  referentId: string | null
+  referentName: string | null
   stage: AcademyStageName
   phase: ParkourPhase
 }
@@ -846,7 +851,7 @@ export const parkourStandings = async (
 ): Promise<ParkourStanding[]> => {
   const rows = await prisma.academyJunior.findMany({
     where: { ...where, status: AcademyJuniorStatuses.Active },
-    include: { ...PARKOUR_SHAPE, trainer: { select: { displayName: true } } },
+    include: { ...PARKOUR_SHAPE, referent: { select: { displayName: true } } },
   })
 
   return rows.map((row) => ({
@@ -855,8 +860,8 @@ export const parkourStandings = async (
     sessionName: row.session.summary ?? row.session.jobFunction.name,
     sessionRunning: row.session.status === AcademySessionStatuses.Running,
     name: row.account.displayName,
-    trainerId: row.trainerId,
-    trainerName: row.trainer?.displayName ?? null,
+    referentId: row.referentId,
+    referentName: row.referent?.displayName ?? null,
     stage: row.stage as AcademyStageName,
     phase: phaseOf(row),
   }))

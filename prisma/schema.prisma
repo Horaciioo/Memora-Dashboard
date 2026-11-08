@@ -333,7 +333,7 @@ model Account {
   socialLinks           SocialLink[]
   constraints           AccountConstraint[]
   calendarEntries       CalendarEvent[]          @relation("CalendarSubject")
-  trainedEvents         CalendarEvent[]          @relation("CalendarTrainer")
+  referentEvents        CalendarEvent[]          @relation("CalendarReferent")
   absences              Absence[]                @relation("AbsenceOwner")
   reviewedAbsences      Absence[]                @relation("AbsenceReviewer")
   notesReceived         AccountNote[]            @relation("NoteSubject")
@@ -344,9 +344,11 @@ model Account {
   legacyTracks          LegacyTrack[]            @relation("LegacyMember")
   legacyDecisions       LegacyTrack[]            @relation("LegacyDecider")
   legacyGrades          LegacyModuleResult[]     @relation("LegacyGrader")
-  academyTrainees       AcademyJunior[]          @relation("AcademyJuniorTrainer")
-  academySeats          AcademySessionTrainer[]  @relation("AcademyTrainer")
+  referredJuniors       AcademyJunior[]          @relation("AcademyJuniorReferent")
+  academySeats          AcademySessionReferent[] @relation("AcademyReferent")
   integrationInvites    IntegrationInvite[]      @relation("IntegrationInviteCreatedBy")
+  identityChecks        IdentityCheck[]          @relation("IdentityCheckAccount")
+  identityResolutions   IdentityCheck[]          @relation("IdentityCheckResolver")
   integrationClaims     IntegrationClaim[]       @relation("IntegrationClaimAccount")
   quizAnswers           JuniorAnswer[]
   trainingFeedbacks     TrainingFeedback[]
@@ -1450,7 +1452,7 @@ model AcademySession {
 
   jobFunction JobFunction @relation(fields: [functionId], references: [id], onDelete: Restrict)
 
-  trainers       AcademySessionTrainer[]
+  referents      AcademySessionReferent[]
   juniors        AcademyJunior[]
   comments       AcademyComment[]
   calendarEvents CalendarEvent[]
@@ -1511,8 +1513,46 @@ model IntegrationClaim {
   @@map("integration_claims")
 }
 
-// Moderator holding the trainer seat on a session
-model AcademySessionTrainer {
+// Where a Discord identity check stands
+enum IdentityCheckStatus {
+  OPEN
+  ESCALATED
+  RESOLVED
+  DONE
+}
+
+// Discord identity proven by Discord itself before any session opens
+model IdentityCheck {
+  id                String              @id @default(cuid())
+  discordId         String
+  discordUsername   String?
+  discordAvatarHash String?
+  // Account this identity opens, null when nobody matches
+  accountId         String?
+  status            IdentityCheckStatus @default(OPEN)
+  // Pseudonym the person typed after saying it is not them
+  typedName         String?
+  attempts          Int                 @default(0)
+  // Accepted application the pseudonym points at
+  candidateId       String?
+  // Identifier a responsable gave, the only one the link accepts
+  resolvedDiscordId String?
+  resolvedById      String?
+  linkToken         String?             @unique
+  linkExpiresAt     DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  account    Account?              @relation("IdentityCheckAccount", fields: [accountId], references: [id], onDelete: SetNull)
+  candidate  RecruitmentCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
+  resolvedBy Account?              @relation("IdentityCheckResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@map("identity_checks")
+}
+
+// Moderator holding the referent seat on a session
+model AcademySessionReferent {
   id          String    @id @default(cuid())
   sessionId   String
   accountId   String
@@ -1523,10 +1563,10 @@ model AcademySessionTrainer {
   forgottenAt DateTime?
 
   session AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  account Account        @relation("AcademyTrainer", fields: [accountId], references: [id], onDelete: Cascade)
+  account Account        @relation("AcademyReferent", fields: [accountId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, accountId])
-  @@map("academy_session_trainers")
+  @@map("academy_session_referents")
 }
 
 // Junior followed through one session, always an existing moderator
@@ -1534,7 +1574,7 @@ model AcademyJunior {
   id               String              @id @default(cuid())
   sessionId        String
   accountId        String
-  trainerId        String?
+  referentId       String?
   // Chosen by the junior on the integration form, empty until then
   dispositifId     String?
   // Application this seat was admitted from
@@ -1561,7 +1601,7 @@ model AcademyJunior {
 
   session    AcademySession        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account    Account               @relation("AcademyJunior", fields: [accountId], references: [id], onDelete: Cascade)
-  trainer    Account?              @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
+  referent   Account?              @relation("AcademyJuniorReferent", fields: [referentId], references: [id], onDelete: SetNull)
   dispositif Dispositif?           @relation(fields: [dispositifId], references: [id], onDelete: Restrict)
   candidate  RecruitmentCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
 
@@ -1664,7 +1704,7 @@ model AcademyReview {
   feeling         String?
   summary         String        @default("")
   advice          ReviewAdvice
-  // Outcome the responsable kept, the trainer's advice followed or not
+  // Outcome the responsable kept, the referent's advice followed or not
   decision        ReviewAdvice?
   status          ReviewStatus  @default(DRAFT)
   decidedById     String?
@@ -1683,7 +1723,7 @@ model AcademyReview {
 
 // What a calendar template stands for in the academy, fixed in code
 enum EventPurpose {
-  TRAINER_INTERVIEW
+  REFERENT_INTERVIEW
   PANEL_INTERVIEW
   REVIEW_ONE
   REVIEW_FINAL
@@ -1748,7 +1788,7 @@ model CalendarEvent {
   meetingId         String?
   sessionId         String?
   juniorId          String?
-  trainerId         String?
+  referentId        String?
   startsAt          DateTime
   endsAt            DateTime?
   allDay            Boolean          @default(false)
@@ -1776,13 +1816,13 @@ model CalendarEvent {
   meeting  Meeting?        @relation(fields: [meetingId], references: [id], onDelete: SetNull)
   session  AcademySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
   junior   AcademyJunior?  @relation(fields: [juniorId], references: [id], onDelete: Cascade)
-  trainer  Account?        @relation("CalendarTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
+  referent Account?        @relation("CalendarReferent", fields: [referentId], references: [id], onDelete: SetNull)
 
   @@index([startsAt])
   @@index([kind, startsAt])
   @@index([templateId])
   @@index([juniorId])
-  @@index([trainerId])
+  @@index([referentId])
   @@index([ownerId])
   @@index([accountId])
   @@index([rollCall, remindAt, remindedAt])
@@ -2342,24 +2382,26 @@ enum RecruitmentOwner {
 
 // Campaign opened for one creator and one function, announced outside then held on Discord
 model RecruitmentSession {
-  id               String              @id @default(cuid())
-  youtuberId       String
-  functionId       String
-  academySessionId String?             @unique
-  name             String
-  status           RecruitmentStatus   @default(DRAFT)
-  summary          String?
-  instructions     String              @default("")
-  platform         RecruitmentPlatform @default(DISCORD)
+  id                  String              @id @default(cuid())
+  youtuberId          String
+  functionId          String
+  academySessionId    String?             @unique
+  name                String
+  status              RecruitmentStatus   @default(DRAFT)
+  summary             String?
+  instructions        String              @default("")
+  platform            RecruitmentPlatform @default(DISCORD)
   // Keys of the questions the recruiters picked, in asking order
-  questionKeys     String[]            @default([])
-  opensAt          DateTime?
-  closesAt         DateTime?
+  questionKeys        String[]            @default([])
+  opensAt             DateTime?
+  closesAt            DateTime?
   // Discord wording posted for the interviews, once announced
-  announcement     String?
-  announcedAt      DateTime?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  announcement        String?
+  announcedAt         DateTime?
+  // Accounts of the accepted candidates opened by a responsable
+  accountsActivatedAt DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
 
   youtuber       Youtuber                 @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
   jobFunction    JobFunction              @relation(fields: [functionId], references: [id], onDelete: Restrict)
@@ -2460,15 +2502,16 @@ model RecruitmentCandidate {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  session    RecruitmentSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  recruiter  Account?             @relation("RecruitmentRecruiter", fields: [recruiterId], references: [id], onDelete: SetNull)
-  outcome    RecruitmentOutcome?  @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
-  recruiters CandidateRecruiter[]
-  observers  RecruitmentSeat[]
-  comments   RecruitmentComment[]
-  exercises  ExerciseLink[]
-  answers    RecruitmentAnswer[]
-  admission  AcademyJunior?
+  session        RecruitmentSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  recruiter      Account?             @relation("RecruitmentRecruiter", fields: [recruiterId], references: [id], onDelete: SetNull)
+  outcome        RecruitmentOutcome?  @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
+  recruiters     CandidateRecruiter[]
+  observers      RecruitmentSeat[]
+  comments       RecruitmentComment[]
+  exercises      ExerciseLink[]
+  answers        RecruitmentAnswer[]
+  admission      AcademyJunior?
+  identityChecks IdentityCheck[]
 
   @@unique([sessionId, discordId])
   @@index([discordId])

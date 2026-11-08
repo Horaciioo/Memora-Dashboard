@@ -3,6 +3,7 @@
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { useSessionState } from '@/composites/academy/session/SessionFileContext'
+import { toJuniorEditFields } from '@/core/lib/academy/juniorForm'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { formatDay } from '@/utils/format/dates'
@@ -23,7 +24,11 @@ export const SessionDrawers = () => {
         open={dialog === 'junior'}
         title={editingJunior ? editingJunior.displayName : ACADEMY_COPY.juniorAdd}
         description={formatDay(detail.summary.startsAt)}
-        fields={fields.junior.filter((field) => editingJunior || field.name !== 'status')}
+        fields={
+          editingJunior
+            ? toJuniorEditFields(fields.junior)
+            : fields.junior.filter((field) => field.name !== 'bonusLives')
+        }
         initialValues={editingJunior?.values}
         issues={session.issues}
         isSaving={session.isSaving}

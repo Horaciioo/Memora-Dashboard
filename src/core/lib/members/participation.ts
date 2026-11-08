@@ -56,7 +56,7 @@ export interface RecruitmentParticipationRow {
 }
 
 /**
- * Academy promotion with only the viewed member's trainer seat
+ * Academy promotion with only the viewed member's referent seat
  * @typedef {Object} AcademyParticipationRow
  */
 
@@ -64,7 +64,7 @@ export interface AcademyParticipationRow {
   id: string
   startsAt: Date
   endsAt: Date | null
-  trainers: SeatFlags[]
+  referents: SeatFlags[]
   juniors: string[]
   youtuber: CreatorMark | null
 }
@@ -172,19 +172,19 @@ export const mergeParticipation = ({
   }))
 
   const trained = promotions
-    .filter((row) => !row.trainers.some((seat) => seat.forgottenAt))
+    .filter((row) => !row.referents.some((seat) => seat.forgottenAt))
     .map((row): MemberParticipation => ({
       id: row.id,
       kind: 'academy',
       title: promotionTitles.get(row.id) ?? row.id,
       startsAt: row.startsAt.toISOString(),
       endsAt: row.endsAt?.toISOString() ?? null,
-      roles: ['trainer'],
+      roles: ['referent'],
       ...NO_EXTRAS,
       ...creatorOf(row.youtuber),
       juniors: row.juniors,
       canOpen: canOpen.academy,
-      ...temporaryState(row.trainers),
+      ...temporaryState(row.referents),
     }))
 
   const coordinated = coordinations.map((row): MemberParticipation => ({

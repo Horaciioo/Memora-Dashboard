@@ -332,7 +332,7 @@ export const readCourse = async (
 }
 
 /**
- * Tell the trainer of a junior that a course is done
+ * Tell the referent of a junior that a course is done
  * @param {string} accountId - Junior account
  * @param {string} courseName - Course finished
  * @return {Promise<void>} - Notified
@@ -341,7 +341,7 @@ export const readCourse = async (
 const announceFinish = async (accountId: string, courseName: string): Promise<void> => {
   const junior = await prisma.academyJunior.findFirst({
     where: { accountId, status: AcademyJuniorStatuses.Active },
-    select: { id: true, trainerId: true },
+    select: { id: true, referentId: true },
     orderBy: { startedAt: 'desc' },
   })
   if (!junior) return
@@ -355,7 +355,7 @@ const announceFinish = async (accountId: string, courseName: string): Promise<vo
     where: { youtuberId: { in: creators?.youtubers.map((creator) => creator.id) ?? [] } },
     select: { accountId: true },
   })
-  const recipients = [junior.trainerId, ...leads.map((lead) => lead.accountId)]
+  const recipients = [junior.referentId, ...leads.map((lead) => lead.accountId)]
 
   if (recipients.some(Boolean)) {
     await notify({

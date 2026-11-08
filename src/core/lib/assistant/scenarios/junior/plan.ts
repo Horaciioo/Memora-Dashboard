@@ -183,7 +183,7 @@ export const planSave: ScenarioStep = async (context) => {
         templateId: data.templateId,
         juniorId: junior.id,
         sessionId: junior.sessionId,
-        trainerId: junior.values.trainerId ?? undefined,
+        referentId: junior.values.referentId ?? undefined,
         startsAt: data.start,
         endsAt: endOf(data.start, Number(data.minutes)),
       },

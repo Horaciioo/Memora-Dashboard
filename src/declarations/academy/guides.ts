@@ -165,9 +165,9 @@ const PIM_DESTINATION_MAP = {
       },
     ],
   },
-  fsiTrainer: {
+  fsiReferent: {
     label: 'Référent du junior',
-    icon: 'functionTrainer',
+    icon: 'functionReferent',
     surface: 'junior',
     tab: FSI_TABS.informations,
     marks: [

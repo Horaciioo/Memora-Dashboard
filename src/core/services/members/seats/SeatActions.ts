@@ -82,7 +82,7 @@ const actOnAcademy = async (
   sessionId: string,
   action: SeatAction
 ): Promise<void> => {
-  const { count } = await prisma.academySessionTrainer.updateMany({
+  const { count } = await prisma.academySessionReferent.updateMany({
     where: { sessionId, accountId },
     data: stateOf(action, new Date()),
   })

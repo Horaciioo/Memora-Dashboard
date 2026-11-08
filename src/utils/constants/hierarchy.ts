@@ -167,7 +167,7 @@ export type AcademyStageName = (typeof AcademyStages)[keyof typeof AcademyStages
 
 export const StepOwners = {
   Responsable: 'RESPONSABLE',
-  Formateurs: 'FORMATEURS',
+  Referents: 'REFERENTS',
   Both: 'BOTH',
   Junior: 'JUNIOR',
 } as const

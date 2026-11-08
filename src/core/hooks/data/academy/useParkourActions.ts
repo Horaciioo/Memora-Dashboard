@@ -26,13 +26,11 @@ export interface PromotionActions {
  * Gestures a responsable makes on the journey of one junior
  * @typedef {Object} JuniorActions
  * @property {boolean} isSaving - Gesture in flight
- * @property {() => Promise<boolean>} declareKickoff - Open the integration of the junior
  * @property {() => Promise<boolean>} resign - Record their resignation
  */
 
 export interface JuniorActions {
   isSaving: boolean
-  declareKickoff: () => Promise<boolean>
   resign: () => Promise<boolean>
 }
 
@@ -86,8 +84,6 @@ export const useJuniorActions = (juniorId: string): JuniorActions => {
 
   return {
     isSaving,
-    declareKickoff: () =>
-      act(API_ROUTES.juniorParkour(juniorId), { action: 'kickoff' }, PARKOUR_COPY.kickoffDeclared),
     resign: () =>
       act(API_ROUTES.juniorParkour(juniorId), { action: 'resign' }, PARKOUR_COPY.resigned),
   }

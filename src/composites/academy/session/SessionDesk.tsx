@@ -52,7 +52,7 @@ const DeskCard = ({ title, empty, action, count, juniors, onStart }: DeskCardPro
 )
 
 /**
- * Check-ins a trainer owes and decisions a responsable owes, beside the information box
+ * Check-ins a referent owes and decisions a responsable owes, beside the information box
  * @return {JSX.Element | null}
  */
 

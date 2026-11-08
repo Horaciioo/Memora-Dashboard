@@ -4,17 +4,16 @@ import { prisma } from '@/core/lib/db'
 import { activeFunctions } from '@/core/services/reference/lookups'
 import { functionOptions, rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { teamOptions } from '@/core/services/work/shared'
-import { TRAINER_FUNCTION } from '@/declarations/reference/fixed'
+import { REFERENT_FUNCTION } from '@/declarations/reference/fixed'
 import { ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
 import {
-  ACADEMY_JUNIOR_STATUS_REGISTRY,
   ACADEMY_STAGE_REGISTRY,
   ACADEMY_SESSION_STATUS_REGISTRY,
   NOTE_KIND_REGISTRY,
   OBJECTIVE_STATUS_REGISTRY,
   REVIEW_ADVICE_REGISTRY,
 } from '@/declarations/academy/registries'
-import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import { GONE_MEMBER_STATUSES, AcademyStages } from '@/utils/constants/hierarchy'
 
@@ -32,13 +31,13 @@ const REVIEW_STAGE_OPTIONS: FieldOption[] = REVIEW_STAGES.map((stage) => ({
 
 /**
  * Build the session form declarations
- * @param {string} [youtuberId] - Creator of the linked campaign, narrowing the trainers
+ * @param {string} [youtuberId] - Creator of the linked campaign, narrowing the referents
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
 export const sessionFields = async (youtuberId?: string): Promise<FieldDefinition[]> => {
-  const [trainers, functions] = await Promise.all([
-    teamOptions({ functionName: TRAINER_FUNCTION, youtuberId }),
+  const [referents, functions] = await Promise.all([
+    teamOptions({ functionName: REFERENT_FUNCTION, youtuberId }),
     activeFunctions(),
   ])
 
@@ -70,10 +69,10 @@ export const sessionFields = async (youtuberId?: string): Promise<FieldDefinitio
       required: true,
     },
     {
-      name: 'trainerIds',
+      name: 'referentIds',
       kind: 'multiselect',
-      label: ACADEMY_FIELD_COPY.trainers,
-      options: trainers,
+      label: ACADEMY_FIELD_COPY.referents,
+      options: referents,
     },
   ]
 }
@@ -85,9 +84,9 @@ export const sessionFields = async (youtuberId?: string): Promise<FieldDefinitio
  */
 
 export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]> => {
-  const [candidates, trainers, dispositifs] = await Promise.all([
+  const [candidates, referents, dispositifs] = await Promise.all([
     juniorCandidates(sessionId),
-    teamOptions({ functionName: TRAINER_FUNCTION }),
+    teamOptions({ functionName: REFERENT_FUNCTION }),
     prisma.dispositif.findMany({ orderBy: { position: 'asc' } }),
   ])
 
@@ -100,17 +99,10 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
       options: candidates,
     },
     {
-      name: 'status',
+      name: 'referentId',
       kind: 'select',
-      label: ACADEMY_FIELD_COPY.status,
-      options: toOptions(ACADEMY_JUNIOR_STATUS_REGISTRY),
-      mark: 'dot',
-    },
-    {
-      name: 'trainerId',
-      kind: 'select',
-      label: ACADEMY_FIELD_COPY.trainer,
-      options: trainers,
+      label: ACADEMY_FIELD_COPY.referent,
+      options: referents,
       span: 'half',
     },
     {
@@ -120,6 +112,14 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
       required: true,
       options: rowsToOptions(dispositifs),
       span: 'half',
+    },
+    {
+      name: 'bonusLives',
+      kind: 'number',
+      label: ACADEMY_FIELD_COPY.bonusLives,
+      hint: ACADEMY_FIELD_COPY.bonusLivesHint,
+      min: 0,
+      max: ACADEMY_SETTINGS.bonusMaxLives,
     },
   ]
 }

@@ -55,17 +55,17 @@ export const readMemberParticipation = async (
       },
     }),
     prisma.academySession.findMany({
-      where: { trainers: { some: { accountId } } },
+      where: { referents: { some: { accountId } } },
       select: {
         id: true,
         functionId: true,
         startsAt: true,
         endsAt: true,
         jobFunction: true,
-        trainers: seat,
+        referents: seat,
         recruitmentSession: { select: { youtuber: creator } },
         juniors: {
-          where: { trainerId: accountId },
+          where: { referentId: accountId },
           orderBy: { startedAt: 'asc' },
           select: { account: { select: { displayName: true } } },
         },
