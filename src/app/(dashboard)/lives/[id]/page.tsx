@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { LiveClosedNotice } from '@/composites/lives/LiveClosedNotice'
-import { LiveDeniedNotice } from '@/composites/lives/LiveDeniedNotice'
+import { LiveClosedNotice } from '@/composites/lives/notices/LiveClosedNotice'
+import { LiveDeniedNotice } from '@/composites/lives/notices/LiveDeniedNotice'
 import { LiveGate } from '@/composites/lives/LiveGate'
 import { LiveModView } from '@/composites/modview/LiveModView'
 import { activeCoordinatorIds } from '@/core/lib/lives/coordination'

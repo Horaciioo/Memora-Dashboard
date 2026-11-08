@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { Avatar, AvatarStack } from '@/components/elements/display/Avatar'
 import { AddRow } from '@/components/structures/inline/AddRow'
-import { LiveCoordinatorsEditor } from '@/composites/lives/LiveCoordinatorsEditor'
+import { LiveCoordinatorsEditor } from '@/composites/lives/coordination/LiveCoordinatorsEditor'
 import { LIVE_COPY, LIVE_COORDINATION_COPY } from '@/declarations/lives/copy'
 import { LIVE_COORDINATOR } from '@/declarations/lives/registries'
 import { ICONS } from '@/declarations/ui/icons'

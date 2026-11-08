@@ -2,7 +2,7 @@
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { AddRow } from '@/components/structures/inline/AddRow'
-import { ReinforcementTag } from '@/composites/lives/ReinforcementTag'
+import { ReinforcementTag } from '@/composites/lives/coordination/ReinforcementTag'
 import { memberMenu } from '@/composites/modview/memberMenu'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { WindowEmpty } from '@/composites/modview/ModWindow'

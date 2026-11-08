@@ -1,7 +1,7 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { ReinforcementTag } from '@/composites/lives/ReinforcementTag'
+import { ReinforcementTag } from '@/composites/lives/coordination/ReinforcementTag'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
 import { useLiveRoster } from '@/core/hooks/data/lives/useLiveRoster'
 import { useActionMenu } from '@/core/hooks/interaction/layout/overlay/useActionMenu'

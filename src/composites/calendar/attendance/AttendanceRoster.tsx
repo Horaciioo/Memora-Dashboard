@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
-import { ReinforcementTag } from '@/composites/lives/ReinforcementTag'
+import { ReinforcementTag } from '@/composites/lives/coordination/ReinforcementTag'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { useDragAndDrop } from '@/core/hooks/interaction/gestures/useDragAndDrop'
 import { ATTENDANCE_STATUS_REGISTRY } from '@/declarations/calendar/registries'
