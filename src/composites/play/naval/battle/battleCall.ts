@@ -1,5 +1,5 @@
-import type { NavalCaptainView } from '@/composites/play/naval/captains'
-import type { NavalEvent, NavalPlayback } from '@/composites/play/naval/useNavalPlayback'
+import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
+import type { NavalEvent, NavalPlayback } from '@/composites/play/naval/battle/useNavalPlayback'
 import { isHitCode, isSinking, isStriking, NavalCodes } from '@/core/lib/play/naval/state'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
 import { fillPlayMessage } from '@/declarations/play/copy'

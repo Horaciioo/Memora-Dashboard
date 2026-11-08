@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 
 import { playNaval, preloadNavalSounds, startSea } from '@/composites/play/naval/sound'
-import type { NavalEvent } from '@/composites/play/naval/useNavalPlayback'
+import type { NavalEvent } from '@/composites/play/naval/battle/useNavalPlayback'
 
 /**
  * Sea bed, the bell when the turn comes round and when a captain goes down

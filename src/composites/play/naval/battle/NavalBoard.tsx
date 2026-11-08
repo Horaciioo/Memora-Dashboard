@@ -1,9 +1,9 @@
 'use client'
 
-import { captainsOf } from '@/composites/play/naval/captains'
-import type { NavalFace } from '@/composites/play/naval/captains'
-import { NavalBattle } from '@/composites/play/naval/NavalBattle'
-import { NavalPlacement } from '@/composites/play/naval/NavalPlacement'
+import { captainsOf } from '@/composites/play/naval/setup/captains'
+import type { NavalFace } from '@/composites/play/naval/setup/captains'
+import { NavalBattle } from '@/composites/play/naval/battle/NavalBattle'
+import { NavalPlacement } from '@/composites/play/naval/setup/NavalPlacement'
 import { useNavalBoard } from '@/core/hooks/data/play/useNavalBoard'
 import type { NavalBoardView } from '@/core/lib/play/naval/state'
 import { NavalPhases } from '@/utils/constants/play'
