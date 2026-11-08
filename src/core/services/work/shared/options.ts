@@ -1,7 +1,5 @@
 import 'server-only'
-
 import { prisma } from '@/core/lib/db'
-import { readList } from '@/core/lib/forms/values'
 import { HELD_FUNCTIONS, toMemberFunctions } from '@/core/services/reference/functions'
 import { allPriorities } from '@/core/services/reference/lookups'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -12,202 +10,14 @@ import { FIXED_PRIORITIES } from '@/declarations/reference/fixed'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import { projectVisibility } from '@/core/services/work/visibility'
 import type { WorkViewer } from '@/core/services/work/visibility'
-import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
-import type { BoardColumn } from '@/components/structures/data/KanbanBoard'
-import type { FieldOption, FormValues } from '@/types/forms'
-import type { WorkAuthorship, WorkPerson, WorkTag } from '@/types/work'
+import type { FieldOption } from '@/types/forms'
 import { GLOBAL_ROLES, GONE_MEMBER_STATUSES, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { WorkflowPhases } from '@/utils/constants/workflow'
-import type { WorkflowPhaseName, WorkflowScopeName } from '@/utils/constants/workflow'
+import type { WorkflowScopeName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
-
-/**
- * Narrow a people list to what a bounded viewer may pick — the encadrement always
- * @param {AccessScope} [scope] - Viewer perimeter
- * @return {Prisma.AccountWhereInput} - Clause
- */
-
-export const peopleInScope = (scope?: AccessScope): Prisma.AccountWhereInput =>
-  !scope || scope.isGlobal
-    ? {}
-    : {
-        OR: [
-          { role: { in: LEADERSHIP_ROLES } },
-          { youtubers: { some: { id: { in: scope.youtuberIds } } } },
-        ],
-      }
-
-/**
- * Reference row shaped like a tag
- * @typedef {Object} TagRow
- * @property {string} id - Row identifier
- * @property {string} name - Display name
- * @property {string | null} accent - Colour token
- */
-
-interface TagRow {
-  id: string
-  name: string
-  accent?: string | null
-  phase?: WorkflowPhaseName | null
-}
-
-/**
- * Map a reference row to a tag
- * @param {TagRow | null} row - Reference row
- * @return {WorkTag | null} - Tag or null
- */
-
-export const toTag = (row: TagRow | null | undefined): WorkTag | null =>
-  row
-    ? { id: row.id, label: row.name, accent: row.accent ?? null, phase: row.phase ?? undefined }
-    : null
-
-/**
- * Creator row shaped like a tag
- * @param {{ id: string, name: string, accent: string | null, avatarUrl: string | null } | null} row - Creator row
- * @return {WorkTag | null} - Tag or null
- */
-
-export const toCreatorTag = (
-  row: { id: string; name: string; accent: string | null; avatarUrl: string | null } | null
-): WorkTag | null =>
-  row ? { id: row.id, label: row.name, accent: row.accent, image: row.avatarUrl } : null
-
-/**
- * Creator rows shaped like tags
- * @param {Array<{ id: string, name: string, accent: string | null, avatarUrl: string | null }>} rows - Creator rows
- * @return {WorkTag[]} - Tags
- */
-
-export const toCreatorTags = (
-  rows: { id: string; name: string; accent: string | null; avatarUrl: string | null }[]
-): WorkTag[] => rows.map((row) => toCreatorTag(row)).filter((tag) => tag !== null)
-
-// Creators a work card lists, in display order
-export const YOUTUBERS_INCLUDE = { orderBy: { position: 'asc' } } as const
-
-/**
- * Read the picked creators
- * @param {FormValues} values - Parsed body
- * @return {string[]} - Creator identifiers
- */
-
-export const readCreatorIds = (values: FormValues): string[] => [
-  ...new Set(readList(values, 'youtuberIds')),
-]
-
-/**
- * Creators a row ends up with
- * @param {string[]} picked - Creators chosen in the form
- * @param {AccessScope} scope - Editor perimeter
- * @param {string[]} [stored] - Creators the row already carries
- * @return {string[]} - Chosen creators, plus the stored ones the editor cannot see
- */
-
-export const keptCreatorIds = (
-  picked: string[],
-  scope: AccessScope,
-  stored: string[] = []
-): string[] =>
-  scope.isGlobal
-    ? picked
-    : [...picked, ...stored.filter((id) => !scope.youtuberIds.includes(id) && !picked.includes(id))]
-
-/**
- * Identify creators for a relation write
- * @param {string[]} ids - Creator identifiers
- * @return {Array<{ id: string }>} - Relation targets
- */
-
-export const creatorLinks = (ids: string[]): { id: string }[] => ids.map((id) => ({ id }))
-
-/**
- * Project row shaped like a tag
- * @param {{ id: string, title: string, emoji: string | null } | null} row - Project row
- * @return {WorkTag | null} - Tag or null
- */
-
-export const toProjectTag = (
-  row: { id: string; title: string; emoji: string | null } | null
-): WorkTag | null => (row ? { id: row.id, label: row.title, accent: null, emoji: row.emoji } : null)
-
-/**
- * Account row shaped like a person
- * @typedef {Object} PersonRow
- * @property {string} id - Account identifier
- * @property {string} displayName - Display name
- * @property {string | null} avatarUrl - Portrait
- */
-
-interface PersonRow {
-  id: string
-  displayName: string
-  avatarUrl: string | null
-}
-
-/**
- * Map an account row to a person
- * @param {PersonRow | null} row - Account row
- * @return {WorkPerson | null} - Person or null
- */
-
-export const toPerson = (row: PersonRow | null | undefined): WorkPerson | null =>
-  row ? { id: row.id, name: row.displayName, src: row.avatarUrl } : null
-
-// Relations naming who opened a work record and who touched it last
-export const AUTHORSHIP_INCLUDE = { createdBy: true, updatedBy: true } as const
-
-/**
- * Work row carrying its authorship
- * @typedef {Object} AuthoredRow
- * @property {PersonRow | null} createdBy - Who opened it
- * @property {PersonRow | null} updatedBy - Who last edited it
- * @property {Date} createdAt - Creation moment
- * @property {Date} updatedAt - Last edit moment
- */
-
-interface AuthoredRow {
-  createdBy: PersonRow | null
-  updatedBy: PersonRow | null
-  createdAt: Date
-  updatedAt: Date
-}
-
-/**
- * Map the authorship of a work row
- * @param {AuthoredRow} row - Row with its author and its editor
- * @return {WorkAuthorship} - Who touched it and when
- */
-
-export const toAuthorship = (row: AuthoredRow): WorkAuthorship => ({
-  createdBy: toPerson(row.createdBy),
-  createdAt: row.createdAt.toISOString(),
-  updatedBy: toPerson(row.updatedBy),
-  updatedAt: row.updatedAt.toISOString(),
-})
-
-/**
- * Read the columns of one board
- * @param {WorkflowScopeName} scope - Board scope
- * @return {Promise<BoardColumn[]>} - Columns in display order
- */
-
-export const boardColumns = async (scope: WorkflowScopeName): Promise<BoardColumn[]> => {
-  const rows = await prisma.workflowState.findMany({
-    where: { scope },
-    orderBy: { position: 'asc' },
-  })
-
-  return rows.map((row) => ({
-    id: row.id,
-    label: row.name,
-    accent: row.accent,
-    phase: row.phase,
-  }))
-}
+import { peopleInScope } from '@/core/services/work/shared/people'
 
 /**
  * Read the default column of one board
@@ -436,24 +246,4 @@ export const projectOptions = async (
   })
 
   return rows.map((row) => ({ value: row.id, label: row.title, emoji: row.emoji }))
-}
-
-/**
- * Compute the position of a card dropped inside a column
- * @param {Array<{ id: string, position: number }>} cards - Cards already in the column
- * @param {number} index - Drop index
- * @return {number} - New position
- */
-
-export const positionAt = (cards: { id: string; position: number }[], index: number): number => {
-  const step = FORM_SETTINGS.positionStep
-
-  // Dropped above the first card
-  if (cards.length === 0) return step
-  if (index <= 0) return cards[0].position - step
-
-  // Dropped below the last card
-  if (index >= cards.length) return cards[cards.length - 1].position + step
-
-  return Math.floor((cards[index - 1].position + cards[index].position) / 2)
 }
