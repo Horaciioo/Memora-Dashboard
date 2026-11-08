@@ -1,6 +1,6 @@
 import { BufferGeometry, Float32BufferAttribute } from 'three'
 
-import { railEnds } from '@/composites/play/golf/scene/railEnds'
+import { railEnds } from '@/composites/play/golf/scene/course/railEnds'
 import { floorHeight } from '@/core/lib/play/golf'
 import type { GolfHole, GolfPad, GolfWall } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'

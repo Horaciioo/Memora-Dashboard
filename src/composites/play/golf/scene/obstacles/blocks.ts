@@ -3,7 +3,7 @@ import type { BufferGeometry, Color } from 'three'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 
-import { isFlatBlock } from '@/composites/play/golf/scene/geometry'
+import { isFlatBlock } from '@/composites/play/golf/scene/course/geometry'
 import type { GolfBlock } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
