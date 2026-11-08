@@ -12,7 +12,7 @@ import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import type { ScenarioChoice, ScenarioMove, ScenarioStep } from '@/types/scenario'
 import { fillTemplate } from '@/utils/format/strings'
 
-// One trainer found by the search
+// One referent found by the search
 interface Found {
   id: string
   name: string
@@ -22,20 +22,20 @@ interface Found {
 const searchAsk = (): ScenarioMove['ask'] => ({ kind: 'search', placeholder: COPY.followWhoHint })
 
 /**
- * Ask which trainer is meant
+ * Ask which referent is meant
  * @return {Promise<ScenarioMove>} - Search field
  */
 
-export const askTrainer: ScenarioStep = async () => ({
+export const askReferent: ScenarioStep = async () => ({
   say: [COPY.followWho],
   ask: searchAsk(),
-  next: 'trainerAnswer',
+  next: 'referentAnswer',
 })
 
-const chosen = (trainer: { id: string; name: string }): ScenarioMove => ({
+const chosen = (referent: { id: string; name: string }): ScenarioMove => ({
   say: [],
-  next: 'trainerReport',
-  data: { trainerId: trainer.id, trainerName: trainer.name, onlyJunior: '' },
+  next: 'referentReport',
+  data: { referentId: referent.id, referentName: referent.name, onlyJunior: '' },
 })
 
 /**
@@ -45,15 +45,15 @@ const chosen = (trainer: { id: string; name: string }): ScenarioMove => ({
  * @return {Promise<ScenarioMove>} - Next move
  */
 
-export const trainerAnswer: ScenarioStep = async (context, answer) => {
+export const referentAnswer: ScenarioStep = async (context, answer) => {
   const text = answer?.value ?? ''
-  const hits = await apiGet<Found[]>(`${API_ROUTES.academyTrainers}?q=${encodeURIComponent(text)}`)
+  const hits = await apiGet<Found[]>(`${API_ROUTES.academyReferents}?q=${encodeURIComponent(text)}`)
 
   if (hits.length === 0) {
     return {
       say: [fillTemplate(COPY.followNone, { text })],
       ask: searchAsk(),
-      next: 'trainerAnswer',
+      next: 'referentAnswer',
     }
   }
   if (hits.length === 1) return chosen(hits[0])
@@ -64,35 +64,35 @@ export const trainerAnswer: ScenarioStep = async (context, answer) => {
     hint: String(hit.juniorCount),
   }))
 
-  return { say: [COPY.followMany], ask: { kind: 'choices', choices }, next: 'trainerPick' }
+  return { say: [COPY.followMany], ask: { kind: 'choices', choices }, next: 'referentPick' }
 }
 
-export const trainerPick: ScenarioStep = async (context, answer) =>
+export const referentPick: ScenarioStep = async (context, answer) =>
   chosen({ id: answer?.value ?? '', name: answer?.label ?? '' })
 
 /**
- * From a Junior's file, the trainer who follows them
+ * From a Junior's file, the referent who follows them
  * @param {ScenarioContext} context - Member and data
- * @return {Promise<ScenarioMove>} - Report on that trainer and that Junior
+ * @return {Promise<ScenarioMove>} - Report on that referent and that Junior
  */
 
-export const trainerOfJunior: ScenarioStep = async (context) => {
+export const referentOfJunior: ScenarioStep = async (context) => {
   const { junior } = await readDossier(context.data.juniorId)
-  if (!junior.trainer) return { say: [COPY.followNoTrainer], next: 'hubAgain' }
+  if (!junior.referent) return { say: [COPY.followNoReferent], next: 'hubAgain' }
 
   return {
     say: [],
-    next: 'trainerReport',
+    next: 'referentReport',
     data: {
-      trainerId: junior.trainer.id,
-      trainerName: junior.trainer.name,
+      referentId: junior.referent.id,
+      referentName: junior.referent.name,
       onlyJunior: context.data.juniorId,
     },
   }
 }
 
 /**
- * A line on one junior of the trainer
+ * A line on one junior of the referent
  * @param {JuniorFollow} follow - Where they stand
  * @return {string} - Sentence
  */
@@ -103,8 +103,8 @@ const summary = (follow: JuniorFollow): string => {
   return fillTemplate(COPY.followLine, {
     junior: follow.name,
     current: follow.current || COPY.followNothing,
-    done: String(follow.trainerDone),
-    total: String(follow.trainerTotal),
+    done: String(follow.referentDone),
+    total: String(follow.referentTotal),
     todo: String(follow.todo.length),
     late: late > 0 ? fillTemplate(COPY.followLate, { late: String(late) }) : '',
     lives: String(follow.liveCount),
@@ -113,18 +113,18 @@ const summary = (follow: JuniorFollow): string => {
 }
 
 /**
- * Where the trainer stands with their Juniors, or with one of them
+ * Where the referent stands with their Juniors, or with one of them
  * @param {ScenarioContext} context - Member and data
  * @return {Promise<ScenarioMove>} - Report, then back to the hub when it came from a file
  */
 
-export const trainerReport: ScenarioStep = async (context) => {
-  const { trainerId, trainerName, onlyJunior } = context.data
-  const { juniors } = await readFollow(trainerId, onlyJunior || undefined)
+export const referentReport: ScenarioStep = async (context) => {
+  const { referentId, referentName, onlyJunior } = context.data
+  const { juniors } = await readFollow(referentId, onlyJunior || undefined)
   const back = onlyJunior ? 'hubAgain' : undefined
 
   if (juniors.length === 0) {
-    return { say: [fillTemplate(COPY.followEmpty, { trainer: trainerName })], next: back }
+    return { say: [fillTemplate(COPY.followEmpty, { referent: referentName })], next: back }
   }
 
   const lines = juniors.slice(0, ASSISTANT_SETTINGS.maxChoices).flatMap((junior) => [
@@ -133,5 +133,5 @@ export const trainerReport: ScenarioStep = async (context) => {
     ...(onlyJunior ? junior.todo.slice(0, ASSISTANT_SETTINGS.maxChoices).map(stepSentence) : []),
   ])
 
-  return { say: [fillTemplate(COPY.followIntro, { trainer: trainerName }), ...lines], next: back }
+  return { say: [fillTemplate(COPY.followIntro, { referent: referentName }), ...lines], next: back }
 }

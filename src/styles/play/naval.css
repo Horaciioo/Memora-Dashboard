@@ -1,0 +1,99 @@
+/* Naval ground: night sea, a burning glow on the horizon */
+.play-room:has(.play-sea) {
+  background:
+    radial-gradient(
+      70rem 26rem at 50% 108%,
+      color-mix(in srgb, var(--play-naval-hit) 26%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-naval-night) 0%, var(--play-naval-deep) 100%);
+}
+
+.play-room:has(.play-sea)::before,
+.play-room:has(.play-sea) .play-floor {
+  display: none;
+}
+
+/* Canvas sea, tilted towards the viewer */
+.naval-ocean {
+  perspective: var(--eye);
+}
+
+.naval-ocean-canvas {
+  transform: rotateX(var(--tilt));
+  transform-origin: 50% 50%;
+  box-shadow:
+    0 0 0 0.18rem rgb(255 255 255 / 0.08),
+    0 1.6rem 3rem rgb(0 0 0 / 0.5);
+  transition: filter 0.3s ease;
+}
+
+/* Not the viewer's turn: the sea aimed at goes grey */
+.naval-ocean-dim .naval-ocean-canvas {
+  filter: grayscale(0.7) brightness(0.75);
+}
+
+/* Hub photo, darkened under the cards */
+.naval-hub-veil {
+  background: linear-gradient(180deg, rgb(4 17 29 / 0.25) 0%, rgb(4 17 29 / 0.75) 100%);
+}
+
+.naval-callout {
+  animation: naval-callout 1.6s ease-out forwards;
+}
+
+/* Clock: a bar that empties */
+.naval-clock-fill {
+  transform-origin: left;
+  transform: scaleX(var(--left));
+  transition: transform 0.25s linear;
+}
+
+.naval-chip-turn {
+  box-shadow: 0 0 0 0.13rem var(--play-naval-glow);
+}
+
+.naval-chip-hit {
+  animation: naval-chip-hit 0.6s ease-out;
+}
+
+.naval-dock-ship {
+  touch-action: none;
+}
+
+@keyframes naval-callout {
+  0% {
+    opacity: 0;
+    transform: translateY(0.8rem) scale(0.85);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+  25% {
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-0.6rem);
+  }
+}
+
+@keyframes naval-chip-hit {
+  0% {
+    background: rgb(255 59 59 / 0.55);
+  }
+  100% {
+    background: var(--play-naval-panel);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .naval-callout,
+  .naval-chip-hit {
+    animation: none;
+  }
+}

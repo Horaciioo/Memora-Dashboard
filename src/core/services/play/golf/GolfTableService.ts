@@ -5,13 +5,15 @@ import { after, countdownEnd } from '@/core/lib/play/clock'
 import {
   cardTotal,
   drawCourse,
+  effectsForHole,
   golfSettingsOf,
-  holeScore,
+  compileHole,
+  holeScores,
   holesOf,
   strokeCeiling,
 } from '@/core/lib/play/golf'
 import { IDLE_STEP } from '@/core/engines/play/steps'
-import { asJson, isEveryoneDone, withGolf } from '@/core/services/play/golf/lookups'
+import { asJson, effectsOf, isEveryoneDone, withGolf } from '@/core/services/play/golf/lookups'
 import type { GolfTable } from '@/core/services/play/golf/lookups'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import type { EngineSession, EngineStep } from '@/types/play'
@@ -86,10 +88,13 @@ export const closeHole = async (table: GolfTable): Promise<EngineStep> => {
   const lastRest = Math.max(now.getTime(), ...players.map((player) => player.restsAt.getTime()))
   const closedAt = new Date(Math.min(lastRest, Math.max(now.getTime(), game.endsAt.getTime())))
 
-  for (const player of players) {
+  const layout = holesOf(settings)[game.hole]
+  const hole = layout ? compileHole(layout) : undefined
+  const scores = holeScores(players, strokeCeiling(settings), hole)
+  for (const [index, player] of players.entries()) {
     await tx.golfPlayer.update({
       where: { id: player.id },
-      data: { card: { push: holeScore(player, strokeCeiling(settings)) } },
+      data: { card: { push: scores[index] } },
     })
   }
   await tx.golfGame.update({
@@ -106,17 +111,26 @@ export const closeHole = async (table: GolfTable): Promise<EngineStep> => {
  * @return {Promise<EngineStep>} - Step
  */
 
-const openNextHole = async ({ tx, game, settings, now }: GolfTable): Promise<EngineStep> => {
+const openNextHole = async ({
+  tx,
+  game,
+  settings,
+  players,
+  now,
+}: GolfTable): Promise<EngineStep> => {
   const hole = game.hole + 1
   const [x, z] = holesOf(settings)[hole].tee
   const startsAt = after(now, GOLF_SETTINGS.holeIntroSeconds)
   const endsAt = after(startsAt, settings.holeSeconds)
 
-  // Powers in hand stay, effects wear off
-  await tx.golfPlayer.updateMany({
-    where: { sessionId: game.sessionId },
-    data: { x, z, restsAt: now, strokes: 0, holedAt: null, effects: [] },
-  })
+  // Powers in hand stay, bonuses queued for this hole start
+  for (const player of players) {
+    const effects = effectsForHole(effectsOf(player.effects), hole, startsAt.getTime())
+    await tx.golfPlayer.update({
+      where: { id: player.id },
+      data: { x, z, restsAt: now, strokes: 0, holedAt: null, effects: asJson(effects) },
+    })
+  }
   await tx.golfGame.update({
     where: { sessionId: game.sessionId },
     data: { hole, startsAt, endsAt, closedAt: null, orbs: [], hazards: [], rev: { increment: 1 } },

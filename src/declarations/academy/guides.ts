@@ -9,7 +9,7 @@ import type { IconName } from '@/declarations/ui/icons'
 
 export const GUIDE_PARAMS = {
   guide: 'guide',
-  tab: 'onglet',
+  tab: 'tab',
 } as const
 
 /**
@@ -165,16 +165,16 @@ const PIM_DESTINATION_MAP = {
       },
     ],
   },
-  fsiTrainer: {
-    label: 'Formateur du junior',
-    icon: 'functionTrainer',
+  fsiReferent: {
+    label: 'Référent du junior',
+    icon: 'functionReferent',
     surface: 'junior',
     tab: FSI_TABS.informations,
     marks: [
       {
         beacon: GUIDE_BEACONS.fsiEdit,
-        title: 'Attribue un Formateur',
-        body: 'Clique sur « Attribuer un Formateur » dans la timeline, choisis-le dans la liste et enregistre. Il retrouvera ses tâches sur son Accueil.',
+        title: 'Attribue un Référent',
+        body: 'Clique sur « Attribuer un Référent » dans la timeline, choisis-le dans la liste et enregistre. Il retrouvera ses tâches sur son Accueil.',
       },
     ],
   },
@@ -185,13 +185,13 @@ const PIM_DESTINATION_MAP = {
     marks: [
       {
         beacon: GUIDE_BEACONS.sessionJuniors,
-        title: 'Chaque junior a son Formateur ?',
-        body: 'La PIM ne se lance qu’une fois un Formateur attribué à chaque junior confirmé.',
+        title: 'Chaque junior a son Référent ?',
+        body: 'La PIM ne se lance qu’une fois un Référent attribué à chaque junior confirmé.',
       },
       {
         beacon: GUIDE_BEACONS.sessionLaunch,
         title: 'Lance la PIM',
-        body: 'Le bouton passe la session En cours : la timeline de chaque junior démarre aujourd’hui, et chaque Formateur reçoit sa première tâche.',
+        body: 'Le bouton passe la session En cours : la timeline de chaque junior démarre aujourd’hui, et chaque Référent reçoit sa première tâche.',
       },
     ],
   },

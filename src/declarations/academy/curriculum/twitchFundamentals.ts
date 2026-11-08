@@ -62,7 +62,7 @@ export const TWITCH_FUNDAMENTALS: Course = {
           prompt: 'Tu es prêt(e) à démarrer ?',
           yes: 'Oui !',
           no: 'Retour à l’Accueil',
-          note: 'Si au cours de la Formation, des questions te viennent à l’esprit, note-les pour les poser à ton Référent ou à ton Formateur.',
+          note: 'Si au cours de la Formation, des questions te viennent à l’esprit, note-les pour les poser à ton Référent.',
         },
         {
           kind: 'text',
@@ -200,7 +200,7 @@ export const TWITCH_FUNDAMENTALS: Course = {
                 'Cette fenêtre est le journal d’activité du live : tu y vois l’action de chacun, de tes collègues aux Responsables, jusqu’à l’équipe du créateur ou le créateur lui-même.',
                 'C’est très utile quand plusieurs personnes repèrent la même infraction : tu vérifies tout de suite si l’action a déjà été réalisée.',
                 'Tu y trouves notamment les messages supprimés, l’ajout ou le retrait de termes bloqués, les sanctions (ban, déban, timeout…) et les demandes d’annulation de bannissement, que seul Jérémy peut traiter.',
-                '**Attention** : ici, chacun progresse à son rythme. Ce n’est ni une compétition, ni un outil de dénonciation. Si tu penses qu’un Modérateur ou un Junior abuse de ses droits, parles-en uniquement à ton Formateur : ne fais pas justice toi-même.',
+                '**Attention** : ici, chacun progresse à son rythme. Ce n’est ni une compétition, ni un outil de dénonciation. Si tu penses qu’un Modérateur ou un Junior abuse de ses droits, parles-en uniquement à ton Référent : ne fais pas justice toi-même.',
               ],
             },
             {

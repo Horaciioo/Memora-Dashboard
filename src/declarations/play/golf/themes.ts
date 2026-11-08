@@ -4,11 +4,15 @@
  */
 
 export const GOLF_THEMES = {
-  prairie: { drift: 'cloud', hasStars: false },
-  canyon: { drift: 'cloud', hasStars: false },
-  tropical: { drift: 'cloud', hasStars: false },
-  espace: { drift: 'asteroid', hasStars: true },
-  plage: { drift: 'cloud', hasStars: false },
+  randomtown: { drift: 'cloud', hasStars: false },
+  droppinhit: { drift: 'cloud', hasStars: false },
+  zarbland: { drift: 'cloud', hasStars: false },
+  slidetown: { drift: 'cloud', hasStars: false },
+  singletown: { drift: 'cloud', hasStars: false },
+  speedtown: { drift: 'cloud', hasStars: false },
+  boingtown: { drift: 'cloud', hasStars: false },
+  zigzag: { drift: 'cloud', hasStars: true },
+  candy: { drift: 'cloud', hasStars: false },
 } as const
 
 export type GolfThemeName = keyof typeof GOLF_THEMES

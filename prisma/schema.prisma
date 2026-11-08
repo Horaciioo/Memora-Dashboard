@@ -130,7 +130,7 @@ enum TrainingStatus {
   ABANDONED
 }
 
-// Outcome a Formateur proposes at the end of a voice check-in
+// Outcome a Référent proposes at the end of a voice check-in
 enum ReviewAdvice {
   PASS
   BONUS
@@ -304,6 +304,8 @@ model Account {
   anonymisedAt          DateTime?
   // Access shut until lifted
   frozenAt              DateTime?
+  // Play bot level, null for a member
+  botKind               PlayBotKind?
   languages             String[]     @default([])
   timezone              String?
   theme                 String?
@@ -331,7 +333,7 @@ model Account {
   socialLinks           SocialLink[]
   constraints           AccountConstraint[]
   calendarEntries       CalendarEvent[]          @relation("CalendarSubject")
-  trainedEvents         CalendarEvent[]          @relation("CalendarTrainer")
+  referentEvents        CalendarEvent[]          @relation("CalendarReferent")
   absences              Absence[]                @relation("AbsenceOwner")
   reviewedAbsences      Absence[]                @relation("AbsenceReviewer")
   notesReceived         AccountNote[]            @relation("NoteSubject")
@@ -342,9 +344,11 @@ model Account {
   legacyTracks          LegacyTrack[]            @relation("LegacyMember")
   legacyDecisions       LegacyTrack[]            @relation("LegacyDecider")
   legacyGrades          LegacyModuleResult[]     @relation("LegacyGrader")
-  academyTrainees       AcademyJunior[]          @relation("AcademyJuniorTrainer")
-  academySeats          AcademySessionTrainer[]  @relation("AcademyTrainer")
+  referredJuniors       AcademyJunior[]          @relation("AcademyJuniorReferent")
+  academySeats          AcademySessionReferent[] @relation("AcademyReferent")
   integrationInvites    IntegrationInvite[]      @relation("IntegrationInviteCreatedBy")
+  identityChecks        IdentityCheck[]          @relation("IdentityCheckAccount")
+  identityResolutions   IdentityCheck[]          @relation("IdentityCheckResolver")
   integrationClaims     IntegrationClaim[]       @relation("IntegrationClaimAccount")
   quizAnswers           JuniorAnswer[]
   trainingFeedbacks     TrainingFeedback[]
@@ -398,8 +402,16 @@ model Account {
   ludoPlayers           LudoPlayer[]
   ludoMoves             LudoMove[]
   playMessages          PlayMessage[]
+  navalPlayers          NavalPlayer[]
   playInvitesSent       PlayInvite[]             @relation("PlayInviteFrom")
   playInvitesReceived   PlayInvite[]             @relation("PlayInviteTo")
+  playFollows           PlayFollow[]
+  playGroupsHosted      PlayGroup[]              @relation("PlayGroupHost")
+  playGroupMembers      PlayGroupMember[]
+  playGroupMessages     PlayGroupMessage[]
+  playGroupInvites      PlayGroupInvite[]
+  playGroupProposals    PlayGroupProposal[]
+  playNotices           PlayNotice[]
   activityAsSubject     ActivityLog[]            @relation("LogSubject")
   activityAsActor       ActivityLog[]            @relation("LogActor")
   notificationsReceived Notification[]           @relation("NotificationRecipient")
@@ -1440,7 +1452,7 @@ model AcademySession {
 
   jobFunction JobFunction @relation(fields: [functionId], references: [id], onDelete: Restrict)
 
-  trainers       AcademySessionTrainer[]
+  referents      AcademySessionReferent[]
   juniors        AcademyJunior[]
   comments       AcademyComment[]
   calendarEvents CalendarEvent[]
@@ -1501,8 +1513,46 @@ model IntegrationClaim {
   @@map("integration_claims")
 }
 
-// Moderator holding the trainer seat on a session
-model AcademySessionTrainer {
+// Where a Discord identity check stands
+enum IdentityCheckStatus {
+  OPEN
+  ESCALATED
+  RESOLVED
+  DONE
+}
+
+// Discord identity proven by Discord itself before any session opens
+model IdentityCheck {
+  id                String              @id @default(cuid())
+  discordId         String
+  discordUsername   String?
+  discordAvatarHash String?
+  // Account this identity opens, null when nobody matches
+  accountId         String?
+  status            IdentityCheckStatus @default(OPEN)
+  // Pseudonym the person typed after saying it is not them
+  typedName         String?
+  attempts          Int                 @default(0)
+  // Accepted application the pseudonym points at
+  candidateId       String?
+  // Identifier a responsable gave, the only one the link accepts
+  resolvedDiscordId String?
+  resolvedById      String?
+  linkToken         String?             @unique
+  linkExpiresAt     DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  account    Account?              @relation("IdentityCheckAccount", fields: [accountId], references: [id], onDelete: SetNull)
+  candidate  RecruitmentCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
+  resolvedBy Account?              @relation("IdentityCheckResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@map("identity_checks")
+}
+
+// Moderator holding the referent seat on a session
+model AcademySessionReferent {
   id          String    @id @default(cuid())
   sessionId   String
   accountId   String
@@ -1513,10 +1563,10 @@ model AcademySessionTrainer {
   forgottenAt DateTime?
 
   session AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  account Account        @relation("AcademyTrainer", fields: [accountId], references: [id], onDelete: Cascade)
+  account Account        @relation("AcademyReferent", fields: [accountId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, accountId])
-  @@map("academy_session_trainers")
+  @@map("academy_session_referents")
 }
 
 // Junior followed through one session, always an existing moderator
@@ -1524,7 +1574,7 @@ model AcademyJunior {
   id               String              @id @default(cuid())
   sessionId        String
   accountId        String
-  trainerId        String?
+  referentId       String?
   // Chosen by the junior on the integration form, empty until then
   dispositifId     String?
   // Application this seat was admitted from
@@ -1551,7 +1601,7 @@ model AcademyJunior {
 
   session    AcademySession        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account    Account               @relation("AcademyJunior", fields: [accountId], references: [id], onDelete: Cascade)
-  trainer    Account?              @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
+  referent   Account?              @relation("AcademyJuniorReferent", fields: [referentId], references: [id], onDelete: SetNull)
   dispositif Dispositif?           @relation(fields: [dispositifId], references: [id], onDelete: Restrict)
   candidate  RecruitmentCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
 
@@ -1654,7 +1704,7 @@ model AcademyReview {
   feeling         String?
   summary         String        @default("")
   advice          ReviewAdvice
-  // Outcome the responsable kept, the trainer's advice followed or not
+  // Outcome the responsable kept, the referent's advice followed or not
   decision        ReviewAdvice?
   status          ReviewStatus  @default(DRAFT)
   decidedById     String?
@@ -1673,7 +1723,7 @@ model AcademyReview {
 
 // What a calendar template stands for in the academy, fixed in code
 enum EventPurpose {
-  TRAINER_INTERVIEW
+  REFERENT_INTERVIEW
   PANEL_INTERVIEW
   REVIEW_ONE
   REVIEW_FINAL
@@ -1738,7 +1788,7 @@ model CalendarEvent {
   meetingId         String?
   sessionId         String?
   juniorId          String?
-  trainerId         String?
+  referentId        String?
   startsAt          DateTime
   endsAt            DateTime?
   allDay            Boolean          @default(false)
@@ -1766,13 +1816,13 @@ model CalendarEvent {
   meeting  Meeting?        @relation(fields: [meetingId], references: [id], onDelete: SetNull)
   session  AcademySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
   junior   AcademyJunior?  @relation(fields: [juniorId], references: [id], onDelete: Cascade)
-  trainer  Account?        @relation("CalendarTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
+  referent Account?        @relation("CalendarReferent", fields: [referentId], references: [id], onDelete: SetNull)
 
   @@index([startsAt])
   @@index([kind, startsAt])
   @@index([templateId])
   @@index([juniorId])
-  @@index([trainerId])
+  @@index([referentId])
   @@index([ownerId])
   @@index([accountId])
   @@index([rollCall, remindAt, remindedAt])
@@ -2332,24 +2382,26 @@ enum RecruitmentOwner {
 
 // Campaign opened for one creator and one function, announced outside then held on Discord
 model RecruitmentSession {
-  id               String              @id @default(cuid())
-  youtuberId       String
-  functionId       String
-  academySessionId String?             @unique
-  name             String
-  status           RecruitmentStatus   @default(DRAFT)
-  summary          String?
-  instructions     String              @default("")
-  platform         RecruitmentPlatform @default(DISCORD)
+  id                  String              @id @default(cuid())
+  youtuberId          String
+  functionId          String
+  academySessionId    String?             @unique
+  name                String
+  status              RecruitmentStatus   @default(DRAFT)
+  summary             String?
+  instructions        String              @default("")
+  platform            RecruitmentPlatform @default(DISCORD)
   // Keys of the questions the recruiters picked, in asking order
-  questionKeys     String[]            @default([])
-  opensAt          DateTime?
-  closesAt         DateTime?
+  questionKeys        String[]            @default([])
+  opensAt             DateTime?
+  closesAt            DateTime?
   // Discord wording posted for the interviews, once announced
-  announcement     String?
-  announcedAt      DateTime?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  announcement        String?
+  announcedAt         DateTime?
+  // Accounts of the accepted candidates opened by a responsable
+  accountsActivatedAt DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
 
   youtuber       Youtuber                 @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
   jobFunction    JobFunction              @relation(fields: [functionId], references: [id], onDelete: Restrict)
@@ -2450,15 +2502,16 @@ model RecruitmentCandidate {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  session    RecruitmentSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  recruiter  Account?             @relation("RecruitmentRecruiter", fields: [recruiterId], references: [id], onDelete: SetNull)
-  outcome    RecruitmentOutcome?  @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
-  recruiters CandidateRecruiter[]
-  observers  RecruitmentSeat[]
-  comments   RecruitmentComment[]
-  exercises  ExerciseLink[]
-  answers    RecruitmentAnswer[]
-  admission  AcademyJunior?
+  session        RecruitmentSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  recruiter      Account?             @relation("RecruitmentRecruiter", fields: [recruiterId], references: [id], onDelete: SetNull)
+  outcome        RecruitmentOutcome?  @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
+  recruiters     CandidateRecruiter[]
+  observers      RecruitmentSeat[]
+  comments       RecruitmentComment[]
+  exercises      ExerciseLink[]
+  answers        RecruitmentAnswer[]
+  admission      AcademyJunior?
+  identityChecks IdentityCheck[]
 
   @@unique([sessionId, discordId])
   @@index([discordId])
@@ -2753,6 +2806,20 @@ enum PlayGame {
   GOLF
   BOMB
   LUDO
+  NAVAL
+}
+
+// Play bot level
+enum PlayBotKind {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// Who finds a game in the lists
+enum PlayVisibility {
+  PUBLIC
+  PRIVATE
 }
 
 // Life of a game or a tournament
@@ -2797,6 +2864,9 @@ model PlaySession {
   tournamentIndex Int?
   // Game this one replays with the same table
   rematchOfId     String?           @unique
+  // Private games hide from the lists and open with a code
+  visibility      PlayVisibility    @default(PUBLIC)
+  joinCode        String?           @unique
   // Choices of the host, shaped by the game
   settings        Json
   startedAt       DateTime?
@@ -2804,23 +2874,29 @@ model PlaySession {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  host        Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
-  tournament  PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  rematchOf   PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
-  rematch     PlaySession?        @relation("PlayRematch")
-  seats       PlaySeat[]
-  bacRounds   BaccalaureatRound[]
-  bombGame    BombGame?
-  bombSeats   BombPlayer[]
-  bombMoves   BombMove[]
-  golfGame    GolfGame?
-  golfPlayers GolfPlayer[]
-  golfMoves   GolfMove[]
-  ludoGame    LudoGame?
-  ludoPlayers LudoPlayer[]
-  ludoMoves   LudoMove[]
-  messages    PlayMessage[]
-  invites     PlayInvite[]
+  host         Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+  tournament   PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  rematchOf    PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
+  rematch      PlaySession?        @relation("PlayRematch")
+  seats        PlaySeat[]
+  bacRounds    BaccalaureatRound[]
+  bombGame     BombGame?
+  bombSeats    BombPlayer[]
+  bombMoves    BombMove[]
+  golfGame     GolfGame?
+  golfPlayers  GolfPlayer[]
+  golfMoves    GolfMove[]
+  ludoGame     LudoGame?
+  ludoPlayers  LudoPlayer[]
+  ludoMoves    LudoMove[]
+  navalGame    NavalGame?
+  navalPlayers NavalPlayer[]
+  navalMatches NavalMatch[]
+  navalShots   NavalShot[]
+  messages     PlayMessage[]
+  invites      PlayInvite[]
+  follows      PlayFollow[]
+  notices      PlayNotice[]
 
   @@index([status, game])
   @@index([tournamentId, tournamentIndex])
@@ -2840,6 +2916,8 @@ model PlaySeat {
   joinedAt  DateTime     @default(now())
   leftAt    DateTime?
   kickedAt  DateTime?
+  // Set once the player confirms in the lobby
+  readyAt   DateTime?
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
@@ -2900,6 +2978,43 @@ model PlayInvite {
   @@map("play_invites")
 }
 
+// What a followed game tells its follower
+enum PlayNoticeKind {
+  STARTED
+  FINISHED
+}
+
+// A member following a game, told when it starts and ends
+model PlayFollow {
+  id        String   @id @default(cuid())
+  accountId String
+  sessionId String
+  createdAt DateTime @default(now())
+
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, sessionId])
+  @@index([sessionId])
+  @@map("play_follows")
+}
+
+// A followed game news waiting for a member, deleted once closed
+model PlayNotice {
+  id        String         @id @default(cuid())
+  accountId String
+  sessionId String
+  kind      PlayNoticeKind
+  createdAt DateTime       @default(now())
+
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, sessionId, kind])
+  @@index([accountId])
+  @@map("play_notices")
+}
+
 // Totals of one player on one game, the global ones are their sum
 model PlayGameStat {
   id                String   @id @default(cuid())
@@ -2930,13 +3045,15 @@ model PlayGameStat {
 
 // Global side of a player, outside any game
 model PlayProfile {
-  accountId String    @id
+  accountId  String    @id
   // XP given on the global line alone
-  bonusXp   Int       @default(0)
-  bannedAt  DateTime?
-  banReason String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  bonusXp    Int       @default(0)
+  bannedAt   DateTime?
+  banReason  String?
+  // Last time the member left Play, for "recently online"
+  lastSeenAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
@@ -3217,6 +3334,113 @@ model LudoMove {
   @@map("play_ludo_moves")
 }
 
+// Stage of a naval battle
+enum NavalPhase {
+  PLACEMENT
+  BATTLE
+  OVER
+}
+
+// Life of one match of a naval battle
+enum NavalMatchStatus {
+  WAITING
+  LIVE
+  DONE
+}
+
+// What a shell did
+enum NavalShotResult {
+  MISS
+  HIT
+  SUNK
+  // Lit by a flare, nothing struck
+  SPOTTED
+  CLEAR
+}
+
+// Naval table: stage, clocks and the revision of the newest change
+model NavalGame {
+  sessionId   String     @id
+  phase       NavalPhase @default(PLACEMENT)
+  startsAt    DateTime
+  phaseEndsAt DateTime
+  // Bumped on every change, the newest board wins
+  rev         Int        @default(0)
+  updatedAt   DateTime   @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_naval_games")
+}
+
+// A captain, their secret fleet and their standing
+model NavalPlayer {
+  id           String    @id @default(cuid())
+  sessionId    String
+  accountId    String
+  // Seat order, fixes the turn order
+  slot         Int
+  // Ships placed, never sent to another player
+  fleet        Json?
+  readyAt      DateTime?
+  eliminatedAt DateTime?
+  place        Int?
+  // Turns lost to the clock in a row
+  strikes      Int       @default(0)
+  // Ammo for special weapons
+  ammo         Int       @default(0)
+  // Weapons drawn for the current turn
+  offer        String[]  @default([])
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@map("play_naval_players")
+}
+
+// One fight: the whole table in a melee, a pair in a duel or a bracket
+model NavalMatch {
+  id         String           @id @default(cuid())
+  sessionId  String
+  round      Int
+  slot       Int
+  fighters   String[]
+  status     NavalMatchStatus @default(WAITING)
+  turnId     String?
+  startsAt   DateTime
+  turnEndsAt DateTime
+  winnerId   String?
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round, slot])
+  @@map("play_naval_matches")
+}
+
+// One shell fired at one square
+model NavalShot {
+  id          String          @id @default(cuid())
+  sessionId   String
+  matchId     String
+  rev         Int
+  shooterId   String
+  targetId    String
+  x           Int
+  y           Int
+  result      NavalShotResult
+  // Weapon fired, one strike shares its revision
+  weapon      String          @default("cannon")
+  orientation Int             @default(0)
+  createdAt   DateTime        @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, rev])
+  @@index([matchId])
+  @@map("play_naval_shots")
+}
+
 // Level a share hands out, the owner stands above all of them
 enum PageAccessLevel {
   FULL
@@ -3375,4 +3599,86 @@ model PageComment {
   @@index([pageId, createdAt])
   @@index([parentId])
   @@map("page_comments")
+}
+
+// A lasting circle of players, led by its host
+model PlayGroup {
+  id        String   @id @default(cuid())
+  name      String
+  hostId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  host      Account             @relation("PlayGroupHost", fields: [hostId], references: [id], onDelete: Cascade)
+  members   PlayGroupMember[]
+  invites   PlayGroupInvite[]
+  proposals PlayGroupProposal[]
+  messages  PlayGroupMessage[]
+
+  @@index([hostId])
+  @@map("play_groups")
+}
+
+// A player in a group, as many groups as wanted
+model PlayGroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  accountId String
+  joinedAt  DateTime @default(now())
+
+  group   PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  account Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, accountId])
+  @@index([groupId])
+  @@index([accountId])
+  @@map("play_group_members")
+}
+
+// A call from the host to join a group
+model PlayGroupInvite {
+  id        String   @id @default(cuid())
+  groupId   String
+  inviteeId String
+  createdAt DateTime @default(now())
+
+  group   PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  invitee Account   @relation(fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, inviteeId])
+  @@index([inviteeId])
+  @@map("play_group_invites")
+}
+
+// A game a member would like to play with the group
+model PlayGroupProposal {
+  id        String   @id @default(cuid())
+  groupId   String
+  accountId String
+  game      PlayGame
+  createdAt DateTime @default(now())
+
+  group   PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  account Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, accountId, game])
+  @@map("play_group_proposals")
+}
+
+// A line of the group chat
+model PlayGroupMessage {
+  id        String    @id @default(cuid())
+  groupId   String
+  accountId String
+  body      String
+  // Game this line invites to, with its table
+  game      PlayGame?
+  sessionId String?
+  createdAt DateTime  @default(now())
+
+  group   PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  account Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, createdAt])
+  @@map("play_group_messages")
 }

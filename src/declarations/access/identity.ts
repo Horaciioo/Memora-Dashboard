@@ -1,6 +1,6 @@
 import 'server-only'
 
-import adminIdentity from '@/configurations/system/identifiant.admin.json'
+import adminIdentity from '@/configurations/system/admin-identity.json'
 import { readBoolean, readString } from '@/declarations/configurations/readers'
 import { MemberRoles, type MemberRoleName } from '@/utils/constants/hierarchy'
 
@@ -24,14 +24,14 @@ export interface RootIdentity {
 const discordId = process.env.ADMIN_DISCORD_ID?.trim() ?? ''
 
 const displayNameVariable = readString(adminIdentity.displayNameVariable, {
-  path: 'system/identifiant.admin.displayNameVariable',
+  path: 'system/admin-identity.displayNameVariable',
   fallback: 'ADMIN_DISPLAY_NAME',
 })
 
 const seedName = process.env[displayNameVariable]?.trim() ?? ''
 
 const role = readString(adminIdentity.role, {
-  path: 'system/identifiant.admin.role',
+  path: 'system/admin-identity.role',
   fallback: MemberRoles.Admin,
 })
 
@@ -45,7 +45,7 @@ export const ROOT_IDENTITY: RootIdentity = {
   seedName: seedName.length > 0 ? seedName : null,
   role: role === MemberRoles.Admin ? MemberRoles.Admin : (role as MemberRoleName),
   immutable: readBoolean(adminIdentity.immutable, {
-    path: 'system/identifiant.admin.immutable',
+    path: 'system/admin-identity.immutable',
     fallback: true,
   }),
 }

@@ -8,8 +8,9 @@ import {
   golfPhase,
   golfSettingsOf,
   holesOf,
-  isEffectActive,
+  isEffectKept,
   isHoleDone,
+  isIced,
   strokeCeiling,
 } from '@/core/lib/play/golf'
 import { effectsOf, hazardsOf, orbsOf } from '@/core/services/play/golf/lookups'
@@ -17,7 +18,20 @@ import type { GolfTrack } from '@/core/services/play/golf/lookups'
 import { GOLF_POWERS } from '@/declarations/play/golf/powers'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import type { EngineSession } from '@/types/play'
+import { GolfPowers } from '@/utils/constants/play'
 import type { GolfPowerName } from '@/utils/constants/play'
+
+/**
+ * Feed line kind, aces and teleports told apart
+ * @param {{ kind: string, strokes: number | null, power: string | null }} move - Move
+ * @return {string} - Kind
+ */
+
+const feedKindOf = (move: { kind: string; strokes: number | null; power: string | null }) => {
+  if (move.strokes === 1) return 'ACE'
+
+  return move.power === GolfPowers.Teleport ? 'TELEPORT' : move.kind
+}
 
 /**
  * Board of a golf game
@@ -58,6 +72,7 @@ export const golfView = async (session: EngineSession) => {
   const at = now.getTime()
   const clock = game ?? { hole: 0, startsAt: now, endsAt: now, closedAt: null }
   const isLast = clock.hole + 1 >= holes
+  const hazards = hazardsOf(game?.hazards ?? []).filter((hazard) => isEffectKept(hazard, at))
 
   return {
     settings,
@@ -75,7 +90,9 @@ export const golfView = async (session: EngineSession) => {
       : null,
     rev: game?.rev ?? 0,
     orbs: orbsOf(game?.orbs ?? []),
-    hazards: hazardsOf(game?.hazards ?? []).filter((hazard) => isEffectActive(hazard, at)),
+    hazards,
+    // Whole course frozen, every slab drawn iced
+    isIced: isIced(hazards, at),
     players: players.map((player) => ({
       accountId: player.accountId,
       x: player.x,
@@ -87,7 +104,7 @@ export const golfView = async (session: EngineSession) => {
       card: player.card,
       total: cardTotal(player.card),
       hand: player.powers.filter((power): power is GolfPowerName => GOLF_POWERS.has(power)),
-      effects: effectsOf(player.effects).filter((effect) => isEffectActive(effect, at)),
+      effects: effectsOf(player.effects).filter((effect) => isEffectKept(effect, at)),
       powers: [...activePowers(effectsOf(player.effects), at)],
       hasLeft: !present.has(player.accountId),
     })),
@@ -99,12 +116,15 @@ export const golfView = async (session: EngineSession) => {
     })),
     feed: feed.map((move) => ({
       id: move.id,
-      kind: move.strokes === 1 ? 'ACE' : move.kind,
+      kind: feedKindOf(move),
       accountId: move.accountId,
       at: move.createdAt,
       hole: move.hole,
-      // Key for the power sound
-      power: move.power && GOLF_POWERS.has(move.power) ? move.power : null,
+      // Key for the power sound, none on a teleport line
+      power:
+        move.power && GOLF_POWERS.has(move.power) && feedKindOf(move) === 'POWER'
+          ? move.power
+          : null,
       values: {
         count: move.strokes ?? 0,
         power: move.power && GOLF_POWERS.has(move.power) ? GOLF_POWERS.label(move.power) : '',

@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 import { readPeriod } from '@/core/lib/assistant/period'
 import { ABSENCE_SCENARIO } from '@/core/lib/assistant/scenarios/absence'
 import { CANDIDATE_SCENARIO } from '@/core/lib/assistant/scenarios/candidate'
+import { IDENTITY_SCENARIO } from '@/core/lib/assistant/scenarios/identity'
 import { JUNIOR_SCENARIO } from '@/core/lib/assistant/scenarios/junior'
 import { TASK_SCENARIO } from '@/core/lib/assistant/scenarios/task'
 import { RECRUITMENT_SCENARIO } from '@/core/lib/assistant/scenarios/recruitment'
@@ -19,6 +20,7 @@ import type {
   ScenarioId,
   ScenarioAnswer,
   ScenarioAsk,
+  ScenarioCard,
   ScenarioChoice,
   ScenarioLine,
   ScenarioLink,
@@ -37,6 +39,7 @@ const SCENARIOS: Record<ScenarioId, Scenario> = {
   candidate: CANDIDATE_SCENARIO,
   task: TASK_SCENARIO,
   junior: JUNIOR_SCENARIO,
+  identity: IDENTITY_SCENARIO,
 }
 
 export type { ScenarioId }
@@ -73,12 +76,12 @@ export interface ScenarioRunner {
 /**
  * What the runner needs from the chat
  * @typedef {Object} ScenarioDeps
- * @property {(from: 'me' | 'memora', text: string, link?: ScenarioLink) => void} say - Writes a line
+ * @property {(from: 'me' | 'memora', text: string, link?: ScenarioLink, card?: ScenarioCard) => void} say - Writes a line
  * @property {() => void} refresh - Reloads the page behind
  */
 
 export interface ScenarioDeps {
-  say: (from: 'me' | 'memora', text: string, link?: ScenarioLink) => void
+  say: (from: 'me' | 'memora', text: string, link?: ScenarioLink, card?: ScenarioCard) => void
   refresh: () => void
 }
 
@@ -120,7 +123,14 @@ export const useAssistantScenario = ({ say, refresh }: ScenarioDeps): ScenarioRu
     if (!prefersReducedMotion()) await wait(typingDuration(text.length, ASSISTANT_SETTINGS))
     if (turn !== generation.current) return false
 
-    say('memora', text, typeof line === 'string' ? undefined : line.link)
+    if (typeof line === 'string') say('memora', text)
+    else
+      say(
+        'memora',
+        text,
+        'link' in line ? line.link : undefined,
+        'card' in line ? line.card : undefined
+      )
 
     return true
   }
@@ -133,7 +143,13 @@ export const useAssistantScenario = ({ say, refresh }: ScenarioDeps): ScenarioRu
     try {
       while (step && scenario.current) {
         const move = await scenario.current.steps[step](
-          { today: today(), accountId: session?.id ?? '', data: data.current, refresh },
+          {
+            today: today(),
+            accountId: session?.id ?? '',
+            name: session?.displayName.split(' ')[0] ?? '',
+            data: data.current,
+            refresh,
+          },
           answer
         )
         if (turn !== generation.current) return

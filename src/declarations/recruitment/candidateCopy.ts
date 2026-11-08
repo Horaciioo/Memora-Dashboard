@@ -1,7 +1,7 @@
 import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
 
 // Search parameter naming the tab to open
-export const CANDIDATE_TAB_PARAM = 'onglet'
+export const CANDIDATE_TAB_PARAM = 'tab'
 
 /**
  * Copy of the candidate file

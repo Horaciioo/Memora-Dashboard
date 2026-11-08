@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { playLudoSound, playLudoTake, preloadLudoSounds } from '@/composites/play/ludo/sound'
 import {
+  arrivalStep,
   GOAL_STEP,
   isOnTrack,
   linesSince,
@@ -18,7 +19,7 @@ import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { LUDO_MIX } from '@/declarations/play/ludo/sounds'
 
 // Pauses after a beat, in steps
-const BEATS = { exit: 2, capture: 3, penalty: 3, finish: 4 }
+const BEATS = { exit: 2, hit: 1.5, fly: 2.5, penalty: 3, finish: 4 }
 
 /**
  * Pawn of a colour
@@ -28,6 +29,23 @@ const BEATS = { exit: 2, capture: 3, penalty: 3, finish: 4 }
 export interface LudoWalker {
   accountId: string
   pawn: number
+}
+
+/**
+ * Pawn being eaten: struck where it stood, then sent flying home
+ * @typedef {Object} LudoStrike
+ */
+
+export interface LudoStrike {
+  // Owner of the pawn eaten
+  accountId: string
+  pawn: number
+  // Step it was taken on
+  from: number
+  // Player who ate it
+  captorId: string
+  phase: 'hit' | 'fly'
+  key: number
 }
 
 /**
@@ -47,6 +65,8 @@ export interface LudoMotion {
   hop: { accountId: string; pawn: number; key: number } | null
   // Pawn still on its way, not stopped yet
   walking: LudoWalker | null
+  // Pawn being eaten
+  strike: LudoStrike | null
 }
 
 /**
@@ -89,6 +109,7 @@ export const useLudoMotion = (
     isBusy: false,
     hop: null,
     walking: null,
+    strike: null,
   }))
   const latest = useRef(board)
   const shown = useRef(board.rev)
@@ -145,6 +166,7 @@ export const useLudoMotion = (
       isBusy: false,
       hop: null,
       walking: null,
+      strike: null,
     }))
   }, [place, viewerId, sessionId, setPlayed])
 
@@ -246,8 +268,16 @@ const playLine = async ({
         await wait(stepMs)
       }
     }
-    if (to >= GOAL_STEP) playLudoSound('home')
-    else if (
+    if (to >= GOAL_STEP) {
+      // The pile numbers pawns by arrival
+      setMotion((current) => {
+        const pawns = [...(current.pawns[line.accountId] ?? [])]
+        pawns[pawn] = arrivalStep(pawns.filter((_, index) => index !== pawn))
+
+        return { ...current, pawns: { ...current.pawns, [line.accountId]: pawns } }
+      })
+      playLudoSound('home')
+    } else if (
       board.settings.rules.safeSquares &&
       isOnTrack(to) &&
       SAFE_SQUARES.has(squareOf(corner, to))
@@ -256,11 +286,22 @@ const playLine = async ({
     return
   }
 
-  // Taken pawn sent home
-  if (line.kind === 'CAPTURE' && line.victimId && line.pawn !== null) {
-    place(line.victimId, line.pawn, YARD_STEP)
+  // Taken pawn struck where it stood, then sent flying home
+  if (line.kind === 'CAPTURE' && line.victimId && line.pawn !== null && line.from !== null) {
+    const strike = {
+      accountId: line.victimId,
+      pawn: line.pawn,
+      from: line.from,
+      captorId: line.accountId,
+      key: line.rev,
+    }
+    setMotion((current) => ({ ...current, strike: { ...strike, phase: 'hit' } }))
     playLudoSound(line.victimId === viewerId ? 'eaten' : 'eat')
-    await wait(stepMs * BEATS.capture)
+    await wait(stepMs * BEATS.hit)
+    place(line.victimId, line.pawn, YARD_STEP)
+    setMotion((current) => ({ ...current, strike: { ...strike, phase: 'fly' } }))
+    await wait(stepMs * BEATS.fly)
+    setMotion((current) => ({ ...current, strike: null }))
     return
   }
 

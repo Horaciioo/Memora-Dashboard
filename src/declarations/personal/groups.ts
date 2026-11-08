@@ -74,10 +74,10 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     icon: 'clock',
     pim: true,
   },
-  assignTrainer: {
-    one: 'Tu dois attribuer {n} Formateur',
-    other: 'Tu dois attribuer {n} Formateurs',
-    title: 'Formateurs à attribuer',
+  assignReferent: {
+    one: 'Tu dois attribuer {n} Référent',
+    other: 'Tu dois attribuer {n} Référents',
+    title: 'Référents à attribuer',
     icon: 'tasks',
     pim: true,
   },
@@ -93,13 +93,6 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     other: 'Tu as {n} formations à suivre',
     title: 'Formations à suivre',
     icon: 'academy',
-  },
-  declareKickoff: {
-    one: 'Tu dois déclarer {n} début de PIM',
-    other: 'Tu dois déclarer {n} débuts de PIM',
-    title: 'Débuts de PIM à déclarer',
-    icon: 'tasks',
-    pim: true,
   },
   pimReview: {
     one: 'Tu as {n} bilan de PIM à faire',
@@ -160,9 +153,8 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
  */
 
 export const SYSTEM_TASK_KINDS: readonly HomeTaskKind[] = [
-  'assignTrainer',
+  'assignReferent',
   'launchPim',
-  'declareKickoff',
   'pimDecision',
   'secondPeriod',
   'pimReview',

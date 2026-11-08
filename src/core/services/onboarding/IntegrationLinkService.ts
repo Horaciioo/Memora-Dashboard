@@ -3,12 +3,14 @@ import 'server-only'
 import crypto from 'crypto'
 
 import { prisma } from '@/core/lib/db'
-import { notFound } from '@/core/lib/errors'
+import { conflict, notFound } from '@/core/lib/errors'
 import { readDate, readNumberValue, readText } from '@/core/lib/forms/values'
+import { admitSession } from '@/core/services/academy/AdmissionService'
 import { reachableSession } from '@/core/services/recruitment'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { INTEGRATION_LINK_FIELD_COPY } from '@/declarations/onboarding/copy'
+import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { INTEGRATION_LINK_KIND_REGISTRY } from '@/declarations/onboarding/registries'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { IntegrationLinkView } from '@/types/onboarding'
@@ -138,6 +140,12 @@ export const emitLink = async (
       token: crypto.randomBytes(TOKEN_BYTES).toString('base64url'),
     },
   })
+
+  // The link admits at once
+  const failed = await admitSession(recruitmentSessionId)
+  if (failed.length > 0) {
+    throw conflict(RECRUITMENT_COPY.closeFailed.replace('{names}', failed.join(', ')))
+  }
 
   // The step that hands out the form is cleared by the act of handing it out
   await prisma.recruitmentStep.updateMany({

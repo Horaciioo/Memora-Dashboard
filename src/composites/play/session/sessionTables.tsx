@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 
-import { BacLiveProgress } from '@/composites/play/baccalaureat/BacLiveProgress'
 import { BaccalaureatBoard } from '@/composites/play/baccalaureat/BaccalaureatBoard'
 import type { BacBoardView } from '@/composites/play/baccalaureat/types'
 import { BombBoard } from '@/composites/play/bomb/BombBoard'
@@ -9,7 +8,9 @@ import { GolfBoard } from '@/composites/play/golf/GolfBoard'
 import { GolfFeed } from '@/composites/play/golf/GolfFeed'
 import { LudoBoard } from '@/composites/play/ludo/LudoBoard'
 import { LudoFeed } from '@/composites/play/ludo/LudoFeed'
+import { NavalBoard } from '@/composites/play/naval/NavalBoard'
 import type { LudoBoardView } from '@/core/lib/play/ludo/state'
+import type { NavalBoardView } from '@/core/lib/play/naval/state'
 import type { GolfBoardView } from '@/core/lib/play/golf'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlainLiveFeed } from '@/composites/play/session/live/PlainLiveFeed'
@@ -31,6 +32,8 @@ export interface PlayTableInput {
   spectators: PlayFace[]
   viewerId: string
   me: { isSeated: boolean; isHost: boolean }
+  // Play management right: inspection tools in the free view
+  canInspect?: boolean
 }
 
 /**
@@ -65,16 +68,13 @@ export const PLAY_SESSION_TABLES: Partial<
 
     return {
       board: (
-        <>
-          <BaccalaureatBoard
-            sessionId={sessionId}
-            board={bac}
-            players={asPlayers(players)}
-            viewerId={viewerId}
-            me={me}
-          />
-          <BacLiveProgress sessionId={sessionId} board={bac} players={players} />
-        </>
+        <BaccalaureatBoard
+          sessionId={sessionId}
+          board={bac}
+          players={asPlayers(players)}
+          viewerId={viewerId}
+          me={me}
+        />
       ),
       feed: (
         <PlainLiveFeed
@@ -109,7 +109,7 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
-  [PlayGames.Golf]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+  [PlayGames.Golf]: ({ sessionId, board, seats, spectators, viewerId, me, canInspect }) => {
     const golf = board as GolfBoardView
 
     return {
@@ -124,6 +124,7 @@ export const PLAY_SESSION_TABLES: Partial<
             color: color ?? '',
           }))}
           viewerId={viewerId}
+          canInspect={Boolean(canInspect)}
           isSeated={me.isSeated}
         />
       ),
@@ -138,7 +139,7 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
-  [PlayGames.Ludo]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+  [PlayGames.Ludo]: ({ sessionId, board, seats, spectators, viewerId }) => {
     const ludo = board as LudoBoardView
 
     return {
@@ -153,10 +154,25 @@ export const PLAY_SESSION_TABLES: Partial<
             isHost: Boolean(isHost),
           }))}
           viewerId={viewerId}
-          isSeated={me.isSeated}
         />
       ),
       feed: <LudoFeed sessionId={sessionId} board={ludo} players={[...seats, ...spectators]} />,
     }
   },
+  [PlayGames.Naval]: ({ sessionId, board, seats, viewerId }) => ({
+    board: (
+      <NavalBoard
+        sessionId={sessionId}
+        board={board as NavalBoardView}
+        faces={seats.map(({ id, name, avatarUrl, isBot }) => ({
+          accountId: id,
+          name,
+          avatarUrl,
+          isBot: Boolean(isBot),
+        }))}
+        viewerId={viewerId}
+      />
+    ),
+    feed: null,
+  }),
 }

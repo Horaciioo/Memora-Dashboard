@@ -1,6 +1,5 @@
 import type { CommentView } from '@/types/comments'
 import type { DiscordIdentifierView } from '@/types/discord'
-import type { IntegrationLinkView } from '@/types/onboarding'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ParticipationRole } from '@/types/members'
 import type {
@@ -237,7 +236,7 @@ export interface SessionParticipant {
  * @property {string[]} questionKeys - Questions picked for the interviews
  * @property {string[]} bannedIds - Barred identifiers, for those who manage
  * @property {RecruitmentOutcomeView[]} outcomes - Columns of the results board
- * @property {IntegrationLinkView | null} link - Integration form handed out
+ * @property {AccountActivationView} activation - Where the accounts of the campaign stand
  * @property {SessionParticipant[]} participants - Everyone affiliated, those who manage see them
  */
 
@@ -249,11 +248,25 @@ export interface RecruitmentDetail {
   steps: RecruitmentStepView[]
   questionKeys: string[]
   outcomes: RecruitmentOutcomeView[]
-  link: IntegrationLinkView | null
+  activation: AccountActivationView
   identifiers: DiscordIdentifierView[]
   // Identifiers barred from new sessions, filled for those who manage
   bannedIds: string[]
   participants: SessionParticipant[]
+}
+
+/**
+ * Where the accounts of a campaign stand
+ * @typedef {Object} AccountActivationView
+ * @property {string | null} activatedAt - ISO moment a responsable opened them
+ * @property {number} opened - Accounts opened for accepted candidates
+ * @property {number} confirmed - Candidates who confirmed their identity
+ */
+
+export interface AccountActivationView {
+  activatedAt: string | null
+  opened: number
+  confirmed: number
 }
 
 /**
@@ -268,7 +281,6 @@ export interface RecruitmentFields {
   comment: FieldDefinition[]
   review: FieldDefinition[]
   instruction: FieldDefinition[]
-  link: FieldDefinition[]
 }
 
 /**

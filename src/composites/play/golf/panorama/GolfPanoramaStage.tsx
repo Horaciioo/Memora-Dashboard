@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Vector3 } from 'three'
 
+import { GolfFlyCamera } from '@/composites/play/golf/fly/GolfFlyCamera'
 import { GolfNeighbours } from '@/composites/play/golf/scene/GolfNeighbours'
 import { courseMap, neighboursOf } from '@/composites/play/golf/scene/map'
 import { readPaint } from '@/composites/play/golf/scene/paint'
@@ -62,15 +63,18 @@ const PanoramaCamera = ({
  * @param {Object} props - Course
  * @param {string} props.course - Course key
  * @param {boolean} [props.isStill] - Fixed view
+ * @param {boolean} [props.isFlying] - Free flight instead of the sway
  * @return {JSX.Element}
  */
 
 export const GolfPanoramaStage = ({
   course,
   isStill = false,
+  isFlying = false,
 }: {
   course: string
   isStill?: boolean
+  isFlying?: boolean
 }) => {
   const meta = GOLF_COURSES.get(course)
   const paint = useMemo(() => readPaint(meta.paint), [meta.paint])
@@ -95,6 +99,16 @@ export const GolfPanoramaStage = ({
     }
   }, [meta.holes, holes])
   const distance = (reach * panorama.zoom) / Math.tan((panorama.fov * Math.PI) / 360)
+  // Flight starts where the sway would stand
+  const start = useMemo(
+    () =>
+      new Vector3(
+        center.x + Math.sin(panorama.yaw) * Math.cos(panorama.pitch) * distance,
+        Math.sin(panorama.pitch) * distance,
+        center.z + Math.cos(panorama.yaw) * Math.cos(panorama.pitch) * distance
+      ),
+    [center, distance]
+  )
 
   return (
     <>
@@ -109,7 +123,11 @@ export const GolfPanoramaStage = ({
         intensity={light.sun}
       />
       <GolfNeighbours neighbours={holes} paint={paint} clock={clock} />
-      <PanoramaCamera center={center} distance={distance} isStill={isStill} />
+      {isFlying ? (
+        <GolfFlyCamera start={start} target={center} />
+      ) : (
+        <PanoramaCamera center={center} distance={distance} isStill={isStill} />
+      )}
     </>
   )
 }

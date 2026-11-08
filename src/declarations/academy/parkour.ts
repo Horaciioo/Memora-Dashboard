@@ -47,17 +47,11 @@ export interface ParkourPhaseOption {
  */
 
 export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
-  needsTrainer: {
-    label: 'Formateur à attribuer',
-    lead: 'Un Formateur doit être attribué.',
+  needsReferent: {
+    label: 'Référent à attribuer',
+    lead: 'Un Référent doit être attribué.',
     tone: 'caution',
-    icon: 'functionTrainer',
-  },
-  needsKickoff: {
-    label: 'Début de PIM à déclarer',
-    lead: 'Un Responsable déclare le début de la PIM.',
-    tone: 'caution',
-    icon: 'link',
+    icon: 'functionReferent',
   },
   awaitingInfo: {
     label: 'En attente d’infos',
@@ -79,7 +73,7 @@ export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
   },
   reviewOneDue: {
     label: 'Bilan de 1ère phase à faire',
-    lead: 'Le Formateur remplit le bilan.',
+    lead: 'Le Référent remplit le bilan.',
     tone: 'warning',
     icon: 'sheet',
   },
@@ -103,7 +97,7 @@ export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
   },
   reviewTwoDue: {
     label: 'Bilan de 2e phase à faire',
-    lead: 'Le Formateur donne son avis.',
+    lead: 'Le Référent donne son avis.',
     tone: 'warning',
     icon: 'sheet',
   },
@@ -121,7 +115,7 @@ export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
   },
   finalReviewDue: {
     label: 'Bilan définitif à faire',
-    lead: 'Le Formateur fait le bilan définitif.',
+    lead: 'Le Référent fait le bilan définitif.',
     tone: 'warning',
     icon: 'sheet',
   },
@@ -193,9 +187,7 @@ export const PARKOUR_DECISION_CONFIRM: Record<ReviewAdviceName, string> = {
 
 export const PARKOUR_COPY = {
   title: PARKOUR_NAME,
-  assignTrainer: 'Attribuer un Formateur',
-  declareKickoff: 'Déclarer le début de la PIM',
-  kickoffDeclared: 'Début de PIM déclaré',
+  assignReferent: 'Attribuer un Référent',
   integrationLink: 'Lien d’intégration',
   launchAnyway: 'Lancer la PIM quand même',
   launchAnywayHint:
@@ -207,7 +199,7 @@ export const PARKOUR_COPY = {
   submitFirst: 'Bilan de 1ère phase réalisé',
   submit: 'Déposer le bilan',
   submitIncomplete: 'Remplis le compte rendu et note chaque compétence avant de déposer le bilan.',
-  bounce: 'Renvoyer au Formateur',
+  bounce: 'Renvoyer au Référent',
   decided: 'Décision enregistrée',
   deadline: 'Date limite de la 3e période',
   deadlineHint: 'Le bilan définitif tombe ce jour-là.',
@@ -219,7 +211,6 @@ export const PARKOUR_COPY = {
   resigned: 'Démission enregistrée',
   lives: 'Lives où il était présent',
   livesOf: '{count} / {needed}',
-  kickoffPending: 'Ton début de PIM n’a pas encore été déclaré. Ton Responsable te préviendra.',
   launchNobodyReady: 'Aucun Junior n’a fini son formulaire.',
   reviewDueTitle: 'Bilan de {name}',
   doReviews: 'Réaliser mes bilans',

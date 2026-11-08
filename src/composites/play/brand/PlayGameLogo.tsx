@@ -138,10 +138,48 @@ const MARKS: Record<string, ReactNode> = {
       </g>
     </>
   ),
+  playNaval: (
+    <>
+      {/* Splash of a shell in the water */}
+      <path d="M44 38c2-8 1-13-1-17 5 3 8 9 6 17z" fill="white" opacity="0.9" />
+      <circle cx="46" cy="40" r="4" fill="white" opacity="0.9" />
+      <circle cx="52" cy="35" r="1.8" fill="white" opacity="0.8" />
+      {/* Warship, bow to the left */}
+      <path d="M5 38h42l-6 9H12z" {...tint('--play-naval-hull')} />
+      <path d="M12 47h29l-1.5 3H14z" {...tint('--play-naval-hull-deep')} />
+      <rect x="20" y="30" width="14" height="8" rx="1.5" {...tint('--play-naval-mine')} />
+      <rect x="24" y="24" width="7" height="6" rx="1" {...tint('--play-naval-mine-deep')} />
+      <rect x="27" y="17" width="1.8" height="7" {...tint('--play-naval-hull-deep')} />
+      <rect x="9" y="33" width="9" height="5" rx="1.5" {...tint('--play-naval-mine-deep')} />
+      <path
+        d="M4 34l10 2"
+        stroke="var(--play-naval-hull-deep)"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      {/* Waves */}
+      <path
+        d="M3 55c4-3 8-3 12 0s8 3 12 0 8-3 12 0 8 3 12 0 6-2 8-1"
+        fill="none"
+        stroke="white"
+        strokeOpacity="0.85"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M9 60c4-2 7-2 11 0s7 2 11 0 7-2 11 0"
+        fill="none"
+        stroke="white"
+        strokeOpacity="0.45"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </>
+  ),
 }
 
 // Logos drawn bare, without their tile
-const BARE = new Set(['playBaccalaureat', 'playBomb', 'playGolf', 'playLudo'])
+const BARE = new Set(['playBaccalaureat', 'playBomb', 'playGolf', 'playLudo', 'playNaval'])
 
 // Game not announced yet
 const MYSTERY = {

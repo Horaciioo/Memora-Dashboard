@@ -9,6 +9,7 @@ import { cn } from '@/utils/classnames'
 export interface PlayGameCardProps {
   game: PlayGameName
   playable: boolean
+  onLocked?: () => void
   className?: string
 }
 
@@ -18,7 +19,7 @@ export interface PlayGameCardProps {
  * @return {JSX.Element}
  */
 
-export const PlayGameCard = ({ game, playable, className }: PlayGameCardProps) => {
+export const PlayGameCard = ({ game, playable, onLocked, className }: PlayGameCardProps) => {
   const meta = PLAY_GAMES.get(game)
   const isHidden = !playable
 
@@ -34,11 +35,18 @@ export const PlayGameCard = ({ game, playable, className }: PlayGameCardProps) =
         </p>
       </div>
 
-      {playable && (
+      {playable ? (
         <AppLink
           href={ROUTES.playGame(meta.slug)}
           aria-label={`${PLAY_HUB_COPY.enter} ${meta.label}`}
           className={PLAY_HUB.cardLink}
+        />
+      ) : (
+        <button
+          type="button"
+          aria-label={PLAY_HUB_COPY.mysteryTagline}
+          className={PLAY_HUB.cardLink}
+          onClick={onLocked}
         />
       )}
     </article>

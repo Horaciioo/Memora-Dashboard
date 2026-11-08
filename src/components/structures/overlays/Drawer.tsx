@@ -21,6 +21,8 @@ export interface DrawerProps {
   subheader?: ReactNode
   footer?: ReactNode
   isWide?: boolean
+  // Whole screen on a phone
+  isFullScreen?: boolean
   children: ReactNode
 }
 
@@ -34,6 +36,7 @@ export interface DrawerProps {
  * @param {ReactNode} [subheader] - Line under the header
  * @param {ReactNode} [footer] - Controls pinned to the bottom
  * @param {boolean} [isWide] - Wider panel from md
+ * @param {boolean} [isFullScreen] - Whole screen on a phone
  * @param {ReactNode} children - Drawer content
  * @return {JSX.Element | null}
  */
@@ -47,6 +50,7 @@ export const Drawer = ({
   subheader,
   footer,
   isWide = false,
+  isFullScreen = false,
   children,
 }: DrawerProps) => {
   const containerRef = useFocusTrap(open, onClose)
@@ -65,7 +69,11 @@ export const Drawer = ({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
-        className={cn(DRAWER_STYLES.panel, isWide && DRAWER_STYLES.wide)}
+        className={cn(
+          DRAWER_STYLES.panel,
+          isWide && DRAWER_STYLES.wide,
+          isFullScreen && DRAWER_STYLES.fullScreen
+        )}
       >
         <ModalHeader titleId={titleId} title={title} icon={icon} onClose={onClose} />
         {description && (

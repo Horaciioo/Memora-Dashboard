@@ -1,8 +1,3 @@
-'use client'
-
-import { useState } from 'react'
-
-import { CONCEPT_CLIPS } from '@/composites/play/hub/concept/conceptClips'
 import { PLAY_CONCEPT, PLAY_CONCEPT_COPY } from '@/declarations/play/concept'
 import { GOLF_POWERS } from '@/declarations/play/golf/powers'
 import { ICONS } from '@/declarations/ui/icons'
@@ -53,53 +48,26 @@ const GolfPowerList = () => (
 )
 
 /**
- * How a game plays: short looping clips step by step, the golf powers after
+ * How a game plays, numbered steps then the golf powers
  * @param {Object} props - Concept
  * @param {PlayGameName} props.game - Game
  * @return {JSX.Element}
  */
 
-export const PlayConcept = ({ game }: { game: PlayGameName }) => {
-  const steps = PLAY_CONCEPT[game]
-  const [index, setIndex] = useState(0)
-  const step = steps[index]
-  const Clip = CONCEPT_CLIPS[step.clip]
-
-  return (
-    <div className={PLAY_CONCEPT_UI.root}>
-      <figure className={PLAY_CONCEPT_UI.player}>
-        {/* Keyed so each step replays from the start */}
-        <div key={step.clip} className={PLAY_CONCEPT_UI.screen} aria-hidden="true">
-          <Clip />
-        </div>
-        <div className={PLAY_CONCEPT_UI.bar} aria-hidden="true">
-          <span className={PLAY_CONCEPT_UI.barPlay} />
-          <span className={PLAY_CONCEPT_UI.track}>
-            <span key={step.clip} className={PLAY_CONCEPT_UI.progress} />
+export const PlayConcept = ({ game }: { game: PlayGameName }) => (
+  <div className={PLAY_CONCEPT_UI.root}>
+    <ol className={PLAY_CONCEPT_UI.list}>
+      {PLAY_CONCEPT[game].map((step, at) => (
+        <li key={step.title} className={PLAY_CONCEPT_UI.step}>
+          <span className={PLAY_CONCEPT_UI.stepNumber}>{at + 1}</span>
+          <span className={PLAY_CONCEPT_UI.stepBody}>
+            <span className={PLAY_CONCEPT_UI.stepTitle}>{step.title}</span>
+            <span className={PLAY_CONCEPT_UI.stepText}>{step.text}</span>
           </span>
-        </div>
-        <figcaption className={PLAY_CONCEPT_UI.caption}>
-          <span className={PLAY_CONCEPT_UI.stepTitle}>{step.title}</span>
-          <span className={PLAY_CONCEPT_UI.stepText}>{step.text}</span>
-        </figcaption>
-      </figure>
+        </li>
+      ))}
+    </ol>
 
-      <nav className={PLAY_CONCEPT_UI.steps} aria-label={PLAY_CONCEPT_COPY.steps}>
-        {steps.map((entry, at) => (
-          <button
-            key={entry.clip}
-            type="button"
-            className={cn(PLAY_CONCEPT_UI.stepKey, at === index && PLAY_CONCEPT_UI.stepKeyOn)}
-            aria-current={at === index}
-            onClick={() => setIndex(at)}
-          >
-            <span className={PLAY_CONCEPT_UI.stepNumber}>{at + 1}</span>
-            {entry.title}
-          </button>
-        ))}
-      </nav>
-
-      {game === PlayGames.Golf && <GolfPowerList />}
-    </div>
-  )
-}
+    {game === PlayGames.Golf && <GolfPowerList />}
+  </div>
+)

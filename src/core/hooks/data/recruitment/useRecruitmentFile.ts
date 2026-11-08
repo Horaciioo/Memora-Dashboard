@@ -6,11 +6,10 @@ import { apiDelete, apiPatch, apiPost, apiPut } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useRecruitmentLive } from '@/core/hooks/data/recruitment/useRecruitmentLive'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { INTEGRATION_LINK_COPY } from '@/declarations/onboarding/copy'
+import { ACCOUNT_ACTIVATION_COPY } from '@/declarations/onboarding/copy'
 import { entityFeedback } from '@/declarations/ui/copy'
 import type { CommentView } from '@/types/comments'
 import type { FieldIssue, FormValues } from '@/types/forms'
-import type { IntegrationLinkView } from '@/types/onboarding'
 import type {
   AnswerState,
   CandidateView,
@@ -20,7 +19,7 @@ import type {
 import { marksAt } from '@/core/lib/recruitment/candidateTimeline'
 import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
 import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
-import type { InterviewPatch } from '@/types/recruitment'
+import type { AccountActivationView, InterviewPatch } from '@/types/recruitment'
 
 /**
  * One recruitment session file
@@ -28,7 +27,7 @@ import type { InterviewPatch } from '@/types/recruitment'
  * @property {string} instructions - Consignes in force
  * @property {CandidateView[]} candidates - Applicants held
  * @property {RecruitmentStepView[]} steps - Timeline moments
- * @property {IntegrationLinkView | null} link - Integration form handed out
+ * @property {AccountActivationView} activation - Where the accounts stand
  * @property {string[]} questionKeys - Questions picked for the interviews
  * @property {(id: string, key: string, patch: Partial<AnswerState>) => Promise<void>} saveAnswer - Note one question
  * @property {(id: string, stage: CandidateStage) => Promise<void>} markStage - Place a candidate on a timeline moment
@@ -52,8 +51,7 @@ import type { InterviewPatch } from '@/types/recruitment'
  * @property {(id: string, done: boolean) => Promise<void>} setStepDone - Clear or reopen a moment
  * @property {(id: string) => Promise<void>} removeStep - Drop a timeline moment
  * @property {(instructions: string) => Promise<boolean>} saveInstructions - Write the consignes
- * @property {(values: FormValues) => Promise<boolean>} emitLink - Hand out the integration form
- * @property {() => Promise<void>} revokeLink - Close the integration form
+ * @property {() => Promise<boolean>} activateAccounts - Open the accounts of the accepted candidates
  */
 
 export interface RecruitmentFile {
@@ -61,7 +59,7 @@ export interface RecruitmentFile {
   candidates: CandidateView[]
   mergeCandidate: (saved: CandidateView) => void
   steps: RecruitmentStepView[]
-  link: IntegrationLinkView | null
+  activation: AccountActivationView
   questionKeys: string[]
   saveAnswer: (id: string, key: string, patch: Partial<AnswerState>) => Promise<void>
   markStage: (id: string, stage: CandidateStage) => Promise<void>
@@ -85,8 +83,7 @@ export interface RecruitmentFile {
   setStepDone: (id: string, done: boolean) => Promise<void>
   removeStep: (id: string) => Promise<void>
   saveInstructions: (instructions: string) => Promise<boolean>
-  emitLink: (values: FormValues) => Promise<boolean>
-  revokeLink: () => Promise<void>
+  activateAccounts: () => Promise<boolean>
 }
 
 /**
@@ -101,7 +98,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
   const [candidates, setCandidates] = useState(detail.candidates)
   const [steps, setSteps] = useState(detail.steps)
   const [comments, setComments] = useState(detail.comments)
-  const [link, setLink] = useState(detail.link)
+  const [activation, setActivation] = useState(detail.activation)
   const questionKeys = detail.questionKeys
 
   // A page read again hands over the fresh state
@@ -112,7 +109,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     setCandidates(detail.candidates)
     setSteps(detail.steps)
     setComments(detail.comments)
-    setLink(detail.link)
+    setActivation(detail.activation)
   }
   const { isSaving, issues, clearIssues, run } = useMutation()
 
@@ -393,32 +390,23 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     [run, mergeCandidate]
   )
 
-  // Handing out the form also clears the step that carries it
-  const emitLink = useCallback(
-    async (values: FormValues) => {
-      const emitted = await run(
-        () => apiPost<IntegrationLinkView>(API_ROUTES.recruitmentLink(sessionId), values),
-        INTEGRATION_LINK_COPY.emitted
-      )
+  // Opening the accounts also clears the step that carries it
+  const activateAccounts = useCallback(async () => {
+    const opened = await run(
+      () => apiPost<AccountActivationView>(API_ROUTES.recruitmentActivation(sessionId), {}),
+      ACCOUNT_ACTIVATION_COPY.activated
+    )
 
-      if (emitted) {
-        setLink(emitted)
-        setSteps((current) =>
-          current.map((step) =>
-            step.emitsInvite && !step.doneAt ? { ...step, doneAt: new Date().toISOString() } : step
-          )
+    if (opened) {
+      setActivation(opened)
+      setSteps((current) =>
+        current.map((step) =>
+          step.emitsInvite && !step.doneAt ? { ...step, doneAt: new Date().toISOString() } : step
         )
-      }
+      )
+    }
 
-      return emitted !== null
-    },
-    [run, sessionId]
-  )
-
-  const revokeLink = useCallback(async () => {
-    const dropped = await run(() => apiDelete<null>(API_ROUTES.recruitmentLink(sessionId)))
-
-    if (dropped !== null) setLink(null)
+    return opened !== null
   }, [run, sessionId])
 
   return {
@@ -426,7 +414,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     candidates,
     mergeCandidate,
     steps,
-    link,
+    activation,
     questionKeys,
     saveAnswer,
     markStage,
@@ -450,7 +438,6 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     setStepDone,
     removeStep,
     saveInstructions,
-    emitLink,
-    revokeLink,
+    activateAccounts,
   }
 }

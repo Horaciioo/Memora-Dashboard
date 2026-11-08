@@ -36,6 +36,24 @@ export const GOLF_VOTE_TIMING = {
   limit: 15_000,
   // Avatar lands on its card
   land: 520,
+  // Tournament draw: grid, pile, corner, deal, fade
+  deck: {
+    hold: 900,
+    stackGap: 140,
+    stack: 520,
+    move: 650,
+    dealGap: 260,
+    deal: 560,
+    vanish: 420,
+    rest: 1400,
+    // Imperfect pile, degrees and card widths
+    maxTilt: 9,
+    maxShift: 0.08,
+    // Gap between cards, in card widths
+    gap: 0.18,
+    // Joined later than this, the draw shows its end
+    lateJoin: 600,
+  },
 } as const
 
 /**
@@ -74,4 +92,7 @@ export const GOLF_VOTE_COPY = {
   back: 'Retour',
   you: 'Toi',
   timer: 'Temps restant',
+  deckTitle: 'Tirage du tournoi',
+  deckLead: 'Les parcours du tournoi, dans l’ordre de jeu.',
+  deckSlot: 'Parcours {n}',
 } as const

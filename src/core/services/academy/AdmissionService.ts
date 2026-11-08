@@ -3,8 +3,13 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { isAdmissionOpen } from '@/core/lib/recruitment/closure'
-import { JUNIOR_FUNCTION_OF } from '@/declarations/reference/fixed'
-import { AcademyJuniorStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
+import { JUNIOR_FUNCTION_OF, tradeOfFunction } from '@/declarations/reference/fixed'
+import {
+  AcademyJuniorStatuses,
+  GONE_MEMBER_STATUSES,
+  MemberRoles,
+  MemberStatuses,
+} from '@/utils/constants/hierarchy'
 
 /**
  * Read the junior function a trade trains through
@@ -46,7 +51,7 @@ const admittedAccount = async (
   const trainingFunctionId = await juniorFunctionId(functionId)
   const known = await prisma.account.findUnique({
     where: { discordId: candidate.discordId },
-    select: { id: true },
+    select: { id: true, status: true },
   })
 
   // A member changing trade keeps their role
@@ -57,6 +62,21 @@ const admittedAccount = async (
       },
       update: {},
       create: { accountId: known.id, functionId: trainingFunctionId },
+    })
+    await prisma.account.update({
+      where: { id: known.id },
+      data: {
+        youtubers: { connect: { id: youtuberId } },
+        // A former member starts over
+        ...(GONE_MEMBER_STATUSES.includes(known.status)
+          ? {
+              role: MemberRoles.Junior,
+              status: MemberStatuses.Pending,
+              leftAt: null,
+              anonymisedAt: null,
+            }
+          : {}),
+      },
     })
     await syncFunctionTeams([known.id])
 
@@ -119,6 +139,8 @@ export const syncAdmission = async (candidateId: string, isClosing = false): Pro
       session: {
         select: {
           status: true,
+          invite: { select: { id: true } },
+          accountsActivatedAt: true,
           youtuberId: true,
           functionId: true,
           academySession: { select: { id: true, functionId: true, startsAt: true } },
@@ -130,7 +152,11 @@ export const syncAdmission = async (candidateId: string, isClosing = false): Pro
 
   const promotion = candidate.session.academySession
   // A session that closed admits at once the ones accepted later
-  const isClosed = isAdmissionOpen(candidate.session.status, isClosing)
+  // Opened accounts admit too, so does an emitted link
+  const isClosed =
+    candidate.session.accountsActivatedAt !== null ||
+    candidate.session.invite !== null ||
+    isAdmissionOpen(candidate.session.status, isClosing)
   const admitted = candidate.outcome?.admits === true && promotion !== null && isClosed
 
   // A confirmed seat belongs to the junior now
@@ -222,9 +248,8 @@ export const findAdmission = async (
   sessionId: string,
   discordId: string
 ): Promise<PendingAdmission | null> => {
-  // A seat opens to its form once a responsable declared the PIM start
   const row = await prisma.academyJunior.findFirst({
-    where: { sessionId, account: { discordId }, confirmedAt: null, kickoffAt: { not: null } },
+    where: { sessionId, account: { discordId }, confirmedAt: null },
     select: {
       id: true,
       accountId: true,
@@ -243,13 +268,61 @@ export const findAdmission = async (
 }
 
 /**
+ * Hold the training function
+ * @param {string} accountId - Member
+ * @param {string} functionId - Trade trained for
+ * @return {Promise<void>} - Held
+ */
+
+export const holdTrainingFunction = async (
+  accountId: string,
+  functionId: string
+): Promise<void> => {
+  const trainingFunctionId = await juniorFunctionId(functionId)
+
+  await prisma.accountFunction.upsert({
+    where: { accountId_functionId: { accountId, functionId: trainingFunctionId } },
+    update: {},
+    create: { accountId, functionId: trainingFunctionId },
+  })
+  await syncFunctionTeams([accountId])
+}
+
+/**
+ * Take a member off the team
+ * @param {string} accountId - Failed member
+ * @param {string} functionId - Trade trained for
+ * @return {Promise<void>} - Released
+ */
+
+export const releaseAccount = async (accountId: string, functionId: string): Promise<void> => {
+  const trainingFunctionId = await juniorFunctionId(functionId)
+
+  await prisma.accountFunction.deleteMany({ where: { accountId, functionId: trainingFunctionId } })
+  await syncFunctionTeams([accountId])
+}
+
+/**
  * Swap the junior function for the trade it trained for
  * @param {string} accountId - Graduating account
- * @param {string} functionId - Trade the session trained for
+ * @param {string} sessionFunctionId - Promotion function
  * @return {Promise<void>} - Applied
  */
 
-export const graduateAccount = async (accountId: string, functionId: string): Promise<void> => {
+export const graduateAccount = async (
+  accountId: string,
+  sessionFunctionId: string
+): Promise<void> => {
+  // A promotion may name the junior function
+  const held = await prisma.jobFunction.findUniqueOrThrow({
+    where: { id: sessionFunctionId },
+    select: { name: true },
+  })
+  const trade = await prisma.jobFunction.findUnique({
+    where: { name: tradeOfFunction(held.name) },
+    select: { id: true },
+  })
+  const functionId = trade?.id ?? sessionFunctionId
   const trainingFunctionId = await juniorFunctionId(functionId)
 
   await prisma.$transaction([

@@ -22,6 +22,7 @@ export type NotificationTargetName =
   | 'junior'
   | 'home'
   | 'page'
+  | 'identity'
 
 /**
  * Where one notification leads
@@ -60,6 +61,8 @@ const NOTIFICATION_TARGET_MAP: Record<NotificationTargetName, NotificationTarget
     route: (id) => (id ? ROUTES.session(id) : ROUTES.academy),
   },
   home: { label: 'tes tâches', route: () => ROUTES.home },
+  // Opened by Memora, never a page
+  identity: { label: 'l’identifiant', route: () => null },
   page: { label: 'la page', route: (id) => (id ? ROUTES.page(id) : ROUTES.pages) },
   calendar: {
     label: 'le calendrier',

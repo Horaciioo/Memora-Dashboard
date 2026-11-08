@@ -1,6 +1,6 @@
 import { isAllHome, progressOf } from '@/core/lib/play/ludo/rules'
 import type { LudoPlan } from '@/core/lib/play/ludo/rules'
-import { YARD_STEP } from '@/core/lib/play/ludo/track'
+import { GOAL_STEP, YARD_STEP } from '@/core/lib/play/ludo/track'
 import { LudoEndings } from '@/declarations/play/ludo/settings'
 import type { LudoEndingName } from '@/declarations/play/ludo/settings'
 
@@ -20,6 +20,15 @@ export interface LudoStanding {
 }
 
 /**
+ * Step kept for a pawn reaching the goal: the goal plus the pawns already there, the arrival order
+ * @param {number[]} pawns - Steps before the move
+ * @return {number} - Step
+ */
+
+export const arrivalStep = (pawns: number[]): number =>
+  GOAL_STEP + pawns.filter((step) => step >= GOAL_STEP).length
+
+/**
  * Seats after a move, the taken pawns back in their yard
  * @param {T[]} seats - Seats before
  * @param {Object} move - Move
@@ -37,7 +46,8 @@ export const seatsAfter = <T extends LudoStanding>(
 
   return seats.map((seat) => {
     const pawns = seat.pawns.map((step, pawn) => {
-      if (seat.accountId === moverId && pawn === plan.pawn) return plan.to
+      if (seat.accountId === moverId && pawn === plan.pawn)
+        return plan.isHome ? arrivalStep(seat.pawns) : plan.to
       const isTaken = plan.captures.some(
         (taken) => taken.accountId === seat.accountId && taken.pawn === pawn
       )

@@ -244,10 +244,10 @@ export interface MemberAdminState {
 
 /**
  * Part a member played in one session
- * @typedef {'responsable' | 'recruiter' | 'observer' | 'trainer'} ParticipationRole
+ * @typedef {'responsable' | 'recruiter' | 'observer' | 'referent'} ParticipationRole
  */
 
-export type ParticipationRole = 'responsable' | 'recruiter' | 'observer' | 'trainer'
+export type ParticipationRole = 'responsable' | 'recruiter' | 'observer' | 'referent'
 
 /**
  * Session a member took part in, whatever their roles

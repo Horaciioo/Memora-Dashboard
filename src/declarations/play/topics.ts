@@ -3,14 +3,16 @@ const SESSION_PREFIX = 'play:partie:'
 
 /**
  * Topics of the Play bus
- * @type {{ lobbies: string, invites: string, session: (id: string) => string, sessionIdOf: (topic: string) => string | null }}
+ * @type {{ lobbies: string, notices: string, groups: string, session: (id: string) => string, sessionIdOf: (topic: string) => string | null }}
  */
 
 export const PLAY_TOPICS = {
   // Lobbies opening and filling
   lobbies: 'play:lobbies',
-  // Invitations sent or answered
-  invites: 'play:invites',
+  // Invitations and followed games
+  notices: 'play:notices',
+  // Groups moving: members, invitations, proposals
+  groups: 'play:groups',
   session: (id: string) => `${SESSION_PREFIX}${id}`,
   sessionIdOf: (topic: string): string | null =>
     topic.startsWith(SESSION_PREFIX) ? topic.slice(SESSION_PREFIX.length) || null : null,

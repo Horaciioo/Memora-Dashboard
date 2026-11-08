@@ -5,14 +5,15 @@ import type { GolfPad, GolfPoint } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
-const { cup, sink } = GOLF_SCENE
-const { cupRadius } = GOLF_SETTINGS.physics
+const { cup } = GOLF_SCENE
+const pit = GOLF_SETTINGS.cup
 
 // Point in space
 type Vertex = [number, number, number]
 
-// Outer edge of the funnel
-const LIP = cupRadius * cup.lip
+// Outer edge of the funnel, then the opening
+const LIP = pit.radius
+const NECK = pit.radius - pit.funnel
 
 /**
  * Ring of points round the cup
@@ -95,8 +96,8 @@ export const pitFaces = (pad: GolfPad, centre: GolfPoint) => {
   const [cx, cz] = centre
   const rim = padHeight(pad, cx, cz)
   const lip = ringOf(centre, LIP).map(([x, z]): Vertex => [x, padHeight(pad, x, z), z])
-  const neck = ringOf(centre, cupRadius).map(([x, z]): Vertex => [x, rim - cup.funnel, z])
-  const base = neck.map(([x, , z]): Vertex => [x, rim - sink.depth, z])
+  const neck = ringOf(centre, NECK).map(([x, z]): Vertex => [x, rim - pit.drop, z])
+  const base = neck.map(([x, , z]): Vertex => [x, rim - pit.depth, z])
 
   return {
     funnel: band(lip, neck),
@@ -105,7 +106,7 @@ export const pitFaces = (pad: GolfPad, centre: GolfPoint) => {
       ...a,
       ...base[(index + 1) % base.length],
       cx,
-      rim - sink.depth,
+      rim - pit.depth,
       cz,
     ]),
   }

@@ -17,7 +17,7 @@ import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
 
 type Gesture = (state: SessionFileState, here: string[]) => ReactNode
 
-// The trainer writes the check-ins of their own juniors standing here
+// The referent writes the check-ins of their own juniors standing here
 const reviewGesture: Gesture = ({ session, can, setFlow }, here) =>
   can.writeReviews &&
   reviewQueue(session.juniors, can.viewerId).some((junior) => here.includes(junior.id)) ? (

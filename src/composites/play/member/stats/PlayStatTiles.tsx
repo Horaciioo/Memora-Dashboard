@@ -12,7 +12,7 @@ import { HOUR_SECONDS, MINUTE_SECONDS } from '@/utils/constants/time'
  * @return {string} - Duration
  */
 
-const playTime = (seconds: number): string => {
+export const playTime = (seconds: number): string => {
   const hours = Math.floor(seconds / HOUR_SECONDS)
   const minutes = Math.floor((seconds % HOUR_SECONDS) / MINUTE_SECONDS)
 

@@ -80,7 +80,7 @@ export const TRAININGS_WELCOME: readonly WelcomePage[] = [
     title: 'Avance à ton rythme',
     body: [
       'Ton parcours, c’est ton parcours. Prends le temps qu’il te faut. Va à ton rythme. Rien n’est pressant, ce qui importe c’est que tu sois à l’aise sur ta fonction et que celle-ci n’en devienne pas un fardeau.',
-      'Si tu as la moindre question, consulte ton Formateur, il saura y répondre.',
+      'Si tu as la moindre question, consulte ton Référent, il saura y répondre.',
     ],
   },
   {

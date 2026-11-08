@@ -2,7 +2,7 @@ import { PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_HUB } from '@/declarations/ui/variants'
 
 /**
- * Ban notice, the game to resume lives in the dock feed
+ * Ban notice
  * @param {Object} props - Player state
  * @param {boolean} props.isBanned - Kept out of Play
  * @return {JSX.Element | null}

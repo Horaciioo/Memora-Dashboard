@@ -1,10 +1,12 @@
 'use client'
 
+import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
 import { useGolfPrefsStore } from '@/core/store/golfPrefs'
 import type { GolfPrefs } from '@/core/store/golfPrefs'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_BOARD, GOLF_PANEL } from '@/declarations/ui/variants'
+import { PLAY_GAMES } from '@/declarations/play'
 import { PlayGames } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
 
@@ -18,11 +20,14 @@ const SWITCHES: { key: keyof GolfPrefs; label: string }[] = [
 ]
 
 /**
- * Settings card: sound and display switches
+ * Settings card: sound, display switches and the game exits
+ * @param {Object} props - Session
+ * @param {string} props.sessionId - Session id
+ * @param {boolean} props.isSeated - Viewer plays
  * @return {JSX.Element}
  */
 
-export const GolfSettings = () => {
+export const GolfSettings = ({ sessionId, isSeated }: { sessionId: string; isSeated: boolean }) => {
   const prefs = useGolfPrefsStore()
 
   return (
@@ -51,6 +56,16 @@ export const GolfSettings = () => {
           </span>
         </button>
       ))}
+      <div className="flex flex-col gap-1">
+        <div className={GOLF_BOARD.rule} role="separator" />
+        <PlayGameActions
+          sessionId={sessionId}
+          gameSlug={PLAY_GAMES.get(PlayGames.Golf).slug}
+          isSeated={isSeated}
+          itemClass={cn(GOLF_BOARD.setting, 'justify-start')}
+          iconClass="size-5"
+        />
+      </div>
     </div>
   )
 }

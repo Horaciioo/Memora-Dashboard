@@ -26,17 +26,14 @@
   },
   "submitGraceSeconds": 2,
   "reviewSeconds": 60,
-  "rejectShare": 0.5,
   "points": {
-    "solo": 15,
     "unique": 10,
-    "sharedDivisor": 2,
+    "sharedRule": "half",
     "stopBonus": 5
   },
   "letters": "ABCDEFGHIJLMNOPRSTV",
   "alphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   "defaultCategories": ["firstName", "country", "city", "animal", "job", "fruitVegetable"],
-  "jokersPerPlayer": 1,
   "tournament": {
     "games": [3, 6, 9],
     "rounds": 3

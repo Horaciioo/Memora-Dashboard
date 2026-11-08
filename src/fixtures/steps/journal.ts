@@ -395,7 +395,7 @@ export const seedJournal = async (cast: Cast) => {
     logs.push({
       event: 'JuniorEnrolled',
       at: junior.startedAt,
-      actorId: junior.trainerId,
+      actorId: junior.referentId,
       subjectId: junior.accountId,
       targetType: 'academy-junior',
       targetId: junior.id,

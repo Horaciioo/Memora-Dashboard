@@ -30,7 +30,9 @@ export const OptionLead = ({ option, mark, isSelected, size = 'xs' }: OptionLead
       ? size === 'xs'
         ? SELECT_MENU_STYLES.leadPortrait
         : SELECT_MENU_STYLES.leadPortraitLarge
-      : SELECT_MENU_STYLES.leadGlyph
+      : mark === 'playGame'
+        ? SELECT_MENU_STYLES.leadLogo
+        : SELECT_MENU_STYLES.leadGlyph
 
   return (
     <span className={cn(SELECT_MENU_STYLES.lead, cell)} aria-hidden="true">

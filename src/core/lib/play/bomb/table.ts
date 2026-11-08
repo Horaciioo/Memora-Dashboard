@@ -23,3 +23,16 @@ export const forwardAngle = (previous: number, target: number): number => {
 
   return previous + delta
 }
+
+// Curve bending the heat up early
+const HEAT_CURVE = 0.7
+
+/**
+ * How dangerous the bomb looks, never the real fuse
+ * @param {number} elapsedMs - Time since lit
+ * @param {number} longestSeconds - Longest possible fuse
+ * @return {number} - Zero to one
+ */
+
+export const bombHeat = (elapsedMs: number, longestSeconds: number): number =>
+  Math.min(1, Math.max(0, elapsedMs / (longestSeconds * 1000))) ** HEAT_CURVE

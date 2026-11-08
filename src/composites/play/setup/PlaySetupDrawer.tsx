@@ -33,6 +33,8 @@ export interface PlaySetupDrawerProps {
   canSubmit: boolean
   // Words of the last button when a step follows
   submitLabel?: string
+  // Single footer row, save and cancel on every tab
+  isCompact?: boolean
   copy: PlaySetupCopy
   tabs: TabItem[]
   onClose: () => void
@@ -53,7 +55,9 @@ const FooterLine = ({
   tone,
   onClick,
   icon,
+  base = DRAWER_ACTIONS.line,
 }: {
+  base?: string
   label: string
   disabled: boolean
   tone: string
@@ -65,7 +69,7 @@ const FooterLine = ({
     disabled={disabled}
     onClick={onClick}
     aria-label={label}
-    className={cn(DRAWER_ACTIONS.line, tone)}
+    className={cn(base, tone)}
   >
     {icon}
     <span className={DRAWER_ACTIONS.lineLabel}>{label}</span>
@@ -84,6 +88,7 @@ export const PlaySetupDrawer = ({
   isEditing,
   canSubmit,
   submitLabel,
+  isCompact = false,
   copy,
   tabs,
   onClose,
@@ -102,11 +107,33 @@ export const PlaySetupDrawer = ({
     { entry: tabs[index + 1], tone: DRAWER_ACTIONS.stepNext, Icon: NextIcon },
   ]
   const isLast = !tabs[index + 1]
+  const stepButtons = steps.map(
+    ({ entry, tone, Icon }) =>
+      entry && (
+        <button
+          key={entry.value}
+          type="button"
+          onClick={() => setTab(entry.value)}
+          aria-label={entry.label}
+          className={cn(DRAWER_ACTIONS.step, tone)}
+        >
+          {tone === DRAWER_ACTIONS.stepBack && (
+            <Icon className={DRAWER_ACTIONS.stepIcon} aria-hidden="true" />
+          )}
+          <span className={DRAWER_ACTIONS.stepLabel}>{entry.label}</span>
+          {tone === DRAWER_ACTIONS.stepNext && (
+            <Icon className={DRAWER_ACTIONS.stepIcon} aria-hidden="true" />
+          )}
+        </button>
+      )
+  )
+  const saveLabel = submitLabel ?? (isEditing ? PLAY_HUB_COPY.saveRules : copy.create)
 
   return (
     <Drawer
       open={open}
       onClose={onClose}
+      isFullScreen
       title={isEditing ? PLAY_HUB_COPY.rulesHost : copy.title}
       icon="play"
       subheader={
@@ -117,57 +144,56 @@ export const PlaySetupDrawer = ({
         </div>
       }
       footer={
-        <div className={DRAWER_ACTIONS.stack}>
-          {tabs.length > 1 && (
-            <div className={DRAWER_ACTIONS.steps}>
-              {steps.map(
-                ({ entry, tone, Icon }) =>
-                  entry && (
-                    <button
-                      key={entry.value}
-                      type="button"
-                      onClick={() => setTab(entry.value)}
-                      aria-label={entry.label}
-                      className={cn(DRAWER_ACTIONS.step, tone)}
-                    >
-                      {tone === DRAWER_ACTIONS.stepBack && (
-                        <Icon className={DRAWER_ACTIONS.stepIcon} aria-hidden="true" />
-                      )}
-                      <span className={DRAWER_ACTIONS.stepLabel}>{entry.label}</span>
-                      {tone === DRAWER_ACTIONS.stepNext && (
-                        <Icon className={DRAWER_ACTIONS.stepIcon} aria-hidden="true" />
-                      )}
-                    </button>
-                  )
-              )}
-            </div>
-          )}
-          {isLast && (
-            <>
-              <FooterLine
-                label={submitLabel ?? (isEditing ? PLAY_HUB_COPY.saveRules : copy.create)}
-                disabled={isSaving || !canSubmit}
-                tone={DRAWER_ACTIONS.save}
-                onClick={onSubmit}
-                icon={
-                  submitLabel ? (
-                    <NextIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
-                  ) : (
-                    <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
-                  )
-                }
-              />
-              <span className={DRAWER_ACTIONS.divider} aria-hidden="true" />
-              <FooterLine
-                label={copy.cancel}
-                disabled={isSaving}
-                tone={DRAWER_ACTIONS.cancel}
-                onClick={onClose}
-                icon={<CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />}
-              />
-            </>
-          )}
-        </div>
+        isCompact ? (
+          <div className={DRAWER_ACTIONS.compactStack}>
+            <div className={DRAWER_ACTIONS.compactSteps}>{stepButtons}</div>
+            <FooterLine
+              label={saveLabel}
+              disabled={isSaving || !canSubmit}
+              base={DRAWER_ACTIONS.compactLine}
+              tone={DRAWER_ACTIONS.save}
+              onClick={onSubmit}
+              icon={<SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />}
+            />
+            <FooterLine
+              label={copy.cancel}
+              disabled={isSaving}
+              base={DRAWER_ACTIONS.compactLine}
+              tone={DRAWER_ACTIONS.cancel}
+              onClick={onClose}
+              icon={<CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />}
+            />
+          </div>
+        ) : (
+          <div className={DRAWER_ACTIONS.stack}>
+            {tabs.length > 1 && <div className={DRAWER_ACTIONS.steps}>{stepButtons}</div>}
+            {isLast && (
+              <>
+                <FooterLine
+                  label={saveLabel}
+                  disabled={isSaving || !canSubmit}
+                  tone={DRAWER_ACTIONS.save}
+                  onClick={onSubmit}
+                  icon={
+                    submitLabel ? (
+                      <NextIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
+                    ) : (
+                      <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
+                    )
+                  }
+                />
+                <span className={DRAWER_ACTIONS.divider} aria-hidden="true" />
+                <FooterLine
+                  label={copy.cancel}
+                  disabled={isSaving}
+                  tone={DRAWER_ACTIONS.cancel}
+                  onClick={onClose}
+                  icon={<CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />}
+                />
+              </>
+            )}
+          </div>
+        )
       }
     >
       <div key={tab} className={slide}>

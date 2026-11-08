@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
+import { PlayFold } from '@/composites/play/mobile/PlayFold'
 import { PlayLevelBar } from '@/composites/play/member/stats/PlayLevelBar'
 import { recordOf } from '@/composites/play/member/stats/PlayStatTiles'
 import { levelShare } from '@/core/lib/play'
@@ -16,8 +17,7 @@ import type { PlayProfileView } from '@/types/play'
  */
 
 export const PlayGameLevels = ({ games }: { games: PlayProfileView['games'] }) => (
-  <section className={PLAY_STATS.section}>
-    <h2 className={PLAY_STATS.heading}>{PLAY_HUB_COPY.sectionGamesLevels}</h2>
+  <PlayFold title={PLAY_HUB_COPY.sectionGamesLevels}>
     <div className={PLAY_STATS.games}>
       {games
         .filter((entry) => PLAY_GAMES.has(entry.game) && PLAY_GAMES.get(entry.game).playable)
@@ -47,5 +47,5 @@ export const PlayGameLevels = ({ games }: { games: PlayProfileView['games'] }) =
           </div>
         ))}
     </div>
-  </section>
+  </PlayFold>
 )

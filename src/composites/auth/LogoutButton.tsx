@@ -1,5 +1,5 @@
 import { SubmitButton } from '@/components/elements/actions/SubmitButton'
-import { logout } from '@/app/connexion/actions'
+import { logout } from '@/app/login/actions'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 import type { ButtonVariant } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'

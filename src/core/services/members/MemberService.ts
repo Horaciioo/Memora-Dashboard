@@ -403,11 +403,11 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
   return [...base.slice(0, at), ...temporary, ...base.slice(at)]
 }
 
-// Accepted juniors stay with the candidates until their PIM starts
+// Accepted juniors await their form
 const AWAITING_PIM = {
   role: MemberRoles.Junior,
   status: MemberStatuses.Pending,
-  academyJuniors: { some: { candidateId: { not: null }, kickoffAt: null } },
+  academyJuniors: { some: { candidateId: { not: null }, confirmedAt: null } },
 }
 
 /**

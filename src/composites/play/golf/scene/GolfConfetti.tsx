@@ -8,7 +8,7 @@ import type { InstancedMesh, Mesh, MeshBasicMaterial } from 'three'
 
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
 import { seededRandom } from '@/composites/play/golf/scene/random'
-import { CUP_PULSE, floorHeight } from '@/core/lib/play/golf'
+import { CUP_PULSE, cupNear } from '@/core/lib/play/golf'
 import type { GolfHole, GolfMotion } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 
@@ -39,7 +39,6 @@ export const GolfConfetti = ({
   const beam = useRef<Mesh>(null)
   const ring = useRef<Mesh>(null)
   const holder = useMemo(() => new Object3D(), [])
-  const cupFloor = floorHeight(hole, hole.cup[0], hole.cup[1]) ?? 0
 
   // Fixed launch of every flake
   const launches = useMemo(() => {
@@ -67,6 +66,10 @@ export const GolfConfetti = ({
   useFrame(() => {
     const mesh = flakes.current
     if (!mesh) return
+    // Celebrates the hole the ball dropped in
+    const at = motionRef.current.cupAt
+    const spot = at ? cupNear(hole, at.x, at.z) : hole.cups[0]
+    const cupFloor = spot.floor
     const firedAt = motionRef.current.pulses.get(CUP_PULSE)
     const age = firedAt === undefined ? Infinity : (performance.now() - firedAt) / 1000
     mesh.visible = age < confetti.seconds
@@ -75,11 +78,13 @@ export const GolfConfetti = ({
     const wave = Math.max(0, 1 - age / confetti.ring.seconds)
     if (beam.current) {
       beam.current.visible = pillar > 0
+      beam.current.position.set(spot.x, cupFloor + confetti.beam.height / 2, spot.z)
       beam.current.scale.set(pillar, 1, pillar)
       ;(beam.current.material as MeshBasicMaterial).opacity = confetti.beam.opacity * pillar
     }
     if (ring.current) {
       ring.current.visible = wave > 0
+      ring.current.position.set(spot.x, cupFloor + 0.02, spot.z)
       ring.current.scale.setScalar(0.1 + (1 - wave) * confetti.ring.reach)
       ;(ring.current.material as MeshBasicMaterial).opacity = confetti.ring.opacity * wave
     }
@@ -87,9 +92,9 @@ export const GolfConfetti = ({
     launches.forEach((flake, index) => {
       // Thrown up, falling slowly
       holder.position.set(
-        hole.cup[0] + flake.vx * age,
+        spot.x + flake.vx * age,
         cupFloor + flake.vy * age - (confetti.gravity * age * age) / 2,
-        hole.cup[1] + flake.vz * age
+        spot.z + flake.vz * age
       )
       holder.rotation.set(flake.spin * age, flake.spin * age * 0.7, 0)
       holder.scale.setScalar(1 - age / confetti.seconds)
@@ -105,22 +110,13 @@ export const GolfConfetti = ({
         <planeGeometry args={[confetti.size, confetti.size * 0.6]} />
         <meshBasicMaterial side={DoubleSide} />
       </instancedMesh>
-      <mesh
-        ref={beam}
-        position={[hole.cup[0], cupFloor + confetti.beam.height / 2, hole.cup[1]]}
-        visible={false}
-      >
+      <mesh ref={beam} visible={false}>
         <cylinderGeometry
           args={[confetti.beam.radius, confetti.beam.radius, confetti.beam.height, 16, 1, true]}
         />
         <meshBasicMaterial color={paint.boost} transparent depthWrite={false} side={DoubleSide} />
       </mesh>
-      <mesh
-        ref={ring}
-        position={[hole.cup[0], cupFloor + 0.02, hole.cup[1]]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        visible={false}
-      >
+      <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
         <ringGeometry args={[1 - confetti.ring.width, 1, 48]} />
         <meshBasicMaterial color={paint.pole} transparent depthWrite={false} />
       </mesh>

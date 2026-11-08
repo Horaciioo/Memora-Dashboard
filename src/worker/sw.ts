@@ -39,7 +39,7 @@ const storeShell = async (): Promise<void> => {
 
   await shell.put(offlineUrl, page.clone())
 
-  // Its styles and scripts, so it renders without network
+  // Its styles and scripts
   if (!isCaching) return
   const assets = [...new Set((await page.text()).match(ASSET_PATTERN) ?? [])]
   const store = await caches.open(ASSET_CACHE)

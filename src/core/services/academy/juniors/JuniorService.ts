@@ -3,7 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import { notFound } from '@/core/lib/errors'
-import { readText } from '@/core/lib/forms/values'
+import { readNumberValue, readText } from '@/core/lib/forms/values'
 import { resolveBoth } from '@/core/services/academy/parkour/phases'
 import { toPerson } from '@/core/services/work/shared'
 import { countCleared } from '@/core/lib/curriculum/progress'
@@ -16,6 +16,8 @@ import type {
   AcademyJuniorStatusName,
   ReviewStatusName,
 } from '@/utils/constants/hierarchy'
+import { holdTrainingFunction } from '@/core/services/academy/AdmissionService'
+import { handOverJunior } from '@/core/services/academy/juniors/referentHandover'
 import { juniorInScope, sessionInScope, sessionTrainings } from '@/core/services/academy/lookups'
 import { SESSION_SHAPE, sessionNumbers, toSummary } from '@/core/services/academy/sessionView'
 
@@ -39,13 +41,12 @@ const toJunior = (
     validatedAt: Date | null
     liveCount: number
     bonusLives: number
-    trainerId: string | null
-    kickoffAt: Date | null
+    referentId: string | null
     deadlineAt: Date | null
     reviews: { stage: AcademyStageName; status: ReviewStatusName }[]
     session: { status: string; secondPeriodAt: Date | null }
     account: { displayName: string; avatarUrl: string | null }
-    trainer: { id: string; displayName: string; avatarUrl: string | null } | null
+    referent: { id: string; displayName: string; avatarUrl: string | null } | null
     dispositif: { id: string; name: string; accent: string | null } | null
     _count: { reviews: number }
   },
@@ -87,7 +88,7 @@ const toJunior = (
     status: row.status,
     stage: row.stage,
     ...resolveBoth(row, row.session),
-    trainer: toPerson(row.trainer),
+    referent: toPerson(row.referent),
     startedAt: row.startedAt.toISOString(),
     validatedAt: row.validatedAt?.toISOString() ?? null,
     liveCount: row.liveCount,
@@ -100,7 +101,7 @@ const toJunior = (
     reviewCount: row._count.reviews,
     values: {
       accountId: row.accountId,
-      trainerId: row.trainerId,
+      referentId: row.referentId,
       dispositifId: row.dispositifId,
       status: row.status,
       liveCount: row.liveCount,
@@ -112,7 +113,7 @@ const toJunior = (
 // Everything a junior row needs to become a view
 const JUNIOR_SHAPE = {
   account: { include: { trainingRecords: { include: { validator: true } } } },
-  trainer: true,
+  referent: true,
   dispositif: true,
   reviews: { select: { stage: true, status: true } },
   session: { select: { status: true, secondPeriodAt: true } },
@@ -160,8 +161,9 @@ export const listJuniors = async (
  */
 
 const toJuniorData = (values: FormValues) => ({
-  trainerId: readText(values, 'trainerId'),
+  referentId: readText(values, 'referentId'),
   dispositifId: readText(values, 'dispositifId'),
+  bonusLives: readNumberValue(values, 'bonusLives') ?? 0,
 })
 
 /**
@@ -186,6 +188,7 @@ export const createJunior = async (
       ...toJuniorData(values),
     },
   })
+  await holdTrainingFunction(readText(values, 'accountId') ?? '', session.functionId)
 
   return listJuniors(sessionId, session.functionId, scope)
 }
@@ -225,21 +228,20 @@ export const updateJunior = async (
 ): Promise<JuniorView[]> => {
   const current = await juniorInScope(id, scope)
 
-  // Status moves only when picked
-  const status = readText(values, 'status') as AcademyJuniorStatusName | null
-  const statusData =
-    status && status !== current.status
-      ? {
-          status,
-          validatedAt: status === AcademyJuniorStatuses.Validated ? new Date() : null,
-        }
-      : {}
-
+  const data = toJuniorData(values)
   const row = await prisma.academyJunior.update({
     where: { id },
-    data: { ...toJuniorData(values), ...statusData },
+    data,
     include: { session: true },
   })
+
+  if (data.referentId && data.referentId !== current.referentId) {
+    await handOverJunior(
+      { id, sessionId: row.sessionId, name: current.account.displayName },
+      current.referentId,
+      data.referentId
+    )
+  }
 
   return listJuniors(row.sessionId, row.session.functionId, scope)
 }

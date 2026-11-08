@@ -46,6 +46,10 @@ export const ASSISTANT_STYLES = {
   answer: 'min-w-24 justify-center rounded-full',
   link: 'flex w-fit max-w-full cursor-pointer items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-left text-sm font-semibold shadow-[var(--shadow-sm)] transition-colors duration-150 hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   linkGlyph: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
+  // A person drawn under a line, portrait on the left, name and identifier under it
+  card: 'flex w-fit max-w-full items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 shadow-[var(--shadow-sm)]',
+  cardName: 'truncate text-sm font-semibold',
+  cardId: 'truncate font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
   // Calendar and its validation, inside the chat
   period:
     'replica-message-in flex flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)] p-3',

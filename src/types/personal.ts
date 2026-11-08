@@ -43,10 +43,9 @@ export interface HomePlanned {
  */
 
 export type HomeTaskKind =
-  | 'assignTrainer'
+  | 'assignReferent'
   | 'launchPim'
   | 'training'
-  | 'declareKickoff'
   | 'pimReview'
   | 'pimDecision'
   | 'secondPeriod'

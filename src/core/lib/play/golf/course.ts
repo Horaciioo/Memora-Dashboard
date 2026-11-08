@@ -1,3 +1,4 @@
+import { parOfLayout } from '@/core/lib/play/golf/par'
 import { padHeight, padUnder, toPad } from '@/core/lib/play/golf/terrain'
 import type { GolfHole, GolfHoleLayout, GolfPoint, GolfWall } from '@/core/lib/play/golf/types'
 import { edgeWalls } from '@/core/lib/play/golf/walls'
@@ -47,13 +48,14 @@ export const compileHole = (layout: GolfHoleLayout): GolfHole => {
 
     return pad ? padHeight(pad, x, z) : 0
   }
-  const blocks = (layout.blocks ?? []).map(({ at, size }) => {
+  const blocks = (layout.blocks ?? []).map(({ at, size, isHidden }) => {
     const [x0, z0] = at
     const x1 = x0 + size[0]
     const z1 = z0 + size[1]
     const floor = floorAt([x0 + size[0] / 2, z0 + size[1] / 2])
 
     return {
+      ...(isHidden ? { isHidden } : {}),
       x0,
       x1,
       z0,
@@ -75,17 +77,48 @@ export const compileHole = (layout: GolfHoleLayout): GolfHole => {
     }
   })
   const margin = GOLF_SETTINGS.physics.worldMargin
+  const rails = (layout.rails ?? []).map(({ from, to, out, isGlass, isBouncy }): GolfWall => {
+    // Normal of the segment, flipped toward the side hinted
+    const length = Math.hypot(to[0] - from[0], to[1] - from[1]) || 1
+    const sign = ((to[1] - from[1]) * out[0] - (to[0] - from[0]) * out[1]) / length < 0 ? -1 : 1
+
+    return {
+      ax: from[0],
+      az: from[1],
+      bx: to[0],
+      bz: to[1],
+      fa: floorAt(from),
+      fb: floorAt(to),
+      top: GOLF_SETTINGS.render.railHeight,
+      kind: 'rail',
+      nx: (sign * (to[1] - from[1])) / length,
+      nz: (-sign * (to[0] - from[0])) / length,
+      ...(isGlass ? { isGlass } : {}),
+      ...(isBouncy ? { isBouncy } : {}),
+    }
+  })
+  const cups = (layout.cups ?? [{ at: layout.cup, points: 0 }]).map(({ at, points }) => ({
+    x: at[0],
+    z: at[1],
+    points,
+    floor: floorAt(at),
+  }))
   const hole: GolfHole = {
     tee: layout.tee,
     cup: layout.cup,
+    cups,
+    isScoring: Boolean(layout.cups),
+    ...(layout.timeBonus ? { timeBonus: layout.timeBonus } : {}),
+    par: parOfLayout(layout),
     pads,
-    walls: [...edgeWalls(layout.pads, pads), ...blocks.flatMap(blockWalls)],
+    walls: [...edgeWalls(layout.pads, pads), ...rails, ...blocks.flatMap(blockWalls)],
     blocks,
-    bumpers: (layout.bumpers ?? []).map(({ at, radius }, index) => ({
+    bumpers: (layout.bumpers ?? []).map(({ at, radius, isHidden }, index) => ({
       id: `fixed-${index}`,
       x: at[0],
       z: at[1],
       r: radius,
+      ...(isHidden ? { isHidden } : {}),
     })),
     spinners: (layout.spinners ?? []).map(({ at, length, speed, phase = 0 }) => ({
       x: at[0],
@@ -108,7 +141,7 @@ export const compileHole = (layout: GolfHoleLayout): GolfHole => {
       z: at[1],
       r: radius,
     })),
-    fans: (layout.fans ?? []).map(({ at, size, push }) => {
+    fans: (layout.fans ?? []).map(({ at, size, push, cycle }) => {
       const length = Math.hypot(push[0], push[1]) || 1
 
       return {
@@ -117,6 +150,7 @@ export const compileHole = (layout: GolfHoleLayout): GolfHole => {
         z0: at[1],
         z1: at[1] + size[1],
         push: [push[0] / length, push[1] / length] as const,
+        ...(cycle ? { period: cycle.period, phase: cycle.phase ?? 0 } : {}),
       }
     }),
     totems: (layout.totems ?? []).map(({ at, radius, period, phase = 0 }, index) => ({

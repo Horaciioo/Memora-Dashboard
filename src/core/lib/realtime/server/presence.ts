@@ -2,8 +2,10 @@ import 'server-only'
 
 import { invalidInput } from '@/core/lib/errors'
 import { membersOf } from '@/core/lib/realtime/members'
+import { touchPlaySeen } from '@/core/services/play/SeenService'
 import { eventFrame } from '@/core/lib/realtime/server/frames'
 import type { RealtimeConnection, RealtimeRequest } from '@/core/lib/realtime/server/types'
+import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { PRESENCE_COPY } from '@/declarations/system/presence'
 import { REALTIME_EVENTS, REALTIME_OPS, REALTIME_SETTINGS } from '@/declarations/system/realtime'
 import type { PresenceMember, PresenceSeat, PresenceState } from '@/types/presence'
@@ -74,7 +76,11 @@ const leave = (topic: string, connection: RealtimeConnection): void => {
 
   // Other tabs of the member keep them in
   const isStill = [...room.seats.values()].some((other) => other.accountId === seat.accountId)
-  if (!isStill) room.departed.set(seat.accountId, { ...seat, status: 'left', at: Date.now() })
+  if (!isStill) {
+    room.departed.set(seat.accountId, { ...seat, status: 'left', at: Date.now() })
+    // Play remembers when a member left it
+    if (topic === PLAY_TOPICS.lobbies) void touchPlaySeen(seat.accountId).catch(() => undefined)
+  }
   schedule(topic)
 }
 

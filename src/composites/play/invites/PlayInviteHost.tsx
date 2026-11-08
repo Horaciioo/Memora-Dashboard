@@ -3,8 +3,8 @@
 import { usePathname } from 'next/navigation'
 
 import { PlayInviteBubble } from '@/composites/play/invites/PlayInviteBubble'
-import { usePlayInviteFeed } from '@/core/hooks/data/play/usePlayInviteFeed'
-import { usePendingInvite } from '@/core/store/playInvites'
+import { usePlayNoticeFeed } from '@/core/hooks/data/play/usePlayNoticeFeed'
+import { usePendingNotice } from '@/core/store/playNotices'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_FEED_BEACON } from '@/declarations/ui/beacons'
 import { PLAY_INVITE_CALL } from '@/declarations/ui/variants'
@@ -17,8 +17,8 @@ import { PLAY_INVITE_CALL } from '@/declarations/ui/variants'
  */
 
 export const PlayInviteHost = ({ isPlay }: { isPlay?: boolean }) => {
-  usePlayInviteFeed()
-  const invite = usePendingInvite()
+  usePlayNoticeFeed()
+  const invite = usePendingNotice()
   const pathname = usePathname()
 
   if (!invite) return null

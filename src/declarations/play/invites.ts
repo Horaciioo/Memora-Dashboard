@@ -1,7 +1,7 @@
 import play from '@/configurations/play/play.json'
 import { readInteger, readNode } from '@/declarations/configurations/readers'
-import { PlayGames } from '@/utils/constants/play'
-import type { PlayGameName } from '@/utils/constants/play'
+import { PlayGames, PlayNoticeKinds } from '@/utils/constants/play'
+import type { PlayGameName, PlayNoticeKindName } from '@/utils/constants/play'
 
 // Raw node
 const invites = readNode(play.invites, 'play/play.invites')
@@ -25,18 +25,65 @@ export const PLAY_INVITE_SETTINGS = {
 }
 
 /**
- * Words of an invitation popup
+ * Words of a news popup
  * @type {Record<string, string>}
  */
 
 export const PLAY_INVITE_COPY = {
-  label: 'Invitation à jouer',
+  label: 'Nouvelle de Memora Play',
   eyebrow: 'Memora Play',
-  play: '{name} t’a invité à jouer {game}',
-  watch: '{name} t’a invité à regarder sa partie {game}',
-  join: 'Rejoindre',
+  everyone: '{name} invite tout Memora',
   accept: 'Accepter',
   decline: 'Refuser',
+  ignore: 'Ignorer',
+} as const
+
+/**
+ * Sentence of each kind of news, the game after the name
+ * @type {Record<PlayNoticeKindName, string>}
+ */
+
+export const PLAY_NOTICE_SENTENCES: Record<PlayNoticeKindName, string> = {
+  [PlayNoticeKinds.Invite]: '{name} t’a invité à jouer {game}',
+  [PlayNoticeKinds.Spectate]: '{name} t’a invité à regarder sa partie {game}',
+  [PlayNoticeKinds.Rematch]: '{name} propose une revanche',
+  [PlayNoticeKinds.Started]: 'La partie {game} de {name} que tu suis a commencé',
+  [PlayNoticeKinds.Finished]: 'La partie {game} de {name} que tu suis est terminée',
+}
+
+/**
+ * Main gesture of each kind of news
+ * @type {Record<PlayNoticeKindName, string>}
+ */
+
+export const PLAY_NOTICE_ACTIONS: Record<PlayNoticeKindName, string> = {
+  [PlayNoticeKinds.Invite]: 'Rejoindre',
+  [PlayNoticeKinds.Spectate]: 'Regarder',
+  [PlayNoticeKinds.Rematch]: 'Accepter la revanche',
+  [PlayNoticeKinds.Started]: 'Regarder',
+  [PlayNoticeKinds.Finished]: 'Voir le résultat',
+}
+
+/**
+ * Kinds of news that need no answer, only a look
+ * @type {PlayNoticeKindName[]}
+ */
+
+export const PLAY_NOTICE_FOLLOWED: PlayNoticeKindName[] = [
+  PlayNoticeKinds.Started,
+  PlayNoticeKinds.Finished,
+]
+
+/**
+ * Follow button of a table
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_FOLLOW_COPY = {
+  follow: 'Suivre',
+  unfollow: 'Suivi',
+  followed: 'Tu suis cette partie, on te prévient du début et de la fin.',
+  unfollowed: 'Tu ne suis plus cette partie.',
 } as const
 
 /**
@@ -49,6 +96,7 @@ export const PLAY_INVITE_GAMES: Record<PlayGameName, { play: string; watch: stri
   [PlayGames.Golf]: { play: 'au Golf', watch: 'de Golf' },
   [PlayGames.Bomb]: { play: 'à Bomb Party', watch: 'de Bomb Party' },
   [PlayGames.Ludo]: { play: 'au Ludo', watch: 'de Ludo' },
+  [PlayGames.Naval]: { play: 'à la Bataille navale', watch: 'de Bataille navale' },
 }
 
 /**

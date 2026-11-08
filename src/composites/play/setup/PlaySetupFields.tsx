@@ -168,7 +168,7 @@ export const SetupLetters = ({
  * One choice among a few, as chips
  * @param {Object} props - Chips
  * @param {PlaySetupStyles} props.styles - Game classes
- * @param {{ value: T, label: string }[]} props.options - Choices
+ * @param {{ value: T, label: string, classes?: Object }[]} props.options - Choices
  * @param {T} props.value - Picked
  * @param {(value: T) => void} props.onChange - New pick
  * @return {JSX.Element}
@@ -181,7 +181,7 @@ export const SetupChips = <T extends string | number>({
   onChange,
 }: {
   styles: PlaySetupStyles
-  options: { value: T; label: string }[]
+  options: { value: T; label: string; classes?: { idle: string; on: string } }[]
   value: T
   onChange: (value: T) => void
 }) => (
@@ -191,11 +191,59 @@ export const SetupChips = <T extends string | number>({
         key={option.value}
         type="button"
         aria-pressed={option.value === value}
-        className={cn(styles.chip, option.value === value && styles.chipOn)}
+        className={
+          option.classes
+            ? option.classes[option.value === value ? 'on' : 'idle']
+            : cn(styles.chip, option.value === value && styles.chipOn)
+        }
         onClick={() => onChange(option.value)}
       >
         {option.label}
       </button>
     ))}
+  </div>
+)
+
+/**
+ * Several choices among a few, as chips
+ * @param {Object} props - Chips
+ * @param {PlaySetupStyles} props.styles - Game classes
+ * @param {{ value: T, label: string }[]} props.options - Choices
+ * @param {T[]} props.value - Picked
+ * @param {(value: T[]) => void} props.onChange - New pick
+ * @return {JSX.Element}
+ */
+
+export const SetupPicks = <T extends string>({
+  styles,
+  options,
+  value,
+  onChange,
+}: {
+  styles: PlaySetupStyles
+  options: { value: T; label: string }[]
+  value: T[]
+  onChange: (value: T[]) => void
+}) => (
+  <div className={styles.chips}>
+    {options.map((option) => {
+      const isOn = value.includes(option.value)
+
+      return (
+        <button
+          key={option.value}
+          type="button"
+          aria-pressed={isOn}
+          className={cn(styles.chip, isOn && styles.chipOn)}
+          onClick={() =>
+            onChange(
+              isOn ? value.filter((entry) => entry !== option.value) : [...value, option.value]
+            )
+          }
+        >
+          {option.label}
+        </button>
+      )
+    })}
   </div>
 )

@@ -9,8 +9,9 @@
 @import './tokens/play.css';
 @import './play/arcade.css';
 @import './play/ludo.css';
+@import './play/naval.css';
+@import './play/golf.css';
 @import './play/sky.css';
-@import './play/concept.css';
 @import './play/invites.css';
 @import './base/root.css';
 @import './base/motion.css';
@@ -31,6 +32,7 @@
 @import './motion/replica.css';
 @import './motion/tour.css';
 @import './motion/exercise.css';
+@import './motion/seal.css';
 @import './content/markdown.css';
 @import './content/page-editor.css';
 @import './content/inline-edit.css';

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { prisma, fx } from '../lib/client.ts'
 
 // Route the app serves stored files from
-const FILE_ROUTE = '/api/fichiers/'
+const FILE_ROUTE = '/api/files/'
 
 /**
  * Store one generated picture and return the URL the app serves it from

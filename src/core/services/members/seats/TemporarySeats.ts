@@ -25,13 +25,17 @@ export const readTemporaryValues = async (
   } as const
   const select = { select: { sessionId: true } }
 
-  const [recruiter, observer, trainer] = await Promise.all([
+  const [recruiter, observer, referent] = await Promise.all([
     prisma.recruitmentRecruiter.findFirst({ ...query, ...select }),
     prisma.recruitmentObserver.findFirst({ ...query, ...select }),
-    prisma.academySessionTrainer.findFirst({ ...query, ...select }),
+    prisma.academySessionReferent.findFirst({ ...query, ...select }),
   ])
 
-  const rows: Record<TemporaryKind, { sessionId: string } | null> = { recruiter, observer, trainer }
+  const rows: Record<TemporaryKind, { sessionId: string } | null> = {
+    recruiter,
+    observer,
+    referent,
+  }
 
   return Object.fromEntries(
     TEMPORARY_KINDS.map((kind) => [TEMPORARY_SEATS[kind].field, rows[kind]?.sessionId ?? null])
@@ -56,7 +60,7 @@ export const syncTemporarySeats = async (
       ? readText(values, TEMPORARY_SEATS[kind].field)
       : null
 
-  const [recruiterId, observerId, trainerId] = TEMPORARY_KINDS.map(picked)
+  const [recruiterId, observerId, referentId] = TEMPORARY_KINDS.map(picked)
   const seat = (sessionId: string) => ({
     where: { sessionId_accountId: { sessionId, accountId } },
     create: { sessionId, accountId },
@@ -66,6 +70,6 @@ export const syncTemporarySeats = async (
   await prisma.$transaction([
     ...(recruiterId ? [prisma.recruitmentRecruiter.upsert(seat(recruiterId))] : []),
     ...(observerId ? [prisma.recruitmentObserver.upsert(seat(observerId))] : []),
-    ...(trainerId ? [prisma.academySessionTrainer.upsert(seat(trainerId))] : []),
+    ...(referentId ? [prisma.academySessionReferent.upsert(seat(referentId))] : []),
   ])
 }

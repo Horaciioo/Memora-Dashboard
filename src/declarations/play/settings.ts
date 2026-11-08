@@ -11,6 +11,7 @@ import {
 } from '@/declarations/configurations/readers'
 import { BACCALAUREAT_CATEGORIES } from '@/declarations/play/baccalaureat/categories'
 import { BACCALAUREAT_PACKS } from '@/declarations/play/baccalaureat/packs'
+import { BACCALAUREAT_SHARING } from '@/declarations/play/baccalaureat/sharing'
 
 /**
  * Setting the host picks inside bounds
@@ -53,6 +54,8 @@ const xp = readNode(play.xp, 'play/play.xp')
 const levels = readNode(play.levels, 'play/play.levels')
 const tournament = readNode(play.tournament, 'play/play.tournament')
 const rewards = readNode(play.rewards, 'play/play.rewards')
+const privateGames = readNode(play.privateGames, 'play/play.privateGames')
+const group = readNode(play.group, 'play/play.group')
 const admin = readNode(play.admin, 'play/play.admin')
 const idle = readNode(play.idle, 'play/play.idle')
 const stop = readNode(baccalaureat.stop, 'play/baccalaureat.stop')
@@ -112,6 +115,44 @@ export const PLAY_SETTINGS = {
       fallback: 60,
       min: 0,
     }),
+    // XP kept beside a bot
+    botXpRatio: readNumber(rewards.botXpRatio, {
+      path: 'play/play.rewards.botXpRatio',
+      fallback: 0.4,
+      min: 0,
+      max: 1,
+    }),
+  },
+  group: {
+    nameMax: readInteger(group.nameMax, { path: 'play/play.group.nameMax', fallback: 40, min: 3 }),
+    sizeMax: readInteger(group.sizeMax, { path: 'play/play.group.sizeMax', fallback: 12, min: 2 }),
+    perPlayerMax: readInteger(group.perPlayerMax, {
+      path: 'play/play.group.perPlayerMax',
+      fallback: 5,
+      min: 1,
+    }),
+    messageMax: readInteger(group.messageMax, {
+      path: 'play/play.group.messageMax',
+      fallback: 500,
+      min: 20,
+    }),
+    messagesShown: readInteger(group.messagesShown, {
+      path: 'play/play.group.messagesShown',
+      fallback: 60,
+      min: 10,
+    }),
+  },
+  privateGames: {
+    codeLength: readInteger(privateGames.codeLength, {
+      path: 'play/play.privateGames.codeLength',
+      fallback: 6,
+      min: 4,
+    }),
+    recentDays: readInteger(privateGames.recentDays, {
+      path: 'play/play.privateGames.recentDays',
+      fallback: 14,
+      min: 1,
+    }),
   },
   lobbyIdleMinutes: readInteger(play.lobbyIdleMinutes, {
     path: 'play/play.lobbyIdleMinutes',
@@ -126,6 +167,16 @@ export const PLAY_SETTINGS = {
     }),
     emptyTableMinutes: readInteger(idle.emptyTableMinutes, {
       path: 'play/play.idle.emptyTableMinutes',
+      fallback: 3,
+      min: 1,
+    }),
+    awaySeconds: readInteger(idle.awaySeconds, {
+      path: 'play/play.idle.awaySeconds',
+      fallback: 20,
+      min: 1,
+    }),
+    lostNoticeSeconds: readInteger(idle.lostNoticeSeconds, {
+      path: 'play/play.idle.lostNoticeSeconds',
       fallback: 3,
       min: 1,
     }),
@@ -146,6 +197,26 @@ export const PLAY_SETTINGS = {
   leaderboardSize: readInteger(play.leaderboardSize, {
     path: 'play/play.leaderboardSize',
     fallback: 20,
+    min: 1,
+  }),
+  historySize: readInteger(play.historySize, {
+    path: 'play/play.historySize',
+    fallback: 30,
+    min: 1,
+  }),
+  historyPage: readInteger(play.historyPage, {
+    path: 'play/play.historyPage',
+    fallback: 15,
+    min: 1,
+  }),
+  profileRecent: readInteger(play.profileRecent, {
+    path: 'play/play.profileRecent',
+    fallback: 5,
+    min: 1,
+  }),
+  profileTopGames: readInteger(play.profileTopGames, {
+    path: 'play/play.profileTopGames',
+    fallback: 3,
     min: 1,
   }),
 }
@@ -223,23 +294,16 @@ export const BACCALAUREAT_SETTINGS = {
     fallback: 60,
     min: 5,
   }),
-  rejectShare: readNumber(baccalaureat.rejectShare, {
-    path: 'play/baccalaureat.rejectShare',
-    fallback: 0.5,
-    min: 0,
-    max: 1,
-  }),
   points: {
-    solo: readInteger(points.solo, { path: 'play/baccalaureat.points.solo', fallback: 15, min: 0 }),
     unique: readInteger(points.unique, {
       path: 'play/baccalaureat.points.unique',
       fallback: 10,
       min: 0,
     }),
-    sharedDivisor: readInteger(points.sharedDivisor, {
-      path: 'play/baccalaureat.points.sharedDivisor',
-      fallback: 2,
-      min: 1,
+    sharedRule: readChoice(points.sharedRule, {
+      path: 'play/baccalaureat.points.sharedRule',
+      fallback: 'half',
+      allowed: Object.keys(BACCALAUREAT_SHARING) as (keyof typeof BACCALAUREAT_SHARING)[],
     }),
     stopBonus: readInteger(points.stopBonus, {
       path: 'play/baccalaureat.points.stopBonus',
@@ -247,11 +311,6 @@ export const BACCALAUREAT_SETTINGS = {
       min: 0,
     }),
   },
-  jokersPerPlayer: readInteger(baccalaureat.jokersPerPlayer, {
-    path: 'play/baccalaureat.jokersPerPlayer',
-    fallback: 1,
-    min: 0,
-  }),
   flash: {
     roundSeconds: readInteger(flash.roundSeconds, {
       path: 'play/baccalaureat.flash.roundSeconds',

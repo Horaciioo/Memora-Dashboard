@@ -511,15 +511,15 @@ export const RecruiterFunctionGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Academy trainer function
+ * Academy referent function
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
 
-export const TrainerFunctionGlyph = ({ className }: GlyphProps) => (
+export const ReferentFunctionGlyph = ({ className }: GlyphProps) => (
   <Frame
     className={className}
-    tone="TRAINER"
+    tone="REFERENT"
     render={({ fill, lift, deep, cut }) => (
       <>
         <path d="M6 11.4v4.2c0 1.9 2.7 3.6 6 3.6s6-1.7 6-3.6v-4.2l-6 3z" fill={deep} />

@@ -39,7 +39,7 @@ export interface JuniorDossier {
   agenda: PlanOption[]
 }
 
-// Where a trainer stands, the follow-up of one trainer
+// Where a referent stands, the follow-up of one referent
 export interface Follow {
   canFollow: boolean
   juniors: JuniorFollow[]
@@ -55,15 +55,15 @@ export const readDossier = (id: string): Promise<JuniorDossier> =>
   apiGet<JuniorDossier>(API_ROUTES.juniorFile(id))
 
 /**
- * Where a trainer stands with their juniors
- * @param {string} [trainerId] - Trainer, the signed-in member by default
+ * Where a referent stands with their juniors
+ * @param {string} [referentId] - Referent, the signed-in member by default
  * @param {string} [juniorId] - Keep one junior
  * @return {Promise<Follow>} - Follow-up
  */
 
-export const readFollow = (trainerId?: string, juniorId?: string): Promise<Follow> => {
+export const readFollow = (referentId?: string, juniorId?: string): Promise<Follow> => {
   const query = new URLSearchParams()
-  if (trainerId) query.set('formateur', trainerId)
+  if (referentId) query.set('referent', referentId)
   if (juniorId) query.set('junior', juniorId)
 
   return apiGet<Follow>(`${API_ROUTES.academyFollow}?${query.toString()}`)

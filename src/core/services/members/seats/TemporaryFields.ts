@@ -37,7 +37,7 @@ const recruitmentOptions = async (): Promise<FieldOption[]> => {
 }
 
 /**
- * Promotions to seat a trainer in, the current ones first
+ * Promotions to seat a referent in, the current ones first
  * @return {Promise<FieldOption[]>} - Options grouped by state
  */
 

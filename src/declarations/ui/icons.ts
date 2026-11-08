@@ -1,5 +1,6 @@
 import { createElement, type ComponentType } from 'react'
 import {
+  AirplaneTilt,
   Alarm,
   ArrowArcRight,
   ArrowBendDownRight,
@@ -11,7 +12,6 @@ import {
   ArrowsDownUp,
   ArrowsIn,
   ArrowsInSimple,
-  ArrowsLeftRight,
   ArrowsOut,
   ArrowsOutSimple,
   ArrowSquareOut,
@@ -28,6 +28,7 @@ import {
   CaretDoubleLeft,
   CaretDoubleRight,
   CaretDown,
+  CaretUp,
   CaretLeft,
   CaretRight,
   ChartBar,
@@ -123,7 +124,6 @@ import {
   Quotes,
   Repeat,
   Robot,
-  Rocket,
   Scales,
   Scan,
   Scroll,
@@ -185,6 +185,8 @@ import {
   XCircle,
   YoutubeLogo,
   TextHTwo,
+  ArrowFatLinesUp,
+  MapPinArea,
   TextHThree,
   TextHFour,
   TextHFive,
@@ -227,7 +229,7 @@ import {
   JuniorLiveFunctionGlyph,
   LiveFunctionGlyph,
   RecruiterFunctionGlyph,
-  TrainerFunctionGlyph,
+  ReferentFunctionGlyph,
   ObserverFunctionGlyph,
   EmployeGlyph,
 } from '@/components/elements/display/glyphs/BrandGlyphs'
@@ -271,6 +273,8 @@ const phosphor = (Base: Icon, look: Look = {}): LucideIcon => {
 // Memora Play: chunky keys, two-tone objects, cartoon but plain
 const PLAY_BOLD: Look = { weight: 'bold' }
 const PLAY_DUO: Look = { weight: 'duotone' }
+// Mobile tabs: one tone
+const PLAY_FILL: Look = { weight: 'fill' }
 
 // Moderation colours
 const TONE_WARN = 'text-[var(--color-warning)]'
@@ -376,6 +380,7 @@ export const ICONS = {
   playSpectators: phosphor(Eye, PLAY_DUO),
   playProfile: phosphor(UserCircle, PLAY_DUO),
   playStats: phosphor(ChartBar, PLAY_DUO),
+  playHistory: phosphor(ClockCounterClockwise, PLAY_DUO),
   playTrophy: phosphor(Trophy, PLAY_DUO),
   playKick: phosphor(UserMinus, PLAY_DUO),
   playPawn: phosphor(MapPin, PLAY_DUO),
@@ -385,6 +390,7 @@ export const ICONS = {
   playInvite: phosphor(UserPlus, PLAY_DUO),
   playCall: phosphor(Megaphone, PLAY_DUO),
   playLetters: phosphor(TextAa, PLAY_DUO),
+  playCategories: phosphor(ListChecks, PLAY_DUO),
   playRounds: phosphor(Repeat, PLAY_DUO),
   playBracket: phosphor(TreeStructure, PLAY_DUO),
   playAdd: phosphor(Plus, PLAY_BOLD),
@@ -396,6 +402,9 @@ export const ICONS = {
   playFlame: phosphor(Fire, PLAY_DUO),
   playCrown: phosphor(Crown, PLAY_DUO),
   playFeed: phosphor(Bell, PLAY_DUO),
+  playUnfollow: phosphor(BellSlash, PLAY_DUO),
+  playResume: phosphor(Play, PLAY_FILL),
+  playTabLive: phosphor(GameController, PLAY_FILL),
   playOpen: phosphor(ArrowSquareOut, PLAY_BOLD),
   playHeart: phosphor(Heart, { ...PLAY_DUO, weight: 'fill' }),
   golfTornado: phosphor(Tornado, PLAY_DUO),
@@ -408,18 +417,23 @@ export const ICONS = {
   golfGust: phosphor(Wind, PLAY_DUO),
   golfIce: phosphor(Snowflake, PLAY_DUO),
   golfFart: phosphor(Cloud, PLAY_DUO),
-  golfTurbo: phosphor(Rocket, PLAY_DUO),
   golfFlash: phosphor(Lightning, PLAY_DUO),
   golfSteady: phosphor(Hand, PLAY_DUO),
   golfTwist: phosphor(ArrowBendDownRight, PLAY_DUO),
   golfMirror: phosphor(FlipHorizontal),
   golfBlind: phosphor(EyeSlash),
   golfLob: phosphor(ArrowArcRight),
-  golfSwap: phosphor(ArrowsLeftRight),
+  golfBumperMan: phosphor(UserCircle, PLAY_DUO),
+  golfBoing: phosphor(ArrowFatLinesUp, PLAY_DUO),
+  golfTeleport: phosphor(MapPinArea, PLAY_DUO),
   golfFlag: phosphor(Flag),
   golfStroke: phosphor(Golf),
   golfOverview: phosphor(FrameCorners),
   golfFollow: phosphor(Crosshair),
+  golfFly: phosphor(AirplaneTilt),
+  golfZap: phosphor(Lightning, PLAY_BOLD),
+  golfRise: phosphor(CaretUp, PLAY_BOLD),
+  golfSink: phosphor(CaretDown, PLAY_BOLD),
   golfSound: phosphor(SpeakerHigh),
   golfMute: phosphor(SpeakerSlash),
   settings: phosphor(Gear),
@@ -463,7 +477,7 @@ export const ICONS = {
   functionJuniorAnimator: JuniorAnimatorFunctionGlyph,
   functionJuniorLead: JuniorLeadFunctionGlyph,
   functionRecruiter: RecruiterFunctionGlyph,
-  functionTrainer: TrainerFunctionGlyph,
+  functionReferent: ReferentFunctionGlyph,
   functionObserver: ObserverFunctionGlyph,
   lock: phosphor(Lock),
   unlock: phosphor(LockOpen),

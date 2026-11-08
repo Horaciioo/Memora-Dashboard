@@ -1,4 +1,10 @@
+import type { Prisma } from '@prisma/client'
+
+import { navalSeatsOf } from '@/core/lib/play/naval/settings'
+import { PLAY_GAMES } from '@/declarations/play/games'
 import { PLAY_SETTINGS } from '@/declarations/play/settings'
+import { PlayGames } from '@/utils/constants/play'
+import type { PlayGameName } from '@/utils/constants/play'
 
 /**
  * Colour key of a seat
@@ -22,4 +28,21 @@ export const pickSeatColor = (taken: string[], random: () => number = Math.rando
   ).filter((key) => !used.has(key))
 
   return free[Math.floor(random() * free.length)] ?? seatColorKey(used.size)
+}
+
+/**
+ * Seats a table accepts, a mode may narrow the game
+ * @param {PlayGameName} game - Game
+ * @param {Prisma.JsonValue} settings - Table settings
+ * @return {{ min: number; max: number }} - Bounds
+ */
+
+export const seatBoundsOf = (
+  game: PlayGameName,
+  settings: Prisma.JsonValue
+): { min: number; max: number } => {
+  if (game === PlayGames.Naval) return navalSeatsOf(settings)
+  const { minPlayers, maxPlayers } = PLAY_GAMES.get(game)
+
+  return { min: minPlayers, max: maxPlayers }
 }

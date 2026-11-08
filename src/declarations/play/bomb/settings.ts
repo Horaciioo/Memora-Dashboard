@@ -25,28 +25,32 @@ const alphabet = readString(bomb.alphabet, {
   fallback: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 }).toUpperCase()
 
+// Fallback thresholds, easiest first
+const LEVEL_FALLBACKS = {
+  beginner: 10000,
+  easy: 5000,
+  medium: 2500,
+  hard: 1000,
+  extreme: 500,
+} as const
+
 /**
  * Words a prompt must fit, per level
- * @type {Record<string, number>}
+ * @type {Record<BombLevel, number>}
  */
 
-const WORDS_PER_PROMPT = {
-  beginner: readInteger(difficulties.beginner, {
-    path: 'play/bomb.difficulties.beginner',
-    fallback: 500,
-    min: 1,
-  }),
-  medium: readInteger(difficulties.medium, {
-    path: 'play/bomb.difficulties.medium',
-    fallback: 300,
-    min: 1,
-  }),
-  hard: readInteger(difficulties.hard, {
-    path: 'play/bomb.difficulties.hard',
-    fallback: 100,
-    min: 1,
-  }),
-}
+const WORDS_PER_PROMPT = Object.fromEntries(
+  Object.entries(LEVEL_FALLBACKS).map(([level, fallback]) => [
+    level,
+    readInteger(difficulties[level], {
+      path: `play/bomb.difficulties.${level}`,
+      fallback,
+      min: 1,
+    }),
+  ])
+) as Record<keyof typeof LEVEL_FALLBACKS, number>
+
+export type BombLevel = keyof typeof WORDS_PER_PROMPT
 
 export type BombDifficulty = keyof typeof WORDS_PER_PROMPT | 'custom'
 

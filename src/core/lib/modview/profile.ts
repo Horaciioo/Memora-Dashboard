@@ -13,7 +13,7 @@ export const profileOfPermissions = (permissions: PermissionName[]): ModViewProf
   // Only the Admin talks in Livecon 1
   if (permissions.includes(Permissions.LiveCrisisChat)) return ModViewProfiles.Admin
   if (permissions.includes(Permissions.LiveRoster)) return ModViewProfiles.Lead
-  if (permissions.includes(Permissions.LiveFocus)) return ModViewProfiles.Trainer
+  if (permissions.includes(Permissions.LiveFocus)) return ModViewProfiles.Referent
 
   return ModViewProfiles.Moderator
 }

@@ -36,7 +36,7 @@ const requirePlay = (session: SessionUser): void => {
  */
 
 const isFor = (payload: unknown, accountId: string): boolean => {
-  const ids = (payload as { inviteeIds?: unknown } | null)?.inviteeIds
+  const ids = (payload as { accountIds?: unknown } | null)?.accountIds
 
   return !Array.isArray(ids) || ids.includes(accountId)
 }
@@ -71,7 +71,12 @@ export const PLAY_REALTIME_TOPICS: RealtimeTopic[] = [
     (topic, connection) => forwardTopic(topic, connection)
   ),
   playTopic(
-    (topic) => topic === PLAY_TOPICS.invites,
+    (topic) => topic === PLAY_TOPICS.groups,
+    (topic, connection) =>
+      forwardTopic(topic, connection, (payload) => isFor(payload, connection.session.id))
+  ),
+  playTopic(
+    (topic) => topic === PLAY_TOPICS.notices,
     (topic, connection) =>
       forwardTopic(topic, connection, (payload) => isFor(payload, connection.session.id))
   ),

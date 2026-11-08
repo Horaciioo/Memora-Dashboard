@@ -1,25 +1,33 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
 import { PlayInviteAnchor } from '@/composites/play/session/PlayInviteAnchor'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
-import { PLAY_HUB } from '@/declarations/ui/variants'
-import type { PlayCandidate } from '@/types/play'
+import { PLAY_ROOM } from '@/declarations/ui/variants'
+import type { PlayInviteCandidate } from '@/types/play'
 
 /**
- * Dashed empty seat that invites someone
+ * Empty seat of the table, one tap opens the picker under it
  * @param {Object} props - Game and candidates
  * @param {string} props.sessionId - Game
- * @param {PlayCandidate[]} props.candidates - Members to call
+ * @param {PlayInviteCandidate[]} props.candidates - Members to call
+ * @param {ReactNode} [props.extras] - Lobby tools in the panel
+ * @param {boolean} [props.isOpenAtStart] - Picker open on arrival
  * @return {JSX.Element}
  */
 
 export const PlayInviteSlot = ({
   sessionId,
   candidates,
+  extras,
+  isOpenAtStart,
 }: {
   sessionId: string
-  candidates: PlayCandidate[]
+  candidates: PlayInviteCandidate[]
+  extras?: ReactNode
+  isOpenAtStart?: boolean
 }) => {
   const AddIcon = ICONS.playAdd
 
@@ -28,18 +36,15 @@ export const PlayInviteSlot = ({
       sessionId={sessionId}
       candidates={candidates}
       canSeat
-      inline
+      centered
+      extras={extras}
+      isOpenAtStart={isOpenAtStart}
       trigger={(toggle, isOpen) => (
-        <button
-          type="button"
-          aria-expanded={isOpen}
-          className={PLAY_HUB.inviteSlot}
-          onClick={toggle}
-        >
-          <span className={PLAY_HUB.inviteSlotIcon}>
-            <AddIcon className={PLAY_HUB.backIcon} />
+        <button type="button" aria-expanded={isOpen} className={PLAY_ROOM.tile} onClick={toggle}>
+          <span className={PLAY_ROOM.tileEmpty}>
+            <AddIcon className={PLAY_ROOM.tileEmptyIcon} />
           </span>
-          <span className={PLAY_HUB.seatName}>{PLAY_HUB_COPY.inviteSlot}</span>
+          <span className={PLAY_ROOM.tileNote}>{PLAY_HUB_COPY.slotFree}</span>
         </button>
       )}
     />

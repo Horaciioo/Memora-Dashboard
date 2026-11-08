@@ -18,8 +18,7 @@
     "captureReplay": true,
     "homeReplay": true,
     "forcedCapture": false,
-    "safeSquares": true,
-    "exactFinish": true
+    "safeSquares": true
   },
   "maxSixes": 3,
   "graceSeconds": 1,

@@ -235,7 +235,7 @@ export const seedPeople = async (reference: Reference): Promise<Cast> => {
     const second = chance(0.15) ? pick(reference.creators).id : main
     const secondaries: FunctionKey[] =
       status === 'ACTIVE' && chance(0.22)
-        ? [pick<FunctionKey>(['functionRecruiter', 'functionTrainer'])]
+        ? [pick<FunctionKey>(['functionRecruiter', 'functionReferent'])]
         : []
 
     moderators.push(

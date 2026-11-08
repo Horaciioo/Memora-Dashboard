@@ -1,26 +1,30 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import AppLink from '@/components/elements/navigation/AppLink'
+import { PlayGameChatBar } from '@/composites/play/mobile/PlayGameChatBar'
+import { PlayGameMenu } from '@/composites/play/mobile/PlayGameMenu'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
+import { PlaySpectatorBar } from '@/composites/play/session/PlaySpectatorBar'
 import { PlayStageKeys } from '@/composites/play/session/PlayStageKeys'
 import { PlayChat } from '@/composites/play/session/PlayChat'
 import type { PlayChatProps } from '@/composites/play/session/PlayChat'
-import { PlayReplay } from '@/composites/play/session/PlayReplay'
-import type { PlayReplayState } from '@/composites/play/session/PlayReplay'
+import { PlayEndActions } from '@/composites/play/session/PlayEndActions'
+import type { PlayRematchState } from '@/composites/play/session/PlayEndActions'
 import { usePlayCrowd } from '@/core/hooks/data/play/usePlayCrowd'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { useBoxSpan } from '@/core/hooks/interaction/layout/useBoxSpan'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { usePlayFullscreen } from '@/core/hooks/interaction/state/usePlayFullscreen'
 import { usePlayStageStore } from '@/core/store/playStage'
 import { ROUTES } from '@/declarations/navigation'
 import { BAC_SESSION_COPY, PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
-import { BAC_SESSION, BUTTON_STYLES, PLAY_ROOM } from '@/declarations/ui/variants'
+import { BAC_SESSION, BUTTON_STYLES, PLAY_GAME_BAR, PLAY_ROOM } from '@/declarations/ui/variants'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
@@ -37,7 +41,7 @@ export interface PlaySessionRoomProps {
   // Feed window under the chat
   feed: ReactNode
   // Offer once the game is over
-  replay: PlayReplayState | null
+  replay: { canReplay: boolean; rematch: PlayRematchState | null } | null
   // The game table
   children: ReactNode
 }
@@ -62,7 +66,13 @@ export const PlaySessionRoom = ({
   children,
 }: PlaySessionRoomProps) => {
   const moves = usePlayMoves()
+  const isMobile = useIsMobileShell()
   const crowd = usePlayCrowd(chat.sessionId, players, spectators)
+  // Absent seats shown dimmed
+  const faces = useMemo(
+    () => players.map((player) => ({ ...player, isAway: crowd.away.has(player.id) })),
+    [players, crowd.away]
+  )
   // Chat and feed fold together
   const [isSideOpen, setSideOpen] = useState(true)
   const BackIcon = ICONS.playBack
@@ -103,7 +113,8 @@ export const PlaySessionRoom = ({
       <div
         className={cn(
           BAC_SESSION.main,
-          isFullscreen && [BAC_SESSION.mainFull, isChatOpen && BAC_SESSION.mainBeside]
+          isFullscreen && [BAC_SESSION.mainFull, isChatOpen && BAC_SESSION.mainBeside],
+          isMobile && [PLAY_GAME_BAR.room, hasKeys && PLAY_GAME_BAR.roomKeys]
         )}
       >
         <div className={cn(BAC_SESSION.top, isFullscreen && 'hidden')}>
@@ -115,9 +126,6 @@ export const PlaySessionRoom = ({
               <BackIcon className={BAC_SESSION.exitIcon} aria-hidden="true" />
               {PLAY_HUB_COPY.backToHub}
             </AppLink>
-            {replay && (
-              <PlayReplay sessionId={chat.sessionId} className={BAC_SESSION.exit} {...replay} />
-            )}
             {me.isSeated && (
               <Button
                 variant="arcadeDanger"
@@ -131,7 +139,14 @@ export const PlaySessionRoom = ({
             )}
           </div>
           <div className={BAC_SESSION.identity}>
-            {hasKeys && !isFullscreen && <PlayStageKeys game={game} />}
+            {hasKeys && !isFullscreen && (
+              <PlayStageKeys
+                game={game}
+                sessionId={chat.sessionId}
+                gameSlug={gameSlug}
+                isSeated={me.isSeated}
+              />
+            )}
             <div className={BAC_SESSION.titles}>
               <h1 className={BAC_SESSION.title}>{title}</h1>
               <p className={PLAY_ROOM.game}>{gameLabel}</p>
@@ -140,7 +155,20 @@ export const PlaySessionRoom = ({
           </div>
         </div>
 
-        {hasKeys && isFullscreen && <PlayStageKeys game={game} />}
+        {crowd.isLost && (
+          <p role="status" className={PLAY_ROOM.lost}>
+            {PLAY_HUB_COPY.reconnecting}
+          </p>
+        )}
+        {!me.isSeated && <PlaySpectatorBar players={faces} />}
+        {hasKeys && isFullscreen && (
+          <PlayStageKeys
+            game={game}
+            sessionId={chat.sessionId}
+            gameSlug={gameSlug}
+            isSeated={me.isSeated}
+          />
+        )}
         <section
           ref={boxRef}
           className={
@@ -151,48 +179,70 @@ export const PlaySessionRoom = ({
         >
           {children}
         </section>
+        {replay && (
+          <PlayEndActions
+            game={game}
+            gameSlug={gameSlug}
+            sessionId={chat.sessionId}
+            isSeated={me.isSeated}
+            {...replay}
+          />
+        )}
       </div>
 
-      <aside
-        className={cn(
-          BAC_SESSION.side,
-          span && BAC_SESSION.sideSpan,
-          isFullscreen
-            ? [
-                BAC_SESSION.sideFull,
-                hasKeys ? BAC_SESSION.sideFullPad : BAC_SESSION.sideFullBleed,
-                isChatOpen ? BAC_SESSION.sideShown : BAC_SESSION.sideHidden,
-              ]
-            : isSideOpen
-              ? BAC_SESSION.sideOpen
-              : BAC_SESSION.sideFolded
-        )}
-        style={span}
-        inert={isFullscreen && !isChatOpen}
-      >
-        {isColumn ? (
-          <>
-            <PlayChat
-              {...chat}
-              isSide
-              crowd={{ players, spectators: crowd }}
-              feed={feed}
-              onFold={isFullscreen ? toggleChat : () => setSideOpen(false)}
-            />
-          </>
-        ) : (
-          <div className={BAC_SESSION.rail}>
-            <button
-              type="button"
-              className={BAC_SESSION.fold}
-              aria-label={BAC_SESSION_COPY.unfoldSide}
-              onClick={() => setSideOpen(true)}
-            >
-              <UnfoldIcon className={BAC_SESSION.foldIcon} aria-hidden="true" />
-            </button>
-          </div>
-        )}
-      </aside>
+      {isMobile ? (
+        <>
+          {hasKeys && (
+            <PlayGameMenu sessionId={chat.sessionId} gameSlug={gameSlug} isSeated={me.isSeated} />
+          )}
+          <PlayGameChatBar
+            chat={chat}
+            crowd={{ players: faces, spectators: crowd.spectators }}
+            feed={feed}
+          />
+        </>
+      ) : (
+        <aside
+          className={cn(
+            BAC_SESSION.side,
+            span && BAC_SESSION.sideSpan,
+            isFullscreen
+              ? [
+                  BAC_SESSION.sideFull,
+                  hasKeys ? BAC_SESSION.sideFullPad : BAC_SESSION.sideFullBleed,
+                  isChatOpen ? BAC_SESSION.sideShown : BAC_SESSION.sideHidden,
+                ]
+              : isSideOpen
+                ? BAC_SESSION.sideOpen
+                : BAC_SESSION.sideFolded
+          )}
+          style={span}
+          inert={isFullscreen && !isChatOpen}
+        >
+          {isColumn ? (
+            <>
+              <PlayChat
+                {...chat}
+                isSide
+                crowd={{ players: faces, spectators: crowd.spectators }}
+                feed={feed}
+                onFold={isFullscreen ? toggleChat : () => setSideOpen(false)}
+              />
+            </>
+          ) : (
+            <div className={BAC_SESSION.rail}>
+              <button
+                type="button"
+                className={BAC_SESSION.fold}
+                aria-label={BAC_SESSION_COPY.unfoldSide}
+                onClick={() => setSideOpen(true)}
+              >
+                <UnfoldIcon className={BAC_SESSION.foldIcon} aria-hidden="true" />
+              </button>
+            </div>
+          )}
+        </aside>
+      )}
     </div>
   )
 }

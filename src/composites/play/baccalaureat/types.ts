@@ -36,6 +36,16 @@ export const secondsTo = (to: Date | string, now: number): number =>
   Math.max(0, Math.ceil((new Date(to).getTime() - now) / 1000))
 
 /**
+ * Seconds between two dates
+ * @param {Date | string} from - Start
+ * @param {Date | string} to - End
+ * @return {number} - Seconds
+ */
+
+export const spanSeconds = (from: Date | string, to: Date | string): number =>
+  Math.max(0, Math.round((new Date(to).getTime() - new Date(from).getTime()) / 1000))
+
+/**
  * Totals of the scored rounds, best first
  * @param {BacBoardView['history']} history - Scored rounds
  * @param {BacPlayer[]} players - Table

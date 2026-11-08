@@ -116,6 +116,24 @@
   }
 }
 
+/* Urgent talk: the sunset turns red and the bubble becomes red glass */
+.dock-alert {
+  --color-sunset-pink: var(--color-danger);
+  --color-sunset-coral: color-mix(in srgb, var(--color-danger) 78%, var(--color-surface-raised));
+  --color-sunset-amber: color-mix(in srgb, var(--color-danger) 58%, var(--color-surface-raised));
+}
+
+.dock-alert .speech-bubble {
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--color-danger) 20%, var(--color-surface-raised)),
+    color-mix(in srgb, var(--color-danger) 8%, var(--color-surface-raised))
+  );
+  -webkit-backdrop-filter: blur(var(--glass-thick-blur)) saturate(var(--glass-thick-saturate));
+  backdrop-filter: blur(var(--glass-thick-blur)) saturate(var(--glass-thick-saturate));
+  border-color: color-mix(in srgb, var(--color-danger) 42%, transparent);
+}
+
 /* Memora speech bubble, its tail pointing at the button */
 .speech-bubble {
   background: var(--color-surface-raised);

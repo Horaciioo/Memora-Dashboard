@@ -42,7 +42,7 @@ export const OverviewTab = () => {
   const state = sessionState(summary)
   const FunctionGlyph =
     summary.function.icon && isIconName(summary.function.icon) ? ICONS[summary.function.icon] : null
-  const trainers = pickedOptions(fieldFor('trainerIds'), record.values.trainerIds)
+  const referents = pickedOptions(fieldFor('referentIds'), record.values.referentIds)
   const { recruitment } = summary
   const period = Array.isArray(record.values.period) ? record.values.period : null
 
@@ -72,13 +72,13 @@ export const OverviewTab = () => {
 
   const team: EditableEntry[] = [
     {
-      label: SESSION_FILE_COPY.trainers,
-      field: fieldFor('trainerIds'),
+      label: SESSION_FILE_COPY.referents,
+      field: fieldFor('referentIds'),
       display:
-        trainers.length > 0 ? (
+        referents.length > 0 ? (
           <AvatarStack
             size="sm"
-            people={trainers.map((option) => ({
+            people={referents.map((option) => ({
               id: option.value,
               name: option.label,
               src: option.image,

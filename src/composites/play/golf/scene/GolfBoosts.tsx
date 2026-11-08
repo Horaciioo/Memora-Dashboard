@@ -3,37 +3,51 @@
 import { useEffect, useMemo, useRef } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { Color } from 'three'
 import type { CanvasTexture, Group, MeshBasicMaterial } from 'three'
 
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
-import { boostChevronTexture, boostTexture } from '@/composites/play/golf/scene/textures'
+import { chevronTileTexture } from '@/composites/play/golf/scene/obstacles/textures'
+import { boostTexture } from '@/composites/play/golf/scene/textures'
 import { boostId, floorHeight } from '@/core/lib/play/golf'
 import type { GolfHole, GolfMotion, GolfPad } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 
 const { chevron, boost } = GOLF_SCENE
 
-// Chevron indexes, front first, the back one lights first
-const CHEVRONS = [0, 1] as const
+// Flash tone of the chevrons
+const WHITE = new Color('white')
+
+/**
+ * Chevron strip moved up its plate, toward the push
+ * @param {CanvasTexture} strip - Shared strip
+ * @param {number} step - Tiles
+ * @return {void}
+ */
+
+const scrollStrip = (strip: CanvasTexture, step: number): void => {
+  strip.offset.y = (strip.offset.y - step) % 1
+}
 
 interface GolfBoostProps {
   hole: GolfHole
   pad: GolfPad
   index: number
   plate: CanvasTexture
-  flashes: CanvasTexture[]
+  chevrons: CanvasTexture
+  tint: Color
   motionRef: RefObject<GolfMotion>
 }
 
 /**
- * Boost slab decal, chevrons flashing in turn when a ball rolls on
+ * Boost slab decal, chevrons scrolling along the push, flashing when a ball rolls on
  * @param {GolfBoostProps} props - Slab
  * @return {JSX.Element}
  */
 
-const GolfBoost = ({ hole, pad, index, plate, flashes, motionRef }: GolfBoostProps) => {
+const GolfBoost = ({ hole, pad, index, plate, chevrons, tint, motionRef }: GolfBoostProps) => {
   const body = useRef<Group>(null)
-  const lights = useRef<(MeshBasicMaterial | null)[]>([])
+  const light = useRef<MeshBasicMaterial>(null)
   const [pushX, pushZ] = pad.push ?? [0, 0]
   const x = (pad.x0 + pad.x1) / 2
   const z = (pad.z0 + pad.z1) / 2
@@ -46,13 +60,7 @@ const GolfBoost = ({ hole, pad, index, plate, flashes, motionRef }: GolfBoostPro
     const swell = Math.sin(Math.PI * progress)
     body.current?.scale.setScalar(1 + boost.pop * swell)
     body.current?.position.set(x, floor + boost.rise * swell, z)
-    CHEVRONS.forEach((chevronIndex) => {
-      const light = lights.current[chevronIndex]
-      if (!light) return
-      // Front chevron waits for the back one
-      const late = age - (1 - chevronIndex) * boost.waitMs
-      light.opacity = late < 0 ? 0 : Math.max(0, 1 - late / (boost.pulseMs - boost.waitMs))
-    })
+    light.current?.color.copy(tint).lerp(WHITE, 1 - progress)
   })
 
   return (
@@ -61,20 +69,10 @@ const GolfBoost = ({ hole, pad, index, plate, flashes, motionRef }: GolfBoostPro
         <planeGeometry args={[size, size]} />
         <meshBasicMaterial map={plate} transparent />
       </mesh>
-      {flashes.map((flash, chevronIndex) => (
-        <mesh key={chevronIndex} position={[0, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[size, size]} />
-          <meshBasicMaterial
-            ref={(material) => {
-              lights.current[chevronIndex] = material
-            }}
-            map={flash}
-            transparent
-            opacity={0}
-            depthWrite={false}
-          />
-        </mesh>
-      ))}
+      <mesh position={[0, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[size * chevron.inner, size * chevron.inner]} />
+        <meshBasicMaterial ref={light} map={chevrons} color={tint} transparent depthWrite={false} />
+      </mesh>
     </group>
   )
 }
@@ -98,18 +96,22 @@ export const GolfBoosts = ({
   motionRef: RefObject<GolfMotion>
 }) => {
   const plate = useMemo(() => boostTexture(paint.obstacle, paint['obstacle-top']), [paint])
-  // Chevrons flash in the card colour
-  const flashes = useMemo(
-    () => CHEVRONS.map((chevronIndex) => boostChevronTexture(paint.obstacle, chevronIndex)),
-    [paint]
-  )
+  // One strip for every plate, scrolled once a frame
+  const chevrons = useMemo(() => {
+    const texture = chevronTileTexture()
+    texture.repeat.set(1, chevron.tiles)
+    return texture
+  }, [])
   useEffect(
     () => () => {
       plate.dispose()
-      flashes.forEach((flash) => flash.dispose())
+      chevrons.dispose()
     },
-    [plate, flashes]
+    [plate, chevrons]
   )
+  useFrame((_, delta) => {
+    scrollStrip(chevrons, delta * chevron.speed)
+  })
 
   return (
     <>
@@ -121,7 +123,8 @@ export const GolfBoosts = ({
             pad={pad}
             index={index}
             plate={plate}
-            flashes={flashes}
+            chevrons={chevrons}
+            tint={paint['obstacle-top']}
             motionRef={motionRef}
           />
         ) : null

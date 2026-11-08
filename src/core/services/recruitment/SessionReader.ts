@@ -9,7 +9,7 @@ import { VERDICT_OUTCOMES } from '@/declarations/reference/fixed'
 import { STEP_ORDER } from '@/core/lib/recruitment/stepState'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readPortraits } from '@/core/services/recruitment/CandidatePortraits'
-import { toLinkView } from '@/core/services/onboarding/IntegrationLinkService'
+import { readActivation } from '@/core/services/onboarding/AccountActivationService'
 import { recommendedKeys } from '@/core/lib/recruitment/questionnaire'
 import type {
   RecruitmentDetail,
@@ -144,7 +144,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     // A session nobody configured asks the suggested pick
     questionKeys: row.questionKeys.length > 0 ? row.questionKeys : recommendedKeys(row.platform),
     outcomes: outcomeViews,
-    link: row.invite ? toLinkView(row.invite) : null,
+    activation: await readActivation(id),
     identifiers: await identifiersForCreator(row.youtuberId),
     bannedIds: [],
     participants: await readParticipants(id),

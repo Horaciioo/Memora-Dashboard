@@ -9,6 +9,7 @@ import { FileOverview } from '@/components/structures/page/FileOverview'
 import { ObjectivesCard } from '@/composites/academy/junior/ObjectivesCard'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { ACADEMY_COPY, ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
+import { AcademyStages } from '@/utils/constants/hierarchy'
 import { ACADEMY_JUNIOR_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
 import { FILE_BOX } from '@/declarations/ui/variants'
@@ -33,14 +34,13 @@ export const JuniorOverview = () => {
     { label: ACADEMY_FIELD_COPY.junior, display: <RecordId id={junior.id} /> },
     {
       label: SESSION_FILE_COPY.status,
-      field: fieldFor('status'),
       display: <Status label={status.label} accent={status.accent} icon="statusDot" />,
     },
     {
-      label: ACADEMY_FIELD_COPY.trainer,
-      field: fieldFor('trainerId'),
-      display: junior.trainer ? (
-        <CreatorLabel name={junior.trainer.name} image={junior.trainer.src} />
+      label: ACADEMY_FIELD_COPY.referent,
+      field: fieldFor('referentId'),
+      display: junior.referent ? (
+        <CreatorLabel name={junior.referent.name} image={junior.referent.src} />
       ) : null,
     },
     {
@@ -48,6 +48,16 @@ export const JuniorOverview = () => {
       field: fieldFor('dispositifId'),
       display: junior.dispositif?.name ?? null,
     },
+    // Optional third period target
+    ...(junior.stage === AcademyStages.Bonus
+      ? [
+          {
+            label: ACADEMY_FIELD_COPY.bonusLives,
+            field: fieldFor('bonusLives'),
+            display: junior.bonusLives > 0 ? junior.bonusLives : null,
+          },
+        ]
+      : []),
     { label: ACADEMY_FIELD_COPY.startsAt, display: formatDay(junior.startedAt) },
     {
       label: ACADEMY_COPY.validatedOn,

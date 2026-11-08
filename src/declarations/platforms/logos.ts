@@ -1,4 +1,4 @@
-import config from '@/configurations/system/plateformes.json'
+import config from '@/configurations/system/platforms.json'
 import type { IconName } from '@/declarations/ui/icons'
 
 /**

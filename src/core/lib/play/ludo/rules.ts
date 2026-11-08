@@ -90,10 +90,9 @@ const planOf = ({
   const isExit = from <= YARD_STEP
   if (isExit && !settings.exitFaces.includes(dice)) return null
 
-  // Landing step, overshoot held at home or refused
-  const reach = isExit ? 0 : from + dice
-  if (reach > GOAL_STEP && settings.rules.exactFinish) return null
-  const to = Math.min(reach, GOAL_STEP)
+  // Exact count only: past the goal, the pawn stays put
+  const to = isExit ? 0 : from + dice
+  if (to > GOAL_STEP) return null
 
   const { safeSquares } = settings.rules
 
@@ -101,15 +100,9 @@ const planOf = ({
   const square = isOnTrack(to) ? squareOf(mover.corner, to) : null
   const isSafe = square !== null && SAFE_SQUARES.has(square)
   const rivals = square === null ? [] : rivalsOn(seats, mover.accountId, square).flat()
-  const mates = isOnTrack(to)
-    ? mover.pawns.filter((step, index) => index !== pawn && step === to).length
-    : 0
 
-  // A pawn leaving the yard eats whoever sits on its start, safe or not
+  // Safe squares share: rivals stay, nobody is eaten. A pawn leaving the yard eats whoever sits on its start
   const isShielded = safeSquares && isSafe && !isExit
-
-  // Never two pawns on one square: a mate, or a rival a safe square would spare
-  if (mates > 0 || (isShielded && rivals.length > 0)) return null
 
   return {
     pawn,
@@ -189,7 +182,7 @@ export const isAllHome = (pawns: number[]): boolean => pawns.every((step) => ste
  */
 
 export const progressOf = (pawns: number[]): number =>
-  pawns.reduce((total, step) => total + step + 1, 0)
+  pawns.reduce((total, step) => total + Math.min(step, GOAL_STEP) + 1, 0)
 
 /**
  * Next colour clockwise still in the game

@@ -178,7 +178,7 @@ export const audienceClauses = async (
       },
       select: { id: true, leads: { select: { accountId: true } } },
     }),
-    prisma.academySessionTrainer.findMany({
+    prisma.academySessionReferent.findMany({
       where: { accountId: viewerId },
       select: { sessionId: true },
     }),
@@ -199,7 +199,7 @@ export const audienceClauses = async (
       audienceTeamId: { in: teams.map((team) => team.id) },
     },
     { ...bound, audienceLeadsOnly: true, audienceTeamId: { in: ledTeamIds } },
-    // Juniors and trainers of a promotion
+    // Juniors and referents of a promotion
     {
       ...bound,
       audienceLeadsOnly: false,

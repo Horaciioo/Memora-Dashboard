@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayCreateButton } from '@/composites/play/hub/PlayCreateButton'
+import { PlayJoinCode } from '@/composites/play/hub/PlayJoinCode'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_CONCEPT_COPY } from '@/declarations/play/concept'
@@ -89,6 +90,7 @@ export const PlayHubMenu = ({
               lockedReason={lockedReason}
               className={PLAY_HUB.hubButton}
             />
+            {canCreate && <PlayJoinCode className={PLAY_HUB.hubButton} />}
             {GAME_VIEWS.map(viewButton)}
           </div>
           <div className={PLAY_HUB.hubGroup}>{PLAYER_VIEWS.map(viewButton)}</div>

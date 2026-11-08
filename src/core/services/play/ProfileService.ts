@@ -94,13 +94,61 @@ export const readPlayProfile = async (accountId: string) => {
 }
 
 /**
+ * Best players over every game by one measure, counters summed
+ * @param {PlayLeaderMetric} metric - Ranking measure
+ * @return {Promise<PlayLeader[]>} - Leaders
+ */
+
+const leadersOfAll = async (metric: PlayLeaderMetric): Promise<PlayLeader[]> => {
+  const sums = await prisma.playGameStat.groupBy({
+    by: ['accountId'],
+    where: { played: { gt: 0 } },
+    _sum: { xp: true, wins: true, played: true },
+    orderBy: PLAY_LEADER_METRICS[metric].sort.map((field) => ({
+      _sum: { [field]: 'desc' as const },
+    })),
+    take: PLAY_SETTINGS.leaderboardSize,
+  })
+  const accounts = await prisma.account.findMany({
+    where: { id: { in: sums.map((entry) => entry.accountId) } },
+    select: { id: true, displayName: true, avatarUrl: true },
+  })
+  const byId = new Map(accounts.map((account) => [account.id, account]))
+
+  return sums.flatMap((entry, index) => {
+    const account = byId.get(entry.accountId)
+    const xp = entry._sum.xp ?? 0
+
+    return account
+      ? [
+          {
+            rank: index + 1,
+            accountId: entry.accountId,
+            name: account.displayName,
+            avatarUrl: account.avatarUrl,
+            xp,
+            level: levelOf(xp).level,
+            wins: entry._sum.wins ?? 0,
+            played: entry._sum.played ?? 0,
+          },
+        ]
+      : []
+  })
+}
+
+/**
  * Best players of one game by one measure
  * @param {PlayGameName} game - Game
  * @param {PlayLeaderMetric} metric - Ranking measure
  * @return {Promise<PlayLeader[]>} - Leaders
  */
 
-const leadersBy = async (game: PlayGameName, metric: PlayLeaderMetric): Promise<PlayLeader[]> => {
+const leadersBy = async (
+  game: PlayGameName | null,
+  metric: PlayLeaderMetric
+): Promise<PlayLeader[]> => {
+  if (game === null) return leadersOfAll(metric)
+
   const leaders = await prisma.playGameStat.findMany({
     where: { game, played: { gt: 0 } },
     orderBy: PLAY_LEADER_METRICS[metric].sort.map((field) => ({ [field]: 'desc' as const })),
@@ -121,13 +169,13 @@ const leadersBy = async (game: PlayGameName, metric: PlayLeaderMetric): Promise<
 }
 
 /**
- * Best players of one game, one list per measure
- * @param {PlayGameName} game - Game
+ * Best players of one game or of all of them, one list per measure
+ * @param {PlayGameName | null} game - Game, null for all
  * @return {Promise<Record<PlayLeaderMetric, PlayLeader[]>>} - Leaders
  */
 
 export const readLeaderboards = async (
-  game: PlayGameName
+  game: PlayGameName | null
 ): Promise<Record<PlayLeaderMetric, PlayLeader[]>> => {
   const lists = await Promise.all(PLAY_LEADER_KEYS.map((metric) => leadersBy(game, metric)))
 

@@ -1,11 +1,10 @@
 'use client'
 
+import { BacAnswerCard } from '@/composites/play/baccalaureat/BacAnswerCard'
 import type { BacBoardView, BacPlayer, BacRoundView } from '@/composites/play/baccalaureat/types'
-import { BacVote } from '@/composites/play/baccalaureat/BacVote'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
-import { BAC_BOARD_COPY, fillPlayMessage } from '@/declarations/play'
+import { fitsLetter, liveVerdict, sharedAnswerIds } from '@/core/lib/play/baccalaureat'
 import { BAC_BOARD } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
 
 export interface BacReviewProps {
   sessionId: string
@@ -13,13 +12,13 @@ export interface BacReviewProps {
   settings: BacBoardView['settings']
   players: BacPlayer[]
   viewerId: string
-  // Votes and points, or just the result
+  // Votes open, or the result with points
   isScored: boolean
   canVote: boolean
 }
 
 /**
- * Words laid out by category, voted during the review, with points once scored
+ * Words by category as cards, voted with a check or a cross, locked once cast
  * @param {BacReviewProps} props - Round and players
  * @return {JSX.Element}
  */
@@ -34,8 +33,9 @@ export const BacReview = ({
   canVote,
 }: BacReviewProps) => {
   const { act, isSaving } = usePlayAct(sessionId)
-  const vote = (answerId: string, accepted: boolean) =>
-    void act({ type: 'vote', answerId, accepted })
+
+  // Words written twice, refused ones pay nothing so they never share
+  const shared = sharedAnswerIds(round.answers.filter((answer) => !isScored || answer.valid))
 
   return (
     <div className={BAC_BOARD.categories}>
@@ -48,48 +48,41 @@ export const BacReview = ({
                 (item) => item.category === entry.id && item.accountId === player.accountId
               )
               const isMine = player.accountId === viewerId
+              const fits = answer ? fitsLetter(answer.word, round.letter) : true
+              const verdict = isScored
+                ? answer?.valid
+                  ? 'yes'
+                  : 'no'
+                : liveVerdict({
+                    fits,
+                    accepts: answer?.acceptedBy.length ?? 0,
+                    rejects: answer?.rejectedBy.length ?? 0,
+                  })
+              const canCast = canVote && !isMine && answer
+
+              const named = (ids: string[] | undefined) =>
+                players.filter((item) => ids?.includes(item.accountId))
 
               return (
-                <div key={player.accountId} className={BAC_BOARD.answer}>
-                  <span className={BAC_BOARD.answerName}>{player.name}</span>
-                  {answer ? (
-                    <span
-                      className={cn(
-                        BAC_BOARD.answerWord,
-                        answer.valid === false && BAC_BOARD.answerOff
-                      )}
-                    >
-                      {answer.word}
-                    </span>
-                  ) : (
-                    <span className={BAC_BOARD.answerEmpty}>{BAC_BOARD_COPY.empty}</span>
-                  )}
-                  {answer && isScored && (
-                    <span className={BAC_BOARD.answerNote}>
-                      {fillPlayMessage(BAC_BOARD_COPY.points, { points: answer.points })}
-                    </span>
-                  )}
-                  {answer && !isScored && (
-                    <>
-                      <BacVote
-                        label={BAC_BOARD_COPY.accept}
-                        voterIds={answer.acceptedBy}
-                        players={players}
-                        isMine={answer.myVote === true}
-                        disabled={isSaving}
-                        onVote={canVote && !isMine ? () => vote(answer.id, true) : undefined}
-                      />
-                      <BacVote
-                        label={BAC_BOARD_COPY.reject}
-                        voterIds={answer.rejectedBy}
-                        players={players}
-                        isMine={answer.myVote === false}
-                        disabled={isSaving}
-                        onVote={canVote && !isMine ? () => vote(answer.id, false) : undefined}
-                      />
-                    </>
-                  )}
-                </div>
+                <BacAnswerCard
+                  key={player.accountId}
+                  player={player}
+                  answer={answer}
+                  verdict={verdict}
+                  isScored={isScored}
+                  isShared={Boolean(answer && shared.has(answer.id))}
+                  isWrongLetter={!fits}
+                  voters={{
+                    accepted: named(answer?.acceptedBy),
+                    rejected: named(answer?.rejectedBy),
+                  }}
+                  isSaving={isSaving}
+                  onVote={
+                    canCast
+                      ? (accepted) => void act({ type: 'vote', answerId: answer.id, accepted })
+                      : undefined
+                  }
+                />
               )
             })}
           </div>

@@ -10,6 +10,7 @@ import type {
   WebGLProgramParametersWithUniforms,
 } from 'three'
 
+import type { courseGeometry } from '@/composites/play/golf/scene/geometry'
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
 import { holeSeed, seededRandom } from '@/composites/play/golf/scene/random'
 import { iceTexture, skyCube } from '@/composites/play/golf/scene/weatherTextures'
@@ -34,6 +35,20 @@ float iceEdge = 1.0 - smoothstep(0.0, uBand, uFront - iceDistance);
 gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.95, 0.99, 1.0), iceEdge * 0.85);
 gl_FragColor.a *= (1.0 - uMelt);`,
 }
+
+/**
+ * Surfaces the rink covers: every dry slab, rail tops, block tops
+ * @param {ReturnType<typeof courseGeometry>} geometry - Hole meshes
+ * @return {BufferGeometry[]} - Geometries to glaze
+ */
+
+export const iceSurfaces = (geometry: ReturnType<typeof courseGeometry>): BufferGeometry[] => [
+  ...geometry.tops
+    .filter(({ surface }) => surface !== GolfSurfaces.Water)
+    .map(({ geometry: top }) => top),
+  geometry.rails,
+  geometry.blockTops,
+]
 
 /**
  * Time left to ice over, as a share of the melt

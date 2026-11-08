@@ -1,6 +1,5 @@
 import { padUnder } from '@/core/lib/play/golf/terrain'
-import type { GolfHole } from '@/core/lib/play/golf/types'
-import { GOLF_POWERS } from '@/declarations/play/golf/powers'
+import type { GolfCup, GolfHole } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPhases, GolfPowers, GolfSurfaces } from '@/utils/constants/play'
 import type { GolfPhaseName, GolfPowerName } from '@/utils/constants/play'
@@ -57,16 +56,6 @@ export const isHoleDone = (
 ): boolean => Boolean(player.holedAt) || player.strokes >= maxStrokes
 
 /**
- * Power playable from the hand, a finished player keeps the malus
- * @param {GolfPowerName} power - Power
- * @param {boolean} isDone - Hole finished
- * @return {boolean} - Playable
- */
-
-export const canPlayPower = (power: GolfPowerName, isDone: boolean): boolean =>
-  !isDone || !GOLF_POWERS.get(power).isBonus
-
-/**
  * Strokes written on the card
  * @param {{ holedAt: Date | string | null, strokes: number }} player - Player
  * @param {number} maxStrokes - Stroke ceiling
@@ -74,12 +63,79 @@ export const canPlayPower = (power: GolfPowerName, isDone: boolean): boolean =>
  */
 
 export const holeScore = (
-  player: { holedAt: Date | string | null; strokes: number },
-  maxStrokes: number
-): number =>
-  player.holedAt
+  player: { holedAt: Date | string | null; strokes: number; x?: number; z?: number },
+  maxStrokes: number,
+  hole?: GolfHole
+): number => {
+  // Scoring hole: the points of the cup the ball sleeps in, written below zero
+  if (hole?.isScoring)
+    return 0 - (player.holedAt ? cupPoints(hole, player.x ?? 0, player.z ?? 0) : 0)
+
+  return player.holedAt
     ? player.strokes
     : (Number.isFinite(maxStrokes) ? maxStrokes : player.strokes) + GOLF_SETTINGS.missPenalty
+}
+
+/**
+ * Score of every player on a hole, the first ball holed winning the time bonus
+ * @param {Object[]} players - Players of the hole
+ * @param {number} maxStrokes - Stroke ceiling
+ * @param {GolfHole} [hole] - Hole
+ * @return {number[]} - Scores, in the order of the players
+ */
+
+export const holeScores = <
+  T extends { holedAt: Date | string | null; strokes: number; x?: number; z?: number },
+>(
+  players: T[],
+  maxStrokes: number,
+  hole?: GolfHole
+): number[] => {
+  const times = players.map((player) => (player.holedAt ? msOf(player.holedAt) : Infinity))
+  const first = Math.min(...times)
+
+  return players.map((player, index) => {
+    const base = holeScore(player, maxStrokes, hole)
+
+    return hole?.timeBonus && Number.isFinite(first) && times[index] === first
+      ? base - hole.timeBonus
+      : base
+  })
+}
+
+/**
+ * Points of the cup nearest to a spot
+ * @param {GolfHole} hole - Hole
+ * @param {number} x - Ball x
+ * @param {number} z - Ball z
+ * @return {number} - Points
+ */
+
+export const cupPoints = (hole: GolfHole, x: number, z: number): number =>
+  cupNear(hole, x, z).points
+
+/**
+ * Hole nearest to a spot, the first one when no spot is known
+ * @param {GolfHole} hole - Hole
+ * @param {number} x - Spot x
+ * @param {number} z - Spot z
+ * @return {GolfCup} - Hole
+ */
+
+export const cupNear = (hole: GolfHole, x: number, z: number): GolfCup =>
+  hole.cups.reduce(
+    (best, spot) =>
+      Math.hypot(spot.x - x, spot.z - z) < Math.hypot(best.x - x, best.z - z) ? spot : best,
+    hole.cups[0]
+  )
+
+/**
+ * Card cell as shown: strokes, or points when written at or below zero
+ * @param {number} value - Card cell
+ * @return {string} - Text
+ */
+
+export const cardCell = (value: number): string => (value > 0 ? `${value}` : `${-value} pt`)
 
 /**
  * Strokes of a whole card
@@ -103,7 +159,50 @@ export const canPlaceAt = (hole: GolfHole, x: number, z: number): boolean => {
   if (!pad || pad.surface === GolfSurfaces.Water) return false
   const gap = GOLF_SETTINGS.placementGap
 
-  return [hole.cup, hole.tee].every(([pointX, pointZ]) => Math.hypot(x - pointX, z - pointZ) >= gap)
+  return [...hole.cups.map((spot): [number, number] => [spot.x, spot.z]), hole.tee].every(
+    ([pointX, pointZ]) => Math.hypot(x - pointX, z - pointZ) >= gap
+  )
+}
+
+/**
+ * Half side of the teleporter square, in metres
+ * @return {number} - Reach from the ball
+ */
+
+export const teleportReach = (): number =>
+  (GOLF_SETTINGS.powers.teleport.cells * GOLF_SETTINGS.grid.cell) / 2
+
+/**
+ * Spot a ball may teleport to: in its square, on a slab, clear of blocks and bumpers, walls crossed freely
+ * @param {GolfHole} hole - Hole
+ * @param {{ x: number, z: number }} ball - Ball at rest
+ * @param {{ x: number, z: number }} spot - Spot asked
+ * @return {boolean} - Allowed
+ */
+
+export const canTeleportTo = (
+  hole: GolfHole,
+  ball: { x: number; z: number },
+  spot: { x: number; z: number }
+): boolean => {
+  const reach = teleportReach()
+  if (Math.abs(spot.x - ball.x) > reach || Math.abs(spot.z - ball.z) > reach) return false
+  if (!canPlaceAt(hole, spot.x, spot.z)) return false
+  const radius = GOLF_SETTINGS.physics.ballRadius
+  const isInBlock = hole.blocks.some(
+    (block) =>
+      spot.x > block.x0 - radius &&
+      spot.x < block.x1 + radius &&
+      spot.z > block.z0 - radius &&
+      spot.z < block.z1 + radius
+  )
+
+  return (
+    !isInBlock &&
+    hole.bumpers.every(
+      (bumper) => Math.hypot(spot.x - bumper.x, spot.z - bumper.z) > bumper.r + radius
+    )
+  )
 }
 
 /**
@@ -150,32 +249,6 @@ export const scatterSpot = (
 }
 
 /**
- * Rival nearest the cup, still on the hole
- * @param {T[]} players - Players
- * @param {GolfHole} hole - Hole
- * @param {string} selfId - Player asking
- * @return {string | null} - Account, none when alone
- */
-
-export const closestRival = <
-  T extends { accountId: string; x: number; z: number; isDone: boolean; hasLeft: boolean },
->(
-  players: T[],
-  hole: GolfHole,
-  selfId: string
-): string | null => {
-  const [cupX, cupZ] = hole.cup
-  const rivals = players
-    .filter((player) => player.accountId !== selfId && !player.isDone && !player.hasLeft)
-    .toSorted(
-      (left, right) =>
-        Math.hypot(left.x - cupX, left.z - cupZ) - Math.hypot(right.x - cupX, right.z - cupZ)
-    )
-
-  return rivals[0]?.accountId ?? null
-}
-
-/**
  * Angle and length of a pull, zero angle toward +z
  * @param {number} dx - Shot x
  * @param {number} dz - Shot z
@@ -199,39 +272,40 @@ export const rankCards = <T extends { hasLeft: boolean; total: number }>(players
   )
 
 /**
- * Aim swaying side to side, wider the harder the pull, bent by the aim powers
- * @param {number} angle - Pulled angle
- * @param {number} power - Pull
- * @param {number} seconds - Time aiming
- * @param {Set<GolfPowerName>} [powers] - Powers on the ball
- * @return {number} - Angle shot
+ * Pull being aimed
+ * @typedef {Object} GolfAimGesture
  */
 
-export const swayedAngle = (
-  angle: number,
-  power: number,
-  seconds: number,
-  powers: Set<GolfPowerName> = new Set()
-): number => {
-  const twist = powers.has(GolfPowers.Twist) ? GOLF_SETTINGS.powers.twist.turn * seconds : 0
-  if (powers.has(GolfPowers.Steady)) return angle + twist
-
-  return (
-    angle +
-    twist +
-    Math.sin(seconds * 2 * Math.PI * GOLF_SETTINGS.aim.wobbleHz) * GOLF_SETTINGS.aim.wobble * power
-  )
+export interface GolfAimGesture {
+  // Pulled angle, zero toward +z
+  angle: number
+  power: number
+  // Time aiming
+  seconds: number
+  // Camera look when the pull began, the mirror axis
+  axis?: number
 }
 
 /**
- * Angle the arrow shows, turned around by the mirror
- * @param {number} angle - Angle shot
- * @param {Set<GolfPowerName>} powers - Powers on the ball
- * @return {number} - Angle drawn
+ * Angle of the arrow, the one the ball leaves on: mirrored gesture, twist and sway
+ * @param {GolfAimGesture} gesture - Pull
+ * @param {Set<GolfPowerName>} [powers] - Powers on the ball
+ * @return {number} - Angle
  */
 
-export const shownAngle = (angle: number, powers: Set<GolfPowerName>): number =>
-  powers.has(GolfPowers.Mirror) ? angle + Math.PI : angle
+export const aimOf = (
+  { angle, power, seconds, axis = angle }: GolfAimGesture,
+  powers: Set<GolfPowerName> = new Set()
+): number => {
+  // Mirror swaps left and right around the look
+  const pulled = powers.has(GolfPowers.Mirror) ? 2 * axis - angle : angle
+  const twist = powers.has(GolfPowers.Twist) ? GOLF_SETTINGS.powers.twist.turn * seconds : 0
+  // Steady drops the sway, never the twist
+  if (powers.has(GolfPowers.Steady)) return pulled + twist
+  const { wobble, wobbleHz } = GOLF_SETTINGS.aim
+
+  return pulled + twist + Math.sin(seconds * 2 * Math.PI * wobbleHz) * wobble * power
+}
 
 /**
  * Arrow and gauge hidden
@@ -266,3 +340,15 @@ export const holeWinners = <T extends { hasLeft: boolean; card: number[] }>(
 
   return played.filter((player) => player.card[hole] === best)
 }
+
+/**
+ * Stroke speed from a pull, small pulls kept fine
+ * @param {number} power - Pull, 0 to 1
+ * @param {number} [scale] - Ball power factor
+ * @return {number} - Metres per second
+ */
+
+export const shotSpeed = (power: number, scale = 1): number =>
+  Math.min(1, Math.max(0, power)) ** GOLF_SETTINGS.aim.curve *
+  GOLF_SETTINGS.physics.maxSpeed *
+  scale

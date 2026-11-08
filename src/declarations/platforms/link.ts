@@ -7,8 +7,8 @@ import type { LivePlatformName } from '@/utils/constants/lives'
  */
 
 export const LINK_RESULT = {
-  linked: 'lie',
-  failed: 'erreur',
+  linked: 'linked',
+  failed: 'error',
 } as const
 
 /**
@@ -17,8 +17,8 @@ export const LINK_RESULT = {
  */
 
 export const LINK_PARAMS = {
-  platform: 'liaison',
-  result: 'resultat',
+  platform: 'link',
+  result: 'result',
 } as const
 
 /**

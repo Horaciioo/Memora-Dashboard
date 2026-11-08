@@ -28,6 +28,8 @@ export interface StepTimelineProps {
   steps: TimelineStep[]
   label: string
   className?: string
+  // Captions stay readable by screen readers only when off
+  showLabels?: boolean
 }
 
 // Glyph carried by each state
@@ -59,10 +61,11 @@ const STATE_CONNECTORS: Record<StepState, string> = {
  * @param {TimelineStep[]} steps - Steps in display order
  * @param {string} label - Accessible name of the whole timeline
  * @param {string} [className] - Extra classes merged onto the row
+ * @param {boolean} [showLabels] - Draws the captions under the dots
  * @return {JSX.Element}
  */
 
-export const StepTimeline = ({ steps, label, className }: StepTimelineProps) => (
+export const StepTimeline = ({ steps, label, className, showLabels = true }: StepTimelineProps) => (
   <ol className={cn(HORIZONTAL_TIMELINE_STYLES.row, className)} aria-label={label}>
     {steps.map((step, index) => {
       const Icon = ICONS[step.icon ?? STATE_ICONS[step.state]]
@@ -92,7 +95,7 @@ export const StepTimeline = ({ steps, label, className }: StepTimelineProps) => 
             )}
             <span
               className={cn(
-                HORIZONTAL_TIMELINE_STYLES.label,
+                showLabels ? HORIZONTAL_TIMELINE_STYLES.label : 'sr-only',
                 isDone ? HORIZONTAL_TIMELINE_STYLES.labelDone : HORIZONTAL_TIMELINE_STYLES.labelIdle
               )}
             >

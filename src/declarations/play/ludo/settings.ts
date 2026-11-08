@@ -82,10 +82,6 @@ const RULES = {
     path: 'play/ludo.rules.safeSquares',
     fallback: true,
   }),
-  exactFinish: readBoolean(rules.exactFinish, {
-    path: 'play/ludo.rules.exactFinish',
-    fallback: true,
-  }),
 }
 
 export type LudoRuleName = keyof typeof RULES

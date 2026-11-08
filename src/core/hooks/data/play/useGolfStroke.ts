@@ -61,7 +61,6 @@ export const useGolfStroke = ({
         if (!isDone) dropLocal(motionRef.current)
       })
     },
-    power: (play: { slot: number; x?: number; z?: number; targetId?: string }) =>
-      act({ type: 'power', ...play }),
+    power: (play: { slot: number; x?: number; z?: number }) => act({ type: 'power', ...play }),
   }
 }

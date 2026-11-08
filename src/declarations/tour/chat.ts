@@ -23,10 +23,10 @@ export type ChatAsk =
 
 /**
  * Something Memora plays inside the thread between two messages
- * @typedef {'notify' | 'privacy' | 'loading'} ChatScene
+ * @typedef {'notify' | 'privacy' | 'loading' | 'identity'} ChatScene
  */
 
-export type ChatScene = 'notify' | 'privacy' | 'loading'
+export type ChatScene = 'notify' | 'privacy' | 'loading' | 'identity'
 
 /**
  * Part of the welcome a turn belongs to

@@ -23,7 +23,7 @@ interface Found {
 const searchAsk = (placeholder: string): ScenarioMove['ask'] => ({ kind: 'search', placeholder })
 
 /**
- * Entry without a junior: one of them, the member's steps, or a trainer
+ * Entry without a junior: one of them, the member's steps, or a referent
  * @return {Promise<ScenarioMove>} - Choices
  */
 
@@ -40,7 +40,7 @@ export const home: ScenarioStep = async () => {
 
 export const homeAnswer: ScenarioStep = async (context, answer) => ({
   say: [],
-  next: answer?.value === 'mine' ? 'mine' : answer?.value === 'follow' ? 'askTrainer' : 'askWho',
+  next: answer?.value === 'mine' ? 'mine' : answer?.value === 'follow' ? 'askReferent' : 'askWho',
 })
 
 /**
@@ -137,7 +137,7 @@ const hubOf = async (
     ...(can.objective ? [{ value: 'objectives', label: COPY.hubObjectives }] : []),
     ...(can.plan ? [{ value: 'plan', label: COPY.hubPlan }] : []),
     { value: 'steps', label: COPY.hubSteps },
-    ...(can.follow && junior.trainer ? [{ value: 'trainer', label: COPY.hubTrainer }] : []),
+    ...(can.follow && junior.referent ? [{ value: 'referent', label: COPY.hubReferent }] : []),
     { value: 'done', label: COPY.hubDone },
   ]
 
@@ -160,7 +160,7 @@ const WAYS: Record<string, string> = {
   note: 'noteMenu',
   objectives: 'objectiveMenu',
   steps: 'steps',
-  trainer: 'trainerOfJunior',
+  referent: 'referentOfJunior',
 }
 
 export const hubAnswer: ScenarioStep = async (context, answer) => {
@@ -177,10 +177,10 @@ export const hubAnswer: ScenarioStep = async (context, answer) => {
 
 export const steps: ScenarioStep = async (context) => {
   const { can, steps: journey } = await readDossier(context.data.juniorId)
-  // A responsable sees theirs too, a trainer only the trainer's
+  // A responsable sees theirs too, a referent only the referent's
   const owners: string[] = can.follow
-    ? [StepOwners.Formateurs, StepOwners.Both, StepOwners.Responsable]
-    : [StepOwners.Formateurs, StepOwners.Both]
+    ? [StepOwners.Referents, StepOwners.Both, StepOwners.Responsable]
+    : [StepOwners.Referents, StepOwners.Both]
   const todo = journey
     .filter((step) => step.state !== 'done' && step.owner && owners.includes(step.owner))
     .slice(0, ASSISTANT_SETTINGS.maxChoices)

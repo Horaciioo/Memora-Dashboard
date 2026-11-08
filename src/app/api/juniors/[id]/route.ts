@@ -1,12 +1,12 @@
 import { prisma } from '@/core/lib/db'
 import { invalidInput, notFound } from '@/core/lib/errors'
+import { toJuniorEditFields } from '@/core/lib/academy/juniorForm'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { juniorFields, removeJunior, updateJunior } from '@/core/services/academy/AcademyService'
-import { recordEvent } from '@/core/services/system/ActivityService'
+import { afterReferentAssigned } from '@/core/services/academy/parkour/ParkourService'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
-import { ACADEMY_JUNIOR_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
@@ -19,23 +19,16 @@ export const PATCH = createProtectedRoute({
     })
     if (!junior) throw notFound()
 
-    const parsed = parseFormValues(await juniorFields(junior.sessionId), raw, { fillMissing: true })
+    const parsed = parseFormValues(toJuniorEditFields(await juniorFields(junior.sessionId)), raw, {
+      fillMissing: true,
+    })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     const juniors = await updateJunior(params.id, academyScope(session, access), parsed.values)
 
-    // Only a real transition is journalled
-    const next = juniors.find((entry) => entry.id === params.id)
-    if (next && next.status !== junior.status) {
-      await recordEvent({
-        eventType: 'AcademyAdvanced',
-        actorId: session.id,
-        subjectId: junior.accountId,
-        targetType: 'junior',
-        targetId: params.id,
-        summary: `${junior.account.displayName}, ${ACADEMY_JUNIOR_STATUS_REGISTRY.label(next.status)}`,
-      })
-    }
+    // A last Référent may launch
+    if (!junior.referentId && parsed.values.referentId)
+      await afterReferentAssigned(junior.sessionId)
 
     return juniors
   },

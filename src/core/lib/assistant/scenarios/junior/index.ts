@@ -38,11 +38,11 @@ import {
   skillStart,
 } from '@/core/lib/assistant/scenarios/junior/skills'
 import {
-  askTrainer,
-  trainerAnswer,
-  trainerOfJunior,
-  trainerPick,
-  trainerReport,
+  askReferent,
+  referentAnswer,
+  referentOfJunior,
+  referentPick,
+  referentReport,
 } from '@/core/lib/assistant/scenarios/junior/follow'
 import {
   askWho,
@@ -131,10 +131,10 @@ export const JUNIOR_SCENARIO: Scenario = {
     planRecap,
     planAnswer,
     planSave,
-    askTrainer,
-    trainerAnswer,
-    trainerPick,
-    trainerOfJunior,
-    trainerReport,
+    askReferent,
+    referentAnswer,
+    referentPick,
+    referentOfJunior,
+    referentReport,
   },
 }

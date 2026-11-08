@@ -201,7 +201,7 @@ const templateOptions = async (
           Boolean(row.linksTo && !running[row.linksTo]) ||
           isTemplateGreyed(academy, row.id) ||
           (live.templateIds.includes(row.id) && !live.allowed) ||
-          // A trainer plans interviews and check-ins only
+          // A referent plans interviews and check-ins only
           (!isLead && !academy.purposes.has(row.id)),
         group: theme === '' ? undefined : theme,
       }))
@@ -906,7 +906,7 @@ const toEntry = (
     live?: { id: string } | null
     sessionId: string | null
     juniorId: string | null
-    trainerId: string | null
+    referentId: string | null
     rollCall: boolean
     rollCallTeamIds: string[]
     remindAt: Date | null
@@ -1001,12 +1001,12 @@ const toEntry = (
       memberIds: row.attendances.map((seat) => seat.accountId),
       sessionId: row.sessionId,
       juniorId: row.juniorId,
-      trainerId: row.trainerId,
-      // Whoever is convened beside the junior and their trainer
+      referentId: row.referentId,
+      // Whoever is convened beside the junior and their referent
       responsableIds: row.juniorId
         ? row.attendances
             .map((seat) => seat.accountId)
-            .filter((id) => id !== row.accountId && id !== row.trainerId)
+            .filter((id) => id !== row.accountId && id !== row.referentId)
         : [],
     },
   }
@@ -1207,7 +1207,7 @@ const toEntryData = (values: FormValues) => ({
   rollCallTeamIds: readList(values, 'teamIds'),
   // An academy template fixes these afterwards
   juniorId: null as string | null,
-  trainerId: null as string | null,
+  referentId: null as string | null,
 })
 
 /**

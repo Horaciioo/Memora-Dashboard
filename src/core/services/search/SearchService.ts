@@ -167,7 +167,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         // Teams live in their creator's file
         href:
           row.youtuberId && access.can(Permissions.ReferenceRead)
-            ? ROUTES.settingsRecord('youtubeurs', row.youtuberId)
+            ? ROUTES.settingsRecord('creators', row.youtuberId)
             : ROUTES.teams,
       })),
     })

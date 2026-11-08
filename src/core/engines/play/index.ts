@@ -4,6 +4,7 @@ import { BACCALAUREAT_ENGINE } from '@/core/engines/play/BaccalaureatEngine'
 import { BOMB_ENGINE } from '@/core/engines/play/BombEngine'
 import { GOLF_ENGINE } from '@/core/engines/play/GolfEngine'
 import { LUDO_ENGINE } from '@/core/engines/play/LudoEngine'
+import { NAVAL_ENGINE } from '@/core/engines/play/NavalEngine'
 import type { PlayEngine } from '@/types/play'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -18,6 +19,7 @@ export const PLAY_ENGINES: Partial<Record<PlayGameName, PlayEngine>> = {
   [PlayGames.Bomb]: BOMB_ENGINE,
   [PlayGames.Golf]: GOLF_ENGINE,
   [PlayGames.Ludo]: LUDO_ENGINE,
+  [PlayGames.Naval]: NAVAL_ENGINE,
 }
 
 export type { EngineSession, EngineStep, PlayEngine } from '@/types/play'

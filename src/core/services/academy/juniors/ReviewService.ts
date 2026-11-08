@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { decisionEffect, decisionsFor } from '@/core/lib/academy/parkour'
+import { decisionEffect, decisionsFor, reviewStageOf } from '@/core/lib/academy/parkour'
 import { prisma } from '@/core/lib/db'
 import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import { conflict, invalidInput } from '@/core/lib/errors'
@@ -103,6 +103,17 @@ const toReviewData = (values: FormValues) => ({
 })
 
 /**
+ * Refuse another stage
+ * @param {AcademyStageName} current - Junior stage
+ * @param {AcademyStageName} wanted - Check-in stage
+ * @return {void} - Throws when mismatched
+ */
+
+const assertReviewStage = (current: AcademyStageName, wanted: AcademyStageName): void => {
+  if (reviewStageOf(current) !== wanted) throw conflict(ACADEMY_COPY.reviewWrongStage)
+}
+
+/**
  * Write the trace of a voice check-in
  * @param {string} juniorId - Junior identifier
  * @param {AcademyScope} scope - Visibility fragment
@@ -117,8 +128,10 @@ export const createReview = async (
   authorId: string,
   values: FormValues
 ): Promise<AcademyReviewView[]> => {
-  await juniorInScope(juniorId, scope)
-  await prisma.academyReview.create({ data: { juniorId, authorId, ...toReviewData(values) } })
+  const junior = await juniorInScope(juniorId, scope)
+  const data = toReviewData(values)
+  assertReviewStage(junior.stage, data.stage)
+  await prisma.academyReview.create({ data: { juniorId, authorId, ...data } })
 
   return listReviews(juniorId, scope)
 }
@@ -139,7 +152,14 @@ export const updateReview = async (
   const existing = await reviewInScope(id, scope)
   if (existing.status !== ReviewStatuses.Draft) throw conflict()
 
-  const row = await prisma.academyReview.update({ where: { id }, data: toReviewData(values) })
+  const data = toReviewData(values)
+  const junior = await prisma.academyJunior.findUniqueOrThrow({
+    where: { id: existing.juniorId },
+    select: { stage: true },
+  })
+  assertReviewStage(junior.stage, data.stage)
+
+  const row = await prisma.academyReview.update({ where: { id }, data })
 
   return listReviews(row.juniorId, scope)
 }
@@ -229,7 +249,7 @@ export const decideReview = async (
   const existing = await reviewInScope(id, scope)
   if (existing.status !== ReviewStatuses.Submitted) throw conflict()
 
-  // Sent back to the trainer
+  // Sent back to the referent
   if (readText(values, 'status') === ReviewStatuses.Rejected) {
     await prisma.academyReview.update({
       where: { id },

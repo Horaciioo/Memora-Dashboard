@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client'
 
 import {
+  golfDeal,
   golfSettingsOf,
   golfVoteOptions,
   golfVoteSettings,
@@ -27,6 +28,8 @@ export interface PlayVoteState {
   endsAt: number
   picks: Record<string, string>
   chosen: Record<string, string>
+  // Server ms a closing draw started, the vote is over
+  dealtAt?: number
 }
 
 /**
@@ -46,6 +49,8 @@ export interface PlayVoteRules {
   ) => string
   // Raw settings for the game's reader
   settings: (chosen: Record<string, string>, stored: Prisma.JsonValue) => Record<string, unknown>
+  // Draw shown before the start, settings fixed and its length
+  deal?: (settled: Prisma.JsonValue) => { settings: Prisma.InputJsonObject; ms: number } | null
 }
 
 /**
@@ -84,7 +89,7 @@ const declaredRules = (game: PlayGameName): PlayVoteRules | null => {
     steps.find((entry) => entry.key === step)?.choices.map((choice) => choice.key) ?? []
 
   return {
-    steps: (chosen) => steps.filter((entry) => !entry.skipWhen?.(chosen)).map((entry) => entry.key),
+    steps: () => steps.map((entry) => entry.key),
     options: optionsOf,
     winner: (step, picks, hostId) => mostPicked(optionsOf(step), picks, hostId),
     settings: (chosen) => toSettings(chosen),
@@ -98,6 +103,7 @@ const GOLF_RULES: PlayVoteRules = {
   winner: (step, picks, hostId, stored) =>
     winningCard(step as GolfVoteStep, picks, hostId, golfSettingsOf(stored)),
   settings: (chosen, stored) => golfVoteSettings(chosen, golfSettingsOf(stored)),
+  deal: golfDeal,
 }
 
 /**

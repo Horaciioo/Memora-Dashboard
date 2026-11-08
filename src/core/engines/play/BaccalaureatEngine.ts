@@ -16,7 +16,6 @@ import {
   closingAt,
   latestRound,
   openRound,
-  rerollLetter,
   writeAnswers,
 } from '@/core/services/play/baccalaureat/BaccalaureatRoundService'
 import {
@@ -96,8 +95,9 @@ const ACTIONS: Record<
 > = {
   write: writeAnswers,
   stop: (session, accountId) => callStop(session, accountId),
-  reroll: (session, accountId) => rerollLetter(session, accountId),
-  vote: castVote,
+  // Last vote may count the round
+  vote: async (session, accountId, raw) =>
+    closeIfLast(session, (await castVote(session, accountId, raw)).changed),
   // Host closes the review now
   count: async (session, accountId) => {
     hostOnly(session, accountId)

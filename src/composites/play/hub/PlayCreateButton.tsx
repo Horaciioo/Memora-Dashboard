@@ -8,6 +8,7 @@ import { PLAY_SETUP_DRAWERS } from '@/composites/play/registry'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_HUB } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 export interface PlayCreateButtonProps {
@@ -17,10 +18,12 @@ export interface PlayCreateButtonProps {
   // Said on hover while locked
   lockedReason?: string | null
   className?: string
+  // Words of the button, create by default
+  label?: string
 }
 
 /**
- * Open a table of this game
+ * Open a table of this game, the rules rail first except for Golf
  * @param {PlayCreateButtonProps} props - Game
  * @return {JSX.Element}
  */
@@ -30,40 +33,40 @@ export const PlayCreateButton = ({
   disabled,
   lockedReason,
   className,
+  label = PLAY_HUB_COPY.create,
 }: PlayCreateButtonProps) => {
   const moves = usePlayMoves()
-  const [isSetupOpen, setSetupOpen] = useState(false)
+  const [isSetting, setSetting] = useState(false)
+  const Setup = game === PlayGames.Golf ? undefined : PLAY_SETUP_DRAWERS[game]
 
-  // Games with rules ask them first
-  const Setup = PLAY_SETUP_DRAWERS[game]
   const button = (
     <Button
       variant="arcade"
       className={className}
       disabled={disabled}
       isLoading={moves.isSaving}
-      onClick={() => (Setup ? setSetupOpen(true) : void moves.create(game))}
+      onClick={() => (Setup ? setSetting(true) : void moves.create(game))}
     >
-      {PLAY_HUB_COPY.create}
+      {label}
     </Button>
   )
 
   return (
     <>
+      {Setup && (
+        <Setup
+          open={isSetting}
+          isSaving={moves.isSaving}
+          onClose={() => setSetting(false)}
+          onSubmit={(setup) => void moves.create(game, setup as Record<string, unknown>)}
+        />
+      )}
       {disabled && lockedReason ? (
         <Tip label={lockedReason} className={PLAY_HUB.tipBlock}>
           {button}
         </Tip>
       ) : (
         button
-      )}
-      {Setup && (
-        <Setup
-          open={isSetupOpen}
-          isSaving={moves.isSaving}
-          onClose={() => setSetupOpen(false)}
-          onSubmit={(setup) => void moves.create(game, { ...setup })}
-        />
       )}
     </>
   )

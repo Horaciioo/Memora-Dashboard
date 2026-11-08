@@ -16,7 +16,7 @@ import { PlayGames } from '@/utils/constants/play'
  * @return {number} - Milliseconds, zero without one
  */
 
-const blastOf = (board: BombBoardView): number =>
+export const blastOf = (board: BombBoardView): number =>
   board.blast ? new Date(board.blast.at).getTime() : 0
 
 /**
@@ -42,13 +42,14 @@ const playChanges = (before: BombBoardView, board: BombBoardView): void => {
 }
 
 /**
- * Fuse crackling all game long, fast and loud on the viewer's turn
+ * Fuse crackling for the holder only, faster as it heats
  * @param {boolean} isLive - Bomb lit
  * @param {boolean} isMine - Viewer holds it
+ * @param {number} heat - Zero to one
  * @return {void}
  */
 
-const useFuse = (isLive: boolean, isMine: boolean): void => {
+const useFuse = (isLive: boolean, isMine: boolean, heat: number): void => {
   const fuse = useRef<SoundLoop | null>(null)
   const isMuted = usePlaySoundStore((state) => state.isMuted)
   const volume = usePlaySoundStore((state) => volumeOf(state, PlayGames.Bomb))
@@ -59,30 +60,32 @@ const useFuse = (isLive: boolean, isMine: boolean): void => {
     return () => fuse.current?.stop()
   }, [])
 
+  // Silent unless the bomb is in the viewer's hands
   useEffect(() => {
-    const level = isMine ? BOMB_MIX.fuseMine : BOMB_MIX.fuse
+    const level = BOMB_MIX.fuseMine + heat * BOMB_MIX.fuseHeat
     fuse.current?.set(
-      isLive && !isMuted ? volume * level : 0,
-      isMine ? BOMB_MIX.fuseRateMine : BOMB_MIX.fuseRate
+      isMine && isLive && !isMuted ? volume * level : 0,
+      BOMB_MIX.fuseRateMine + heat * BOMB_MIX.fuseRateHeat
     )
-  }, [isLive, isMine, isMuted, volume])
+  }, [heat, isLive, isMine, isMuted, volume])
 }
 
 /**
  * Every Bomb Party sound, read off the live board
  * @param {BombBoardView} board - Board
  * @param {number} countdown - Seconds before the start
+ * @param {number} heat - Bomb heat
  * @return {void}
  */
 
-export const useBombSounds = (board: BombBoardView, countdown: number): void => {
+export const useBombSounds = (board: BombBoardView, countdown: number, heat: number): void => {
   const previous = useRef(board)
   const counted = useRef(countdown)
   const isLive = countdown === 0 && !board.isOver
   const isMine = board.isMyTurn && isLive
 
   useEffect(() => preloadBombSounds(), [])
-  useFuse(isLive, isMine)
+  useFuse(isLive, isMine, heat)
 
   // Ticks, then the start
   useEffect(() => {

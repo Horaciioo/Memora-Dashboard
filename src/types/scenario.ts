@@ -1,9 +1,9 @@
 /**
  * Guided talks Memora can lead
- * @type {'absence' | 'recruitment' | 'candidate'}
+ * @type {'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity'}
  */
 
-export type ScenarioId = 'absence' | 'recruitment' | 'candidate' | 'task' | 'junior'
+export type ScenarioId = 'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity'
 
 /**
  * One answer Memora offers
@@ -11,12 +11,14 @@ export type ScenarioId = 'absence' | 'recruitment' | 'candidate' | 'task' | 'jun
  * @property {string} value - Stored value
  * @property {string} label - Shown label
  * @property {string} [hint] - Small detail under the label
+ * @property {'success' | 'danger'} [tone] - Colour of its button
  */
 
 export interface ScenarioChoice {
   value: string
   label: string
   hint?: string
+  tone?: 'success' | 'danger'
 }
 
 /**
@@ -69,11 +71,26 @@ export interface ScenarioLink {
 }
 
 /**
- * A line, with a link under it when it points somewhere
- * @type {string | { text: string, link: ScenarioLink }}
+ * A person drawn in the thread: portrait, name, identifier
+ * @typedef {Object} ScenarioCard
+ * @property {string} name - Name shown
+ * @property {string} id - Identifier shown under it
+ * @property {string | null} avatarUrl - Portrait
  */
 
-export type ScenarioLine = string | { text: string; link: ScenarioLink }
+export interface ScenarioCard {
+  name: string
+  id: string
+  avatarUrl: string | null
+}
+
+/**
+ * A line, with a link or a person under it
+ * @type {string | { text: string, link: ScenarioLink } | { text: string, card: ScenarioCard }}
+ */
+
+export type ScenarioLine =
+  string | { text: string; link: ScenarioLink } | { text: string; card: ScenarioCard }
 
 /**
  * What a step hands back
@@ -98,6 +115,7 @@ export interface ScenarioMove {
  * @typedef {Object} ScenarioContext
  * @property {string} today - ISO day of the member
  * @property {string} accountId - Signed-in member
+ * @property {string} name - First name of the signed-in member
  * @property {Record<string, string>} data - Values kept so far
  * @property {() => void} refresh - Reloads the page behind the chat
  */
@@ -105,6 +123,7 @@ export interface ScenarioMove {
 export interface ScenarioContext {
   today: string
   accountId: string
+  name: string
   data: Record<string, string>
   refresh: () => void
 }

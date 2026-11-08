@@ -28,7 +28,6 @@ export const readCatalog = () => ({
     categories: Object.entries(BACCALAUREAT_CATEGORIES).map(([id, entry]) => ({ id, ...entry })),
     packs: Object.entries(BACCALAUREAT_PACKS).map(([id, entry]) => ({ id, ...entry })),
     flash: BACCALAUREAT_SETTINGS.flash,
-    jokersPerPlayer: BACCALAUREAT_SETTINGS.jokersPerPlayer,
     alphabet: BACCALAUREAT_SETTINGS.alphabet,
     rounds: BACCALAUREAT_SETTINGS.rounds,
     roundSeconds: BACCALAUREAT_SETTINGS.roundSeconds,

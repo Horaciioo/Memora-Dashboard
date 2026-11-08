@@ -89,7 +89,7 @@ export const listFocuses = async ({
     where: {
       liveId,
       endedAt: null,
-      // A trainer never sees another Focus
+      // A referent never sees another Focus
       ...(OVERSEERS.includes(role) ? {} : { watcherId: viewerId }),
     },
     include: {
@@ -235,11 +235,11 @@ export const focusableMembers = async (
 ): Promise<string[]> => {
   if (OVERSEERS.includes(role)) return memberIds
 
-  // A trainer only follows their own juniors
+  // A referent only follows their own juniors
   const juniors = await prisma.academyJunior.findMany({
     where: {
       accountId: { in: memberIds },
-      trainerId: viewerId,
+      referentId: viewerId,
       status: AcademyJuniorStatuses.Active,
     },
     select: { accountId: true },

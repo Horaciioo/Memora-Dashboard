@@ -7,9 +7,9 @@ import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import type { ScenarioChoice, ScenarioStep } from '@/types/scenario'
 import { fillTemplate, foldText } from '@/utils/format/strings'
 
-// What a trainer or a responsable may change on the file, the status is a human's decision
+// What a referent or a responsable may change on the file, the status is a human's decision
 const PROPS = [
-  { key: 'trainerId', label: COPY.trainerId, isClearable: true },
+  { key: 'referentId', label: COPY.referentId, isClearable: true },
   { key: 'dispositifId', label: COPY.dispositifId, isClearable: false },
 ]
 

@@ -3,15 +3,11 @@
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
 
-import { playBoostSweep, playGolfSound } from '@/composites/play/golf/sound'
-import { CUP_PULSE, dueEvents, isLocalTrack, isTrackOver } from '@/core/lib/play/golf'
-import type {
-  GolfMotion,
-  GolfMotionTrack,
-  GolfPlayerState,
-  GolfShotEvent,
-} from '@/core/lib/play/golf'
+import { playBoostSweep, playCupFanfare, playGolfSound } from '@/composites/play/golf/sound'
+import { CUP_PULSE, dueEvents, isTrackOver, trackSpot } from '@/core/lib/play/golf'
+import type { GolfMotion, GolfPlayerState, GolfShotEvent } from '@/core/lib/play/golf'
 import { useGolfCheerStore } from '@/core/store/golfCheer'
+import { useGolfHandStore } from '@/core/store/golfHand'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 // Quietest contact
@@ -29,32 +25,22 @@ const volumeOf = (event: GolfShotEvent): number =>
     : 1
 
 /**
- * Confetti for any ball holed, the banner for the own one
+ * Confetti and floating words for any ball holed, the fanfare for the own one
  * @param {GolfMotion} motion - Motion
- * @param {Object} context - Event
- * @param {GolfShotEvent} context.event - Cup event
- * @param {GolfMotionTrack} context.track - Track playing it
- * @param {GolfPlayerState[]} context.players - Board balls
- * @param {string} context.viewerId - Screen owner
+ * @param {GolfShotEvent} event - Cup event
+ * @param {string} viewerId - Screen owner
  * @param {number} now - Local ms
  * @return {void}
  */
 
-const cheer = (
-  motion: GolfMotion,
-  {
-    event,
-    track,
-    players,
-    viewerId,
-  }: { event: GolfShotEvent; track: GolfMotionTrack; players: GolfPlayerState[]; viewerId: string },
-  now: number
-): void => {
+const cheer = (motion: GolfMotion, event: GolfShotEvent, viewerId: string, now: number): void => {
   motion.pulses.set(CUP_PULSE, now)
-  const me = players.find((player) => player.accountId === viewerId)
-  if (event.id !== viewerId || !me) return
-  // Prediction runs before the board counts it
-  useGolfCheerStore.getState().cheerHole(me.strokes + (isLocalTrack(track) ? 1 : 0))
+  // The cup is the one under the ball
+  const track = motion.tracks.get(event.id)
+  const spot = track ? trackSpot(track, now) : null
+  motion.cupAt = spot ? { x: spot.x, z: spot.z } : null
+  useGolfCheerStore.getState().cheerHole(event.id, spot?.x ?? 0, spot?.z ?? 0)
+  if (event.id === viewerId) playCupFanfare()
 }
 
 /**
@@ -83,7 +69,12 @@ export const GolfMotionDriver = ({
       if (track.isLead) {
         for (const event of dueEvents(track, now)) {
           if (event.kind === 'bumper' || event.kind === 'boost') motion.pulses.set(event.id, now)
-          if (event.kind === 'cup') cheer(motion, { event, track, players, viewerId }, now)
+          if (event.kind === 'cup') cheer(motion, event, viewerId, now)
+          if (event.kind === 'splash') {
+            const spot = trackSpot(motion.tracks.get(event.id) ?? track, now)
+            motion.splash = { ...spot, at: now }
+          }
+          if (event.kind === 'full' && event.id === viewerId) useGolfHandStore.getState().bump()
           if (event.kind === 'boost') playBoostSweep()
           else playGolfSound(event.kind, volumeOf(event))
         }

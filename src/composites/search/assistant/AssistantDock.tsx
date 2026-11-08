@@ -4,7 +4,7 @@ import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { FloatingChat } from '@/composites/search/assistant/FloatingChat'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
 import { useNudgeCycle } from '@/core/hooks/interaction/state/useNudgeCycle'
-import { useAssistantDock } from '@/core/store/assistantDock'
+import { URGENT_SCENARIO, useAssistantDock } from '@/core/store/assistantDock'
 import { ASSISTANT_DOCK_COPY, ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import type { AssistantOffer } from '@/declarations/assistant/offers'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
@@ -24,7 +24,7 @@ export interface AssistantDockProps {
  */
 
 export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
-  const { action, greeting, hello, welcome, toggle, close } = useAssistantDock()
+  const { action, focus, greeting, hello, welcome, toggle, close } = useAssistantDock()
   const { session } = useAuthContext()
   const { shortcuts, groups } = useRailEntries(viewContext)
   const isOpen = greeting !== null
@@ -45,7 +45,10 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
 
   return (
     <div
-      className={FLOATING_ADD_STYLES.dock}
+      className={cn(
+        FLOATING_ADD_STYLES.dock,
+        focus?.scenario === URGENT_SCENARIO && FLOATING_ADD_STYLES.alert
+      )}
       onKeyDown={(event) => {
         if (event.key === 'Escape') close()
       }}

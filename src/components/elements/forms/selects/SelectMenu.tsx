@@ -42,6 +42,8 @@ export interface SelectMenuProps {
   opensUp?: boolean
   // Trigger drawn without the field box
   isBare?: boolean
+  // Trigger wears the arcade field
+  isPlay?: boolean
   disabled?: boolean
   invalid?: boolean
   describedBy?: string
@@ -70,6 +72,7 @@ const SEARCH_THRESHOLD = 8
  * @param {SelectMenuSize} [size] - Size token
  * @param {boolean} [opensUp] - Panel opens upward
  * @param {boolean} [isBare] - Trigger without the field box
+ * @param {boolean} [isPlay] - Trigger in the arcade field
  * @param {boolean} [disabled] - Blocks the control
  * @param {boolean} [invalid] - Paints the rejection border
  * @param {string} [describedBy] - Identifier of the message describing the control
@@ -92,6 +95,7 @@ export const SelectMenu = ({
   size = 'block',
   opensUp,
   isBare,
+  isPlay,
   disabled,
   invalid,
   describedBy,
@@ -210,8 +214,12 @@ export const SelectMenu = ({
         }
       }}
       className={cn(
-        isBare ? SELECT_MENU_STYLES.triggerBare : SELECT_MENU_STYLES.trigger,
-        SELECT_MENU_SIZES[size].trigger,
+        isPlay
+          ? SELECT_MENU_STYLES.triggerPlay
+          : [
+              isBare ? SELECT_MENU_STYLES.triggerBare : SELECT_MENU_STYLES.trigger,
+              SELECT_MENU_SIZES[size].trigger,
+            ],
         invalid && SELECT_MENU_STYLES.invalid,
         className
       )}
@@ -231,7 +239,11 @@ export const SelectMenu = ({
         )}
       </span>
       <ChevronIcon
-        className={cn(SELECT_MENU_STYLES.chevron, isOpen && SELECT_MENU_STYLES.chevronOpen)}
+        className={cn(
+          SELECT_MENU_STYLES.chevron,
+          isPlay && SELECT_MENU_STYLES.chevronPlay,
+          isOpen && SELECT_MENU_STYLES.chevronOpen
+        )}
         aria-hidden="true"
       />
     </button>

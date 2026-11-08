@@ -17,8 +17,8 @@ export const listAcceptedCandidates = async (scope: AccessScope): Promise<Accept
     where: {
       outcome: { admits: true },
       session: sessionScope(scope),
-      // Moderators from the PIM start on
-      NOT: { admission: { kickoffAt: { not: null } } },
+      // Until their form
+      NOT: { admission: { confirmedAt: { not: null } } },
     },
     orderBy: { createdAt: 'asc' },
     select: {

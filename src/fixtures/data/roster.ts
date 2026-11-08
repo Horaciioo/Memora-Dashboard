@@ -40,7 +40,7 @@ export const CREATORS: CreatorSeed[] = [
 
 // Function keys
 export type FunctionKey =
-  'functionDiscord' | 'functionLive' | 'functionAnimator' | 'functionRecruiter' | 'functionTrainer'
+  'functionDiscord' | 'functionLive' | 'functionAnimator' | 'functionRecruiter' | 'functionReferent'
 
 /**
  * Responsable
@@ -59,7 +59,7 @@ export const RESPONSABLES: ResponsableSeed[] = [
   {
     name: 'Procyonaa',
     creator: 'Michou',
-    functions: ['functionLive', 'functionTrainer'],
+    functions: ['functionLive', 'functionReferent'],
     seniority: 720,
   },
   {
@@ -72,7 +72,7 @@ export const RESPONSABLES: ResponsableSeed[] = [
   {
     name: 'Witt',
     creator: 'Inoxtag',
-    functions: ['functionDiscord', 'functionTrainer'],
+    functions: ['functionDiscord', 'functionReferent'],
     seniority: 480,
   },
   {

@@ -2,10 +2,10 @@ import { FunctionNames } from '@/declarations/reference/fixed'
 
 /**
  * Secondary functions that last one session
- * @typedef {'recruiter' | 'observer' | 'trainer'} TemporaryKind
+ * @typedef {'recruiter' | 'observer' | 'referent'} TemporaryKind
  */
 
-export type TemporaryKind = 'recruiter' | 'observer' | 'trainer'
+export type TemporaryKind = 'recruiter' | 'observer' | 'referent'
 
 /**
  * Gestures on the seat a temporary function holds
@@ -40,9 +40,9 @@ export const TEMPORARY_SEATS: Record<
     field: 'observerSessionId',
     family: 'recruitment',
   },
-  trainer: {
-    functionName: FunctionNames.Trainers,
-    field: 'trainerSessionId',
+  referent: {
+    functionName: FunctionNames.Referents,
+    field: 'referentSessionId',
     family: 'academy',
   },
 }
@@ -52,7 +52,7 @@ export const TEMPORARY_SEATS: Record<
  * @type {TemporaryKind[]}
  */
 
-export const TEMPORARY_KINDS: TemporaryKind[] = ['recruiter', 'observer', 'trainer']
+export const TEMPORARY_KINDS: TemporaryKind[] = ['recruiter', 'observer', 'referent']
 
 /**
  * Copy of the temporary seats
@@ -63,7 +63,7 @@ export const SEAT_COPY = {
   fieldLabel: {
     recruiter: 'Session des Recruteurs',
     observer: 'Session des Observateurs',
-    trainer: 'Session des Formateurs',
+    referent: 'Session des Référents',
   },
   fieldInfo: 'Cette fonction ne dure que le temps d’une session, elle n’ouvre que celle-ci.',
   currentGroup: 'Sessions actuelles',
@@ -72,7 +72,7 @@ export const SEAT_COPY = {
   unidentified: {
     recruiter: 'Recruteur non identifié',
     observer: 'Observateur non identifié',
-    trainer: 'Formateur non identifié',
+    referent: 'Référent non identifié',
   },
   menuTitle: 'Participation',
   revoke: 'Enlever ses accès',

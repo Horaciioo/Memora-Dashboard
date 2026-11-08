@@ -2,15 +2,21 @@ import { Plane, Raycaster, Vector2, Vector3 } from 'three'
 import type { Camera, Group } from 'three'
 import type { RefObject } from 'react'
 
-import { clampDistance, clampPitch } from '@/composites/play/golf/scene/rig'
+import {
+  clampDistance,
+  clampFree,
+  clampFreeSpeed,
+  clampPitch,
+  flatAxes,
+} from '@/composites/play/golf/scene/rig'
 import type { GolfRig } from '@/composites/play/golf/scene/rig'
-import { isAimHidden, shotVector, swayedAngle } from '@/core/lib/play/golf'
+import { aimOf, isAimHidden, shotVector } from '@/core/lib/play/golf'
 import type { GolfPowerName } from '@/utils/constants/play'
 import { useGolfAimStore } from '@/core/store/golfAim'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
-const { aim, camera, physics } = GOLF_SETTINGS
+const { aim, camera, freeCamera, physics } = GOLF_SETTINGS
 
 // Ground faces up
 const UP = new Vector3(0, 1, 0)
@@ -39,8 +45,8 @@ export interface GolfPointerInput {
  */
 
 export interface GolfPointerState {
-  // Pull being aimed, sway clock in ms
-  shot: { angle: number; power: number; since: number } | null
+  // Pull being aimed, sway clock in ms, camera look when it began
+  shot: { angle: number; power: number; since: number; axis: number } | null
   // Ground point held, the rubber band end
   grip: Vector3 | null
   // Lawn spot under the pointer while placing
@@ -109,7 +115,8 @@ const pull = (context: PointerContext, event: PointerEvent): void => {
   if (!found) return
   const { angle, length } = shotVector(found.ball.x - found.point.x, found.ball.z - found.point.z)
   const since = context.state.shot?.since ?? performance.now()
-  context.state.shot = { angle, power: Math.min(1, length / aim.pullMeters), since }
+  const axis = context.state.shot?.axis ?? context.input.current.rigRef.current.yaw
+  context.state.shot = { angle, power: Math.min(1, length / aim.pullMeters), since, axis }
   context.state.grip = found.point
   // Blind aim shows no gauge
   const isHidden = isAimHidden(context.input.current.powers())
@@ -117,7 +124,7 @@ const pull = (context: PointerContext, event: PointerEvent): void => {
 }
 
 /**
- * Angle the ball leaves on, swayed now
+ * Angle of the arrow now, the one the ball leaves on
  * @param {NonNullable<GolfPointerState['shot']>} shot - Pull
  * @param {Set<GolfPowerName>} powers - Powers on the ball
  * @return {number} - Angle
@@ -126,7 +133,7 @@ const pull = (context: PointerContext, event: PointerEvent): void => {
 export const aimedAngle = (
   shot: NonNullable<GolfPointerState['shot']>,
   powers: Set<GolfPowerName>
-): number => swayedAngle(shot.angle, shot.power, (performance.now() - shot.since) / 1000, powers)
+): number => aimOf({ ...shot, seconds: (performance.now() - shot.since) / 1000 }, powers)
 
 /**
  * Drop the pull being aimed
@@ -183,7 +190,15 @@ const onMove = (context: PointerContext, event: PointerEvent): void => {
   const last = context.pointers.get(event.pointerId)
   if (!last) return
   if (context.mode === 'aim') pull(context, event)
-  if (context.mode === 'turn') {
+  if (context.mode === 'turn' && rig.isFree && event.pointerType === 'touch') {
+    // One finger slides the flight over the ground
+    const { ahead, right } = flatAxes(rig.yaw)
+    const side = -(event.clientX - last.x) * freeCamera.pan
+    const forth = (event.clientY - last.y) * freeCamera.pan
+    rig.free.position.x += right[0] * side + ahead[0] * forth
+    rig.free.position.z += right[1] * side + ahead[1] * forth
+    clampFree(rig.free.position, rig.free.box)
+  } else if (context.mode === 'turn') {
     // The ground follows the finger
     rig.yaw -= (event.clientX - last.x) * camera.dragTurn
     rig.pitch = clampPitch(rig.pitch + (event.clientY - last.y) * camera.dragPitch)
@@ -192,7 +207,16 @@ const onMove = (context: PointerContext, event: PointerEvent): void => {
   if (context.mode !== 'pinch' || context.pointers.size < 2) return
   const [first, second] = [...context.pointers.values()]
   const distance = first.distanceTo(second)
-  rig.distance = clampDistance((rig.distance * context.pinch) / Math.max(1, distance))
+  if (rig.isFree) {
+    // Spreading the fingers flies ahead
+    const { ahead } = flatAxes(rig.yaw)
+    const step = (distance - context.pinch) * freeCamera.pinch
+    rig.free.position.x += ahead[0] * step
+    rig.free.position.z += ahead[1] * step
+    clampFree(rig.free.position, rig.free.box)
+  } else {
+    rig.distance = clampDistance((rig.distance * context.pinch) / Math.max(1, distance))
+  }
   context.pinch = distance
 }
 
@@ -246,7 +270,10 @@ export const bindPointer = (
   const wheel = (event: WheelEvent) => {
     event.preventDefault()
     const rig = input.current.rigRef.current
-    rig.distance = clampDistance(rig.distance * Math.exp(event.deltaY * camera.zoomStep))
+    // Free flight: the wheel sets the speed
+    if (rig.isFree)
+      rig.free.speed = clampFreeSpeed(rig.free.speed * Math.exp(-event.deltaY * freeCamera.wheel))
+    else rig.distance = clampDistance(rig.distance * Math.exp(event.deltaY * camera.zoomStep))
   }
   const handlers: [string, (event: PointerEvent) => void][] = [
     ['pointerdown', (event) => onDown(context, event)],

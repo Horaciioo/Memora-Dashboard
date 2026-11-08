@@ -24,7 +24,7 @@ export interface ReviewFlowProps {
 }
 
 /**
- * The check-ins a trainer owes, written one junior after the other
+ * The check-ins a referent owes, written one junior after the other
  * @param {JuniorView[]} queue - Juniors owing a check-in
  * @param {FieldDefinition[]} fields - Declarations of the check-in form
  * @param {() => void} onClose - Leaves the flow

@@ -47,11 +47,11 @@ export const viewerSanctions = async (
 ): Promise<ViewerSanction[]> => {
   const live = await liveInScope(liveId, scope)
 
-  // A trainer reads the gestures of their own juniors, a Modo only their own
+  // A referent reads the gestures of their own juniors, a Modo only their own
   const juniors = reader.seesAll
     ? []
     : await prisma.academyJunior.findMany({
-        where: { trainerId: reader.readerId },
+        where: { referentId: reader.readerId },
         select: { accountId: true },
       })
   const readable = new Set([reader.readerId, ...juniors.map((junior) => junior.accountId)])

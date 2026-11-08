@@ -3,6 +3,7 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
+import { seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict } from '@/core/lib/errors'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
@@ -10,7 +11,7 @@ import { signalPlay } from '@/core/lib/play/signal'
 import { clearDeadline, scheduleDeadline } from '@/core/lib/play/timers'
 import { voteAt, voteOf, voteRulesOf } from '@/core/lib/play/vote'
 import type { PlayVoteRules, PlayVoteState } from '@/core/lib/play/vote'
-import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
+import { PLAY_ERRORS } from '@/declarations/play'
 import { GolfVoteActions } from '@/declarations/play/golf/vote'
 import type { GolfVoteAction } from '@/declarations/play/golf/vote'
 import { startSession } from '@/core/services/play/GameService'
@@ -80,7 +81,7 @@ const open = async (context: VoteContext): Promise<VoteOutcome> => {
   const { session, vote, accountId, rules } = context
   requireHost(session, accountId)
   if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
-  if (session.seats.filter(isPresent).length < PLAY_GAMES.get(session.game).minPlayers) {
+  if (session.seats.filter(isPresent).length < seatBoundsOf(session.game, session.settings).min) {
     throw conflict(PLAY_ERRORS.tooFewPlayers)
   }
   if (!vote)
@@ -123,6 +124,13 @@ const close = async (context: VoteContext): Promise<VoteOutcome> => {
     return { isStarting: false }
   }
 
+  // Draw over: the dealt settings are stored, the game starts
+  if (vote.dealtAt) {
+    await store(context, withVote(session.settings, null))
+
+    return { isStarting: true }
+  }
+
   const present = new Set(session.seats.filter(isPresent).map((seat) => seat.accountId))
   const picks = Object.fromEntries(
     Object.entries(vote.picks).filter(([voter]) => present.has(voter))
@@ -142,6 +150,22 @@ const close = async (context: VoteContext): Promise<VoteOutcome> => {
   // Last step: the winners become the rules, the game starts
   const asked = rules.settings(chosen, session.settings)
   const settled = engineOf(session.game).readSettings(asked, session.settings)
+  const dealt = rules.deal?.(settled as Prisma.JsonValue)
+  if (dealt) {
+    const now = Date.now()
+    await store(
+      context,
+      withVote(dealt.settings as Prisma.JsonValue, {
+        ...vote,
+        picks,
+        chosen,
+        endsAt: now + dealt.ms,
+        dealtAt: now,
+      })
+    )
+
+    return { isStarting: false }
+  }
   await store(context, withVote(settled as Prisma.JsonValue, null))
 
   return { isStarting: true }

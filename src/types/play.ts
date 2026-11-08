@@ -1,6 +1,8 @@
 import type {
+  PlayBotKindName,
   PlayGameName,
   PlayInviteRoleName,
+  PlayNoticeKindName,
   PlayMessageKindName,
   PlayStatusName,
 } from '@/utils/constants/play'
@@ -21,6 +23,10 @@ export interface PlayLobbyCard {
   status: string
   maxPlayers: number
   gamesCount: number | null
+  // Followed by the reader
+  isFollowed?: boolean
+  // Private game an admin watches unseen
+  isOverseen?: boolean
 }
 
 /**
@@ -70,6 +76,8 @@ export interface PlayEngine {
   settle: (session: EngineSession) => Promise<EngineStep>
   view: (session: EngineSession, viewerId: string) => Promise<unknown>
   extraStats: (sessionId: string) => Promise<Map<string, Record<string, number>>>
+  // XP factor of the winner
+  winnerMultiplier?: (settings: Prisma.JsonValue) => number
 }
 
 /**
@@ -81,6 +89,18 @@ export interface PlayPresence {
   sessionId: string
   game: PlayGameName
   status: PlayStatusName
+}
+
+/**
+ * What a member does in Play right now, read from the Play room
+ * @typedef {Object} PlayPlaceState
+ * @property {'playing' | 'watching'} state - Seated or watching
+ * @property {string} sessionId - Game
+ */
+
+export interface PlayPlaceState {
+  state: 'playing' | 'watching'
+  sessionId: string
 }
 
 /**
@@ -147,17 +167,19 @@ export interface PlayAdminState extends PlayProfileView {
 }
 
 /**
- * Invitation waiting for a member
- * @typedef {Object} PlayInviteView
+ * News waiting for a member: an invitation, a revenge, a followed game
+ * @typedef {Object} PlayNoticeView
  */
 
-export interface PlayInviteView {
+export interface PlayNoticeView {
   id: string
+  kind: PlayNoticeKindName
   sessionId: string
   game: PlayGameName
-  role: PlayInviteRoleName
+  // A call to all of Memora is only closed
   isEveryone: boolean
-  inviter: { name: string; avatarUrl: string | null }
+  // Who invites, or hosts the followed game
+  actor: { name: string; avatarUrl: string | null }
   createdAt: string
 }
 
@@ -199,4 +221,220 @@ export interface PlayCandidate {
   id: string
   displayName: string
   avatarUrl: string | null
+}
+
+/**
+ * Member the picker can call
+ * @typedef {Object} PlayInviteCandidate
+ */
+
+export interface PlayInviteCandidate extends PlayCandidate {
+  // Shared a finished game with the caller
+  hasPlayedWith: boolean
+  // Sat at a table lately
+  isRecent: boolean
+}
+
+/**
+ * One finished game of a player
+ * @typedef {Object} PlayHistoryEntry
+ */
+
+export interface PlayHistoryEntry {
+  sessionId: string
+  game: PlayGameName
+  rank: number | null
+  outcome: 'WIN' | 'DRAW' | 'LOSS' | null
+  xp: number
+  score: number
+  players: number
+  finishedAt: string
+  // Seconds between start and end, null when never started
+  durationSeconds: number | null
+  // Everyone at the table, best rank first
+  table: PlayHistorySeat[]
+  // One counter of the viewer, shaped by the game
+  fact: { key: string; value: number } | null
+}
+
+/**
+ * Seat of a finished game
+ * @typedef {Object} PlayHistorySeat
+ */
+
+export interface PlayHistorySeat {
+  accountId: string
+  name: string
+  avatarUrl: string | null
+  isBot: boolean
+  isMe: boolean
+  rank: number | null
+  score: number
+}
+
+/**
+ * One page of the history
+ * @typedef {Object} PlayHistoryPage
+ */
+
+export interface PlayHistoryPage {
+  entries: PlayHistoryEntry[]
+  // Seat id to resume after, null on the last page
+  nextCursor: string | null
+}
+
+/**
+ * Seated player, human or bot
+ * @typedef {Object} PlayPlayer
+ */
+
+export interface PlayPlayer {
+  accountId: string
+  botKind: PlayBotKindName | null
+}
+
+/**
+ * Move a bot plans
+ * @typedef {Object} PlayBotMove
+ * @property {string} key - Board state it answers
+ * @property {Record<string, unknown>} raw - Action body
+ * @property {Date} at - When to play
+ */
+
+export interface PlayBotMove {
+  key: string
+  raw: Record<string, unknown>
+  at: Date
+}
+
+/**
+ * What a bot decides from
+ * @typedef {Object} PlayBotTurn
+ */
+
+export interface PlayBotTurn {
+  botId: string
+  level: PlayBotKindName
+  settings: Prisma.JsonValue
+  // Its own engine view, nothing more
+  view: unknown
+  now: Date
+}
+
+/**
+ * Bot strategy of one game
+ * @typedef {Object} PlayBotStrategy
+ */
+
+export interface PlayBotStrategy {
+  decide: (turn: PlayBotTurn) => Promise<PlayBotMove | null>
+}
+
+/**
+ * One record on a player sheet
+ * @typedef {Object} PlayRecordView
+ * @property {string} key - Stable key
+ * @property {PlayGameName | null} game - Game, null when global
+ * @property {string} label - What it measures
+ * @property {string} value - Written value
+ */
+
+export interface PlayRecordView {
+  key: string
+  game: PlayGameName | null
+  label: string
+  value: string
+}
+
+/**
+ * What a player sheet shows beyond the level and the figures
+ * @typedef {Object} PlaySheetView
+ */
+
+export interface PlaySheetView {
+  // Most played first
+  topGames: { game: PlayGameName; played: number }[]
+  records: PlayRecordView[]
+  recent: PlayHistoryEntry[]
+  lastSeenAt: string | null
+  // Table the player sits at right now
+  presence: PlayPresence | null
+}
+
+/**
+ * Player of a group
+ * @typedef {Object} PlayGroupMemberView
+ */
+
+export interface PlayGroupMemberView {
+  accountId: string
+  name: string
+  avatarUrl: string | null
+  isHost: boolean
+  isMe: boolean
+}
+
+/**
+ * Game a member would like to play
+ * @typedef {Object} PlayGroupProposalView
+ */
+
+export interface PlayGroupProposalView {
+  id: string
+  game: PlayGameName
+  by: { name: string; avatarUrl: string | null }
+  isMine: boolean
+}
+
+/**
+ * Group of the viewer
+ * @typedef {Object} PlayGroupView
+ */
+
+export interface PlayGroupView {
+  id: string
+  name: string
+  isHost: boolean
+  members: PlayGroupMemberView[]
+  // Called by the host, not answered yet
+  invited: { accountId: string; name: string; avatarUrl: string | null }[]
+  proposals: PlayGroupProposalView[]
+  messages: PlayGroupMessageView[]
+}
+
+/**
+ * Line of a group chat
+ * @typedef {Object} PlayGroupMessageView
+ */
+
+export interface PlayGroupMessageView {
+  id: string
+  body: string
+  createdAt: string
+  // Game this line invites to, with its table
+  game: PlayGameName | null
+  sessionId: string | null
+  author: { accountId: string; name: string; avatarUrl: string | null }
+  isMine: boolean
+}
+
+/**
+ * Call to join a group
+ * @typedef {Object} PlayGroupInvitationView
+ */
+
+export interface PlayGroupInvitationView {
+  id: string
+  groupName: string
+  host: { name: string; avatarUrl: string | null }
+}
+
+/**
+ * What the group tab shows
+ * @typedef {Object} PlayGroupState
+ */
+
+export interface PlayGroupState {
+  groups: PlayGroupView[]
+  invitations: PlayGroupInvitationView[]
 }

@@ -1,8 +1,33 @@
-import { activePowers, ballScale } from '@/core/lib/play/golf/effects'
+import type { GolfCupStage } from '@/core/lib/play/golf/cup'
+import { activePowers, ballScale, isEffectActive } from '@/core/lib/play/golf/effects'
 import { padHeight, padUnder } from '@/core/lib/play/golf/terrain'
-import type { GolfBallInput, GolfPad, GolfShotInput } from '@/core/lib/play/golf/types'
+import type { GolfBallInput, GolfEffect, GolfPad, GolfShotInput } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPowers } from '@/utils/constants/play'
+
+// Strong kick or a jump
+export type GolfBounceKind = 'bumper' | 'boing'
+
+/**
+ * Bumper ball effect running
+ * @param {GolfEffect[]} effects - Effects
+ * @param {number} at - Server ms
+ * @return {Pick<GolfBody, 'bounce' | 'bounceLeft'>} - Kind and hits left
+ */
+
+const bounceOf = (effects: GolfEffect[], at: number): Pick<GolfBody, 'bounce' | 'bounceLeft'> => {
+  const running = effects.find(
+    (effect) =>
+      (effect.power === GolfPowers.BumperMan || effect.power === GolfPowers.BoingBoing) &&
+      isEffectActive(effect, at)
+  )
+  if (!running) return { bounce: null, bounceLeft: 0 }
+
+  return {
+    bounce: running.power === GolfPowers.BumperMan ? 'bumper' : 'boing',
+    bounceLeft: running.lives ?? 0,
+  }
+}
 
 /**
  * Ball inside the simulation
@@ -13,6 +38,9 @@ export interface GolfBody {
   id: string
   x: number
   z: number
+  // Spot before the substep move
+  lastX: number
+  lastZ: number
   // Height of the ball bottom
   y: number
   vx: number
@@ -33,19 +61,23 @@ export interface GolfBody {
   isGhost: boolean
   isSticky: boolean
   isUntouchable: boolean
-  captureScale: number
   powerScale: number
   // Top roll speed, lifted by a flash
   speedCap: number
   // Stroke boosted by a flash
   isFlash: boolean
   canPick: boolean
-  // Rolling over the cup
-  inCup: boolean
+  // Funnel, pit or holed
+  cupStage: GolfCupStage
+  // Hole last met, in the cups of the hole
+  cupIndex: number
   // Just out of a ring, until it leaves every ring
   isPortalLocked: boolean
   // Stroke leaves the ground
   isLob: boolean
+  // Bumper ball sending others back, hits left
+  bounce: GolfBounceKind | null
+  bounceLeft: number
   path: number[]
 }
 
@@ -68,6 +100,8 @@ export const createBody = (ball: GolfBallInput, input: GolfShotInput): GolfBody 
     id: ball.id,
     x: ball.x,
     z: ball.z,
+    lastX: ball.x,
+    lastZ: ball.z,
     y: pad ? padHeight(pad, ball.x, ball.z) : 0,
     vx: 0,
     vz: 0,
@@ -86,17 +120,15 @@ export const createBody = (ball: GolfBallInput, input: GolfShotInput): GolfBody 
     isGhost: ball.id === input.shooterId && powers.has(GolfPowers.Ghost),
     isSticky: powers.has(GolfPowers.Sticky),
     isUntouchable: powers.has(GolfPowers.AntiCollision),
-    captureScale: powers.has(GolfPowers.Giant) ? GOLF_SETTINGS.powers.giant.capture : 1,
-    powerScale:
-      (powers.has(GolfPowers.Mini) ? GOLF_SETTINGS.powers.mini.power : 1) *
-      (powers.has(GolfPowers.Turbo) ? GOLF_SETTINGS.powers.turbo.power : 1) *
-      flashScale,
+    powerScale: (powers.has(GolfPowers.Mini) ? GOLF_SETTINGS.powers.mini.power : 1) * flashScale,
     speedCap: GOLF_SETTINGS.physics.speedCap * flashScale,
     isFlash,
     canPick: ball.canPick,
-    inCup: false,
+    cupStage: 'none',
+    cupIndex: 0,
     isPortalLocked: false,
     isLob: ball.id === input.shooterId && powers.has(GolfPowers.Lob),
+    ...bounceOf(ball.effects, input.at),
     path: [],
   }
 }
@@ -135,9 +167,10 @@ export const halt = (body: GolfBody): void => {
 }
 
 /**
- * Body still on the course
+ * Body still on the course, a ball dropping in the pit gone from it
  * @param {GolfBody} body - Body
  * @return {boolean} - In play
  */
 
-export const isInPlay = (body: GolfBody): boolean => !body.isHoled && !body.hasFallen
+export const isInPlay = (body: GolfBody): boolean =>
+  !body.isHoled && !body.hasFallen && body.cupStage !== 'falling'

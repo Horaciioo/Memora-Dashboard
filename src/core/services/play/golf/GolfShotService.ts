@@ -6,15 +6,17 @@ import { conflict, invalidInput } from '@/core/lib/errors'
 import {
   activePowers,
   handSize,
-  isEffectActive,
+  isEffectKept,
   isHoleDone,
+  releaseArmed,
   shotDuration,
   simulateShot,
   spendShot,
+  wearBounces,
   strokeBalls,
   strokeCeiling,
 } from '@/core/lib/play/golf'
-import type { GolfShotInput, GolfShotResult } from '@/core/lib/play/golf'
+import type { GolfEffect, GolfShotInput, GolfShotResult } from '@/core/lib/play/golf'
 import { boardStep, closeHole } from '@/core/services/play/golf/GolfTableService'
 import { grantPickups } from '@/core/services/play/golf/GolfPowerService'
 import {
@@ -50,6 +52,19 @@ const readStroke = (raw: Record<string, unknown>, field: string): number => {
 }
 
 /**
+ * Effects of a ball, armed ones released when it stopped
+ * @param {GolfTable} table - Locked course
+ * @param {GolfPlayer} player - Ball
+ * @return {GolfEffect[]} - Effects
+ */
+
+const effectsAtShot = (table: GolfTable, player: GolfPlayer): GolfEffect[] =>
+  releaseArmed(effectsOf(player.effects), {
+    at: Math.max(table.now.getTime(), player.restsAt.getTime()),
+    hole: table.game.hole,
+  })
+
+/**
  * Balls a stroke can meet
  * @param {GolfTable} table - Locked course
  * @param {GolfPlayer} shooter - Ball hit
@@ -63,7 +78,7 @@ const ballsOf = (table: GolfTable, shooter: GolfPlayer): GolfShotInput['balls'] 
       hand: player.powers,
       isDone: isHoleDone(player, strokeCeiling(table.settings)),
       restsAt: player.restsAt.getTime(),
-      effects: effectsOf(player.effects),
+      effects: effectsAtShot(table, player),
     })),
     shooter.accountId,
     table.now.getTime(),
@@ -81,13 +96,15 @@ const ballsOf = (table: GolfTable, shooter: GolfPlayer): GolfShotInput['balls'] 
 const writeBalls = async (table: GolfTable, shooter: GolfPlayer, result: GolfShotResult) => {
   const { tx, now } = table
   const restsAt = new Date(now.getTime() + shotDuration(result))
-  const wasGhost = activePowers(effectsOf(shooter.effects), now.getTime()).has(GolfPowers.Ghost)
+  const shooterEffects = effectsAtShot(table, shooter)
+  const wasGhost = activePowers(shooterEffects, now.getTime()).has(GolfPowers.Ghost)
 
   return Promise.all(
     table.players.map(async (player) => {
       const outcome = result.outcomes[player.accountId]
       const isShooter = player.id === shooter.id
-      if (!outcome && !isShooter) return player
+      const hits = result.bumperHits[player.accountId] ?? 0
+      if (!outcome && !isShooter && !hits) return player
       const fallPenalty =
         outcome?.hasFallen && isShooter && !wasGhost ? GOLF_SETTINGS.voidPenalty : 0
       const strokes = player.strokes + (isShooter ? 1 + fallPenalty : 0)
@@ -100,9 +117,13 @@ const writeBalls = async (table: GolfTable, shooter: GolfPlayer, result: GolfSho
           restsAt: outcome ? restsAt : player.restsAt,
           strokes,
           holedAt: outcome?.isHoled ? restsAt : player.holedAt,
-          effects: isShooter
-            ? asJson(spendShot(effectsOf(player.effects), now.getTime()))
-            : undefined,
+          effects: asJson(
+            wearBounces(
+              isShooter ? spendShot(shooterEffects, now.getTime()) : effectsOf(player.effects),
+              hits,
+              Boolean(outcome?.isHoled)
+            )
+          ),
         },
       })
     })
@@ -169,7 +190,7 @@ const writeCourse = async ({ tx, game, hole, now }: GolfTable, result: GolfShotR
         ? { ...hazard, lives: (hazard.lives ?? 0) - result.bumperHits[hazard.id] }
         : hazard
     )
-    .filter((hazard) => isEffectActive(hazard, now.getTime()))
+    .filter((hazard) => isEffectKept(hazard, now.getTime()))
   const orbs = hole.orbs.map((_, index) => orbsOf(game.orbs)[index] ?? 0)
   for (const pickup of result.pickups) {
     orbs[pickup.orb] = pickup.at + GOLF_SETTINGS.orbs.respawnSeconds * 1000

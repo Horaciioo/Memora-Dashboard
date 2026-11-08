@@ -14,6 +14,7 @@ import { DOCK_COPY } from '@/declarations/pwa/copy'
 import { DOCK_HOME_PATH } from '@/declarations/pwa/dock'
 import { MOBILE_DOCK } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
+import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { railIcon } from '@/declarations/ui/railIcons'
 import type { LucideIcon } from '@/declarations/ui/icons'
@@ -88,6 +89,8 @@ export const MobileDock = ({ session, viewContext, unreadCount, held }: MobileDo
 
   const reaches = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
   const isHome = reaches(DOCK_HOME_PATH)
+  // Play wears its own tab bar
+  const isPlay = reaches(ROUTES.play)
 
   // One drawing per side
   const linkOf = (item: NavigationItem) => (
@@ -106,7 +109,7 @@ export const MobileDock = ({ session, viewContext, unreadCount, held }: MobileDo
   return (
     <>
       {/* The keyboard covers the bottom edge, the dock steps aside */}
-      {!isTyping && (
+      {!isTyping && !isPlay && (
         <nav aria-label={DOCK_COPY.label} className={MOBILE_DOCK.bar}>
           {left.map(linkOf)}
           <Link

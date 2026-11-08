@@ -7,14 +7,15 @@ import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { clockLabel } from '@/composites/play/baccalaureat/clockLabel'
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
+import { SetupChips, SetupLetters, SetupSection } from '@/composites/play/setup/PlaySetupFields'
+import { baccalaureatSettingsOf, isCustomCategory } from '@/core/lib/play/baccalaureat/settings'
 import {
-  SetupChips,
-  SetupLetters,
-  SetupSection,
-  SetupStepper,
-} from '@/composites/play/setup/PlaySetupFields'
-import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
-import { BAC_SETUP_COPY, BACCALAUREAT_SETTINGS, fillPlayMessage } from '@/declarations/play'
+  BAC_SETUP_COPY,
+  BACCALAUREAT_SETTINGS,
+  BACCALAUREAT_SHARING,
+  fillPlayMessage,
+} from '@/declarations/play'
+import type { BaccalaureatCategoryKey, BaccalaureatSharingKey } from '@/declarations/play'
 import { BAC_SETUP, FIELD_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -27,6 +28,12 @@ const TABS = [
   { value: 'rounds', label: BAC_SETUP_COPY.tabRounds, icon: 'playRounds' as const },
   { value: 'tournament', label: BAC_SETUP_COPY.tabTournament, icon: 'playBracket' as const },
 ]
+
+// Sharing rule chips
+const SHARING = (Object.keys(BACCALAUREAT_SHARING) as BaccalaureatSharingKey[]).map((key) => ({
+  value: key,
+  label: BACCALAUREAT_SHARING[key].label,
+}))
 
 // Clock presets as chips
 const CLOCKS = BACCALAUREAT_SETTINGS.roundPresets.map((preset) => ({
@@ -46,6 +53,8 @@ export interface BacSetup {
     autoStop: boolean
     roundSeconds: number
     rounds: number
+    categories: BaccalaureatCategoryKey[]
+    sharedRule: BaccalaureatSharingKey
   }
   games: number
 }
@@ -57,18 +66,22 @@ export interface BacSetup {
  */
 
 export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: PlaySetupProps) => {
-  const { alphabet, rounds: range, tournament } = BACCALAUREAT_SETTINGS
+  const { alphabet, tournament } = BACCALAUREAT_SETTINGS
   // Rules on screen, stored ones when editing
   const start = baccalaureatSettingsOf(current?.settings ?? null)
+  // Categories and rounds come from the launch vote
+  const categories = start.categories
+    .filter((entry) => !isCustomCategory(entry.id))
+    .map((entry) => entry.id) as BaccalaureatCategoryKey[]
+  const [sharedRule, setSharedRule] = useState(start.sharedRule)
   const [letters, setLetters] = useState<string[]>(start.letters)
   const [stop, setStop] = useState(start.stop)
   const [autoStop, setAutoStop] = useState(start.autoStop)
   const [seconds, setSeconds] = useState(start.roundSeconds)
-  const [rounds, setRounds] = useState(start.rounds)
   const [games, setGames] = useState(current?.tournamentGames ?? NO_TOURNAMENT)
 
   const isTournament = games !== NO_TOURNAMENT
-  const played = isTournament ? tournament.rounds : rounds
+  const played = isTournament ? tournament.rounds : start.rounds
   const isShort = letters.length < played
   const submit = () =>
     onSubmit({
@@ -78,6 +91,8 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
         autoStop: stop && autoStop,
         roundSeconds: seconds,
         rounds: played,
+        categories,
+        sharedRule,
       },
       games,
     } satisfies BacSetup)
@@ -139,25 +154,6 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
             <>
               <SetupSection
                 styles={BAC_SETUP}
-                title={BAC_SETUP_COPY.rounds}
-                hint={
-                  isTournament
-                    ? fillPlayMessage(BAC_SETUP_COPY.roundsLocked, { rounds: tournament.rounds })
-                    : BAC_SETUP_COPY.roundsHint
-                }
-              >
-                <SetupStepper
-                  styles={BAC_SETUP}
-                  value={played}
-                  range={range}
-                  disabled={isTournament}
-                  onChange={setRounds}
-                  labels={BAC_SETUP_COPY}
-                />
-              </SetupSection>
-
-              <SetupSection
-                styles={BAC_SETUP}
                 title={BAC_SETUP_COPY.roundSeconds}
                 hint={BAC_SETUP_COPY.roundSecondsHint}
               >
@@ -166,6 +162,19 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
                   options={CLOCKS}
                   value={seconds}
                   onChange={setSeconds}
+                />
+              </SetupSection>
+
+              <SetupSection
+                styles={BAC_SETUP}
+                title={BAC_SETUP_COPY.sharing}
+                hint={BAC_SETUP_COPY.sharingHint}
+              >
+                <SetupChips
+                  styles={BAC_SETUP}
+                  options={SHARING}
+                  value={sharedRule}
+                  onChange={setSharedRule}
                 />
               </SetupSection>
 

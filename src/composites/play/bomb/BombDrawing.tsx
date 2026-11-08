@@ -1,5 +1,7 @@
 import { useId } from 'react'
+import type { CSSProperties } from 'react'
 
+import { BombBlast } from '@/composites/play/bomb/BombBlast'
 import { BOMB_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -11,29 +13,41 @@ import { cn } from '@/utils/classnames'
 
 const stop = (token: string) => ({ style: { stopColor: `var(${token})` } })
 
+// Heat from which the bomb trembles
+const TREMBLE_HEAT = 0.75
+
 export interface BombDrawingProps {
   // Syllable written on the shell
   prompt: string
+  // Zero to one, grows with the time
+  heat: number
   // Bomb went off just now
   isBlasting: boolean
   className?: string
 }
 
 /**
- * Round iron bomb, brass cap, curled cord and a live spark, the syllable on its belly
- * @param {BombDrawingProps} props - Prompt and blast
+ * Round iron bomb that glows hotter, the syllable on its belly
+ * @param {BombDrawingProps} props - Prompt, heat and blast
  * @return {JSX.Element}
  */
 
-export const BombDrawing = ({ prompt, isBlasting, className }: BombDrawingProps) => {
+export const BombDrawing = ({ prompt, heat, isBlasting, className }: BombDrawingProps) => {
   const id = useId()
   const shell = `${id}-shell`
   const cap = `${id}-cap`
   const glow = `${id}-glow`
 
   return (
-    <div className={cn(BOMB_BOARD.bomb, isBlasting && BOMB_BOARD.bombBlast, className)}>
-      <svg viewBox="0 0 200 200" className={BOMB_BOARD.bombArt} aria-hidden="true">
+    <div
+      className={cn(BOMB_BOARD.bomb, isBlasting && BOMB_BOARD.bombBlast, className)}
+      style={{ '--heat': heat } as CSSProperties}
+    >
+      <svg
+        viewBox="0 0 200 200"
+        className={cn(BOMB_BOARD.bombArt, heat >= TREMBLE_HEAT && BOMB_BOARD.bombTremble)}
+        aria-hidden="true"
+      >
         <defs>
           <radialGradient id={shell} cx="0.36" cy="0.32" r="0.75">
             <stop offset="0" {...stop('--play-bomb-cap')} />
@@ -72,13 +86,16 @@ export const BombDrawing = ({ prompt, isBlasting, className }: BombDrawingProps)
         {/* Shell */}
         <circle cx="96" cy="118" r="66" fill={`url(#${shell})`} />
         <ellipse
-          cx="70"
-          cy="88"
-          rx="20"
-          ry="12"
+          cx="62"
+          cy="74"
+          rx="18"
+          ry="10"
           fill="var(--play-bomb-shine)"
-          transform="rotate(-35 70 88)"
+          transform="rotate(-35 62 74)"
         />
+        {/* Shell heating up */}
+        <circle cx="96" cy="118" r="66" fill="var(--play-bomb)" className={BOMB_BOARD.heatTint} />
+
         <circle
           cx="96"
           cy="118"
@@ -89,11 +106,14 @@ export const BombDrawing = ({ prompt, isBlasting, className }: BombDrawingProps)
         />
 
         {/* Spark at the cord tip */}
-        <g className={BOMB_BOARD.spark}>
-          <circle cx="168" cy="54" r="16" fill={`url(#${glow})`} />
-          <path d="m168 40 3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="var(--play-bomb-glow)" />
+        <g className={BOMB_BOARD.sparkGrow}>
+          <g className={BOMB_BOARD.spark}>
+            <circle cx="168" cy="54" r="16" fill={`url(#${glow})`} />
+            <path d="m168 40 3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="var(--play-bomb-glow)" />
+          </g>
         </g>
       </svg>
+      {isBlasting && <BombBlast />}
 
       <span className={BOMB_BOARD.prompt}>{prompt}</span>
     </div>

@@ -129,8 +129,8 @@ const isPast = (stage: Stage, reached: Stage): boolean =>
  */
 
 export const seedPipeline = async (reference: Reference, cast: Cast) => {
-  const trainers = [...cast.responsables, ...cast.moderators].filter(
-    (person) => person.functions.includes('functionTrainer') && person.status === 'ACTIVE'
+  const referents = [...cast.responsables, ...cast.moderators].filter(
+    (person) => person.functions.includes('functionReferent') && person.status === 'ACTIVE'
   )
   const recruiters = [...cast.responsables, ...cast.moderators].filter(
     (person) => person.functions.includes('functionRecruiter') && person.status === 'ACTIVE'
@@ -154,7 +154,7 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
     const opensAt = seed.opens === null ? null : day(seed.opens, 18)
     const startsAt = seed.opens === null ? day(45) : day(seed.opens + closingOffset, 19)
     const leads = cast.responsables.filter((person) => person.creators.includes(creator.id))
-    const sessionTrainers = sample(trainers, Math.min(3, trainers.length))
+    const sessionReferents = sample(referents, Math.min(3, referents.length))
 
     const promotion = await prisma.academySession.create({
       data: {
@@ -168,9 +168,9 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
         status: seed.promotion,
         summary: `Promotion ${jobFunction.name}, ${creator.name}`,
         createdAt: opensAt ?? day(-3),
-        trainers: {
-          create: sessionTrainers.map((person) => ({
-            id: fx('academy-trainer'),
+        referents: {
+          create: sessionReferents.map((person) => ({
+            id: fx('academy-referent'),
             accountId: person.id,
           })),
         },
@@ -263,7 +263,7 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
           startsAt,
           seed.functionKey,
           seed.promotion,
-          sessionTrainers
+          sessionReferents
         )
       )
     }
@@ -320,7 +320,7 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
           title: `Accueil de la promotion ${jobFunction.name}`,
           emoji: '🎓',
           kind: 'EVENT',
-          ownerId: sessionTrainers[0]?.id ?? cast.root.id,
+          ownerId: sessionReferents[0]?.id ?? cast.root.id,
           youtuberId: creator.id,
           sessionId: promotion.id,
           startsAt: startsAt,
@@ -375,7 +375,7 @@ const writeJunior = async (
   startsAt: Date,
   functionKey: FunctionKey,
   promotion: Promotion,
-  trainers: Person[]
+  referents: Person[]
 ): Promise<string> => {
   const daysIn = Math.floor((Date.now() - startsAt.getTime()) / 86_400_000) - between(0, 6)
   const isOver = promotion === 'CLOSED' || promotion === 'ARCHIVED'
@@ -385,7 +385,7 @@ const writeJunior = async (
       ? pick<Stage>(['REVIEW_ONE', 'PRACTICE'])
       : pick<Stage>(['REVIEW_FINAL', 'BONUS'])
     : stageAfter(daysIn)
-  const trainer = trainers.length > 0 ? pick(trainers) : null
+  const referent = referents.length > 0 ? pick(referents) : null
   const liveCount = isOver ? between(6, 12) : Math.max(0, Math.floor(daysIn / 3))
   const validatedAt = isOver && !stopped ? plusMinutes(startsAt, between(30, 40) * 1440) : null
   const id = fx('junior')
@@ -395,7 +395,7 @@ const writeJunior = async (
       id,
       sessionId,
       accountId: person.id,
-      trainerId: trainer?.id ?? null,
+      referentId: referent?.id ?? null,
       dispositifId: pick(reference.dispositifs),
       status: isOver ? (stopped ? 'STOPPED' : 'VALIDATED') : 'ACTIVE',
       stage,
@@ -407,7 +407,7 @@ const writeJunior = async (
     },
   })
 
-  const validator = trainer ?? trainers[0] ?? null
+  const validator = referent ?? referents[0] ?? null
 
   // Voice check-ins of each review stage reached
   for (const reviewStage of ['REVIEW_ONE', 'REVIEW_FINAL'] as Stage[]) {
@@ -434,7 +434,7 @@ const writeJunior = async (
       data: {
         id: fx('academy-review'),
         juniorId: id,
-        authorId: trainer?.id ?? null,
+        authorId: referent?.id ?? null,
         stage: reviewStage,
         heldAt,
         durationMinutes: pick([20, 30, 45]),
@@ -445,7 +445,7 @@ const writeJunior = async (
         decidedById: status === 'VALIDATED' ? (validator?.id ?? null) : null,
         decidedAt: status === 'VALIDATED' ? plusMinutes(heldAt, 1440) : null,
         decisionNote:
-          status === 'VALIDATED' && chance(0.5) ? 'Validé en réunion des formateurs.' : null,
+          status === 'VALIDATED' && chance(0.5) ? 'Validé en réunion des référents.' : null,
       },
     })
   }
@@ -476,7 +476,7 @@ const writeJunior = async (
       data: {
         id: fx('junior-note'),
         juniorId: id,
-        authorId: pick(trainers.length > 0 ? trainers : [person]).id,
+        authorId: pick(referents.length > 0 ? referents : [person]).id,
         stage: STAGE_ORDER[between(1, Math.max(1, STAGE_ORDER.indexOf(stage)))],
         kind: positive ? 'POSITIVE' : 'NEGATIVE',
         body: pick(positive ? JUNIOR_NOTES_POSITIVE : JUNIOR_NOTES_NEGATIVE),
@@ -495,7 +495,7 @@ const writeJunior = async (
         data: {
           id: fx('junior-objective'),
           juniorId: id,
-          authorId: trainer?.id ?? null,
+          authorId: referent?.id ?? null,
           title,
           description,
           dueAt: plusMinutes(startsAt, (28 + position * 2) * 1440),

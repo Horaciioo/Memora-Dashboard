@@ -4,16 +4,10 @@ import { useState } from 'react'
 
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
-import {
-  SetupChips,
-  SetupLetters,
-  SetupSection,
-  SetupStepper,
-} from '@/composites/play/setup/PlaySetupFields'
+import { SetupLetters, SetupSection, SetupStepper } from '@/composites/play/setup/PlaySetupFields'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
 import type { BombGameSettings } from '@/core/lib/play/bomb/settings'
 import { BOMB_SETTINGS, BOMB_SETUP_COPY, fillPlayMessage, PLAY_ERRORS } from '@/declarations/play'
-import type { BombDifficulty } from '@/declarations/play'
 import { BOMB_SETUP, FIELD_STYLES } from '@/declarations/ui/variants'
 
 // Tabs of the drawer
@@ -21,15 +15,6 @@ const TABS = [
   { value: 'words', label: BOMB_SETUP_COPY.tabWords, icon: 'playLetters' as const },
   { value: 'lives', label: BOMB_SETUP_COPY.tabLives, icon: 'playHeart' as const },
   { value: 'turns', label: BOMB_SETUP_COPY.tabTurns, icon: 'playRounds' as const },
-]
-
-// Levels as chips, their threshold under the name
-const DIFFICULTIES: { value: BombDifficulty; label: string }[] = [
-  ...Object.entries(BOMB_SETTINGS.wordsPerPrompt).map(([value, count]) => ({
-    value: value as BombDifficulty,
-    label: `${BOMB_SETUP_COPY[value as keyof typeof BOMB_SETTINGS.wordsPerPrompt]} - ${fillPlayMessage(BOMB_SETUP_COPY.wordsPerPrompt, { count })}`,
-  })),
-  { value: 'custom', label: BOMB_SETUP_COPY.custom },
 ]
 
 /**
@@ -69,50 +54,11 @@ export const BombSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
                 hint={BOMB_SETUP_COPY.dictionaryHint}
                 aside={<span className={BOMB_SETUP.value}>{BOMB_SETUP_COPY.dictionaryValue}</span>}
               />
-              <SetupSection
-                styles={BOMB_SETUP}
-                title={BOMB_SETUP_COPY.difficulty}
-                hint={BOMB_SETUP_COPY.difficultyHint}
-              >
-                <SetupChips
-                  styles={BOMB_SETUP}
-                  options={DIFFICULTIES}
-                  value={settings.difficulty}
-                  onChange={set('difficulty')}
-                />
-              </SetupSection>
-              {settings.difficulty === 'custom' && (
-                <SetupSection styles={BOMB_SETUP} title={BOMB_SETUP_COPY.customCount}>
-                  <SetupStepper
-                    styles={BOMB_SETUP}
-                    value={settings.wordsPerPrompt}
-                    range={BOMB_SETTINGS.customWordsPerPrompt}
-                    step={BOMB_SETTINGS.customWordsStep}
-                    onChange={set('wordsPerPrompt')}
-                    labels={steps}
-                  />
-                </SetupSection>
-              )}
             </>
           )}
 
           {tab === 'lives' && (
             <>
-              <SetupSection styles={BOMB_SETUP} title={BOMB_SETUP_COPY.startLives}>
-                <SetupStepper
-                  styles={BOMB_SETUP}
-                  value={settings.startLives}
-                  range={BOMB_SETTINGS.startLives}
-                  onChange={(startLives) =>
-                    setSettings((current) => ({
-                      ...current,
-                      startLives,
-                      maxLives: Math.max(current.maxLives, startLives),
-                    }))
-                  }
-                  labels={steps}
-                />
-              </SetupSection>
               <SetupSection
                 styles={BOMB_SETUP}
                 title={BOMB_SETUP_COPY.maxLives}

@@ -1,7 +1,8 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Tip } from '@/components/elements/feedback/Tip'
-import { BAC_SESSION_COPY } from '@/declarations/play'
+import { BAC_SESSION_COPY, fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
 import { BAC_SESSION } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 /**
  * Face shown in a stack
@@ -15,6 +16,9 @@ export interface PlayFace {
   // Seat colour key
   color?: string
   isHost?: boolean
+  isBot?: boolean
+  // No socket for a while
+  isAway?: boolean
 }
 
 /**
@@ -27,8 +31,17 @@ export interface PlayFace {
 const FaceStack = ({ faces }: { faces: PlayFace[] }) => (
   <div className={BAC_SESSION.stack}>
     {faces.map((face) => (
-      <Tip key={face.id} label={face.name} floating>
-        <Avatar name={face.name} src={face.avatarUrl} size="sm" className={BAC_SESSION.stacked} />
+      <Tip
+        key={face.id}
+        label={face.isAway ? fillPlayMessage(PLAY_HUB_COPY.away, { name: face.name }) : face.name}
+        floating
+      >
+        <Avatar
+          name={face.name}
+          src={face.avatarUrl}
+          size="sm"
+          className={cn(BAC_SESSION.stacked, face.isAway && BAC_SESSION.faceAway)}
+        />
       </Tip>
     ))}
   </div>

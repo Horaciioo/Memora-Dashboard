@@ -74,7 +74,7 @@ export const FunctionNames = {
   JuniorLives: 'Junior Lives',
   JuniorAnimators: 'Junior Animateurs',
   Recruiters: 'Recruteurs',
-  Trainers: 'Formateurs',
+  Referents: 'Référents',
   Observers: 'Observateurs',
   Coordinator: 'Coordinateur de Live',
 } as const
@@ -82,7 +82,7 @@ export const FunctionNames = {
 // Secondary functions that open a team picker
 export const RECRUITER_FUNCTION = FunctionNames.Recruiters
 export const OBSERVER_FUNCTION = FunctionNames.Observers
-export const TRAINER_FUNCTION = FunctionNames.Trainers
+export const REFERENT_FUNCTION = FunctionNames.Referents
 // Holders may be asked to coordinate a live
 export const COORDINATOR_FUNCTION = FunctionNames.Coordinator
 
@@ -156,10 +156,10 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     summary: 'Mène les recrutements.',
   },
   {
-    name: TRAINER_FUNCTION,
+    name: REFERENT_FUNCTION,
     kind: 'SECONDARY',
     position: 8,
-    icon: 'functionTrainer',
+    icon: 'functionReferent',
     accent: '#7dbf8e',
     category: 'MODERATION',
     summary: 'Forme les juniors de l’Academy.',

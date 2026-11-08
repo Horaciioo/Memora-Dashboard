@@ -16,7 +16,7 @@ export const WORKER_FILE = { script: '/sw.js', scope: '/' } as const
 
 export const WORKER_PARAMS = {
   version: 'version',
-  offline: 'secours',
+  offline: 'fallback',
   // Off in development, chunks there are not content-hashed
   caching: 'cache',
 } as const

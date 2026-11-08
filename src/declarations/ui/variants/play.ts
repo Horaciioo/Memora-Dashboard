@@ -1,4 +1,5 @@
 import { PROPERTY_LABEL, PROPERTY_SPACING } from '@/declarations/ui/variants/controls'
+import { BOTTOM_SHEET } from '@/declarations/ui/variants/surfaces'
 
 /**
  * Play blocks of a moderator file
@@ -39,6 +40,7 @@ export const PLAY_MEMBER = {
 // Shared arcade surfaces
 const PANEL =
   'rounded-2xl bg-[var(--play-panel)] ring-1 ring-[var(--play-line)] backdrop-blur-xl backdrop-saturate-150'
+export const PLAY_PANEL = PANEL
 // Lift of the main boxes, as on the Memora sections
 const LIFT = 'shadow-[var(--shadow-sm)]'
 const HEADING = 'text-xl font-extrabold tracking-tight text-[var(--play-ink)] sm:text-2xl'
@@ -61,10 +63,19 @@ export const PLAY_REWARD = {
 export const PLAY_SHELL = {
   room: 'play-room fixed inset-0 z-40 flex flex-col overflow-hidden',
   floor: 'play-floor',
-  bar: 'relative z-10 flex w-full shrink-0 items-center justify-end gap-3 px-4 pt-5 sm:px-8 xl:px-12',
   // Pages scroll here, the room itself never does
   content:
-    'relative z-10 flex min-h-0 w-full flex-1 flex-col gap-8 overflow-y-auto overscroll-contain px-4 pt-6 pb-36 sm:px-8 xl:px-12',
+    'relative z-10 flex min-h-0 w-full flex-1 flex-col gap-8 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pt-8 pb-36 sm:px-8 xl:px-12',
+} as const
+
+/**
+ * Illustrated backdrop of the room, full screen
+ * @type {Readonly<{ root: string; art: string }>}
+ */
+
+export const PLAY_SCENE_BANNER = {
+  root: 'play-scene-banner pointer-events-none fixed inset-0 z-0 overflow-hidden',
+  art: 'absolute inset-0 size-full object-cover object-center',
 } as const
 
 /**
@@ -89,23 +100,29 @@ export const PLAY_BRAND = {
 export const PLAY_HUB = {
   section: 'flex flex-col gap-4',
   heading: HEADING,
+  // Same title as the Dashboard navigation sheet
+  title: `${BOTTOM_SHEET.figureTitle} w-full text-center text-[var(--color-on-media)]`,
   headRow: 'flex flex-wrap items-end justify-between gap-3',
   callout: `${PANEL} flex flex-wrap items-center justify-between gap-3 bg-[var(--play-panel-strong)] px-5 py-4 text-sm font-semibold text-[var(--play-ink)]`,
   // Game cards
   games: 'grid gap-5 sm:grid-cols-2 2xl:grid-cols-4',
   main: 'flex min-w-0 flex-col gap-10',
-  card: `play-card relative flex aspect-[3/4] min-h-96 flex-col justify-end overflow-hidden rounded-[2rem] text-[var(--play-on-art)] ${LIFT} ring-2 ring-white/20`,
+  // Phone: a wide row, art right, name left
+  card: `play-card relative flex aspect-[3/4] min-h-96 flex-col justify-end overflow-hidden rounded-[2rem] text-[var(--play-on-art)] ${LIFT} ring-2 ring-white/20 transition-transform duration-100 active:scale-[0.98] max-md:aspect-[5/2] max-md:min-h-28 max-md:justify-center max-md:rounded-3xl`,
   cardShade:
-    'absolute inset-0 bg-linear-to-t from-[var(--play-night)] from-5% via-[var(--play-night)]/55 via-35% to-transparent to-65%',
+    'absolute inset-0 bg-linear-to-t from-[var(--play-night)] from-5% via-[var(--play-night)]/55 via-35% to-transparent to-65% max-md:bg-linear-to-r max-md:via-45% max-md:to-80%',
   cardLink:
-    'absolute inset-0 z-10 rounded-[2rem] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
-  cardBody: 'relative flex flex-col items-center gap-2 p-7 text-center',
-  cardName: 'truncate text-3xl font-extrabold tracking-tight uppercase',
-  cardTagline: 'line-clamp-3 text-sm text-[var(--play-on-art)]/85',
+    'absolute inset-0 z-10 rounded-[2rem] max-md:rounded-3xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
+  cardBody:
+    'relative flex flex-col items-center gap-2 p-7 text-center max-md:w-3/5 max-md:items-start max-md:gap-1 max-md:p-5 max-md:text-left',
+  cardName:
+    'truncate text-3xl font-extrabold tracking-tight uppercase max-md:max-w-full max-md:text-xl max-md:whitespace-normal',
+  cardTagline:
+    'line-clamp-3 text-sm text-[var(--play-on-art)]/85 max-md:line-clamp-2 max-md:text-xs',
   skeleton:
-    'animate-pulse rounded-[1.75rem] bg-[var(--play-panel-strong)] motion-reduce:animate-none',
+    'min-h-64 animate-pulse rounded-[1.75rem] bg-[var(--play-panel-strong)] motion-reduce:animate-none',
   // Game hub, centred and fitted to the room: logo | divider | actions, never scrolling
-  page: 'relative flex min-h-0 flex-1 flex-col',
+  page: 'play-game-hub relative flex min-h-0 flex-1 flex-col',
   hub: 'relative flex min-h-0 flex-1 items-center justify-center max-sm:overflow-y-auto',
   hubSplit: 'flex flex-col items-center gap-8 lg:flex-row lg:gap-14 xl:gap-20',
   hubLive: 'w-full max-w-md shrink-0 lg:max-h-[min(36rem,calc(100dvh-14rem))] lg:w-[26rem]',
@@ -168,13 +185,18 @@ export const PLAY_HUB = {
     'rounded-full px-4 py-1.5 text-xs font-extrabold text-[var(--play-ink-soft)] transition-colors hover:text-[var(--play-ink)]',
   leaderTabOn: 'bg-[var(--play-panel-strong)] text-[var(--play-ink)] shadow-[var(--shadow-sm)]',
   // Lobby
-  seats: 'grid gap-3 sm:grid-cols-2',
-  seat: `${PANEL} flex h-20 items-center gap-4 px-4`,
+  seats: 'grid grid-cols-1 gap-3 sm:grid-cols-2',
+  // Two columns on a phone, so the seat stacks its face over its name
+  seat: `${PANEL} relative flex h-20 items-center gap-4 px-4 text-left`,
+  seatReady: 'mt-0.5 inline-flex items-center gap-1 text-xs font-extrabold text-[var(--play-ink)]',
+  seatWait: 'mt-0.5 text-xs font-bold text-[var(--play-ink-faint)] italic',
+  seatReadyIcon: 'size-3.5',
   // Empty seat inviting, dashed
   inviteSlot:
-    'flex h-20 w-full items-center gap-4 rounded-2xl border-2 border-dashed border-[var(--play-line)] px-4 text-left text-[var(--play-ink-soft)] transition-colors hover:border-[var(--play-ink-faint)] hover:text-[var(--play-ink)]',
+    'col-span-full flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[var(--play-line)] px-3 text-[var(--play-ink-soft)] transition-colors hover:border-[var(--play-ink-faint)] hover:text-[var(--play-ink)]',
   inviteSlotIcon:
-    'grid size-14 shrink-0 place-items-center rounded-full bg-[var(--play-chip)] text-[var(--play-ink-soft)]',
+    'grid size-6 shrink-0 place-items-center rounded-full bg-[var(--play-chip)] text-[var(--play-ink-soft)]',
+  inviteSlotText: 'truncate text-sm font-extrabold',
   rowLogo: 'size-10',
   seatOff: 'opacity-50',
   seatName: 'truncate text-base font-extrabold',
@@ -201,20 +223,20 @@ export const PLAY_STATS = {
     'absolute -right-1 -bottom-1 flex h-9 min-w-9 items-center justify-center rounded-full bg-[var(--play-gold)] px-1.5 text-sm font-extrabold tabular-nums text-[var(--play-night)] ring-4 ring-[var(--play-panel-strong)]',
   playerText: 'flex min-w-0 flex-1 flex-col gap-2.5',
   playerHead: 'flex flex-wrap items-center justify-center gap-2 @md:justify-start',
-  playerName: 'mr-1 text-3xl font-extrabold tracking-tight',
+  playerName: 'mr-1 text-2xl font-extrabold tracking-tight sm:text-3xl',
   tier: 'inline-flex w-fit items-center rounded-lg px-3 py-1 text-xs font-extrabold tracking-wider text-[var(--play-night)] uppercase',
-  chip: 'rounded-lg bg-[var(--play-chip)] px-2.5 py-1 text-xs font-extrabold tabular-nums',
+  chip: 'rounded-lg bg-[var(--play-chip)] px-2 py-0.5 text-[0.65rem] font-extrabold md:px-2.5 md:py-1 md:text-xs tabular-nums',
   bar: 'block h-4 w-full overflow-hidden rounded-full bg-[var(--play-track)]',
   barThin: 'block h-2 w-full overflow-hidden rounded-full bg-[var(--play-track)]',
   barFill: 'block h-full rounded-full bg-[var(--play-gold)]',
   caption: NOTE,
   // One board split in cells, no loose cards
   tiles: `${LIFT} grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-[var(--play-line)] ring-1 ring-[var(--play-line)] sm:grid-cols-3`,
-  tile: 'flex flex-col gap-3 bg-[var(--play-panel-strong)] p-5',
+  tile: 'flex flex-col gap-3 bg-[var(--play-panel-strong)] p-4 sm:p-5',
   tileIcon:
     'grid size-10 shrink-0 place-items-center rounded-xl bg-[color-mix(in_srgb,var(--tile)_16%,transparent)] text-[var(--tile)]',
   tileText: 'flex min-w-0 flex-col gap-0.5',
-  tileValue: 'text-3xl font-extrabold tracking-tight tabular-nums',
+  tileValue: 'text-2xl font-extrabold sm:text-3xl tracking-tight tabular-nums',
   tileLabel: 'text-xs font-bold tracking-wide text-[var(--play-ink-faint)] uppercase',
   games: 'grid gap-4 sm:grid-cols-2 xl:grid-cols-4',
   // Card topped by a band in its game colour
@@ -246,7 +268,6 @@ export const PLAY_STATS = {
  */
 
 export const PLAY_PLAYER = {
-  back: 'w-fit',
   backIcon: 'size-4',
   hero: 'flex flex-col gap-4 rounded-3xl bg-[color-mix(in_oklab,var(--tier)_22%,var(--play-night))] p-6 ring-2 ring-[var(--tier)] sm:p-8',
   top: 'flex flex-wrap items-center gap-5',
@@ -274,6 +295,8 @@ export const PLAY_PLAYER = {
 export const PLAY_CHAT_BUBBLE = {
   open: 'play-side-in mt-4 flex min-h-80 w-full flex-col lg:fixed lg:top-1/2 lg:right-0 lg:z-40 lg:mt-0 lg:w-[var(--play-side-open)] lg:-translate-y-1/2',
   folding: 'play-side-out',
+  // Centred over the chat box, desktop only
+  above: 'absolute bottom-full left-0 mb-3 flex w-full justify-center max-lg:hidden',
   closed:
     'play-glass play-pop fixed top-1/2 right-0 z-40 grid size-14 -translate-y-1/2 place-items-center rounded-l-full text-[var(--play-ink)] hover:text-[var(--play-gold-ink)]',
   icon: 'size-6',
@@ -303,20 +326,20 @@ export const PLAY_NOTICE = {
  */
 
 export const PLAY_CROSS = {
-  // Games left, the live column right
-  stage:
-    'mx-auto grid w-full max-w-[96rem] items-start gap-8 pb-28 lg:min-h-[calc(100dvh-11rem)] lg:grid-cols-[minmax(0,1fr)_26rem] lg:items-center xl:grid-cols-[minmax(0,1fr)_29rem]',
+  stage: 'mx-auto flex w-full max-w-6xl flex-col gap-8 pb-28',
   games: 'flex min-w-0 flex-col items-center gap-6',
-  heading: `${HEADING} text-center sm:text-3xl`,
-  // Two by two, posters as tall as the screen leaves room for
-  cross:
-    'grid w-full gap-5 sm:grid-cols-2 lg:mx-auto lg:max-w-[min(100%,calc((100dvh-16rem)/2*3/4*2+1.25rem))]',
-  card: 'min-h-0! aspect-[4/3]! lg:aspect-[3/4]!',
-  live: 'lg:max-h-[calc(100dvh-11rem)]',
+  heading: `${HEADING} text-center max-md:sr-only sm:text-3xl`,
+  // Three by three on desktop, one column on a phone
+  cross: 'grid w-full gap-4 md:grid-cols-3 md:gap-6',
+  card: 'min-h-0! md:aspect-[4/3]!',
+  live: 'min-h-0 shrink',
+  online: 'min-h-0 shrink-0',
 } as const
 
 // Bubble opened by the dock
 const BUBBLE = 'play-glass rounded-2xl'
+// Opaque card for pickers
+const SOLID = 'rounded-2xl bg-[var(--play-panel-strong)] ring-1 ring-[var(--play-line)] shadow-xl'
 
 /**
  * Dock at the bottom of Memora Play
@@ -324,15 +347,19 @@ const BUBBLE = 'play-glass rounded-2xl'
  */
 
 export const PLAY_DOCK = {
-  wrap: 'fixed inset-x-0 bottom-4 z-50 flex justify-center px-4 pointer-events-none',
+  wrap: 'fixed inset-x-0 bottom-4 z-50 flex justify-center px-4 pointer-events-none max-md:hidden',
   bar: `${BUBBLE} pointer-events-auto relative flex items-center gap-2 rounded-full px-3 py-2 sm:gap-4 sm:px-5`,
   button:
-    'grid size-11 place-items-center rounded-full text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
-  buttonOn: 'bg-[var(--play-chip)] text-[var(--play-ink)]',
+    'group relative grid size-11 place-items-center rounded-full text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
+  // Open key: the glyph grows, the box and its neighbours stay put
+  buttonOn: 'bg-transparent! text-[var(--play-ink)] [&_svg]:scale-[1.4]',
+  // Page title above a hovered key
+  tip: 'play-glass pointer-events-none absolute bottom-full left-1/2 z-10 mb-3 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-extrabold whitespace-nowrap text-[var(--play-ink)] opacity-0 transition-opacity group-hover:opacity-100 group-aria-expanded:hidden',
   // Game or invitation waiting, the glyph turns gold
   buttonCall: 'text-[var(--play-gold-ink)]',
-  icon: 'size-5',
-  avatarButton: 'relative mx-1 -my-6 rounded-full transition-transform hover:-translate-y-0.5',
+  icon: 'size-5 transition-transform duration-200',
+  avatarButton:
+    'group relative mx-1 -my-6 rounded-full transition-transform hover:-translate-y-0.5',
   avatarRing: 'rounded-full ring-4 ring-[var(--play-panel-strong)]',
   level:
     'absolute -right-1 -bottom-1 grid min-w-7 place-items-center rounded-full bg-[var(--play-gold)] px-1.5 py-0.5 text-xs font-extrabold tabular-nums text-[var(--play-night)] ring-2 ring-[var(--play-panel-strong)]',
@@ -348,6 +375,10 @@ export const PLAY_DOCK = {
   openIcon: 'size-4',
   rows: 'flex max-h-96 flex-col divide-y divide-[var(--play-line)] overflow-y-auto',
   row: 'flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0',
+  // Own game, a row of the sessions list
+  resume: 'flex items-center gap-3 py-3 first:pt-0 last:pb-0',
+  resumeLogo: 'size-12 shrink-0',
+  resumeText: 'min-w-0 flex-1 text-sm font-extrabold text-[var(--play-ink)]',
   rowHead: 'flex items-center justify-between gap-2 text-sm font-extrabold',
   rowName: 'flex min-w-0 items-center gap-2 truncate',
   rowLogo: 'size-7',
@@ -368,19 +399,48 @@ export const PLAY_DOCK = {
 export const PLAY_ROOM = {
   // Lobby: header row, then the box centred in what is left
   main: 'flex min-w-0 flex-col gap-4 lg:min-h-[calc(100dvh-17rem)]',
-  head: 'flex items-start justify-between gap-4',
+  head: 'flex flex-col items-center gap-3 md:flex-row md:items-start md:justify-between md:gap-4',
   center: 'my-auto',
-  logo: 'ml-16 size-28 sm:ml-12 sm:size-32 xl:ml-8',
+  logo: 'size-28 sm:size-32 md:ml-12 xl:ml-8',
   game: NOTE,
+  watch: 'flex flex-wrap items-center gap-3 rounded-2xl bg-[var(--play-chip)] px-4 py-2',
+  watchLabel: 'text-xs font-extrabold tracking-wider text-[var(--play-ink)] uppercase',
+  watchFaces: 'flex items-center gap-1.5',
+  watchAway: 'opacity-40 grayscale',
+  lost: 'fixed top-3 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[var(--play-panel-strong)] px-4 py-1.5 text-xs font-bold text-[var(--play-ink-soft)] shadow-lg',
   back: 'inline-flex shrink-0 items-center gap-1.5 text-xs font-extrabold tracking-wider text-[var(--play-ink-soft)] uppercase hover:text-[var(--play-ink)]',
   // Players and gestures, centred
   middle: 'mx-auto flex w-full max-w-2xl flex-col items-center gap-6',
+  // Line under the title: access, count, rules
+  summary:
+    'grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm font-bold text-[var(--play-ink-soft)]',
+  summaryCount: 'text-center',
+  summaryLink:
+    'justify-self-start rounded-xl bg-[var(--play-chip)] px-3 py-1.5 font-extrabold text-[var(--play-ink)] transition-colors hover:bg-[var(--play-panel-strong)] focus-visible:outline-3 focus-visible:outline-[var(--play-key)] disabled:cursor-default disabled:hover:bg-[var(--play-chip)]',
+  summaryEnd: 'justify-self-end',
+  // The table: seats as faces, empty ones as dashed rounds
+  table: 'flex w-full flex-wrap justify-center gap-x-3 gap-y-4 py-2 md:gap-x-5 md:gap-y-6',
+  tile: 'flex w-20 flex-col items-center gap-1 text-center md:w-24 md:gap-1.5',
+  tileOff: 'opacity-50',
+  tileName: 'w-full truncate text-xs font-extrabold md:text-sm',
+  tileNote:
+    'text-[0.6rem] font-extrabold tracking-wider md:text-xs text-[var(--play-ink-faint)] uppercase',
+  tileReady:
+    'inline-flex items-center gap-1 text-[0.6rem] md:text-xs font-extrabold text-[var(--play-ink)]',
+  tileEmpty:
+    'grid size-10 place-items-center rounded-full border-2 border-dashed md:size-16 border-[var(--play-line)] text-[var(--play-ink-soft)] transition-colors hover:border-[var(--play-ink-faint)] hover:text-[var(--play-ink)]',
+  tileEmptyIcon: 'size-4 md:size-6',
+  // Share row, always in reach
+  link: 'flex w-full max-w-sm items-center gap-3 rounded-2xl bg-[var(--play-chip)] px-4 py-3 text-left text-sm font-bold text-[var(--play-ink-soft)] hover:text-[var(--play-ink)]',
+  linkMain: 'mr-auto truncate',
+  linkCode: 'text-lg font-extrabold tracking-[0.5em] text-[var(--play-ink)]',
+  linkCopy: 'shrink-0 text-xs font-extrabold text-[var(--play-ink)]',
   playersTitle: `${HEADING} text-center`,
-  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-6 rounded-[2rem] p-6 sm:p-8`,
-  seatsBox: 'h-[17.5rem] w-full overflow-y-auto p-1',
-  actions: 'flex w-full max-w-sm flex-col gap-4',
-  divider: 'h-px w-full bg-[var(--play-line)]',
-  secondary: 'grid grid-cols-2 gap-3 *:min-w-0',
+  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 rounded-[2rem] p-5 sm:p-8`,
+  // Plain column, flows under the players
+  actions: 'flex w-full max-w-sm flex-col gap-3',
+  // Quiet way out, under the main key
+  exit: 'mx-auto text-sm font-bold text-[var(--play-ink-soft)] underline-offset-4 transition-colors hover:text-[var(--play-ink)] hover:underline disabled:opacity-50',
   note: 'text-center text-sm text-[var(--play-ink-soft)]',
 } as const
 
@@ -407,6 +467,7 @@ export const PLAY_CHAT_UI = {
     'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
   peopleStack: 'flex min-w-0 items-center -space-x-2',
   peopleFace: 'rounded-full ring-2 ring-[var(--play-ring)]',
+  peopleAway: 'opacity-40 grayscale',
   peopleSplit: 'h-5 w-px shrink-0 bg-[var(--play-line)]',
   list: 'flex flex-1 flex-col overflow-y-auto px-2 py-3',
   empty: 'm-auto px-6 text-center text-sm italic text-[var(--play-ink-faint)]',
@@ -436,31 +497,58 @@ export const PLAY_CHAT_UI = {
 
 export const PLAY_INVITE = {
   anchor: 'relative',
-  panel: `${BUBBLE} absolute top-full left-0 z-30 mt-2 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-3 p-3 text-[var(--play-ink)]`,
+  panel: `${SOLID} absolute top-full left-0 z-30 mt-3 flex w-96 flex-col gap-3 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-[80] max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
+  // Phone: a centred modal, so side anchors do nothing
   panelEnd: 'right-0 left-auto',
+  panelCentered: 'left-1/2 right-auto -translate-x-1/2',
+  // Dim page behind the phone modal
+  scrim: 'fixed inset-0 z-[79] bg-[var(--color-scrim)]/40 md:hidden',
   // Over the composer, as wide as it so the chat never clips it
-  panelDock: `${BUBBLE} absolute inset-x-3 bottom-full z-30 mb-2 flex flex-col gap-3 p-3 text-[var(--play-ink)]`,
+  panelDock: `${SOLID} absolute inset-x-3 bottom-full z-30 mb-2 flex flex-col gap-3 p-3 text-[var(--play-ink)]`,
   // Opens in the seats grid, never clipped
   anchorInline: 'contents',
-  panelInline: `${PANEL} relative col-span-full mx-auto mt-2 flex w-full max-w-md flex-col gap-3 p-3 text-[var(--play-ink)]`,
+  // Full screen sheet on a phone
+  panelInline: `${SOLID} relative col-span-full mx-auto mt-2 flex w-full max-w-md flex-col gap-3 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-[80] max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
   // Tip aimed at the trigger above
   arrow:
-    'absolute -top-1.5 left-[var(--arrow-x,50%)] size-3 -translate-x-1/2 rotate-45 bg-[var(--play-panel-strong)] ring-1 ring-[var(--play-line)] [clip-path:polygon(0_0,100%_0,0_100%)]',
+    'absolute -top-1.5 left-[var(--arrow-x,50%)] size-3 max-md:hidden -translate-x-1/2 rotate-45 bg-[var(--play-panel-strong)] ring-1 ring-[var(--play-line)] [clip-path:polygon(0_0,100%_0,0_100%)]',
+  // Quiet row under the list, label left and state right
   choice:
-    'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-extrabold hover:bg-[var(--play-chip)]',
-  choiceIcon: 'size-5 shrink-0 text-[var(--play-ink-soft)]',
-  roles: 'grid grid-cols-2 gap-1 rounded-xl bg-[var(--play-chip)] p-1',
-  role: 'rounded-lg px-3 py-1.5 text-xs font-extrabold text-[var(--play-ink-soft)]',
-  roleOn: 'bg-[var(--play-panel-strong)] text-[var(--play-ink)] shadow-[var(--shadow-sm)]',
+    'flex w-full flex-wrap items-center gap-x-3 gap-y-2 rounded-xl px-3 py-1.5 text-left text-xs font-extrabold md:py-2 md:text-sm text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)] disabled:opacity-50',
+  choiceIcon: 'size-5 shrink-0',
+  choiceText: 'mr-auto whitespace-nowrap',
+  level:
+    'rounded-lg bg-[var(--play-chip)] px-2.5 py-1 text-xs font-extrabold text-[var(--play-ink)] hover:bg-[var(--play-line)] disabled:opacity-50',
+  foot: 'flex flex-col gap-1',
+  footGroup: 'flex flex-col border-t border-[var(--play-line)] pt-1',
   search:
-    'w-full rounded-xl bg-[var(--play-chip)] px-3 py-2 text-sm placeholder:text-[var(--play-ink-faint)] focus:outline-none',
-  people: 'flex max-h-44 flex-col overflow-y-auto',
-  person:
-    'flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm font-bold hover:bg-[var(--play-chip)]',
-  personOn: 'play-pick bg-[var(--play-chip)]',
+    'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-3 py-2 text-sm font-semibold md:py-2.5 placeholder:text-[var(--play-ink-faint)] focus:outline-none',
+  head: 'flex items-center gap-2',
+  close:
+    'grid size-8 place-items-center rounded-lg text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
+  // Only a phone sheet needs a way out, elsewhere a tap outside closes
+  closeMobile: 'md:hidden',
+  closeIcon: 'size-4',
+  section: 'flex flex-col',
+  sectionTitle:
+    'px-2 pt-2 pb-1 text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
+  people: 'flex max-h-60 flex-col overflow-y-auto max-md:max-h-none max-md:flex-1',
+  // Faces side by side, name under each
+  faces: 'grid grid-cols-5 gap-x-1.5 gap-y-2 px-1 pb-1.5 md:gap-x-2 md:gap-y-3 md:pb-2',
+  face: 'flex min-w-0 flex-col items-center gap-1 rounded-xl p-1.5 transition-colors hover:bg-[var(--play-chip)]',
+  faceSent: 'cursor-default opacity-70 hover:bg-transparent',
+  faceAvatar: 'relative',
+  faceBadge:
+    'absolute -right-0.5 -bottom-0.5 grid size-4 place-items-center rounded-full bg-[var(--play-ink)] text-[var(--play-panel-strong)] ring-2 ring-[var(--play-panel-strong)]',
+  faceName: 'w-full truncate text-center text-[0.65rem] font-bold md:text-xs',
+  stateIcon: 'size-2.5',
   check: 'ml-auto size-4 text-[var(--play-ink)]',
   empty: 'px-2 py-2 text-sm italic text-[var(--play-ink-faint)]',
-  back: 'w-fit text-xs font-extrabold tracking-wider text-[var(--play-ink-soft)] uppercase hover:text-[var(--play-ink)]',
+  codeInline: 'text-base font-extrabold tracking-[0.3em] text-[var(--play-ink)]',
+  // Join with a code from the hub
+  entry: 'flex w-full flex-col gap-2',
+  entryInput:
+    'w-full rounded-xl bg-[var(--play-chip)] px-3 py-3 text-center text-base font-extrabold tracking-[0.3em] text-[var(--play-ink)] uppercase placeholder:text-[var(--play-ink-faint)] placeholder:tracking-normal placeholder:normal-case focus:outline-none',
 } as const
 
 /**
@@ -469,13 +557,41 @@ export const PLAY_INVITE = {
  */
 
 export const BAC_BOARD = {
-  board: 'flex flex-col gap-5',
-  bar: 'flex flex-wrap items-center justify-between gap-3',
-  round: NOTE,
-  clock: 'text-2xl font-extrabold tabular-nums text-[var(--play-ink)]',
+  // Phase on screen, rising in
+  board: 'play-phase flex flex-col gap-5',
+  // Header: round, letter, clock
+  bar: 'grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-3xl bg-[var(--play-chip)] p-3 sm:p-4',
+  roundBlock: 'flex min-w-0 flex-col gap-1.5',
+  roundLabel:
+    'text-[0.7rem] font-extrabold tracking-[0.25em] text-[var(--play-ink-faint)] uppercase',
+  roundFigure:
+    'flex items-baseline gap-1.5 text-5xl leading-none font-black tabular-nums text-[var(--play-ink)] sm:text-6xl',
+  roundTotal: 'text-lg font-extrabold text-[var(--play-ink-faint)]',
+  pips: 'flex flex-wrap gap-1',
+  pip: 'h-1.5 w-3 rounded-full bg-[var(--play-line)]',
+  pipDone: 'bg-[var(--play-baccalaureat)] opacity-50',
+  pipNow: 'bg-[var(--play-baccalaureat)]',
+  // Letter tile, bright blue
+  letter:
+    'play-tick grid size-24 place-items-center rounded-3xl bg-gradient-to-b from-[var(--play-baccalaureat-glow)] to-[var(--play-baccalaureat)] text-7xl leading-none font-black text-white shadow-[0_0.4rem_0_var(--play-baccalaureat-deep)] [text-shadow:0_2px_0_rgb(0_0_0/0.18)] sm:size-28 sm:text-8xl',
+  letterHidden:
+    'from-[var(--play-panel-strong)] to-[var(--play-chip)] text-[var(--play-ink-faint)]',
+  // Clock ring, the number inside
+  clockSlot: 'flex items-center justify-end',
+  clock: 'relative grid size-20 place-items-center sm:size-24',
+  clockSvg: 'absolute inset-0 size-full -rotate-90',
+  clockTrack: 'stroke-[var(--play-line)]',
+  clockBar:
+    'stroke-[var(--play-baccalaureat)] transition-[stroke-dashoffset] duration-1000 ease-linear',
+  clockBarLow: 'stroke-[var(--color-danger)]',
+  clockNumber: 'relative text-3xl font-black tabular-nums text-[var(--play-ink)] sm:text-4xl',
   clockLow: 'text-[var(--color-danger)]',
   // Countdown in place of the board, no veil behind
   inline: 'grid min-h-[50vh] place-items-center',
+  // Spectator waiting for the words
+  wait: 'grid min-h-[40vh] place-content-center justify-items-center gap-2 text-center',
+  waitLead: 'text-xl font-extrabold text-[var(--play-ink)]',
+  waitNote: 'text-sm font-semibold text-[var(--play-ink-soft)]',
   // Countdown over the whole screen, chat and keys included, the veil fading in
   overlay: 'play-count fixed inset-0 z-[60] grid place-items-center',
   stage: 'relative flex flex-col items-center justify-center gap-6 text-center',
@@ -486,39 +602,92 @@ export const BAC_BOARD = {
   figure:
     'play-figure play-figure-blue text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
   // Someone called stop: their face, then the word, in place of the clock
-  stop: 'flex items-center gap-3',
+  stop: 'flex items-center justify-end gap-2',
   stopWord:
-    'play-stop text-4xl leading-none font-extrabold tracking-tight text-[var(--color-danger)] sm:text-6xl',
-  // Letter tile
-  letterRow: 'flex items-center gap-4',
-  letter:
-    'play-figure grid size-20 place-items-center rounded-2xl bg-[var(--play-chip)] text-6xl font-black',
-  letterLabel: 'text-xs font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
+    'play-stop text-3xl leading-none font-extrabold tracking-tight text-[var(--color-danger)] sm:text-5xl',
   // Writing form
   fields: 'grid gap-3 sm:grid-cols-2',
-  field: 'flex flex-col gap-1.5',
-  fieldLabel: 'text-xs font-extrabold tracking-wide text-[var(--play-ink-soft)] uppercase',
+  field:
+    'flex items-center gap-3 rounded-2xl bg-[var(--play-chip)] p-3 transition-shadow focus-within:shadow-[0_0_0_2px_var(--play-baccalaureat)]',
+  fieldIndex:
+    'grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--play-panel-strong)] text-sm font-black text-[var(--play-ink-faint)]',
+  fieldDone: 'bg-[var(--play-baccalaureat)] text-white',
+  fieldIcon: 'size-5',
+  fieldBody: 'flex min-w-0 flex-1 flex-col gap-0.5',
+  fieldLabel:
+    'text-[0.7rem] leading-tight font-extrabold tracking-wide text-[var(--play-ink-soft)] uppercase',
   input:
-    'rounded-xl bg-[var(--play-chip)] px-3 py-2.5 text-base font-bold text-[var(--play-ink)] placeholder:font-normal placeholder:text-[var(--play-ink-faint)] focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--play-baccalaureat)]!',
-  actions: 'flex flex-wrap items-center gap-3',
-  // Review and scores
-  lead: 'text-sm text-[var(--play-ink-soft)]',
-  categories: 'flex flex-col gap-4',
+    'w-full bg-transparent text-lg font-extrabold text-[var(--play-ink)] placeholder:text-base placeholder:font-normal placeholder:text-[var(--play-ink-faint)] focus:outline-none',
+  actions: 'flex flex-wrap items-center justify-center gap-3',
+  // Line at the bottom, like the Bomb Party hint
+  lead: 'text-center text-sm font-semibold text-[var(--play-ink-soft)]',
+  leadStrong: 'text-[var(--play-ink)]',
+  // Votes and scored words, one card per word
+  categories: 'flex flex-col gap-5',
   category: 'flex flex-col gap-2',
   categoryName: 'text-xs font-extrabold tracking-wide text-[var(--play-ink-soft)] uppercase',
-  answers: 'flex flex-col divide-y divide-[var(--play-line)] rounded-xl bg-[var(--play-chip)]',
-  answer: 'flex items-center gap-3 px-3 py-2',
-  answerName: 'w-28 shrink-0 truncate text-xs font-bold text-[var(--play-ink-soft)]',
-  answerWord: 'min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
-  answerOff: 'line-through opacity-50',
-  answerEmpty: 'min-w-0 flex-1 text-sm italic text-[var(--play-ink-faint)]',
-  answerNote: NOTE,
-  vote: 'rounded-lg px-2.5 py-1 text-xs font-extrabold text-[var(--play-ink-soft)] hover:bg-[var(--play-panel-strong)]',
-  voteOn: 'bg-[var(--play-panel-strong)] text-[var(--play-ink)]',
-  // Vote side with the faces of its voters
-  voteSide: 'flex shrink-0 items-center gap-1.5',
-  voteLabel: 'px-1 text-xs font-extrabold text-[var(--play-ink-faint)]',
-  // Ranking
+  answers: 'grid gap-2 sm:grid-cols-2',
+  card: 'flex items-center gap-3 rounded-2xl bg-[var(--play-chip)] p-2.5',
+  cardFace: 'flex shrink-0 flex-col items-center gap-1',
+  cardBody: 'flex min-w-0 flex-1 flex-col',
+  cardName: 'truncate text-[0.7rem] font-bold text-[var(--play-ink-faint)]',
+  cardWord: 'truncate text-base font-extrabold text-[var(--play-ink)]',
+  cardWordOff: 'line-through opacity-50',
+  cardEmpty: 'text-sm italic text-[var(--play-ink-faint)]',
+  cardTag: 'truncate text-[0.7rem] font-bold text-[var(--play-ink-soft)]',
+  // Who voted for or against
+  voters: 'mt-1 flex flex-wrap items-center gap-y-1',
+  voterGroup:
+    'flex items-center gap-1 not-first:ml-2 not-first:border-l not-first:border-[var(--play-ink)]/20 not-first:pl-2',
+  voterMark: 'grid size-4 place-items-center rounded-full',
+  voterIcon: 'size-2.5',
+  // Check or cross under the avatar
+  verdict: 'grid size-6 place-items-center rounded-full',
+  verdictYes: 'bg-[var(--color-success)] text-white',
+  verdictNo: 'bg-[var(--color-danger)] text-white',
+  verdictNone: 'bg-[var(--play-panel-strong)] text-[var(--play-ink-faint)]',
+  verdictIcon: 'size-3.5',
+  // Ballot buttons, then the locked vote
+  ballots: 'flex shrink-0 items-center gap-1.5',
+  ballot:
+    'grid size-9 place-items-center rounded-full bg-[var(--play-panel-strong)] text-[var(--play-ink-soft)] transition-transform hover:scale-110 disabled:opacity-50',
+  ballotYes: 'hover:bg-[var(--color-success)] hover:text-white',
+  ballotNo: 'hover:bg-[var(--color-danger)] hover:text-white',
+  ballotOnYes: 'bg-[var(--color-success)] text-white',
+  ballotOnNo: 'bg-[var(--color-danger)] text-white',
+  ballotOff: 'opacity-35 grayscale',
+  ballotIcon: 'size-5',
+  points:
+    'shrink-0 rounded-full bg-[var(--play-baccalaureat)] px-2.5 py-1 text-sm font-black tabular-nums text-white',
+  pointsNone: 'bg-[var(--play-panel-strong)] text-[var(--play-ink-faint)]',
+  // Scores, a reward moment
+  scores: 'flex flex-col gap-4',
+  hero: 'flex flex-col items-center gap-2 py-2 text-center',
+  heroFace: 'play-pop relative',
+  heroCrown: 'absolute -top-6 left-1/2 size-7 -translate-x-1/2 text-[var(--play-gold-ink)]',
+  heroTitle: 'text-xl font-black tracking-tight text-[var(--play-ink)] sm:text-2xl',
+  heroPoints: 'text-[var(--play-baccalaureat)]',
+  scoreList: 'flex flex-col gap-2',
+  scoreRow: 'play-score-row relative flex items-center gap-3 overflow-hidden rounded-2xl p-3',
+  scoreRowPlain: 'bg-[var(--play-chip)]',
+  // Filled boxes, gold then silver then bronze
+  scoreRowMedals: [
+    'bg-[var(--play-medal-gold)] [--play-ink:var(--play-medal-ink)] [--play-ink-faint:var(--play-medal-ink)]',
+    'bg-[var(--play-medal-silver)] [--play-ink:var(--play-medal-ink)] [--play-ink-faint:var(--play-medal-ink)]',
+    'bg-[var(--play-medal-bronze)] [--play-ink:var(--play-medal-ink)] [--play-ink-faint:var(--play-medal-ink)]',
+  ],
+  scoreBarMedal: 'bg-white/30',
+  scoreBar: 'play-score-bar absolute inset-0 origin-left',
+  scoreBarPlain: 'bg-[color-mix(in_srgb,var(--play-baccalaureat)_22%,transparent)]',
+  scoreRank:
+    'relative w-6 text-center text-sm font-black tabular-nums text-[var(--play-ink-faint)]',
+  scoreName: 'relative min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
+  scoreGain:
+    'play-pop relative rounded-full bg-[var(--play-baccalaureat)] px-2.5 py-1 text-sm font-black tabular-nums text-white',
+  scoreSum: 'relative flex items-center gap-2.5',
+  scoreDivider: 'h-7 w-0.5 rounded-full bg-[var(--play-ink)] opacity-30',
+  scoreTotal: 'relative min-w-12 text-left text-2xl font-black tabular-nums text-[var(--play-ink)]',
+  // Final ranking under the podium
   ranks: 'flex flex-col gap-2',
   rank: `${PANEL} flex items-center gap-3 px-3 py-2.5`,
   rankIndex: 'w-6 text-center text-sm font-extrabold tabular-nums text-[var(--play-ink-faint)]',
@@ -542,6 +711,28 @@ export const BAC_BOARD = {
  * @type {Record<string, string>}
  */
 
+/**
+ * Row of lives shared by the games: hearts that pop when won and empty when lost
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_HEARTS = {
+  hearts: 'relative flex items-center gap-0.5',
+  heartsMax: 'play-hearts-max',
+  heartCell: 'relative grid',
+  heartShine: 'play-heart-shine',
+  heartGain: 'play-heart-gain',
+  heartLose: 'play-heart-lose',
+  heartBurst: 'play-heart-burst',
+  heartTag: 'play-heart-tag',
+  heart: 'size-6 drop-shadow-[0_2px_4px_rgb(0_0_0/0.35)]',
+  heartOn: 'text-[var(--play-heart)]',
+  heartOff: 'text-[var(--play-ink-faint)] opacity-50',
+  // Small row under a golf bumper
+  heartsSmall: 'pointer-events-none select-none',
+  heartSmall: 'size-4 drop-shadow-[0_1px_2px_rgb(0_0_0/0.35)]',
+}
+
 export const BOMB_BOARD = {
   board: 'relative grid items-start gap-6 sm:grid-cols-[auto_minmax(0,1fr)]',
   figure:
@@ -549,17 +740,24 @@ export const BOMB_BOARD = {
   // Bonus letters, a column on the left
   letters: 'flex gap-1 max-sm:flex-wrap max-sm:justify-center sm:flex-col',
   letter:
-    'grid size-7 place-items-center rounded-lg bg-[var(--play-chip)] text-xs font-extrabold text-[var(--play-ink-faint)] transition-colors duration-[var(--motion-duration-fast)]',
-  letterOn:
-    'bg-[var(--play-bomb)] text-[var(--play-on-art)] shadow-[0_0.15rem_0_var(--play-bomb-deep)]',
+    'grid size-7 place-items-center rounded-lg bg-[var(--play-chip)] text-xs font-extrabold transition-opacity duration-[var(--motion-duration-fast)]',
+  letterFree: 'text-[var(--play-ink)]',
+  // Used: struck through and faded
+  letterUsed:
+    'text-[var(--play-ink-faint)] line-through decoration-2 decoration-[var(--play-bomb)] opacity-45',
   // Clear of the dock at the bottom
   stage: 'flex min-w-0 flex-col items-center gap-4 pb-16 in-[.play-boxfull]:pb-0',
   // Square table, seats on an orbit
   table: 'play-bomb-table relative aspect-square w-full max-w-[min(34rem,60dvh)]',
-  center: 'absolute top-1/2 left-1/2 w-[44%] -translate-x-1/2 -translate-y-1/2',
-  bomb: 'play-bomb relative',
+  center: 'absolute top-1/2 left-1/2 w-[36%] -translate-x-1/2 -translate-y-1/2',
+  bomb: 'play-bomb',
   bombBlast: 'play-bomb-blast',
   bombArt: 'block h-auto w-full',
+  bombTremble: 'play-bomb-tremble',
+  heatTint: 'play-bomb-heat',
+  sparkGrow: 'play-bomb-spark-grow',
+  shockwave: 'play-bomb-shockwave',
+  debris: 'play-bomb-debris',
   prompt:
     'absolute top-[59%] left-[48%] -translate-x-1/2 -translate-y-1/2 text-[clamp(1.5rem,6cqi,3rem)] leading-none font-black tracking-wider text-[var(--play-on-art)] uppercase',
   spark: 'play-bomb-spark',
@@ -567,14 +765,9 @@ export const BOMB_BOARD = {
   seat: 'play-bomb-seat flex w-28 flex-col items-center gap-1 text-center transition-opacity duration-[var(--motion-duration-panel)]',
   seatTurn: 'play-bomb-seat-turn',
   seatOut: 'opacity-40 grayscale',
-  seatBlast: 'play-bomb-shake',
+  seatBlast: 'play-bomb-shake play-bomb-hit',
   seatNote: NOTE,
-  hearts: 'flex items-center gap-0.5',
-  heartCell: 'relative grid',
-  heartShine: 'play-heart-shine',
-  heart: 'size-6 drop-shadow-[0_2px_4px_rgb(0_0_0/0.35)]',
-  heartOn: 'text-[var(--play-heart)]',
-  heartOff: 'text-[var(--play-ink-faint)] opacity-50',
+  ...PLAY_HEARTS,
   // Live typing under the player on turn
   draft:
     'max-w-36 truncate rounded-lg bg-[var(--play-chip)] px-2 py-0.5 text-sm font-extrabold tracking-wide text-[var(--play-ink)] uppercase',
@@ -590,6 +783,50 @@ export const BOMB_BOARD = {
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-4 py-3 text-center text-lg font-extrabold tracking-wide text-[var(--play-ink)] uppercase placeholder:font-normal placeholder:normal-case placeholder:text-[var(--play-ink-faint)] focus:bg-[var(--play-panel-strong)] focus:outline-none',
   // Final screen
   result: 'flex flex-col items-center gap-5',
+} as const
+
+// Idle chip of a difficulty, faded; picked one raised
+const LEVEL_CHIP =
+  'min-h-11 rounded-[var(--radius-md)] px-3.5 text-sm font-semibold tabular-nums transition-[opacity,box-shadow] duration-[var(--motion-duration-fast)]'
+
+/**
+ * Setup chip of a Bomb Party difficulty
+ * @param {string} colour - Fill and ink classes
+ * @param {string} raised - Shadow of the picked chip
+ * @return {{ idle: string, on: string }} - Classes
+ */
+
+const levelChip = (colour: string, raised: string) => ({
+  idle: `${LEVEL_CHIP} ${colour} opacity-55 hover:opacity-90`,
+  on: `${LEVEL_CHIP} ${colour} opacity-100 ${raised}`,
+})
+
+/**
+ * Colour of each Bomb Party difficulty button
+ * @type {Record<string, { idle: string, on: string }>}
+ */
+
+export const BOMB_LEVEL_CHIPS = {
+  beginner: levelChip(
+    'bg-[var(--play-level-beginner)] text-[var(--play-level-light-ink)]',
+    'shadow-[0_0.2rem_0_color-mix(in_srgb,var(--play-level-beginner)_55%,black)]'
+  ),
+  easy: levelChip(
+    'bg-[var(--play-level-easy)] text-[var(--play-level-light-ink)]',
+    'shadow-[0_0.2rem_0_color-mix(in_srgb,var(--play-level-easy)_55%,black)]'
+  ),
+  medium: levelChip(
+    'bg-[var(--play-level-medium)] text-[var(--play-level-dark-ink)]',
+    'shadow-[0_0.2rem_0_color-mix(in_srgb,var(--play-level-medium)_55%,black)]'
+  ),
+  hard: levelChip(
+    'bg-[var(--play-level-hard)] text-[var(--play-level-dark-ink)]',
+    'shadow-[0_0.2rem_0_color-mix(in_srgb,var(--play-level-hard)_55%,black)]'
+  ),
+  extreme: levelChip(
+    'bg-[var(--play-level-extreme)] text-[var(--play-level-light-ink)]',
+    'shadow-[0_0.2rem_0_color-mix(in_srgb,var(--play-level-extreme)_55%,black)]'
+  ),
 } as const
 
 /**
@@ -611,6 +848,17 @@ export const BAC_PODIUM_BLOCKS: Record<number, string> = {
 export const PLAY_CONFETTI_UI = {
   layer: 'pointer-events-none fixed inset-0 z-30 overflow-hidden',
   piece: 'play-confetti absolute top-0 block',
+} as const
+
+/**
+ * End of a game: replay, new game and hub under the result
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_END = {
+  bar: 'flex flex-wrap items-center justify-center gap-2 px-4 pb-4',
+  count: 'w-full text-center text-sm font-semibold text-[var(--play-ink-soft,inherit)] opacity-80',
+  action: 'gap-2 px-4! py-2.5! text-sm!',
 } as const
 
 /**
@@ -643,7 +891,7 @@ export const BAC_SESSION = {
   // Full screen table scrolls when taller than the screen
   boxFull: 'play-boxfull flex min-h-0 flex-1 flex-col overflow-y-auto',
   // Same panel as the page so the ink stays readable, content centred as one group, dock margin dropped
-  boxFullPad: `${PANEL} ${LIFT} m-4 gap-5 p-5 sm:m-6 sm:p-6 *:first:mt-auto *:last:mb-auto *:pb-0!`,
+  boxFullPad: `${PANEL} ${LIFT} m-4 mt-20 gap-5 p-5 sm:m-6 sm:mt-24 sm:p-6 *:first:mt-auto *:last:mb-auto *:pb-0!`,
   // Stage keys: in the top bar, then floating over the table, shifted by the open chat
   keys: 'flex items-center gap-2',
   keysFull:
@@ -652,11 +900,12 @@ export const BAC_SESSION = {
   keysShifted:
     'right-[calc(min(var(--play-side-open),100vw)+2rem)] sm:right-[calc(min(var(--play-side-open),100vw)+2.5rem)]',
   keysIcon: 'size-5',
+  exitKey: 'play-key play-key-ghost inline-flex items-center gap-2 px-3 py-2 text-sm font-bold',
   keyButton: 'px-3! py-2!',
   // Sound card hanging under the sound key
   keyHolder: 'relative',
   volumeCard:
-    'absolute top-full right-0 z-10 mt-2 flex w-64 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--play-panel,var(--color-surface))] p-3 shadow-lg ring-1 ring-[var(--play-line,var(--color-border))]',
+    'absolute top-full right-0 z-10 mt-2 flex w-64 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--play-panel,var(--color-surface))] p-3 shadow-lg ring-1 ring-[var(--play-line,var(--color-border))]',
   box: `${PANEL} ${LIFT} flex flex-col gap-5 p-5 sm:p-6`,
   // Column flush against the right edge, under the shell bar
   side: 'mt-4 flex min-w-0 flex-col gap-3 lg:fixed lg:top-[var(--play-bar-h)] lg:right-0 lg:bottom-0 lg:z-40 lg:mt-0 lg:pb-28',
@@ -679,12 +928,12 @@ export const BAC_SESSION = {
   groupTitle: 'text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
   stack: 'flex flex-wrap items-center -space-x-2.5',
   stacked: 'rounded-full ring-2 ring-[var(--play-ring)]',
+  faceAway: 'opacity-40 grayscale',
   empty: 'text-sm italic text-[var(--play-ink-faint)]',
   fold: 'inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
   foldIcon: 'size-5',
   // Avatars in a row, done or still writing
-  progress:
-    'flex flex-wrap items-center justify-center gap-5 border-t border-[var(--play-line)] pt-4',
+  progress: 'flex flex-wrap items-center justify-center gap-5',
   progressItem: 'relative',
   badge:
     'absolute -right-1 -bottom-1 grid size-5 place-items-center rounded-full ring-2 ring-[var(--play-ring)]',
@@ -831,3 +1080,92 @@ export const PLAY_VOLUME_UI = {
     'self-start px-1 text-xs font-bold text-[var(--play-ink-soft,var(--color-ink-subtle))] underline underline-offset-2',
   followed: 'px-1 text-xs text-[var(--play-ink-soft,var(--color-ink-subtle))]',
 }
+
+/**
+ * Extra sections of a player sheet: top games, records, presence
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_PROFILE = {
+  list: 'flex flex-col gap-2',
+  row: `${PANEL} flex items-center gap-3 p-3`,
+  logo: 'size-10 shrink-0',
+  rowText: 'flex min-w-0 flex-1 flex-col',
+  rowName: 'truncate text-sm font-extrabold',
+  rowNote: NOTE,
+  records: 'grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3',
+  record: `${PANEL} flex flex-col gap-1 p-4`,
+  recordValue: 'text-2xl font-extrabold tabular-nums tracking-tight',
+  recordLabel: 'text-xs font-bold tracking-wide text-[var(--play-ink-faint)] uppercase',
+  empty: 'text-sm italic text-[var(--play-ink-soft)]',
+  // Presence line and the gestures under the hero
+  presence: 'flex flex-wrap items-center gap-2 text-sm font-bold text-[var(--play-ink-soft)]',
+  presenceOn: 'text-[var(--play-ink)]',
+  dot: 'size-2 rounded-full bg-[var(--play-ink-faint)]',
+  dotOn: 'bg-[var(--play-gold)]',
+  actions: 'flex flex-wrap gap-2',
+  key: 'play-key inline-flex items-center px-5 py-3 text-base font-bold',
+  keyGhost: 'play-key play-key-ghost inline-flex items-center px-5 py-3 text-base font-bold',
+  more: 'w-fit text-sm font-extrabold text-[var(--play-accent)] underline-offset-4 hover:underline',
+} as const
+
+/**
+ * Group tab: name, members, invitations, proposed games
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_GROUP = {
+  // Name edited in place, same box as the title
+  name: 'w-full min-w-0 truncate rounded-lg bg-transparent px-1 text-left text-xl font-extrabold tracking-tight text-[var(--play-ink)] sm:text-2xl',
+  nameInput:
+    'w-full min-w-0 rounded-lg bg-[var(--play-chip)] px-1 text-xl font-extrabold tracking-tight text-[var(--play-ink)] outline-none sm:text-2xl',
+  section: 'flex flex-col gap-3',
+  heading: 'text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
+  list: 'flex flex-col gap-2',
+  // Game picker grid
+  gameRow: 'grid grid-cols-1 gap-3 sm:grid-cols-2',
+  memberList: 'grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3',
+  hint: 'text-sm text-[var(--play-ink-soft)]',
+  // Banner box, the title sits bottom left
+  gameBox:
+    'group relative block aspect-[16/6] w-full lg:aspect-[16/9] overflow-hidden rounded-2xl text-left transition-transform duration-150 enabled:active:scale-[0.98] disabled:cursor-default',
+  // Banner inside a chat line
+  chatGame:
+    'relative mt-1 block aspect-[16/8] w-64 max-w-full overflow-hidden rounded-xl transition-transform duration-150 active:scale-[0.98]',
+  gameArt: 'absolute inset-0 size-full object-cover',
+  gameShade: 'absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent',
+  gameTitle:
+    'absolute bottom-7 left-3.5 max-w-[55%] truncate text-base font-bold text-white sm:text-lg drop-shadow-[0_0.1rem_0.3rem_rgb(0_0_0/0.5)]',
+  gamePlayers:
+    'absolute bottom-2.5 left-3.5 text-xs font-semibold text-white/90 drop-shadow-[0_0.1rem_0.3rem_rgb(0_0_0/0.5)]',
+  // Pill on a banner, tells the host it opens a table
+  gamePlay:
+    'absolute right-2.5 bottom-2.5 rounded-full bg-white/90 px-2.5 py-1 text-xs font-black whitespace-nowrap text-black',
+  row: 'flex min-h-[4.5rem] items-center gap-3 rounded-xl bg-[var(--play-chip)] p-3',
+  rowText: 'flex min-w-0 flex-1 flex-col',
+  rowName: 'truncate text-base font-extrabold',
+  rowNote: NOTE,
+  rowOnline: 'size-2.5 shrink-0 rounded-full bg-[var(--play-gold)]',
+  rowOffline: 'size-2.5 shrink-0 rounded-full bg-[var(--play-ink-faint)]',
+  presence: 'flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[var(--play-ink-soft)]',
+  actions: 'flex shrink-0 flex-wrap items-center gap-2',
+  link: 'text-xs font-extrabold text-[var(--play-ink-soft)] transition-colors hover:text-[var(--play-ink)] disabled:opacity-50',
+  logo: 'size-10 shrink-0',
+  faces: 'flex -space-x-2',
+  search:
+    'min-h-11 w-full rounded-xl bg-[var(--play-chip)] px-3 text-sm text-[var(--play-ink)] outline-none placeholder:text-[var(--play-ink-faint)]',
+  pick: 'flex max-h-72 flex-col gap-1 overflow-y-auto',
+  pickRow:
+    'flex min-h-11 w-full items-center gap-3 rounded-xl px-2 text-left text-sm font-bold transition-colors hover:bg-[var(--play-chip)]',
+  pickRowOn: 'bg-[var(--play-chip)] ring-1 ring-[var(--play-key)]',
+  footer: 'flex flex-wrap gap-2 pt-2',
+} as const
+
+/**
+ * Floating note above the bottom bar
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_NOTE = {
+  note: 'play-glass fixed inset-x-4 bottom-28 z-50 mx-auto w-fit max-w-md rounded-2xl px-5 py-3 text-center text-sm font-semibold text-[var(--play-ink)] shadow-lg',
+} as const

@@ -5,7 +5,6 @@ import { commentFields } from '@/core/lib/forms/commentFields'
 import { bannedIdentifiers } from '@/core/services/recruitment/BanService'
 import { isObserver } from '@/core/services/recruitment/ObserverReader'
 import { maskForObserver } from '@/core/services/recruitment/ObserverMask'
-import { linkFields } from '@/core/services/onboarding/IntegrationLinkService'
 import {
   candidateFields,
   proseFields,
@@ -108,7 +107,6 @@ export const loadRecruitment = async (
       comment: commentFields(),
       review: proseFields('review'),
       instruction: proseFields('instructions'),
-      link: linkFields(),
     },
     can: {
       manage: allowed(Permissions.RecruitmentManage),

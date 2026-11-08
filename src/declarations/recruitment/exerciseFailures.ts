@@ -3,7 +3,7 @@
  * @type {string}
  */
 
-export const EXERCISE_ERROR_PARAM = 'erreur'
+export const EXERCISE_ERROR_PARAM = 'error'
 
 /**
  * Why an identity check was refused

@@ -216,6 +216,7 @@ const LEAD_PRESET: PermissionName[] = [
   Permissions.LiveconRead,
   Permissions.LiveconUpdate,
   Permissions.SanctionRead,
+  Permissions.SanctionDiscordRead,
   Permissions.SanctionManage,
   Permissions.AcademyRead,
   Permissions.AcademyManage,

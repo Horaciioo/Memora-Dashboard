@@ -1,6 +1,8 @@
 import Link from '@/components/elements/navigation/AppLink'
 
 import { Avatar } from '@/components/elements/display/Avatar'
+import { isIdentityAlert } from '@/core/hooks/interaction/state/useIdentityAlert'
+import { useAssistantDock } from '@/core/store/assistantDock'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
 import { NOTIFICATION_KIND_REGISTRY } from '@/declarations/notifications/registries'
 import { NOTIFICATION_TARGETS } from '@/declarations/notifications/targets'
@@ -99,6 +101,20 @@ export const NotificationItem = ({
             onClick={() => onOpen(entry.id)}
             aria-label={NOTIFICATION_COPY.goTo.replace('{target}', target?.label ?? '')}
             className={NOTIFICATION_STYLES.rowLink}
+          />
+          <ActionIcon className={NOTIFICATION_STYLES.rowArrow} aria-hidden="true" />
+        </>
+      )}
+      {withAction && isIdentityAlert(entry) && (
+        <>
+          <button
+            type="button"
+            aria-label={NOTIFICATION_COPY.openWithMemora}
+            className={NOTIFICATION_STYLES.rowLink}
+            onClick={() => {
+              useAssistantDock.getState().alert({ checkId: entry.targetId ?? '' })
+              onOpen(entry.id)
+            }}
           />
           <ActionIcon className={NOTIFICATION_STYLES.rowArrow} aria-hidden="true" />
         </>

@@ -1,4 +1,5 @@
 import type { GolfBody } from '@/core/lib/play/golf/body'
+import { isEffectActive } from '@/core/lib/play/golf/effects'
 import { floorHeight } from '@/core/lib/play/golf/course'
 import type {
   GolfCircle,
@@ -36,7 +37,10 @@ export interface GolfWorld {
   hazards: GolfHazard[]
   bumpers: GolfBumper[]
   orbs: number[]
-  cupFloor: number
+  // Ground height under each orb
+  orbFloors: number[]
+  // Ball and orb pairs a full hand already met
+  fullHands: Set<string>
   // Lost below this height
   voidFloor: number
   // Pairs overlapping at the start, ignored until apart
@@ -96,7 +100,7 @@ const bumpersOf = (input: GolfShotInput, hazards: GolfHazard[]): GolfBumper[] =>
       hazard: null,
     })),
     ...hazards
-      .filter((hazard) => hazard.power === GolfPowers.Bumper && (hazard.lives ?? 0) > 0)
+      .filter((hazard) => hazard.power === GolfPowers.Bumper && isEffectActive(hazard, input.at))
       .map((hazard) => ({
         id: hazard.id,
         x: hazard.x,
@@ -124,7 +128,8 @@ export const createWorld = (input: GolfShotInput, bodies: GolfBody[]): GolfWorld
     hazards,
     bumpers: bumpersOf(input, hazards),
     orbs: [...input.orbs],
-    cupFloor: floorHeight(input.hole, input.hole.cup[0], input.hole.cup[1]) ?? 0,
+    orbFloors: input.hole.orbs.map(([x, z]) => floorHeight(input.hole, x, z) ?? 0),
+    fullHands: new Set(),
     voidFloor: Math.min(...input.hole.pads.map((pad) => pad.h)) - GOLF_SETTINGS.physics.voidDepth,
     exempt: overlapping(bodies),
     boosting: new Map(),

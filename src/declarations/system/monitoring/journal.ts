@@ -24,11 +24,11 @@ export const JOURNAL_DEFAULT_PERIOD: JournalPeriod = 'week'
  */
 
 export const JOURNAL_PARAMS = {
-  level: 'niveau',
+  level: 'level',
   event: 'type',
-  origin: 'origine',
-  actor: 'acteur',
-  period: 'periode',
+  origin: 'origin',
+  actor: 'actor',
+  period: 'period',
   search: 'q',
   page: 'page',
 } as const

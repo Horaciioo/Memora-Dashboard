@@ -5,15 +5,18 @@ import { useFrame } from '@react-three/fiber'
 import { MathUtils } from 'three'
 import type { Group, Mesh, MeshBasicMaterial } from 'three'
 
+import { orbCardTexture, softShadeTexture } from '@/composites/play/golf/scene/orbTextures'
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
-import { questionTexture } from '@/composites/play/golf/scene/textures'
 import { floorHeight } from '@/core/lib/play/golf'
 import type { GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 const { orb } = GOLF_SCENE
-const { render } = GOLF_SETTINGS
+const { render, orbs, physics } = GOLF_SETTINGS
+
+// Sway kept under half a ball, the hitbox sits at the mean height
+const BOB = Math.min(orb.bob, physics.ballRadius / 2)
 
 // Back-out ease, overshooting the size
 const popScale = (progress: number): number => {
@@ -23,11 +26,30 @@ const popScale = (progress: number): number => {
 }
 
 /**
- * Power orb: glass shell, prism core, satellites and a ground ring, popping in when it returns
+ * Orb textures, dropped with the paint
+ * @param {GolfPaint} paint - Colours
+ * @return {Object} - Card and shade
+ */
+
+const useOrbTextures = (paint: GolfPaint) => {
+  const textures = useMemo(
+    () => ({
+      card: orbCardTexture(getComputedStyle(document.body).fontFamily),
+      shade: softShadeTexture(paint.shade),
+    }),
+    [paint]
+  )
+  useEffect(() => () => Object.values(textures).forEach((texture) => texture.dispose()), [textures])
+
+  return textures
+}
+
+/**
+ * Power card: rainbow card floating over a soft shade, popping in when it returns
  * @param {Object} props - Orb
  * @param {GolfHole} props.hole - Hole
  * @param {GolfPaint} props.paint - Colours
- * @param {number} props.index - Orb index
+ * @param {number} props.index - Orb index, its phase
  * @param {number} props.takenUntil - Server ms it returns
  * @param {() => number} props.serverNow - Server ms now
  * @return {JSX.Element}
@@ -47,89 +69,81 @@ export const GolfOrb = ({
   serverNow: () => number
 }) => {
   const body = useRef<Group>(null)
-  const shell = useRef<Group>(null)
-  const core = useRef<Mesh>(null)
-  const coreMaterial = useRef<MeshBasicMaterial>(null)
-  const satellites = useRef<Group>(null)
-  const ring = useRef<Mesh>(null)
+  const sphere = useRef<Mesh>(null)
+  const shade = useRef<Mesh>(null)
+  const shadeMaterial = useRef<MeshBasicMaterial>(null)
   const appearedAt = useRef<number | null>(null)
-  const mark = useMemo(() => questionTexture(orb.pixels, paint.shade), [paint.shade])
-  useEffect(() => () => mark.dispose(), [mark])
+  const takenAt = useRef<number | null>(null)
+  const textures = useOrbTextures(paint)
   const [x, z] = hole.orbs[index]
   const floor = floorHeight(hole, x, z) ?? 0
 
   useFrame(({ clock }) => {
-    if (!body.current || !ring.current) return
+    if (!body.current || !shade.current) return
     const time = clock.elapsedTime
     const isReady = serverNow() >= takenUntil
-    body.current.visible = isReady
-    ring.current.visible = isReady
+    // Taken: implodes, spins in, then gone until it returns
+    if (!isReady && appearedAt.current !== null) takenAt.current ??= performance.now()
+    const implode = takenAt.current
+      ? MathUtils.clamp((performance.now() - takenAt.current) / orb.implodeMs, 0, 1)
+      : 0
+    const isShown = isReady || (takenAt.current !== null && implode < 1)
+    body.current.visible = isShown
+    shade.current.visible = isShown
     // Pop-in clock restarts on every return
     if (!isReady) {
       appearedAt.current = null
-      return
-    }
-    appearedAt.current ??= performance.now()
-    const progress = MathUtils.clamp((performance.now() - appearedAt.current) / orb.popMs, 0, 1)
-    const grow = popScale(progress)
+      if (!isShown) {
+        takenAt.current = null
+        return
+      }
+    } else takenAt.current = null
+    appearedAt.current ??= isReady ? performance.now() : null
+    const progress = appearedAt.current
+      ? MathUtils.clamp((performance.now() - appearedAt.current) / orb.popMs, 0, 1)
+      : 1
+    const grow = Math.max(
+      isReady
+        ? popScale(progress)
+        : (1 - implode) * (1 + orb.implodeSwell * Math.sin(implode * Math.PI)),
+      1e-3
+    )
+    const sway = Math.sin(time * orb.bobSpeed + index * orb.phase)
 
-    body.current.scale.setScalar(Math.max(grow, 1e-3))
-    body.current.position.y =
-      floor + render.orbHover + Math.sin(time * orb.bobSpeed + index) * orb.bob
-    shell.current?.rotation.set(orb.tilt, time * orb.spin, orb.tilt)
-    core.current?.rotation.set(time * orb.coreSpin, time * orb.coreSpin * orb.coreTumble, 0)
-    if (satellites.current) satellites.current.rotation.set(0, time * orb.orbitSpeed, orb.tilt)
-    // Core shifts through the rainbow, any power may hide inside
-    coreMaterial.current?.color.setHSL((time * orb.coreHue + index * orb.hueGap) % 1, 1, 0.6)
-    const beat = 1 + Math.sin(time * orb.ring.pulseSpeed + index) * orb.ring.pulse
-    ring.current.scale.setScalar(beat * Math.max(grow, 1e-3))
+    body.current.scale.setScalar(grow)
+    body.current.position.y = floor + render.orbHover + sway * BOB
+    sphere.current?.rotation.set(0, Math.sin(time * orb.spin + index) * orb.card.swing, 0)
+    // Shade shrinks and fades as the orb rises
+    const lift = (sway + 1) / 2
+    shade.current.scale.setScalar(grow * (1 - lift * orb.shade.shrink))
+    if (shadeMaterial.current) {
+      shadeMaterial.current.opacity = orb.shade.opacity * (1 - lift * orb.shade.shrink)
+    }
   })
 
   return (
     <>
-      <mesh
-        ref={ring}
-        position={[x, floor + GOLF_SCENE.chevron.lift, z]}
-        rotation={[-Math.PI / 2, 0, 0]}
-      >
-        <ringGeometry args={[orb.ring.inner, orb.ring.outer, GOLF_SCENE.portal.segments]} />
-        <meshBasicMaterial color={paint.ice} transparent opacity={orb.ring.opacity} />
+      <mesh ref={shade} position={[x, floor + orb.shade.lift, z]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[orbs.radius * orb.shade.size, orbs.radius * orb.shade.size]} />
+        <meshBasicMaterial
+          ref={shadeMaterial}
+          map={textures.shade}
+          transparent
+          depthWrite={false}
+          opacity={orb.shade.opacity}
+        />
       </mesh>
       <group ref={body} position={[x, floor + render.orbHover, z]}>
-        <group ref={shell}>
-          <mesh castShadow>
-            <boxGeometry args={[orb.size, orb.size, orb.size]} />
-            <meshStandardMaterial
-              color={paint.ice}
-              transparent
-              opacity={orb.opacity}
-              roughness={orb.roughness}
-            />
-          </mesh>
-          <mesh scale={orb.mark}>
-            <boxGeometry args={[orb.size, orb.size, orb.size]} />
-            <meshBasicMaterial map={mark} transparent depthWrite={false} />
-          </mesh>
-        </group>
-        <mesh ref={core}>
-          <boxGeometry args={[orb.core, orb.core, orb.core]} />
-          <meshBasicMaterial ref={coreMaterial} toneMapped={false} />
+        <mesh ref={sphere} castShadow>
+          <boxGeometry
+            args={[
+              orbs.radius * orb.card.width,
+              orbs.radius * orb.card.height,
+              orbs.radius * orb.card.depth,
+            ]}
+          />
+          <meshBasicMaterial map={textures.card} toneMapped={false} />
         </mesh>
-        <group ref={satellites}>
-          {Array.from({ length: orb.satellites }, (_, satellite) => {
-            const angle = (satellite / orb.satellites) * Math.PI * 2
-
-            return (
-              <mesh
-                key={satellite}
-                position={[Math.cos(angle) * orb.orbit, 0, Math.sin(angle) * orb.orbit]}
-              >
-                <boxGeometry args={[orb.satellite, orb.satellite, orb.satellite]} />
-                <meshBasicMaterial color={paint.ice} />
-              </mesh>
-            )
-          })}
-        </group>
       </group>
     </>
   )

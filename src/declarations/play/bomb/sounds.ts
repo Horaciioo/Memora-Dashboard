@@ -38,12 +38,12 @@ export type BombTakeName = keyof typeof BOMB_TAKES
  */
 
 export const BOMB_MIX = {
-  fuse: 0.12,
-  fuseMine: 0.4,
-  fuseRate: 1,
-  fuseRateMine: 1.8,
+  fuseMine: 0.35,
+  fuseHeat: 0.35,
+  fuseRateMine: 1.2,
+  fuseRateHeat: 1.6,
   word: 0.6,
-  miss: 0.7,
+  miss: 0.4,
   turn: 0.8,
   typing: 0.25,
   clock: 0.5,

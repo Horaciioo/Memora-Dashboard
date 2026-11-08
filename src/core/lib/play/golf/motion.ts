@@ -44,6 +44,10 @@ export interface GolfMotion {
   seen: Set<string>
   // Local ms each bumper or boost was last hit
   pulses: Map<string, number>
+  // Last ball dropped in water, local ms
+  splash: { x: number; y: number; z: number; at: number } | null
+  // Where a ball last dropped in a hole, the cup to celebrate
+  cupAt: { x: number; z: number } | null
 }
 
 /**
@@ -55,6 +59,8 @@ export const createMotion = (): GolfMotion => ({
   tracks: new Map(),
   seen: new Set(),
   pulses: new Map(),
+  splash: null,
+  cupAt: null,
 })
 
 /**
@@ -208,6 +214,44 @@ export const dropLocal = (motion: GolfMotion): void => {
 }
 
 /**
+ * Clock of a replay, joined to the track it replaces so the ball never jumps
+ * @param {GolfShotState} shot - Replayed stroke
+ * @param {GolfMotion} motion - Motion
+ * @return {number | null} - Local ms of frame zero
+ */
+
+const replayStart = (shot: GolfShotState, motion: GolfMotion): number | null => {
+  if (!shot.track.replay) return null
+  const replaced = Object.keys(shot.track.paths)
+    .map((id) => motion.tracks.get(id))
+    .find((track) => track && !isLocalTrack(track))
+
+  return replaced ? replaced.startedAt + (shot.at - replaced.serverStart) : null
+}
+
+/**
+ * Clock of a stroke, own prediction kept
+ * @param {GolfShotState} shot - Stroke
+ * @param {GolfMotion} motion - Motion
+ * @param {Object} context - Screen
+ * @param {number} context.now - Local ms
+ * @param {number} context.elapsed - Server ms since
+ * @param {string} context.viewerId - Screen owner
+ * @return {number} - Local ms of frame zero
+ */
+
+const strokeStart = (
+  shot: GolfShotState,
+  motion: GolfMotion,
+  { now, elapsed, viewerId }: { now: number; elapsed: number; viewerId: string }
+): number => {
+  const local = shot.accountId === viewerId ? motion.tracks.get(viewerId) : undefined
+  if (local?.key === LOCAL_KEY) return local.startedAt
+
+  return now - Math.max(0, elapsed - GOLF_SETTINGS.lateShotMs)
+}
+
+/**
  * Replay the server strokes not seen yet, a prediction swapped for the real tracks
  * @param {GolfMotion} motion - Motion
  * @param {GolfShotState[]} shots - Recent strokes
@@ -229,17 +273,14 @@ export const syncShots = (
     const elapsed = serverNow - shot.at
     if (elapsed >= Math.max(0, shot.track.frames - 1) * shot.track.frameMs) continue
 
-    // Own prediction keeps its clock
-    const local = shot.accountId === viewerId ? motion.tracks.get(viewerId) : undefined
     const startedAt =
-      local?.key === LOCAL_KEY
-        ? local.startedAt
-        : now - Math.max(0, elapsed - GOLF_SETTINGS.lateShotMs)
+      replayStart(shot, motion) ?? strokeStart(shot, motion, { now, elapsed, viewerId })
     startTracks(motion, shot.track, {
       key: shot.id,
       startedAt,
       serverStart: shot.at,
-      leadId: shot.accountId,
+      // A replay sounds from its first ball
+      leadId: shot.track.replay ? (Object.keys(shot.track.paths)[0] ?? '') : shot.accountId,
     })
   }
 }

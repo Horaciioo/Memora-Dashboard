@@ -10,9 +10,11 @@
   "promptAge": { "default": 2, "min": 1, "max": 20 },
   "fuseSeconds": { "min": 10, "max": 30 },
   "difficulties": {
-    "beginner": 500,
-    "medium": 300,
-    "hard": 100
+    "beginner": 10000,
+    "easy": 5000,
+    "medium": 2500,
+    "hard": 1000,
+    "extreme": 500
   },
   "difficulty": "beginner",
   "customWordsPerPrompt": { "default": 200, "min": 1, "max": 5000 },

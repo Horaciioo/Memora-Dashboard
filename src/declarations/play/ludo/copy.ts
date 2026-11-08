@@ -8,8 +8,13 @@ import type { LudoCornerName } from '@/declarations/play/ludo/board'
 export const LUDO_BOARD_COPY = {
   board: 'Plateau de Ludo',
   roll: 'Lancer le dé',
-  yourRoll: 'À toi, lance le dé',
-  yourMove: 'Choisis un pion',
+  yourRoll: 'Touche le dé pour le lancer',
+  yourMove: 'Touche un pion qui rebondit pour le jouer',
+  yourTurn: 'À toi de jouer !',
+  turnMine: 'Ton tour',
+  turnTheirs: 'Son tour',
+  eaten: 'Mangé !',
+  eating: '{name} a mangé un pion de {victim}',
   theirRoll: '{name} lance le dé',
   theirMove: '{name} choisit un pion',
   starting: 'La partie commence',
@@ -17,7 +22,6 @@ export const LUDO_BOARD_COPY = {
   bonus: 'Tour bonus',
   noMove: 'Aucun pion ne peut bouger',
   penalty: 'Trois six de suite, tour perdu',
-  spectating: 'Tu regardes la partie.',
   host: 'Hôte',
   left: 'A quitté',
   done: 'Arrivé',
@@ -111,11 +115,7 @@ export const LUDO_RULE_COPY = {
   },
   safeSquares: {
     label: 'Cases protégées',
-    hint: 'Personne ne se fait manger sur une étoile ni sur une case de départ.',
-  },
-  exactFinish: {
-    label: 'Arrivée exacte',
-    hint: 'Il faut le nombre juste pour entrer à la maison.',
+    hint: 'Personne ne se fait manger sur une étoile ni sur une case de départ, les pions s’y partagent la case.',
   },
 } as const
 

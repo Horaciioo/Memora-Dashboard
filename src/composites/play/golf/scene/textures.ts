@@ -42,34 +42,6 @@ export const ballTexture = (color: Color, stripe: Color): CanvasTexture => {
   return texture
 }
 
-/**
- * Question mark of a power box, white on clear
- * @param {number} size - Canvas pixels
- * @param {Color} ink - Outline colour
- * @return {CanvasTexture} - Texture
- */
-
-export const questionTexture = (size: number, ink: Color): CanvasTexture => {
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const context = canvas.getContext('2d')
-  if (context) {
-    context.font = `900 ${size * 0.72}px ${getComputedStyle(document.body).fontFamily}`
-    context.textAlign = 'center'
-    context.textBaseline = 'middle'
-    context.lineWidth = size * 0.08
-    context.strokeStyle = `#${ink.getHexString()}`
-    context.fillStyle = 'white'
-    context.strokeText('?', size / 2, size * 0.54)
-    context.fillText('?', size / 2, size * 0.54)
-  }
-  const texture = new CanvasTexture(canvas)
-  texture.colorSpace = SRGBColorSpace
-
-  return texture
-}
-
 // Decal pixels
 const DECAL = 256
 
@@ -91,32 +63,10 @@ const decal = (paint: (context: CanvasRenderingContext2D) => void): CanvasTextur
   return texture
 }
 
-// Chevron tops of a boost plate, front first
-const BOOST_CHEVRONS = [0.3, 0.55]
-
 /**
- * Chevron pointing up
- * @param {CanvasRenderingContext2D} context - Canvas
- * @param {Color} color - Stroke colour
- * @param {number} top - Tip height share
- * @return {void}
- */
-
-const strokeChevron = (context: CanvasRenderingContext2D, color: Color, top: number): void => {
-  context.strokeStyle = `#${color.getHexString()}`
-  context.lineWidth = DECAL * 0.09
-  context.lineJoin = 'miter'
-  context.beginPath()
-  context.moveTo(DECAL * 0.2, DECAL * (top + 0.2))
-  context.lineTo(DECAL * 0.5, DECAL * top)
-  context.lineTo(DECAL * 0.8, DECAL * (top + 0.2))
-  context.stroke()
-}
-
-/**
- * Boost plate: yellow card, red rim, two red chevrons pointing up
+ * Boost plate: card and rim, the chevrons scroll over it
  * @param {Color} fill - Card colour
- * @param {Color} edge - Rim and chevrons
+ * @param {Color} edge - Rim
  * @return {CanvasTexture} - Texture
  */
 
@@ -131,18 +81,7 @@ export const boostTexture = (fill: Color, edge: Color): CanvasTexture =>
     context.beginPath()
     context.roundRect(rim * 1.5, rim * 1.5, DECAL - rim * 3, DECAL - rim * 3, DECAL * 0.05)
     context.fill()
-    for (const top of BOOST_CHEVRONS) strokeChevron(context, edge, top)
   })
-
-/**
- * One chevron of a boost plate on clear, to flash over the plate
- * @param {Color} color - Chevron colour
- * @param {number} index - Chevron, front first
- * @return {CanvasTexture} - Texture
- */
-
-export const boostChevronTexture = (color: Color, index: number): CanvasTexture =>
-  decal((context) => strokeChevron(context, color, BOOST_CHEVRONS[index]))
 
 /**
  * Fade in square steps, solid at the top, gone at the bottom, rough edges

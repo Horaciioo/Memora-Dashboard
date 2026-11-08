@@ -6,16 +6,16 @@ import { PARKOUR_COPY } from '@/declarations/academy/parkour'
  * Junior as the queues read them
  * @typedef {Object} QueueJunior
  * @property {ParkourPhase} phase - Where the junior stands
- * @property {{ id: string } | null} trainer - Trainer in charge
+ * @property {{ id: string } | null} referent - Referent in charge
  */
 
 export interface QueueJunior {
   phase: ParkourPhase
-  trainer: { id: string } | null
+  referent: { id: string } | null
 }
 
 /**
- * Juniors a trainer owes a check-in
+ * Juniors a referent owes a check-in
  * @param {T[]} juniors - Juniors in reach
  * @param {string} viewerId - Member looking
  * @return {T[]} - Their own juniors whose check-in falls due
@@ -23,7 +23,7 @@ export interface QueueJunior {
 
 export const reviewQueue = <T extends QueueJunior>(juniors: T[], viewerId: string): T[] =>
   juniors.filter(
-    (junior) => REVIEW_DUE_PHASES.includes(junior.phase) && junior.trainer?.id === viewerId
+    (junior) => REVIEW_DUE_PHASES.includes(junior.phase) && junior.referent?.id === viewerId
   )
 
 /**

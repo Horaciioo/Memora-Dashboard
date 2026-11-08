@@ -127,7 +127,7 @@ const parkourTask = ({
 })
 
 /**
- * Read what the PIM journey waits on from a responsable: trainers, PIM starts, launches,
+ * Read what the PIM journey waits on from a responsable: referents, PIM starts, launches,
  * decisions and the second period
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
@@ -145,31 +145,17 @@ const managerTasks = async (
   for (const standing of standings) {
     const context = `${standing.name}, ${standing.sessionName}`
 
-    if (standing.phase === 'needsTrainer') {
+    if (standing.phase === 'needsReferent') {
       tasks.push(
         guidedTask({
-          key: `trainer:${standing.juniorId}`,
-          kind: 'assignTrainer',
-          title: PERSONAL_TASK_COPY.assignTrainer,
+          key: `referent:${standing.juniorId}`,
+          kind: 'assignReferent',
+          title: PERSONAL_TASK_COPY.assignReferent,
           context,
-          destination: 'fsiTrainer',
+          destination: 'fsiReferent',
           sessionId: standing.sessionId,
           juniorId: standing.juniorId,
-          description: PERSONAL_TASK_COPY.assignTrainerDescription,
-        })
-      )
-    }
-
-    if (standing.phase === 'needsKickoff') {
-      tasks.push(
-        parkourTask({
-          key: `kickoff:${standing.juniorId}`,
-          kind: 'declareKickoff',
-          title: PERSONAL_TASK_COPY.declareKickoff,
-          context,
-          icon: 'link',
-          href: ROUTES.junior(standing.sessionId, standing.juniorId),
-          description: PERSONAL_TASK_COPY.declareKickoffDescription,
+          description: PERSONAL_TASK_COPY.assignReferentDescription,
         })
       )
     }
@@ -180,7 +166,7 @@ const managerTasks = async (
           key: `decision:${standing.juniorId}`,
           kind: 'pimDecision',
           title: PERSONAL_TASK_COPY.decision
-            .replace('{trainer}', standing.trainerName ?? '')
+            .replace('{referent}', standing.referentName ?? '')
             .replace('{junior}', standing.name),
           context: standing.sessionName,
           icon: 'sheet',
@@ -250,13 +236,13 @@ const managerTasks = async (
 }
 
 /**
- * Read the check-ins a trainer owes
- * @param {string} trainerId - Signed-in trainer
+ * Read the check-ins a referent owes
+ * @param {string} referentId - Signed-in referent
  * @return {Promise<HomeTask[]>} - Review tasks
  */
 
-const reviewTasks = async (trainerId: string): Promise<HomeTask[]> => {
-  const standings = await parkourStandings({ trainerId })
+const reviewTasks = async (referentId: string): Promise<HomeTask[]> => {
+  const standings = await parkourStandings({ referentId })
 
   return standings
     .filter((standing) => REVIEW_DUE_PHASES.includes(standing.phase))

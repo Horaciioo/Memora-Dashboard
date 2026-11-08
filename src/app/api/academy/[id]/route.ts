@@ -8,10 +8,12 @@ import {
   sessionFields,
   updateSession,
 } from '@/core/services/academy/AcademyService'
+import { announceLaunch } from '@/core/services/academy/parkour/ParkourService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { summariseChange } from '@/core/services/system/changes'
 import { JOURNAL_FILES } from '@/core/services/system/FileJournal'
 import { sessionTitle } from '@/utils/format/academy'
+import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
@@ -35,6 +37,13 @@ export const PATCH = createProtectedRoute({
       summary: sessionTitle(before.summary),
       change: after ? summariseChange(fields, before.summary.values, after.values) : null,
     })
+
+    if (
+      after?.status === AcademySessionStatuses.Running &&
+      before.summary.status !== after.status
+    ) {
+      await announceLaunch(params.id, session.id)
+    }
 
     return sessions
   },

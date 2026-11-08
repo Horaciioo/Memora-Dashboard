@@ -7,6 +7,7 @@ import { rankScores, tournamentXp } from '@/core/lib/play'
 import { PLAY_JOURNAL, PLAY_OUTCOME_LABELS, PLAY_SETTINGS } from '@/declarations/play'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
 import type { PlayJournalInput } from '@/core/services/play/PlayJournalService'
+import { botIdsAmong, humanResults } from '@/core/services/play/bots/BotRewardService'
 import { recordResults } from '@/core/services/play/StatService'
 import { cloneTable, loadSession } from '@/core/services/play/PlaySessionService'
 import { isPresent } from '@/core/lib/play/session'
@@ -40,13 +41,14 @@ const closeTournament = async (
     )
   )
   const pays = totals.size - gone.size >= PLAY_SETTINGS.rewards.minPlayers
-  const results = rankScores(totals, gone).map((standing) => ({
+  const ranked = rankScores(totals, gone).map((standing) => ({
     ...standing,
     xp:
       pays && !gone.has(standing.accountId)
         ? tournamentXp(standing.outcome, tournament.gamesCount)
         : 0,
   }))
+  const results = humanResults(ranked, await botIdsAmong(tx, [...totals.keys()]))
 
   await recordResults(
     tx,

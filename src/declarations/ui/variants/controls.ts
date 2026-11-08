@@ -77,6 +77,18 @@ export const SEGMENTED_STYLES = {
 } as const
 
 /**
+ * Segmented switch of Memora Play: one key per choice, the pick in colour
+ * @type {Record<string, string>}
+ */
+
+export const SEGMENTED_PLAY = {
+  group: 'flex w-full items-center gap-2 pb-1.5',
+  option: 'play-key min-h-11 flex-1 px-3 py-2 text-center text-sm whitespace-nowrap',
+  selected: '',
+  idle: 'play-key-ghost',
+} as const
+
+/**
  * Property title
  * @type {string}
  */
@@ -248,6 +260,10 @@ export const SELECT_MENU_STYLES = {
   // No field box, a hover wash only
   triggerBare:
     'flex min-w-0 items-center gap-2 rounded-[var(--radius-lg)] px-2 py-1.5 text-left text-sm text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)] disabled:pointer-events-none disabled:opacity-60',
+  // Arcade field: chip fill like the other play inputs
+  triggerPlay:
+    'flex min-h-11 w-full min-w-0 items-center gap-2 rounded-xl bg-[var(--play-chip)] px-3 text-left text-sm font-semibold text-[var(--play-ink)] transition-colors hover:bg-[var(--play-panel-strong)] focus-visible:outline-3 focus-visible:outline-[var(--play-key)] disabled:pointer-events-none disabled:opacity-60',
+  chevronPlay: 'text-[var(--play-ink-faint)]',
   invalid: 'border-[var(--color-danger)]',
   // Chevron trails the text
   value: 'flex min-w-0 items-center gap-2 truncate',
@@ -276,6 +292,8 @@ export const SELECT_MENU_STYLES = {
   // Cell holding the check or the mark
   lead: 'flex shrink-0 items-center justify-center',
   leadGlyph: 'h-4 w-4',
+  // Game logo cell
+  leadLogo: 'size-6',
   leadPortrait: 'h-6 w-6',
   leadPortraitLarge: 'h-8 w-8',
   empty: 'px-3 py-4 text-center text-xs text-[var(--color-ink-subtle)]',

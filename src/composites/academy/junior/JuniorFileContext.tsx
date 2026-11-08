@@ -96,10 +96,10 @@ export interface JuniorRows {
 
 /**
  * Form standing open
- * @typedef {'note' | 'objective' | 'review' | 'trainer' | null} JuniorDialog
+ * @typedef {'note' | 'objective' | 'review' | 'referent' | null} JuniorDialog
  */
 
-export type JuniorDialog = 'note' | 'objective' | 'review' | 'trainer' | null
+export type JuniorDialog = 'note' | 'objective' | 'review' | 'referent' | null
 
 /**
  * Flow of check-ins or decisions standing open
@@ -137,7 +137,7 @@ export interface JuniorFileContextState extends JuniorSurroundings {
   noteForm: (note: JuniorNoteView | null) => void
   objectiveForm: (objective: JuniorObjectiveView | null) => void
   reviewForm: () => void
-  trainerForm: () => void
+  referentForm: () => void
 }
 
 const FileContext = createContext<JuniorFileContextState | null>(null)
@@ -235,7 +235,7 @@ export const JuniorFileProvider = ({
       open('objective')
     },
     reviewForm: () => open('review'),
-    trainerForm: () => open('trainer'),
+    referentForm: () => open('referent'),
   }
 
   return <FileContext.Provider value={state}>{children}</FileContext.Provider>

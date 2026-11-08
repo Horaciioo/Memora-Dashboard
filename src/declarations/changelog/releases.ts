@@ -108,7 +108,6 @@ export interface ChangelogComment {
  * @property {string} description - Why the changes were made
  * @property {ChangelogItem[]} items - Change lines
  * @property {ChangelogComment[]} [comments] - Team words
- * @property {boolean} [hasShowcase] - Animated tour on top
  */
 
 export interface ChangelogRelease {
@@ -119,7 +118,6 @@ export interface ChangelogRelease {
   description: string
   items: ChangelogItem[]
   comments?: ChangelogComment[]
-  hasShowcase?: boolean
 }
 
 /**
@@ -129,6 +127,462 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.11.0',
+    date: '2026-11-08',
+    title: 'Memora Play sur son 31',
+    intro:
+      'Memora Play passe à la vitesse supérieure : une Bataille navale, des bots pour compléter les tables, des groupes, neuf nouvelles maps de Golf, et une chasse aux bugs sans précédent, avec 45 corrections dans cette version.',
+    description:
+      'Les parties de Memora Play manquaient de joueurs à certaines heures, se perdaient dans des tables oubliées et cachaient plusieurs défauts de jeu, du Golf au Ludo en passant par la Bombe et le Baccalauréat. Cette version ajoute la Bataille navale, les bots, les parties privées, les groupes, l’historique et la carrière de chaque joueur, refait les maps du Golf et corrige un nombre record de bugs, autant dans le jeu que dans l’Academy, le Recrutement et le Panel de sanctions. Les Formateurs deviennent des Référents partout, et chaque candidat accepté confirme désormais son identité Discord avant d’entrer.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Bataille navale » : chaque capitaine place sa flotte sur la mer puis tire case par case, en Duel, en Tournoi de deux à huit capitaines ou en Chacun pour soi, sur une mer Rapide (10 x 10), Standard (12 x 12) ou Océan (36 x 36).',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de cinq armes dans la « Bataille navale » : le Canon, la Frappe aérienne, la Bordée, l’Obus éclairant qui révèle une zone sans toucher, et la Torpille qui file jusqu’au premier navire.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de bots dans « Memora Play » : « Ajouter un bot » ou « Compléter la table » remplit une partie en Facile, Moyen ou Difficile (un seul niveau au Ludo), et un bot ne gagne ni ne rapporte jamais d’XP.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité de créer une partie privée dans « Memora Play » : elle ne figure dans aucune liste, se rejoint avec son code ou sur invitation, et reste fermée aux autres.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Groupes » dans « Memora Play » : on crée un groupe, on y invite des membres, on discute dans un chat de groupe, on lui propose des jeux et on ouvre une partie pour tout le groupe d’un clic.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un « Historique » dans « Memora Play » : les parties terminées, filtrables par jeu, avec les adversaires, le classement final et un chiffre marquant du jeu.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une page « Carrière » dans les statistiques de « Memora Play » : maîtrise de chaque jeu, rangs, taux de victoire et décompte des victoires, nuls et défaites.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de nouvelles pages « Salon », « Feed » et « Classement » dans « Memora Play » : qui est en partie, les dernières parties et les invitations, et le classement de chaque jeu.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une barre d’onglets propre à « Memora Play » sur téléphone, et d’une barre de discussion collée en bas de chaque partie.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité de confirmer qu’on est prêt avant une partie, de la lancer quand même sans les retardataires, et de proposer ou d’accepter une revanche à la fin.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de neuf nouvelles maps dans le « Golf » : RandomTown, SpeedTown, BoingTown, ZigZag, SingleTown, SlideTown, ZarbLand, DroppinHit et Candy Kingdom, qui remplacent les cinq anciens parcours.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout du par de chaque trou dans le « Golf » : le score s’affiche contre le par (Trou en un, Albatros, Eagle, Birdie, Bogey…), avec des mots qui flottent au-dessus du trou.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une colonne des pouvoirs en cours dans le « Golf » : elle montre qui les a lancés, sur quoi ils agissent et à quel moment.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout, pour les spectateurs du « Golf », de la possibilité de suivre un joueur, de passer au joueur précédent ou suivant, ou de voler librement au-dessus du parcours.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’un vol libre au-dessus de toutes les maps du « Golf » depuis le jeu, avec les boîtes de collision et le point du sol regardé, pour vérifier un parcours.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.IntegrationManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité d’activer d’un clic les comptes de tous les candidats acceptés d’un recrutement, avec le suivi de ceux qui ont confirmé leur identité.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une vérification d’identité Discord avant toute connexion : Memora présente à chaque candidat accepté le compte trouvé, lui demande de confirmer, puis l’accueille dans sa session avec une animation.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.IntegrationManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une alerte de Memora, en rouge, quand un candidat ne retrouve pas son compte : le Responsable saisit le bon identifiant Discord, vérifie qui se cache derrière et copie un nouveau lien à lui envoyer.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de l’accueil de « Memora Play » : une grille des jeux avec leurs logos et leurs bannières, un jeu mystère qui complète la dernière rangée, et un bouton qui ouvre directement une nouvelle table.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du « Golf » : les pouvoirs deviennent des cartes arc-en-ciel qui se balancent, les ventilateurs se dressent sur un pied, la flèche de visée devient une ligne de carrés et les bumpers montrent leur propriétaire.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du « Golf » : après le dernier coup d’un trou, les balles s’envolent ensemble vers le départ suivant, avec des bruitages de chute, de fanfare et de cartes distribuées au vote de tournoi.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du « Ludo » : un plateau aux cases arrondies, un médaillon central, des pions numérotés qui s’empilent à la maison, un cadre qui s’allume à ton tour et de nouveaux sons de dé.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de la « Bombe » : la mèche tremble de plus en plus avant l’explosion, et on peut changer son vote du « Baccalauréat » jusqu’au décompte, avec le choix en surbrillance.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Amélioration de « Academy » : les Formateurs deviennent des Référents partout, dans les pages, les droits, les notifications, le « Calendrier » et l’« Assistant Memora ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration de « Academy » : une promotion se lance d’elle-même dès que chaque Junior confirmé a son Référent, la déclaration du début de la PIM disparaît.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.sanctions,
+        permission: Permissions.SanctionRead,
+        text: 'Amélioration du « Panel de sanctions » : chaque métier ouvre son propre panel, Lives pour les équipes Lives, Discord pour les équipes Discord.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de toutes les adresses de Memora : les pages et les réglages ont des adresses en anglais, et les anciens liens redirigent vers les nouveaux.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.changelog,
+        text: 'Amélioration de la page « Nouveautés » : la présentation animée disparaît, chaque note s’ouvre directement sur son contenu.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui enfonçait la flèche de visée dans les pentes au lieu de la poser dessus.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui laissait un bumper posé sur une pente flotter dans le vide ou s’enfoncer dans le sol.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui laissait une balle très rapide traverser un mur.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui comptait deux fois le choc entre deux balles en mouvement.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui faisait apparaître, depuis un trou voisin, des blocs cachés sur le parcours.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui comptait comme un coup de plus le rejeu d’une balle après un malus.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui effaçait un bonus armé pour le trou suivant dès l’ouverture de ce trou.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui laissait activer un bonus sur le dernier trou, où il n’avait plus aucun effet : il reste maintenant en main.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui laissait se téléporter sur un point hors du parcours ou trop loin de la balle.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui permettait de poser un pouvoir sur un trou qui n’était pas celui en cours.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui dessinait les ventilateurs sans les tourner dans le sens du vent.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui laissait une scène blanche après la perte du contexte graphique du navigateur.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui faisait tirer les bots pendant que la balle roulait encore.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui privait le podium de ses touches pour rejouer ou quitter.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui cachait sur ordinateur les sorties du jeu dans les réglages, réservées jusque-là au téléphone.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui faisait clignoter le dessus de certains blocs et rails.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui laissait des trous dans le sillage d’une balle très rapide.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui répétait l’alerte « Main pleine » à chaque passage sur une orbe.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’une lenteur dans « Golf » sur les parcours qui comptent beaucoup de plaques d’accélération.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui lançait les confettis au mauvais trou sur les parcours à plusieurs trous.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Ludo » qui ne tenait pas compte de l’ordre d’arrivée des pions pour départager les joueurs.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Ludo » qui renvoyait un pion mangé à la maison sans le montrer.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Ludo » qui numérotait mal les pions empilés à la maison.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Bombe » qui laissait un mot refusé dans la zone de saisie, à effacer à la main.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Bombe » qui mélangeait des syllabes faciles aux niveaux plus difficiles.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Bombe » qui faisait entendre à tous le bruit de la mèche, même quand la bombe n’était pas dans leurs mains.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Baccalauréat » qui partageait les points d’un mot refusé avec un mot identique.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Baccalauréat » qui faisait attendre la fin du minuteur pour compter les votes alors que tout le monde avait voté.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Baccalauréat » qui affichait le bouton d’arrêt alors que l’hôte avait désactivé l’arrêt manuel.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui laissait ouvertes dans « Memora Play » des tables oubliées ou occupées par des bots seuls.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui laissait modifier les règles d’une partie sans que les joueurs aient à confirmer de nouveau qu’ils étaient prêts.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui comptait avec retard l’abandon d’un joueur pendant une partie.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui proposait d’inviter des joueurs déjà assis à la table.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’une lenteur à l’ouverture de « Memora Play », qui refaisait le ménage des tables à chaque page.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui laissait la barre de discussion d’une partie flotter au lieu de rester collée en bas de l’écran sur téléphone.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui décalait la fenêtre d’invitation par rapport à son bouton.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui rouvrait le plein écran d’une partie sans que le joueur l’ait demandé.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui cachait « Enregistrer » et « Annuler » sur certains onglets des réglages d’une partie.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui cachait les boutons d’enregistrement des formulaires par étapes selon la largeur de l’écran.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Correction d’un bug dans « Academy » qui réinitialisait l’état de tous les Référents d’une promotion dès qu’on la modifiait.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyReviewWrite,
+        text: 'Correction d’un bug dans « Academy » qui laissait rédiger un bilan pour une autre étape que celle du Junior.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Correction d’un bug dans « Academy » qui fermait le compte d’un modérateur déjà en place quand il quittait une promotion.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Correction d’un bug dans « Recrutements » qui laissait un ancien membre sans accès quand il était de nouveau accepté.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.sanctions,
+        permission: Permissions.SanctionDiscordRead,
+        text: 'Correction d’un bug dans « Panel de sanctions » qui fermait le panel Discord à ceux qui n’avaient que ce droit.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.sanctions,
+        permission: Permissions.SanctionRead,
+        text: 'Correction d’un bug dans « Panel de sanctions » qui ouvrait le panel des lives aux équipes Discord et Animation.',
+      },
+    ],
+    comments: [
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        text: 'Une chasse aux bugs sur tous les jeux : Golf, Ludo, Bombe et Baccalauréat ont été passés au peigne fin, et chaque défaut croisé est corrigé dans cette version.',
+      },
+    ],
+  },
+  {
     version: '0.10.2',
     date: '2026-11-02',
     title: 'L’assistant et les pages privées arrivent !',
@@ -136,7 +590,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       'Memora te parle maintenant : demande-lui une absence ou une mise à jour, elle s’en occupe. Et tes notes ont enfin leur place, rien qu’à toi ou partagées.',
     description:
       'Déclarer une absence ou mettre à jour un dossier obligeait à retrouver la bonne page, puis le bon formulaire, et les notes personnelles vivaient en dehors de Memora. Cette version ajoute un assistant qui mène la discussion pas à pas et des pages privées en blocs, à partager avec qui tu veux. Les réglages, les sanctions, les lives terminés et la page de statut gagnent aussi en clarté au passage, et les fiches de « Recrutements » se rangent mieux, avec un onglet de gestion et la blacklist.',
-    hasShowcase: true,
     items: [
       {
         tag: ChangelogTags.Added,
@@ -216,14 +669,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.members,
         permission: Permissions.MemberRead,
         audience: ChangelogAudiences.Responsables,
-        text: 'Ajout de la possibilité de retirer, de rendre ou de supprimer les accès d’un Recruteur, d’un Observateur ou d’un Formateur à une session, d’un clic droit sur sa ligne dans la « Participation » de sa fiche.',
+        text: 'Ajout de la possibilité de retirer, de rendre ou de supprimer les accès d’un Recruteur, d’un Observateur ou d’un Référent à une session, d’un clic droit sur sa ligne dans la « Participation » de sa fiche.',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.members,
         permission: Permissions.MemberRead,
         audience: ChangelogAudiences.Responsables,
-        text: 'Ajout d’un onglet par fonction dans la « Participation » de la fiche d’un modérateur : « Recrutement », « Académie » pour les Formateurs avec les Juniors pris en charge, et « Coordination » avec le temps passé et les actions effectuées en live.',
+        text: 'Ajout d’un onglet par fonction dans la « Participation » de la fiche d’un modérateur : « Recrutement », « Académie » pour les Référents avec les Juniors pris en charge, et « Coordination » avec le temps passé et les actions effectuées en live.',
       },
       {
         tag: ChangelogTags.Added,
@@ -574,7 +1027,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       'Memora te parle maintenant : demande-lui une absence ou une mise à jour, elle s’en occupe. Et tes notes ont enfin leur place, rien qu’à toi ou partagées.',
     description:
       'Déclarer une absence ou mettre à jour un dossier obligeait à retrouver la bonne page, puis le bon formulaire, et les notes personnelles vivaient en dehors de Memora. Cette version ajoute un assistant qui mène la discussion pas à pas et des pages privées en blocs, à partager avec qui tu veux. Les réglages, les sanctions, les lives terminés et la page de statut gagnent aussi en clarté au passage, et les fiches de « Recrutements » se rangent mieux, avec un onglet de gestion et la blacklist.',
-    hasShowcase: true,
     items: [
       {
         tag: ChangelogTags.Added,
@@ -822,7 +1274,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       'Memora te parle maintenant : demande-lui une absence ou une mise à jour, elle s’en occupe. Et tes notes ont enfin leur place, rien qu’à toi ou partagées.',
     description:
       'Déclarer une absence ou mettre à jour un dossier obligeait à retrouver la bonne page, puis le bon formulaire, et les notes personnelles vivaient en dehors de Memora. Cette version ajoute un assistant qui mène la discussion pas à pas et des pages privées en blocs, à partager avec qui tu veux. Les réglages, les sanctions, les lives terminés et la page de statut gagnent aussi en clarté au passage.',
-    hasShowcase: true,
     items: [
       {
         tag: ChangelogTags.Added,
@@ -1987,14 +2438,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.calendar,
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.CalendarManage,
-        text: 'Ajout des modèles d’entrevues « Junior <> Formateurs » : on choisit la session, les formateurs de la session sont convoqués et les Responsables des équipes du YouTubeur sont les Responsables de l’entrevue',
+        text: 'Ajout des modèles d’entrevues « Junior <> Référents » : on choisit la session, les référents de la session sont convoqués et les Responsables des équipes du YouTubeur sont les Responsables de l’entrevue',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.calendar,
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.CalendarManage,
-        text: 'Ajout des « Bilans de fin de période » créés automatiquement sept jours avant la fin d’une période, visibles des Responsables et des Formateurs, et disponibles dans les modèles seulement pendant cette fenêtre',
+        text: 'Ajout des « Bilans de fin de période » créés automatiquement sept jours avant la fin d’une période, visibles des Responsables et des Référents, et disponibles dans les modèles seulement pendant cette fenêtre',
       },
       {
         tag: ChangelogTags.Added,
@@ -2333,13 +2784,13 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         page: ROUTES.academy,
         permission: Permissions.AcademyRead,
-        text: 'Amélioration de l’accès à « Academy » : les Formateurs l’ouvrent désormais depuis le menu',
+        text: 'Amélioration de l’accès à « Academy » : les Référents l’ouvrent désormais depuis le menu',
       },
       {
         tag: ChangelogTags.Fixed,
         page: ROUTES.calendar,
         permission: Permissions.CalendarManage,
-        text: 'Correction d’un bug où un Modérateur pouvait créer n’importe quel évènement dans le « Calendrier » : seuls les Responsables le peuvent, et les Formateurs ne planifient plus dans le « Calendrier » pour le moment',
+        text: 'Correction d’un bug où un Modérateur pouvait créer n’importe quel évènement dans le « Calendrier » : seuls les Responsables le peuvent, et les Référents ne planifient plus dans le « Calendrier » pour le moment',
       },
       {
         tag: ChangelogTags.Fixed,
@@ -2836,7 +3287,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.lives,
         permission: Permissions.LiveRead,
-        text: 'Ajout d’une disposition de départ propre à chaque poste de la « Mod View » : Modérateur, Formateur, Responsable et Admin, mémorisée séparément',
+        text: 'Ajout d’une disposition de départ propre à chaque poste de la « Mod View » : Modérateur, Référent, Responsable et Admin, mémorisée séparément',
       },
       {
         tag: ChangelogTags.Added,
@@ -3087,7 +3538,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.calendar,
         permission: Permissions.AcademyRead,
-        text: 'Ajout des entretiens de formateur, des entretiens de panel et des bilans de l’Academy dans le « Calendrier », avec le formateur concerné',
+        text: 'Ajout des entretiens de référent, des entretiens de panel et des bilans de l’Academy dans le « Calendrier », avec le référent concerné',
       },
       {
         tag: ChangelogTags.Added,
@@ -3181,7 +3632,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Fixed,
         page: ROUTES.academy,
         permission: Permissions.AcademyRead,
-        text: 'Correction d’un bug qui privait les Formateurs de leurs accès initiaux',
+        text: 'Correction d’un bug qui privait les Référents de leurs accès initiaux',
       },
       {
         tag: ChangelogTags.Fixed,
@@ -3749,7 +4200,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         page: ROUTES.projects,
         permission: Permissions.ProjectRead,
-        text: 'Amélioration des droits des modérateurs : ils consultent leurs « Tâches » sans pouvoir les modifier, et les pages « Formations » et « Recrutement » restent aux formateurs et recruteurs',
+        text: 'Amélioration des droits des modérateurs : ils consultent leurs « Tâches » sans pouvoir les modifier, et les pages « Formations » et « Recrutement » restent aux référents et recruteurs',
       },
       {
         tag: ChangelogTags.Improved,

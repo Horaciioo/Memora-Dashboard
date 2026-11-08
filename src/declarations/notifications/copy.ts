@@ -8,6 +8,7 @@ export const NOTIFICATION_COPY = {
   open: 'Ouvrir les notifications',
   close: 'Fermer les notifications',
   goTo: 'Voir {target}',
+  openWithMemora: 'Régler ça avec Memora',
   markAll: 'Tout marquer comme lu',
   markUnread: 'Marquer comme non lu',
   clearRead: 'Supprimer les lues',

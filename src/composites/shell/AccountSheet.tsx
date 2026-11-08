@@ -3,7 +3,7 @@
 import Link from '@/components/elements/navigation/AppLink'
 import { ThemeToggle } from '@/components/elements/actions/ThemeToggle'
 import { BottomSheet } from '@/components/structures/overlays/BottomSheet'
-import { logout } from '@/app/connexion/actions'
+import { logout } from '@/app/login/actions'
 import { CreatorPicker } from '@/composites/shell/CreatorPicker'
 import { ROUTES } from '@/declarations/navigation'
 import { ACCOUNT_SHEET } from '@/declarations/ui/blocks'

@@ -16,7 +16,7 @@ export const ONBOARDING_COPY = {
   pending: 'Envoi…',
   successTitle: 'C’est enregistré',
   successAdmittedDescription:
-    'Ta fiche est confirmée. Un Formateur va t’être attribué, et ta PIM démarre dès que ton Responsable la lance.',
+    'Ta fiche est confirmée. Un Référent va t’être attribué, et ta PIM démarre dès que ton Responsable la lance.',
   successDescription: 'Ton compte est ouvert, tu peux te connecter au dashboard avec Discord.',
   successPendingDescription:
     'Ton dossier part à ton Responsable, il ouvre ton accès dès qu’il l’a validé.',
@@ -64,7 +64,7 @@ export const ONBOARDING_DISCORD_COPY = {
   notAdmittedBody:
     'Ce formulaire est réservé aux candidats acceptés de ce recrutement. Si tu as bien reçu une réponse positive, vérifie que tu te connectes avec le compte Discord donné à ta candidature, sinon rapproche-toi de ton Responsable.',
   admittedEyebrow: 'Candidature acceptée',
-  admittedTitle: 'Tu es admis dans la session PIM « {session} »',
+  admittedTitle: 'Bienvenue dans la session PIM « {session} »',
   admittedBody:
     'Ta fiche a été préparée à partir de ta candidature. Vérifie chaque information, complète ce qui manque, puis confirme : tu rejoins l’équipe {function} en tant que Junior.',
   takenTitle: 'Ce compte a déjà une fiche',
@@ -134,6 +134,23 @@ export const INTEGRATION_LINK_COPY = {
   unlimited: '∞',
   expiredBadge: 'Expiré',
   exhaustedBadge: 'Complet',
+} as const
+
+/**
+ * Words of the step that opens the accounts
+ * @type {Record<string, string>}
+ */
+
+export const ACCOUNT_ACTIVATION_COPY = {
+  title: 'Activer les comptes',
+  action: 'Activer les comptes',
+  confirmTitle: 'Activer les comptes ?',
+  confirmDescription:
+    'Chaque candidat accepté reçoit son compte et pourra se connecter avec Discord. Memora vérifie son identité, puis lui souhaite la bienvenue. Les candidats acceptés plus tard sont activés d’eux-mêmes.',
+  activated: 'Comptes activés',
+  activatedOn: 'Activés le {day}',
+  progress: '{confirmed} sur {opened} ont confirmé leur identité',
+  noPromotion: 'Ce recrutement n’a pas encore de promotion à rejoindre.',
 } as const
 
 /**

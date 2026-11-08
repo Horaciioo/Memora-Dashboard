@@ -1,16 +1,21 @@
 import 'server-only'
 
+import { prisma } from '@/core/lib/db'
+import { forbidden } from '@/core/lib/errors'
 import { subscribeLive } from '@/core/lib/lives/bus'
 import { logger } from '@/core/lib/logger'
+import { mayEnter, mayOversee } from '@/core/lib/play/access'
 import { isPresent, toEngineSession } from '@/core/lib/play/session'
 import { clearDeadline, scheduleDeadline, timerKey } from '@/core/lib/play/timers'
 import { eventFrame, eventOf, signalFrame } from '@/core/lib/realtime/server/frames'
 import { joinPresence } from '@/core/lib/realtime/server/presence'
 import type { RealtimeConnection } from '@/core/lib/realtime/server/types'
+import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { abandonRunning } from '@/core/services/play/PlayIdleService'
 import { engineOf, loadSession } from '@/core/services/play/PlaySessionService'
 import { PLAY_STREAM_EVENTS, PLAY_TOPICS } from '@/declarations/play/topics'
 import { PLAY_SETTINGS } from '@/declarations/play'
+import { Permissions } from '@/utils/constants/permissions'
 import { PlayStatuses } from '@/utils/constants/play'
 import { MINUTE_MS } from '@/utils/constants/time'
 
@@ -149,13 +154,18 @@ export const joinPlayRoom = async (
   sessionId: string,
   connection: RealtimeConnection
 ): Promise<() => void> => {
-  // Unknown games refuse the socket
-  await loadSession(sessionId)
+  // Unknown and private games refuse the socket, admins watch unseen
+  const session = await loadSession(sessionId)
+  const isInvited = await mayEnter(prisma, session, connection.session.id)
+  const canManage = resolvePermissions(connection.session).can(Permissions.PlayManage)
+  if (!isInvited && !mayOversee(session, canManage)) throw forbidden()
   const room = rooms.get(sessionId) ?? openRoom(sessionId)
   room.members.add(connection)
   clearDeadline(timerKey('away', sessionId))
   // The stands move through presence, no page read
-  const leavePresence = joinPresence(PLAY_TOPICS.session(sessionId), connection)
+  const leavePresence = isInvited
+    ? joinPresence(PLAY_TOPICS.session(sessionId), connection)
+    : () => {}
   // The newcomer's board, missed moves included
   void pushBoards(sessionId, room)
 

@@ -26,7 +26,9 @@ export interface SanctionsScreenProps {
  */
 
 export const SanctionsScreen = async ({ discord = false, youtuberId }: SanctionsScreenProps) => {
-  const { session, access, scope } = await requirePermission(Permissions.SanctionRead)
+  const { session, access, scope } = await requirePermission(
+    discord ? Permissions.SanctionDiscordRead : Permissions.SanctionRead
+  )
   const perimeter = await scope()
 
   const [levels, state, creators, held] = await Promise.all([

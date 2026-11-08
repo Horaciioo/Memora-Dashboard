@@ -203,6 +203,15 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     trail: '',
     addressed: true,
   },
+  PimReferentAssigned: {
+    label: 'PIM',
+    tone: 'info',
+    icon: 'functionReferent',
+    lead: 'Tu accompagnes {subject}',
+    verb: 'désormais',
+    trail: '',
+    addressed: true,
+  },
   PimReviewDue: {
     label: 'PIM',
     tone: 'warning',
@@ -342,6 +351,15 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     lead: 't’a',
     verb: 'convié',
     trail: 'à confirmer ta présence',
+  },
+  IdentityAlert: {
+    label: 'Urgent',
+    tone: 'danger',
+    icon: 'warning',
+    lead: 'Un candidat n’a pas le bon identifiant, il faut s’en occuper',
+    verb: 'de ce pas',
+    trail: '',
+    addressed: true,
   },
   PushTrial: {
     label: 'Essai',

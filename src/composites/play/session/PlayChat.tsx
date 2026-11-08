@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { KeyboardEvent, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlayInviteAnchor } from '@/composites/play/session/PlayInviteAnchor'
@@ -11,15 +11,13 @@ import type { PlayFeedSource } from '@/composites/play/session/chat/feedBridge'
 import { PlayChatLine } from '@/composites/play/session/chat/PlayChatLine'
 import { PlayChatPeople } from '@/composites/play/session/chat/PlayChatPeople'
 import { usePlayChatLines } from '@/core/hooks/data/play/usePlayChatLines'
-import { useMutation } from '@/core/hooks/data/system/useMutation'
+import { usePlayChatDraft } from '@/core/hooks/data/play/usePlayChatDraft'
 import { usePlayPeopleMenu } from '@/core/hooks/interaction/state/usePlayPeopleMenu'
 import type { PlayPeopleTable } from '@/core/hooks/interaction/state/usePlayPeopleMenu'
-import { apiPost } from '@/core/lib/api/client'
-import { API_ROUTES } from '@/core/lib/api/routes'
 import { BAC_SESSION_COPY, PLAY_CHAT, PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION, PLAY_CHAT_UI } from '@/declarations/ui/variants'
-import type { PlayCandidate, PlayMessageView } from '@/types/play'
+import type { PlayInviteCandidate, PlayMessageView } from '@/types/play'
 import { cn } from '@/utils/classnames'
 
 /**
@@ -42,13 +40,15 @@ export interface PlayChatProps {
   // Sits in the session column instead of beside the lobby
   isSide?: boolean
   // Null when the reader cannot invite
-  invite: { candidates: PlayCandidate[]; canSeat: boolean } | null
+  invite: { candidates: PlayInviteCandidate[]; canSeat: boolean } | null
   // Session page folds it away
   onFold?: () => void
   // Players and spectators drawn under the tabs
   crowd?: { players: PlayFace[]; spectators: PlayFace[] }
   // Game feed, mixed in by the tabs
   feed?: ReactNode
+  // Tab shown first
+  initialTab?: PlayChatTab
 }
 
 // Tabs of a box with a feed
@@ -58,7 +58,7 @@ const TABS = [
   { key: 'all', label: PLAY_HUB_COPY.chatTabAll },
 ] as const
 
-type PlayChatTab = (typeof TABS)[number]['key']
+export type PlayChatTab = (typeof TABS)[number]['key']
 
 /**
  * Chat line or feed line, on one clock
@@ -85,12 +85,11 @@ export const PlayChat = ({
   onFold,
   crowd,
   feed,
+  initialTab = 'all',
 }: PlayChatProps) => {
   const { lines: messages, add } = usePlayChatLines(sessionId, rendered)
-  const { run } = useMutation()
-  const isSending = useRef(false)
-  const [draft, setDraft] = useState('')
-  const [tab, setTab] = useState<PlayChatTab>('all')
+  const { draft, setDraft, onKeyDown } = usePlayChatDraft(sessionId, add)
+  const [tab, setTab] = useState<PlayChatTab>(initialTab)
   const [source, setSource] = useState<PlayFeedSource | null>(null)
   const list = useRef<HTMLUListElement>(null)
   const FoldIcon = ICONS.playFold
@@ -144,26 +143,6 @@ export const PlayChat = ({
   useEffect(() => {
     list.current?.scrollTo({ top: list.current.scrollHeight })
   }, [items.length])
-
-  const send = async () => {
-    const body = draft.trim()
-    // One line in flight, a second Enter waits
-    if (!body || isSending.current) return
-    isSending.current = true
-    setDraft('')
-    const sent = await run(() =>
-      apiPost<PlayMessageView>(API_ROUTES.playMessages(sessionId), { body })
-    )
-    isSending.current = false
-    if (sent === null) return setDraft(body)
-    add(sent)
-  }
-  const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enter closing an accent or a suggestion is not a send
-    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return
-    event.preventDefault()
-    void send()
-  }
 
   return (
     <aside className={isSide ? PLAY_CHAT_UI.panelSide : PLAY_CHAT_UI.panel}>

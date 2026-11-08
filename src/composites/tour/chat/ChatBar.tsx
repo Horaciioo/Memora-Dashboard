@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { Button } from '@/components/elements/actions/Button'
 import { ThemeIconButton } from '@/components/elements/actions/ThemeIconButton'
 import { ChatTimer } from '@/composites/tour/chat/ChatTimer'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
@@ -97,15 +96,6 @@ export const ChatBar = ({ draft, holdMs, ask, onSend }: ChatBarProps) => {
                 }
               }}
             />
-            <Button
-              variant="primary"
-              aria-label={TOUR_COPY.inputSend}
-              disabled={text.trim() === ''}
-              isLoading={isSaving}
-              onClick={() => void send()}
-            >
-              {TOUR_COPY.send}
-            </Button>
           </>
         ) : (
           <>

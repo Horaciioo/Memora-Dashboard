@@ -7,7 +7,7 @@ import { sessionNumbers } from '@/core/services/academy/AcademyService'
 import { teamOptions } from '@/core/services/work/shared'
 import { ACADEMY_EVENT_COPY, CALENDAR_FIELD_COPY } from '@/declarations/calendar/copy'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
-import { TRAINER_FUNCTION } from '@/declarations/reference/fixed'
+import { REFERENT_FUNCTION } from '@/declarations/reference/fixed'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import {
@@ -31,7 +31,7 @@ export interface FormJunior {
   name: string
   avatar: string | null
   sessionId: string
-  trainerId: string | null
+  referentId: string | null
   // End of each period of the junior
   dueOne: Date | null
   dueFinal: Date | null
@@ -91,7 +91,7 @@ export const readAcademyForm = async (scope: AcademyScope): Promise<AcademyFormC
       name: row.account.displayName,
       avatar: row.account.avatarUrl,
       sessionId: row.sessionId,
-      trainerId: row.trainerId,
+      referentId: row.referentId,
       dueOne: row.reviewOneDueAt,
       dueFinal: row.reviewFinalDueAt,
       promotion: sessionTitle({
@@ -175,8 +175,8 @@ const juniorOptions = (context: AcademyFormContext): FieldOption[] =>
         disabled: !open,
         owner: templateId,
         alsoOwner: junior.sessionId,
-        // Picking the junior hands over their own trainer
-        sets: junior.trainerId ? { trainerId: junior.trainerId } : undefined,
+        // Picking the junior hands over their own referent
+        sets: junior.referentId ? { referentId: junior.referentId } : undefined,
       }
     })
   )
@@ -195,7 +195,7 @@ const templatesOf = (context: AcademyFormContext, purposes: EventPurposeName[]):
  * Fields the academy templates add to the calendar form
  * @param {AcademyFormContext} context - Templates and juniors
  * @param {string} actorId - Member filling the form
- * @return {Promise<FieldDefinition[]>} - Junior, trainer and responsables
+ * @return {Promise<FieldDefinition[]>} - Junior, referent and responsables
  */
 
 export const academyFields = async (
@@ -204,8 +204,8 @@ export const academyFields = async (
 ): Promise<FieldDefinition[]> => {
   if (context.purposes.size === 0) return []
 
-  const [trainers, actor, sessions, seats, numbers] = await Promise.all([
-    teamOptions({ functionName: TRAINER_FUNCTION }),
+  const [referents, actor, sessions, seats, numbers] = await Promise.all([
+    teamOptions({ functionName: REFERENT_FUNCTION }),
     prisma.account.findUnique({
       where: { id: actorId },
       select: { displayName: true, avatarUrl: true },
@@ -218,25 +218,28 @@ export const academyFields = async (
       orderBy: { startsAt: 'desc' },
       select: { id: true, jobFunction: { select: { name: true } } },
     }),
-    prisma.academySessionTrainer.findMany({ select: { sessionId: true, accountId: true } }),
+    prisma.academySessionReferent.findMany({ select: { sessionId: true, accountId: true } }),
     sessionNumbers(),
   ])
 
-  // A trainer is offered under the promotions they train
+  // A referent is offered under the promotions they train
   const sessionsOf = new Map<string, string[]>()
   for (const seat of seats) {
     sessionsOf.set(seat.accountId, [...(sessionsOf.get(seat.accountId) ?? []), seat.sessionId])
   }
-  const trainersOfSession = trainers.map((option) => ({
+  const referentsOfSession = referents.map((option) => ({
     ...option,
     owners: sessionsOf.get(option.value) ?? [],
   }))
 
   // The author is always a choice, whatever function they hold
   const authors =
-    actor && !trainers.some((option) => option.value === actorId)
-      ? [{ value: actorId, label: actor.displayName, image: actor.avatarUrl }, ...trainersOfSession]
-      : trainersOfSession
+    actor && !referents.some((option) => option.value === actorId)
+      ? [
+          { value: actorId, label: actor.displayName, image: actor.avatarUrl },
+          ...referentsOfSession,
+        ]
+      : referentsOfSession
 
   const sessionChoices: FieldOption[] = sessions.map((session) => ({
     value: session.id,
@@ -245,7 +248,7 @@ export const academyFields = async (
   }))
 
   const interviews = templatesOf(context, [
-    EventPurposes.TrainerInterview,
+    EventPurposes.ReferentInterview,
     EventPurposes.PanelInterview,
   ])
 
@@ -276,10 +279,10 @@ export const academyFields = async (
       visibleWhen: { field: 'templateId', oneOf: [...context.purposes.keys()] },
     },
     {
-      name: 'trainerId',
+      name: 'referentId',
       kind: 'select',
-      label: CALENDAR_FIELD_COPY.trainer,
-      info: ACADEMY_EVENT_COPY.trainerInfo,
+      label: CALENDAR_FIELD_COPY.referent,
+      info: ACADEMY_EVENT_COPY.referentInfo,
       options: authors,
       ownerField: 'sessionId',
       preset: 'actor',

@@ -5,6 +5,8 @@ import { pathPoint } from '@/core/lib/play/golf/frames'
 import { contactsOf } from '@/core/lib/play/golf/contacts'
 import { settleGround } from '@/core/lib/play/golf/ground'
 import { isIced } from '@/core/lib/play/golf/obstacles'
+import { shotSpeed } from '@/core/lib/play/golf/rules'
+import { padHeight } from '@/core/lib/play/golf/terrain'
 import type { GolfWorld } from '@/core/lib/play/golf/world'
 import { createWorld } from '@/core/lib/play/golf/world'
 import type { GolfShotInput, GolfShotResult } from '@/core/lib/play/golf/types'
@@ -50,7 +52,12 @@ const record = (world: GolfWorld): void => {
 const advance = (world: GolfWorld, step: number): void => {
   const dt = 1 / physics.stepHz
   const at = world.input.at + step * dt * 1000
-  const context = { hazards: world.hazards, hole: world.input.hole, at }
+  const context = {
+    hazards: world.hazards,
+    hole: world.input.hole,
+    at,
+    seconds: (at - world.input.holeStart) / 1000,
+  }
   const moving = world.bodies.filter((body) => body.isMoving)
   for (const body of moving) pushBody(body, context, dt)
 
@@ -58,6 +65,8 @@ const advance = (world: GolfWorld, step: number): void => {
   const substeps = substepsOf(moving, dt)
   for (let index = 0; index < substeps; index += 1) {
     for (const body of world.bodies) {
+      body.lastX = body.x
+      body.lastZ = body.z
       if (!body.isMoving) continue
       body.x += (body.vx * dt) / substeps
       body.z += (body.vz * dt) / substeps
@@ -100,6 +109,31 @@ const outcomesOf = (world: GolfWorld): GolfShotResult['outcomes'] =>
   )
 
 /**
+ * Balls already rolling carry on, a replay
+ * @param {GolfWorld} world - Simulation
+ * @return {void}
+ */
+
+const carryOn = (world: GolfWorld): void => {
+  const motions = world.input.motions ?? {}
+  for (const body of world.bodies) {
+    const motion = motions[body.id]
+    if (!motion) continue
+    body.vx = motion.vx
+    body.vz = motion.vz
+    // Airborne above its floor
+    const floor = body.pad ? padHeight(body.pad, body.x, body.z) : -Infinity
+    if (motion.y > floor + physics.stepUp) {
+      body.y = motion.y
+      body.vy = motion.vy
+      body.isAirborne = true
+      body.pad = null
+    }
+    wake(body)
+  }
+}
+
+/**
  * Play one stroke to the end
  * @param {GolfShotInput} input - Shot
  * @return {GolfShotResult} - Tracks and outcomes
@@ -110,10 +144,11 @@ export const simulateShot = (input: GolfShotInput): GolfShotResult => {
     input,
     input.balls.map((ball) => createBody(ball, input))
   )
+  carryOn(world)
   const shooter = world.bodies.find((body) => body.id === input.shooterId)
   if (shooter) {
     // Stroke speed, angle zero toward +z
-    const speed = Math.min(1, Math.max(0, input.power)) * physics.maxSpeed * shooter.powerScale
+    const speed = shotSpeed(input.power, shooter.powerScale)
     shooter.vx = Math.sin(input.angle) * speed
     shooter.vz = Math.cos(input.angle) * speed
     // Lob leaves the ground

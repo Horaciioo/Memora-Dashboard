@@ -8,6 +8,7 @@ export const CookieKeys = {
   oauthState: 'oauth_state',
   platformState: 'platform_state',
   integrationClaim: 'integration_claim',
+  identityCheck: 'identity_check',
   exerciseClaim: 'exercise_claim',
   navigationView: 'navigation_view',
   activeYoutuber: 'active_youtuber',

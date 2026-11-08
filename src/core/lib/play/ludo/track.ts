@@ -113,7 +113,7 @@ const centreOf = ([row, column]: LudoCell): LudoCell => [row + 0.5, column + 0.5
 
 export const pawnPoint = (corner: number, step: number, pawn: number): LudoCell => {
   if (step <= YARD_STEP) return turnPoint(LUDO_LAYOUT.yardSpots[pawn], corner)
-  if (step >= GOAL_STEP) return turnPoint(LUDO_LAYOUT.goalSpots[pawn], corner)
+  if (step >= GOAL_STEP) return turnPoint(LUDO_LAYOUT.goalSpot, corner)
   if (isOnTrack(step)) return centreOf(TRACK[squareOf(corner, step)])
 
   return centreOf(turnCell(LUDO_LAYOUT.lane[step - LAP], corner))

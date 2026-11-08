@@ -216,6 +216,9 @@ export const DRAWER_STYLES = {
     'drawer-enter fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
   // Wider footprint from md
   wide: 'md:w-[var(--drawer-page-wide-w)]',
+  // Page of its own on a phone
+  fullScreen:
+    'max-md:inset-0 max-md:h-dvh max-md:rounded-none max-md:border-0 max-md:pt-[env(safe-area-inset-top)] max-md:pb-[env(safe-area-inset-bottom)]',
   // Form on the left, live result on the right, same width and height
   split:
     'flex min-h-full flex-col gap-6 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-x-8',
@@ -267,6 +270,11 @@ export const DRAWER_ACTIONS = {
   slimLine:
     'flex size-11 shrink-0 items-center justify-center rounded-full text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60',
   slimIcon: 'h-5 w-5 shrink-0',
+  // One row at every width: steps, then save and cancel always there
+  compactStack: 'flex items-center gap-2 p-1',
+  compactSteps: 'flex flex-1 items-center gap-2',
+  compactLine:
+    'flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-full px-3 text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60 md:px-4',
   divider: 'mx-1 hidden h-px bg-[var(--color-border)] md:block',
   note: 'mb-4 text-sm text-[var(--color-ink-subtle)]',
 } as const
@@ -520,8 +528,6 @@ export const WIZARD_STYLES = {
   title: 'text-xl font-bold tracking-tight sm:text-2xl',
   body: 'flex min-h-64 flex-col gap-4',
   footer: 'flex items-center justify-between gap-3 border-t border-[var(--color-border)] pt-6',
-  // The rail only fits on a wide viewport
-  rail: 'hidden sm:block',
 } as const
 
 /**
@@ -563,9 +569,9 @@ export const ONBOARDING_STYLES = {
   outcome: 'flex flex-col gap-2 text-center',
   outcomeTitle: 'text-xl font-bold tracking-tight',
   // Admitted candidate
-  admission: 'flex flex-col gap-1 border-l-4 border-[var(--color-success)] py-1 pl-4',
+  admission: 'flex flex-col gap-1',
   admissionEyebrow:
-    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-success)] uppercase',
+    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-accent)] uppercase',
 } as const
 
 /**
@@ -614,7 +620,7 @@ export const PAGE_OPTIONS = {
   backdrop: 'fixed inset-0 z-[55] bg-[var(--color-scrim)]/30 backdrop-blur-sm md:hidden',
   icon: 'size-4',
   panel:
-    'popover-enter glass-panel absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex w-72 flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
+    'popover-enter glass-panel absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
   title:
     'px-2.5 pt-1.5 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   row: 'flex items-center justify-between gap-4 rounded-[var(--radius-md)] px-2.5 py-2 font-semibold',

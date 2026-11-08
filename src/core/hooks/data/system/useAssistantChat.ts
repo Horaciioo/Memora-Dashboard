@@ -11,7 +11,7 @@ import { useAssistantStore } from '@/core/store/assistant'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { IDEMPOTENCY_HEADER } from '@/declarations/system/security/idempotency'
 import type { AssistantProposal } from '@/types/assistant'
-import type { ScenarioLink } from '@/types/scenario'
+import type { ScenarioCard, ScenarioLink } from '@/types/scenario'
 import type { TaskSummary } from '@/types/work'
 
 /**
@@ -22,6 +22,7 @@ import type { TaskSummary } from '@/types/work'
  * @property {string} text - Line shown
  * @property {AssistantProposal} [proposal] - Answer behind it
  * @property {ScenarioLink} [link] - Page the line points at
+ * @property {ScenarioCard} [card] - Person drawn under the line
  */
 
 export interface AssistantTurn {
@@ -30,6 +31,7 @@ export interface AssistantTurn {
   text: string
   proposal?: AssistantProposal
   link?: ScenarioLink
+  card?: ScenarioCard
 }
 
 /**
@@ -97,11 +99,12 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
     from: AssistantTurn['from'],
     text: string,
     proposal?: AssistantProposal,
-    link?: ScenarioLink
-  ) => setTurns((lines) => [...lines, { id: lines.length, from, text, proposal, link }])
+    link?: ScenarioLink,
+    card?: ScenarioCard
+  ) => setTurns((lines) => [...lines, { id: lines.length, from, text, proposal, link, card }])
 
   const scenario = useAssistantScenario({
-    say: (from, text, link) => say(from, text, undefined, link),
+    say: (from, text, link, card) => say(from, text, undefined, link, card),
     refresh: () => router.refresh(),
   })
 

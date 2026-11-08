@@ -14,15 +14,21 @@ import { cn } from '@/utils/classnames'
  * @param {Object} props - View
  * @param {boolean} props.isOverview - Whole hole shown
  * @param {() => void} props.onOverview - Switch view
+ * @param {string} props.sessionId - Session id
+ * @param {boolean} props.isSeated - Viewer plays
  * @return {JSX.Element}
  */
 
 export const GolfViewKeys = ({
   isOverview,
   onOverview,
+  sessionId,
+  isSeated,
 }: {
   isOverview: boolean
   onOverview: () => void
+  sessionId: string
+  isSeated: boolean
 }) => {
   const [isOpen, setOpen] = useState(false)
   const ViewIcon = isOverview ? ICONS.golfFollow : ICONS.golfOverview
@@ -62,7 +68,7 @@ export const GolfViewKeys = ({
         </button>
         <button
           type="button"
-          className={cn(GOLF_BOARD.view, isFullscreen && GOLF_BOARD.viewOn)}
+          className={cn(GOLF_BOARD.view, GOLF_BOARD.viewDesktop, isFullscreen && GOLF_BOARD.viewOn)}
           aria-label={isFullscreen ? GOLF_BOARD_COPY.windowed : GOLF_BOARD_COPY.fullscreen}
           aria-pressed={isFullscreen}
           onClick={toggleFullscreen}
@@ -72,7 +78,7 @@ export const GolfViewKeys = ({
         {isFullscreen && (
           <button
             type="button"
-            className={cn(GOLF_BOARD.view, isChatOpen && GOLF_BOARD.viewOn)}
+            className={cn(GOLF_BOARD.view, GOLF_BOARD.viewDesktop, isChatOpen && GOLF_BOARD.viewOn)}
             aria-label={isChatOpen ? GOLF_BOARD_COPY.hideChat : GOLF_BOARD_COPY.showChat}
             aria-pressed={isChatOpen}
             onClick={toggleChat}
@@ -81,7 +87,7 @@ export const GolfViewKeys = ({
           </button>
         )}
       </div>
-      {isOpen && <GolfSettings />}
+      {isOpen && <GolfSettings sessionId={sessionId} isSeated={isSeated} />}
     </div>
   )
 }

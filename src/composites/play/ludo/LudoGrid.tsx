@@ -9,6 +9,10 @@ import { cn } from '@/utils/classnames'
 const MIDDLE = LUDO_LAYOUT.size / 2
 // Grid stroke, cell units
 const LINE = 0.025
+// Rounded tile: gap round it and corner radius, cell units
+const TILE = { gap: 0.05, radius: 0.24 }
+// Centre medallion radii, cell units
+const MEDAL = { outer: 0.95, inner: 0.55 }
 // Yard inset and hole size, cell units
 const YARD_INSET = 0.55
 const HOLE = 0.48
@@ -81,13 +85,12 @@ const CornerArt = ({ corner }: { corner: number }) => {
       {[[startRow, startColumn] as const, ...LUDO_LAYOUT.lane].map(([row, column]) => (
         <rect
           key={`${row}:${column}`}
-          x={column}
-          y={row}
-          width="1"
-          height="1"
+          x={column + TILE.gap}
+          y={row + TILE.gap}
+          width={1 - TILE.gap * 2}
+          height={1 - TILE.gap * 2}
+          rx={TILE.radius}
           fill={tone(colour)}
-          stroke="var(--play-ludo-line)"
-          strokeWidth={LINE}
         />
       ))}
 
@@ -126,10 +129,11 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
         {TRACK.map(([row, column]) => (
           <rect
             key={`${row}:${column}`}
-            x={column}
-            y={row}
-            width="1"
-            height="1"
+            x={column + TILE.gap}
+            y={row + TILE.gap}
+            width={1 - TILE.gap * 2}
+            height={1 - TILE.gap * 2}
+            rx={TILE.radius}
             fill="var(--play-ludo-board)"
             stroke="var(--play-ludo-line)"
             strokeWidth={LINE}
@@ -138,6 +142,17 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
         {LUDO_CORNERS.map((_, corner) => (
           <CornerArt key={corner} corner={corner} />
         ))}
+
+        {/* Medallion over the meeting point of the four lanes */}
+        <circle cx={MIDDLE} cy={MIDDLE} r={MEDAL.outer} fill="var(--play-ludo-board)" />
+        <circle
+          cx={MIDDLE}
+          cy={MIDDLE}
+          r={MEDAL.inner}
+          fill="none"
+          stroke={`url(#${gold})`}
+          strokeWidth="0.12"
+        />
 
         {/* Arrows into each lane */}
         {LUDO_CORNERS.map((colour, corner) => (
@@ -171,12 +186,14 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
               fill={`url(#${gold})`}
               className={cn(LUDO_BOARD.starCell, isLit && LUDO_BOARD.starLit)}
             />
+            {/* Outline when free; gilded and swollen when held, its points left showing around the pawn */}
             <polygon
               points={starPoints(x, y)}
-              fill="none"
+              fill={isLit ? `url(#${gold})` : 'none'}
               stroke={isLit ? 'var(--play-ludo-star-lit-line)' : 'var(--play-ludo-star)'}
-              strokeWidth="0.045"
+              strokeWidth={isLit ? 0.06 : 0.045}
               strokeLinejoin="round"
+              className={cn(LUDO_BOARD.starShape, isLit && LUDO_BOARD.starShapeLit)}
             />
           </g>
         )

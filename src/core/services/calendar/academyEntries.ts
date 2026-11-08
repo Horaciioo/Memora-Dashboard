@@ -16,7 +16,7 @@ import { EventPurposes } from '@/utils/constants/workflow'
  * What an academy template fixes on an entry
  * @typedef {Object} AcademyPatch
  * @property {string | null} juniorId - Junior the entry is about
- * @property {string | null} trainerId - Trainer who receives them
+ * @property {string | null} referentId - Referent who receives them
  * @property {string | null} [accountId] - Account of that junior
  * @property {string | null} [sessionId] - Promotion of that junior
  * @property {true} [rollCall] - Asks the convened members to confirm
@@ -25,7 +25,7 @@ import { EventPurposes } from '@/utils/constants/workflow'
 
 export interface AcademyPatch {
   juniorId: string | null
-  trainerId: string | null
+  referentId: string | null
   accountId?: string | null
   sessionId?: string | null
   rollCall?: true
@@ -33,13 +33,13 @@ export interface AcademyPatch {
 }
 
 // Nothing to fix on an entry of another kind
-const NONE: AcademyPatch = { juniorId: null, trainerId: null, memberIds: null }
+const NONE: AcademyPatch = { juniorId: null, referentId: null, memberIds: null }
 
 /**
- * Settle what an academy template fixes on an entry: the junior, their trainer and who is convened
+ * Settle what an academy template fixes on an entry: the junior, their referent and who is convened
  * @param {string | null} templateId - Template the entry starts from
  * @param {FormValues} values - Parsed body
- * @param {string} actorId - Member posting it, the trainer by default
+ * @param {string} actorId - Member posting it, the referent by default
  * @param {AcademyScope} academy - Juniors the member may plan for
  * @return {Promise<AcademyPatch>} - What to write
  */
@@ -87,7 +87,7 @@ export const resolveAcademyEntry = async (
     })
     if (opensAt && opensAt.getTime() > Date.now()) throw conflict(ACADEMY_EVENT_COPY.reviewNotYet)
 
-    return { ...patch, trainerId: junior.trainerId, memberIds: null }
+    return { ...patch, referentId: junior.referentId, memberIds: null }
   }
 
   // An interview is planned within a promotion, the junior must belong to it
@@ -97,16 +97,16 @@ export const resolveAcademyEntry = async (
     throw invalidInput([{ field: 'juniorId', message: FORM_COPY.notAnOption }])
   }
 
-  // An interview convenes the junior, their trainer and, with responsables, the leads of the creator's teams
-  const trainerId = readText(values, 'trainerId') ?? actorId
+  // An interview convenes the junior, their referent and, with responsables, the leads of the creator's teams
+  const referentId = readText(values, 'referentId') ?? actorId
   const responsableIds =
     template.purpose === EventPurposes.PanelInterview ? await sessionResponsables(sessionId) : []
 
   return {
     ...patch,
-    trainerId,
+    referentId,
     rollCall: true,
-    memberIds: [...new Set([junior.accountId, trainerId, ...responsableIds])],
+    memberIds: [...new Set([junior.accountId, referentId, ...responsableIds])],
   }
 }
 
@@ -133,7 +133,7 @@ const sessionResponsables = async (sessionId: string): Promise<string[]> => {
 }
 
 /**
- * Refuse an entry a trainer may not plan: only the academy templates are theirs
+ * Refuse an entry a referent may not plan: only the academy templates are theirs
  * @param {string | null} templateId - Template the entry starts from
  * @param {boolean} isLead - Member sits at responsable level or above
  * @return {Promise<void>} - Throws when the template is not an academy one

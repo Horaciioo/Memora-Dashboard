@@ -13,6 +13,8 @@ export const GOLF_COURSE_PAINT = [
   'speck',
   'leaf',
   'wall',
+  'orb',
+  'orb-deep',
 ] as const
 
 /**
@@ -54,6 +56,8 @@ export const GOLF_SHARED_PAINT = [
   'place',
   'bad',
   'shade',
+  'hitbox',
+  'trail-frozen',
 ] as const
 
 /**

@@ -9,7 +9,7 @@ import type { EventPurposeName } from '@/utils/constants/workflow'
 import { DAY_MS } from '@/utils/constants/time'
 
 /**
- * Declare the check-ins of the periods about to end, one week ahead, for the trainers and responsables
+ * Declare the check-ins of the periods about to end, one week ahead, for the referents and responsables
  * @return {Promise<void>} - Entries created where missing
  */
 
@@ -75,8 +75,8 @@ export const openDueReviews = async (): Promise<void> => {
           visibility: template.visibility,
           startsAt: new Date(dueAt.getTime() - DECLARED_DAYS_BEFORE * DAY_MS),
           endsAt: dueAt,
-          ownerId: junior.trainerId,
-          trainerId: junior.trainerId,
+          ownerId: junior.referentId,
+          referentId: junior.referentId,
           juniorId: junior.id,
           accountId: junior.accountId,
           sessionId: junior.sessionId,

@@ -11,5 +11,8 @@ export const GOLF_KEYS = {
   pitchUp: ['KeyE', 'PageUp'],
   pitchDown: ['KeyQ', 'PageDown'],
   overview: ['Space'],
+  // Free flight: up and down, the arrows and letters move
+  rise: ['Space'],
+  sink: ['ShiftLeft', 'ShiftRight'],
   cancel: ['Escape'],
 } as const

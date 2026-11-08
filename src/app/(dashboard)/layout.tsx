@@ -11,7 +11,6 @@ import { needsHistoryConsent } from '@/core/services/preferences/ConsentService'
 import { readTourState } from '@/core/services/tour/TourService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
-import { ReleaseWelcome } from '@/composites/changelog/ReleaseWelcome'
 import { VisitTracker } from '@/composites/shell/VisitTracker'
 import { GuideHost } from '@/composites/shell/GuideHost'
 import { openRoutes } from '@/core/lib/tour/progress'
@@ -77,7 +76,6 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     >
       {children}
       <VisitTracker />
-      <ReleaseWelcome isAlways={APP_ENVIRONMENT === 'dev'} />
       <Suspense fallback={null}>
         <GuideHost />
       </Suspense>

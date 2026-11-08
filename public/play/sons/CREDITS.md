@@ -27,7 +27,7 @@ https://kenney.nl/assets/interface-sounds
 
 `ton-tour.mp3` (deux notes douces qui montent) et `etoile.mp3` (un « ding » rond) : synthétisés, timbre
 de marimba.
-`lancer-1..3.mp3` : dé dur qui cogne sur une table en bois, trois prises synthétisées (claquement, résonance, rebonds amortis).
+`lancer-1..3.mp3` : dé en plastique lancé sur un tapis, trois prises synthétisées (souffle du lancer, claquement sec, rebonds amortis, petit roulé final), calées sur les 700 ms du lancer.
 `pas-1..3.mp3` : pion posé sur une table, trois prises (« Casino Audio » de Kenney, chip-lay-1..3, CC0).
 `six.mp3` (maximize_006) et `sortie.mp3` (maximize_008) : « Interface Sounds » de Kenney, CC0.
 
@@ -56,3 +56,19 @@ de marimba.
 - `victoire.mp3` : copie de celle du Ludo (jingles_STEEL02, « Music Jingles »).
 - `meche.mp3` (la mèche qui crépite, jouée en boucle) : synthétisée pour Memora, souffle filtré et
   crépitements aléatoires, versée au domaine public (CC0 1.0).
+
+## Bataille navale (`naval/`)
+
+Échantillons CC0 de rubberduck sur OpenGameArt, convertis en mp3 mono et normalisés :
+
+- `canon-1..2`, `explosion-1..2`, `fusee`, `fusee-eclat` : « 25 CC0 bang / firework SFX »,
+  https://opengameart.org/content/25-cc0-bang-firework-sfx
+- `plouf-1..3`, `mer` (filtrée), bulles de `naufrage` : « 40 CC0 water / splash / slime SFX »,
+  https://opengameart.org/content/40-cc0-water-splash-slime-sfx
+- `coque`, `avions`, `torpille`, `clic` : « 100 CC0 SFX #2 », https://opengameart.org/content/100-cc0-sfx-2
+- `explosion-3`, `cloche`, `pose` : « 100 CC0 SFX », https://opengameart.org/content/100-cc0-sfx
+- craquement de `naufrage` : « 75 CC0 breaking / falling / hit SFX »,
+  https://opengameart.org/content/75-cc0-breaking-falling-hit-sfx
+
+Fond du hub (`/play/naval/mer-crepuscule.jpg`) : photo Unsplash
+(https://unsplash.com/photos/014607f694d7), licence Unsplash.
