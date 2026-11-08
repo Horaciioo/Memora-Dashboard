@@ -6,7 +6,7 @@ import { socialFormFields } from '@/core/services/members/MemberFileService'
 import { isEncadrement } from '@/declarations/access/roles'
 import { GUIDE_KEYS, tourPageKey } from '@/declarations/academy/welcome'
 import { TOUR_SETTINGS } from '@/declarations/configurations/settings'
-import { WELCOMES_EVERY_ACCOUNT } from '@/declarations/system/environments'
+import { REPLAYS_TOUR_ON_REFRESH, WELCOMES_EVERY_ACCOUNT } from '@/declarations/system/environments'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { TourCreator, TourState } from '@/types/tour'
 
@@ -58,11 +58,11 @@ export const readTourState = async (
   })
   if (!account) return null
 
+  // Nothing is remembered while the visit is being built
+  const seenGuides = REPLAYS_TOUR_ON_REFRESH ? [] : account.seenGuides
+
   // Played once, left or finished
-  if (
-    account.seenGuides.includes(GUIDE_KEYS.tourSkipped) ||
-    account.seenGuides.includes(GUIDE_KEYS.tourDone)
-  ) {
+  if (seenGuides.includes(GUIDE_KEYS.tourSkipped) || seenGuides.includes(GUIDE_KEYS.tourDone)) {
     return null
   }
 
@@ -74,8 +74,8 @@ export const readTourState = async (
     open,
     held.map((row) => row.jobFunction.name)
   )
-  const seen = routes.filter((route) => account.seenGuides.includes(tourPageKey(route)))
-  const isIntroSeen = account.seenGuides.includes(GUIDE_KEYS.tourIntro)
+  const seen = routes.filter((route) => seenGuides.includes(tourPageKey(route)))
+  const isIntroSeen = seenGuides.includes(GUIDE_KEYS.tourIntro)
 
   // Everything explained
   if (isIntroSeen && !nextRoute(routes, seen)) return null
