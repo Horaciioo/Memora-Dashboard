@@ -1,7 +1,7 @@
-import { parOfLayout } from '@/core/lib/play/golf/par'
-import { padHeight, padUnder, toPad } from '@/core/lib/play/golf/terrain'
+import { parOfLayout } from '@/core/lib/play/golf/course/par'
+import { padHeight, padUnder, toPad } from '@/core/lib/play/golf/physics/terrain'
 import type { GolfHole, GolfHoleLayout, GolfPoint, GolfWall } from '@/core/lib/play/golf/types'
-import { edgeWalls } from '@/core/lib/play/golf/walls'
+import { edgeWalls } from '@/core/lib/play/golf/physics/walls'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 // Compiled once per layout

@@ -1,5 +1,5 @@
-import { isArmed } from '@/core/lib/play/golf/arming'
-import { isEffectActive, isEffectKept } from '@/core/lib/play/golf/effects'
+import { isArmed } from '@/core/lib/play/golf/powers/arming'
+import { isEffectActive, isEffectKept } from '@/core/lib/play/golf/powers/effects'
 import type { GolfEffect, GolfHazard } from '@/core/lib/play/golf/types'
 import type { GolfPowerName } from '@/utils/constants/play'
 

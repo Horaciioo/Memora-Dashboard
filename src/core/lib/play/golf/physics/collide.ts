@@ -1,5 +1,5 @@
-import type { GolfBody } from '@/core/lib/play/golf/body'
-import { wake } from '@/core/lib/play/golf/body'
+import type { GolfBody } from '@/core/lib/play/golf/physics/body'
+import { wake } from '@/core/lib/play/golf/physics/body'
 import type { GolfCircle, GolfSpinner, GolfTotem, GolfWall } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 

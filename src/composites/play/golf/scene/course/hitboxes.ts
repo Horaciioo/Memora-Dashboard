@@ -1,5 +1,5 @@
 import { floorHeight, isEffectActive } from '@/core/lib/play/golf'
-import { CUP_HOLE } from '@/core/lib/play/golf/cup'
+import { CUP_HOLE } from '@/core/lib/play/golf/course/cup'
 import type { GolfHazard, GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'

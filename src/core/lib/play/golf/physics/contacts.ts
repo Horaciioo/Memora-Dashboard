@@ -1,6 +1,6 @@
-import { bounceBack, bouncerOf } from '@/core/lib/play/golf/bounce'
-import type { GolfBody } from '@/core/lib/play/golf/body'
-import { halt, isInPlay, speedOf } from '@/core/lib/play/golf/body'
+import { bounceBack, bouncerOf } from '@/core/lib/play/golf/physics/bounce'
+import type { GolfBody } from '@/core/lib/play/golf/physics/body'
+import { halt, isInPlay, speedOf } from '@/core/lib/play/golf/physics/body'
 import {
   collideBalls,
   collideBumper,
@@ -11,12 +11,12 @@ import {
   kickAway,
   reflectOff,
   wallBounce,
-} from '@/core/lib/play/golf/collide'
+} from '@/core/lib/play/golf/physics/collide'
 import { collidersOf, queryGrid, sweepBox, sweepSegment } from '@/core/lib/play/golf/colliders'
 import type { GolfSweepHit } from '@/core/lib/play/golf/colliders'
-import { boostId } from '@/core/lib/play/golf/terrain'
-import type { GolfWorld } from '@/core/lib/play/golf/world'
-import { pairKey } from '@/core/lib/play/golf/world'
+import { boostId } from '@/core/lib/play/golf/physics/terrain'
+import type { GolfWorld } from '@/core/lib/play/golf/physics/world'
+import { pairKey } from '@/core/lib/play/golf/physics/world'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { SECOND_MS } from '@/utils/constants/time'
 

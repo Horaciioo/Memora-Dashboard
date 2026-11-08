@@ -1,4 +1,4 @@
-import { isArmed } from '@/core/lib/play/golf/arming'
+import { isArmed } from '@/core/lib/play/golf/powers/arming'
 import type { GolfEffect, GolfHazard } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPowers } from '@/utils/constants/play'

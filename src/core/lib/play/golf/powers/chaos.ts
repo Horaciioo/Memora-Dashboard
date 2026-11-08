@@ -1,4 +1,4 @@
-import { compileHole } from '@/core/lib/play/golf/course'
+import { compileHole } from '@/core/lib/play/golf/course/course'
 import { canPlaceAt } from '@/core/lib/play/golf/rules'
 import type { GolfGameSettings } from '@/core/lib/play/golf/settings'
 import type { GolfHole, GolfHoleLayout, GolfPoint, GolfWall } from '@/core/lib/play/golf/types'

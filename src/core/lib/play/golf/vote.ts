@@ -5,7 +5,7 @@ import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GOLF_VOTE_TIMING, GolfVoteSteps } from '@/declarations/play/golf/vote'
 import type { GolfVoteStep } from '@/declarations/play/golf/vote'
 import { GolfModes } from '@/utils/constants/play'
-import { deckDuration } from '@/core/lib/play/golf/deck'
+import { deckDuration } from '@/core/lib/play/golf/powers/deck'
 import { drawCourse, golfSettingsOf, holeRange } from '@/core/lib/play/golf/settings'
 import type { GolfGameSettings } from '@/core/lib/play/golf/settings'
 

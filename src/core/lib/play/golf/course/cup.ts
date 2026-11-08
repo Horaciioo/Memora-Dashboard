@@ -1,6 +1,6 @@
-import type { GolfBody } from '@/core/lib/play/golf/body'
-import { halt } from '@/core/lib/play/golf/body'
-import type { GolfWorld } from '@/core/lib/play/golf/world'
+import type { GolfBody } from '@/core/lib/play/golf/physics/body'
+import { halt } from '@/core/lib/play/golf/physics/body'
+import type { GolfWorld } from '@/core/lib/play/golf/physics/world'
 import type { GolfCup } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 

@@ -1,4 +1,4 @@
-import { pathAt, pathLength } from '@/core/lib/play/golf/frames'
+import { pathAt, pathLength } from '@/core/lib/play/golf/physics/frames'
 import type { GolfBallMotion, GolfShotResult } from '@/core/lib/play/golf/types'
 import { SECOND_MS } from '@/utils/constants/time'
 

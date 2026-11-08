@@ -1,6 +1,6 @@
-import type { GolfBody } from '@/core/lib/play/golf/body'
-import { speedOf, wake } from '@/core/lib/play/golf/body'
-import type { GolfWorld } from '@/core/lib/play/golf/world'
+import type { GolfBody } from '@/core/lib/play/golf/physics/body'
+import { speedOf, wake } from '@/core/lib/play/golf/physics/body'
+import type { GolfWorld } from '@/core/lib/play/golf/physics/world'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 const { bumperMan, boingBoing } = GOLF_SETTINGS.powers

@@ -1,5 +1,5 @@
-import type { GolfShotState } from '@/core/lib/play/golf/board'
-import { pathAt } from '@/core/lib/play/golf/frames'
+import type { GolfShotState } from '@/core/lib/play/golf/course/board'
+import { pathAt } from '@/core/lib/play/golf/physics/frames'
 import type { GolfEventKind, GolfShotEvent, GolfShotResult } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 

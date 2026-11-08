@@ -1,6 +1,6 @@
-import type { GolfBody } from '@/core/lib/play/golf/body'
-import { isEffectActive } from '@/core/lib/play/golf/effects'
-import { floorHeight } from '@/core/lib/play/golf/course'
+import type { GolfBody } from '@/core/lib/play/golf/physics/body'
+import { isEffectActive } from '@/core/lib/play/golf/powers/effects'
+import { floorHeight } from '@/core/lib/play/golf/course/course'
 import type {
   GolfCircle,
   GolfEventKind,

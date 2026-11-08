@@ -1,4 +1,4 @@
-import { padHeight, padUnder } from '@/core/lib/play/golf/terrain'
+import { padHeight, padUnder } from '@/core/lib/play/golf/physics/terrain'
 import type { GolfHole, GolfPad, GolfPoint, GolfWall } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 

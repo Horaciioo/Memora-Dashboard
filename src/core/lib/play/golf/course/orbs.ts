@@ -1,6 +1,6 @@
-import type { GolfBody } from '@/core/lib/play/golf/body'
+import type { GolfBody } from '@/core/lib/play/golf/physics/body'
 import { segmentDistance } from '@/core/lib/play/golf/colliders/hit'
-import type { GolfWorld } from '@/core/lib/play/golf/world'
+import type { GolfWorld } from '@/core/lib/play/golf/physics/world'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { SECOND_MS } from '@/utils/constants/time'
 
