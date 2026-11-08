@@ -8,7 +8,7 @@ const BOWL = 12
 const BOWL_END = 20
 
 /**
- * Ventilo Score: a left path with one fan, a right path with two facing fans, then a bumper bowl
+ * Ventilo Score: a left path with one fan, a right path with two fans, the last one blowing to the centre, then a bumper bowl
  * @return {GolfHoleLayout} - Hole
  */
 
@@ -25,12 +25,13 @@ export const fansHole = (): GolfHoleLayout => {
     tee: [0, 1.2],
     cup: field.centre,
     cups: field.cups,
+    rails: field.rails,
     pads: [
       slab(-1.2, 0, 2.4, 2.4, TOP),
       // Left: west, south with a fan, east into the bowl
       slab(-6.2, 0, 5, 2.4, TOP),
       slab(-6.2, 2.4, 2.6, 9.6, TOP, 1),
-      // Right: south, then east with the corner fans, south again
+      // Right: south, then east with a fan, south again toward the centre
       slab(-1.2, 2.4, 2.4, 3.6, TOP, 1.4),
       slab(-1.2, 6, 7.4, 2.6, 1.4, 1.2),
       slab(3.6, 8.6, 2.6, 3.4, 1.2, 1),
@@ -41,7 +42,7 @@ export const fansHole = (): GolfHoleLayout => {
     fans: [
       { at: [-6.2, 5.5], size: [2.6, 1.8], push: [0, 1] },
       { at: [-1.2, 6.2], size: [1, 2.2], push: [1, 0] },
-      { at: [2.6, 6.2], size: [1, 2.2], push: [-1, 0] },
+      { at: [3.6, 8.8], size: [2.6, 2.6], push: [-0.5, 0.87] },
     ],
     bumpers,
     orbs: [

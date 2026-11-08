@@ -112,17 +112,7 @@ export const BaccalaureatBoard = ({
           total={BACCALAUREAT_SETTINGS.countdownSeconds}
           lead={BAC_BOARD_COPY.getReady}
           className={BAC_BOARD.inline}
-        >
-          {me.isSeated && board.jokersLeft > 0 && !round.rerolledById && (
-            <Button
-              variant="arcadeGhost"
-              isLoading={isSaving}
-              onClick={() => void act({ type: 'reroll' })}
-            >
-              {BAC_BOARD_COPY.reroll}
-            </Button>
-          )}
-        </PlayCountdown>
+        ></PlayCountdown>
       </div>
     )
   }

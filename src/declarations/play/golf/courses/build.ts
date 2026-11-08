@@ -2,7 +2,7 @@ import type { GolfPadLayout, GolfPoint, GolfRailLayout } from '@/core/lib/play/g
 import { GolfSurfaces } from '@/utils/constants/play'
 
 /**
- * Slab running along z, downhill toward +z when it ends lower
+ * Slab running along z
  * @param {number} x0 - West edge
  * @param {number} z0 - South edge
  * @param {number} width - Along x
@@ -47,10 +47,10 @@ export const boosted = (pad: GolfPadLayout, push: GolfPoint): GolfPadLayout => {
 }
 
 /**
- * Rails along an arc, each facing away from the centre
+ * Rails along an arc
  * @param {GolfPoint} centre - Circle centre
  * @param {number} radius - Radius
- * @param {number} from - Start angle, radians from +z toward +x
+ * @param {number} from - Start angle
  * @param {number} to - End angle
  * @param {number} steps - Segments
  * @param {boolean} [isGlass] - Glass wall
@@ -93,7 +93,7 @@ export const railBetween = (from: GolfPoint, to: GolfPoint, out: GolfPoint): Gol
 })
 
 /**
- * Slab running along x, higher to the east when it ends higher
+ * Slab running along x
  * @param {number} x0 - West edge
  * @param {number} z0 - South edge
  * @param {number} width - Along x
@@ -121,7 +121,7 @@ export const slabX = (
 })
 
 /**
- * Cushion rail, kicking the ball back
+ * Cushion rail
  * @param {GolfPoint} from - Start
  * @param {GolfPoint} to - End
  * @param {GolfPoint} out - Side away from the floor
@@ -136,7 +136,7 @@ export const cushion = (from: GolfPoint, to: GolfPoint, out: GolfPoint): GolfRai
 })
 
 /**
- * Rail closing a bay behind a hole, low glass
+ * Rail closing a bay behind a hole
  * @param {GolfPoint} from - Start
  * @param {GolfPoint} to - End
  * @param {GolfPoint} out - Side away from the floor
@@ -227,7 +227,7 @@ const leg = (
 }
 
 /**
- * Corridor of flat squares at the waypoints joined by tilted legs, outer corners cut by a diagonal wall
+ * Corridor of flat squares at the waypoints joined by tilted legs
  * @param {GolfPoint[]} points - Waypoints, each leg along an axis
  * @param {number} width - Corridor width
  * @param {number[]} heights - Floor height at each waypoint
@@ -318,11 +318,11 @@ export const valley = (
 const SQRT_HALF = Math.SQRT1_2
 
 /**
- * Mirror cutting a corner, sending a ball turning through a right angle
+ * Mirror cutting a corner
  * @param {GolfPoint} centre - Middle of the corner box
  * @param {number} half - Half side of the box
  * @param {1 | -1} slope - Diagonal rising (1) or falling (-1) along x
- * @param {1 | -1} side - Side of the diagonal holding the floor, 1 toward south east or south west
+ * @param {1 | -1} side - Side of the diagonal holding the floor
  * @return {GolfRailLayout} - Rail
  */
 

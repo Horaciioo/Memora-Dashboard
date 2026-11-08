@@ -311,11 +311,6 @@ export const BACCALAUREAT_SETTINGS = {
       min: 0,
     }),
   },
-  jokersPerPlayer: readInteger(baccalaureat.jokersPerPlayer, {
-    path: 'play/baccalaureat.jokersPerPlayer',
-    fallback: 1,
-    min: 0,
-  }),
   flash: {
     roundSeconds: readInteger(flash.roundSeconds, {
       path: 'play/baccalaureat.flash.roundSeconds',

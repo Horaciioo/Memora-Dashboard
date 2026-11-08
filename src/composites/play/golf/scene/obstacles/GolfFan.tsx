@@ -16,7 +16,7 @@ const { fan, propeller } = GOLF_SCENE
 const { frame, streaks } = fan
 
 /**
- * Fan at the wind source, its zone drawn on the ground, streaks blowing along the wind
+ * Fan at the wind source
  * @param {Object} props - Fan
  * @param {GolfHole} props.hole - Hole
  * @param {GolfPaint} props.paint - Colours
@@ -59,7 +59,8 @@ export const GolfFan = ({
       const progress = (state.clock.elapsedTime * streaks.speed + index / streaks.count) % 1
       const along = (progress - 0.5) * (reach - streaks.length)
       const lateral = (((index * 0.618) % 1) - 0.5) * span * streaks.spread
-      holder.position.set(px * along - pz * lateral, streaks.lift, pz * along + px * lateral)
+      const lift = streaks.lift + ((index * 0.37) % 1) * streaks.rise
+      holder.position.set(px * along - pz * lateral, lift, pz * along + px * lateral)
       holder.rotation.set(0, heading, 0)
       holder.scale.set(1, 1, Math.sin(progress * Math.PI))
       holder.updateMatrix()
@@ -85,6 +86,7 @@ export const GolfFan = ({
           -pz * (reach / 2 - propeller.radius),
         ]}
         paint={paint}
+        heading={heading}
         size={Math.min(1.6, Math.max(1, span / (propeller.radius * 2.4)))}
       />
       <group ref={zone}>

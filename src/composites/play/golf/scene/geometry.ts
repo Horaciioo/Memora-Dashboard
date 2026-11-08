@@ -2,6 +2,7 @@ import { BufferGeometry, Float32BufferAttribute } from 'three'
 
 import { holdsCup, holedTop, pitFaces } from '@/composites/play/golf/scene/cupPit'
 import { holeSeed, seededRandom } from '@/composites/play/golf/scene/random'
+import { railEnds } from '@/composites/play/golf/scene/railEnds'
 import { padHeight } from '@/core/lib/play/golf'
 import type { GolfBlock, GolfHole, GolfPad, GolfPoint, GolfWall } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
@@ -120,18 +121,20 @@ const padCorners = (pad: GolfPad): Corner[] => [
  * @param {GolfWall} wall - Rail
  * @param {number} bottom - Course bottom
  * @param {number} index - Rail number
+ * @param {GolfPad[]} pads - Slabs
  * @return {{ top: number[], inner: number[], outer: number[] }} - Faces
  */
 
-const railFaces = (wall: GolfWall, bottom: number, index: number) => {
+const railFaces = (wall: GolfWall, bottom: number, index: number, pads: GolfPad[]) => {
   const length = Math.hypot(wall.bx - wall.ax, wall.bz - wall.az)
   const ux = (wall.bx - wall.ax) / length
   const uz = (wall.bz - wall.az) / length
   // Corner ends stretched to close them, openings left flush with the path
   // Just short of the neighbour's outer face, no shared plane
   const reach = render.railWidth - 0.004
-  const reachA = wall.cutA ? 0 : reach
-  const reachB = wall.cutB ? 0 : reach
+  const ends = railEnds(wall, pads)
+  const reachA = ends.a ? reach : 0
+  const reachB = ends.b ? reach : 0
   const ax = wall.ax - ux * reachA
   const az = wall.az - uz * reachA
   const bx = wall.bx + ux * reachB
@@ -228,13 +231,13 @@ export const courseGeometry = (hole: GolfHole) => {
   const seenRails = hole.walls.filter((wall) => wall.kind === 'rail' && !wall.isHidden)
   const rails = seenRails
     .filter((wall) => !wall.isGlass && !wall.isBouncy)
-    .map((wall, index) => railFaces(wall, floor - GOLF_SCENE.island.depth, index))
+    .map((wall, index) => railFaces(wall, floor - GOLF_SCENE.island.depth, index, hole.pads))
   const panes = seenRails
     .filter((wall) => wall.isGlass)
-    .map((wall, index) => railFaces(wall, floor - GOLF_SCENE.island.depth, index))
+    .map((wall, index) => railFaces(wall, floor - GOLF_SCENE.island.depth, index, hole.pads))
   const cushions = seenRails
     .filter((wall) => wall.isBouncy)
-    .map((wall, index) => railFaces(wall, floor - GOLF_SCENE.island.depth, index))
+    .map((wall, index) => railFaces(wall, floor - GOLF_SCENE.island.depth, index, hole.pads))
   // Flat blocks are rounded apart, tilted ones stay prisms
   const blocks = hole.blocks
     .filter((block) => !isFlatBlock(block) && !block.isHidden)

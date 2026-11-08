@@ -46,6 +46,27 @@ const riseOf = (progress: number): number => {
 }
 
 /**
+ * Lowest and highest floor under a bumper
+ * @param {GolfHole} hole - Hole
+ * @param {{ x: number, z: number }} spot - Centre
+ * @param {number} radius - Bumper radius
+ * @return {{ low: number, rise: number }} - Foot height and slope rise
+ */
+
+const footing = (hole: GolfHole, spot: { x: number; z: number }, radius: number) => {
+  const { samples } = bumper.foot
+  const heights = Array.from({ length: samples + 1 }, (_, index) => {
+    const angle = (index / samples) * Math.PI * 2
+    const reach = index === samples ? 0 : radius
+
+    return floorHeight(hole, spot.x + Math.cos(angle) * reach, spot.z + Math.sin(angle) * reach)
+  }).filter((height): height is number => height !== null)
+  const low = Math.min(...heights)
+
+  return { low, rise: Math.max(...heights) - low }
+}
+
+/**
  * Lives shown under a bumper
  * @typedef {Object} GolfBumperLives
  */
@@ -90,9 +111,19 @@ export const GolfBumper = ({
   const body = useRef<Group>(null)
   const glows = useRef<(MeshStandardMaterial | null)[]>([])
   const bornAt = useRef<number | null>(null)
+  // Foot on the lowest floor, the cap rising with the slope
+  const foot = useMemo(
+    () => (spot ? footing(spot.hole, spot, radius) : { low: 0, rise: 0 }),
+    [spot, radius]
+  )
+  const total = height + foot.rise
+  const isOwned = Boolean(face)
   const parts = useMemo(
-    () => ({ plate: turned(skin.plate, radius, height), puck: turned(skin.puck, radius, height) }),
-    [radius, height]
+    () => ({
+      plate: turned(skin.plate, radius, total),
+      puck: turned(isOwned ? skin.puck : skin.dome, radius, total),
+    }),
+    [radius, total, isOwned]
   )
   const tag = useMemo(
     () =>
@@ -130,7 +161,7 @@ export const GolfBumper = ({
     for (const glow of glows.current) if (glow) glow.emissiveIntensity = bumper.glow * fade
   })
 
-  const floor = spot ? (floorHeight(spot.hole, spot.x, spot.z) ?? 0) : 0
+  const floor = foot.low
 
   return (
     <group position={spot ? [spot.x, floor, spot.z] : [0, 0, 0]}>
@@ -151,7 +182,7 @@ export const GolfBumper = ({
             roughness={bumper.roughness}
           />
         </mesh>
-        <mesh position={[0, skin.ring.up * height, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh position={[0, skin.ring.up * total, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry
             args={[skin.ring.across * radius, skin.ring.tube * radius, 12, bumper.segments]}
           />
@@ -167,28 +198,32 @@ export const GolfBumper = ({
           />
         </mesh>
         {/* Tray rim in the owner colour, avatar laid flat inside */}
-        <mesh position={[0, skin.tray.up * height, 0]} rotation={FLAT}>
-          <ringGeometry
-            args={[skin.tray.inner * radius, skin.tray.outer * radius, bumper.segments]}
-          />
-          <meshStandardMaterial color={color} roughness={bumper.roughness} />
-        </mesh>
-        <mesh position={[0, skin.tray.up * height - skin.tray.lift, 0]} rotation={FLAT}>
-          <circleGeometry args={[skin.tray.avatar * radius, bumper.segments]} />
-          {tag ? (
-            <meshBasicMaterial map={tag} />
-          ) : (
-            <meshStandardMaterial
-              ref={(material) => {
-                glows.current[1] = material
-              }}
-              color={color}
-              emissive={color}
-              emissiveIntensity={0}
-              roughness={bumper.roughness}
-            />
-          )}
-        </mesh>
+        {isOwned && (
+          <>
+            <mesh position={[0, skin.tray.up * total, 0]} rotation={FLAT}>
+              <ringGeometry
+                args={[skin.tray.inner * radius, skin.tray.outer * radius, bumper.segments]}
+              />
+              <meshStandardMaterial color={color} roughness={bumper.roughness} />
+            </mesh>
+            <mesh position={[0, skin.tray.up * total - skin.tray.lift, 0]} rotation={FLAT}>
+              <circleGeometry args={[skin.tray.avatar * radius, bumper.segments]} />
+              {tag ? (
+                <meshBasicMaterial map={tag} />
+              ) : (
+                <meshStandardMaterial
+                  ref={(material) => {
+                    glows.current[1] = material
+                  }}
+                  color={color}
+                  emissive={color}
+                  emissiveIntensity={0}
+                  roughness={bumper.roughness}
+                />
+              )}
+            </mesh>
+          </>
+        )}
       </group>
       {hearts && (
         <Html position={[0, -bumper.heartsDrop, 0]} center zIndexRange={[10, 0]}>

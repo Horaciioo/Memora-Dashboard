@@ -4,19 +4,14 @@
  */
 
 export const GOLF_SCENE_POWERS = {
-  // Power orb: tinted glass sphere, gradient core, fixed gleam, soft ground shade, pop-in on return
+  // Power card: rainbow card swinging over a soft ground shade, pop-in on return
   orb: {
     bob: 0.025,
     bobSpeed: 1.6,
     phase: 2.1,
-    spin: 0.9,
-    segments: 28,
-    opacity: 0.82,
-    roughness: 0.15,
-    pixels: 128,
-    mark: 1.3,
-    markDepth: 0.35,
-    gleam: { size: 0.22, x: -0.38, y: 0.42, z: 0.6, opacity: 0.85 },
+    spin: 1.3,
+    // Card size in orb radii, swing in radians
+    card: { width: 1.7, height: 2.3, depth: 0.12, swing: 0.8 },
     shade: { size: 2.1, opacity: 0.32, shrink: 0.45, lift: 0.004 },
     popMs: 420,
     // Taken: swells a little then implodes
@@ -47,9 +42,12 @@ export const GOLF_SCENE_POWERS = {
     dust: { discs: 3, radius: 0.95, opacity: 0.45, spin: 2.4, lift: 0.012, pulse: 0.12 },
     cloud: { puffs: 6, radius: 1.05, size: 0.62, squash: 0.42, opacity: 0.5, spin: 0.5 },
   },
-  // Ventilo: flat propeller, translucent blades with an outline, motion ghost, wind squares
+  // Ventilo: upright propeller on a post, translucent blades, motion ghost, wind squares
   propeller: {
     radius: 0.4,
+    height: 0.5,
+    foot: 0.05,
+    post: 0.03,
     blades: 4,
     spin: 11,
     opacity: 0.78,

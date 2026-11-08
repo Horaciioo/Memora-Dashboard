@@ -43,7 +43,9 @@ export const GOLF_SCENE_BALL = {
   aim: { lift: 0.02, clickPixels: 6 },
   // Chevrons ahead, more the harder the pull, stretched arm behind ending in a ring
   arrow: {
-    lift: 0.02,
+    lift: 0.035,
+    // Metres either side of a mark to read the slope
+    slopeStep: 0.08,
     start: 0.32,
     chevrons: 9,
     gap: 0.17,
@@ -55,7 +57,11 @@ export const GOLF_SCENE_BALL = {
     ring: 0.15,
     ringHole: 0.085,
     dots: 40,
-    dot: 0.032,
+    // Guide marks: outer half side, hole of the frame and core, shares of it
+    dot: 0.026,
+    frameHole: 0.72,
+    core: 0.46,
+    frameOpacity: 0.5,
     dotGap: 0.22,
     dotFade: 0.5,
     dotOpacity: 0.85,

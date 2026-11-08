@@ -121,15 +121,12 @@ const recentPlayers = async (): Promise<Set<string>> => {
 
 /**
  * Members who can still be called to a game
- * @param {string} sessionId - Game
+ * @param {string[]} seated - Members already at the table
  * @param {string} viewerId - Player calling
  * @return {Promise<object[]>} - Candidates with their ties
  */
 
-export const inviteCandidates = async (sessionId: string, viewerId: string) => {
-  const session = await loadSession(sessionId)
-  const seated = session.seats.filter(isPresent).map((seat) => seat.accountId)
-
+export const inviteCandidates = async (seated: string[], viewerId: string) => {
   const [members, former, recent] = await Promise.all([
     prisma.account.findMany({
       where: { id: { notIn: seated }, leftAt: null, anonymisedAt: null, frozenAt: null },

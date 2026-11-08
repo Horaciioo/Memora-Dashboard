@@ -11,10 +11,9 @@ import { ludoSettingsOf } from '@/core/lib/play/ludo/settings'
 import type { LudoGameSettings } from '@/core/lib/play/ludo/settings'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { LUDO_RULE_COPY, LUDO_SETUP_COPY } from '@/declarations/play/ludo/copy'
-import { LUDO_SETTINGS, LudoEndings } from '@/declarations/play/ludo/settings'
+import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import type { LudoExitRule, LudoRuleName } from '@/declarations/play/ludo/settings'
 import { FIELD_STYLES, LUDO_SETUP } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
 
 // Tabs of the drawer
 const TABS = [
@@ -27,12 +26,6 @@ const EXITS = (Object.keys(LUDO_SETTINGS.exits) as LudoExitRule[]).map((value) =
   value,
   label: LUDO_SETUP_COPY[value],
 }))
-
-// Endings as cards
-const ENDINGS = [
-  { value: LudoEndings.Podium, title: LUDO_SETUP_COPY.podium, note: LUDO_SETUP_COPY.podiumNote },
-  { value: LudoEndings.First, title: LUDO_SETUP_COPY.first, note: LUDO_SETUP_COPY.firstNote },
-]
 
 // House rules, in reading order
 const RULES = Object.keys(LUDO_RULE_COPY) as LudoRuleName[]
@@ -72,19 +65,6 @@ export const LudoSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
             <>
               <SetupSection
                 styles={LUDO_SETUP}
-                title={LUDO_SETUP_COPY.pawns}
-                hint={LUDO_SETUP_COPY.pawnsHint}
-              >
-                <SetupStepper
-                  styles={LUDO_SETUP}
-                  value={settings.pawns}
-                  range={LUDO_SETTINGS.pawns}
-                  onChange={set('pawns')}
-                  labels={steps}
-                />
-              </SetupSection>
-              <SetupSection
-                styles={LUDO_SETUP}
                 title={LUDO_SETUP_COPY.turn}
                 hint={LUDO_SETUP_COPY.turnHint}
               >
@@ -111,25 +91,6 @@ export const LudoSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
                   value={settings.exit}
                   onChange={set('exit')}
                 />
-              </SetupSection>
-              <SetupSection styles={LUDO_SETUP} title={LUDO_SETUP_COPY.ending}>
-                <div className={LUDO_SETUP.cards}>
-                  {ENDINGS.map((ending) => (
-                    <button
-                      key={ending.value}
-                      type="button"
-                      aria-pressed={settings.ending === ending.value}
-                      className={cn(
-                        LUDO_SETUP.card,
-                        settings.ending === ending.value && LUDO_SETUP.cardOn
-                      )}
-                      onClick={() => set('ending')(ending.value)}
-                    >
-                      <span className={LUDO_SETUP.cardTitle}>{ending.title}</span>
-                      <span className={LUDO_SETUP.cardNote}>{ending.note}</span>
-                    </button>
-                  ))}
-                </div>
               </SetupSection>
             </>
           )}

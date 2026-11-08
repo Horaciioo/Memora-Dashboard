@@ -1,9 +1,8 @@
 import { boosted, slab } from '@/declarations/play/golf/courses/build'
 import type { GolfHoleLayout } from '@/core/lib/play/golf/types'
-import { GolfSurfaces } from '@/utils/constants/play'
 
 /**
- * Le Pur-sang: a long lane with a soft S, two boosts, then a bumper triangle between sand
+ * Le Pur-sang: a long lane with a soft S, two boosts, then a bumper triangle
  * @return {GolfHoleLayout} - Hole
  */
 
@@ -18,9 +17,7 @@ export const thoroughbredHole = (): GolfHoleLayout => ({
     slab(-0.7, 8, 3, 5),
     boosted(slab(-0.7, 13, 3, 2), [0, 1]),
     slab(-0.7, 15, 3, 2),
-    slab(-2.5, 17, 1, 7, 0, 0, { surface: GolfSurfaces.Sand }),
     slab(-1.5, 17, 3, 7),
-    slab(1.5, 17, 1, 7, 0, 0, { surface: GolfSurfaces.Sand }),
     slab(-1.5, 24, 3, 3),
   ],
   bumpers: [

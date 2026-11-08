@@ -14,9 +14,10 @@ export const blindHole = (): GolfHoleLayout => {
     tee: [0, 1.2],
     cup: field.centre,
     cups: field.cups,
+    rails: field.rails,
     pads: [
       slab(-3.5, 0, 7, 6, 3.4, 2.2),
-      slab(-3.5, 6, 7, 11, 2.2, 0, { hidden: true }),
+      slab(-4.5, 6, 9, 11, 2.2, 0, { hidden: true }),
       ...field.pads,
     ],
     bumpers: [

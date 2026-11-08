@@ -34,13 +34,14 @@ export const pisteHole = (): GolfHoleLayout => {
     tee: [0, 1.5],
     cup: field.centre,
     cups: field.cups,
+    rails: field.rails,
     pads: [
       slab(LEFT, 0, 7, 3, 0),
       ...climb,
       boosted(slab(LEFT, 13, COLUMN, 2, 1), [-0.3, 1]),
       slab(LEFT + COLUMN, 13, COLUMN, 2, 1),
       boosted(slab(LEFT + 2 * COLUMN, 13, COLUMN, 2, 1), [0.3, 1]),
-      slab(LEFT, 15, 7, 9, 1, 0),
+      slab(-4.5, 15, 9, 9, 1, 0),
       ...field.pads,
     ],
     orbs: [

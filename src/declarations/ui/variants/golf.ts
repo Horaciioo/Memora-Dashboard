@@ -378,3 +378,20 @@ export const GOLF_DECK = {
   name: 'px-2 text-center text-xs font-black tracking-wide text-white uppercase',
   slot: 'absolute inset-x-0 top-full mt-2 text-center text-xs font-black tracking-wide whitespace-nowrap text-[var(--play-golf-gold-light)] uppercase [text-shadow:0_2px_0_rgb(0_0_0/0.5)] sm:text-sm',
 } as const
+
+/**
+ * Free flight over a whole map, opened from the hub
+ * @type {Record<string, string>}
+ */
+
+export const GOLF_FLY = {
+  open: 'fixed right-4 bottom-24 z-30 grid size-12 place-items-center rounded-full bg-orange-500 text-white shadow-lg transition-transform hover:scale-105 lg:bottom-6',
+  openIcon: 'size-6',
+  root: 'fixed inset-0 z-[80] bg-black',
+  canvas: 'absolute inset-0 touch-none cursor-grab active:cursor-grabbing',
+  bar: 'absolute inset-x-0 top-0 z-10 flex items-center gap-3 bg-gradient-to-b from-black/60 to-transparent p-3 text-white',
+  select: 'rounded-lg bg-white/15 px-3 py-2 text-sm font-bold text-white backdrop-blur',
+  option: 'text-black',
+  hint: 'hidden flex-1 truncate text-xs text-white/70 md:block',
+  close: 'ml-auto rounded-lg bg-white/15 px-3 py-2 text-sm font-bold text-white backdrop-blur',
+} as const

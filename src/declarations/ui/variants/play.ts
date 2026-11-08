@@ -351,12 +351,13 @@ export const PLAY_DOCK = {
   bar: `${BUBBLE} pointer-events-auto relative flex items-center gap-2 rounded-full px-3 py-2 sm:gap-4 sm:px-5`,
   button:
     'group relative grid size-11 place-items-center rounded-full text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
-  buttonOn: 'bg-[var(--play-chip)] text-[var(--play-ink)]',
+  // Open key: the glyph grows, the box and its neighbours stay put
+  buttonOn: 'bg-transparent! text-[var(--play-ink)] [&_svg]:scale-[1.4]',
   // Page title above a hovered key
   tip: 'play-glass pointer-events-none absolute bottom-full left-1/2 z-10 mb-3 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-extrabold whitespace-nowrap text-[var(--play-ink)] opacity-0 transition-opacity group-hover:opacity-100 group-aria-expanded:hidden',
   // Game or invitation waiting, the glyph turns gold
   buttonCall: 'text-[var(--play-gold-ink)]',
-  icon: 'size-5',
+  icon: 'size-5 transition-transform duration-200',
   avatarButton:
     'group relative mx-1 -my-6 rounded-full transition-transform hover:-translate-y-0.5',
   avatarRing: 'rounded-full ring-4 ring-[var(--play-panel-strong)]',
@@ -652,7 +653,9 @@ export const BAC_BOARD = {
     'grid size-9 place-items-center rounded-full bg-[var(--play-panel-strong)] text-[var(--play-ink-soft)] transition-transform hover:scale-110 disabled:opacity-50',
   ballotYes: 'hover:bg-[var(--color-success)] hover:text-white',
   ballotNo: 'hover:bg-[var(--color-danger)] hover:text-white',
-  ballotLocked: 'grid size-9 place-items-center rounded-full opacity-90',
+  ballotOnYes: 'bg-[var(--color-success)] text-white',
+  ballotOnNo: 'bg-[var(--color-danger)] text-white',
+  ballotOff: 'opacity-35 grayscale',
   ballotIcon: 'size-5',
   points:
     'shrink-0 rounded-full bg-[var(--play-baccalaureat)] px-2.5 py-1 text-sm font-black tabular-nums text-white',
@@ -888,7 +891,7 @@ export const BAC_SESSION = {
   // Full screen table scrolls when taller than the screen
   boxFull: 'play-boxfull flex min-h-0 flex-1 flex-col overflow-y-auto',
   // Same panel as the page so the ink stays readable, content centred as one group, dock margin dropped
-  boxFullPad: `${PANEL} ${LIFT} m-4 gap-5 p-5 sm:m-6 sm:p-6 *:first:mt-auto *:last:mb-auto *:pb-0!`,
+  boxFullPad: `${PANEL} ${LIFT} m-4 mt-20 gap-5 p-5 sm:m-6 sm:mt-24 sm:p-6 *:first:mt-auto *:last:mb-auto *:pb-0!`,
   // Stage keys: in the top bar, then floating over the table, shifted by the open chat
   keys: 'flex items-center gap-2',
   keysFull:
@@ -897,6 +900,7 @@ export const BAC_SESSION = {
   keysShifted:
     'right-[calc(min(var(--play-side-open),100vw)+2rem)] sm:right-[calc(min(var(--play-side-open),100vw)+2.5rem)]',
   keysIcon: 'size-5',
+  exitKey: 'play-key play-key-ghost inline-flex items-center gap-2 px-3 py-2 text-sm font-bold',
   keyButton: 'px-3! py-2!',
   // Sound card hanging under the sound key
   keyHolder: 'relative',

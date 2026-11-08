@@ -42,34 +42,6 @@ export const ballTexture = (color: Color, stripe: Color): CanvasTexture => {
   return texture
 }
 
-/**
- * Question mark of a power box, white on clear
- * @param {number} size - Canvas pixels
- * @param {Color} ink - Outline colour
- * @return {CanvasTexture} - Texture
- */
-
-export const questionTexture = (size: number, ink: Color): CanvasTexture => {
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const context = canvas.getContext('2d')
-  if (context) {
-    context.font = `900 ${size * 0.72}px ${getComputedStyle(document.body).fontFamily}`
-    context.textAlign = 'center'
-    context.textBaseline = 'middle'
-    context.lineWidth = size * 0.08
-    context.strokeStyle = `#${ink.getHexString()}`
-    context.fillStyle = 'white'
-    context.strokeText('?', size / 2, size * 0.54)
-    context.fillText('?', size / 2, size * 0.54)
-  }
-  const texture = new CanvasTexture(canvas)
-  texture.colorSpace = SRGBColorSpace
-
-  return texture
-}
-
 // Decal pixels
 const DECAL = 256
 

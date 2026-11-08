@@ -7,21 +7,12 @@ import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { clockLabel } from '@/composites/play/baccalaureat/clockLabel'
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
-import {
-  SetupChips,
-  SetupLetters,
-  SetupPicks,
-  SetupSection,
-  SetupStepper,
-} from '@/composites/play/setup/PlaySetupFields'
+import { SetupChips, SetupLetters, SetupSection } from '@/composites/play/setup/PlaySetupFields'
 import { baccalaureatSettingsOf, isCustomCategory } from '@/core/lib/play/baccalaureat/settings'
 import {
   BAC_SETUP_COPY,
-  BACCALAUREAT_CATEGORIES,
-  BACCALAUREAT_CATEGORY_KINDS,
   BACCALAUREAT_SETTINGS,
   BACCALAUREAT_SHARING,
-  categoriesOfKind,
   fillPlayMessage,
 } from '@/declarations/play'
 import type { BaccalaureatCategoryKey, BaccalaureatSharingKey } from '@/declarations/play'
@@ -33,23 +24,10 @@ const NO_TOURNAMENT = 0
 
 // Tabs of the drawer
 const TABS = [
-  { value: 'categories', label: BAC_SETUP_COPY.tabCategories, icon: 'playCategories' as const },
   { value: 'letters', label: BAC_SETUP_COPY.tabLetters, icon: 'playLetters' as const },
   { value: 'rounds', label: BAC_SETUP_COPY.tabRounds, icon: 'playRounds' as const },
   { value: 'tournament', label: BAC_SETUP_COPY.tabTournament, icon: 'playBracket' as const },
 ]
-
-// Category chips per family
-const FAMILIES = (
-  Object.keys(BACCALAUREAT_CATEGORY_KINDS) as (keyof typeof BACCALAUREAT_CATEGORY_KINDS)[]
-).map((kind) => ({
-  kind,
-  title: BACCALAUREAT_CATEGORY_KINDS[kind],
-  options: categoriesOfKind(kind).map((key) => ({
-    value: key,
-    label: BACCALAUREAT_CATEGORIES[key].label,
-  })),
-}))
 
 // Sharing rule chips
 const SHARING = (Object.keys(BACCALAUREAT_SHARING) as BaccalaureatSharingKey[]).map((key) => ({
@@ -88,27 +66,23 @@ export interface BacSetup {
  */
 
 export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: PlaySetupProps) => {
-  const { alphabet, rounds: range, tournament } = BACCALAUREAT_SETTINGS
+  const { alphabet, tournament } = BACCALAUREAT_SETTINGS
   // Rules on screen, stored ones when editing
   const start = baccalaureatSettingsOf(current?.settings ?? null)
-  const [categories, setCategories] = useState(
-    start.categories
-      .filter((entry) => !isCustomCategory(entry.id))
-      .map((entry) => entry.id) as BaccalaureatCategoryKey[]
-  )
+  // Categories and rounds come from the launch vote
+  const categories = start.categories
+    .filter((entry) => !isCustomCategory(entry.id))
+    .map((entry) => entry.id) as BaccalaureatCategoryKey[]
   const [sharedRule, setSharedRule] = useState(start.sharedRule)
   const [letters, setLetters] = useState<string[]>(start.letters)
   const [stop, setStop] = useState(start.stop)
   const [autoStop, setAutoStop] = useState(start.autoStop)
   const [seconds, setSeconds] = useState(start.roundSeconds)
-  const [rounds, setRounds] = useState(start.rounds)
   const [games, setGames] = useState(current?.tournamentGames ?? NO_TOURNAMENT)
 
   const isTournament = games !== NO_TOURNAMENT
-  const played = isTournament ? tournament.rounds : rounds
+  const played = isTournament ? tournament.rounds : start.rounds
   const isShort = letters.length < played
-  const { categories: bounds } = BACCALAUREAT_SETTINGS
-  const isOutOfRange = categories.length < bounds.min || categories.length > bounds.max
   const submit = () =>
     onSubmit({
       settings: {
@@ -140,7 +114,7 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
       open={open}
       isSaving={isSaving}
       isEditing={Boolean(current)}
-      canSubmit={!isShort && !isOutOfRange}
+      canSubmit={!isShort}
       copy={BAC_SETUP_COPY}
       tabs={TABS}
       onClose={onClose}
@@ -148,39 +122,6 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
     >
       {(tab) => (
         <div className={BAC_SETUP.body}>
-          {tab === 'categories' && (
-            <>
-              {FAMILIES.map((family) => (
-                <SetupSection
-                  key={family.kind}
-                  styles={BAC_SETUP}
-                  title={family.title}
-                  hint={family.kind === 'normal' ? BAC_SETUP_COPY.categoriesHint : undefined}
-                >
-                  <SetupPicks
-                    styles={BAC_SETUP}
-                    options={family.options}
-                    value={categories}
-                    onChange={(picked) =>
-                      setCategories([
-                        ...categories.filter((key) => !family.options.some((o) => o.value === key)),
-                        ...picked,
-                      ])
-                    }
-                  />
-                </SetupSection>
-              ))}
-              {isOutOfRange && (
-                <p className={FIELD_STYLES.error}>
-                  {fillPlayMessage(BAC_SETUP_COPY.categoriesRange, {
-                    min: bounds.min,
-                    max: bounds.max,
-                  })}
-                </p>
-              )}
-            </>
-          )}
-
           {tab === 'letters' && (
             <SetupSection
               styles={BAC_SETUP}
@@ -211,25 +152,6 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
 
           {tab === 'rounds' && (
             <>
-              <SetupSection
-                styles={BAC_SETUP}
-                title={BAC_SETUP_COPY.rounds}
-                hint={
-                  isTournament
-                    ? fillPlayMessage(BAC_SETUP_COPY.roundsLocked, { rounds: tournament.rounds })
-                    : BAC_SETUP_COPY.roundsHint
-                }
-              >
-                <SetupStepper
-                  styles={BAC_SETUP}
-                  value={played}
-                  range={range}
-                  disabled={isTournament}
-                  onChange={setRounds}
-                  labels={BAC_SETUP_COPY}
-                />
-              </SetupSection>
-
               <SetupSection
                 styles={BAC_SETUP}
                 title={BAC_SETUP_COPY.roundSeconds}

@@ -15,7 +15,7 @@ export interface BacAnswerCardProps {
   isWrongLetter: boolean
   // Who judged the word
   voters: { accepted: BacPlayer[]; rejected: BacPlayer[] }
-  // Ballot buttons, only before the viewer's vote
+  // Ballot buttons, the chosen one lit
   onVote?: (accepted: boolean) => void
   isSaving: boolean
 }
@@ -90,29 +90,19 @@ export const BacAnswerCard = ({
           {fillPlayMessage(BAC_BOARD_COPY.points, { points: answer.points })}
         </span>
       )}
-      {answer && !isScored && !onVote && answer.myVote !== null && (
-        <span
-          className={cn(
-            BAC_BOARD.ballotLocked,
-            answer.myVote ? BAC_BOARD.verdictYes : BAC_BOARD.verdictNo
-          )}
-          role="img"
-          aria-label={BAC_BOARD_COPY.yourVote}
-        >
-          {answer.myVote ? (
-            <YesIcon className={BAC_BOARD.ballotIcon} aria-hidden="true" />
-          ) : (
-            <NoIcon className={BAC_BOARD.ballotIcon} aria-hidden="true" />
-          )}
-        </span>
-      )}
       {answer && !isScored && onVote && (
         <div className={BAC_BOARD.ballots}>
           <button
             type="button"
             disabled={isSaving}
             aria-label={BAC_BOARD_COPY.accept}
-            className={cn(BAC_BOARD.ballot, BAC_BOARD.ballotYes)}
+            aria-pressed={answer.myVote === true}
+            className={cn(
+              BAC_BOARD.ballot,
+              BAC_BOARD.ballotYes,
+              answer.myVote === true && BAC_BOARD.ballotOnYes,
+              answer.myVote === false && BAC_BOARD.ballotOff
+            )}
             onClick={() => onVote(true)}
           >
             <YesIcon className={BAC_BOARD.ballotIcon} aria-hidden="true" />
@@ -121,7 +111,13 @@ export const BacAnswerCard = ({
             type="button"
             disabled={isSaving}
             aria-label={BAC_BOARD_COPY.reject}
-            className={cn(BAC_BOARD.ballot, BAC_BOARD.ballotNo)}
+            aria-pressed={answer.myVote === false}
+            className={cn(
+              BAC_BOARD.ballot,
+              BAC_BOARD.ballotNo,
+              answer.myVote === false && BAC_BOARD.ballotOnNo,
+              answer.myVote === true && BAC_BOARD.ballotOff
+            )}
             onClick={() => onVote(false)}
           >
             <NoIcon className={BAC_BOARD.ballotIcon} aria-hidden="true" />

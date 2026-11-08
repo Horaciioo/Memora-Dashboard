@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/elements/actions/Button'
+import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { PlayVolumeKey } from '@/composites/play/session/PlayVolumeKey'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { usePlayStageStore } from '@/core/store/playStage'
@@ -14,10 +15,23 @@ import { cn } from '@/utils/classnames'
  * Sound key, full screen key, and the chat key once the table fills the screen
  * @param {Object} props - Game
  * @param {PlayGameName} props.game - Game played
+ * @param {string} props.sessionId - Session id
+ * @param {string} props.gameSlug - Hub of the game
+ * @param {boolean} props.isSeated - Viewer plays
  * @return {JSX.Element}
  */
 
-export const PlayStageKeys = ({ game }: { game: PlayGameName }) => {
+export const PlayStageKeys = ({
+  game,
+  sessionId,
+  gameSlug,
+  isSeated,
+}: {
+  game: PlayGameName
+  sessionId: string
+  gameSlug: string
+  isSeated: boolean
+}) => {
   const { isFullscreen, isChatOpen, toggleFullscreen, toggleChat } = usePlayStageStore()
   const isMobile = useIsMobileShell()
   const FullscreenIcon = isFullscreen ? ICONS.playWindowed : ICONS.playFullscreen
@@ -32,6 +46,15 @@ export const PlayStageKeys = ({ game }: { game: PlayGameName }) => {
         isFullscreen && [BAC_SESSION.keysFull, isChatOpen && BAC_SESSION.keysShifted]
       )}
     >
+      {isFullscreen && (
+        <PlayGameActions
+          sessionId={sessionId}
+          gameSlug={gameSlug}
+          isSeated={isSeated}
+          itemClass={BAC_SESSION.exitKey}
+          iconClass={BAC_SESSION.exitIcon}
+        />
+      )}
       <PlayVolumeKey game={game} />
       {isFullscreen && (
         <Button

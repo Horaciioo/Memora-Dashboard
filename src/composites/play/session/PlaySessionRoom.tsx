@@ -139,7 +139,14 @@ export const PlaySessionRoom = ({
             )}
           </div>
           <div className={BAC_SESSION.identity}>
-            {hasKeys && !isFullscreen && <PlayStageKeys game={game} />}
+            {hasKeys && !isFullscreen && (
+              <PlayStageKeys
+                game={game}
+                sessionId={chat.sessionId}
+                gameSlug={gameSlug}
+                isSeated={me.isSeated}
+              />
+            )}
             <div className={BAC_SESSION.titles}>
               <h1 className={BAC_SESSION.title}>{title}</h1>
               <p className={PLAY_ROOM.game}>{gameLabel}</p>
@@ -154,7 +161,14 @@ export const PlaySessionRoom = ({
           </p>
         )}
         {!me.isSeated && <PlaySpectatorBar players={faces} />}
-        {hasKeys && isFullscreen && <PlayStageKeys game={game} />}
+        {hasKeys && isFullscreen && (
+          <PlayStageKeys
+            game={game}
+            sessionId={chat.sessionId}
+            gameSlug={gameSlug}
+            isSeated={me.isSeated}
+          />
+        )}
         <section
           ref={boxRef}
           className={

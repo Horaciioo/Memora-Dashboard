@@ -31,6 +31,17 @@ export const GOLF_SCENE_OBSTACLES = {
         [0.82, 0.86],
         [0, 0.86],
       ],
+      // Domed cap of a course bumper, a tapered drum under a rounded crown
+      dome: [
+        [0, 0.1],
+        [1, 0.1],
+        [0.98, 0.5],
+        [0.9, 0.66],
+        [0.76, 0.8],
+        [0.56, 0.92],
+        [0.3, 0.98],
+        [0, 1],
+      ],
       // Bounce band round the side, tray rim and avatar disc
       ring: { across: 1, up: 0.5, tube: 0.05 },
       tray: { inner: 0.8, outer: 0.88, up: 0.87, avatar: 0.78, lift: 0.005 },
@@ -40,6 +51,8 @@ export const GOLF_SCENE_OBSTACLES = {
     riseOvershoot: 1.4,
     // Hearts under it, pixels below the foot
     heartsDrop: 0.05,
+    // Floor samples round the foot, to stand on the lowest
+    foot: { samples: 8 },
   },
   // Rail: rounded cap tone toward the cloud, points per round
   rail: { cap: 0.35, segments: 12 },
@@ -89,7 +102,15 @@ export const GOLF_SCENE_OBSTACLES = {
     // Zone frame on the ground: width, opacity
     frame: { width: 0.04, opacity: 0.5, fill: 0.12 },
     // Wind streaks: count, length, width, height above ground, trips per second
-    streaks: { count: 18, length: 0.32, width: 0.025, lift: 0.08, speed: 0.9, spread: 0.85 },
+    streaks: {
+      count: 24,
+      length: 0.42,
+      width: 0.03,
+      lift: 0.08,
+      rise: 0.5,
+      speed: 1.1,
+      spread: 0.85,
+    },
   },
   // Post: rise, height, segments, taper, lowest scale, ground shadow lead share and opacities
   totem: {

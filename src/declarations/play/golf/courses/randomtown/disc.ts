@@ -2,67 +2,73 @@ import { arcRails, boosted, railBetween, slab } from '@/declarations/play/golf/c
 import { cupField } from '@/declarations/play/golf/courses/randomtown/field'
 import type { GolfHoleLayout, GolfPadLayout, GolfRailLayout } from '@/core/lib/play/golf/types'
 
-// Disc radius, centre, total drop
-const RADIUS = 9
+// Disc radius, centre, total drop, depth where the floor meets the bins
+const RADIUS = 9.2
 const CENTRE_Z = 9
 const DROP = 3.6
-// Where the round wall turns into the funnel
-const FUNNEL_FROM = 14.5
-const MOUTH = 4.5
-const BOTTOM = 18
+const BOTTOM = 17
+// Strip depth, thinner where the wall closes in, so the floor follows the round wall
+const ROW = 0.5
+const FINE_FROM = 14
+const FINE_ROW = 0.1
 // Island splitting the two corridors
 const ISLAND = { x0: -3.5, x1: 5, z0: 3, z1: 13 }
 
 /**
- * Half width of the floor at a depth, round then funnel
+ * Half width of the round floor at a depth
  * @param {number} z - Depth
  * @return {number} - Half width
  */
 
-const half = (z: number): number => {
-  if (z <= FUNNEL_FROM) return Math.sqrt(RADIUS ** 2 - (z - CENTRE_Z) ** 2)
-  const edge = Math.sqrt(RADIUS ** 2 - (FUNNEL_FROM - CENTRE_Z) ** 2)
-
-  return edge - ((z - FUNNEL_FROM) * (edge - MOUTH)) / (BOTTOM - FUNNEL_FROM)
-}
+const half = (z: number): number => Math.sqrt(Math.max(0, RADIUS ** 2 - (z - CENTRE_Z) ** 2))
 
 // Height of the disc at a depth
 const heightAt = (z: number): number => DROP * (1 - z / BOTTOM)
 
 /**
- * Strips of the floor, split in two corridors beside the island
+ * South edge of every strip
+ * @return {number[]} - Depths
+ */
+
+const rows = (): number[] => [
+  ...Array.from({ length: Math.round(FINE_FROM / ROW) }, (_, row) => row * ROW),
+  ...Array.from(
+    { length: Math.round((BOTTOM - FINE_FROM) / FINE_ROW) },
+    (_, row) => Math.round((FINE_FROM + row * FINE_ROW) * 1000) / 1000
+  ),
+]
+
+/**
+ * Strips of the floor kept inside the wall, split in two corridors beside the island
  * @return {GolfPadLayout[]} - Slabs
  */
 
 const strips = (): GolfPadLayout[] =>
-  Array.from({ length: BOTTOM }, (_, row): GolfPadLayout[] => {
-    const z = row
-    const width = Math.max(half(z), half(z + 1)) + 0.15
-    const common = { open: 'news' }
+  rows().flatMap((z): GolfPadLayout[] => {
+    const depth = z < FINE_FROM ? ROW : FINE_ROW
+    // Narrowest end, so the floor never pokes out of the wall
+    const width = Math.min(half(z), half(z + depth))
     const slope = (x0: number, w: number, extra: Partial<GolfPadLayout> = {}) =>
-      slab(x0, z, w, 1, heightAt(z), heightAt(z + 1), { ...common, ...extra })
+      slab(x0, z, w, depth, heightAt(z), heightAt(z + depth), { open: 'news', ...extra })
     if (z < ISLAND.z0 || z >= ISLAND.z1) return [slope(-width, width * 2)]
     const isStart = z === ISLAND.z0
     const left = slope(-width, width + ISLAND.x0)
     const right = slope(ISLAND.x1, width - ISLAND.x1)
 
     return [isStart ? boosted(left, [0, 1]) : left, isStart ? boosted(right, [0, 1]) : right]
-  }).flat()
+  })
 
 /**
- * Round wall, island and funnel walls
+ * Round wall down to the bins, and the island walls
  * @return {GolfRailLayout[]} - Rails
  */
 
 const walls = (): GolfRailLayout[] => {
-  const edge = half(FUNNEL_FROM)
-  const angle = Math.atan2(edge, FUNNEL_FROM - CENTRE_Z)
+  const angle = Math.acos((BOTTOM - CENTRE_Z) / RADIUS)
   const { x0, x1, z0, z1 } = ISLAND
 
   return [
-    ...arcRails([0, CENTRE_Z], RADIUS, angle, Math.PI * 2 - angle, 36),
-    railBetween([-edge, FUNNEL_FROM], [-MOUTH, BOTTOM], [-1, 0]),
-    railBetween([edge, FUNNEL_FROM], [MOUTH, BOTTOM], [1, 0]),
+    ...arcRails([0, CENTRE_Z], RADIUS, angle, Math.PI * 2 - angle, 40),
     railBetween([x0, z0], [x1, z0], [0, 1]),
     railBetween([x1, z0], [x1, z1], [-1, 0]),
     railBetween([x1, z1], [x0, z1], [0, -1]),
@@ -71,7 +77,7 @@ const walls = (): GolfRailLayout[] => {
 }
 
 /**
- * Le Disque: two corridors round an island, a funnel, then the five holes
+ * Le Disque: two corridors round an island, ending straight on the five bins
  * @return {GolfHoleLayout} - Hole
  */
 
@@ -83,7 +89,7 @@ export const discHole = (): GolfHoleLayout => {
     cup: field.centre,
     cups: field.cups,
     pads: [...strips(), ...field.pads],
-    rails: walls(),
+    rails: [...walls(), ...field.rails],
     bumpers: [
       { at: [-3, 14.2], radius: 0.35 },
       { at: [-1.2, 15.4], radius: 0.35 },

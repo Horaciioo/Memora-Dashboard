@@ -34,7 +34,6 @@
   "letters": "ABCDEFGHIJLMNOPRSTV",
   "alphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   "defaultCategories": ["firstName", "country", "city", "animal", "job", "fruitVegetable"],
-  "jokersPerPlayer": 1,
   "tournament": {
     "games": [3, 6, 9],
     "rounds": 3

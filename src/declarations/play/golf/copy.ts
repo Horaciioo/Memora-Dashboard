@@ -82,6 +82,12 @@ export const GOLF_BOARD_COPY = {
   watchPlayer: 'Vue joueur',
   watchFree: 'Vue libre',
   flyRise: 'Monter',
+  // Free flight over a whole map, from the hub
+  flyOpen: 'Voler librement dans les maps',
+  flyMap: 'Map',
+  flyClose: 'Fermer',
+  flyHint:
+    'ZQSD ou flèches pour avancer, glisser pour regarder, Espace monte, Maj descend, molette pour la vitesse',
   flySink: 'Descendre',
   // Ground spot under the screen centre, admins only
   probe: 'x {x} · z {z}',

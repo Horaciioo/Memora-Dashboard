@@ -109,18 +109,25 @@ export const createSession = async (accountId: string, raw: Record<string, unkno
     })
   })
   await closeOtherTables(accountId, game, session.id)
-  await announceInChat(session.id, accountId, PlayMessageKinds.Joined)
-  await signalPlay(session.id, true)
-  await journalPlay({
-    eventType: 'PlayJoined',
-    subjectId: accountId,
-    game,
-    template: PLAY_JOURNAL.hosted,
-    sessionId: session.id,
-  })
+  // Independent side effects, together
+  await Promise.all([
+    announceInChat(session.id, accountId, PlayMessageKinds.Joined),
+    signalPlay(session.id, true),
+    journalPlay({
+      eventType: 'PlayJoined',
+      subjectId: accountId,
+      game,
+      template: PLAY_JOURNAL.hosted,
+      sessionId: session.id,
+    }),
+  ])
 
   return session
 }
+
+// Last idle sweep, ms
+let lastSweepAt = 0
+const SWEEP_EVERY_MS = 15_000
 
 // Private games never show in the lists
 const OPEN_TO_ALL = { visibility: PlayVisibilities.Public } as const
@@ -134,15 +141,18 @@ const OPEN_TO_ALL = { visibility: PlayVisibilities.Public } as const
  */
 
 export const listLobbies = async (accountId: string, game?: string | null, canManage = false) => {
-  const idleSince = new Date(Date.now() - PLAY_SETTINGS.lobbyIdleMinutes * MINUTE_MS)
-
-  // Forgotten lobbies close quietly
-  const { count: closed } = await prisma.playSession.updateMany({
-    where: { status: PlayStatuses.Lobby, updatedAt: { lt: idleSince } },
-    data: { status: PlayStatuses.Abandoned },
-  })
-  if (closed) await signalLobbies()
-  await sweepIdleGames()
+  // Sweeps run at most every few seconds, not on every page
+  if (Date.now() - lastSweepAt > SWEEP_EVERY_MS) {
+    lastSweepAt = Date.now()
+    const idleSince = new Date(Date.now() - PLAY_SETTINGS.lobbyIdleMinutes * MINUTE_MS)
+    // Forgotten lobbies close quietly
+    const { count: closed } = await prisma.playSession.updateMany({
+      where: { status: PlayStatuses.Lobby, updatedAt: { lt: idleSince } },
+      data: { status: PlayStatuses.Abandoned },
+    })
+    if (closed) await signalLobbies()
+    await sweepIdleGames()
+  }
 
   // Running games welcome spectators
   const [lobbies, running, current] = await Promise.all([

@@ -10,11 +10,7 @@ import {
 } from '@/core/lib/play/baccalaureat'
 import { lookUpWords } from '@/core/lib/play/baccalaureat/dictionary'
 import { baccalaureatRecap } from '@/core/services/play/baccalaureat/BaccalaureatRecapService'
-import {
-  BACCALAUREAT_CATEGORIES,
-  BACCALAUREAT_SETTINGS,
-  isBaccalaureatCategory,
-} from '@/declarations/play'
+import { BACCALAUREAT_CATEGORIES, isBaccalaureatCategory } from '@/declarations/play'
 import type { EngineSession } from '@/types/play'
 
 /**
@@ -133,7 +129,6 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
         scoredAt: true,
         stoppedById: true,
         bonus: true,
-        rerolledById: true,
       },
     }),
     prisma.baccalaureatAnswer.groupBy({
@@ -198,11 +193,6 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
           ])
       ),
     })),
-    jokersLeft: Math.max(
-      0,
-      BACCALAUREAT_SETTINGS.jokersPerPlayer -
-        rounds.filter((entry) => entry.rerolledById === viewerId).length
-    ),
     recap: isComplete
       ? await baccalaureatRecap(
           session.id,
@@ -217,7 +207,6 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
       endsAt: round.endsAt,
       reviewEndsAt: round.reviewEndsAt,
       stoppedById: round.stoppedById,
-      rerolledById: round.rerolledById,
       bonus: round.bonus,
       answers,
     },

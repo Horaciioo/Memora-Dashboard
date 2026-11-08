@@ -58,7 +58,7 @@ export const BacReview = ({
                     accepts: answer?.acceptedBy.length ?? 0,
                     rejects: answer?.rejectedBy.length ?? 0,
                   })
-              const canCast = canVote && !isMine && answer && answer.myVote === null
+              const canCast = canVote && !isMine && answer
 
               const named = (ids: string[] | undefined) =>
                 players.filter((item) => ids?.includes(item.accountId))

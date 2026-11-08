@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Object3D, Shape, ShapeGeometry } from 'three'
+import { CircleGeometry, Object3D, RingGeometry, Shape, ShapeGeometry } from 'three'
 import type { Color, Group, InstancedMesh, Mesh } from 'three'
 
 import { aimErased } from '@/composites/play/golf/scene/fx/aimErase'
@@ -43,8 +43,25 @@ const headGeometry = (width: number, length: number): ShapeGeometry => {
 }
 
 /**
+ * Pitch of the ground along a heading, to lay a mark flat on a slope
+ * @param {GolfPad[]} pads - Slabs
+ * @param {GolfPoint} at - Spot
+ * @param {number} heading - Angle, zero toward +z
+ * @param {number} level - Ground level under the ball
+ * @return {number} - Radians, up when the ground climbs
+ */
+
+const pitchAt = (pads: GolfPad[], [x, z]: GolfPoint, heading: number, level: number): number => {
+  const step = arrow.slopeStep
+  const ahead = groundFrom(pads, x + Math.sin(heading) * step, z + Math.cos(heading) * step, level)
+  const behind = groundFrom(pads, x - Math.sin(heading) * step, z - Math.cos(heading) * step, level)
+
+  return Math.atan2(ahead - behind, step * 2)
+}
+
+/**
  * Dots laid along a polyline, each on the ground under it
- * @param {InstancedMesh} dots - Dots
+ * @param {InstancedMesh[]} dots - Frame and core of each mark
  * @param {GolfPoint[]} line - Polyline
  * @param {Object} place - Placement
  * @param {GolfPad[]} place.pads - Slabs
@@ -54,12 +71,12 @@ const headGeometry = (width: number, length: number): ShapeGeometry => {
  */
 
 const layDots = (
-  dots: InstancedMesh,
+  dots: InstancedMesh[],
   line: GolfPoint[],
   { pads, floor, skip }: { pads: GolfPad[]; floor: number; skip: number }
 ): void => {
   const holder = new Object3D()
-  holder.rotation.set(...FLAT)
+  holder.rotation.order = 'YXZ'
   let index = 0
   let carry = skip
   // Climbs ramps from the ball
@@ -68,6 +85,7 @@ const layDots = (
     const [ax, az] = line[leg - 1]
     const [bx, bz] = line[leg]
     const length = Math.hypot(bx - ax, bz - az)
+    const heading = Math.atan2(bx - ax, bz - az)
     // Even spacing across bends
     let along = carry
     for (; along < length && index < arrow.dots; along += arrow.dotGap) {
@@ -76,33 +94,38 @@ const layDots = (
       const z = az + (bz - az) * share
       level = groundFrom(pads, x, z, level)
       holder.position.set(x, level + arrow.lift, z)
+      holder.rotation.set(-Math.PI / 2 - pitchAt(pads, [x, z], heading, level), heading, 0)
       holder.scale.setScalar(1 - (index / arrow.dots) * arrow.dotFade)
       holder.updateMatrix()
-      dots.setMatrixAt(index, holder.matrix)
+      for (const mesh of dots) mesh.setMatrixAt(index, holder.matrix)
       index += 1
     }
     carry = along - length
   }
-  dots.count = index
-  dots.instanceMatrix.needsUpdate = true
+  for (const mesh of dots) {
+    mesh.count = index
+    mesh.instanceMatrix.needsUpdate = true
+  }
 }
 
 /**
  * Hides the first dots of a guide, wiped by the pencil
- * @param {InstancedMesh} dots - Dots
+ * @param {InstancedMesh[]} dots - Frame and core of each mark
  * @param {number} count - Dots hidden
  * @return {void}
  */
 
-const hideFirst = (dots: InstancedMesh, count: number): void => {
+const hideFirst = (dots: InstancedMesh[], count: number): void => {
   if (count <= 0) return
   const holder = new Object3D()
   holder.scale.setScalar(0)
   holder.updateMatrix()
-  for (let index = 0; index < Math.min(count, dots.count); index += 1) {
-    dots.setMatrixAt(index, holder.matrix)
+  for (const mesh of dots) {
+    for (let index = 0; index < Math.min(count, mesh.count); index += 1) {
+      mesh.setMatrixAt(index, holder.matrix)
+    }
+    mesh.instanceMatrix.needsUpdate = true
   }
-  dots.instanceMatrix.needsUpdate = true
 }
 
 /**
@@ -143,12 +166,26 @@ export const GolfAim = ({
   const chevrons = useRef<InstancedMesh>(null)
   const arm = useRef<Mesh>(null)
   const ring = useRef<Mesh>(null)
-  const dots = useRef<InstancedMesh>(null)
+  const frames = useRef<InstancedMesh>(null)
+  const cores = useRef<InstancedMesh>(null)
   const pencil = useRef<Group>(null)
   const clock = useRef<GolfPowerClock>(new Map())
   const isFirst = useRef(true)
   const chevron = useMemo(() => headGeometry(arrow.width, arrow.length), [])
-  useEffect(() => () => chevron.dispose(), [chevron])
+  // Square frame round a solid square core
+  const frame = useMemo(
+    () => new RingGeometry(arrow.dot * arrow.frameHole, arrow.dot, 4, 1, Math.PI / 4),
+    []
+  )
+  const core = useMemo(() => new CircleGeometry(arrow.dot * arrow.core, 4, Math.PI / 4), [])
+  useEffect(
+    () => () => {
+      chevron.dispose()
+      frame.dispose()
+      core.dispose()
+    },
+    [chevron, frame, core]
+  )
 
   useFrame(() => {
     const ball = myId ? rigRef.current.spots.get(myId) : undefined
@@ -171,7 +208,6 @@ export const GolfAim = ({
     ahead.current.rotation.y = angle
     if (chevrons.current) {
       const holder = new Object3D()
-      holder.rotation.set(...FLAT)
       let level = floor
       for (let index = 0; index < count; index += 1) {
         // Each chevron rests on the ground ahead, ramps included
@@ -183,6 +219,9 @@ export const GolfAim = ({
           level
         )
         holder.position.set(0, level - floor, reach)
+        // Lies on the slope ahead, never sunk in it
+        const spot: GolfPoint = [ball.x + Math.sin(angle) * reach, ball.z + Math.cos(angle) * reach]
+        holder.rotation.set(-Math.PI / 2 - pitchAt(hole.pads, spot, angle, level), 0, 0)
         holder.scale.setScalar(1 - (index / arrow.chevrons) * arrow.shrink)
         holder.updateMatrix()
         chevrons.current.setMatrixAt(index, holder.matrix)
@@ -218,7 +257,7 @@ export const GolfAim = ({
     }
 
     // Guide to the first bounce
-    if (dots.current) {
+    if (frames.current && cores.current) {
       const line = aimGuide(hole, {
         from: [ball.x, ball.z],
         floor,
@@ -226,8 +265,9 @@ export const GolfAim = ({
         power: shot.power,
       })
       const skip = arrow.start + arrow.chevrons * arrow.gap
-      layDots(dots.current, line, { pads: hole.pads, floor, skip })
-      hideFirst(dots.current, Math.ceil(erased * dots.current.count))
+      const marks = [frames.current, cores.current]
+      layDots(marks, line, { pads: hole.pads, floor, skip })
+      hideFirst(marks, Math.ceil(erased * cores.current.count))
     }
   })
 
@@ -259,8 +299,15 @@ export const GolfAim = ({
         />
         <meshToonMaterial color={color} />
       </mesh>
-      <instancedMesh ref={dots} args={[undefined, undefined, arrow.dots]}>
-        <circleGeometry args={[arrow.dot, 12]} />
+      <instancedMesh ref={frames} args={[frame, undefined, arrow.dots]} frustumCulled={false}>
+        <meshBasicMaterial
+          color={isFrozen ? paint['trail-frozen'] : paint.pole}
+          transparent
+          opacity={arrow.frameOpacity}
+          depthWrite={false}
+        />
+      </instancedMesh>
+      <instancedMesh ref={cores} args={[core, undefined, arrow.dots]} frustumCulled={false}>
         <meshBasicMaterial
           color={isFrozen ? paint['trail-frozen'] : paint.pole}
           transparent

@@ -161,6 +161,7 @@ const Wind = ({ hazard, hole, paint, serverNow }: GustProps) => {
         <GolfPropeller
           key={index}
           position={[x, floor + propeller.lift, z]}
+          heading={Math.atan2(hazard.vx ?? 0, hazard.vz ?? 0)}
           paint={paint}
           direction={index % 2 ? -1 : 1}
           presence={presence}

@@ -20,6 +20,7 @@ export const descentHole = (): GolfHoleLayout => {
     tee: [0, 1.4],
     cup: field.centre,
     cups: field.cups,
+    rails: field.rails,
     pads: [
       slab(-1.8, 0, 3.6, START, TOP, TOP),
       slab(-4.5, START, 9, LENGTH, TOP, 0, { glass: 'ew' }),

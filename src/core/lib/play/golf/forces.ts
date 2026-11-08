@@ -32,6 +32,19 @@ const slopePull = (pad: GolfPad | null): number =>
   pad ? physics.gravity * Math.hypot(pad.gx, pad.gz) : 0
 
 /**
+ * Steepest pull a ball still rests on
+ * @param {GolfPad | null} pad - Slab
+ * @param {boolean} iced - Course frozen
+ * @return {number} - Acceleration
+ */
+
+const restPull = (pad: GolfPad | null, iced: boolean): number => {
+  const roll = physics.rolling * surfaceGrip(pad, iced)
+
+  return Math.min(roll, Math.max(physics.gravity * physics.slideTilt, roll * physics.slideGrip))
+}
+
+/**
  * Body able to stop where it is
  * @param {GolfBody} body - Body
  * @param {boolean} iced - Course frozen
@@ -44,7 +57,7 @@ export const canRest = (body: GolfBody, iced: boolean): boolean =>
   body.cupStage !== 'falling' &&
   speedOf(body) < physics.restSpeed &&
   !body.pad?.push &&
-  slopePull(body.pad) <= physics.rolling * surfaceGrip(body.pad, iced)
+  slopePull(body.pad) <= restPull(body.pad, iced)
 
 /**
  * Swirl of the tornados met: spun fast round the eye, drawn in outside it, thrown out inside
@@ -131,7 +144,9 @@ export const pushBody = (
   // Rolling friction, never reversing
   const speed = speedOf(body)
   if (speed < 1e-9) return
-  const grip = surfaceGrip(pad, isIced(hazards, at))
+  const isIcy = isIced(hazards, at)
+  const isSliding = speed < physics.slideSpeed && slopePull(pad) > restPull(pad, isIcy)
+  const grip = surfaceGrip(pad, isIcy) * (isSliding ? physics.slideGrip : 1)
   const slowed = Math.max(0, speed - physics.rolling * grip * dt) * (1 - physics.damping * dt)
   const capped = Math.min(slowed, body.speedCap)
   body.vx *= capped / speed

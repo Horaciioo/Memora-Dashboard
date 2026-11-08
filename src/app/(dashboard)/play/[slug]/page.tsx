@@ -3,6 +3,7 @@ import type { ComponentType } from 'react'
 import { notFound } from 'next/navigation'
 
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
+import { GolfFlyButton } from '@/composites/play/golf/fly/GolfFlyButton'
 import { GolfPanorama } from '@/composites/play/golf/panorama/GolfPanorama'
 import { PlayCallouts } from '@/composites/play/hub/PlayCallouts'
 import { PlayConcept } from '@/composites/play/hub/concept/PlayConcept'
@@ -46,6 +47,7 @@ import {
 import { PLAY_HUB, PLAY_HUB_TABS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { Permissions } from '@/utils/constants/permissions'
+import { PlayGames } from '@/utils/constants/play'
 
 // Animated layer of each hub ground
 const GROUND_LAYERS: Record<string, ComponentType> = {
@@ -113,6 +115,7 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
         }
       />
       <PlaySignal topic={PLAY_TOPICS.lobbies} />
+      {game === PlayGames.Golf && access.can(Permissions.PlayManage) && <GolfFlyButton />}
       <PlayCallouts isBanned={Boolean(profile.ban)} />
 
       <div className={PLAY_HUB_TABS.desktop}>

@@ -89,7 +89,7 @@ const declaredRules = (game: PlayGameName): PlayVoteRules | null => {
     steps.find((entry) => entry.key === step)?.choices.map((choice) => choice.key) ?? []
 
   return {
-    steps: (chosen) => steps.filter((entry) => !entry.skipWhen?.(chosen)).map((entry) => entry.key),
+    steps: () => steps.map((entry) => entry.key),
     options: optionsOf,
     winner: (step, picks, hostId) => mostPicked(optionsOf(step), picks, hostId),
     settings: (chosen) => toSettings(chosen),

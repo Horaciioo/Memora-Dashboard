@@ -44,14 +44,25 @@
     "stepUp": 0.03,
     "hitSound": 0.6,
     "worldMargin": 1.5,
-    "boostAccel": 12,
+    "boostAccel": 15,
+    "slideTilt": 0.05,
+    "slideGrip": 0.2,
+    "slideSpeed": 0.6,
     "fall": 9.8,
     "voidDepth": 3,
     "landKeep": 0.92,
     "hopSpeed": 1.2,
     "groundBounce": 0.3,
     "gridCell": 0.6,
-    "cup": { "radius": 0.24, "funnel": 0.1, "drop": 0.06, "depth": 0.3, "lipBounce": 0.45, "lipKeep": 0.75, "lipHold": 0.5 }
+    "cup": {
+      "radius": 0.24,
+      "funnel": 0.1,
+      "drop": 0.06,
+      "depth": 0.3,
+      "lipBounce": 0.45,
+      "lipKeep": 0.75,
+      "lipHold": 0.5
+    }
   },
   "surfaces": {
     "grass": 1,
@@ -102,7 +113,7 @@
     "portalRadius": 0.3,
     "vortexPull": 9,
     "vortexCore": 0.2,
-    "fanAccel": 9,
+    "fanAccel": 12,
     "totemBounce": 0.9
   },
   "tournament": { "holesPerMap": 6, "maps": [3, 6, 9] },
@@ -146,10 +157,10 @@
     "wobbleHz": 0.8,
     "guideMeters": 6,
     "guideBounce": 1.4,
-    "curve": 1.3,
+    "curve": 0.75,
     "fullMeters": 16.2,
-    "shortPull": 0.1,
-    "shortMeters": 0.05
+    "shortPull": 0.02,
+    "shortMeters": 0.06
   },
   "render": {
     "maxDpr": 1.75,

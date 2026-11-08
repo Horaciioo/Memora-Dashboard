@@ -32,10 +32,11 @@ const BLADES = Array.from({ length: propeller.blades }, (_, index) => ({
 }))
 
 /**
- * Spinning flat ventilator: green translucent blades, orange outline, a ghost turn for speed
+ * Upright ventilator blowing along a heading: post, cage, green translucent blades, a ghost turn for speed
  * @param {Object} props - Ventilator
- * @param {[number, number, number]} props.position - Hub centre
+ * @param {[number, number, number]} props.position - Foot on the ground
  * @param {GolfPaint} props.paint - Colours
+ * @param {number} [props.heading] - Wind angle, zero toward +z
  * @param {number} [props.size] - Radius gain
  * @param {number} [props.direction] - Turn sign
  * @param {() => number} [props.presence] - Zero to one, grows and fades
@@ -45,12 +46,14 @@ const BLADES = Array.from({ length: propeller.blades }, (_, index) => ({
 export const GolfPropeller = ({
   position,
   paint,
+  heading = 0,
   size = 1,
   direction = 1,
   presence,
 }: {
   position: [number, number, number]
   paint: GolfPaint
+  heading?: number
   size?: number
   direction?: number
   presence?: () => number
@@ -70,46 +73,60 @@ export const GolfPropeller = ({
 
   return (
     <group ref={root} position={position} scale={size}>
-      <group rotation={[-Math.PI / 2, 0, 0]} scale={propeller.radius}>
-        {/* Outline under the blades */}
-        <group scale={propeller.outline} position={[0, 0, -0.004]}>
-          {BLADES.map(({ index, turn }) => (
-            <mesh key={index} geometry={blade} rotation={[0, 0, turn]}>
-              <meshBasicMaterial color={paint['propeller-edge']} side={DoubleSide} />
-            </mesh>
-          ))}
-        </group>
-        {/* Ghost turn */}
-        <group ref={ghost} position={[0, 0, 0.002]}>
-          {BLADES.map(({ index, turn }) => (
-            <mesh key={index} geometry={blade} rotation={[0, 0, turn]}>
-              <meshBasicMaterial
-                color={paint.propeller}
-                transparent
-                opacity={propeller.ghost}
-                side={DoubleSide}
-                depthWrite={false}
-              />
-            </mesh>
-          ))}
-        </group>
-        <group ref={turning} position={[0, 0, 0.006]}>
-          {BLADES.map(({ index, turn }) => (
-            <mesh key={index} geometry={blade} rotation={[0, 0, turn]}>
-              <meshBasicMaterial
-                color={paint.propeller}
-                transparent
-                opacity={propeller.opacity}
-                side={DoubleSide}
-                depthWrite={false}
-              />
-            </mesh>
-          ))}
-        </group>
-        <mesh position={[0, 0, 0.01]}>
-          <circleGeometry args={[propeller.hub / propeller.radius, 16]} />
-          <meshBasicMaterial color={paint.frost} />
+      <group rotation={[0, heading, 0]}>
+        {/* Foot and post */}
+        <mesh position={[0, propeller.foot / 2, 0]}>
+          <cylinderGeometry
+            args={[propeller.radius * 0.32, propeller.radius * 0.4, propeller.foot, 20]}
+          />
+          <meshToonMaterial color={paint['propeller-edge']} />
         </mesh>
+        <mesh position={[0, propeller.height / 2, 0]}>
+          <cylinderGeometry args={[propeller.post, propeller.post, propeller.height, 10]} />
+          <meshToonMaterial color={paint['propeller-edge']} />
+        </mesh>
+        {/* Head standing upright, disc facing the wind */}
+        <group position={[0, propeller.height, 0]}>
+          <mesh>
+            <torusGeometry
+              args={[propeller.radius * propeller.outline, propeller.post * 0.7, 8, 28]}
+            />
+            <meshToonMaterial color={paint['propeller-edge']} />
+          </mesh>
+          <group scale={propeller.radius}>
+            {/* Ghost turn */}
+            <group ref={ghost} position={[0, 0, -0.002]}>
+              {BLADES.map(({ index, turn }) => (
+                <mesh key={index} geometry={blade} rotation={[0, 0, turn]}>
+                  <meshBasicMaterial
+                    color={paint.propeller}
+                    transparent
+                    opacity={propeller.ghost}
+                    side={DoubleSide}
+                    depthWrite={false}
+                  />
+                </mesh>
+              ))}
+            </group>
+            <group ref={turning}>
+              {BLADES.map(({ index, turn }) => (
+                <mesh key={index} geometry={blade} rotation={[0, 0, turn]}>
+                  <meshBasicMaterial
+                    color={paint.propeller}
+                    transparent
+                    opacity={propeller.opacity}
+                    side={DoubleSide}
+                    depthWrite={false}
+                  />
+                </mesh>
+              ))}
+            </group>
+            <mesh position={[0, 0, 0.01]}>
+              <circleGeometry args={[propeller.hub / propeller.radius, 16]} />
+              <meshBasicMaterial color={paint.frost} />
+            </mesh>
+          </group>
+        </group>
       </group>
     </group>
   )

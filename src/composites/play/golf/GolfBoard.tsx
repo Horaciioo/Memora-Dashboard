@@ -139,7 +139,8 @@ export const GolfBoard = ({
     pars: layouts.map(parOfLayout),
     viewerId,
   }
-  if (phase === GolfPhases.Over) return <GolfResult {...card} />
+  if (phase === GolfPhases.Over)
+    return <GolfResult {...card} sessionId={sessionId} isSeated={isSeated} />
 
   // Laid powers wait for a spot
   const playPower = (power: GolfPowerName, slot: number) => {

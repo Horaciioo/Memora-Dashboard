@@ -28,17 +28,23 @@ export interface PlayVoteStepSpec {
   title: string
   lead: string
   choices: PlayVoteChoice[]
-  // Skipped after some earlier picks
-  skipWhen?: (chosen: Record<string, string>) => boolean
 }
 
-// Bac packs offered, the flash one is its own format
-const BAC_PACKS = (['classic', 'popCulture', 'twitch'] as const).map((key) => ({
-  key,
-  label: BACCALAUREAT_PACKS[key].label,
-  hint: `${BACCALAUREAT_PACKS[key].categories.map((id) => BACCALAUREAT_CATEGORIES[id].label).join(', ')}.`,
-  icon: 'playLetters' as IconName,
-}))
+// Bac formats offered, the flash one is its own format
+const BAC_FORMATS = [
+  ...(['classic', 'popCulture', 'twitch'] as const).map((key) => ({
+    key: key as string,
+    label: BACCALAUREAT_PACKS[key].label,
+    hint: `${BACCALAUREAT_PACKS[key].categories.map((id) => BACCALAUREAT_CATEGORIES[id].label).join(', ')}.`,
+    icon: 'playLetters' as IconName,
+  })),
+  {
+    key: 'flash',
+    label: 'Éclair',
+    hint: 'Trois catégories, des manches de trente secondes.',
+    icon: 'playClock' as IconName,
+  },
+]
 
 /**
  * Launch votes of the games without their own, players choose the main rules
@@ -48,30 +54,10 @@ const BAC_PACKS = (['classic', 'popCulture', 'twitch'] as const).map((key) => ({
 export const PLAY_VOTE_STEPS: Partial<Record<PlayGameName, PlayVoteStepSpec[]>> = {
   [PlayGames.Baccalaureat]: [
     {
-      key: 'mode',
-      title: 'Format',
-      lead: 'Choisis le type de la partie.',
-      choices: [
-        {
-          key: 'classic',
-          label: 'Classique',
-          hint: 'Des manches posées, les catégories du pack.',
-          icon: 'playLetters',
-        },
-        {
-          key: 'flash',
-          label: 'Éclair',
-          hint: 'Trois catégories, des manches de trente secondes.',
-          icon: 'playClock',
-        },
-      ],
-    },
-    {
       key: 'pack',
-      title: 'Catégories',
-      lead: 'Choisis le pack de catégories.',
-      choices: BAC_PACKS,
-      skipWhen: (chosen) => chosen.mode === 'flash',
+      title: 'Format',
+      lead: 'Choisis les catégories ou le mode éclair.',
+      choices: BAC_FORMATS,
     },
     {
       key: 'rounds',
@@ -158,8 +144,8 @@ export const PLAY_VOTE_SETTINGS: Partial<
   Record<PlayGameName, (chosen: Record<string, string>) => Record<string, unknown>>
 > = {
   [PlayGames.Baccalaureat]: (chosen) => ({
-    flash: chosen.mode === 'flash',
-    ...(chosen.mode !== 'flash' && { pack: chosen.pack }),
+    flash: chosen.pack === 'flash',
+    ...(chosen.pack !== 'flash' && { pack: chosen.pack }),
     rounds: Number(chosen.rounds),
   }),
   [PlayGames.Bomb]: (chosen) => ({

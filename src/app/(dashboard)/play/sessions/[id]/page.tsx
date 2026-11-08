@@ -50,7 +50,12 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
   const canInvite = game.me.isSeated && PLAY_OPEN_STATUSES.includes(game.status)
   const [messages, candidates] = await Promise.all([
     listMessages(id),
-    canInvite ? inviteCandidates(id, session.id) : [],
+    canInvite
+      ? inviteCandidates(
+          game.seats.filter((seat) => !seat.hasLeft).map((seat) => seat.accountId),
+          session.id
+        )
+      : [],
   ])
   const BackIcon = ICONS.playBack
   const title = STAGE_COPY[game.status] ?? PLAY_HUB_COPY.lobbyFinished

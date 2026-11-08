@@ -20,6 +20,8 @@ export const GOLF_SCENE_CAMERA = {
     swing: 0.18,
     swingSpeed: 0.07,
     far: 6,
+    // Free flight: look per dragged pixel, speed per wheel step, start height share
+    fly: { look: 0.004, wheel: 0.002, maxPitch: 1.5 },
     fogNear: 1.1,
     fogFar: 3,
   },

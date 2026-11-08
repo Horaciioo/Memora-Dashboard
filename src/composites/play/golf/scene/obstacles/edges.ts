@@ -1,5 +1,6 @@
 import { BufferGeometry, Float32BufferAttribute } from 'three'
 
+import { railEnds } from '@/composites/play/golf/scene/railEnds'
 import { floorHeight } from '@/core/lib/play/golf'
 import type { GolfHole, GolfPad, GolfWall } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
@@ -51,8 +52,9 @@ export const railCaps = (hole: GolfHole): GolfRailCap[] => {
       const ux = (wall.bx - wall.ax) / length
       const uz = (wall.bz - wall.az) / length
       // Centre line of the rail, corners met in their middle
-      const endA = wall.cutA ? 0 : half
-      const endB = wall.cutB ? 0 : half
+      const ends = railEnds(wall, hole.pads)
+      const endA = ends.a ? half : 0
+      const endB = ends.b ? half : 0
       const lift = render.railHeight - half
       const a: [number, number, number] = [
         wall.ax - ux * endA + wall.nx * half,
@@ -65,7 +67,7 @@ export const railCaps = (hole: GolfHole): GolfRailCap[] => {
         wall.bz + uz * endB + wall.nz * half,
       ]
 
-      return { a, b, knobs: [...(wall.cutA ? [] : [a]), ...(wall.cutB ? [] : [b])] }
+      return { a, b, knobs: [...(ends.a ? [a] : []), ...(ends.b ? [b] : [])] }
     })
 }
 

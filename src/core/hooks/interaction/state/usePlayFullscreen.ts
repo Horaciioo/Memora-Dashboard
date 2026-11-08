@@ -18,7 +18,7 @@ export const usePlayFullscreen = (target: RefObject<HTMLElement | null>) => {
   useEffect(() => {
     // Browser mode follows the morph, a viewport change would abort it
     void stageSettled().then(() => {
-      if (isFullscreen && !document.fullscreenElement)
+      if (isFullscreen && !document.fullscreenElement && navigator.userActivation?.isActive)
         void target.current?.requestFullscreen?.().catch(() => {})
       if (!isFullscreen && document.fullscreenElement) void document.exitFullscreen()
     })

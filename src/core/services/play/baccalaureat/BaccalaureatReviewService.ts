@@ -39,12 +39,13 @@ export const castVote = async (
     throw conflict(PLAY_ERRORS.notReviewing)
   if (answer.accountId === accountId) throw forbidden(PLAY_ERRORS.ownAnswer)
 
-  // First vote stands
-  const { count } = await prisma.baccalaureatVote.createMany({
-    data: [{ answerId, voterId: accountId, accepted: raw.accepted !== false }],
-    skipDuplicates: true,
+  // Vote can be changed until the count
+  const accepted = raw.accepted !== false
+  await prisma.baccalaureatVote.upsert({
+    where: { answerId_voterId: { answerId, voterId: accountId } },
+    create: { answerId, voterId: accountId, accepted },
+    update: { accepted },
   })
-  if (!count) throw conflict(PLAY_ERRORS.alreadyVoted)
 
   // Everyone voted, count now
   const answers = await prisma.baccalaureatAnswer.findMany({

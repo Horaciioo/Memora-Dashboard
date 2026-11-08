@@ -1,14 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useRef } from 'react'
-import { Billboard } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { MathUtils } from 'three'
 import type { Group, Mesh, MeshBasicMaterial } from 'three'
 
-import { orbGlassTexture, softShadeTexture } from '@/composites/play/golf/scene/orbTextures'
+import { orbCardTexture, softShadeTexture } from '@/composites/play/golf/scene/orbTextures'
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
-import { questionTexture } from '@/composites/play/golf/scene/textures'
 import { floorHeight } from '@/core/lib/play/golf'
 import type { GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
@@ -30,14 +28,13 @@ const popScale = (progress: number): number => {
 /**
  * Orb textures, dropped with the paint
  * @param {GolfPaint} paint - Colours
- * @return {Object} - Glass, mark and shade
+ * @return {Object} - Card and shade
  */
 
 const useOrbTextures = (paint: GolfPaint) => {
   const textures = useMemo(
     () => ({
-      glass: orbGlassTexture(paint.orb, paint['orb-deep']),
-      mark: questionTexture(orb.pixels, paint['orb-deep']),
+      card: orbCardTexture(getComputedStyle(document.body).fontFamily),
       shade: softShadeTexture(paint.shade),
     }),
     [paint]
@@ -48,7 +45,7 @@ const useOrbTextures = (paint: GolfPaint) => {
 }
 
 /**
- * Power orb: tinted glass sphere floating over a soft shade, popping in when it returns
+ * Power card: rainbow card floating over a soft shade, popping in when it returns
  * @param {Object} props - Orb
  * @param {GolfHole} props.hole - Hole
  * @param {GolfPaint} props.paint - Colours
@@ -115,7 +112,7 @@ export const GolfOrb = ({
 
     body.current.scale.setScalar(grow)
     body.current.position.y = floor + render.orbHover + sway * BOB
-    sphere.current?.rotation.set(0, time * orb.spin + index, 0)
+    sphere.current?.rotation.set(0, Math.sin(time * orb.spin + index) * orb.card.swing, 0)
     // Shade shrinks and fades as the orb rises
     const lift = (sway + 1) / 2
     shade.current.scale.setScalar(grow * (1 - lift * orb.shade.shrink))
@@ -138,36 +135,15 @@ export const GolfOrb = ({
       </mesh>
       <group ref={body} position={[x, floor + render.orbHover, z]}>
         <mesh ref={sphere} castShadow>
-          <sphereGeometry args={[orbs.radius, orb.segments, orb.segments]} />
-          <meshStandardMaterial
-            map={textures.glass}
-            transparent
-            opacity={orb.opacity}
-            roughness={orb.roughness}
-          />
-        </mesh>
-        <Billboard>
-          {/* Mark set back inside the glass */}
-          <mesh position={[0, 0, -orbs.radius * orb.markDepth]}>
-            <planeGeometry args={[orbs.radius * orb.mark, orbs.radius * orb.mark]} />
-            <meshBasicMaterial map={textures.mark} transparent depthWrite={false} />
-          </mesh>
-          <mesh
-            position={[
-              orbs.radius * orb.gleam.x,
-              orbs.radius * orb.gleam.y,
-              orbs.radius * orb.gleam.z,
+          <boxGeometry
+            args={[
+              orbs.radius * orb.card.width,
+              orbs.radius * orb.card.height,
+              orbs.radius * orb.card.depth,
             ]}
-          >
-            <circleGeometry args={[orbs.radius * orb.gleam.size, orb.segments]} />
-            <meshBasicMaterial
-              color={paint.sign}
-              transparent
-              opacity={orb.gleam.opacity}
-              depthWrite={false}
-            />
-          </mesh>
-        </Billboard>
+          />
+          <meshBasicMaterial map={textures.card} toneMapped={false} />
+        </mesh>
       </group>
     </>
   )
