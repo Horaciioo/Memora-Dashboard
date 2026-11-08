@@ -28,27 +28,17 @@ export const useModViewPresence = (liveId: string): void => {
     })
 
     // Beats while the page lives
-    const beat = () => void apiPost(path, { ...flags(), closing: false }).catch(() => null)
+    const beat = () => void apiPost(path, flags()).catch(() => null)
     beat()
     const timer = window.setInterval(beat, LIVE_SETTINGS.heartbeatSeconds * 1000)
 
-    // The last beat survives the tab closing
-    const leave = () =>
-      navigator.sendBeacon(
-        path,
-        new Blob([JSON.stringify({ ...flags(), closing: true })], { type: 'application/json' })
-      )
-
     ACTIVITY_EVENTS.forEach((name) => window.addEventListener(name, mark, { passive: true }))
     document.addEventListener('visibilitychange', beat)
-    window.addEventListener('pagehide', leave)
 
     return () => {
       window.clearInterval(timer)
       ACTIVITY_EVENTS.forEach((name) => window.removeEventListener(name, mark))
       document.removeEventListener('visibilitychange', beat)
-      window.removeEventListener('pagehide', leave)
-      leave()
     }
   }, [liveId])
 }

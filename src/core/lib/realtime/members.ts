@@ -31,6 +31,7 @@ export const membersOf = (seats: PresenceSeat[], departed: PresenceMember[]): Pr
       status: known?.status === 'active' || seat.activity === 'active' ? 'active' : 'idle',
       place: isLatest ? seat.place : (known?.place ?? null),
       at: Math.max(seat.at, known?.at ?? 0),
+      seenAt: Math.max(seat.seenAt, known?.seenAt ?? 0),
     })
   }
 

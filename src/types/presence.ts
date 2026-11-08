@@ -35,6 +35,8 @@ export interface PresenceSeat extends PresenceState {
   image: string | null
   // Last report, epoch milliseconds
   at: number
+  // Last sign of activity
+  seenAt: number
 }
 
 /**
@@ -49,4 +51,5 @@ export interface PresenceMember {
   status: PresenceStatus
   place: string | null
   at: number
+  seenAt: number
 }

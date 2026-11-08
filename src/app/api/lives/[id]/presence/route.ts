@@ -15,7 +15,6 @@ export const POST = createProtectedRoute({
     await beatPresence(params.id, session.id, {
       visible: raw.visible === true,
       active: raw.active === true,
-      closing: raw.closing === true,
     })
 
     return null

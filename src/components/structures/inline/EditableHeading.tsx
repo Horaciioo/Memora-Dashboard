@@ -4,6 +4,7 @@ import { useId, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Glyph } from '@/components/elements/display/glyphs/Glyph'
 import { EmojiPicker } from '@/components/elements/forms/pickers/EmojiPicker'
+import { presenceAnchor } from '@/core/lib/realtime/anchors'
 import { EMOJI_COPY } from '@/declarations/ui/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -19,6 +20,9 @@ export interface EditableHeadingProps {
   // Persists a picked glyph
   onGlyphCommit?: (value: string | null) => Promise<boolean>
 }
+
+// Presence anchor name
+const HEADING_ANCHOR = 'heading'
 
 /**
  * Page title that swaps for an input on click
@@ -56,7 +60,7 @@ export const EditableHeading = ({
   }
 
   return (
-    <div className={PAGE_STYLES.heading}>
+    <div className={PAGE_STYLES.heading} {...presenceAnchor(HEADING_ANCHOR)}>
       {lead ? (
         lead
       ) : onGlyphCommit && !disabled ? (

@@ -99,14 +99,13 @@ const judgeCount = async (liveId: string, member: SessionUser): Promise<boolean>
  * @param {Object} beat - Beat
  * @param {boolean} beat.visible - Tab shown
  * @param {boolean} beat.active - Member acting recently
- * @param {boolean} beat.closing - Tab closing
  * @return {Promise<void>} - Counted
  */
 
 export const beatPresence = async (
   liveId: string,
   accountId: string,
-  beat: { visible: boolean; active: boolean; closing: boolean }
+  beat: { visible: boolean; active: boolean }
 ): Promise<void> => {
   const now = new Date()
 
@@ -130,26 +129,21 @@ export const beatPresence = async (
     }
 
     if (!open) {
-      if (!beat.closing) {
-        await tx.modViewPresence.create({
-          data: { liveId, accountId, openedAt: now, lastBeatAt: now },
-        })
-      }
+      await tx.modViewPresence.create({
+        data: { liveId, accountId, openedAt: now, lastBeatAt: now },
+      })
 
-      return { stoppedAt: stale, opened: !beat.closing }
+      return { stoppedAt: stale, opened: true }
     }
 
     // Several tabs beat the same presence
     const next = tallyBeat(open, { at: now, ...beat }, LIVE_SETTINGS.heartbeatSeconds * 2)
     await tx.modViewPresence.update({
       where: { id: open.id },
-      data: {
-        ...next,
-        ...(beat.closing ? { closedAt: now, closeReason: 'CLOSED' as const } : {}),
-      },
+      data: next,
     })
 
-    return { stoppedAt: beat.closing ? now : null, opened: false }
+    return { stoppedAt: null, opened: false }
   })
 
   // Moderating follows the presence

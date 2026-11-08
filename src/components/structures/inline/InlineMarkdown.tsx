@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import type { FocusEvent, KeyboardEvent } from 'react'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { MarkdownEditor } from '@/components/elements/forms/MarkdownEditor'
+import { presenceAnchor } from '@/core/lib/realtime/anchors'
 import { INLINE_EDIT_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -81,7 +82,12 @@ export const InlineMarkdown = ({
 
   if (editing) {
     return (
-      <div onBlur={onBlur} onKeyDown={onKeyDown} className={INLINE_EDIT_STYLES.blockEditing}>
+      <div
+        onBlur={onBlur}
+        onKeyDown={onKeyDown}
+        className={INLINE_EDIT_STYLES.blockEditing}
+        {...presenceAnchor(id)}
+      >
         <MarkdownEditor
           id={id}
           value={draft}
@@ -104,6 +110,7 @@ export const InlineMarkdown = ({
         if (event.key === 'Enter') start()
       }}
       className={cn(!disabled && INLINE_EDIT_STYLES.block)}
+      {...presenceAnchor(id)}
     >
       {value.trim().length > 0 ? (
         <Markdown source={value} />

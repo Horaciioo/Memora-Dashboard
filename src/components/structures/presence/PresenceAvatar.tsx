@@ -6,6 +6,8 @@ import { PRESENCE_COPY, PRESENCE_STATUS_COPY } from '@/declarations/system/prese
 import { PRESENCE_STYLES } from '@/declarations/ui/variants'
 import type { PresenceMember } from '@/types/presence'
 import { cn } from '@/utils/classnames'
+import { MINUTE_MS } from '@/utils/constants/time'
+import { formatSince } from '@/utils/format/dates'
 
 export interface PresenceAvatarProps {
   member: PresenceMember
@@ -15,6 +17,12 @@ export interface PresenceAvatarProps {
   onJump?: (place: string) => void
 }
 
+// Idle wording, elapsed after a minute
+const statusOf = (member: PresenceMember): string =>
+  member.status === 'idle' && Date.now() - member.seenAt >= MINUTE_MS
+    ? formatSince(new Date(member.seenAt))
+    : PRESENCE_STATUS_COPY[member.status]
+
 /**
  * One collaborator: portrait, status by shade, position on hover
  * @param {PresenceAvatarProps} props - Member and gestures
@@ -23,11 +31,7 @@ export interface PresenceAvatarProps {
 
 export const PresenceAvatar = ({ member, isLive, position, onJump }: PresenceAvatarProps) => {
   const shade = isLive ? PRESENCE_STYLES[member.status] : PRESENCE_STYLES.uncertain
-  const label = [
-    member.name,
-    isLive ? PRESENCE_STATUS_COPY[member.status] : PRESENCE_COPY.uncertain,
-    position,
-  ]
+  const label = [member.name, isLive ? statusOf(member) : PRESENCE_COPY.uncertain, position]
     .filter(Boolean)
     .join(PRESENCE_COPY.separator)
   const { place } = member
