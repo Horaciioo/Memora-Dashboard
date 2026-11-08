@@ -1,22 +1,11 @@
 import 'server-only'
-
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import { readProgress } from '@/core/lib/curriculum/progress'
-import { scoreExercise } from '@/core/lib/curriculum/scoring'
-import type { ExerciseAnswer, ExerciseResult } from '@/core/lib/curriculum/scoring'
 import { hasSeenGuide } from '@/core/services/preferences/GuideService'
-import { recordEvent } from '@/core/services/system/ActivityService'
-import { notify } from '@/core/services/system/NotificationService'
-import {
-  AVAILABLE_COURSE_KEYS,
-  COURSES,
-  courseByKey,
-  exercisesOf,
-} from '@/declarations/academy/curriculum'
+import { AVAILABLE_COURSE_KEYS, courseByKey, exercisesOf } from '@/declarations/academy/curriculum'
 import type { Course } from '@/declarations/academy/curriculum/types'
 import { isEncadrement } from '@/declarations/access/roles'
-import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import { GUIDE_KEYS, TOUR_COURSE_ID } from '@/declarations/academy/welcome'
 import { ROUTES } from '@/declarations/navigation'
@@ -24,84 +13,12 @@ import { tradeOfFunction } from '@/declarations/reference/fixed'
 import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import type { SessionUser } from '@/types/auth'
 import type { CourseCard, CourseProgress } from '@/types/academy'
-import {
-  AcademyJuniorStatuses,
-  AcademyPeriods,
-  AcademyStages,
-  TrainingStatuses,
-} from '@/utils/constants/hierarchy'
+import { AcademyJuniorStatuses, TrainingStatuses } from '@/utils/constants/hierarchy'
 import type { AcademyStageName, TrainingStatusName } from '@/utils/constants/hierarchy'
-import type { Prisma } from '@prisma/client'
-
-/**
- * Stages from which the secondary courses open
- * @type {AcademyStageName[]}
- */
-
-export const PRACTICE_STAGES: AcademyStageName[] = [
-  AcademyStages.Practice,
-  AcademyStages.ReviewFinal,
-  AcademyStages.Bonus,
-]
-
-/**
- * Whether the specialisations opened for a junior who has not been told yet
- * @param {string} accountId - Junior account
- * @return {Promise<boolean>} - Bubble due
- */
-
-export const hasNewSpecialisations = async (accountId: string): Promise<boolean> => {
-  const [junior, seen] = await Promise.all([
-    prisma.academyJunior.findFirst({
-      where: { accountId, status: AcademyJuniorStatuses.Active },
-      select: { stage: true },
-      orderBy: { startedAt: 'desc' },
-    }),
-    hasSeenGuide(accountId, GUIDE_KEYS.specialisations),
-  ])
-
-  return !seen && junior !== null && PRACTICE_STAGES.includes(junior.stage)
-}
-
-// Catalogue written once per server process
-let synced: Promise<void> | null = null
-
-/**
- * Write the courses declared in code onto their training rows
- * @return {Promise<void>} - Synced
- */
-
-export const syncCurriculum = (): Promise<void> => {
-  synced ??= (async () => {
-    const functions = await prisma.jobFunction.findMany({ select: { id: true, name: true } })
-    const functionIds = new Map(functions.map((row) => [row.name, row.id]))
-
-    for (const [position, course] of COURSES.entries()) {
-      const data = {
-        name: course.name,
-        summary: course.summary,
-        period:
-          course.track === 'indispensable' ? AcademyPeriods.Discovery : AcademyPeriods.Practice,
-        mandatory: course.track === 'indispensable',
-        // A course for one trade hangs on it
-        functionId:
-          course.functions.length === 1 ? (functionIds.get(course.functions[0]!) ?? null) : null,
-        position,
-      }
-
-      await prisma.training.upsert({
-        where: { curriculumKey: course.key },
-        update: data,
-        create: { ...data, curriculumKey: course.key },
-      })
-    }
-  })().catch((error: unknown) => {
-    synced = null
-    throw error
-  })
-
-  return synced
-}
+import {
+  PRACTICE_STAGES,
+  syncCurriculum,
+} from '@/core/services/academy/training/CurriculumService/sync'
 
 /**
  * Trades a member works
@@ -329,139 +246,4 @@ export const readCourse = async (
   })
 
   return { card, course, progress: readProgress(record?.progress) }
-}
-
-/**
- * Tell the referent of a junior that a course is done
- * @param {string} accountId - Junior account
- * @param {string} courseName - Course finished
- * @return {Promise<void>} - Notified
- */
-
-const announceFinish = async (accountId: string, courseName: string): Promise<void> => {
-  const junior = await prisma.academyJunior.findFirst({
-    where: { accountId, status: AcademyJuniorStatuses.Active },
-    select: { id: true, referentId: true },
-    orderBy: { startedAt: 'desc' },
-  })
-  if (!junior) return
-
-  // Responsables of the junior's creators hear of it too
-  const creators = await prisma.account.findUnique({
-    where: { id: accountId },
-    select: { youtubers: { select: { id: true } } },
-  })
-  const leads = await prisma.youtuberLead.findMany({
-    where: { youtuberId: { in: creators?.youtubers.map((creator) => creator.id) ?? [] } },
-    select: { accountId: true },
-  })
-  const recipients = [junior.referentId, ...leads.map((lead) => lead.accountId)]
-
-  if (recipients.some(Boolean)) {
-    await notify({
-      kind: 'TrainingFinished',
-      recipients,
-      actorId: accountId,
-      target: 'member',
-      targetId: accountId,
-      subject: courseName,
-    })
-  }
-}
-
-/**
- * Score one exercise on the server
- * @param {string} trainingId - Training identifier
- * @param {SessionUser} viewer - Signed-in member
- * @param {string} blockKey - Exercise key
- * @param {ExerciseAnswer} answer - Learner answer
- * @return {Promise<{ result: ExerciseResult, progress: CourseProgress, finished: boolean }>} - Outcome
- */
-
-export const submitExercise = async (
-  trainingId: string,
-  viewer: SessionUser,
-  blockKey: string,
-  answer: ExerciseAnswer
-): Promise<{ result: ExerciseResult; progress: CourseProgress; finished: boolean }> => {
-  const { course, progress } = await readCourse(trainingId, viewer)
-  const exercises = exercisesOf(course)
-  const block = exercises.find((entry) => entry.key === blockKey)
-  if (!block) throw notFound()
-
-  const result = scoreExercise(block, answer, ACADEMY_SETTINGS.exercisePassPercent)
-  const next: CourseProgress = {
-    blocks: {
-      ...progress.blocks,
-      // A cleared exercise stays cleared
-      [blockKey]: {
-        passed: result.passed || progress.blocks[blockKey]?.passed === true,
-        score: result.score,
-        max: result.max,
-        answer,
-      },
-    },
-  }
-
-  const finished = exercises.every((entry) => next.blocks[entry.key]?.passed)
-  const existing = await prisma.trainingRecord.findUnique({
-    where: { trainingId_accountId: { trainingId, accountId: viewer.id } },
-    select: { status: true },
-  })
-  const alreadyDone = existing?.status === TrainingStatuses.Done
-
-  await prisma.trainingRecord.upsert({
-    where: { trainingId_accountId: { trainingId, accountId: viewer.id } },
-    update: {
-      progress: next as unknown as Prisma.InputJsonValue,
-      ...(finished && !alreadyDone
-        ? { status: TrainingStatuses.Done, completedAt: new Date() }
-        : alreadyDone
-          ? {}
-          : { status: TrainingStatuses.InProgress }),
-    },
-    create: {
-      trainingId,
-      accountId: viewer.id,
-      startedAt: new Date(),
-      progress: next as unknown as Prisma.InputJsonValue,
-      status: finished ? TrainingStatuses.Done : TrainingStatuses.InProgress,
-      completedAt: finished ? new Date() : null,
-    },
-  })
-
-  if (finished && !alreadyDone) {
-    await recordEvent({
-      eventType: 'TrainingValidated',
-      actorId: viewer.id,
-      subjectId: viewer.id,
-      targetType: 'training',
-      targetId: trainingId,
-      summary: course.name,
-    })
-    await announceFinish(viewer.id, course.name)
-  }
-
-  return { result, progress: next, finished }
-}
-
-/**
- * Keep what a learner thought of a course
- * @param {string} trainingId - Training identifier
- * @param {SessionUser} viewer - Signed-in member
- * @param {{ content: number, fluency: number, comment: string | null }} review - Marks out of 10
- * @return {Promise<void>} - Saved
- */
-
-export const saveFeedback = async (
-  trainingId: string,
-  viewer: SessionUser,
-  review: { content: number; fluency: number; comment: string | null }
-): Promise<void> => {
-  // Only a course the learner can open takes a review
-  await readCourse(trainingId, viewer)
-
-  await prisma.trainingFeedback.create({
-    data: { trainingId, accountId: viewer.id, ...review },
-  })
 }
