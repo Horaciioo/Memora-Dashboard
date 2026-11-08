@@ -2,8 +2,8 @@ import { notFound } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { signalCandidate, signalSession } from '@/core/lib/recruitment/signal'
 import { commentSubject, pinComment, removeComment } from '@/core/services/recruitment'
-import { commentSessionId } from '@/core/services/recruitment/CommentService'
-import { removeSessionComment } from '@/core/services/recruitment/SessionCommentService'
+import { commentSessionId } from '@/core/services/recruitment/comments/CommentService'
+import { removeSessionComment } from '@/core/services/recruitment/comments/SessionCommentService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({

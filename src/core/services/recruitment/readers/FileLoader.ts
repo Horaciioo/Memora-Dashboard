@@ -3,8 +3,8 @@ import 'server-only'
 import { commentFields } from '@/core/lib/forms/commentFields'
 
 import { bannedIdentifiers } from '@/core/services/recruitment/BanService'
-import { isObserver } from '@/core/services/recruitment/ObserverReader'
-import { maskForObserver } from '@/core/services/recruitment/ObserverMask'
+import { isObserver } from '@/core/services/recruitment/observers/ObserverReader'
+import { maskForObserver } from '@/core/services/recruitment/observers/ObserverMask'
 import {
   candidateFields,
   proseFields,

@@ -20,7 +20,7 @@ import type {
 import { COMMENT_SHAPE, toComment } from '@/core/services/academy/juniors/CommentService'
 import { SUMMARY_INCLUDE, toSummary, toCandidate } from '@/core/services/recruitment/shape'
 import { sessionScope } from '@/core/services/recruitment/reach'
-import { readParticipants } from '@/core/services/recruitment/ParticipantReader'
+import { readParticipants } from '@/core/services/recruitment/readers/ParticipantReader'
 import { hiddenLabels } from '@/core/services/recruitment/SeatLabels'
 
 /**

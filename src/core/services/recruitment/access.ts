@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { readSeatStates } from '@/core/services/recruitment/SeatReader'
+import { readSeatStates } from '@/core/services/recruitment/readers/SeatReader'
 import type { PermissionHelpers } from '@/types/auth'
 import { Permissions } from '@/utils/constants/permissions'
 

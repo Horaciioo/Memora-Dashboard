@@ -2,7 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
-import { readSeatStates } from '@/core/services/recruitment/SeatReader'
+import { readSeatStates } from '@/core/services/recruitment/readers/SeatReader'
 
 /**
  * Observer sits in on, or leaves, one interview

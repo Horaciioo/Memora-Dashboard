@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { readSeatStates } from '@/core/services/recruitment/SeatReader'
+import { readSeatStates } from '@/core/services/recruitment/readers/SeatReader'
 
 /**
  * Whether a member observes a session, by a named seat or by an interview they sit in

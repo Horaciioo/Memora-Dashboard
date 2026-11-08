@@ -2,7 +2,7 @@ import { invalidInput } from '@/core/lib/errors'
 import { commentFields, parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { signalSession } from '@/core/lib/recruitment/signal'
-import { addSessionComment } from '@/core/services/recruitment/SessionCommentService'
+import { addSessionComment } from '@/core/services/recruitment/comments/SessionCommentService'
 import { notifyMentions } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
