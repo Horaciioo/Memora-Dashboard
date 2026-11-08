@@ -26,7 +26,7 @@ import {
   sweepAnnualReminders,
   syncAnnualProjectStates,
 } from '@/core/services/calendar/AnnualSlotService'
-import { instantToWall } from '@/utils/format/zone'
+import { instantToWall } from '@/utils/format/time/zone'
 import { openDueReviews } from '@/core/services/calendar/reviewEntries'
 import { workViewerOf } from '@/core/services/work/visibility'
 import { ANNUAL_REVIEW_COPY } from '@/declarations/calendar/copy'

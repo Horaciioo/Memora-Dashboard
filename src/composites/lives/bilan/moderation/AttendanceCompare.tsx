@@ -5,7 +5,7 @@ import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
 import type { LiveModTime } from '@/types/lives'
-import { formatHourMark } from '@/utils/format/dates'
+import { formatHourMark } from '@/utils/format/time/dates'
 import { formatSpan } from '@/utils/format/modview'
 
 export interface AttendanceCompareProps {

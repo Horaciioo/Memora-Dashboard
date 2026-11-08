@@ -1,6 +1,6 @@
 import type { ParkourPhase } from '@/core/lib/academy/parkour'
 import { PARKOUR_PHASES } from '@/declarations/academy/parkour'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 /**
  * What a phase asks of the people around the junior

@@ -33,7 +33,7 @@ import {
 } from '@/declarations/recruitment/copy'
 import { HISTORY_COPY } from '@/declarations/recruitment/historyCopy'
 import type { CandidateView } from '@/types/recruitment'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 /**
  * Candidates of the session, filtered and sorted

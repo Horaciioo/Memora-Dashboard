@@ -16,7 +16,7 @@ import { ACADEMY_STAGE_REGISTRY, REVIEW_ADVICE_REGISTRY } from '@/declarations/a
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import type { JuniorView } from '@/types/academy'
 import { ReviewStatuses } from '@/utils/constants/hierarchy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface DecisionFlowProps {
   // Juniors whose check-in waits on a decision, one after the other

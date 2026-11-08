@@ -5,7 +5,7 @@ import type { JobReport } from '@/core/services/system/QueueReportService'
 import { QUEUES_COPY } from '@/declarations/system/queues'
 import { CONSOLE_BLOCK } from '@/declarations/ui/blocks'
 import type { Tone } from '@/declarations/ui/theme'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface JobCardProps {
   job: JobReport

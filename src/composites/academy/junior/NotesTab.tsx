@@ -14,7 +14,7 @@ import { ACADEMY_STAGE_REGISTRY, NOTE_KIND_REGISTRY } from '@/declarations/acade
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { MEMBER_FILE } from '@/declarations/ui/blocks'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 /**
  * Confidential notes written on the junior

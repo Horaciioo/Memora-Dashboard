@@ -3,7 +3,7 @@
 import { DatePicker } from '@/components/elements/forms/date/DatePicker'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { LIVE_COORDINATION } from '@/declarations/ui/variants'
-import type { HoursInput } from '@/utils/format/hours'
+import type { HoursInput } from '@/utils/format/time/hours'
 
 export interface AttendanceHoursFieldsProps {
   value: HoursInput

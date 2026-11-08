@@ -16,7 +16,7 @@ import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { MEMBER_ADMIN, PLAY_MEMBER } from '@/declarations/ui/variants'
 import type { PlayAdminState } from '@/types/play'
 import type { FormValues } from '@/types/forms'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 type Confirm = 'remove' | 'wipe'
 

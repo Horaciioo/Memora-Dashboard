@@ -3,7 +3,7 @@ import { parseMarkdown } from '@/core/lib/markdown'
 import type { BlockNode, InlineNode } from '@/core/lib/markdown'
 import { COMMENT_THREAD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { splitMentions } from '@/utils/format/mentions'
+import { splitMentions } from '@/utils/format/chat/mentions'
 
 /**
  * Render inline nodes as React elements

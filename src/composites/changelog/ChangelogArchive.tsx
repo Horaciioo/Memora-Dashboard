@@ -12,7 +12,7 @@ import type { ChangelogMonth } from '@/declarations/changelog/helpers'
 import type { ChangelogRelease } from '@/declarations/changelog/releases'
 import { CHANGELOG_BOARD } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
-import { dayMonthLabel, monthLabel } from '@/utils/format/days'
+import { dayMonthLabel, monthLabel } from '@/utils/format/time/days'
 
 // Mid-month avoids timezone drift
 const monthOf = (key: string): string => monthLabel(new Date(`${key}-15T12:00:00Z`))

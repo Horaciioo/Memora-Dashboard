@@ -4,7 +4,7 @@ import { isBlankValue as isBlank, isSameValue as isSame } from '@/core/lib/forms
 import { isSensitiveField } from '@/declarations/access/sensitive'
 import { CHANGE_COPY, FIELD_NOUNS } from '@/declarations/activity/changes'
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 /**
  * One-line change description

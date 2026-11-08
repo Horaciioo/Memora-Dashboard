@@ -9,7 +9,7 @@ import { PROFILE_CARD } from '@/declarations/ui/variants'
 import type { ProfileDetail } from '@/types/preferences'
 import { cn } from '@/utils/classnames'
 import { MemberRoles } from '@/utils/constants/hierarchy'
-import { formatDay, formatSince } from '@/utils/format/dates'
+import { formatDay, formatSince } from '@/utils/format/time/dates'
 
 export interface ProfileCardProps {
   profile: ProfileDetail

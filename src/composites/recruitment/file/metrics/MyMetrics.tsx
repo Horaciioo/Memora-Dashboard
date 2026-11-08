@@ -9,7 +9,7 @@ import { MetricCard } from '@/composites/recruitment/file/metrics/MetricCard'
 import type { MeMetrics, MetricDay } from '@/core/lib/recruitment/meMetrics'
 import { MY_STATS_COPY, type MetricSentence } from '@/declarations/recruitment/copy'
 import { MY_STATS } from '@/declarations/ui/variants'
-import { roughDuration } from '@/utils/format/hours'
+import { roughDuration } from '@/utils/format/time/hours'
 
 export interface MyMetricsProps {
   metrics: MeMetrics

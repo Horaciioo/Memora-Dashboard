@@ -11,7 +11,7 @@ import type { LiveBeacon } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { LiveStatuses } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 /**
  * Platform name with its glyph

@@ -10,7 +10,7 @@ import { useViewerComments } from '@/core/hooks/data/lives/useViewerComments'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_USER } from '@/declarations/ui/variants'
 import type { Chatter } from '@/types/modview'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface ViewerNotesProps {
   liveId: string

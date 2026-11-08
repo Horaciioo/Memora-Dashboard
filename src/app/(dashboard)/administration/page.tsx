@@ -18,7 +18,7 @@ import { APP_VERSION } from '@/declarations/app'
 import { NavigationViews } from '@/declarations/navigation'
 import { CONSOLE_COPY } from '@/declarations/system/monitoring/console'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export const metadata: Metadata = { title: VIEW_COPY.adminTitle }
 

@@ -10,7 +10,7 @@ import { useMentionable } from '@/core/hooks/data/system/useMentionable'
 import { ACTION_COPY, COMMENT_COPY } from '@/declarations/ui/copy'
 import { COMMENT_COMPOSER } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatMention } from '@/utils/format/mentions'
+import { formatMention } from '@/utils/format/chat/mentions'
 
 // Handle being typed right before the caret, a bare at sign included, up to two words
 const QUERY_PATTERN = /(^|\s)@([\p{L}\p{N}._-]*(?:\s[\p{L}\p{N}._-]*)?)$/u

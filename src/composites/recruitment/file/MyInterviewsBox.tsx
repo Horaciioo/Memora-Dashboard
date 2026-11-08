@@ -13,7 +13,7 @@ import { isQuestionnaireOpen, oldestFirst, type MySeat } from '@/core/lib/recrui
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { ROUTES } from '@/declarations/navigation'
 import type { CandidateView } from '@/types/recruitment'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface MyInterviewsBoxProps {
   title: string

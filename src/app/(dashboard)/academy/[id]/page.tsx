@@ -24,7 +24,7 @@ import { readSessionActivity } from '@/core/services/academy/SessionActivity'
 import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 import { sessionTitle } from '@/utils/format/academy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import { gridRange, monthGrid, toDayKey } from '@/utils/format/calendar'
 
 /**

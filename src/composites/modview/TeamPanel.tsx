@@ -18,7 +18,7 @@ import type { LiveFocusView, LivePerson } from '@/types/lives'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import { cn } from '@/utils/classnames'
 import { MINUTE_MS } from '@/utils/constants/time'
-import { formatHourMark } from '@/utils/format/dates'
+import { formatHourMark } from '@/utils/format/time/dates'
 
 export interface TeamPanelProps {
   liveId: string

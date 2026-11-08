@@ -5,7 +5,7 @@ import { invalidInput } from '@/core/lib/errors'
 import { readDate, readRequiredText } from '@/core/lib/forms/values'
 import { notify } from '@/core/services/system/NotificationService'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import type { FormValues } from '@/types/forms'
 
 /**

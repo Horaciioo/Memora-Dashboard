@@ -18,7 +18,7 @@ import { INLINE_EDIT_STYLES, LEGACY_TRACK } from '@/declarations/ui/variants'
 import type { LegacyModuleView, LegacyTrackDetail } from '@/types/legacy'
 import { LegacyStatuses } from '@/utils/constants/hierarchy'
 import type { LegacyStatusName } from '@/utils/constants/hierarchy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import { cn } from '@/utils/classnames'
 
 export interface LegacyTrackViewProps {

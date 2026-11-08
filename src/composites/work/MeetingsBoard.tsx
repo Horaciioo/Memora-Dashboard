@@ -18,7 +18,7 @@ import type { DataTableColumn } from '@/components/structures/data/DataTable'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { MeetingSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface MeetingsBoardProps {
   initialMeetings: MeetingSummary[]

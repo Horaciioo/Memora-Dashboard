@@ -7,7 +7,7 @@ import { useAssistantDock } from '@/core/store/assistantDock'
 import { ASSISTANT_WELCOMES } from '@/declarations/assistant/copy'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { instantToWall } from '@/utils/format/zone'
+import { instantToWall } from '@/utils/format/time/zone'
 import { SECOND_MS } from '@/utils/constants/time'
 
 // Set once per page load, a refresh starts it again

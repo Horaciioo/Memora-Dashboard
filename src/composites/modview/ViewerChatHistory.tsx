@@ -9,7 +9,7 @@ import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_USER } from '@/declarations/ui/variants'
 import type { ChatMessage } from '@/types/modview'
 import { cn } from '@/utils/classnames'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import { formatClock } from '@/utils/format/modview'
 
 export interface ViewerChatHistoryProps {

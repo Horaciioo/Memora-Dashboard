@@ -7,7 +7,7 @@ import { PRESENCE_STYLES } from '@/declarations/ui/variants'
 import type { PresenceMember } from '@/types/presence'
 import { cn } from '@/utils/classnames'
 import { MINUTE_MS } from '@/utils/constants/time'
-import { formatSince } from '@/utils/format/dates'
+import { formatSince } from '@/utils/format/time/dates'
 
 export interface PresenceAvatarProps {
   member: PresenceMember

@@ -10,7 +10,7 @@ import { juniorTargetId } from '@/declarations/notifications/targets'
 import type { NotificationTargetName } from '@/declarations/notifications/targets'
 import { WORK_COMMENT_KIND_NAMES, WORK_COMMENT_KINDS } from '@/declarations/work/comments'
 import { NOTIFICATION_KINDS } from '@/utils/constants/notifications'
-import { readMentions } from '@/utils/format/mentions'
+import { readMentions } from '@/utils/format/chat/mentions'
 
 /**
  * Remark that may have named a member

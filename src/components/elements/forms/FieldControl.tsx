@@ -20,7 +20,7 @@ import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { StorageBucket } from '@/types/storage'
 import type { FieldDefinition, FieldValue } from '@/types/forms'
 import { cn } from '@/utils/classnames'
-import { isWallClock, wallToInstant } from '@/utils/format/zone'
+import { isWallClock, wallToInstant } from '@/utils/format/time/zone'
 
 export interface FieldControlProps {
   id: string

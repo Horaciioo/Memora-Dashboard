@@ -31,7 +31,7 @@ import {
   FINISHED_ACADEMY_SESSION_STATUSES,
 } from '@/utils/constants/hierarchy'
 import { sessionTitle } from '@/utils/format/academy'
-import { formatDay, formatDayRange } from '@/utils/format/dates'
+import { formatDay, formatDayRange } from '@/utils/format/time/dates'
 
 // Key of the promotions held back by a campaign
 const AWAITING_KEY = 'AWAITING_RECRUITMENT'

@@ -1,5 +1,5 @@
 import { COMMENT_THREAD } from '@/declarations/ui/variants'
-import { splitMentions } from '@/utils/format/mentions'
+import { splitMentions } from '@/utils/format/chat/mentions'
 
 export interface MentionTextProps {
   text: string

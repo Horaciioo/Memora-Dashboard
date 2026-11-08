@@ -7,7 +7,7 @@ import type { AdminActor } from '@/core/services/members/admin/guards'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import type { MemberSuspension } from '@/types/members'
-import { addDays, startOfDay } from '@/utils/format/days'
+import { addDays, startOfDay } from '@/utils/format/time/days'
 
 /**
  * Suspension in force on a member

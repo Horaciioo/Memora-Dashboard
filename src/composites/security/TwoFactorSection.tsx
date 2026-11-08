@@ -11,7 +11,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { PREFERENCE_STYLES } from '@/declarations/ui/variants'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 /**
  * Second factor settings

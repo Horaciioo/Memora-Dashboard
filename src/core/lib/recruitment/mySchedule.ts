@@ -1,6 +1,6 @@
 import { RECRUITMENT_SETTINGS } from '@/declarations/configurations/recruitment'
 import type { CandidateView } from '@/types/recruitment'
-import { formatDayKey } from '@/utils/format/days'
+import { formatDayKey } from '@/utils/format/time/days'
 import { MINUTE_MS } from '@/utils/constants/time'
 
 // Where the viewer sits on an interview

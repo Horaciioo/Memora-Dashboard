@@ -24,7 +24,7 @@ import {
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { AnnouncementRow } from '@/types/work'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface AnnouncementsListProps {
   initialRows: AnnouncementRow[]

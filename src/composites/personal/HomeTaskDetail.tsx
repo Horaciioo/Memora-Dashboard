@@ -5,7 +5,7 @@ import { PERSONAL_COPY, PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import { CONTEXT_SEPARATOR, PIM_FACT_ICONS, TASK_GROUPS } from '@/declarations/personal/groups'
 import { DEPARTURE_TASK, TASK_LIST } from '@/declarations/ui/variants'
 import type { HomeTask } from '@/types/personal'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 /**
  * Reading of one task

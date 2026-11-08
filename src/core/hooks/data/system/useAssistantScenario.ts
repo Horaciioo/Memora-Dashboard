@@ -26,7 +26,7 @@ import type {
   ScenarioLink,
 } from '@/types/scenario'
 import { prefersReducedMotion } from '@/utils/motion'
-import { instantToWall } from '@/utils/format/zone'
+import { instantToWall } from '@/utils/format/time/zone'
 
 /**
  * Guided talks Memora can lead

@@ -17,8 +17,8 @@ import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import type { AbsenceStatusName } from '@/utils/constants/workflow'
-import { countDays } from '@/utils/format/dates'
-import { instantToWall } from '@/utils/format/zone'
+import { countDays } from '@/utils/format/time/dates'
+import { instantToWall } from '@/utils/format/time/zone'
 import type { Prisma } from '@prisma/client'
 
 // Relations every absence row needs

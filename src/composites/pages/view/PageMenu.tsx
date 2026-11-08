@@ -19,7 +19,7 @@ import {
   PAGE_HISTORY_COPY,
 } from '@/declarations/pages/copy'
 import type { PageDetail } from '@/types/pages'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface PageMenuProps {
   page: PageDetail

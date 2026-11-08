@@ -22,7 +22,7 @@ import type { MenuItem } from '@/managers/front-end'
 import type { FieldDefinition } from '@/types/forms'
 import type { RecruitmentSummary } from '@/types/recruitment'
 import { FINISHED_RECRUITMENT_STATUSES, RecruitmentStatuses } from '@/utils/constants/recruitment'
-import { formatDay, formatDayRange } from '@/utils/format/dates'
+import { formatDay, formatDayRange } from '@/utils/format/time/dates'
 
 // Display order of the states
 const STATUS_ORDER = [

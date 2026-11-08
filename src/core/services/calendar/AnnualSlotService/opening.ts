@@ -14,7 +14,7 @@ import {
   MeetingAudiences,
   WorkflowScopes,
 } from '@/utils/constants/workflow'
-import { instantToWall, wallToInstant } from '@/utils/format/zone'
+import { instantToWall, wallToInstant } from '@/utils/format/time/zone'
 import { MINUTE_MS } from '@/utils/constants/time'
 import {
   PROJECT_KEY,

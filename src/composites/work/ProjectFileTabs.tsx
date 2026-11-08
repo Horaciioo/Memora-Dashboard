@@ -56,7 +56,7 @@ import type { FieldDefinition, FormValues } from '@/types/forms'
 import { ANNOUNCEMENT_PARAM } from '@/declarations/work/announcements'
 import type { CommunicationEntry, MeetingSummary, ProjectDetail, TaskSummary } from '@/types/work'
 import { WorkflowPhases, WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDay, formatDayTime } from '@/utils/format/dates'
+import { formatDay, formatDayTime } from '@/utils/format/time/dates'
 
 export interface ProjectFileTabsProps {
   detail: ProjectDetail

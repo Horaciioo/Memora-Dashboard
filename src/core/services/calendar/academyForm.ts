@@ -19,7 +19,7 @@ import type { AcademyStageName, ReviewStatusName } from '@/utils/constants/hiera
 import { EventPurposes } from '@/utils/constants/workflow'
 import type { EventPurposeName } from '@/utils/constants/workflow'
 import { sessionTitle } from '@/utils/format/academy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 /**
  * Junior as the calendar form offers them

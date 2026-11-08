@@ -7,7 +7,7 @@ import { ROUTES } from '@/declarations/navigation'
 import type { PermissionHelpers } from '@/types/auth'
 import type { BusySlot, FieldDefinition } from '@/types/forms'
 import { CalendarSources } from '@/utils/constants/workflow'
-import { addDays, startOfDay } from '@/utils/format/days'
+import { addDays, startOfDay } from '@/utils/format/time/days'
 
 // Sources telling something is happening
 const HOLDING_SOURCES: string[] = [CalendarSources.Entry, CalendarSources.Meeting]

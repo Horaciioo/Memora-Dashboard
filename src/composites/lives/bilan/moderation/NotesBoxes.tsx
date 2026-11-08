@@ -4,7 +4,7 @@ import type { ModeratorOption } from '@/composites/lives/bilan/moderation/Modera
 import { BILAN_COPY } from '@/declarations/lives/bilan'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
 import type { LiveNote } from '@/types/lives'
-import { formatHourMark } from '@/utils/format/dates'
+import { formatHourMark } from '@/utils/format/time/dates'
 
 export interface NotesBoxesProps {
   notes: LiveNote[]

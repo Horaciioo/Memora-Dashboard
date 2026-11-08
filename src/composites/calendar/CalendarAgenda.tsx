@@ -9,7 +9,7 @@ import type { CalendarEntry } from '@/types/calendar'
 import { cn } from '@/utils/classnames'
 import type { CalendarDay } from '@/utils/format/calendar'
 import { coversDay, timeOf, weekdayOf } from '@/utils/format/calendar'
-import { monthLabel, parseDay } from '@/utils/format/days'
+import { monthLabel, parseDay } from '@/utils/format/time/days'
 
 export interface CalendarAgendaProps {
   days: CalendarDay[]

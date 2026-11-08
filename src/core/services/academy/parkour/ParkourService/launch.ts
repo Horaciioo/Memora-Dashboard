@@ -14,7 +14,7 @@ import {
   AcademySessionStatuses,
   AcademyStages,
 } from '@/utils/constants/hierarchy'
-import { startOfDay } from '@/utils/format/days'
+import { startOfDay } from '@/utils/format/time/days'
 import { loadJunior } from '@/core/services/academy/parkour/ParkourService/shared'
 
 /**

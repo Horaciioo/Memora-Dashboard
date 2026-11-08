@@ -16,7 +16,7 @@ import { useMenu } from '@/managers/front-end'
 import type { CommentView } from '@/types/comments'
 import type { FieldDefinition, FieldIssue, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface CommentThreadProps {
   comments: CommentView[]

@@ -10,7 +10,7 @@ import { LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_TILE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatClock } from '@/utils/format/dates'
+import { formatClock } from '@/utils/format/time/dates'
 
 /**
  * Live still to come, a compact portrait tile

@@ -10,7 +10,7 @@ import { useMentionMarksStore } from '@/core/store/mentionMarks'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { CommentView } from '@/types/comments'
-import { readMentions } from '@/utils/format/mentions'
+import { readMentions } from '@/utils/format/chat/mentions'
 
 /**
  * Remarks that named the viewer, lit until hovered or until the delay passes

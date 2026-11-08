@@ -1,6 +1,6 @@
 import type { AudienceDay } from '@/core/services/system/AudienceService'
 import { DAILY_BARS_STYLES } from '@/declarations/ui/variants'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface DailyBarsProps {
   days: AudienceDay[]

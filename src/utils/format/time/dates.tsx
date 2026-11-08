@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react'
 
 import { DATE_COPY, DATE_LOCALE, MONTH_LABELS } from '@/declarations/ui/dates'
-import { timeLabel } from '@/utils/format/days'
-import { getActiveZone, instantToWall, shiftToZone } from '@/utils/format/zone'
+import { timeLabel } from '@/utils/format/time/days'
+import { getActiveZone, instantToWall, shiftToZone } from '@/utils/format/time/zone'
 import { DAY_MS, HOUR_MS, MINUTE_MS } from '@/utils/constants/time'
 
 /**

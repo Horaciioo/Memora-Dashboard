@@ -4,7 +4,7 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { birthdaysBetween } from '@/core/services/calendar/projections'
 import { HOME_SETTINGS } from '@/declarations/configurations/settings'
 import type { HomeBirthday } from '@/types/personal'
-import { addDays, startOfDay } from '@/utils/format/days'
+import { addDays, startOfDay } from '@/utils/format/time/days'
 
 /**
  * Read the birthdays coming up

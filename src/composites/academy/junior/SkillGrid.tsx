@@ -13,7 +13,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { SKILL_GRID } from '@/declarations/ui/variants'
 import type { JuniorSkillView } from '@/types/academy'
 import { cn } from '@/utils/classnames'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface SkillGridProps {
   skills: JuniorSkillView[]

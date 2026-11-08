@@ -25,7 +25,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_REPORT, MEMBER_MODERATION } from '@/declarations/ui/variants'
 import type { MemberModerationView as View } from '@/types/lives'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import { formatClock, formatDuration, formatExactSpan, formatSpan } from '@/utils/format/modview'
 
 // Words around the time

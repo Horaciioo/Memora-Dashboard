@@ -9,7 +9,7 @@ import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { CREATOR_BILAN } from '@/declarations/ui/variants'
-import { formatHourMark } from '@/utils/format/dates'
+import { formatHourMark } from '@/utils/format/time/dates'
 import { formatSpan } from '@/utils/format/modview'
 import { SECOND_MS } from '@/utils/constants/time'
 

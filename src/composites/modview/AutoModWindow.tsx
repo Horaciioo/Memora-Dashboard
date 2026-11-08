@@ -18,7 +18,7 @@ import { MODVIEW_FEED, MODVIEW_SUGGEST, MODVIEW_TABS } from '@/declarations/ui/v
 import type { Chatter, HeldMessage, ModAct } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { chatColour } from '@/utils/format/chatColour'
-import { formatSince } from '@/utils/format/dates'
+import { formatSince } from '@/utils/format/time/dates'
 
 // Resolved lines kept under the queue
 const MAX_RESOLVED = 50

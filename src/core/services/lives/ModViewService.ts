@@ -41,7 +41,7 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MODVIEW_LOCK_COPY } from '@/declarations/modview/copy'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import type { LiveView } from '@/types/lives'
 import type {
   ActContext,

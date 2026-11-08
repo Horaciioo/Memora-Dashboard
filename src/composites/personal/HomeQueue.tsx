@@ -35,14 +35,14 @@ import type { HomeEntry, HomeTask } from '@/types/personal'
 import { AbsenceStatuses, AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AbsenceStatusName, AttendanceStatusName } from '@/utils/constants/workflow'
 import { absenceReasonText, absenceSpan } from '@/utils/format/absences'
-import { initialHours } from '@/utils/format/hours'
+import { initialHours } from '@/utils/format/time/hours'
 import {
   formatClock,
   formatDay,
   formatDayTime,
   formatRelativeDay,
   toDateTimeInput,
-} from '@/utils/format/dates'
+} from '@/utils/format/time/dates'
 
 export interface HomeQueueProps {
   absences: MemberAbsence[]

@@ -12,7 +12,7 @@ import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
 import type { LiveModTime } from '@/types/lives'
 import { cn } from '@/utils/classnames'
-import { formatHourMark } from '@/utils/format/dates'
+import { formatHourMark } from '@/utils/format/time/dates'
 
 export interface BilanModeratorsProps {
   team: LiveModTime[]

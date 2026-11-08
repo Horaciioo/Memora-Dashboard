@@ -1,6 +1,6 @@
 import { holds } from '@/core/lib/forms/visibility'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-import { instantToWall, isInstantText, wallToInstant } from '@/utils/format/zone'
+import { instantToWall, isInstantText, wallToInstant } from '@/utils/format/time/zone'
 
 // Hours a day gets back once the flag drops
 const RESTORED_START = '09:00'

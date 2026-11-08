@@ -17,7 +17,7 @@ import {
 } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { periodLabel, toDayKey } from '@/utils/format/calendar'
-import { formatDay, formatDayRange, formatWallDayTime } from '@/utils/format/dates'
+import { formatDay, formatDayRange, formatWallDayTime } from '@/utils/format/time/dates'
 
 export interface DatePickerProps {
   id?: string

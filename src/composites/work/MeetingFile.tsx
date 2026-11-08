@@ -37,7 +37,7 @@ import type { FieldDefinition } from '@/types/forms'
 import { WorkComments } from '@/composites/work/WorkComments'
 import type { MeetingDetail, MeetingTopicEntry } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface MeetingFileProps {
   detail: MeetingDetail

@@ -18,7 +18,7 @@ import type { DataTableColumn } from '@/components/structures/data/DataTable'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { ProjectSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface ProjectsBoardProps {
   initialProjects: ProjectSummary[]

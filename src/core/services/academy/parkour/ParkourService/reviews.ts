@@ -22,7 +22,7 @@ import {
 } from '@/utils/constants/hierarchy'
 import type { AcademyStageName } from '@/utils/constants/hierarchy'
 import { CalendarKinds, EventPurposes, EventVisibilities } from '@/utils/constants/workflow'
-import { addDays, startOfDay } from '@/utils/format/days'
+import { addDays, startOfDay } from '@/utils/format/time/days'
 import { loadJunior, responsablesOf } from '@/core/services/academy/parkour/ParkourService/shared'
 import type { ParkourRow } from '@/core/services/academy/parkour/ParkourService/shared'
 

@@ -22,7 +22,7 @@ import { assertLiveSlotFree, assertNoLiveClash } from '@/core/services/lives/Liv
 import { audienceYoutuberId } from '@/core/services/calendar/audience'
 import { emojiOrRandom } from '@/core/lib/work'
 import { reshapeSeries } from '@/core/services/calendar/AnnualSlotService'
-import { instantToWall, wallToInstant } from '@/utils/format/zone'
+import { instantToWall, wallToInstant } from '@/utils/format/time/zone'
 import { CALENDAR_FIELD_INFO } from '@/declarations/calendar/copy'
 import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import { resolveAcademyEntry } from '@/core/services/calendar/academyEntries'

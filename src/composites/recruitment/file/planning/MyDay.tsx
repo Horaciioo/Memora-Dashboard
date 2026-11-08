@@ -8,8 +8,8 @@ import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { MY_DAY } from '@/declarations/ui/variants'
 import type { CandidateView } from '@/types/recruitment'
 import { cn } from '@/utils/classnames'
-import { formatClock } from '@/utils/format/dates'
-import { formatDayKey } from '@/utils/format/days'
+import { formatClock } from '@/utils/format/time/dates'
+import { formatDayKey } from '@/utils/format/time/days'
 
 export interface MyDayProps {
   candidates: CandidateView[]

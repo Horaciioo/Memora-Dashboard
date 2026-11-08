@@ -22,7 +22,7 @@ import { EMPTY_VALUE } from '@/declarations/ui/variants'
 import type { MenuItem } from '@/managers/front-end'
 import type { MemberParticipation as Participation } from '@/types/members'
 import { cn } from '@/utils/classnames'
-import { formatDay, formatDayRange } from '@/utils/format/dates'
+import { formatDay, formatDayRange } from '@/utils/format/time/dates'
 import { formatSpent } from '@/utils/format/modview'
 
 // Sessions previewed before sending to the path tab

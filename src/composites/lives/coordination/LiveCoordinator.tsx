@@ -10,7 +10,7 @@ import { LIVE_BOARD, LIVE_COORDINATION } from '@/declarations/ui/variants'
 import type { LiveCoordinatorSeat, LiveGap } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { CoordinationStatuses } from '@/utils/constants/lives'
-import { formatClock } from '@/utils/format/dates'
+import { formatClock } from '@/utils/format/time/dates'
 
 export interface LiveCoordinatorProps {
   seats: LiveCoordinatorSeat[]

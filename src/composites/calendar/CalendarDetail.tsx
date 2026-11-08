@@ -26,8 +26,8 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import { CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
 import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { formatClock } from '@/utils/format/dates'
-import { entrySpanParts } from '@/utils/format/entrySpan'
+import { formatClock } from '@/utils/format/time/dates'
+import { entrySpanParts } from '@/utils/format/time/entrySpan'
 
 export interface CalendarDetailProps {
   entry: CalendarEntry

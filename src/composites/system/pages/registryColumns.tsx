@@ -5,7 +5,7 @@ import { PAGE_LEVELS } from '@/declarations/pages/access'
 import { PAGE_REGISTRY_COPY, PAGES_COPY } from '@/declarations/pages/copy'
 import { PAGE_REGISTRY_STYLES } from '@/declarations/ui/variants'
 import type { PageRegistryRow } from '@/types/pages'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 /**
  * Columns of the page registry, titles and access only

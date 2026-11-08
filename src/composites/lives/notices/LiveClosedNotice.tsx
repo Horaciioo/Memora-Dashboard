@@ -4,7 +4,7 @@ import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { MODVIEW_PAGE } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface LiveClosedNoticeProps {
   live: LiveView

@@ -14,7 +14,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { TONES } from '@/declarations/ui/theme'
 import { JOURNAL_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 
 export interface ActivityTimelineProps {

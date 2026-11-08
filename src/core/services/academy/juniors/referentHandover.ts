@@ -3,7 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { notify } from '@/core/services/system/NotificationService'
 import { juniorTargetId } from '@/declarations/notifications/targets'
-import { startOfDay } from '@/utils/format/days'
+import { startOfDay } from '@/utils/format/time/days'
 
 /**
  * Hand a junior over

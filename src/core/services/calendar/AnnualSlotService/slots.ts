@@ -13,7 +13,7 @@ import {
   WorkflowPhases,
   WorkflowScopes,
 } from '@/utils/constants/workflow'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 import {
   everyResponsable,
   leadsOf,

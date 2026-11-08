@@ -8,7 +8,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_UNBAN } from '@/declarations/ui/variants'
 import type { UnbanRequest } from '@/types/modview'
 import { cn } from '@/utils/classnames'
-import { formatSince } from '@/utils/format/dates'
+import { formatSince } from '@/utils/format/time/dates'
 
 // Orders offered
 const ORDERS: { value: UnbanOrder; label: string }[] = [

@@ -7,8 +7,8 @@ import { Dialog } from '@/components/structures/overlays/Dialog'
 import { AttendanceHoursFields } from '@/composites/calendar/attendance/AttendanceHoursFields'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { hoursPayload } from '@/utils/format/hours'
-import type { HoursInput } from '@/utils/format/hours'
+import { hoursPayload } from '@/utils/format/time/hours'
+import type { HoursInput } from '@/utils/format/time/hours'
 
 export interface AttendanceHoursDialogProps {
   initial: HoursInput

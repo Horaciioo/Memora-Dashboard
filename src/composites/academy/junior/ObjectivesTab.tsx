@@ -16,7 +16,7 @@ import { OBJECTIVE_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { LIST_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 // Single drop container
 const CONTAINER = 'objectives'

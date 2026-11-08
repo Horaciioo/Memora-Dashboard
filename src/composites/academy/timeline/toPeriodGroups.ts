@@ -6,7 +6,7 @@ import { PERIOD_TIMELINE_COPY } from '@/declarations/ui/copy'
 import type { PeriodTimelineGroup } from '@/components/structures/data/PeriodTimeline'
 import type { TimelineItem } from '@/components/structures/data/Timeline'
 import type { PeriodView } from '@/types/academy'
-import { formatDay, formatDayRange } from '@/utils/format/dates'
+import { formatDay, formatDayRange } from '@/utils/format/time/dates'
 
 /**
  * Days a period runs between

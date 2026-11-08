@@ -2,7 +2,7 @@ import { RECRUITMENT_SETTINGS } from '@/declarations/configurations/recruitment'
 import { PLANNING_LAYOUT } from '@/declarations/recruitment/planning'
 import type { CandidateView } from '@/types/recruitment'
 import { rangeGrid, type CalendarDay } from '@/utils/format/calendar'
-import { addDays, formatDayKey, parseDay, startOfWeek } from '@/utils/format/days'
+import { addDays, formatDayKey, parseDay, startOfWeek } from '@/utils/format/time/days'
 import { DAY_MS } from '@/utils/constants/time'
 
 /**

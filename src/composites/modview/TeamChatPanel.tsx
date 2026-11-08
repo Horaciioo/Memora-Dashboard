@@ -19,7 +19,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_TEAM_CHAT as STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { MINUTE_MS } from '@/utils/constants/time'
-import { formatHourMark } from '@/utils/format/dates'
+import { formatHourMark } from '@/utils/format/time/dates'
 
 const SendIcon = ICONS.moveUp
 

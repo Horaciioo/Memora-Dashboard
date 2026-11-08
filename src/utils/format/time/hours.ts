@@ -1,5 +1,5 @@
-import { toDateTimeInput } from '@/utils/format/dates'
-import { wallToInstant } from '@/utils/format/zone'
+import { toDateTimeInput } from '@/utils/format/time/dates'
+import { wallToInstant } from '@/utils/format/time/zone'
 
 /**
  * Hours as wall clocks of the form

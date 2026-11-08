@@ -17,7 +17,7 @@ import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
 import { FILE_BOX } from '@/declarations/ui/variants'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { RecruitmentStatuses } from '@/utils/constants/recruitment'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 /**
  * Overview of a recruitment session: boxes of what it is, who carries it

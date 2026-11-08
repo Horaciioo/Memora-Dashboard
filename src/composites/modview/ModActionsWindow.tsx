@@ -18,7 +18,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_FEED } from '@/declarations/ui/variants'
 import type { ModAct } from '@/types/modview'
 import { cn } from '@/utils/classnames'
-import { formatSince } from '@/utils/format/dates'
+import { formatSince } from '@/utils/format/time/dates'
 import { formatDuration } from '@/utils/format/modview'
 
 export interface ModActionsWindowProps {

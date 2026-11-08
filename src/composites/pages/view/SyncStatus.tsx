@@ -6,7 +6,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { PAGE_VIEW_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatSince } from '@/utils/format/dates'
+import { formatSince } from '@/utils/format/time/dates'
 
 export interface SyncStatusProps {
   status: SyncStatusName

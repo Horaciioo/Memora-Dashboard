@@ -3,7 +3,7 @@ import type { ResolvedQuestion } from '@/core/lib/recruitment/questionnaire'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'
 import { ICONS } from '@/declarations/ui/icons'
 import { INTERVIEW } from '@/declarations/ui/variants'
-import { roughDuration } from '@/utils/format/hours'
+import { roughDuration } from '@/utils/format/time/hours'
 
 export interface InterviewMinutesProps {
   questions: ResolvedQuestion[]

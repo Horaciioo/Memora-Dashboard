@@ -13,7 +13,7 @@ import { toEntry } from '@/core/lib/notifications/entry'
 import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
 import type { Prisma } from '@prisma/client'
 import type { MentionMark } from '@/types/mentions'
-import { readMentions } from '@/utils/format/mentions'
+import { readMentions } from '@/utils/format/chat/mentions'
 
 /**
  * Alert worth reaching one member

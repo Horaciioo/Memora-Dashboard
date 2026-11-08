@@ -17,7 +17,7 @@ import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { FILE_BOX } from '@/declarations/ui/variants'
 import type { WorkPerson } from '@/types/work'
 import { sessionState } from '@/utils/format/academy'
-import { formatDayRange } from '@/utils/format/dates'
+import { formatDayRange } from '@/utils/format/time/dates'
 
 // Portraits drawn side by side
 const people = (list: WorkPerson[]) =>

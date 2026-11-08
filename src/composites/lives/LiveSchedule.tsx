@@ -2,7 +2,7 @@ import { LIVE_COPY } from '@/declarations/lives/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatClock, formatRelativeDay } from '@/utils/format/dates'
+import { formatClock, formatRelativeDay } from '@/utils/format/time/dates'
 
 export interface LiveScheduleProps {
   isLive: boolean

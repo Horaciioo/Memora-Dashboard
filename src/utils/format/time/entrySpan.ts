@@ -1,5 +1,5 @@
 import { timeOf, toDayKey } from '@/utils/format/calendar'
-import { formatDay, formatDayRange } from '@/utils/format/dates'
+import { formatDay, formatDayRange } from '@/utils/format/time/dates'
 
 /**
  * Piece of a readable span

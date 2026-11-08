@@ -18,7 +18,7 @@ import {
   SECTION_STYLES,
 } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatClock } from '@/utils/format/dates'
+import { formatClock } from '@/utils/format/time/dates'
 import type { AttendancePerson, CalendarEntry } from '@/types/calendar'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'

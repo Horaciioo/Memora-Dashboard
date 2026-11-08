@@ -25,7 +25,7 @@ import {
   MeetingAudiences,
   WorkflowScopes,
 } from '@/utils/constants/workflow'
-import { instantToWall } from '@/utils/format/zone'
+import { instantToWall } from '@/utils/format/time/zone'
 import type { MeetingAudienceName } from '@/utils/constants/workflow'
 import { MINUTE_MS } from '@/utils/constants/time'
 import { MEETING_INCLUDE, toMeetingSummary } from '@/core/services/work/MeetingService/shape'

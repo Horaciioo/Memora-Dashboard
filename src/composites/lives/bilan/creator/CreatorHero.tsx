@@ -1,7 +1,7 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { CREATOR_BILAN } from '@/declarations/ui/variants'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface CreatorHeroProps {
   creator: { name: string; avatar: string | null; banner: string | null }

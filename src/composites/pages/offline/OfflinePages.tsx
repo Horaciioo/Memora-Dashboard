@@ -9,7 +9,7 @@ import type { OfflineEntry } from '@/core/lib/pages/offline/store'
 import { ROUTES } from '@/declarations/navigation'
 import { PAGE_OFFLINE_COPY, PAGE_SYNC_COPY, PAGES_COPY } from '@/declarations/pages/copy'
 import { PAGE_OFFLINE_STYLES } from '@/declarations/ui/variants'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 /**
  * Pages kept on this device, readable without network

@@ -14,7 +14,7 @@ import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 import { AbsenceStatuses, type AbsenceStatusName } from '@/utils/constants/workflow'
 import { absenceSentence } from '@/utils/format/absences'
-import { formatDayRange } from '@/utils/format/dates'
+import { formatDayRange } from '@/utils/format/time/dates'
 
 export const PATCH = createProtectedRoute({
   fields: [...REVIEW_FIELDS, ...ABSENCE_FIELDS],

@@ -17,7 +17,7 @@ import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import { JOURNAL_COPY } from '@/declarations/system/monitoring/journal'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { JOURNAL_TABLE_STYLES, PAGE_STYLES } from '@/declarations/ui/variants'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export const metadata: Metadata = { title: SYSTEM_COPY.journalTitle }
 

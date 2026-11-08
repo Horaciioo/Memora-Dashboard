@@ -15,7 +15,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_UNBAN } from '@/declarations/ui/variants'
 import type { ChatMessage, UnbanRequest } from '@/types/modview'
 import { cn } from '@/utils/classnames'
-import { formatDay, formatDayTime } from '@/utils/format/dates'
+import { formatDay, formatDayTime } from '@/utils/format/time/dates'
 import { formatClock } from '@/utils/format/modview'
 
 type DeskTab = 'logs' | 'comments'

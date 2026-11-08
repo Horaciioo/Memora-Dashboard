@@ -16,7 +16,7 @@ import { TOUR_COPY } from '@/declarations/tour/copy'
 import { TOUR_CHAT } from '@/declarations/ui/variants'
 import type { ButtonVariant } from '@/declarations/ui/variants'
 import type { FieldDefinition } from '@/types/forms'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface ChatComposerProps {
   ask: ChatAsk

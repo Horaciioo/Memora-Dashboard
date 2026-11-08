@@ -8,7 +8,7 @@ import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { ACCOUNT_ACTIVATION_COPY } from '@/declarations/onboarding/copy'
 import { INTEGRATION_STEP_STYLES } from '@/declarations/ui/variants'
 import type { AccountActivationView } from '@/types/recruitment'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import { fillTemplate } from '@/utils/format/strings'
 
 export interface AccountActivationStepProps {

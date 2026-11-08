@@ -10,7 +10,7 @@ import { BUTTON_STYLES, LIVE_RECENT } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { Permissions } from '@/utils/constants/permissions'
-import { formatHourMark } from '@/utils/format/dates'
+import { formatHourMark } from '@/utils/format/time/dates'
 
 export interface LiveRecentProps {
   live: LiveView

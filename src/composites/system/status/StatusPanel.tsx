@@ -4,7 +4,7 @@ import type { StatusReport } from '@/core/services/system/StatusService'
 import { STATUS_COPY } from '@/declarations/system/monitoring/status'
 import { STATUS_HISTORY_STYLES } from '@/declarations/ui/variants'
 import type { Tone } from '@/declarations/ui/theme'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface StatusPanelProps {
   report: StatusReport

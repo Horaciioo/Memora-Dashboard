@@ -1,6 +1,6 @@
 import { WorkflowPhases } from '@/utils/constants/workflow'
 import type { WorkflowPhaseName } from '@/utils/constants/workflow'
-import { isOverdue } from '@/utils/format/dates'
+import { isOverdue } from '@/utils/format/time/dates'
 
 /**
  * Column holding the day a work item is due

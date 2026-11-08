@@ -6,7 +6,7 @@ import { LIVE_COORDINATION_COPY } from '@/declarations/lives/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_COORDINATION } from '@/declarations/ui/variants'
 import type { CoordinationRequest } from '@/types/lives'
-import { formatClock, formatDay } from '@/utils/format/dates'
+import { formatClock, formatDay } from '@/utils/format/time/dates'
 
 export interface CoordinationAnswerProps {
   request: CoordinationRequest

@@ -15,7 +15,7 @@ import { ABSENCE_WIZARD } from '@/declarations/ui/variants'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import { absenceSentence } from '@/utils/format/absences'
-import { countDays } from '@/utils/format/dates'
+import { countDays } from '@/utils/format/time/dates'
 
 // Steps of a declaration
 const STEPS = [

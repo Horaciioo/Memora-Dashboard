@@ -30,7 +30,7 @@ import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { FieldDefinition } from '@/types/forms'
 import type { TaskSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface TaskFileProps {
   task: TaskSummary

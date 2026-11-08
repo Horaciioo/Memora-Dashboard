@@ -13,7 +13,7 @@ import {
   WorkflowPhases,
   WorkflowScopes,
 } from '@/utils/constants/workflow'
-import { wallToInstant } from '@/utils/format/zone'
+import { wallToInstant } from '@/utils/format/time/zone'
 import { DAY_MS, MINUTE_MS } from '@/utils/constants/time'
 import { PROJECT_KEY } from '@/core/services/calendar/AnnualSlotService/shared'
 

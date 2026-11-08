@@ -9,7 +9,7 @@ import { MODVIEW_CHAT } from '@/declarations/ui/variants'
 import type { LiveEmotes, TwitchEmote } from '@/types/modview'
 import { foldText } from '@/utils/format/strings'
 import { cn } from '@/utils/classnames'
-import { twitchEmoteUrl } from '@/utils/format/emotes'
+import { twitchEmoteUrl } from '@/utils/format/chat/emotes'
 
 export interface EmotePickerProps {
   // Null while loading or when Twitch is out of reach

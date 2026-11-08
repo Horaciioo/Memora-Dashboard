@@ -8,7 +8,7 @@ import { Dialog } from '@/components/structures/overlays/Dialog'
 import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { LIVE_COORDINATION } from '@/declarations/ui/variants'
-import { wallToInstant } from '@/utils/format/zone'
+import { wallToInstant } from '@/utils/format/time/zone'
 
 export interface PresenceUntilDialogProps {
   initial: string

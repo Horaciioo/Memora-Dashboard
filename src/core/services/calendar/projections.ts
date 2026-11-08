@@ -2,7 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
-import { addDays, endOfDay, startOfDay } from '@/utils/format/days'
+import { addDays, endOfDay, startOfDay } from '@/utils/format/time/days'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { meetingVisibility } from '@/core/services/work/visibility'

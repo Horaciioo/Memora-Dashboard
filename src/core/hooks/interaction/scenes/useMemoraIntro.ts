@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { typingDuration } from '@/core/lib/tour/chat'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
-import { mentionLength, mentionPrefix } from '@/utils/format/mentions'
+import { mentionLength, mentionPrefix } from '@/utils/format/chat/mentions'
 import { prefersReducedMotion } from '@/utils/motion'
 
 /**

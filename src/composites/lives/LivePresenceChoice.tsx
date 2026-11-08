@@ -13,8 +13,8 @@ import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_GATE } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
 import { cn } from '@/utils/classnames'
-import { formatHourMark } from '@/utils/format/dates'
-import { toDateTimeInput } from '@/utils/format/dates'
+import { formatHourMark } from '@/utils/format/time/dates'
+import { toDateTimeInput } from '@/utils/format/time/dates'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 
 /**

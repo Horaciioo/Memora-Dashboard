@@ -14,7 +14,7 @@ import { ACADEMY_JUNIOR_STATUS_REGISTRY } from '@/declarations/academy/registrie
 import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
 import { FILE_BOX } from '@/declarations/ui/variants'
 import type { FieldValue } from '@/types/forms'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 /**
  * Overview of a junior's file: what is known of them with their objectives beside it, then the

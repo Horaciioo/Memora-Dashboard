@@ -6,7 +6,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_STREAM } from '@/declarations/ui/variants'
 import { SECOND_MS } from '@/utils/constants/time'
 import { cn } from '@/utils/classnames'
-import { formatLag, formatStopwatch } from '@/utils/format/countdown'
+import { formatLag, formatStopwatch } from '@/utils/format/time/countdown'
 
 export interface StreamTimersProps {
   streamStartedAt?: string | null
