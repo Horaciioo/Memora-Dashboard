@@ -7,14 +7,17 @@ import { memberMenu } from '@/composites/modview/memberMenu'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { WindowEmpty } from '@/composites/modview/ModWindow'
 import { useLiveRoster } from '@/core/hooks/data/lives/useLiveRoster'
+import { useClock } from '@/core/hooks/interaction/state/useClock'
 import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
-import { FOCUS_OFFLINE_ALLOWED, LIVE_COORDINATOR } from '@/declarations/lives/registries'
+import { FOCUS_OFFLINE_ALLOWED } from '@/declarations/lives/registries'
+import { ARRIVAL_FRESH_MINUTES, TEAM_ORDER, TEAM_ROLES, roleOf } from '@/declarations/modview/roles'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_TEAM_COPY as COPY } from '@/declarations/modview/watch'
 import { MODVIEW_TEAM } from '@/declarations/ui/variants'
 import type { LiveFocusView, LivePerson } from '@/types/lives'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import { cn } from '@/utils/classnames'
+import { MINUTE_MS } from '@/utils/constants/time'
 import { formatHourMark } from '@/utils/format/dates'
 
 export interface TeamPanelProps {
@@ -39,6 +42,8 @@ interface TeamMemberProps {
   isCoordinator: boolean
   // ISO hour planned, shown to Responsables
   plannedFrom: string | null
+  // ISO arrival in the Mod View, none when not connected
+  arrivedAt: string | null
 }
 
 /**
@@ -54,8 +59,11 @@ const TeamMember = ({
   isPresent,
   isCoordinator,
   plannedFrom,
+  arrivedAt,
 }: TeamMemberProps) => {
-  const CoordinatorIcon = ICONS[LIVE_COORDINATOR.icon]
+  const now = useClock()
+  const role = roleOf(member.rank, isCoordinator)
+  const RoleIcon = role ? ICONS[TEAM_ROLES[role].icon] : null
   // Only a connected member can be followed
   const handlers = useActionMenu(
     memberMenu(member, {
@@ -65,34 +73,37 @@ const TeamMember = ({
     member.name
   )
   const isFollowed = tools.followingId === member.id
+  const isFresh =
+    arrivedAt !== null && now - new Date(arrivedAt).getTime() < ARRIVAL_FRESH_MINUTES * MINUTE_MS
 
   return (
     <button
       type="button"
-      className={cn(MODVIEW_TEAM.member, isFollowed && MODVIEW_TEAM.memberFocus)}
+      className={cn(
+        MODVIEW_TEAM.member,
+        isCoordinator && !isFollowed && MODVIEW_TEAM.memberCoordinator,
+        isFollowed && MODVIEW_TEAM.memberFocus
+      )}
+      title={arrivedAt ? COPY.arrived.replace('{time}', formatHourMark(arrivedAt)) : undefined}
       {...handlers}
     >
       <span className={MODVIEW_TEAM.portrait}>
         <Avatar name={member.name} src={member.avatar} size="sm" />
-        {isCoordinator && (
+        {role && RoleIcon && (
           <span className={MODVIEW_TEAM.badge}>
-            <CoordinatorIcon
-              className={MODVIEW_TEAM.badgeGlyph}
-              aria-label={LIVE_COORDINATOR.label}
+            <RoleIcon
+              className={cn(MODVIEW_TEAM.badgeGlyph, TEAM_ROLES[role].tone)}
+              aria-label={TEAM_ROLES[role].label}
             />
           </span>
         )}
       </span>
-      <span
-        className={cn(
-          MODVIEW_TEAM.name,
-          isCoordinator && !isFollowed && MODVIEW_TEAM.nameCoordinator
-        )}
-      >
+      <span className={cn(MODVIEW_TEAM.name, role && !isFollowed && TEAM_ROLES[role].tone)}>
         {member.name}
       </span>
       {member.isReinforcement && <ReinforcementTag />}
       {isFollowed && <span className={MODVIEW_TEAM.tag}>{COPY.following}</span>}
+      {isFresh && <span className={MODVIEW_TEAM.tag}>{COPY.justArrived}</span>}
       {isOnline && <span className={MODVIEW_TEAM.dot} role="img" aria-label={COPY.online} />}
       {plannedFrom && (
         <span className={MODVIEW_TEAM.planned}>
@@ -145,10 +156,11 @@ export const TeamPanel = ({
     )
   }
 
-  const groups = [
-    { label: COPY.present, members: tools.members.filter((member) => present.has(member.id)) },
-    { label: COPY.silent, members: tools.members.filter((member) => !present.has(member.id)) },
-  ]
+  // Coordinators first, then the ranks from the top
+  const coordinating = new Set(coordinatorIds)
+  const rankOf = (member: LivePerson) =>
+    TEAM_ORDER.indexOf(roleOf(member.rank, coordinating.has(member.id)) ?? 'moderator')
+  const ordered = [...tools.members].sort((a, b) => rankOf(a) - rankOf(b))
 
   return (
     <>
@@ -159,22 +171,20 @@ export const TeamPanel = ({
             .replace('{target}', focus.targetName)}
         </p>
       ))}
-      {groups.map((group) => (
-        <div key={group.label} className={MODVIEW_TEAM.list}>
-          <p className={MODVIEW_TEAM.group}>{group.label}</p>
-          {group.members.map((member) => (
-            <TeamMember
-              key={member.id}
-              member={member}
-              tools={tools}
-              isOnline={online.has(member.id)}
-              isPresent={present.has(member.id)}
-              isCoordinator={coordinatorIds.includes(member.id)}
-              plannedFrom={planned.get(member.id) ?? null}
-            />
-          ))}
-        </div>
-      ))}
+      <div className={MODVIEW_TEAM.list}>
+        {ordered.map((member) => (
+          <TeamMember
+            key={member.id}
+            member={member}
+            tools={tools}
+            isOnline={online.has(member.id)}
+            isPresent={present.has(member.id)}
+            isCoordinator={coordinating.has(member.id)}
+            plannedFrom={planned.get(member.id) ?? null}
+            arrivedAt={roster?.arrivals[member.id] ?? null}
+          />
+        ))}
+      </div>
       {reinforce}
     </>
   )

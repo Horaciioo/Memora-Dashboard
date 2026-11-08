@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { rankOfRole } from '@/core/lib/modview/tier'
 import { readAnchors } from '@/core/services/auth/LeadService'
 import { closeLivePresences } from '@/core/services/lives/PresenceService'
 import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
@@ -169,7 +170,15 @@ const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveVie
     members: row.members.flatMap((seat) => {
       const person = toPerson(seat.account)
 
-      return person ? [{ ...person, isReinforcement: seat.reinforcement }] : []
+      return person
+        ? [
+            {
+              ...person,
+              isReinforcement: seat.reinforcement,
+              rank: rankOfRole(seat.account.role),
+            },
+          ]
+        : []
     }),
     liveconLevel: entry
       ? {

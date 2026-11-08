@@ -209,13 +209,25 @@ export const sweepStalePresences = async (): Promise<number> => {
  * @return {Promise<string[]>} - Connected accounts
  */
 
-export const connectedMemberIds = async (liveId: string): Promise<string[]> => {
+export const connectedMemberIds = async (liveId: string): Promise<string[]> =>
+  Object.keys(await connectedArrivals(liveId))
+
+/**
+ * Connected members with the moment their open presence began
+ * @param {string} liveId - Live
+ * @return {Promise<Record<string, string>>} - ISO arrival by account
+ */
+
+export const connectedArrivals = async (liveId: string): Promise<Record<string, string>> => {
   const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * 1000)
   const rows = await prisma.modViewPresence.findMany({
     where: { liveId, closedAt: null, lastBeatAt: { gte: horizon } },
-    select: { accountId: true },
-    distinct: ['accountId'],
+    select: { accountId: true, openedAt: true },
+    orderBy: { openedAt: 'desc' },
   })
 
-  return rows.map((row) => row.accountId)
+  // Latest open presence wins
+  return Object.fromEntries(
+    [...rows].reverse().map((row) => [row.accountId, row.openedAt.toISOString()])
+  )
 }

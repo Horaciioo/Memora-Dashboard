@@ -121,15 +121,13 @@ export const MODVIEW_TEAM = {
   memberFocus:
     'bg-gradient-to-r from-[var(--focus-tone)] to-[var(--focus-tone-soft)] text-white hover:bg-transparent',
   name: 'min-w-0 flex-1 truncate text-sm font-semibold',
-  nameCoordinator: 'text-[var(--color-gold-ink)]',
+  memberCoordinator: 'bg-[color-mix(in_srgb,var(--color-gold-400)_14%,transparent)]',
   portrait: 'relative shrink-0',
   badge:
     'absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
   badgeGlyph: 'size-3',
   dot: 'size-2.5 shrink-0 rounded-full bg-[var(--color-success)]',
   offline: 'cursor-not-allowed opacity-60',
-  group:
-    'px-2 pt-2 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   tag: 'shrink-0 text-xs font-bold',
   reinforce: 'p-2',
   planned: 'shrink-0 text-xs text-[var(--color-ink-subtle)] italic tabular-nums',

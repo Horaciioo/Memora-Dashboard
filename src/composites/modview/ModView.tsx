@@ -32,6 +32,7 @@ import type { Suggestion } from '@/core/lib/modview/suggest'
 import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
 import { MODVIEW_WORKSPACE_COPY } from '@/declarations/modview/workspace'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
+import { roleOf } from '@/declarations/modview/roles'
 import { MODVIEW_WINDOWS } from '@/declarations/modview/registries'
 import type { ModViewProfileName } from '@/declarations/modview/profiles'
 import type { IconName } from '@/declarations/ui/icons'
@@ -384,6 +385,10 @@ export const ModView = ({
                   tools: team,
                   focuses: focus.focuses,
                   coordinatorIds: live.coordinatorIds,
+                  viewerRole: roleOf(
+                    live.members.find((member) => member.id === live.viewerId)?.rank,
+                    live.coordinatorIds.includes(live.viewerId)
+                  ),
                   canReinforce: permissions.includes(Permissions.LiveAnnounce),
                 }
               : undefined

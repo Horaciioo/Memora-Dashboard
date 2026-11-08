@@ -6,7 +6,7 @@ import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { activeCoordinatorIds } from '@/core/lib/lives/coordination'
 import { livePermissions } from '@/core/lib/lives/permissions'
 import { respondToRollCall } from '@/core/services/calendar/attendance'
-import { connectedMemberIds } from '@/core/services/lives/PresenceService'
+import { connectedArrivals } from '@/core/services/lives/PresenceService'
 import { syncJuniorLives } from '@/core/services/academy/parkour/LiveCountService'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -103,15 +103,18 @@ export const readLiveRoster = async (
     ).map((member) => member.accountId)
   )
 
+  const arrivals = SUPERVISORS.some((name) => permissions.includes(name))
+    ? await connectedArrivals(live.id)
+    : {}
+
   return {
     liveId: live.id,
     // A cancelled live keeps its roll-call frozen
     canManage:
       permissions.includes(Permissions.LiveRoster) && live.status !== LiveStatuses.Cancelled,
     // Who is in the Mod View stays with whoever supervises
-    connectedIds: SUPERVISORS.some((name) => permissions.includes(name))
-      ? await connectedMemberIds(live.id)
-      : [],
+    connectedIds: Object.keys(arrivals),
+    arrivals,
     people: rows.map((row) => ({
       id: row.account.id,
       name: row.account.displayName,

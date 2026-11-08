@@ -1,6 +1,7 @@
 import type { LiveAccess } from '@/core/lib/lives/access'
 import type { ModerationKind, ModerationOrigin, ModerationStatus } from '@prisma/client'
 import type { IconName } from '@/declarations/ui/icons'
+import type { MemoraRank } from '@/types/modview'
 import type {
   CoordinationStatusName,
   LivePlatformName,
@@ -16,6 +17,7 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
  * @property {string} name - Display name
  * @property {string | null} avatar - Avatar address
  * @property {boolean} [isReinforcement] - Called in on the day
+ * @property {MemoraRank} [rank] - Memora rank, none for a Junior
  */
 
 export interface LivePerson {
@@ -23,6 +25,7 @@ export interface LivePerson {
   name: string
   avatar: string | null
   isReinforcement?: boolean
+  rank?: MemoraRank
 }
 
 /**
@@ -268,6 +271,7 @@ export interface LiveRosterPerson {
  * @property {string} liveId - Live identifier
  * @property {boolean} canManage - Viewer may move people
  * @property {string[]} connectedIds - Members with a Mod View open
+ * @property {Record<string, string>} arrivals - ISO arrival of each connected member
  * @property {LiveRosterPerson[]} people - Convened members
  */
 
@@ -275,6 +279,7 @@ export interface LiveRoster {
   liveId: string
   canManage: boolean
   connectedIds: string[]
+  arrivals: Record<string, string>
   people: LiveRosterPerson[]
 }
 

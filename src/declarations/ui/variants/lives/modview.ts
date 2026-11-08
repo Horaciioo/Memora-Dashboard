@@ -1,4 +1,5 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
+import { TEAM_ROLES } from '@/declarations/modview/roles'
 import type { ChatTier, ModActTone } from '@/types/modview'
 
 /**
@@ -143,9 +144,9 @@ export const MODVIEW_VERB: Record<ModActTone, string> = {
 
 export const MODVIEW_TIER: Record<ChatTier, string> = {
   creator: 'gold-shimmer font-bold',
-  admin: 'text-[var(--color-danger)]',
-  responsable: 'text-[var(--color-apple-orange)]',
-  moderator: 'text-[var(--color-info)]',
+  admin: `${TEAM_ROLES.admin.tone} font-bold`,
+  responsable: TEAM_ROLES.responsable.tone,
+  moderator: TEAM_ROLES.moderator.tone,
   viewer: 'text-[var(--page-ink-subtle)]',
 }
 

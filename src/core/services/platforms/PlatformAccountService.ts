@@ -7,14 +7,13 @@ import { PlatformError } from '@/core/lib/platforms/http'
 import type { PlatformGrant, PlatformIdentity } from '@/core/lib/platforms/grant'
 import { PLATFORM_LINKERS } from '@/core/lib/platforms/linkers'
 import { refreshTwitchGrant } from '@/core/lib/platforms/twitch/oauth'
+import { rankOfRole } from '@/core/lib/modview/tier'
 import { attributePlatformGestures } from '@/core/services/lives/ModerationLogService'
 import { isTwitchConfigured } from '@/declarations/platforms/twitch'
 import { LivePlatforms } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
 import type { MemoraRank } from '@/types/modview'
 import type { PlatformLinkView } from '@/types/platforms'
-import { MemberRoles } from '@/utils/constants/hierarchy'
-import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { MINUTE_MS } from '@/utils/constants/time'
 
 // Renew this long before expiry
@@ -187,14 +186,6 @@ export const unlinkPlatform = async (
   await prisma.platformAccount.delete({ where: { id: stored.id } })
 }
 
-// Memora rank by hierarchy level
-const RANK_OF_ROLE: Partial<Record<MemberRoleName, MemoraRank>> = {
-  [MemberRoles.Admin]: 'admin',
-  [MemberRoles.Employe]: 'responsable',
-  [MemberRoles.Responsable]: 'responsable',
-  [MemberRoles.Moderateur]: 'moderator',
-}
-
 /**
  * Memora ranks of the linked Twitch accounts
  * @return {Promise<Record<string, MemoraRank>>} - Rank by Twitch user
@@ -208,7 +199,7 @@ export const readTwitchRoster = async (): Promise<Record<string, MemoraRank>> =>
 
   return Object.fromEntries(
     rows.flatMap((row) => {
-      const rank = RANK_OF_ROLE[row.account.role as MemberRoleName]
+      const rank = rankOfRole(row.account.role)
 
       return rank ? [[row.externalUserId, rank]] : []
     })

@@ -16,6 +16,8 @@ import type { TeamTools } from '@/composites/modview/memberMenu'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/useOutsideDismiss'
 import { UnbanQueue } from '@/composites/modview/UnbanQueue'
 import { MODVIEW_COPY, MODVIEW_UNBAN_COPY } from '@/declarations/modview/copy'
+import { TEAM_ROLES } from '@/declarations/modview/roles'
+import type { TeamRole } from '@/declarations/modview/roles'
 import { MODVIEW_TEAM_COPY } from '@/declarations/modview/watch'
 import { ROUTES } from '@/declarations/navigation'
 import { PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
@@ -35,6 +37,8 @@ export interface ModViewSidebarProps {
     tools: TeamTools
     focuses: LiveFocusView[]
     coordinatorIds: string[]
+    // Seat the viewer holds, tints the glyph
+    viewerRole: TeamRole | null
     canReinforce: boolean
   }
   // Live left through the exit, which asks whether they stop moderating
@@ -63,6 +67,8 @@ interface PanelButtonProps {
   anchor: 'top' | 'bottom'
   // Wider panel, for a list with its own controls
   isWide?: boolean
+  // Colour class of the glyph
+  tone?: string
   // Control at the far end of the title
   action?: ReactNode
   children: ReactNode
@@ -81,6 +87,7 @@ const PanelButton = ({
   onToggle,
   anchor,
   isWide,
+  tone,
   action,
   children,
 }: PanelButtonProps) => {
@@ -97,7 +104,7 @@ const PanelButton = ({
         aria-expanded={isOpen}
         onClick={onToggle}
       >
-        <Icon className={MODVIEW_SIDEBAR.icon} aria-hidden="true" />
+        <Icon className={cn(MODVIEW_SIDEBAR.icon, tone)} aria-hidden="true" />
       </button>
 
       {isOpen && <span className={MODVIEW_SIDEBAR.arrow} aria-hidden="true" />}
@@ -232,6 +239,7 @@ export const ModViewSidebar = ({
         {team && (
           <PanelButton
             icon="sword"
+            tone={team.viewerRole ? TEAM_ROLES[team.viewerRole].tone : undefined}
             label={MODVIEW_TEAM_COPY.title}
             isOpen={open === 'team'}
             onToggle={() => toggle('team')}
