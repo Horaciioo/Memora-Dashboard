@@ -1,8 +1,5 @@
 import { execFile } from 'node:child_process'
-import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
-import { homedir } from 'node:os'
-import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 
 import next from 'next'
@@ -71,34 +68,6 @@ server.on('upgrade', (request, socket, head) => {
   })
 })
 
-// Where Chrome keeps the shortcuts of installed apps
-const INSTALLED_APPS_DIR = join(homedir(), 'Applications', 'Chrome Apps.localized')
-const APP_URL_KEY = /<key>CrAppModeShortcutURL<\/key>\s*<string>([^<]+)<\/string>/
-
-/**
- * Installed app shortcut that opens this origin
- * @param {string} url - Dev address
- * @return {string | undefined} - App bundle path
- */
-
-const findInstalledApp = (url) => {
-  try {
-    const { origin } = new URL(url)
-
-    return readdirSync(INSTALLED_APPS_DIR)
-      .filter((name) => name.endsWith('.app'))
-      .map((name) => join(INSTALLED_APPS_DIR, name))
-      .find((app) => {
-        const plist = readFileSync(join(app, 'Contents', 'Info.plist'), 'utf8')
-        const shortcut = APP_URL_KEY.exec(plist)?.[1]
-
-        return shortcut !== undefined && new URL(shortcut).origin === origin
-      })
-  } catch {
-    return undefined
-  }
-}
-
 server.listen(port, hostname, () => {
   const url = `http://${hostname}:${port}`
   console.log(`> Memora on ${url} (${dev ? 'dev' : 'production'})`)
@@ -107,9 +76,8 @@ server.listen(port, hostname, () => {
     const copy = execFile('pbcopy')
     copy.on('error', () => {})
     copy.stdin?.end(url)
-    // The installed dev app when there is one, else a Chrome tab
-    const app = findInstalledApp(url)
-    execFile('open', app ? [app] : ['-a', 'Google Chrome', url], () => {})
+    // Always a Chrome tab
+    execFile('open', ['-a', 'Google Chrome', url], () => {})
   }
 })
 
