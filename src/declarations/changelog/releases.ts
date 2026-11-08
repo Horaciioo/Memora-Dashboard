@@ -289,6 +289,13 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyReviewWrite,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration de « Academy » : l’onglet « Juniors » d’une session liste les candidats acceptés dont le compte n’est pas encore activé, sous « En attente d’activation ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
         page: ROUTES.sanctions,
         permission: Permissions.SanctionRead,
         text: 'Amélioration du « Panel de sanctions » : chaque métier ouvre son propre panel, Lives pour les équipes Lives, Discord pour les équipes Discord.',
