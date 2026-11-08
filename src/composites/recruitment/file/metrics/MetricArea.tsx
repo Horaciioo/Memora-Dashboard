@@ -1,4 +1,4 @@
-import { MetricEmpty } from '@/composites/recruitment/file/MetricEmpty'
+import { MetricEmpty } from '@/composites/recruitment/file/metrics/MetricEmpty'
 import {
   GRID_LINES,
   METRIC_TONES,
@@ -6,7 +6,7 @@ import {
   printed,
   scaleOf,
   totalsOf,
-} from '@/composites/recruitment/file/metricScale'
+} from '@/composites/recruitment/file/metrics/metricScale'
 import type { MetricDay } from '@/core/lib/recruitment/meMetrics'
 import { MY_STATS } from '@/declarations/ui/variants'
 

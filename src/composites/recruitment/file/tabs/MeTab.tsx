@@ -2,10 +2,10 @@
 
 import { useSearchParams } from 'next/navigation'
 
-import { MyDay } from '@/composites/recruitment/file/MyDay'
+import { MyDay } from '@/composites/recruitment/file/planning/MyDay'
 import { MyDecisions } from '@/composites/recruitment/file/MyDecisions'
 import { MyInterviewsBox } from '@/composites/recruitment/file/MyInterviewsBox'
-import { MyMetrics } from '@/composites/recruitment/file/MyMetrics'
+import { MyMetrics } from '@/composites/recruitment/file/metrics/MyMetrics'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import { DEMO_METRICS, demoVerdicts } from '@/core/lib/recruitment/demoMetrics'

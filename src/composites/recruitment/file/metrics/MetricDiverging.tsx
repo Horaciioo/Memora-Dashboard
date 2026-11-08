@@ -1,5 +1,5 @@
-import { MetricEmpty } from '@/composites/recruitment/file/MetricEmpty'
-import { METRIC_TONES, printed, scaleOf } from '@/composites/recruitment/file/metricScale'
+import { MetricEmpty } from '@/composites/recruitment/file/metrics/MetricEmpty'
+import { METRIC_TONES, printed, scaleOf } from '@/composites/recruitment/file/metrics/metricScale'
 import type { MetricDay, MetricTone } from '@/core/lib/recruitment/meMetrics'
 import { MY_STATS } from '@/declarations/ui/variants'
 

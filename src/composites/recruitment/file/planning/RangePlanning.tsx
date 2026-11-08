@@ -1,4 +1,4 @@
-import { PlanningBlock } from '@/composites/recruitment/file/PlanningBlock'
+import { PlanningBlock } from '@/composites/recruitment/file/planning/PlanningBlock'
 import {
   PLANNING_FONT,
   PLANNING_LAYOUT,

@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 
-import { RangePlanning, planningSize } from '@/composites/recruitment/file/RangePlanning'
+import { RangePlanning, planningSize } from '@/composites/recruitment/file/planning/RangePlanning'
 import type { RangePlan } from '@/core/lib/recruitment/rangePlanning'
 import { PLANNING_LAYOUT, PLANNING_TOKENS } from '@/declarations/recruitment/planning'
 import type { PlanningPalette } from '@/declarations/recruitment/planning'
