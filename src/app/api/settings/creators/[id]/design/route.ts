@@ -10,6 +10,7 @@ import { recordEvent } from '@/core/services/system/ActivityService'
 import { BannerSlots, DESIGN_COPY, DesignKinds } from '@/declarations/reference/design'
 import type { BannerSlotName, DesignKindName } from '@/declarations/reference/design'
 import { Permissions } from '@/utils/constants/permissions'
+import { fileUrl } from '@/core/services/system/FileService'
 
 /**
  * Read the submitted picture kind
@@ -52,7 +53,7 @@ export const POST = createProtectedRoute({
 
     const kind = readKind(raw.kind)
     const url = typeof raw.url === 'string' ? raw.url : ''
-    if (!url.startsWith('/api/files/')) throw invalidInput([{ field: 'url', message: '' }])
+    if (!url.startsWith(fileUrl(''))) throw invalidInput([{ field: 'url', message: '' }])
 
     const design = await putDesignImage(
       params.id,

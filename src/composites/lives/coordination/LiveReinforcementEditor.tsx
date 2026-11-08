@@ -11,6 +11,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { MODVIEW_TEAM_COPY as COPY } from '@/declarations/modview/watch'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
+import { QUERY_KEYS } from '@/core/lib/api/keys'
 
 export interface LiveReinforcementEditorProps {
   liveId: string
@@ -34,7 +35,7 @@ export const LiveReinforcementEditor = ({
   const router = useRouter()
   const { isSaving, run } = useMutation()
   const { data } = useQuery({
-    queryKey: ['live-reinforcement', liveId],
+    queryKey: QUERY_KEYS.liveReinforcement(liveId),
     queryFn: ({ signal }) =>
       apiGet<{ options: FieldOption[] }>(API_ROUTES.liveReinforcement(liveId), signal),
     enabled: open,

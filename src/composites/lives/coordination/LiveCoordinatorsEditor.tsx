@@ -11,6 +11,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { LIVE_FIELD_COPY, LIVE_COORDINATION_COPY } from '@/declarations/lives/copy'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
+import { QUERY_KEYS } from '@/core/lib/api/keys'
 
 export interface LiveCoordinatorsEditorProps {
   liveId: string
@@ -30,7 +31,7 @@ export const LiveCoordinatorsEditor = ({ liveId, open, onClose }: LiveCoordinato
   const router = useRouter()
   const { isSaving, run } = useMutation()
   const { data } = useQuery({
-    queryKey: ['live-coordinators', liveId],
+    queryKey: QUERY_KEYS.liveCoordinators(liveId),
     queryFn: ({ signal }) =>
       apiGet<{ options: FieldOption[]; selected: string[] }>(
         API_ROUTES.liveCoordinators(liveId),

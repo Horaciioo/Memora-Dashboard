@@ -6,6 +6,7 @@ import { ImageResponse } from 'next/og'
 import { SITE_PALETTE, TICKET_PALETTE as palette } from '@/core/lib/share/ticketPalette'
 import { APP_NAME } from '@/declarations/app'
 import { SHARE_COPY } from '@/declarations/share/copy'
+import { PREVIEW_WINDOWS } from '@/declarations/share/preview'
 
 export const alt = APP_NAME
 export const size = { width: 1200, height: 630 }
@@ -88,19 +89,19 @@ export default async function SiteImage() {
       }}
     >
       <AppWindow
-        title="Calendrier"
+        title={PREVIEW_WINDOWS.calendar}
         place={{ left: 60, top: 80, width: 380, height: 330, transform: 'rotate(-3deg)' }}
         bars={[100, 72, 88, 56, 80]}
         tint={0}
       />
       <AppWindow
-        title="Live en cours"
+        title={PREVIEW_WINDOWS.live}
         place={{ left: 380, top: 130, width: 440, height: 380, zIndex: 2 }}
         bars={[84, 100, 62, 92, 70, 100]}
         tint={1}
       />
       <AppWindow
-        title="Formations"
+        title={PREVIEW_WINDOWS.trainings}
         place={{ left: 770, top: 70, width: 370, height: 320, transform: 'rotate(3deg)' }}
         bars={[90, 64, 100, 76]}
         tint={2}

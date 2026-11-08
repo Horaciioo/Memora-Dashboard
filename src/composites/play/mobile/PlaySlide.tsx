@@ -9,9 +9,10 @@ import { playTabIndexOf, PLAY_PHONE_TABS } from '@/composites/play/mobile/tabs'
 import { useSwipe } from '@/core/hooks/interaction/gestures/useSwipe'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { PLAY_TABS } from '@/declarations/ui/variants'
+import { ROUTES } from '@/declarations/navigation'
 
 // Pages where a game fills the screen
-const SESSION_PREFIX = '/play/sessions/'
+const SESSION_PREFIX = ROUTES.playSession('')
 
 // Unbounded travel
 const FAR = 10000

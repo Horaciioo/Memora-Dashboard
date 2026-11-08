@@ -10,6 +10,7 @@ import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { HISTORY_COPY } from '@/declarations/recruitment/historyCopy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { BanView } from '@/types/recruitment'
+import { QUERY_KEYS } from '@/core/lib/api/keys'
 
 /**
  * Blacklist mutations
@@ -44,7 +45,7 @@ export const useBlacklist = (): Blacklist => {
 
   // Everything showing the ban reads again
   const refresh = useCallback(async () => {
-    await queryClient.invalidateQueries({ queryKey: ['recruitment', 'history'] })
+    await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.recruitmentHistoryAll })
     router.refresh()
   }, [queryClient, router])
 

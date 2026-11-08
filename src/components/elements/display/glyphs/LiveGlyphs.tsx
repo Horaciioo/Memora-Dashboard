@@ -1,5 +1,6 @@
 import { Frame } from '@/components/elements/display/glyphs/BrandGlyphs'
 import type { GlyphProps } from '@/components/elements/display/glyphs/BrandGlyphs'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 
 /**
  * Dot following the colour of its words
@@ -130,7 +131,7 @@ export const CoordinatorGlyph = ({ className }: GlyphProps) => (
  */
 
 export const TwitchModBadge = ({ className }: GlyphProps) => (
-  <svg viewBox="0 0 16 16" className={className} role="img" aria-label="Modérateur">
+  <svg viewBox="0 0 16 16" className={className} role="img" aria-label={FORM_SUBJECTS.member.label}>
     <rect width="16" height="16" rx="2" fill="var(--chat-moderator)" />
     <path
       d="M12.6 3.4 8 8M4.6 10.4l1.8 1.8M5.4 11.2 3.4 13.2M6.8 6.2l3 3"

@@ -9,6 +9,7 @@ import type { Group, InstancedMesh } from 'three'
 import { GRID_UNIFORMS, gridCellOf } from '@/composites/play/golf/scene/decor/grid'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { GOLF_WHITE } from '@/declarations/play/golf/palette'
 
 const { trail } = GOLF_SCENE
 const { physics } = GOLF_SETTINGS
@@ -51,7 +52,7 @@ export const GolfTrail = ({
   const tiles = useRef<InstancedMesh>(null)
   const holder = useMemo(() => new Object3D(), [])
   const tint = useMemo(
-    () => frozen ?? new Color('#ffffff').lerp(color, trail.tint),
+    () => frozen ?? new Color(GOLF_WHITE).lerp(color, trail.tint),
     [color, frozen]
   )
   const store = useRef<TrailStore | null>(null)

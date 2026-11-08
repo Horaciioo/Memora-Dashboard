@@ -22,7 +22,7 @@ import type { PlayNoticeView, PlayPresence } from '@/types/play'
 import { cn } from '@/utils/classnames'
 
 // Pages where a game fills the screen
-const SESSION_PREFIX = '/play/sessions/'
+const SESSION_PREFIX = ROUTES.playSession('')
 
 export interface PlayTabBarProps {
   player: { name: string; avatarUrl: string | null }

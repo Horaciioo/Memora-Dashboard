@@ -7,6 +7,7 @@ import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import type { GolfCup } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { GOLF_WHITE } from '@/declarations/play/golf/palette'
 
 const { points } = GOLF_SCENE
 
@@ -29,9 +30,9 @@ const badgeTexture = (value: number, color: string): CanvasTexture => {
     context.arc(half, half, half - points.ring, 0, Math.PI * 2)
     context.fill()
     context.lineWidth = points.ring
-    context.strokeStyle = '#ffffff'
+    context.strokeStyle = GOLF_WHITE
     context.stroke()
-    context.fillStyle = '#ffffff'
+    context.fillStyle = GOLF_WHITE
     context.font = `800 ${points.pixels * 0.6}px sans-serif`
     context.textAlign = 'center'
     context.textBaseline = 'middle'
