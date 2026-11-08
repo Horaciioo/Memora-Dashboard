@@ -5,7 +5,6 @@ import { listOpenLives, listPastLives, listRecentLives } from '@/core/services/l
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { LIVE_COPY } from '@/declarations/lives/copy'
-import { TWITCH_MOCK_ORIGIN } from '@/declarations/platforms/twitch'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -46,7 +45,6 @@ export default async function LivesPage() {
         canReport={canReadLogs}
         canDelete={access.isResponsable}
         canCreatorReport={access.can(Permissions.LiveCreatorReport)}
-        showFakeLive={TWITCH_MOCK_ORIGIN !== null && access.isAdmin}
       />
     </div>
   )
