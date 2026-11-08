@@ -4,14 +4,15 @@ import type { ModerationKind } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { logger } from '@/core/lib/logger'
+import { ECHO_WINDOW_SECONDS, isSameGesture } from '@/core/lib/lives/gestureMatch'
 import type { PlatformLogEntry } from '@/core/lib/platforms/twitch/logEntry'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import type { ModViewIntent } from '@/types/modview'
 import type { LivePlatformName } from '@/utils/constants/lives'
 import { DAY_MS } from '@/utils/constants/time'
 
-// Seconds a Memora gesture waits for its echo from the platform
-const ECHO_WINDOW_SECONDS = 90
+// Seconds a platform line may precede the Memora one it belongs to
+const EARLY_ECHO_SECONDS = 15
 
 // Longest message excerpt kept
 const EXCERPT_LENGTH = 160
@@ -60,6 +61,48 @@ const targetOf = (intent: ModViewIntent): string | null =>
   'chatterId' in intent ? intent.chatterId : null
 
 /**
+ * Platform line already written for a gesture Memora is about to log
+ * @param {Object} input - Gesture
+ * @param {string} input.liveId - Live
+ * @param {string} input.actorPlatformUserId - Their platform account
+ * @param {ModViewIntent} input.intent - Gesture
+ * @param {ModerationKind} kind - Kind of the gesture
+ * @return {Promise<string | null>} - Line identifier
+ */
+
+const findEarlyEcho = async (
+  input: { liveId: string; actorPlatformUserId: string; intent: ModViewIntent },
+  kind: ModerationKind
+): Promise<string | null> => {
+  const now = new Date()
+  const candidates = await prisma.moderationAction.findMany({
+    where: {
+      liveId: input.liveId,
+      origin: 'PLATFORM',
+      kind,
+      actorPlatformUserId: input.actorPlatformUserId,
+      occurredAt: { gte: new Date(now.getTime() - EARLY_ECHO_SECONDS * 1000) },
+    },
+    orderBy: { occurredAt: 'desc' },
+    select: {
+      id: true,
+      kind: true,
+      actorPlatformUserId: true,
+      targetPlatformUserId: true,
+      occurredAt: true,
+    },
+  })
+  const memora = {
+    kind,
+    actorPlatformUserId: input.actorPlatformUserId,
+    targetPlatformUserId: targetOf(input.intent),
+    occurredAt: now,
+  }
+
+  return candidates.find((line) => isSameGesture(memora, line, EARLY_ECHO_SECONDS))?.id ?? null
+}
+
+/**
  * Write a gesture sent from Memora
  * @param {Object} input - Gesture
  * @param {string} input.liveId - Live
@@ -96,6 +139,26 @@ export const logMemoraGesture = async (input: {
   if (!kind) return null
 
   try {
+    // A platform line that came first is the same gesture, never a second line
+    const early = await findEarlyEcho(input, kind)
+    if (early) {
+      await prisma.moderationAction.update({
+        where: { id: early },
+        data: {
+          origin: 'MEMORA',
+          actorAccountId: input.actorAccountId,
+          idempotencyKey: input.idempotencyKey,
+          reason: 'reason' in intent && intent.reason ? intent.reason : undefined,
+          liveconLevel: input.liveconLevel ?? undefined,
+          offenseId: input.offenseId,
+          rung: input.rung,
+          onBehalfOfId: input.onBehalfOfId,
+        },
+      })
+
+      return early
+    }
+
     const row = await prisma.moderationAction.create({
       data: {
         liveId: input.liveId,
@@ -188,25 +251,40 @@ export const logPlatformGesture = async (input: {
     if (known) return
 
     // The echo of a gesture sent from Memora a moment ago
-    const echo = await prisma.moderationAction.findFirst({
+    const occurredAt = new Date(entry.occurredAt)
+    const waiting = await prisma.moderationAction.findMany({
       where: {
         liveId: input.liveId,
         origin: 'MEMORA',
         kind: entry.kind,
         externalEventId: null,
         actorPlatformUserId: entry.actorPlatformUserId,
-        targetPlatformUserId: entry.targetPlatformUserId,
-        occurredAt: { gte: new Date(Date.parse(entry.occurredAt) - ECHO_WINDOW_SECONDS * 1000) },
+        occurredAt: { gte: new Date(occurredAt.getTime() - ECHO_WINDOW_SECONDS * 1000) },
       },
       orderBy: { occurredAt: 'desc' },
-      select: { id: true },
+      select: {
+        id: true,
+        kind: true,
+        actorPlatformUserId: true,
+        targetPlatformUserId: true,
+        occurredAt: true,
+      },
     })
+    const echo = waiting.find((line) =>
+      isSameGesture(line, {
+        kind: entry.kind,
+        actorPlatformUserId: entry.actorPlatformUserId,
+        targetPlatformUserId: entry.targetPlatformUserId,
+        occurredAt,
+      })
+    )
     if (echo) {
       await prisma.moderationAction.update({
         where: { id: echo.id },
         data: {
           externalEventId: entry.externalEventId,
           status: 'SUCCEEDED',
+          targetPlatformUserId: echo.targetPlatformUserId ?? entry.targetPlatformUserId,
           targetLogin: entry.targetLogin,
           messageExcerpt: entry.messageExcerpt?.slice(0, EXCERPT_LENGTH) ?? undefined,
         },
@@ -253,6 +331,27 @@ export const logPlatformGesture = async (input: {
       error instanceof Error ? error.message : ''
     )
   }
+}
+
+/**
+ * Tie the gestures an account made before it was linked to the member who just linked it
+ * @param {string} accountId - Member
+ * @param {LivePlatformName} platform - Platform linked
+ * @param {string} platformUserId - Their platform account
+ * @return {Promise<number>} - Lines tied
+ */
+
+export const attributePlatformGestures = async (
+  accountId: string,
+  platform: LivePlatformName,
+  platformUserId: string
+): Promise<number> => {
+  const done = await prisma.moderationAction.updateMany({
+    where: { platform, actorPlatformUserId: platformUserId, actorAccountId: null },
+    data: { actorAccountId: accountId },
+  })
+
+  return done.count
 }
 
 /**

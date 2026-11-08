@@ -7,6 +7,7 @@
   "staleSeconds": 60,
   "maxOpenLives": 12,
   "watchSyncSeconds": 30,
+  "coverageMinGapSeconds": 60,
   "eventsubKeepaliveSeconds": 30,
   "feedFlushMs": 100,
   "roomMessages": 200,

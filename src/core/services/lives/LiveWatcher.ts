@@ -15,6 +15,11 @@ import { liveconLevelOf, logPlatformGesture } from '@/core/services/lives/Modera
 import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
 import { forgetSampling, sampleViewers } from '@/core/services/lives/LiveSampler'
 import { sweepStalePresences } from '@/core/services/lives/PresenceService'
+import {
+  beatWatchPeriod,
+  closeWatchPeriod,
+  openWatchPeriod,
+} from '@/core/services/lives/WatchCoverageService'
 import { soleChannel } from '@/core/services/platforms/ChannelService'
 import { readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
@@ -34,6 +39,7 @@ import { MINUTE_MS } from '@/utils/constants/time'
  * @property {string} broadcasterId - Channel
  * @property {ReturnType<typeof setTimeout> | null} offline - Pending end after an offline
  * @property {LiveStatusName} status - Status read at the last sync
+ * @property {boolean} connected - Platform feed alive
  */
 
 interface Watch {
@@ -42,6 +48,7 @@ interface Watch {
   broadcasterId: string
   offline: ReturnType<typeof setTimeout> | null
   status: LiveStatusName
+  connected: boolean
 }
 
 // Survives dev hot reloads
@@ -213,6 +220,12 @@ const watch = async (live: {
       )
     },
     onState: (state) => {
+      const current = watcher.watches.get(live.id)
+      if (current) current.connected = state === 'connected'
+      // The log sees the live only while the feed is alive
+      void (state === 'connected' ? openWatchPeriod(live.id) : closeWatchPeriod(live.id)).catch(
+        () => null
+      )
       void announceConnection(live.id, {
         state,
         notice: state === 'disconnected' ? PLATFORM_NOTICE_COPY.reconnecting : null,
@@ -226,6 +239,7 @@ const watch = async (live: {
     broadcasterId,
     offline: null,
     status: live.status,
+    connected: false,
   })
   session.start()
 }
@@ -324,6 +338,7 @@ const syncOnce = async (): Promise<void> => {
     if (!live) {
       current.session.stop()
       if (current.offline) clearTimeout(current.offline)
+      await closeWatchPeriod(liveId).catch(() => null)
       watcher.watches.delete(liveId)
       watcher.refused.delete(liveId)
       forgetSampling(liveId)
@@ -336,6 +351,7 @@ const syncOnce = async (): Promise<void> => {
     // A seat that gave up hands the live to the next member below
     if (current.session.isStopped) {
       if (current.offline) clearTimeout(current.offline)
+      await closeWatchPeriod(liveId).catch(() => null)
       watcher.watches.delete(liveId)
       watcher.refused.set(
         liveId,
@@ -345,6 +361,7 @@ const syncOnce = async (): Promise<void> => {
     }
 
     current.status = live.status as LiveStatusName
+    if (current.connected) void beatWatchPeriod(liveId).catch(() => null)
     void followStream(liveId, current).catch(() => null)
   }
 
@@ -387,8 +404,9 @@ const holdsWatchLease = async (): Promise<boolean> => {
  */
 
 const releaseWatches = (): void => {
-  for (const current of watcher.watches.values()) {
+  for (const [liveId, current] of watcher.watches) {
     if (current.offline) clearTimeout(current.offline)
+    void closeWatchPeriod(liveId).catch(() => null)
     current.session.stop()
   }
   watcher.watches.clear()

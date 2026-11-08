@@ -7,6 +7,7 @@ import { PlatformError } from '@/core/lib/platforms/http'
 import type { PlatformGrant, PlatformIdentity } from '@/core/lib/platforms/grant'
 import { PLATFORM_LINKERS } from '@/core/lib/platforms/linkers'
 import { refreshTwitchGrant } from '@/core/lib/platforms/twitch/oauth'
+import { attributePlatformGestures } from '@/core/services/lives/ModerationLogService'
 import { isTwitchConfigured } from '@/declarations/platforms/twitch'
 import { LivePlatforms } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
@@ -65,6 +66,9 @@ export const storePlatformGrant = async (
       create: { accountId, platform, ...payload },
     }),
   ])
+
+  // Gestures made before the link now belong to the member
+  await attributePlatformGestures(accountId, platform, identity.id).catch(() => null)
 }
 
 /**

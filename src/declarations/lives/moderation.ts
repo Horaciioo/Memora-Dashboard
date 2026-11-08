@@ -86,6 +86,8 @@ export const LIVE_REPORT_COPY = {
   extra: '+{time} hors de ses horaires',
   moderatorsTitle: 'Par modérateur',
   moderatorsLead: 'Actions de Mod. réussies et temps passé dans la Mod View.',
+  blindNotice:
+    'Le journal n’a pas reçu les actions faites sur Twitch pendant {time} de ce live, faute d’un modérateur connecté à Memora. Les chiffres peuvent être plus bas que la réalité.',
   outsideMemora: 'Hors Memora',
   active: 'actif',
   modSentence: 'A été actif {active} puis {visible} à l’écran. Il a réalisé au total {actions}',

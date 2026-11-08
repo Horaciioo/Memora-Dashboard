@@ -10,6 +10,7 @@ import { readBaseline } from '@/core/services/lives/LiveBaselineService'
 import { readLive } from '@/core/services/lives/LiveService'
 import { liveNotes } from '@/core/services/lives/ViewerCommentService'
 import { readLiveTeam } from '@/core/services/lives/ModStintService'
+import { readCoverage } from '@/core/services/lives/WatchCoverageService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { LiveLogLine, LiveModTime, LiveNote, LiveView } from '@/types/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
@@ -122,6 +123,8 @@ export const readLiveReport = async (
     end,
   }).catch(() => [])
 
+  const coverage = await readCoverage(liveId, start, end).catch(() => null)
+
   const nameOf = (row: { actor: { displayName: string } | null; actorLogin: string | null }) =>
     row.actor?.displayName ?? row.actorLogin ?? '?'
 
@@ -168,7 +171,7 @@ export const readLiveReport = async (
 
   return {
     live,
-    report,
+    report: { ...report, coverage },
     insights,
     team,
     notes,

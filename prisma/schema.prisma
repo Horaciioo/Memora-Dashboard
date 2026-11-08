@@ -1960,6 +1960,7 @@ model Live {
   actions        ModerationAction[]
   presences      ModViewPresence[]
   stints         LiveModStint[]
+  watchPeriods   LiveWatchPeriod[]
   focuses        ModViewFocus[]
   samples        LiveSample[]
 
@@ -2083,6 +2084,21 @@ model LiveModStint {
   @@index([liveId, accountId])
   @@index([accountId, startedAt])
   @@map("live_mod_stints")
+}
+
+// Stretch the platform feed of a live was received, the rest is a blind spot of the log
+model LiveWatchPeriod {
+  id         String    @id @default(cuid())
+  liveId     String
+  startedAt  DateTime  @default(now())
+  // Last proof the feed was alive, closes a period a crash left open
+  lastBeatAt DateTime  @default(now())
+  endedAt    DateTime?
+
+  live Live @relation(fields: [liveId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, startedAt])
+  @@map("live_watch_periods")
 }
 
 // Private comment a member leaves on a viewer of a creator's channel
