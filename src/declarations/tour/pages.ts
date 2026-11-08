@@ -127,7 +127,7 @@ export const TOUR_PAGES: TourPage[] = [
       {
         beacon: TOUR_BEACONS.page,
         title: 'Le calendrier',
-        body: 'Lives, réunions, absences, anniversaires : tout ce que tu as le droit de voir, par mois, par semaine ou en planning. Le menu de gauche liste les calendriers à afficher ; ses boutons « Calendrier » et « Menu », en haut, basculent avec le menu des pages.',
+        body: 'Lives, réunions, absences, anniversaires : tout ce que tu as le droit de voir, par mois, par semaine ou en planning. Le menu de gauche liste les calendriers à afficher.',
       },
       {
         beacon: TOUR_BEACONS.calendarRequest,
