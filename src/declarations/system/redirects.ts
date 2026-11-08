@@ -12,6 +12,10 @@ export interface LegacyRedirect {
 
 // Nested pages first, so the broad prefix never swallows them
 const NESTED: LegacyRedirect[] = [
+  // Registered with the platforms, so the old return address must keep landing
+  { source: '/api/connexion/twitch/retour', destination: '/api/login/twitch/callback' },
+  { source: '/api/connexion/youtube/retour', destination: '/api/login/youtube/callback' },
+  { source: '/api/connexion/discord/retour', destination: '/api/login/discord/callback' },
   {
     source: '/recrutements/:id/:candidate/entretien',
     destination: '/recruitments/:id/:candidate/interview',
