@@ -8,21 +8,23 @@ import {
 } from '@/core/lib/auth/integrationTicket'
 import { EXERCISE_TICKET_COOKIE } from '@/core/lib/auth/exerciseTicket'
 import { matchesToken, unpackHandshake } from '@/core/lib/auth/oauthState'
-import { OAUTH_STATE_COOKIE, SESSION_COOKIE } from '@/core/lib/auth/session'
+import { IDENTITY_CHECK_COOKIE, readWelcomeLink } from '@/core/lib/auth/identityTicket'
+import { OAUTH_STATE_COOKIE } from '@/core/lib/auth/session'
 import { notAuthenticated } from '@/core/lib/errors'
-import { readAddress } from '@/core/lib/http/rateLimit'
 import { createRedirectRoute } from '@/core/lib/http/route'
 import { exchangeCode, readDiscordUser, storeGrant } from '@/core/services/auth/DiscordService'
-import { openSession, resolveDiscordAccount } from '@/core/services/auth/SessionService'
+import { resolveDiscordAccount } from '@/core/services/auth/SessionService'
+import { startSession } from '@/core/services/auth/sessionStart'
+import { claimCheckLink } from '@/core/services/identity'
+import { checkIdentity, holdCheck } from '@/core/services/identity/signIn'
 import { exerciseFailure } from '@/core/services/recruitment/exerciseRedirects'
 import { claimExerciseLink } from '@/core/services/recruitment/ExerciseLinkService'
 import { claimIdentity } from '@/core/services/onboarding/IntegrationService'
-import { recordEvent } from '@/core/services/system/ActivityService'
 import { SIGN_IN_ERRORS, signInFailure } from '@/declarations/access/signIn'
 import { integrationFailure } from '@/core/services/onboarding/redirects'
 import { AUTH_SETTINGS, EXERCISE_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
-import { AUTH_COPY } from '@/declarations/ui/copy/auth'
+import { WELCOME_REFUSED_QUERY } from '@/declarations/onboarding/welcome'
 import { isAccessClosed } from '@/core/lib/auth/closed'
 
 /**
@@ -47,6 +49,10 @@ export const GET = createRedirectRoute({
     const exercise = readOpenExercise(cookieStore.get(EXERCISE_TICKET_COOKIE)?.value)
 
     if (exercise) return exerciseFailure(error, params)
+
+    // A link a responsable handed out answers on its own screen
+    const linkToken = readWelcomeLink(cookieStore.get(IDENTITY_CHECK_COOKIE)?.value)
+    if (linkToken) return `${ROUTES.welcomeLink(linkToken)}?${WELCOME_REFUSED_QUERY}`
 
     return ticket ? integrationFailure(error, params) : signInFailure(error)
   },
@@ -102,32 +108,23 @@ export const GET = createRedirectRoute({
       return ROUTES.integration(ticket.token)
     }
 
+    // A link a responsable handed out only accepts the identifier it was made for
+    const welcomeLink = readWelcomeLink(cookieStore.get(IDENTITY_CHECK_COOKIE)?.value)
+    const linkCheck = welcomeLink ? await claimCheckLink(welcomeLink, identity) : null
+    if (linkCheck) return holdCheck(linkCheck)
+
     // Discord proves who they are
     const account = await resolveDiscordAccount(identity)
+    if (account && isAccessClosed(account)) throw notAuthenticated(SIGN_IN_ERRORS.Revoked)
+
+    // Nothing opens before the person confirms who they are
+    const checkId = await checkIdentity(identity, account)
+    if (checkId) return holdCheck(checkId)
+
     if (!account) throw notAuthenticated(SIGN_IN_ERRORS.Unknown)
-    if (isAccessClosed(account)) throw notAuthenticated(SIGN_IN_ERRORS.Revoked)
 
-    const { token, expiresAt } = await openSession(account.id, {
-      userAgent: request.headers.get('user-agent') ?? undefined,
-      address: readAddress(request.headers) || undefined,
-    })
-
-    cookieStore.set(SESSION_COOKIE, token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      path: ROUTES.home,
-      expires: expiresAt,
-    })
-
-    await Promise.all([
-      storeGrant(account.id, grant),
-      recordEvent({
-        eventType: 'SessionOpened',
-        actorId: account.id,
-        summary: AUTH_COPY.signedIn,
-      }),
-    ])
+    await startSession(account.id, request)
+    await storeGrant(account.id, grant)
 
     return handshake.returnTo ?? ROUTES.dashboard
   },

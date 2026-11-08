@@ -1,0 +1,42 @@
+/* Welcome seal: a ring pops, its check draws itself, the words rise */
+@keyframes seal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes seal-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes seal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.seal-ring {
+  animation: seal-pop var(--motion-duration-panel) var(--motion-ease-spring) both;
+}
+
+.seal-check {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: seal-draw var(--motion-duration-slow) ease-out 300ms forwards;
+}
+
+.seal-text {
+  animation: seal-rise var(--motion-duration-panel) ease-out 720ms both;
+}

@@ -14,6 +14,7 @@ import { WORKER_FILE } from '@/declarations/pwa/worker'
 // Paths reachable, the worker and its fallback page included so they update signed out
 const PUBLIC_PATHS: string[] = [
   ROUTES.login,
+  ROUTES.welcome,
   ROUTES.privacy,
   ROUTES.offline,
   ROUTES.status,
@@ -27,7 +28,7 @@ const SHARE_PATH = new RegExp(
 )
 
 // Path prefixes
-const PUBLIC_PREFIXES: string[] = ['/integration', '/exercise']
+const PUBLIC_PREFIXES: string[] = ['/integration', '/exercise', ROUTES.welcome]
 
 /**
  * Build the per-request nonce and the policy carrying it

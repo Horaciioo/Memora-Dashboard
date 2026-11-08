@@ -1081,6 +1081,20 @@ export const AUTH_SETTINGS = {
     fallback: 10,
     min: 1,
   }),
+  // Life of a Discord identity check
+  identityCheckHours: readInteger(authentication.identityCheckHours, {
+    path: 'system/authentication.identityCheckHours',
+    fallback: 48,
+    min: 1,
+    max: 336,
+  }),
+  // Pseudonyms asked before a responsable is called
+  identityAttempts: readInteger(authentication.identityAttempts, {
+    path: 'system/authentication.identityAttempts',
+    fallback: 2,
+    min: 1,
+    max: 5,
+  }),
 }
 
 /**
@@ -1452,7 +1466,7 @@ export const HOME_SETTINGS = {
 
 /**
  * First visit timings and spotlight sizes
- * @type {{ newcomerDays: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, sendPauseMs: number, loadingMs: number, demoStepMs: number, demoBeats: number, stageHoldMs: number, paneInsetPx: number, photoSharePercent: number, ringPaddingPx: number, bubbleGapPx: number, bubbleWidthPx: number, bubbleHeightPx: number, minAgeYears: number, maxAgeYears: number, graceMs: number }}
+ * @type {{ newcomerDays: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, sendPauseMs: number, loadingMs: number, demoStepMs: number, demoBeats: number, stageHoldMs: number, sealMs: number, paneInsetPx: number, photoSharePercent: number, ringPaddingPx: number, bubbleGapPx: number, bubbleWidthPx: number, bubbleHeightPx: number, minAgeYears: number, maxAgeYears: number, graceMs: number }}
  */
 
 export const TOUR_SETTINGS = {
@@ -1499,6 +1513,12 @@ export const TOUR_SETTINGS = {
   stageHoldMs: readInteger(tour.stageHoldMs, {
     path: 'system/tour.stageHoldMs',
     fallback: 4000,
+    min: 0,
+  }),
+  // Welcome seal before the dashboard
+  sealMs: readInteger(tour.sealMs, {
+    path: 'system/tour.sealMs',
+    fallback: 2800,
     min: 0,
   }),
   paneInsetPx: readInteger(tour.paneInsetPx, {

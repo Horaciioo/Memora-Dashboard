@@ -16,5 +16,6 @@
   "demoBeats": 3,
   "paneInsetPx": 12,
   "photoSharePercent": 40,
-  "stageHoldMs": 4000
+  "stageHoldMs": 4000,
+  "sealMs": 2800
 }

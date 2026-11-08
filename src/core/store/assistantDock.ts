@@ -71,6 +71,7 @@ interface AssistantDockStore {
   close: () => void
   toggle: () => void
   handOff: (offer: AssistantOffer) => void
+  alert: (data: Record<string, string>) => void
   takeHandoff: (offer: AssistantOffer) => boolean
 }
 
@@ -80,6 +81,17 @@ const pickGreeting = () =>
 
 // Hour of the opening, in the member's own zone
 const hourNow = () => Number(instantToWall(new Date()).slice(11, 13))
+
+/**
+ * Talk Memora opens by herself when something is urgent
+ * @type {ScenarioId}
+ */
+
+export const URGENT_SCENARIO: ScenarioId = 'identity'
+
+// Focus left behind once an urgent talk is over
+const leaveAlert = (focus: DockFocus | null): DockFocus | null =>
+  focus?.scenario === URGENT_SCENARIO ? null : focus
 
 const pickOpening = () => ({ greeting: pickGreeting(), hello: pickHello(hourNow()) })
 
@@ -98,8 +110,16 @@ export const useAssistantDock = create<AssistantDockStore>()((set, get) => ({
   // Only the page that placed it
   clear: (action) => set((state) => (state.action === action ? { action: null } : state)),
   open: () => set((state) => (state.greeting ? state : pickOpening())),
-  close: () => set({ greeting: null, hello: null }),
-  toggle: () => set((state) => (state.greeting ? { greeting: null, hello: null } : pickOpening())),
+  // An urgent talk ends with the chat, it never comes back by itself
+  close: () => set((state) => ({ greeting: null, hello: null, focus: leaveAlert(state.focus) })),
+  toggle: () =>
+    set((state) =>
+      state.greeting
+        ? { greeting: null, hello: null, focus: leaveAlert(state.focus) }
+        : pickOpening()
+    ),
+  alert: (data) =>
+    set({ focus: { scenario: URGENT_SCENARIO, entry: 'alert', data }, ...pickOpening() }),
   handOff: (offer) => set({ handoff: { offer, at: Date.now() }, greeting: null, hello: null }),
   // Only fresh, only once
   takeHandoff: (offer) => {

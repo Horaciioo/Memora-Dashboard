@@ -23,7 +23,6 @@ import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { findAdmission } from '@/core/services/academy/AdmissionService'
 import { afterIntegration } from '@/core/services/academy/parkour/ParkourService'
-import { PARKOUR_COPY } from '@/declarations/academy/parkour'
 import type { DiscordIdentity } from '@/core/services/auth/DiscordService'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { IntegrationAdmission, IntegrationClaimView, LiveInvite } from '@/types/onboarding'
@@ -73,22 +72,12 @@ export const claimIdentity = async (token: string, identity: DiscordIdentity): P
   // An admitted candidate is expected
   const admission = invite.session ? await findAdmission(invite.session.id, identity.id) : null
 
-  // An admitted seat whose PIM start is not declared yet waits
-  if (!admission && invite.session) {
-    const waiting = await prisma.academyJunior.count({
-      where: {
-        sessionId: invite.session.id,
-        account: { discordId: identity.id },
-        confirmedAt: null,
-        kickoffAt: null,
-      },
-    })
-    if (waiting > 0) throw conflict(PARKOUR_COPY.kickoffPending)
-  }
-
   if (mode.createsAccount && !admission) {
     // A campaign link only opens its promotion to the candidates it admitted
-    if (invite.recruitmentSessionId && mode.enrolsAcademy) throw forbidden()
+    const fed = invite.session
+      ? await prisma.recruitmentSession.count({ where: { academySessionId: invite.session.id } })
+      : 0
+    if (fed > 0 && mode.enrolsAcademy) throw forbidden()
 
     // A mode that opens an account refuses an identity that already holds one
     const known = await prisma.account.findUnique({ where: { discordId: identity.id } })

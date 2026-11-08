@@ -528,8 +528,6 @@ export const WIZARD_STYLES = {
   title: 'text-xl font-bold tracking-tight sm:text-2xl',
   body: 'flex min-h-64 flex-col gap-4',
   footer: 'flex items-center justify-between gap-3 border-t border-[var(--color-border)] pt-6',
-  // The rail only fits on a wide viewport
-  rail: 'hidden sm:block',
 } as const
 
 /**
@@ -571,9 +569,9 @@ export const ONBOARDING_STYLES = {
   outcome: 'flex flex-col gap-2 text-center',
   outcomeTitle: 'text-xl font-bold tracking-tight',
   // Admitted candidate
-  admission: 'flex flex-col gap-1 border-l-4 border-[var(--color-success)] py-1 pl-4',
+  admission: 'flex flex-col gap-1',
   admissionEyebrow:
-    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-success)] uppercase',
+    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-accent)] uppercase',
 } as const
 
 /**

@@ -1,4 +1,5 @@
 export * from './controls'
+export * from './welcome'
 export * from './data'
 export * from './feedback'
 export * from './surfaces'

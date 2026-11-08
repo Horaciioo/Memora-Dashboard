@@ -75,7 +75,7 @@ export const AssistantAnswers = ({ chat }: AssistantAnswersProps) => {
           isPlain ? (
             <Button
               key={choice.value}
-              variant={index === 0 ? 'primary' : 'secondary'}
+              variant={choice.tone ?? (index === 0 ? 'primary' : 'secondary')}
               className={ASSISTANT_STYLES.answer}
               onClick={() => chat.scenario.answer({ value: choice.value, label: choice.label })}
             >

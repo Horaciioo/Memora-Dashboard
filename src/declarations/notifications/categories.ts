@@ -120,6 +120,8 @@ export const PUSH_CATEGORY_OF_KIND: Record<NotificationKindName, PushCategoryNam
   LegacyOpened: 'academy',
   LegacyDecided: 'academy',
   PimReviewDue: 'academy',
+  PimReferentAssigned: 'academy',
+  IdentityAlert: 'recruitment',
   PimReviewSubmitted: 'academy',
   PimLaunched: 'academy',
   PimSecondPeriod: 'academy',

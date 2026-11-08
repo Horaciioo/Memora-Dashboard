@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { NudgeBubble } from '@/composites/notifications/NudgeBubble'
+import { isIdentityAlert, useIdentityAlert } from '@/core/hooks/interaction/state/useIdentityAlert'
 import { useBeaconSpot } from '@/core/hooks/interaction/layout/useBeaconSpot'
 import { useNotificationNudges } from '@/core/hooks/data/system/useNotificationNudges'
 import { apiPatch } from '@/core/lib/api/client'
@@ -28,11 +29,12 @@ export const NudgeHost = () => {
   const CloseIcon = ICONS.close
 
   const entry = queue[0] ?? null
+  useIdentityAlert(entry, shift)
   const href = entry ? notificationHref(entry) : null
   const label = entry ? notificationText(entry) : null
   const spot = useBeaconSpot(entry !== null && !isMobile, beaconOf(href))
 
-  if (isMobile || !entry || !label || !spot) return null
+  if (isMobile || !entry || isIdentityAlert(entry) || !label || !spot) return null
 
   return (
     <div

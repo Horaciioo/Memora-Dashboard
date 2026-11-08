@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Progress } from '@/components/elements/feedback/Progress'
 import { FormRenderer } from '@/components/structures/data/FormRenderer'
 import {
   StepTimeline,
@@ -116,8 +115,7 @@ export const FormWizard = ({
   return (
     <div className={WIZARD_STYLES.frame}>
       <div className={WIZARD_STYLES.header}>
-        <Progress value={current + 1} max={steps.length} label={label} compact />
-        <StepTimeline steps={rail} label={label} className={WIZARD_STYLES.rail} />
+        <StepTimeline steps={rail} label={label} showLabels={false} />
 
         <div className={WIZARD_STYLES.heading}>
           <h2 className={WIZARD_STYLES.title}>{step.label}</h2>

@@ -23,13 +23,15 @@ export interface ChatPanelProps {
   // Follows the newest message while it is the part under way
   scrollRef?: Ref<HTMLDivElement>
   onReady: () => void
+  // Drawn by the scene named identity
+  identity?: ReactNode
   // The question waiting for an answer
   children?: ReactNode
 }
 
 /**
  * One part of the welcome as its own conversation
- * @param {ChatPanelProps} props - Lines, member and what waits at the end
+ * @param {ChatPanelProps} props - Lines, member, scenes and what waits at the end
  * @return {JSX.Element}
  */
 
@@ -41,6 +43,7 @@ export const ChatPanel = ({
   isHidden,
   scrollRef,
   onReady,
+  identity,
   children,
 }: ChatPanelProps) => {
   // Messages of the same speaker stand under one name
@@ -87,6 +90,7 @@ export const ChatPanel = ({
                         {line.scene === 'notify' && <NotifyDemo />}
                         {line.scene === 'privacy' && <PrivacyNote />}
                         {line.scene === 'loading' && <TourLoader onReady={onReady} />}
+                        {line.scene === 'identity' && identity}
                       </div>
                     ) : (
                       <p key={position} className={TOUR_CHAT.line}>

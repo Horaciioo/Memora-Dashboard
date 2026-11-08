@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 
+import { Avatar } from '@/components/elements/display/Avatar'
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { MemoraTyping } from '@/composites/search/assistant/MemoraTyping'
 import { AssistantAnswers } from '@/composites/search/assistant/AssistantAnswers'
@@ -46,6 +47,15 @@ export const AssistantThread = ({ chat, onSuggestion, opening }: AssistantThread
             isFollow={chat.turns[index - 1]?.from === 'memora'}
           >
             {turn.proposal && <SlotList slots={turn.proposal.slots} />}
+            {turn.card && (
+              <div className={ASSISTANT_STYLES.card}>
+                <Avatar name={turn.card.name} src={turn.card.avatarUrl} size="lg" />
+                <div className="flex min-w-0 flex-col">
+                  <span className={ASSISTANT_STYLES.cardName}>{turn.card.name}</span>
+                  <span className={ASSISTANT_STYLES.cardId}>{turn.card.id}</span>
+                </div>
+              </div>
+            )}
             {turn.link && (
               <button
                 type="button"
