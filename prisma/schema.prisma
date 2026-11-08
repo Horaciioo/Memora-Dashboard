@@ -331,6 +331,7 @@ model Account {
 
   sessions              Session[]
   pushSubscriptions     PushSubscription[]
+  modViewPreferences    ModViewPreference[]
   pushDeliveries        PushDelivery[]
   discordToken          DiscordToken?
   twoFactor             TwoFactorCredential?
@@ -393,6 +394,7 @@ model Account {
   platformAccounts      PlatformAccount[]
   livesAnnounced        Live[]                   @relation("LiveAnnouncer")
   liveCoordinations     LiveCoordination[]
+  liveTeamMessages      LiveTeamMessage[]
   liveSeats             LiveMember[]
   playSessionsHosted    PlaySession[]            @relation("PlaySessionHost")
   playTournamentsHosted PlayTournament[]         @relation("PlayTournamentHost")
@@ -1972,6 +1974,7 @@ model Live {
   focuses        ModViewFocus[]
   samples        LiveSample[]
   chatMessages   LiveChatMessage[]
+  teamMessages   LiveTeamMessage[]
 
   @@unique([platform, streamExternalId])
   @@index([status])
@@ -2156,6 +2159,24 @@ model LiveChatMessage {
   @@map("live_chat_messages")
 }
 
+// Internal chat between the team of one live
+model LiveTeamMessage {
+  id        String   @id @default(cuid())
+  liveId    String
+  authorId  String
+  // Encrypted at rest
+  body      String
+  // Mention kinds the author picked
+  mentions  String[]
+  createdAt DateTime @default(now())
+
+  live   Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  author Account @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, createdAt])
+  @@map("live_team_messages")
+}
+
 // What is known of a viewer's chat on one channel
 model ViewerChatStat {
   youtuberId     String
@@ -2171,6 +2192,20 @@ model ViewerChatStat {
 
   @@id([youtuberId, platform, platformUserId])
   @@map("viewer_chat_stats")
+}
+
+// Mod View choices of a moderator, one row for the account and one per channel
+model ModViewPreference {
+  accountId String
+  // Empty for the account, the creator identifier for a channel
+  scope     String   @default("")
+  values    Json     @default("{}")
+  updatedAt DateTime @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([accountId, scope])
+  @@map("mod_view_preferences")
 }
 
 // Viewer count read from the platform while a live runs
