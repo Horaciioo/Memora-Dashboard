@@ -49,7 +49,7 @@ export const TeamChatEntry = ({
         bubble && (
           <button
             type="button"
-            className={STYLES.bubble}
+            className={STYLES.popup}
             onClick={() => {
               dismiss()
               onToggle()

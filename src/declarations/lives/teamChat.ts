@@ -11,10 +11,10 @@ export type TeamMentionKind = 'everyone' | 'team' | 'coordinator' | 'responsable
  */
 
 export const TEAM_MENTIONS: Record<TeamMentionKind, { label: string }> = {
-  everyone: { label: 'Tout le monde' },
-  team: { label: 'Équipe Twitch' },
+  everyone: { label: 'Tous' },
+  team: { label: 'Twitch' },
+  responsables: { label: 'Responsable' },
   coordinator: { label: 'Coordinateur' },
-  responsables: { label: 'Responsables' },
   designated: { label: 'Référent' },
 }
 

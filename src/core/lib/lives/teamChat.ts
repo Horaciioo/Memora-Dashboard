@@ -93,6 +93,6 @@ export const mentionSegments = (body: string, labels: string[]): MentionSegment[
 
   return body
     .split(new RegExp(`(@(?:${escaped.join('|')}))`, 'i'))
-    .filter(Boolean)
     .map((text, index) => ({ text, isMention: index % 2 === 1 }))
+    .filter((segment) => segment.text !== '')
 }

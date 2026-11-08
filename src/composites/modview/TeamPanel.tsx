@@ -40,7 +40,7 @@ interface TeamMemberProps {
   isPresent: boolean
   // Coordinating right now
   isCoordinator: boolean
-  // ISO hour planned, shown to Responsables
+  // ISO hour planned, coordinators and Responsables only
   plannedFrom: string | null
   // ISO arrival in the Mod View, none when not connected
   arrivedAt: string | null

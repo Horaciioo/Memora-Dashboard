@@ -123,8 +123,8 @@ export const readLiveRoster = async (
       // A member changing trade counts for their PIM too
       isJunior: row.account.role === MemberRoles.Junior || row.account.academyJuniors.length > 0,
       isReinforcement: reinforced.has(row.account.id),
-      // Planned hours stay with the Responsables
-      plannedFrom: permissions.includes(Permissions.LiveInspect)
+      // Planned hours stay with coordinators and Responsables
+      plannedFrom: permissions.includes(Permissions.LiveRoster)
         ? (row.availableFrom?.toISOString() ?? null)
         : null,
     })),
