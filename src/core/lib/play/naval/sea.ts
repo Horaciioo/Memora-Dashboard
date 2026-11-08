@@ -1,7 +1,6 @@
 import { cellsOf, indexOf } from '@/core/lib/play/naval/fleet'
 import type { NavalShip } from '@/core/lib/play/naval/fleet'
 import { NavalCodes, isHitCode } from '@/core/lib/play/naval/state'
-import { NAVAL_COLUMNS } from '@/declarations/play/naval/copy'
 
 /**
  * What a square shows
@@ -16,15 +15,6 @@ export const SeaMarks = {
 } as const
 
 export type SeaMark = (typeof SeaMarks)[keyof typeof SeaMarks]
-
-/**
- * Name of a square, column letter then row number
- * @param {number} x - Column
- * @param {number} y - Row
- * @return {string} - Name, like B4
- */
-
-export const squareName = (x: number, y: number): string => `${NAVAL_COLUMNS[x] ?? '?'}${y + 1}`
 
 /**
  * Marks of a sea from the shots fired at it
@@ -59,17 +49,6 @@ export const shipsDown = (ships: NavalShip[], marks: SeaMark[], size: number): N
   ships.filter((ship) =>
     cellsOf(ship).every(({ x, y }) => marks[indexOf(x, y, size)] === SeaMarks.Hit)
   )
-
-/**
- * Whether every ship of a fleet is down
- * @param {NavalShip[]} fleet - Fleet
- * @param {SeaMark[]} marks - Marks of the sea
- * @param {number} size - Squares per side
- * @return {boolean} - All down
- */
-
-export const isFleetDown = (fleet: NavalShip[], marks: SeaMark[], size: number): boolean =>
-  fleet.length > 0 && shipsDown(fleet, marks, size).length === fleet.length
 
 /**
  * Ship covering a square

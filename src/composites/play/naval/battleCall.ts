@@ -1,5 +1,6 @@
 import type { NavalCaptainView } from '@/composites/play/naval/captains'
 import type { NavalEvent, NavalPlayback } from '@/composites/play/naval/useNavalPlayback'
+import { isHitCode, isSinking, isStriking, NavalCodes } from '@/core/lib/play/naval/state'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { NAVAL_BOARD_COPY, NAVAL_SHIP_NAMES } from '@/declarations/play/naval/copy'
@@ -37,12 +38,12 @@ export const callOf = ({
   }
 
   // Shell coming for the viewer
-  if (playback.playing?.shot.target === viewer) {
+  if (playback.playing?.strike.target === viewer) {
     return { call: NAVAL_BOARD_COPY.incoming, tone: 'danger' }
   }
   if (current.turn === viewer) {
     const last = board.shots.filter((shot) => shot[1] === match).at(-1)
-    const isAgain = last?.[2] === viewer && last[6] > 0 && board.settings.rules.hitReplay
+    const isAgain = last?.[2] === viewer && isHitCode(last[6]) && board.settings.rules.hitReplay
 
     return {
       call: isAgain ? NAVAL_BOARD_COPY.yourTurnAgain : NAVAL_BOARD_COPY.yourTurn,
@@ -57,34 +58,35 @@ export const callOf = ({
 }
 
 /**
- * Callout for a shot just landed
- * @param {NavalEvent} event - Shot
+ * Callout for a strike just landed
+ * @param {NavalEvent} event - Strike
  * @param {NavalCaptainView[]} captains - Captains
  * @param {number} viewer - Seat of the viewer
  * @return {{ text: string; tone: 'hit' | 'sunk' | 'miss' | 'eliminated' }} - Callout
  */
 
 export const calloutOf = (
-  { shot, shipLength, isEliminated }: NavalEvent,
+  { strike, shipLength, isEliminated }: NavalEvent,
   captains: NavalCaptainView[],
   viewer: number
 ): { text: string; tone: 'hit' | 'sunk' | 'miss' | 'eliminated' } => {
   if (isEliminated) {
     return {
       text: fillPlayMessage(NAVAL_BOARD_COPY.captainOut, {
-        name: captains[shot.target]?.name ?? '',
+        name: captains[strike.target]?.name ?? '',
       }),
       tone: 'eliminated',
     }
   }
-  if (shot.code === 2) {
+  if (isSinking(strike)) {
     const ship = NAVAL_SHIP_NAMES[shipLength] ?? NAVAL_BOARD_COPY.wreck
-    const template = shot.target === viewer ? NAVAL_BOARD_COPY.youSunk : NAVAL_BOARD_COPY.sunk
+    const template = strike.target === viewer ? NAVAL_BOARD_COPY.youSunk : NAVAL_BOARD_COPY.sunk
 
     return { text: fillPlayMessage(template, { ship }), tone: 'sunk' }
   }
+  if (isStriking(strike)) return { text: NAVAL_BOARD_COPY.hit, tone: 'hit' }
+  if (strike.cells.some((cell) => cell.code === NavalCodes.Spotted))
+    return { text: NAVAL_BOARD_COPY.spotted, tone: 'hit' }
 
-  return shot.code === 1
-    ? { text: NAVAL_BOARD_COPY.hit, tone: 'hit' }
-    : { text: NAVAL_BOARD_COPY.miss, tone: 'miss' }
+  return { text: NAVAL_BOARD_COPY.miss, tone: 'miss' }
 }

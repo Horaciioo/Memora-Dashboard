@@ -1,24 +1,26 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { cuePlace, cueReady } from '@/composites/play/naval/audio/cues'
 import type { NavalCaptainView } from '@/composites/play/naval/captains'
 import { NavalClock } from '@/composites/play/naval/NavalClock'
-import { NavalSea } from '@/composites/play/naval/NavalSea'
+import { NavalDock } from '@/composites/play/naval/NavalDock'
+import { NavalSkinPicker } from '@/composites/play/naval/NavalSkinPicker'
+import { NavalOcean } from '@/composites/play/naval/ocean/NavalOcean'
+import { useOceanCamera } from '@/composites/play/naval/ocean/useOceanCamera'
+import { playNaval } from '@/composites/play/naval/sound'
 import { useNavalPlacement } from '@/composites/play/naval/useNavalPlacement'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { marksOf } from '@/core/lib/play/naval/sea'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
-import { fillPlayMessage } from '@/declarations/play/copy'
-import { NAVAL_BOARD_COPY, NAVAL_MODE_COPY, NAVAL_SHIP_NAMES } from '@/declarations/play/naval/copy'
+import { NAVAL_BOARD_COPY, NAVAL_MODE_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { NAVAL_BOARD, NAVAL_PLACE } from '@/declarations/ui/variants/naval'
 import { cn } from '@/utils/classnames'
 
 /**
- * Placement screen: lay the fleet on the sea with taps, lock it, wait for the others
+ * Placement screen: drag the fleet onto the sea, lock it, wait for the others
  * @param {Object} props - Placement
  * @param {string} props.sessionId - Game
  * @param {NavalBoardState} props.board - Board
@@ -40,7 +42,9 @@ export const NavalPlacement = ({
 }) => {
   const { act, isSaving } = usePlayAct(sessionId)
   const sea = { ...board.sea, isSpaced: board.settings.rules.spacedShips }
-  const placement = useNavalPlacement(sea, board.you?.fleet ?? [], cuePlace)
+  const placement = useNavalPlacement(sea, board.you?.fleet ?? [])
+  const [camera, setCamera] = useOceanCamera(sea.size, 'placement')
+  const box = useRef<HTMLDivElement>(null)
   const isReady = Boolean(board.you?.isReady)
   const isPlacing = viewer >= 0 && !isReady
 
@@ -48,41 +52,42 @@ export const NavalPlacement = ({
   const { rotate } = placement
   useEffect(() => {
     if (!isPlacing) return
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() === 'r') rotate()
-    }
+    const onKey = (event: KeyboardEvent) => event.key.toLowerCase() === 'r' && rotate()
     window.addEventListener('keydown', onKey)
 
     return () => window.removeEventListener('keydown', onKey)
   }, [isPlacing, rotate])
 
   const lock = async () => {
-    if (await act({ type: 'fleet', ships: placement.ships })) cueReady()
+    if (await act({ type: 'fleet', ships: placement.ships })) playNaval('bell', 0.6)
   }
   const ships = isReady && board.you?.fleet ? board.you.fleet : placement.ships
   const ready = captains.filter((captain) => captain.isReady || captain.isBot).length
-  const left = sea.fleet.length - placement.ships.length
 
   return (
     <div className={NAVAL_BOARD.root}>
       <div className={NAVAL_PLACE.root}>
         <div className={NAVAL_PLACE.sea}>
-          <NavalSea
+          <NavalOcean
+            boxRef={box}
             size={sea.size}
+            camera={camera}
+            setCamera={setCamera}
             marks={marksOf(sea.size, [])}
-            ships={ships.map((ship) => ({ ship, isPicked: false }))}
-            ghost={isPlacing ? placement.ghost : null}
-            isOpen={isPlacing}
-            isShaking={placement.isRefused}
+            ships={ships.map((ship) => ({ ship }))}
+            zone={isPlacing ? placement.zone : null}
             label={NAVAL_BOARD_COPY.yourSea}
-            onPick={placement.tap}
-            onHover={placement.hover}
+            {...(isPlacing && {
+              onGrab: placement.onGrab,
+              onDrag: placement.onDrag,
+              onDrop: placement.onDrop,
+            })}
           />
         </div>
         <div className={NAVAL_PLACE.side}>
           <div className={NAVAL_BOARD.panel}>
             <span className={NAVAL_BOARD.title}>{NAVAL_MODE_COPY[board.settings.mode].title}</span>
-            <h2 className="text-xl font-black">{NAVAL_BOARD_COPY.placeTitle}</h2>
+            <h2 className={NAVAL_PLACE.heading}>{NAVAL_BOARD_COPY.placeTitle}</h2>
             <NavalClock
               serverTime={board.serverTime}
               endsAt={board.phaseEndsAt}
@@ -90,51 +95,20 @@ export const NavalPlacement = ({
               alertSeconds={NAVAL_SETTINGS.alertSeconds}
             />
             {viewer < 0 && <p className={NAVAL_BOARD.sub}>{NAVAL_BOARD_COPY.spectating}</p>}
-            {isPlacing && <p className={NAVAL_BOARD.sub}>{NAVAL_BOARD_COPY.placeHelp}</p>}
           </div>
           {isPlacing && (
             <div className={NAVAL_BOARD.panel}>
-              <div className={NAVAL_PLACE.dock}>
-                {sea.fleet.map((length, id) => {
-                  const isDone = placement.ships.some((ship) => ship.id === id)
-
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      className={cn(
-                        NAVAL_PLACE.ship,
-                        placement.heldId === id && NAVAL_PLACE.shipOn,
-                        isDone && placement.heldId !== id && NAVAL_PLACE.shipDone
-                      )}
-                      aria-pressed={placement.heldId === id}
-                      onClick={() => placement.select(id)}
-                    >
-                      <span className={NAVAL_PLACE.cells}>
-                        {Array.from({ length }, (_, cell) => (
-                          <i key={cell} className={NAVAL_PLACE.cellBlock} />
-                        ))}
-                      </span>
-                      {NAVAL_SHIP_NAMES[length]}
-                    </button>
-                  )
-                })}
-              </div>
-              <p className={cn(NAVAL_BOARD.sub, 'mt-2')}>
-                {left > 0
-                  ? fillPlayMessage(NAVAL_BOARD_COPY.placeLeft, { count: left })
-                  : NAVAL_BOARD_COPY.placeCount}
-              </p>
+              <NavalDock
+                fleet={sea.fleet}
+                placed={placement.ships.map((ship) => ship.id)}
+                heldId={placement.heldId}
+                box={box}
+                view={{ camera, size: sea.size }}
+                onGrab={placement.grabFromDock}
+                onDrag={placement.onDrag}
+                onDrop={placement.onDrop}
+              />
               <div className={cn(NAVAL_PLACE.keys, 'mt-2')}>
-                <button
-                  type="button"
-                  className={NAVAL_PLACE.key}
-                  disabled={placement.heldId === null}
-                  aria-pressed={!placement.isHorizontal}
-                  onClick={placement.rotate}
-                >
-                  {NAVAL_BOARD_COPY.rotate}
-                </button>
                 <button type="button" className={NAVAL_PLACE.key} onClick={placement.shuffle}>
                   {NAVAL_BOARD_COPY.random}
                 </button>
@@ -166,13 +140,11 @@ export const NavalPlacement = ({
             </div>
           )}
           <div className={NAVAL_BOARD.panel}>
-            <span className={NAVAL_BOARD.title}>
-              {fillPlayMessage(NAVAL_BOARD_COPY.waitCount, {
-                count: ready,
-                total: captains.length,
-              })}
-            </span>
-            <div className={cn(NAVAL_PLACE.ready, 'mt-2')}>
+            <span className={NAVAL_BOARD.title}>{NAVAL_BOARD_COPY.skin}</span>
+            <NavalSkinPicker />
+          </div>
+          <div className={NAVAL_BOARD.panel}>
+            <div className={NAVAL_PLACE.ready}>
               {captains.map((captain) => (
                 <span
                   key={captain.accountId}
@@ -183,10 +155,10 @@ export const NavalPlacement = ({
                 >
                   <Avatar name={captain.name} src={captain.avatarUrl} size="xs" />
                   {captain.name}
-                  {(captain.isReady || captain.isBot) && ' ✓'}
                 </span>
               ))}
             </div>
+            <span className="sr-only">{`${ready}/${captains.length}`}</span>
           </div>
         </div>
       </div>

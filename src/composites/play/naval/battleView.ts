@@ -1,4 +1,4 @@
-import type { SeaShip } from '@/composites/play/naval/NavalSea'
+import type { OceanShip as SeaShip } from '@/composites/play/naval/ocean/paint/ships'
 import { marksOf, shipsDown } from '@/core/lib/play/naval/sea'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
 import { sunkToward } from '@/core/lib/play/naval/state'

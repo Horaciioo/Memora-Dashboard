@@ -1,5 +1,5 @@
-import { NavalModes } from '@/utils/constants/play'
-import type { NavalModeName } from '@/utils/constants/play'
+import { NavalModes, NavalWeapons } from '@/utils/constants/play'
+import type { NavalModeName, NavalWeaponName } from '@/utils/constants/play'
 
 /**
  * Hub ground of the naval battle
@@ -8,10 +8,8 @@ import type { NavalModeName } from '@/utils/constants/play'
 
 export const NAVAL_SEA = {
   ground: 'play-sea',
+  photo: '/play/naval/mer-crepuscule.jpg',
 } as const
-
-// Column letters, as many as the largest sea
-export const NAVAL_COLUMNS = 'ABCDEFGHIJKL'
 
 /**
  * Name of each mode
@@ -52,7 +50,7 @@ export const NAVAL_BOARD_COPY = {
   seaOf: 'Mer de {name}',
   yourSea: 'Ta flotte',
   placeTitle: 'Place ta flotte',
-  placeHelp: 'Touche un navire, puis la mer. Touche un navire posé pour le reprendre.',
+  placeHelp: 'Glisse un navire sur la mer. Touche-le pour le tourner.',
   placeLeft: '{count} à poser',
   placeCount: 'Flotte complète',
   rotate: 'Pivoter',
@@ -64,7 +62,7 @@ export const NAVAL_BOARD_COPY = {
   waitCount: '{count} sur {total} prêts',
   yourTurn: 'À toi de tirer',
   yourTurnAgain: 'Touché, tu rejoues',
-  theirTurn: '{name} prend la mer en visée',
+  theirTurn: 'Tour de {name}',
   starting: 'La bataille commence',
   pickSquare: 'Touche une case de la mer ennemie',
   pickFoe: 'Choisis ta cible',
@@ -72,6 +70,7 @@ export const NAVAL_BOARD_COPY = {
   fire: 'Feu',
   incoming: 'Tir en approche',
   miss: 'Dans l’eau',
+  spotted: 'Navire repéré',
   hit: 'Touché',
   sunk: '{ship} coulé',
   youSunk: 'Ton {ship} est coulé',
@@ -95,10 +94,13 @@ export const NAVAL_BOARD_COPY = {
   you: 'Toi',
   bye: 'Qualifié d’office',
   seconds: '{seconds} s',
-  soundEffects: 'Effets sonores',
-  soundAmbience: 'Ambiance et tension',
-  fireKey: 'Tirer sur {square}',
-  tapToAim: 'Touche une case, puis Feu',
+  fireKey: 'Tirer : {weapon}',
+  aimFirst: 'Vise une case',
+  ammo: 'Munitions',
+  map: 'Carte de la mer',
+  skin: 'Apparence des navires',
+  turnWeapon: 'Tourner l’arme',
+  dragHelp: 'Glisse tes navires sur la mer, touche-les pour les tourner.',
   wreck: 'Épave',
   captainOut: '{name} est éliminé',
   standings: 'Classement',
@@ -119,20 +121,6 @@ export const NAVAL_ROUND_COPY = {
   waiting: 'À venir',
   live: 'En cours',
   done: 'Terminé',
-} as const
-
-/**
- * Feed lines of a table
- * @type {Record<string, string>}
- */
-
-export const NAVAL_FEED_COPY = {
-  MISS: 'a *tiré* dans l’eau en {square}',
-  HIT: 'a *touché* {victim} en {square}',
-  SUNK: 'a *coulé* un navire de {victim} en {square}',
-  SPOTTED: 'a *repéré* un navire de {victim} en {square}',
-  CLEAR: 'a *éclairé* l’eau de {victim} en {square}',
-  OUT: 'a *éliminé* {victim}',
 } as const
 
 /**
@@ -192,3 +180,16 @@ export const NAVAL_RULES_COPY = {
   on: 'Oui',
   off: 'Non',
 } as const
+
+/**
+ * Name of each weapon
+ * @type {Record<NavalWeaponName, string>}
+ */
+
+export const NAVAL_WEAPON_COPY: Record<NavalWeaponName, { label: string; note: string }> = {
+  [NavalWeapons.Cannon]: { label: 'Canon', note: 'Une case, toujours là' },
+  [NavalWeapons.Airstrike]: { label: 'Frappe aérienne', note: 'Une ligne de cases' },
+  [NavalWeapons.Broadside]: { label: 'Bordée', note: 'Une croix de cases' },
+  [NavalWeapons.Flare]: { label: 'Obus éclairant', note: 'Révèle une zone sans toucher' },
+  [NavalWeapons.Torpedo]: { label: 'Torpille', note: 'File droit jusqu’au premier navire' },
+}

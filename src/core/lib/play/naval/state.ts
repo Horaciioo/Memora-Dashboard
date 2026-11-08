@@ -158,3 +158,57 @@ export const sunkToward = (
   target: number
 ): NavalShip[] =>
   board.sunk.filter((entry) => entry.match === match && entry.target === target).map((e) => e.ship)
+
+/**
+ * Strike of one turn: every square it touched
+ * @typedef {Object} NavalStrikeView
+ */
+
+export interface NavalStrikeView {
+  rev: number
+  match: number
+  shooter: number
+  target: number
+  weapon: number
+  orientation: number
+  cells: NavalShotView[]
+}
+
+/**
+ * Shots gathered by strike, one revision each
+ * @param {NavalShotView[]} shots - Shots in order
+ * @return {NavalStrikeView[]} - Strikes in order
+ */
+
+export const strikesOf = (shots: NavalShotView[]): NavalStrikeView[] => {
+  const strikes: NavalStrikeView[] = []
+  for (const shot of shots) {
+    const last = strikes.at(-1)
+    if (last?.rev === shot.rev) {
+      last.cells.push(shot)
+      continue
+    }
+    const { rev, match, shooter, target, weapon, orientation } = shot
+    strikes.push({ rev, match, shooter, target, weapon, orientation, cells: [shot] })
+  }
+
+  return strikes
+}
+
+/**
+ * Strike that sank a ship
+ * @param {NavalStrikeView} strike - Strike
+ * @return {boolean} - A ship went down
+ */
+
+export const isSinking = (strike: NavalStrikeView): boolean =>
+  strike.cells.some((cell) => cell.code === NavalCodes.Sunk)
+
+/**
+ * Strike that struck a ship
+ * @param {NavalStrikeView} strike - Strike
+ * @return {boolean} - Hit or sunk
+ */
+
+export const isStriking = (strike: NavalStrikeView): boolean =>
+  strike.cells.some((cell) => isHitCode(cell.code))

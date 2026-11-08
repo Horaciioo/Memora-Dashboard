@@ -94,5 +94,22 @@
   "winnerXp": {
     "melee": 2,
     "bracket": 3
+  },
+  "view": {
+    "tilt": 14,
+    "perspective": 1600,
+    "startCells": 14,
+    "minCells": 6,
+    "zoomStep": 1.15,
+    "tapSlopPx": 10,
+    "swipePx": 24,
+    "mapFrom": 13
+  },
+  "shake": {
+    "cannon": 3,
+    "airstrike": 9,
+    "broadside": 6,
+    "flare": 0,
+    "torpedo": 5
   }
 }

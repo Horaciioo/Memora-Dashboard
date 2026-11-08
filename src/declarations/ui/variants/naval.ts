@@ -26,6 +26,8 @@ export const NAVAL_BOARD = {
   fire: 'mx-auto w-full max-w-[34rem] [grid-area:fire]',
   mine: 'flex flex-col gap-3 [grid-area:mine] lg:[grid-area:auto]',
   side: 'flex flex-col gap-3 [grid-area:side]',
+  target: 'relative mx-auto w-full',
+  mineSea: 'mx-auto mt-2 w-[min(100%,15rem)] lg:w-full',
   panel: PANEL,
   title: 'text-xs font-black tracking-[0.14em] uppercase text-[var(--play-naval-ink-soft)]',
   sub: 'text-sm font-semibold text-[var(--play-naval-ink-soft)]',
@@ -48,29 +50,6 @@ export const NAVAL_HUD = {
   clockFill: 'naval-clock-fill block h-full w-full rounded-full bg-[var(--play-naval-glow)]',
   clockAlert: 'bg-[var(--play-naval-danger)]',
   seconds: 'min-w-9 text-right text-lg font-black tabular-nums',
-  keys: 'flex shrink-0 gap-1.5',
-  soundKey: `${KEY} size-11 bg-white/10 px-0 text-[var(--play-naval-ink)] hover:bg-white/20 aria-pressed:bg-[var(--play-naval)] aria-pressed:text-white`,
-  soundIcon: 'size-5',
-} as const
-
-/**
- * One sea: frame, labels, grid
- * @type {Record<string, string>}
- */
-
-export const NAVAL_SEA_UI = {
-  frame:
-    'grid grid-cols-[1.1rem_1fr] grid-rows-[1.1rem_1fr] gap-x-1 gap-y-0.5 text-[0.65rem] font-black text-[var(--play-naval-ink-soft)]',
-  frameMini: 'grid-cols-[0.7rem_1fr] grid-rows-[0.7rem_1fr] text-[0.5rem]',
-  columns: 'col-start-2 grid',
-  rows: 'row-start-2 grid',
-  label: 'grid place-items-center leading-none',
-  sea: 'naval-sea col-start-2 row-start-2',
-  live: 'naval-sea-live',
-  cells: 'naval-cells',
-  cell: 'naval-cell',
-  ships: 'pointer-events-none absolute inset-0',
-  effects: 'pointer-events-none absolute inset-0 overflow-hidden',
 } as const
 
 /**
@@ -94,19 +73,6 @@ export const NAVAL_FOES = {
 } as const
 
 /**
- * Aim readout and fire key
- * @type {Record<string, string>}
- */
-
-export const NAVAL_FIRE = {
-  bar: `${PANEL} flex items-center gap-3`,
-  target: 'flex min-w-0 flex-1 flex-col',
-  square: 'text-3xl leading-8 font-black tabular-nums text-[var(--play-naval-reticle)]',
-  hint: 'truncate text-sm font-semibold text-[var(--play-naval-ink-soft)]',
-  fire: `${KEY} naval-fire min-h-14 min-w-32 bg-[var(--play-naval-hit)] text-lg text-white shadow-[0_0.3rem_0_#a3270f] hover:bg-[#ff6e4d] active:translate-y-0.5 active:shadow-[0_0.1rem_0_#a3270f]`,
-} as const
-
-/**
  * Placement screen
  * @type {Record<string, string>}
  */
@@ -127,6 +93,11 @@ export const NAVAL_PLACE = {
   ready: 'flex flex-col gap-1.5',
   readyRow: 'flex items-center gap-2 text-sm font-semibold',
   readyOff: 'opacity-55',
+  heading: 'text-xl font-black',
+  skins: 'mt-2 grid grid-cols-2 gap-2',
+  skin: 'flex min-h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-2.5 text-sm font-bold',
+  skinOn: 'border-[var(--play-naval-reticle)] bg-white/15',
+  swatch: 'h-3 w-7 rounded-full',
 } as const
 
 /**
@@ -194,6 +165,39 @@ export const NAVAL_SETUP = setupStyles(
  */
 
 export const NAVAL_HUB = {
-  scene: 'naval-scene pointer-events-none fixed inset-0 z-0 overflow-hidden',
-  layer: 'absolute inset-x-0',
+  scene: 'pointer-events-none fixed inset-0 z-0 overflow-hidden',
+  photo: 'object-cover',
+  veil: 'naval-hub-veil absolute inset-0',
+} as const
+
+/**
+ * Canvas sea and its mini map
+ * @type {Record<string, string>}
+ */
+
+export const NAVAL_OCEAN = {
+  box: 'naval-ocean relative aspect-square w-full touch-none select-none',
+  dim: 'naval-ocean-dim',
+  canvas: 'naval-ocean-canvas block size-full rounded-[1rem]',
+  map: 'absolute top-2 right-2 z-10 aspect-square w-[22%] max-w-32 cursor-pointer rounded-lg border border-white/20 [image-rendering:pixelated]',
+} as const
+
+/**
+ * Weapon row, ammo line and action key
+ * @type {Record<string, string>}
+ */
+
+export const NAVAL_ARSENAL = {
+  root: 'flex flex-col gap-2 rounded-2xl border border-white/10 bg-[var(--play-naval-panel)] p-2.5 backdrop-blur-sm',
+  idle: 'opacity-80',
+  row: 'grid grid-cols-5 gap-1.5',
+  key: 'relative grid aspect-square min-h-12 place-items-center rounded-xl border border-white/10 bg-white/5 text-[var(--play-naval-ink)] transition-[transform,opacity] duration-150 active:scale-95 disabled:opacity-30',
+  keyOn: 'border-[var(--play-naval-reticle)] bg-white/15 text-[var(--play-naval-reticle)]',
+  glyph: 'size-7 fill-current',
+  cost: 'absolute top-0.5 right-1 text-[0.65rem] font-black tabular-nums',
+  ammo: 'flex gap-1',
+  pip: 'h-1.5 flex-1 rounded-full bg-white/10',
+  pipOn: 'bg-[var(--play-naval-reticle)]',
+  fire: 'min-h-12 rounded-xl bg-[var(--play-naval-hit)] px-4 text-lg font-black text-white transition-transform active:scale-[0.98] disabled:bg-white/10 disabled:text-[var(--play-naval-ink-soft)]',
+  wait: 'grid min-h-12 place-items-center text-center text-base font-black text-[var(--play-naval-ink-soft)]',
 } as const

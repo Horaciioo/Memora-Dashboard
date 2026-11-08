@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { cueDefeat, cueVictory } from '@/composites/play/naval/audio/cues'
+import { playNaval } from '@/composites/play/naval/sound'
 import type { NavalCaptainView } from '@/composites/play/naval/captains'
 import { PlayPodium } from '@/composites/play/results/PlayPodium'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -52,8 +52,8 @@ export const NavalResult = ({
   // Fanfare or lament once, for those who played
   useEffect(() => {
     if (viewer < 0) return
-    if (isWinner) cueVictory()
-    else cueDefeat()
+    if (isWinner) playNaval('bell')
+    else playNaval('sinking', 0.7)
   }, [viewer, isWinner])
 
   return (

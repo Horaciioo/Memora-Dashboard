@@ -1,6 +1,7 @@
 export * from '@/core/lib/play/naval/ai'
 export * from '@/core/lib/play/naval/battle'
 export * from '@/core/lib/play/naval/bracket'
+export * from '@/core/lib/play/naval/camera'
 export * from '@/core/lib/play/naval/fleet'
 export * from '@/core/lib/play/naval/outcome'
 export * from '@/core/lib/play/naval/settings'

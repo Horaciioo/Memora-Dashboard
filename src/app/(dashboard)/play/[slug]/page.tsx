@@ -12,7 +12,7 @@ import { PlayHubMenu } from '@/composites/play/hub/PlayHubMenu'
 import { PlayLeaderboard } from '@/composites/play/hub/PlayLeaderboard'
 import { PlayLiveTables } from '@/composites/play/hub/PlayLiveTables'
 import { PlayEmbers } from '@/composites/play/hub/PlayEmbers'
-import { NavalHubScene } from '@/composites/play/naval/NavalHubScene'
+import { NavalHubPhoto } from '@/composites/play/naval/NavalHubPhoto'
 import { LudoHopField } from '@/composites/play/ludo/LudoHopField'
 import { PlayPaperWords } from '@/composites/play/hub/PlayPaperWords'
 import { PlaySignal } from '@/composites/play/hub/PlaySignal'
@@ -53,7 +53,7 @@ const GROUND_LAYERS: Record<string, ComponentType> = {
   [BOMB_EMBERS.ground]: PlayEmbers,
   [GOLF_TURF.ground]: GolfPanorama,
   [LUDO_FELT.ground]: LudoHopField,
-  [NAVAL_SEA.ground]: NavalHubScene,
+  [NAVAL_SEA.ground]: NavalHubPhoto,
 }
 
 interface PlayGamePageProps {
