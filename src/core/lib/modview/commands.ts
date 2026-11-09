@@ -55,6 +55,8 @@ export const formatDuration = (seconds: number): string => {
 export type ChatCommandResult =
   | { kind: 'say'; text: string }
   | { kind: 'intent'; intent: ModViewIntent; target: Chatter | null }
+  | { kind: 'open'; target: Chatter }
+  | { kind: 'pollForm' }
   | { kind: 'error'; reason: 'unknownCommand' | 'unknownUser' | 'badDuration' | 'missingUser' }
 
 /**
@@ -76,8 +78,11 @@ export const parseChatCommand = (
   const option = findChatCommand(head)
   if (!option) return { kind: 'error', reason: 'unknownCommand' }
 
+  // The form says the rest
+  if (option.name === 'poll') return { kind: 'pollForm' }
+
   // Channel modes aim at nobody
-  if (option.probe.kind === 'mode') {
+  if (option.probe?.kind === 'mode') {
     const { mode, enabled } = option.probe
     if (mode !== 'slow' || !enabled) return { kind: 'intent', target: null, intent: option.probe }
 
@@ -92,6 +97,9 @@ export const parseChatCommand = (
 
   const target = findChatter(user.replace(/^@/, ''))
   if (!target) return { kind: 'error', reason: 'unknownUser' }
+
+  // The folder opens here, nothing goes to the chat
+  if (!option.probe) return { kind: 'open', target }
 
   if (option.name === 'timeout') {
     const [duration = '', ...words] = rest

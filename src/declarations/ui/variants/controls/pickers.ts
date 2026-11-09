@@ -196,6 +196,19 @@ export const COLOUR_FIELD_STYLES = {
 } as const
 
 /**
+ * Free colour wheel styles
+ * @type {Record<string, string>}
+ */
+
+export const COLOUR_WHEEL_STYLES = {
+  root: 'flex flex-col items-center gap-4',
+  wheel:
+    'relative size-52 cursor-crosshair touch-none rounded-full bg-[radial-gradient(circle,white,transparent_70%),conic-gradient(red,yellow,lime,cyan,blue,magenta,red)] shadow-[var(--shadow-sm)]',
+  knob: 'pointer-events-none absolute size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[var(--shadow-md)]',
+  slider: 'h-3 w-52 cursor-pointer appearance-none rounded-full',
+} as const
+
+/**
  * Colour swatches styles
  * @type {Record<string, string>}
  */

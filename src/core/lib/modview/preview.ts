@@ -13,7 +13,7 @@ export type PreviewSeat = MemberRoleName | 'COORDINATOR'
 
 // Live batches as declared
 const LIVE_BATCHES = GRANT_ADDITIONS.filter((addition) =>
-  ['live-modview', 'live-chat-modes-by-seat'].includes(addition.key)
+  ['live-modview', 'live-chat-modes-by-seat', 'live-poll'].includes(addition.key)
 )
 
 // Permissions a role holds, denies apart

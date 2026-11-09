@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/page/PageHeader'
+import { LiveHub } from '@/composites/lives/hub/LiveHub'
 import { LivesBoard } from '@/composites/lives/LivesBoard'
+import { readLiveHub } from '@/core/services/lives/LiveHubService'
 import { listOpenLives, listPastLives, listRecentLives } from '@/core/services/lives/LiveService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -22,7 +23,8 @@ export default async function LivesPage() {
   const canAnnounce = access.can(Permissions.LiveAnnounce)
   const canReadLogs = access.can(Permissions.LiveLogRead)
 
-  const [lives, recent, past] = await Promise.all([
+  const [hub, lives, recent, past] = await Promise.all([
+    readLiveHub(perimeter, session.id),
     listOpenLives(perimeter, session.id, session.permissions),
     listRecentLives(perimeter, session.id, session.permissions),
     // Past lives shown on demand: all for the Bilan readers, the ones coordinated for the others
@@ -37,8 +39,9 @@ export default async function LivesPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={LIVE_COPY.title} />
+      <LiveHub creators={hub} initialId={perimeter.activeYoutuberId} />
       <LivesBoard
+        isEmbedded
         initialLives={lives}
         initialRecent={recent}
         canAnnounce={canAnnounce}

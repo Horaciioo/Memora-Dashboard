@@ -39,13 +39,6 @@ export const APP_ENVIRONMENT = resolveEnvironment()
 export const WELCOMES_EVERY_ACCOUNT = APP_ENVIRONMENT === 'dev' || APP_ENVIRONMENT === 'staging'
 
 /**
- * Whether the first visit starts over at every refresh, to be lived while it is built
- * @type {boolean}
- */
-
-export const REPLAYS_TOUR_ON_REFRESH = APP_ENVIRONMENT === 'dev'
-
-/**
  * Environment manifests
  * @type {Record<Environment, EnvironmentManifest>}
  */

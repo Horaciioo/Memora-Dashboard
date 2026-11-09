@@ -23,7 +23,7 @@ const QUEUE_FACTOR = 4
  * @property {number} seq - Last flush
  */
 
-export type RoomMemory = Pick<ModViewState, 'messages' | 'acts' | 'held' | 'pinned' | 'viewers'> & {
+export type RoomMemory = Pick<ModViewState, 'messages' | 'acts' | 'held' | 'pinned' | 'poll' | 'viewers'> & {
   seq: number
 }
 
@@ -78,6 +78,7 @@ const memoryOf = (room: LiveRoom): RoomMemory => ({
   acts: room.view.acts,
   held: room.view.held,
   pinned: room.view.pinned,
+  poll: room.view.poll,
   viewers: room.view.viewers,
   seq: room.seq,
 })

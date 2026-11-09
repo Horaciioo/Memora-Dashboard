@@ -142,6 +142,7 @@ export const PERMISSION_OWNERS: Partial<Record<PermissionName, string>> = {
   [Permissions.LiveUnbanRequest]: 'Jérémy et aux Responsables',
   [Permissions.LiveTerms]: 'Jérémy, aux Responsables et au Coordinateur',
   [Permissions.LivePin]: 'Jérémy, aux Responsables et au Coordinateur',
+  [Permissions.LivePoll]: 'l’équipe de modération, hors Juniors',
   [Permissions.LiveCrisisChat]: 'Jérémy',
 }
 
@@ -178,9 +179,9 @@ const COMMUNITY_GROUP_MAP: Record<keyof ModViewState['community'], CommunityGrou
     target: 'broadcaster',
   },
   moderators: { label: 'Modérateurs', icon: 'shield', empty: 'Personne', target: 'moderators' },
-  vips: { label: 'VIP', icon: 'vip', empty: 'Personne', target: 'vips' },
+  vips: { label: 'VIP', icon: 'star', empty: 'Personne', target: 'vips' },
   bots: { label: 'Bots de chat', icon: 'chatBot', empty: 'Aucun bot', target: null },
-  viewers: { label: 'Spectateurs', icon: 'viewer', empty: 'Personne', target: null },
+  viewers: { label: 'Viewers', icon: 'members', empty: 'Personne', target: null },
 }
 
 export const MODVIEW_COMMUNITY_GROUPS = createRegistry(COMMUNITY_GROUP_MAP)
@@ -240,6 +241,7 @@ const CHAT_OPTION_MAP = {
   deleted: { label: 'Garder le texte des messages supprimés' },
   firstMessages: { label: 'Encadrer les premiers messages' },
   colouredNames: { label: 'Afficher les pseudos en couleur' },
+  hideBots: { label: 'Masquer les messages des bots' },
 }
 
 export const CHAT_OPTIONS = createRegistry(CHAT_OPTION_MAP)
@@ -261,6 +263,32 @@ export const PAUSE_MODES = createRegistry(PAUSE_MODE_MAP)
 export type PauseModeName = keyof typeof PAUSE_MODE_MAP
 
 /**
+ * Sizes of the chat text, one at a time
+ * @type {Record<TextSizeName, { label: string }>}
+ */
+
+const TEXT_SIZE_MAP = {
+  small: { label: 'Petit' },
+  normal: { label: 'Normal' },
+  large: { label: 'Grand' },
+}
+
+export const TEXT_SIZES = createRegistry(TEXT_SIZE_MAP)
+
+/**
+ * Room around each chat line, one at a time
+ * @type {Record<DensityName, { label: string }>}
+ */
+
+const DENSITY_MAP = {
+  compact: { label: 'Serré' },
+  normal: { label: 'Normal' },
+  airy: { label: 'Aéré' },
+}
+
+export const DENSITIES = createRegistry(DENSITY_MAP)
+
+/**
  * Where the gestures of a chat line show, one at a time
  * @type {Record<ToolsPositionName, { label: string }>}
  */
@@ -268,6 +296,8 @@ export type PauseModeName = keyof typeof PAUSE_MODE_MAP
 const TOOLS_POSITION_MAP = {
   left: { label: 'À gauche, toujours visibles' },
   hover: { label: 'Au survol de la ligne' },
+  right: { label: 'À droite, toujours visibles' },
+  card: { label: 'Seulement dans la carte du viewer' },
 }
 
 export const TOOLS_POSITIONS = createRegistry(TOOLS_POSITION_MAP)

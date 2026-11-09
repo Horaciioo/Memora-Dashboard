@@ -4,14 +4,12 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import { ROUTES } from '@/declarations/navigation'
-import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { HOME_LIVE, LIVE_URGENT } from '@/declarations/ui/variants'
+import { HOME_LIVE } from '@/declarations/ui/variants'
 import type { LiveBeacon } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { LiveStatuses } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
-import { formatDayTime } from '@/utils/format/time/dates'
 
 /**
  * Platform name with its glyph
@@ -53,7 +51,7 @@ export interface HomeLiveCallProps {
 }
 
 /**
- * A card per live in progress, the creator's logo on its right, then a line per announced live
+ * A card per live in progress, the creator's logo on its right
  * @param {LiveBeacon | null} beacon - Open lives
  * @return {JSX.Element | null}
  */
@@ -63,7 +61,6 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
 
   const DotIcon = ICONS.liveDot
   const onAir = beacon.lives.filter((live) => live.status === LiveStatuses.Live)
-  const announced = beacon.lives.filter((live) => live.status !== LiveStatuses.Live)
 
   return (
     <>
@@ -95,7 +92,7 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
                   </p>
                   <div className={HOME_LIVE.actions}>
                     <Link
-                      href={ROUTES.live(live.id)}
+                      href={ROUTES.lives}
                       className={cn(HOME_LIVE.join, HOME_LIVE.joinTone[live.platform])}
                     >
                       {LIVE_COPY.liveJoin}
@@ -116,27 +113,6 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
             )
           })}
         </div>
-      )}
-
-      {announced.length > 0 && (
-        <section className={LIVE_URGENT.section}>
-          <h2 className={LIVE_URGENT.label}>{PERSONAL_COPY.urgentTitle}</h2>
-          <ul className={LIVE_URGENT.list}>
-            {announced.map((live) => (
-              <li key={live.id}>
-                <Link href={ROUTES.lives} className={cn(LIVE_URGENT.row, LIVE_URGENT.rowAnnounced)}>
-                  <DotIcon className={LIVE_URGENT.dot} />
-                  <span className={LIVE_URGENT.text}>
-                    {LIVE_COPY.urgentAnnounced
-                      .replace('{creator}', live.creator)
-                      .replace('{time}', formatDayTime(live.plannedStartAt))}
-                  </span>
-                  <span className={LIVE_URGENT.go}>{LIVE_COPY.urgentOpen}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
       )}
     </>
   )

@@ -52,6 +52,7 @@ export const HELIX_PATHS = {
   chatSettings: '/chat/settings',
   chatSend: '/chat/messages',
   pins: '/chat/pins',
+  polls: '/polls',
   games: '/games',
   banned: '/moderation/banned',
   channels: '/channels',
@@ -61,6 +62,9 @@ export const HELIX_PATHS = {
   chatters: '/chat/chatters',
   subscriptions: '/eventsub/subscriptions',
 } as const
+
+// Held by the channel owner to run polls
+export const TWITCH_POLL_SCOPE = 'channel:manage:polls'
 
 /**
  * Scopes asked of a moderator
@@ -83,6 +87,7 @@ export const TWITCH_SCOPES: readonly string[] = [
   'moderator:manage:automod',
   'moderator:manage:blocked_terms',
   'moderator:manage:unban_requests',
+  TWITCH_POLL_SCOPE,
 ]
 
 /**

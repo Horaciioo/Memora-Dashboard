@@ -116,7 +116,7 @@
 }
 
 /* Apple frost: milky tint over a strong blur, lit edge, the rail ground glows through */
-.rail-ground .glass-panel:not(.fixed, .shortcut-fresh, [aria-current='page']) {
+.rail-ground .glass-panel:not(.fixed, .shortcut-fresh, .shortcut-live, [aria-current='page']) {
   background: var(--frost-fill);
   -webkit-backdrop-filter: blur(var(--frost-blur)) saturate(var(--frost-saturate));
   backdrop-filter: blur(var(--frost-blur)) saturate(var(--frost-saturate));
@@ -125,12 +125,12 @@
 }
 
 .rail-ground
-  .glass-panel:not(.fixed, .shortcut-fresh, .rail-footer-box, [aria-current='page']):hover {
+  .glass-panel:not(.fixed, .shortcut-fresh, .shortcut-live, .rail-footer-box, [aria-current='page']):hover {
   background: linear-gradient(rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.14)), var(--frost-fill);
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .rail-ground .glass-panel:not(.fixed, .shortcut-fresh, [aria-current='page']) {
+  .rail-ground .glass-panel:not(.fixed, .shortcut-fresh, .shortcut-live, [aria-current='page']) {
     background: var(--color-surface-raised);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -146,6 +146,21 @@
       color-mix(in srgb, var(--color-frame-mauve) var(--footer-wash-end, 38%), transparent)
     ),
     var(--frost-fill);
+}
+
+/* A live on air: red box, the glyph pulses */
+.rail-shortcuts .shortcut-live {
+  background: var(--color-danger);
+  border-color: color-mix(in srgb, var(--color-danger) 60%, white);
+  color: white;
+}
+
+.rail-shortcuts .shortcut-live:hover {
+  color: white;
+}
+
+.shortcut-live svg {
+  animation: live-pulse var(--motion-duration-pulse) ease-in-out infinite;
 }
 
 /* Unread note: gold box, white glyph, a band of light crossing it on its own */

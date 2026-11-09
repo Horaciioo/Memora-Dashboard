@@ -43,10 +43,6 @@ export const INSTALL_ROUTE_COPY: Record<Exclude<InstallRoute, null>, string> = {
  */
 
 export const LIFECYCLE_COPY = {
-  updateWord: 'Hop !',
-  updateTitle: 'Memora a une nouvelle version',
-  updateLead: 'Recharge pour en profiter.',
-  updateAction: 'Recharger',
   offlineBanner: 'Tu es hors ligne. Ce que tu modifies ne partira qu’au retour de la connexion.',
   offlineTitle: 'Hors ligne',
   offlineLead:

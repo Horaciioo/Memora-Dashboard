@@ -1,5 +1,7 @@
 'use client'
 
+import { useSyncExternalStore } from 'react'
+
 import Link from '@/components/elements/navigation/AppLink'
 
 import { useFreshRelease } from '@/core/hooks/data/system/useFreshRelease'
@@ -17,8 +19,15 @@ import { HOME_FLOW } from '@/declarations/ui/variants'
 export const HomeNews = () => {
   const { release, isFresh } = useFreshRelease()
 
+  // Server and hydration render nothing
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  )
+
   // Gone once read
-  if (!release || !isFresh) return null
+  if (!isClient || !release || !isFresh) return null
 
   const StarIcon = ICONS.news
 

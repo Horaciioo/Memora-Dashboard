@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ColourWheel } from '@/components/elements/forms/pickers/ColourWheel'
 import { ColourSwatches } from '@/components/elements/forms/pickers/ColourSwatches'
 import { Dialog } from '@/components/structures/overlays/Dialog'
 import { COLOUR_COPY } from '@/declarations/ui/copy'
@@ -16,6 +17,8 @@ export interface ColourFieldProps {
   disabled?: boolean
   invalid?: boolean
   describedBy?: string
+  // Free wheel above the palette
+  hasWheel?: boolean
 }
 
 /**
@@ -27,6 +30,7 @@ export interface ColourFieldProps {
  * @param {boolean} [disabled] - Blocks the control
  * @param {boolean} [invalid] - Paints the rejection border
  * @param {string} [describedBy] - Identifier of the describing message
+ * @param {boolean} [hasWheel] - Free wheel above the palette
  * @return {JSX.Element}
  */
 
@@ -38,6 +42,7 @@ export const ColourField = ({
   disabled,
   invalid,
   describedBy,
+  hasWheel,
 }: ColourFieldProps) => {
   const [open, setOpen] = useState(false)
   const picked = isHexColour(value)
@@ -68,6 +73,7 @@ export const ColourField = ({
 
       <Dialog open={open} onClose={() => setOpen(false)} title={label} size="sm">
         <div className={COLOUR_FIELD_STYLES.dialog}>
+          {hasWheel && <ColourWheel value={value} disabled={disabled} onChange={onChange} />}
           <ColourSwatches
             id={`${id}-swatches`}
             value={value}

@@ -28,18 +28,21 @@ import {
 import type { TwitchSeat } from '@/core/lib/platforms/twitch/helix'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readLive } from '@/core/services/lives/LiveService'
+import { announceLivePoll, syncLivePoll } from '@/core/services/lives/LivePollService'
 import { pollLiveState } from '@/core/services/lives/LiveStatePoller'
 import { activeSuspension } from '@/core/services/members/admin/SuspensionService'
 import { logMemoraGesture, settleGesture } from '@/core/services/lives/ModerationLogService'
 import { twitchChannelOf } from '@/core/services/platforms/ChannelService'
 import {
   markTwitchRevoked,
+  readChannelOwnerSeat,
+  readTwitchEmblems,
   readTwitchRoster,
   readTwitchSeat,
 } from '@/core/services/platforms/PlatformAccountService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
-import { MODVIEW_LOCK_COPY } from '@/declarations/modview/copy'
+import { MODVIEW_LOCK_COPY, MODVIEW_POLL_COPY } from '@/declarations/modview/copy'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
 import { formatDay } from '@/utils/format/time/dates'
 import type { LiveView } from '@/types/lives'
@@ -271,7 +274,8 @@ export const openModView = async (
   if (live.access !== 'open') throw conflict()
   // Seat read once, a Twitch live always has one past this check
   const found = await requireChannelModerator(viewerId, live)
-  let state: ModViewState = { ...baseState(live), roster: await readTwitchRoster() }
+  const [roster, emblems] = await Promise.all([readTwitchRoster(), readTwitchEmblems()])
+  let state: ModViewState = { ...baseState(live), roster, emblems }
 
   // The player needs no seat, only the channel
   const channelLogin = found?.login ?? null
@@ -338,6 +342,7 @@ export const openModView = async (
       acts: room.acts,
       held: room.held,
       pinned: room.pinned === undefined ? state.pinned : room.pinned,
+      poll: room.poll,
       viewers: room.viewers === undefined ? state.viewers : room.viewers,
     }
   }
@@ -406,6 +411,12 @@ export const actOnLive = async (input: {
     throw forbidden()
   }
 
+  // Twitch runs polls on the channel owner's token
+  const isPoll = input.intent.kind === 'poll' || input.intent.kind === 'pollEnd'
+  const owner = isPoll ? await readChannelOwnerSeat(found.seat.broadcasterId) : null
+  if (isPoll && !owner) throw forbidden(MODVIEW_POLL_COPY.noCreator)
+  const seat = owner?.seat ?? found.seat
+
   // A double click lands once
   const gestureKey = `${input.liveId}:${input.viewerId}:${input.key}`
   if (!(await claimGestureKey(gestureKey))) return { done: false }
@@ -427,7 +438,7 @@ export const actOnLive = async (input: {
   })
 
   try {
-    await performOnTwitch(input.intent, found.seat)
+    await performOnTwitch(input.intent, seat)
   } catch (error) {
     // A failed gesture may be retried
     await releaseGestureKey(gestureKey)
@@ -436,7 +447,7 @@ export const actOnLive = async (input: {
       false,
       error instanceof PlatformError ? String(error.status) : 'error'
     )
-    throw await translateRefusal(error, input.viewerId)
+    throw await translateRefusal(error, owner?.accountId ?? input.viewerId)
   }
   await settleGesture(logId, true)
 
@@ -450,6 +461,14 @@ export const actOnLive = async (input: {
     } catch (error) {
       throw await translateRefusal(error, input.viewerId)
     }
+  }
+
+  // The poll shows at once
+  if (input.intent.kind === 'poll') {
+    void announceLivePoll(input.liveId, seat, found.memberLogin).catch(() => null)
+  }
+  if (input.intent.kind === 'pollEnd') {
+    void syncLivePoll(input.liveId, seat.broadcasterId).catch(() => null)
   }
 
   // The pin shows at once

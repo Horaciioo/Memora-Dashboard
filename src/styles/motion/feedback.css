@@ -681,3 +681,35 @@
     animation: none;
   }
 }
+
+/* Page content swapping to another creator */
+@keyframes hub-swap {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.hub-swap {
+  animation: hub-swap var(--motion-duration-slow) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Banner swapping to another creator, opacity only so it stays anchored to the page */
+@keyframes hub-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.hub-fade {
+  animation: hub-fade var(--motion-duration-slow) ease-out both;
+}

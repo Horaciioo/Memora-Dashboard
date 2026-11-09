@@ -92,7 +92,7 @@ export const resolveLive: Resolver = async (context) => {
 
   return goTo({
     intent,
-    href: isReport ? ROUTES.liveReport(live.id) : ROUTES.live(live.id),
+    href: isReport ? ROUTES.liveReport(live.id) : ROUTES.lives,
     reply: fill(isReport ? ASSISTANT_COPY.liveReport : ASSISTANT_COPY.liveOpen, { name }),
     memory: { live: { id: live.id, label: name } },
   })

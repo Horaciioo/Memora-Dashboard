@@ -33,6 +33,8 @@ export const LIVE_COPY = {
   urgentAnnounced: 'Live de {creator} prévu le {time}',
   urgentOpen: 'Rejoindre',
   liveBadge: 'En direct',
+  railLive: '{creator} est en live !',
+  dismiss: 'Masquer',
   liveNow: '{creator} est {strong} sur {platform}, on le rejoint ?',
   liveNowStrong: 'actuellement en Live',
   reinforceNow: 'Tu as été demandé en renfort pour modérer sur {platform} !',

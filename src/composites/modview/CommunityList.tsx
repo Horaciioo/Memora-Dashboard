@@ -28,18 +28,22 @@ export interface CommunityListProps {
 
 export const CommunityList = ({ community, spotlight, skip = [], onPick }: CommunityListProps) => {
   const [search, setSearch] = useState('')
+  const SearchIcon = ICONS.search
   const needle = search.trim().toLowerCase()
 
   return (
     <>
       <div className={MODVIEW_COMMUNITY.search}>
-        <input
-          className={MODVIEW_COMMUNITY.input}
-          placeholder={MODVIEW_COPY.searchCommunity}
-          aria-label={MODVIEW_COPY.searchCommunity}
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+        <label className={MODVIEW_COMMUNITY.field}>
+          <SearchIcon className={MODVIEW_COMMUNITY.searchIcon} aria-hidden="true" />
+          <input
+            className={MODVIEW_COMMUNITY.input}
+            placeholder={MODVIEW_COPY.searchCommunity}
+            aria-label={MODVIEW_COPY.searchCommunity}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
       </div>
       {MODVIEW_COMMUNITY_GROUPS.keys
         .filter((key) => !skip.includes(key))
@@ -56,10 +60,14 @@ export const CommunityList = ({ community, spotlight, skip = [], onPick }: Commu
                 group.target !== null && spotlight === group.target && MODVIEW_COMMUNITY.groupLit
               )}
             >
-              <p className={MODVIEW_COMMUNITY.groupHead}>
-                <Icon className={MODVIEW_COMMUNITY.groupIcon} aria-hidden="true" />
-                {group.label}
-              </p>
+              <div className={MODVIEW_COMMUNITY.groupHead}>
+                <span className={MODVIEW_COMMUNITY.groupRule} aria-hidden="true" />
+                <p className={MODVIEW_COMMUNITY.groupName}>
+                  <Icon className={MODVIEW_COMMUNITY.groupIcon} aria-hidden="true" />
+                  {group.label}
+                </p>
+                <span className={MODVIEW_COMMUNITY.groupRule} aria-hidden="true" />
+              </div>
               {members.length === 0 ? (
                 <p className={MODVIEW_COMMUNITY.empty}>{group.empty}</p>
               ) : (

@@ -51,7 +51,7 @@ export const MODVIEW_COPY = {
   unpin: 'Désépingler',
   pinned: 'Message épinglé',
   pinnedBy: 'par {name}',
-  viewers: 'Spectateurs',
+  viewers: 'Viewers',
   streamTimer: 'Durée du stream Twitch',
   synced: 'Synchronisé',
   refreshStream: 'Rafraîchir le live',
@@ -90,6 +90,8 @@ export const MODVIEW_COPY = {
   preferencesDisplay: 'Affichage',
   preferencesPause: 'Mettre le chat en pause',
   preferencesTools: 'Icônes de modération',
+  preferencesText: 'Taille du texte',
+  preferencesDensity: 'Espacement des messages',
   keepResolved: 'Garder les messages traités',
   keepResolvedHint: 'Un message accepté ou refusé reste dans la file, marqué comme résolu.',
   dropResolved: 'Retirer les messages traités',
@@ -119,7 +121,7 @@ export const MODVIEW_COPY = {
   disconnected: 'Déconnecté(e)',
   scripted: 'Scène de formation',
   noEmbed: 'Le flux apparaît ici dès que la chaîne est en direct.',
-  searchCommunity: 'Filtre',
+  searchCommunity: 'Recherche un viewer',
   refresh: 'Rafraîchir',
   reload: 'Resynchroniser le live',
   ago: 'il y a {time}',
@@ -249,6 +251,46 @@ export const MODVIEW_COMMAND_COPY = {
   badDuration: 'Durée illisible : écris 600, 10m, 1h ou 1d.',
   missingUser: 'Précise le viewer après la commande.',
   refused: 'Cette action de Mod. t’est grisée : {reason}',
+} as const
+
+/**
+ * Copy of polls
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_POLL_COPY = {
+  title: 'Sondage',
+  results: 'Résultats du sondage',
+  startedBy: 'lancé par {name}',
+  startedOnTwitch: 'lancé depuis Twitch',
+  end: 'Terminer',
+  fold: 'Plier',
+  unfold: 'Déplier',
+  vote: '{count} vote',
+  votes: '{count} votes',
+  voter: '{count} votant',
+  voters: '{count} votants',
+  left: '{clock} restantes',
+  finished: 'Terminé',
+  createTitle: 'Créer un sondage',
+  question: 'Question',
+  questionPlaceholder: 'Pose ta question au chat',
+  choices: 'Choix',
+  choice: 'Choix {rank}',
+  addChoice: 'Ajouter un choix',
+  removeChoice: 'Retirer ce choix',
+  duration: 'Durée',
+  minutes: '{count} min',
+  points: 'Votes supplémentaires avec les points de chaîne',
+  pointsCost: 'Points par vote supplémentaire',
+  cancel: 'Annuler',
+  start: 'Lancer le sondage',
+  deniedTitle: 'Sondage',
+  denied: 'Tu n’as pas la permission d’effectuer un sondage, désolé !',
+  deniedClose: 'Compris',
+  running: 'Un sondage est déjà en cours.',
+  noCreator:
+    'Le créateur doit relier son compte Twitch à Memora pour que l’on puisse lancer un sondage.',
 } as const
 
 /**

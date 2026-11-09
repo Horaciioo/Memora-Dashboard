@@ -53,3 +53,62 @@ export const readableOnTheme = (hex: string): string => {
   // Perceived lightness held between the floor and the ceiling of the theme
   return normal ? `oklch(from ${normal} clamp(var(--chat-l-min), l, var(--chat-l-max)) c h)` : hex
 }
+
+/**
+ * Hue, saturation and brightness of a colour, each from 0 to 1 (hue in degrees)
+ * @typedef {Object} Hsv
+ */
+
+export interface Hsv {
+  h: number
+  s: number
+  v: number
+}
+
+/**
+ * Hexadecimal colour of a hue, saturation and brightness
+ * @param {Hsv} hsv - Wheel position
+ * @return {string} - Six digit hexadecimal
+ */
+
+export const hsvToHex = ({ h, s, v }: Hsv): string => {
+  const channel = (offset: number) => {
+    const k = (offset + h / 60) % 6
+
+    return v - v * s * Math.max(0, Math.min(k, 4 - k, 1))
+  }
+
+  return `#${[5, 3, 1]
+    .map((offset) =>
+      Math.round(channel(offset) * 255)
+        .toString(16)
+        .padStart(2, '0')
+    )
+    .join('')}`
+}
+
+/**
+ * Wheel position of a hexadecimal colour
+ * @param {string} hex - Stored colour
+ * @return {Hsv} - Hue, saturation and brightness, white when unreadable
+ */
+
+export const hexToHsv = (hex: string): Hsv => {
+  const digits = normaliseHex(hex)
+  if (!digits) return { h: 0, s: 0, v: 1 }
+  const [red, green, blue] = [1, 3, 5].map(
+    (start) => parseInt(digits.slice(start, start + 2), 16) / 255
+  ) as [number, number, number]
+  const max = Math.max(red, green, blue)
+  const delta = max - Math.min(red, green, blue)
+  const sector =
+    delta === 0
+      ? 0
+      : max === red
+        ? ((green - blue) / delta) % 6
+        : max === green
+          ? (blue - red) / delta + 2
+          : (red - green) / delta + 4
+
+  return { h: (sector * 60 + 360) % 360, s: max === 0 ? 0 : delta / max, v: max }
+}

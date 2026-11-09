@@ -307,7 +307,6 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'play',
         permission: Permissions.PlayAccess,
         maturity: 'alpha',
-        quick: true,
       },
       {
         href: ROUTES.calendar,
@@ -416,11 +415,12 @@ export const NAVIGATION: NavigationGroup[] = [
     items: [
       {
         href: ROUTES.lives,
-        label: 'Live en cours',
+        label: 'Live',
         icon: 'liveDot',
         permission: Permissions.LiveRead,
         maturity: 'alpha',
         onLive: true,
+        quick: true,
       },
       {
         href: ROUTES.sanctions,

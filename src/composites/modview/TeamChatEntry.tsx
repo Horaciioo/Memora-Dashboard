@@ -38,7 +38,7 @@ export const TeamChatEntry = ({
 
   return (
     <PanelButton
-      icon="chat"
+      icon="teamChat"
       label={COPY.title}
       isOpen={isOpen}
       onToggle={onToggle}

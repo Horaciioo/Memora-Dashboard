@@ -3,6 +3,7 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { AddRow } from '@/components/structures/inline/AddRow'
 import { ReinforcementTag } from '@/composites/lives/coordination/ReinforcementTag'
+import { SeatGlyphs } from '@/composites/modview/SeatGlyphs'
 import { memberMenu } from '@/composites/modview/memberMenu'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { WindowEmpty } from '@/composites/modview/ModWindow'
@@ -10,7 +11,14 @@ import { useLiveRoster } from '@/core/hooks/data/lives/useLiveRoster'
 import { useClock } from '@/core/hooks/interaction/state/time/useClock'
 import { useActionMenu } from '@/core/hooks/interaction/layout/overlay/useActionMenu'
 import { FOCUS_OFFLINE_ALLOWED } from '@/declarations/lives/registries'
-import { ARRIVAL_FRESH_MINUTES, TEAM_ORDER, TEAM_ROLES, roleOf } from '@/declarations/modview/roles'
+import {
+  ARRIVAL_FRESH_MINUTES,
+  TEAM_ORDER,
+  TEAM_ROLES,
+  TEAM_SECTIONS,
+  roleOf,
+  sectionOf,
+} from '@/declarations/modview/roles'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_TEAM_COPY as COPY } from '@/declarations/modview/watch'
 import { MODVIEW_TEAM } from '@/declarations/ui/variants'
@@ -63,7 +71,7 @@ const TeamMember = ({
 }: TeamMemberProps) => {
   const now = useClock()
   const role = roleOf(member.rank, isCoordinator)
-  const RoleIcon = role ? ICONS[TEAM_ROLES[role].icon] : null
+  const CoordinatorIcon = ICONS[TEAM_ROLES.coordinator.icon]
   // Only a connected member can be followed
   const handlers = useActionMenu(
     memberMenu(member, {
@@ -89,14 +97,15 @@ const TeamMember = ({
     >
       <span className={MODVIEW_TEAM.portrait}>
         <Avatar name={member.name} src={member.avatar} size="sm" />
-        {role && RoleIcon && (
-          <span className={MODVIEW_TEAM.badge}>
-            <RoleIcon
-              className={cn(MODVIEW_TEAM.badgeGlyph, TEAM_ROLES[role].tone)}
-              aria-label={TEAM_ROLES[role].label}
-            />
-          </span>
+      </span>
+      <span className={MODVIEW_TEAM.glyphs}>
+        {isCoordinator && CoordinatorIcon && (
+          <CoordinatorIcon
+            className={cn(MODVIEW_TEAM.glyph, TEAM_ROLES.coordinator.glyph)}
+            aria-label={TEAM_ROLES.coordinator.label}
+          />
         )}
+        {member.emblem && <SeatGlyphs emblem={member.emblem} glyphClassName={MODVIEW_TEAM.glyph} />}
       </span>
       <span className={cn(MODVIEW_TEAM.name, role && !isFollowed && TEAM_ROLES[role].tone)}>
         {member.name}
@@ -156,7 +165,7 @@ export const TeamPanel = ({
     )
   }
 
-  // Coordinators first, then the ranks from the top
+  // Admins above Responsables inside a section
   const coordinating = new Set(coordinatorIds)
   const rankOf = (member: LivePerson) =>
     TEAM_ORDER.indexOf(roleOf(member.rank, coordinating.has(member.id)) ?? 'moderator')
@@ -172,18 +181,41 @@ export const TeamPanel = ({
         </p>
       ))}
       <div className={MODVIEW_TEAM.list}>
-        {ordered.map((member) => (
-          <TeamMember
-            key={member.id}
-            member={member}
-            tools={tools}
-            isOnline={online.has(member.id)}
-            isPresent={present.has(member.id)}
-            isCoordinator={coordinating.has(member.id)}
-            plannedFrom={planned.get(member.id) ?? null}
-            arrivedAt={roster?.arrivals[member.id] ?? null}
-          />
-        ))}
+        {TEAM_SECTIONS.map((section) => {
+          const members = ordered.filter(
+            (member) => sectionOf(member, coordinating.has(member.id)) === section.key
+          )
+          if (members.length === 0) return null
+          const SectionIcon = ICONS[section.icon]
+
+          return (
+            <section key={section.key} className={MODVIEW_TEAM.section}>
+              <h3 className={MODVIEW_TEAM.sectionHead}>
+                <span className={MODVIEW_TEAM.sectionRule} aria-hidden="true" />
+                <span className={MODVIEW_TEAM.sectionTitle}>
+                  <SectionIcon
+                    className={cn(MODVIEW_TEAM.sectionGlyph, section.tone)}
+                    aria-hidden="true"
+                  />
+                  {section.label}
+                </span>
+                <span className={MODVIEW_TEAM.sectionRule} aria-hidden="true" />
+              </h3>
+              {members.map((member) => (
+                <TeamMember
+                  key={member.id}
+                  member={member}
+                  tools={tools}
+                  isOnline={online.has(member.id)}
+                  isPresent={present.has(member.id)}
+                  isCoordinator={coordinating.has(member.id)}
+                  plannedFrom={planned.get(member.id) ?? null}
+                  arrivedAt={roster?.arrivals[member.id] ?? null}
+                />
+              ))}
+            </section>
+          )
+        })}
       </div>
       {reinforce}
     </>

@@ -282,6 +282,40 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LivePoll,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Sondage » dans la « Vue Modérateur » : on pose une question au chat avec deux à cinq choix, une durée et des votes en plus avec les points de chaîne, puis les résultats s’affichent au-dessus du chat, se plient et se terminent d’un clic.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Mes actions » dans la « Vue Modérateur » : tu composes ta barre de sanctions, avec la durée, la raison, l’icône et la couleur de chaque bouton, tu les glisses pour les ranger, tu vois un aperçu et tu peux tout rétablir par défaut.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout, dans les préférences de la « Vue Modérateur », d’une demande de confirmation avant un ban ou une longue exclusion, d’un choix pour masquer les bots, de la taille du texte, de l’espacement des messages et de deux nouveaux emplacements pour les outils du chat (à droite et sur la carte).',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’un résumé personnel en haut de la page « Live » : tes infractions traitées, ton temps passé à modérer, tes messages et tes lives modérés sur les 30 derniers jours, comparés aux 30 précédents, avec la liste de tes derniers lives.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une alerte dans la barre latérale quand un live démarre, avec un bouton pour la masquer, et la boîte « Live » de la barre latérale passe au rouge pendant le direct.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une roue de couleurs dans les sélecteurs de couleur.',
+      },
+      {
+        tag: ChangelogTags.Added,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
         text: 'Ajout de notifications sur téléphone pour « Memora Play » : une invitation à une partie ou à un groupe, et le début d’une partie que tu suis, arrivent dans tes notifications, avec une catégorie « Jeux » à régler dans les paramètres.',
@@ -368,6 +402,38 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.lives,
         permission: Permissions.LiveRead,
         text: 'Amélioration des menus « Modes » et « Options » du chat : une petite flèche les relie au bouton qui les ouvre.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration du menu des commandes du chat de la « Vue Modérateur » : les commandes sont regroupées en « Modération » et « Chat », et la recherche de la liste des viewers s’appelle « Recherche un viewer ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la liste de l’équipe dans la « Vue Modérateur » : elle se range en « Administration », « Coordination », « Référents », « Modérateurs » et « Juniors », et le nom de chaque rôle brille de sa couleur.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la page « Live » (avant « Live en cours ») : elle s’ouvre sur ton résumé, les lives en cours n’ont plus de page à part, et les notifications, l’accueil et l’alerte de début de live te ramènent ici.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.home,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de l’accueil : la liste des lives annoncés disparaît de l’appel au live, qui ne montre plus que les lives en cours.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la barre latérale : l’annonce d’une nouvelle note de mise à jour ne s’y accroche plus au raccourci « Nouveautés », elle reste sur l’accueil.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des mises à jour : l’écran qui proposait de recharger quand une nouvelle version de Memora est disponible disparaît.',
       },
       {
         tag: ChangelogTags.Improved,

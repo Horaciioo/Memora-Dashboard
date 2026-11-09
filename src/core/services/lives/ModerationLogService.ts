@@ -47,6 +47,8 @@ export const kindOfIntent = (intent: ModViewIntent): ModerationKind | null => {
       return 'MESSAGE_SEND'
     case 'pin':
     case 'unpin':
+    case 'poll':
+    case 'pollEnd':
       return null
   }
 }

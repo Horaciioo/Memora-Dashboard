@@ -94,12 +94,13 @@ export const UnbanDesk = ({
             requests={requests}
             selectedId={request?.id ?? null}
             onSelect={(entry) => setPicked(entry.id)}
+            isLarge
           />
         </aside>
 
         {request ? (
           <div className={MODVIEW_UNBAN.detail}>
-            <div className={MODVIEW_UNBAN.detailScroll}>
+            <div key={request.id} className={MODVIEW_UNBAN.detailScroll}>
               <div className={MODVIEW_UNBAN.who}>
                 <Avatar name={request.author.name} src={detail?.avatar ?? null} size="lg" />
                 <div>
