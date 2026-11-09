@@ -23,10 +23,10 @@ interface PlayRankingPageProps {
  */
 
 export default async function PlayRankingPage({ searchParams }: PlayRankingPageProps) {
-  const { session } = await requirePermission(Permissions.PlayAccess)
+  const { session, access } = await requirePermission(Permissions.PlayAccess)
   const query = await searchParams
-  const games = readCatalog()
-    .games.filter((entry) => entry.playable)
+  const games = (await readCatalog(access.isSystem)).games
+    .filter((entry) => entry.playable)
     .map((entry) => entry.game)
   const asked = typeof query.game === 'string' ? playGameOfSlug(query.game) : null
   // No game asked: every game together

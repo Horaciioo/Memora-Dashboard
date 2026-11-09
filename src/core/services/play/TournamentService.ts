@@ -4,6 +4,7 @@ import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { rankScores, tournamentXp } from '@/core/lib/play'
+import { isFeatureOn } from '@/core/services/features'
 import { PLAY_JOURNAL, PLAY_OUTCOME_LABELS, PLAY_SETTINGS } from '@/declarations/play'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
 import type { PlayJournalInput } from '@/core/services/play/PlayJournalService'
@@ -40,7 +41,8 @@ const closeTournament = async (
       (accountId) => !last.seats.some((seat) => seat.accountId === accountId && isPresent(seat))
     )
   )
-  const pays = totals.size - gone.size >= PLAY_SETTINGS.rewards.minPlayers
+  const pays =
+    totals.size - gone.size >= PLAY_SETTINGS.rewards.minPlayers && (await isFeatureOn('play.xp'))
   const ranked = rankScores(totals, gone).map((standing) => ({
     ...standing,
     xp:

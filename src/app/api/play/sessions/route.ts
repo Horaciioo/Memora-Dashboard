@@ -13,5 +13,5 @@ export const POST = createProtectedRoute({
   permission: Permissions.PlayAccess,
   status: 201,
   descriptor: { summary: 'Open a lobby or a tournament', tags: ['play'] },
-  handler: async ({ session, raw }) => createSession(session.id, raw),
+  handler: async ({ session, raw, access }) => createSession(session.id, raw, access.isSystem),
 })

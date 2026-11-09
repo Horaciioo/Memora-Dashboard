@@ -26,7 +26,7 @@ export default async function PlayPage() {
     readPlayProfile(session.id),
     listLobbies(session.id, null, access.can(Permissions.PlayManage)),
   ])
-  const { games } = readCatalog()
+  const { games } = await readCatalog(access.isSystem)
   const everyTable = [...tables.running, ...tables.lobbies]
   const live = (className?: string) => (
     <PlayLiveTables
