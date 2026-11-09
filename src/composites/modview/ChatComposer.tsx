@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 
-import { Button } from '@/components/elements/actions/Button'
 import { EmotePicker } from '@/composites/modview/EmotePicker'
 import type { GateCheck } from '@/composites/modview/types'
 import {
@@ -12,6 +11,7 @@ import {
   matchChatters,
   nameBeingTyped,
 } from '@/core/lib/modview/compose'
+import { COMMAND_CATEGORY } from '@/declarations/modview/commands'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_CHAT } from '@/declarations/ui/variants'
@@ -23,6 +23,8 @@ interface MenuEntry {
   key: string
   label: string
   hint: string
+  // Category heading, null for names
+  group: string | null
   locked: string | null
   // Line once picked
   apply: (draft: string) => string
@@ -92,7 +94,9 @@ export const ChatComposer = ({
           key: option.name,
           label: `/${option.name}`,
           hint: [option.usage, option.description].filter(Boolean).join(' - '),
-          locked: gate(option.probe).allowed ? null : (gate(option.probe).reason ?? ''),
+          group: COMMAND_CATEGORY[option.name] ?? null,
+          locked:
+            option.probe && !gate(option.probe).allowed ? (gate(option.probe).reason ?? '') : null,
           apply: () => `/${option.name} `,
         })),
       }
@@ -107,6 +111,7 @@ export const ChatComposer = ({
         key: chatter.id,
         label: chatter.name,
         hint: '',
+        group: null,
         locked: null,
         apply: (current) => insertName(current, word, chatter),
       })),
@@ -171,21 +176,27 @@ export const ChatComposer = ({
         <div className={MODVIEW_CHAT.menu} role="listbox" aria-label={menu.title}>
           <p className={MODVIEW_CHAT.menuTitle}>{menu.title}</p>
           {menu.entries.map((entry, index) => (
-            <button
-              key={entry.key}
-              type="button"
-              role="option"
-              aria-selected={index === selected}
-              disabled={entry.locked !== null}
-              title={entry.locked ?? undefined}
-              className={cn(MODVIEW_CHAT.menuItem, index === selected && MODVIEW_CHAT.menuItemOn)}
-              // The box keeps focus
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => pick(entry)}
-            >
-              <span className={MODVIEW_CHAT.menuName}>{entry.label}</span>
-              {entry.hint && <span className={MODVIEW_CHAT.menuHint}>{entry.hint}</span>}
-            </button>
+            <Fragment key={entry.key}>
+              {entry.group && entry.group !== menu.entries[index - 1]?.group && (
+                <p className={MODVIEW_CHAT.menuGroup}>{entry.group}</p>
+              )}
+              <button
+                type="button"
+                role="option"
+                aria-selected={index === selected}
+                disabled={entry.locked !== null}
+                title={entry.locked ?? undefined}
+                className={cn(MODVIEW_CHAT.menuItem, index === selected && MODVIEW_CHAT.menuItemOn)}
+                // The box keeps focus
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => pick(entry)}
+              >
+                <span className={entry.group ? MODVIEW_CHAT.menuTag : MODVIEW_CHAT.menuName}>
+                  {entry.label}
+                </span>
+                {entry.hint && <span className={MODVIEW_CHAT.menuHint}>{entry.hint}</span>}
+              </button>
+            </Fragment>
           ))}
         </div>
       )}
@@ -242,14 +253,6 @@ export const ChatComposer = ({
         >
           <EmojiIcon className={MODVIEW_CHAT.toolIcon} aria-hidden="true" />
         </button>
-        <Button
-          type="submit"
-          variant="ghost"
-          icon="chat"
-          aria-label={MODVIEW_COPY.send}
-          title={MODVIEW_COPY.send}
-          disabled={!sayGate.allowed || !draft.trim()}
-        />
       </div>
     </form>
   )

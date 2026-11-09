@@ -8,7 +8,7 @@ import type { ModViewIntent } from '@/types/modview'
  * @property {string[]} aliases - Other words that mean the same
  * @property {string} usage - Arguments, as shown after the name
  * @property {string} description - What it does
- * @property {ModViewIntent} probe - Gesture the gate is asked about to grey it
+ * @property {ModViewIntent | null} probe - Gesture the gate is asked about to grey it, null when free
  */
 
 export interface ChatCommandOption {
@@ -16,7 +16,7 @@ export interface ChatCommandOption {
   aliases: string[]
   usage: string
   description: string
-  probe: ModViewIntent
+  probe: ModViewIntent | null
 }
 
 const channelMode = (
@@ -30,6 +30,13 @@ const channelMode = (
  */
 
 export const CHAT_COMMANDS: readonly ChatCommandOption[] = [
+  {
+    name: 'user',
+    aliases: ['u'],
+    usage: '<viewer>',
+    description: 'Ouvrir le dossier d’un viewer, sans rien envoyer',
+    probe: null,
+  },
   {
     name: 'warn',
     aliases: [],
@@ -57,6 +64,13 @@ export const CHAT_COMMANDS: readonly ChatCommandOption[] = [
     usage: '<viewer>',
     description: 'Débannir ou lever une exclusion',
     probe: { kind: 'unban', chatterId: '' },
+  },
+  {
+    name: 'poll',
+    aliases: ['sondage'],
+    usage: '',
+    description: 'Lancer un sondage dans le chat',
+    probe: null,
   },
   {
     name: 'slow',
@@ -129,6 +143,30 @@ export const CHAT_COMMANDS: readonly ChatCommandOption[] = [
     probe: channelMode('shield', false),
   },
 ]
+
+/**
+ * Category of each command, as the menu groups them
+ * @type {Record<string, string>}
+ */
+
+export const COMMAND_CATEGORY: Record<string, string> = {
+  user: 'Utilisateurs',
+  warn: 'Sanctions',
+  timeout: 'Sanctions',
+  ban: 'Sanctions',
+  unban: 'Sanctions',
+  poll: 'Chat',
+  slow: 'Modes du chat',
+  slowoff: 'Modes du chat',
+  emoteonly: 'Modes du chat',
+  emoteonlyoff: 'Modes du chat',
+  subscribers: 'Modes du chat',
+  subscribersoff: 'Modes du chat',
+  followers: 'Modes du chat',
+  followersoff: 'Modes du chat',
+  shield: 'Modes du chat',
+  shieldoff: 'Modes du chat',
+}
 
 /**
  * Command a typed word stands for
