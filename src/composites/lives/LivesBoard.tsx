@@ -12,7 +12,6 @@ import { PageOptions } from '@/components/structures/page/PageOptions'
 import { FakeLivePanel } from '@/composites/lives/FakeLivePanel'
 import { LiveEndedDialog } from '@/composites/lives/notices/LiveEndedDialog'
 import { LiveRecent } from '@/composites/lives/LiveRecent'
-import { LiveStage } from '@/composites/lives/LiveStage'
 import { LiveTile } from '@/composites/lives/LiveTile'
 import { PastLives } from '@/composites/lives/PastLives'
 import { useLives } from '@/core/hooks/data/lives/useLives'
@@ -36,6 +35,8 @@ export interface LivesBoardProps {
   canCreatorReport: boolean
   // Dev only: simulated live controls
   showFakeLive?: boolean
+  // Sits under the Live hub, which already says when nothing is planned
+  isEmbedded?: boolean
 }
 
 /**
@@ -48,6 +49,7 @@ export interface LivesBoardProps {
  * @param {boolean} canDelete - Viewer erases past lives
  * @param {boolean} canCreatorReport - Viewer reads the creator Bilan
  * @param {boolean} [showFakeLive] - Dev controls of the fake live
+ * @param {boolean} [isEmbedded] - Drops the empty state and the page options frame
  * @return {JSX.Element}
  */
 
@@ -60,6 +62,7 @@ export const LivesBoard = ({
   canDelete,
   canCreatorReport,
   showFakeLive = false,
+  isEmbedded = false,
 }: LivesBoardProps) => {
   const { lives, recent, isSaving, endedId, dismissEnded, move, reopen } = useLives(
     initialLives,
@@ -67,7 +70,6 @@ export const LivesBoard = ({
   )
   const router = useRouter()
   const [showPast, setShowPast] = useState(false)
-  const onAir = lives.filter((live) => live.status === LiveStatuses.Live)
   const upcoming = lives.filter((live) => live.status === LiveStatuses.Announced)
 
   // A live is planned on the calendar
@@ -93,24 +95,19 @@ export const LivesBoard = ({
         ]}
       />
       {lives.length === 0 && recent.length === 0 ? (
-        <EmptyState
-          figure="livecon"
-          title={LIVE_COPY.emptyTitle}
-          description={LIVE_COPY.emptyDescription}
-          action={
-            canAnnounce ? announceButton : <Status label={LIVE_COPY.emptyTitle} tone="neutral" />
-          }
-        />
+        isEmbedded ? null : (
+          <EmptyState
+            figure="livecon"
+            title={LIVE_COPY.emptyTitle}
+            description={LIVE_COPY.emptyDescription}
+            action={
+              canAnnounce ? announceButton : <Status label={LIVE_COPY.emptyTitle} tone="neutral" />
+            }
+          />
+        )
       ) : (
         <>
           {[
-            {
-              key: 'live',
-              title: LIVE_COPY.liveSection,
-              rows: onAir,
-              Card: LiveStage,
-              list: LIVE_BOARD.list,
-            },
             {
               key: 'upcoming',
               title: LIVE_COPY.upcomingSection,
@@ -122,7 +119,7 @@ export const LivesBoard = ({
             .filter((group) => group.rows.length > 0)
             .map(({ key, title, rows, Card, list }) => (
               <section key={key} className={LIVE_BOARD.group}>
-                {key !== 'live' && <h2 className={LIVE_BOARD.groupTitle}>{title}</h2>}
+                <h2 className={LIVE_BOARD.groupTitle}>{title}</h2>
                 <ul className={list}>
                   {rows.map((live) => (
                     <li key={live.id}>

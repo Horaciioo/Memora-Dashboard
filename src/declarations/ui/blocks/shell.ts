@@ -107,6 +107,8 @@ export const LEFT_SIDEBAR = {
   shortcutActive: 'shadow-[var(--shadow-md)]',
   // Unread note, painted in rail.css
   shortcutFresh: 'shortcut-fresh',
+  // A live is on air, painted in rail.css
+  shortcutLive: 'shortcut-live',
   shortcutIcon: 'size-5 shrink-0',
   // Pins footer down
   nav: 'rail-nav flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto px-4 pt-5 pb-4',

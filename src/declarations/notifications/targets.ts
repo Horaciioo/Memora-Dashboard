@@ -55,7 +55,7 @@ const NOTIFICATION_TARGET_MAP: Record<NotificationTargetName, NotificationTarget
     label: 'le parcours Legacy',
     route: (id) => (id ? ROUTES.legacyTrack(id) : ROUTES.legacy),
   },
-  live: { label: 'le live', route: (id) => (id ? ROUTES.live(id) : ROUTES.lives) },
+  live: { label: 'le live', route: () => ROUTES.lives },
   liveReport: { label: 'le bilan', route: (id) => (id ? ROUTES.liveReport(id) : ROUTES.lives) },
   // Junior target identifier is "sessionId/juniorId"
   junior: {

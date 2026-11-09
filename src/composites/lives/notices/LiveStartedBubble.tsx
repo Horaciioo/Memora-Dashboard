@@ -33,7 +33,7 @@ export const LiveStartedBubble = ({ liveId }: LiveStartedBubbleProps) => {
   const close = (join: boolean) => {
     setClosed(true)
     void apiPost(API_ROUTES.seenGuide, { key: liveStartedKey(liveId) }).catch(() => null)
-    if (join) router.push(ROUTES.live(liveId))
+    if (join) router.push(ROUTES.lives)
   }
 
   // Folds by itself

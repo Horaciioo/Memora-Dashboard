@@ -17,7 +17,7 @@ import { RailSlides } from '@/composites/shell/rail/RailSlides'
 import { SimulationBanner } from '@/composites/shell/SimulationBanner'
 import { RailToolbar } from '@/composites/shell/rail/RailToolbar'
 import { RailShortcuts } from '@/composites/shell/rail/RailShortcuts'
-import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
+import { LiveRailNotice } from '@/composites/lives/notices/LiveRailNotice'
 import { PlayNotice } from '@/composites/play/hub/notices/PlayNotice'
 import { PlayInviteNotice } from '@/composites/play/invites/PlayInviteNotice'
 import { usePlayNotice } from '@/core/hooks/interaction/layout/usePlayNotice'
@@ -105,7 +105,7 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   }, [isCompact])
 
   const { shortcuts, groups } = useRailEntries(viewContext)
-  const newsAt = shortcuts.findIndex((item) => item.href === ROUTES.changelog)
+  const liveAt = shortcuts.findIndex((item) => item.href === ROUTES.lives)
   const playAt = shortcuts.findIndex((item) => item.href === ROUTES.play)
   // One bubble at a time, Play first until it is dismissed
   const [isPlayDismissed] = usePlayNotice()
@@ -126,19 +126,19 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
     />
   )
 
-  // Shortcuts and the release notice, in every menu but a course's
+  // Shortcuts and the live notice, in every menu but a course's
   const topBlock = (
     <>
-      <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
-      {/* Hangs under the news shortcut it announces */}
+      <RailShortcuts items={shortcuts} isUnlocking={isTouring} live={viewContext.live} />
+      {/* Hangs under the Live shortcut it announces */}
+      {!isCompact && !isCalendarMenu && liveAt >= 0 && (
+        <LiveRailNotice live={viewContext.live} pointedAt={pointAt(liveAt)} />
+      )}
       {!isCompact && !isCalendarMenu && hasInvite && (
         <PlayInviteNotice pointedAt={playAt >= 0 ? pointAt(playAt) : undefined} />
       )}
       {!isCompact && !isCalendarMenu && !hasInvite && hasPlayNotice && (
         <PlayNotice pointedAt={pointAt(playAt)} />
-      )}
-      {!isCompact && !isCalendarMenu && !hasInvite && !hasPlayNotice && (
-        <ReleaseNotice pointedAt={newsAt >= 0 ? pointAt(newsAt) : undefined} />
       )}
     </>
   )
@@ -205,8 +205,6 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
           ].filter(({ href }) => isUnlocked(href))}
         />
       )}
-
-      {courseRail && !isCompact && <ReleaseNotice />}
 
       {session && (
         <div className={LEFT_SIDEBAR.footer}>

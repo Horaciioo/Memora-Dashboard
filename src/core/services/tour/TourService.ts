@@ -6,7 +6,7 @@ import { socialFormFields } from '@/core/services/members/MemberFileService'
 import { isEncadrement } from '@/declarations/access/roles'
 import { GUIDE_KEYS, tourPageKey } from '@/declarations/academy/welcome'
 import { TOUR_SETTINGS } from '@/declarations/configurations/settings'
-import { REPLAYS_TOUR_ON_REFRESH, WELCOMES_EVERY_ACCOUNT } from '@/declarations/system/environments'
+import { WELCOMES_EVERY_ACCOUNT } from '@/declarations/system/environments'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { TourCreator, TourState } from '@/types/tour'
 
@@ -58,8 +58,7 @@ export const readTourState = async (
   })
   if (!account) return null
 
-  // Nothing is remembered while the visit is being built
-  const seenGuides = REPLAYS_TOUR_ON_REFRESH ? [] : account.seenGuides
+  const { seenGuides } = account
 
   // Played once, left or finished
   if (seenGuides.includes(GUIDE_KEYS.tourSkipped) || seenGuides.includes(GUIDE_KEYS.tourDone)) {
