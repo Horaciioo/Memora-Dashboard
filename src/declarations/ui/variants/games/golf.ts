@@ -16,7 +16,8 @@ export const GOLF_BOARD = {
   board: 'flex flex-col gap-4 pb-16',
   stage:
     'golf-hud-theme relative h-[min(72dvh,46rem)] min-h-[24rem] w-full overflow-hidden rounded-[0.7rem_1.1rem_0.8rem_1rem] border-b-[0.4rem] border-[var(--play-golf-deep)] bg-[var(--play-golf-deep)] ring-1 ring-[var(--play-line)] select-none',
-  stageFull: 'h-full! min-h-0! rounded-none! border-b-0! ring-0!',
+  // Flex fill, iOS drops percent heights
+  stageFull: 'h-auto! min-h-0! flex-1 rounded-none! border-b-0! ring-0!',
   boardFull: 'min-h-0 flex-1 pb-0!',
   loading: 'absolute inset-0 grid place-items-center text-sm font-bold text-[var(--play-ink-soft)]',
   // Top row: hole card, players, view keys
@@ -320,9 +321,9 @@ export const GOLF_VOTE = {
     'golf-plate golf-vote-title px-8 pt-2 pb-1 text-5xl leading-tight font-black tracking-tight text-[var(--play-golf-gold-light)] uppercase [text-shadow:0_3px_0_rgb(0_0_0/0.4)] sm:text-6xl',
   lead: 'golf-plate golf-vote-title px-8 py-2.5 text-center text-sm font-bold tracking-wide text-white uppercase sm:px-12 sm:text-xl',
   // Dark band behind the cards, flush to the screen
-  deck: 'relative flex w-full flex-col items-center py-7 [--vote-card:clamp(5.25rem,11vw,11rem)] [--vote-gap:clamp(0.75rem,2.6vw,3.5rem)]',
+  deck: 'relative flex w-full flex-col items-center py-7 [--vote-card:clamp(6rem,11vw,11rem)] [--vote-gap:clamp(0.75rem,2.6vw,3.5rem)]',
   band: 'golf-vote-band absolute inset-x-0 inset-y-0 bg-[rgb(24_20_36/0.66)]',
-  row: 'relative flex flex-wrap items-start justify-center gap-x-[var(--vote-gap)] gap-y-6 px-4',
+  row: 'relative flex flex-wrap items-start justify-center gap-x-[var(--vote-gap)] gap-y-8 px-4',
   card: 'golf-vote-card group/card relative flex w-[var(--vote-card)] flex-col items-center gap-2 outline-none',
   face: 'relative grid aspect-square w-full place-items-center overflow-hidden bg-[var(--play-golf-vote-tile)] transition-[filter,translate] duration-150 group-hover/card:-translate-y-1 group-hover/card:brightness-110 group-focus-visible/card:ring-4 group-focus-visible/card:ring-white',
   faceOn: 'ring-4 ring-white',
@@ -335,7 +336,7 @@ export const GOLF_VOTE = {
   label:
     'text-center text-base font-black tracking-wide text-white uppercase [text-shadow:0_2px_0_rgb(0_0_0/0.45)] sm:text-2xl',
   strip:
-    'w-full bg-[var(--play-golf-vote-strip)] px-2 py-1 text-center text-xs font-black tracking-wide text-white uppercase sm:text-base',
+    'w-full bg-[var(--play-golf-vote-strip)] px-1 py-1 text-center text-[0.65rem] leading-tight font-black tracking-normal [overflow-wrap:anywhere] text-white uppercase sm:px-2 sm:text-base sm:tracking-wide',
   // Avatar standing over the picked card
   avatarBox:
     'pointer-events-none absolute inset-x-0 bottom-full mb-2 flex flex-wrap items-end justify-center -space-x-1.5',
