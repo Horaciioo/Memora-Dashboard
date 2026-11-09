@@ -22,7 +22,7 @@
 .brain-lobe {
   position: absolute;
   background: center / 100% 100% no-repeat;
-  will-change: transform, filter;
+  will-change: transform;
   animation: brain-lobe-stretch 1.9s cubic-bezier(0.45, 0, 0.25, 1) calc(var(--o) * -0.7s) infinite;
 }
 
@@ -63,15 +63,12 @@
   76%,
   100% {
     transform: none;
-    filter: brightness(1) saturate(1);
   }
   84% {
     transform: translate(calc(var(--x) * 1%), calc(var(--y) * 1%)) scale(1.07);
-    filter: brightness(1.14) saturate(1.3);
   }
   92% {
     transform: translate(calc(var(--x) * 0.12%), calc(var(--y) * 0.12%)) scale(0.985);
-    filter: brightness(1.04) saturate(1);
   }
 }
 
@@ -325,11 +322,11 @@
 
 @keyframes live-card-sheen {
   0% {
-    left: -40%;
+    transform: translateX(0) skewX(-20deg);
   }
   35%,
   100% {
-    left: 130%;
+    transform: translateX(566.67%) skewX(-20deg);
   }
 }
 
@@ -597,11 +594,11 @@
 @keyframes push-cta-sheen {
   0%,
   55% {
-    left: -60%;
+    transform: translateX(0) skewX(-18deg);
   }
   85%,
   100% {
-    left: 130%;
+    transform: translateX(475%) skewX(-18deg);
   }
 }
 

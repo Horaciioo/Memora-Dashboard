@@ -185,10 +185,10 @@
 
 @keyframes shortcut-sheen {
   0% {
-    left: -60%;
+    transform: translateX(0) skewX(-20deg);
   }
   40%,
   100% {
-    left: 130%;
+    transform: translateX(380%) skewX(-20deg);
   }
 }
