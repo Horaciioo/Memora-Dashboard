@@ -79,7 +79,7 @@ const seatBots = async (
   const names = new Set(present.map((seat) => seat.account.displayName))
   const colors = present.map((seat) => seat.color)
   const seats = seatBoundsOf(session.game, session.settings).max
-  const room = botRoomOf(seats, present.filter((seat) => seat.account.botKind).length)
+  const room = botRoomOf(present.filter((seat) => seat.account.botKind).length)
   if (seats <= present.length) throw conflict(PLAY_ERRORS.full)
   if (room <= 0) throw conflict(PLAY_ERRORS.botsFull)
   const free = Math.min(count, seats - present.length, room)

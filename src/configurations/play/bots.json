@@ -1,5 +1,5 @@
 {
-  "seatShare": 0.5,
+  "maxPerGame": 3,
   "callsigns": [
     "Alpha",
     "Bravo",

@@ -33,13 +33,12 @@ export const pickSeatColor = (taken: string[], random: () => number = Math.rando
 
 /**
  * Bots a table still accepts
- * @param {number} seats - Table seats
  * @param {number} seated - Bots seated
  * @return {number} - Bots allowed
  */
 
-export const botRoomOf = (seats: number, seated: number): number =>
-  Math.max(0, Math.floor(seats * PLAY_BOT_SETTINGS.seatShare) - seated)
+export const botRoomOf = (seated: number): number =>
+  Math.max(0, PLAY_BOT_SETTINGS.maxPerGame - seated)
 
 /**
  * Seats a table accepts, a mode may narrow the game

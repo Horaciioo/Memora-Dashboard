@@ -72,8 +72,8 @@ const writeAt = readNode(baccalaureat.writeAt, 'play/bots.baccalaureat.writeAt')
  */
 
 export const PLAY_BOT_SETTINGS = {
-  // Share of seats for bots
-  seatShare: readNumber(bots.seatShare, { path: 'play/bots.seatShare', fallback: 0.5, min: 0 }),
+  // Bots at one table
+  maxPerGame: readNumber(bots.maxPerGame, { path: 'play/bots.maxPerGame', fallback: 3, min: 0 }),
   callsigns: readStringList(bots.callsigns, { path: 'play/bots.callsigns', fallback: ['Alpha'] }),
   ludo: { thinkMs: delay(ludo.thinkMs, 'play/bots.ludo.thinkMs') },
   naval: {
