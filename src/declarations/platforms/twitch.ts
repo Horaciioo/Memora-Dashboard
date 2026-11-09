@@ -1,4 +1,18 @@
 import { readSecret } from '@/declarations/platforms/credentials'
+import { APP_ENVIRONMENT } from '@/declarations/system/environments'
+
+// Fake Twitch, dev only
+const MOCK_ORIGIN =
+  APP_ENVIRONMENT === 'dev' ? readSecret(process.env.TWITCH_MOCK_URL)?.replace(/\/+$/, '') : null
+
+// Path the app serves the fake consent page on, forwarded to the fake Twitch
+export const TWITCH_MOCK_PATH = '/faux-twitch'
+export const TWITCH_MOCK_ORIGIN = MOCK_ORIGIN ?? null
+
+// Server side origins
+const ID_ORIGIN = MOCK_ORIGIN ?? 'https://id.twitch.tv'
+const API_ORIGIN = MOCK_ORIGIN ?? 'https://api.twitch.tv'
+const EVENTSUB_ORIGIN = MOCK_ORIGIN?.replace(/^http/, 'ws') ?? 'wss://eventsub.wss.twitch.tv'
 
 /**
  * Twitch endpoints
@@ -6,11 +20,11 @@ import { readSecret } from '@/declarations/platforms/credentials'
  */
 
 export const TWITCH_ENDPOINTS = {
-  authorize: 'https://id.twitch.tv/oauth2/authorize',
-  token: 'https://id.twitch.tv/oauth2/token',
-  revoke: 'https://id.twitch.tv/oauth2/revoke',
-  helix: 'https://api.twitch.tv/helix',
-  eventsub: 'wss://eventsub.wss.twitch.tv/ws',
+  authorize: `${ID_ORIGIN}/oauth2/authorize`,
+  token: `${ID_ORIGIN}/oauth2/token`,
+  revoke: `${ID_ORIGIN}/oauth2/revoke`,
+  helix: `${API_ORIGIN}/helix`,
+  eventsub: `${EVENTSUB_ORIGIN}/ws`,
   player: 'https://player.twitch.tv',
   playerScript: 'https://player.twitch.tv/js/embed/v1.js',
   site: 'https://www.twitch.tv',
