@@ -236,6 +236,8 @@ export const PLAY_INVITE = {
     'rounded-lg bg-[var(--play-chip)] px-2.5 py-1 text-xs font-extrabold text-[var(--play-ink)] hover:bg-[var(--play-line)] disabled:opacity-50',
   foot: 'flex flex-col gap-1',
   footGroup: 'flex flex-col border-t border-[var(--play-line)] pt-1',
+  footPaused: 'pointer-events-none opacity-50',
+  pausedNote: 'px-3 pb-1 text-xs font-bold text-[var(--play-ink-faint)]',
   search:
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-3 py-2 text-sm font-semibold md:py-2.5 placeholder:text-[var(--play-ink-faint)] focus:outline-none',
   head: 'flex items-center gap-2',

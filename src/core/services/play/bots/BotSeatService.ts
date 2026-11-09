@@ -10,6 +10,7 @@ import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { signalPlay } from '@/core/lib/play/signal'
 import { botLevelsOf, PLAY_BOT_AVATARS, PLAY_BOT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
+import { areBotsAwake } from '@/declarations/play/bots'
 import { announceInChat } from '@/core/services/play/PlayChatService'
 import { lockSession, requireHost } from '@/core/services/play/PlaySessionService'
 import { PlayMessageKinds, PlayStatuses } from '@/utils/constants/play'
@@ -123,6 +124,7 @@ export const addBots = async (
     const session = await lockSession(tx, sessionId)
     requireHost(session, hostId)
     if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
+    if (!areBotsAwake(session.game)) throw conflict(PLAY_ERRORS.botsOff)
 
     return seatBots(tx, session, {
       level: readBotLevel(session, level),

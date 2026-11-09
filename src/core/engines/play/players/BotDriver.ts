@@ -2,6 +2,7 @@ import 'server-only'
 
 import { decideBotMove, sharedBotView } from '@/core/engines/play/players/BotPlayer'
 import { playersOf } from '@/core/engines/play/players/PlayPlayer'
+import { areBotsAwake } from '@/declarations/play/bots'
 import { toAppError } from '@/core/lib/errors'
 import { logger } from '@/core/lib/logger'
 import { botTimerKey, clearDeadline, scheduleDeadline } from '@/core/lib/play/timers'
@@ -10,6 +11,7 @@ import type { LoadedSession } from '@/core/lib/play/session'
 import type { PlayBotMove, PlayPlayer } from '@/types/play'
 import { ErrorCodes } from '@/utils/constants/errors'
 import { PlayStatuses } from '@/utils/constants/play'
+import type { PlayGameName } from '@/utils/constants/play'
 
 // Same path as a human move
 type BotAct = (sessionId: string, botId: string, raw: Record<string, unknown>) => Promise<void>
@@ -112,7 +114,7 @@ const driveBot = async (
     const turn = table.turns.then(() => playTurn(session.id, bot, move, act))
     table.turns = turn
     await turn
-    await driveBots(session.id, act)
+    await driveBots(session.id, session.game, act)
   })
 }
 
@@ -140,11 +142,18 @@ const drivePass = async (sessionId: string, act: BotAct): Promise<void> => {
 /**
  * Plan the moves of every bot at a table
  * @param {string} sessionId - Game
+ * @param {PlayGameName} game - Game kind
  * @param {BotAct} act - Move path
  * @return {Promise<void>} - Planned
  */
 
-export const driveBots = async (sessionId: string, act: BotAct): Promise<void> => {
+export const driveBots = async (
+  sessionId: string,
+  game: PlayGameName,
+  act: BotAct
+): Promise<void> => {
+  // Asleep games stay untouched
+  if (!areBotsAwake(game)) return
   const table = tableOf(sessionId)
   // Burst of moves merged
   if (table.isDriving) {
