@@ -1,5 +1,13 @@
+import type { ComponentType } from 'react'
+
+import { ReferentFunctionGlyph } from '@/components/elements/display/glyphs/BrandGlyphs'
+import { CoordinatorGlyph } from '@/components/elements/display/glyphs/LiveGlyphs'
+import { ROLE_EMBLEMS } from '@/declarations/members/profiles'
 import type { IconName } from '@/declarations/ui/icons'
 import type { MemoraRank } from '@/types/modview'
+import { MemberRoles } from '@/utils/constants/hierarchy'
+
+type TeamSectionIcon = ComponentType<{ className?: string }>
 
 /**
  * Seat a teammate holds in the Mod View, the live Coordinator above the ranks
@@ -11,10 +19,14 @@ export type TeamRole = MemoraRank | 'coordinator'
 // Bright tone of each seat, read by the shimmer and the glyph glow
 const SHINE = {
   moderator: '[--shine:var(--color-apple-green)]',
+  junior:
+    '[--shine:color-mix(in_srgb,var(--color-apple-green)_65%,var(--color-surface))]',
   coordinator: '[--shine:var(--color-gold-400)]',
   responsable: '[--shine:var(--color-apple-orange)]',
   admin: '[--shine:var(--color-apple-red)]',
 } as const
+
+export const TEAM_JUNIOR_TONE = `team-shimmer ${SHINE.junior}`
 
 const roleTone = (role: TeamRole) => ({
   // Name with a band of light crossing it
@@ -59,19 +71,33 @@ export type TeamSection = 'administration' | 'coordination' | 'referents' | 'mod
 export const TEAM_SECTIONS: {
   key: TeamSection
   label: string
-  icon: IconName
-  tone: string
+  glyph: TeamSectionIcon
 }[] = [
-  { key: 'administration', label: 'Administration', icon: 'crown', tone: TEAM_ROLES.admin.glyph },
+  {
+    key: 'administration',
+    label: 'Administration',
+    glyph: ROLE_EMBLEMS[MemberRoles.Admin].glyph,
+  },
   {
     key: 'coordination',
     label: 'Coordination',
-    icon: 'coordinator',
-    tone: TEAM_ROLES.coordinator.glyph,
+    glyph: CoordinatorGlyph,
   },
-  { key: 'referents', label: 'Référents', icon: 'teams', tone: 'text-[var(--color-ink-accent)]' },
-  { key: 'moderators', label: 'Modérateurs', icon: 'shield', tone: TEAM_ROLES.moderator.glyph },
-  { key: 'juniors', label: 'Juniors', icon: 'academy', tone: 'text-[var(--color-ink-subtle)]' },
+  {
+    key: 'referents',
+    label: 'Référents',
+    glyph: ReferentFunctionGlyph,
+  },
+  {
+    key: 'moderators',
+    label: 'Modérateurs',
+    glyph: ROLE_EMBLEMS[MemberRoles.Moderateur].glyph,
+  },
+  {
+    key: 'juniors',
+    label: 'Juniors',
+    glyph: ROLE_EMBLEMS[MemberRoles.Junior].glyph,
+  },
 ]
 
 /**

@@ -172,9 +172,6 @@ export const MODVIEW_TEAM = {
   name: 'min-w-0 flex-1 truncate text-sm font-semibold',
   memberCoordinator: 'bg-[color-mix(in_srgb,var(--color-gold-400)_14%,transparent)]',
   portrait: 'relative shrink-0',
-  // Role and function glyphs after the portrait
-  glyphs: 'flex shrink-0 items-center gap-1',
-  glyph: 'size-5',
   badge:
     'absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
   badgeGlyph: 'size-3',
