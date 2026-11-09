@@ -1,7 +1,11 @@
 'use client'
 
+import { useState } from 'react'
+
 import { Button } from '@/components/elements/actions/Button'
-import { nextRung, thirdRung } from '@/core/lib/modview/commands'
+import { ViewerPicker } from '@/composites/modview/ViewerPicker'
+import { useCopy } from '@/core/hooks/interaction/state/useCopy'
+import { nextRung, thirdRung, writeRungCommand } from '@/core/lib/modview/commands'
 import { MODVIEW_PANEL_COPY } from '@/declarations/modview/copy'
 import { measureTag } from '@/declarations/modview/suggestions'
 import { MODVIEW_RAIL, MODVIEW_VERDICT } from '@/declarations/ui/variants'
@@ -14,7 +18,9 @@ export interface OffenseRailProps {
   target: Chatter | null
   // Rungs already applied to the picked viewer
   applied: number[]
-  onPrefill: (offense: SanctionOffenseCard, rung: number) => void
+  // Viewers the field offers
+  chatters: Chatter[]
+  onPrefill: (offense: SanctionOffenseCard, rung: number, chatter: Chatter) => void
   onClose: () => void
 }
 
@@ -38,10 +44,12 @@ interface RungListProps {
   rungs: SanctionRungView[]
   applied: number[]
   next: number | null
+  // Writes the command of a rung, none until a viewer is chosen
+  onUse: ((rung: number) => void) | null
 }
 
 // Numbered ladder
-const LadderRungs = ({ rungs, applied, next }: RungListProps) => (
+const LadderRungs = ({ rungs, applied, next, onUse }: RungListProps) => (
   <ol className={MODVIEW_RAIL.ladder}>
     {rungs.map((rung, index) => (
       <li key={rung.id} className={MODVIEW_RAIL.step}>
@@ -50,7 +58,21 @@ const LadderRungs = ({ rungs, applied, next }: RungListProps) => (
           {index + 1}
         </span>
         <div
-          className={cn(MODVIEW_RAIL.stepBody, applied.includes(index) && MODVIEW_RAIL.stepDone)}
+          className={cn(
+            MODVIEW_RAIL.stepBody,
+            onUse && MODVIEW_RAIL.stepButton,
+            applied.includes(index) && MODVIEW_RAIL.stepDone
+          )}
+          role={onUse ? 'button' : undefined}
+          tabIndex={onUse ? 0 : undefined}
+          onClick={onUse ? () => onUse(index) : undefined}
+          onKeyDown={
+            onUse
+              ? (event) => {
+                  if (event.key === 'Enter' || event.key === ' ') onUse(index)
+                }
+              : undefined
+          }
         >
           <RungTags rung={rung} />
           {rung.condition && <p className={MODVIEW_RAIL.condition}>{rung.condition}</p>}
@@ -66,7 +88,27 @@ const LadderRungs = ({ rungs, applied, next }: RungListProps) => (
  * @return {JSX.Element}
  */
 
-export const OffenseRail = ({ offense, target, applied, onPrefill, onClose }: OffenseRailProps) => {
+export const OffenseRail = ({
+  offense,
+  target,
+  applied,
+  chatters,
+  onPrefill,
+  onClose,
+}: OffenseRailProps) => {
+  const [chosen, setChosen] = useState<Chatter | null>(null)
+  const copy = useCopy(MODVIEW_PANEL_COPY.copied)
+  const aimed = chosen ?? target
+
+  // Writes the line in the box and keeps it on the clipboard
+  const use = (rung: number) => {
+    const step = offense.rungs[rung]
+    if (!aimed || !step) return
+    onPrefill(offense, rung, aimed)
+    const line = writeRungCommand(step, aimed.login, offense.name)
+    if (line) void copy(line).catch(() => undefined)
+  }
+
   const next = nextRung(applied, offense.rungs.length)
   const third = thirdRung(offense.rungs.length)
 
@@ -83,19 +125,24 @@ export const OffenseRail = ({ offense, target, applied, onPrefill, onClose }: Of
       </header>
 
       <div className={MODVIEW_RAIL.body}>
-        <LadderRungs rungs={offense.rungs} applied={applied} next={target ? next : null} />
-        {!target && <p className={MODVIEW_RAIL.hint}>{MODVIEW_PANEL_COPY.pickTarget}</p>}
+        <ViewerPicker chatters={chatters} value={aimed} onPick={setChosen} />
+        <LadderRungs
+          rungs={offense.rungs}
+          applied={applied}
+          next={aimed ? next : null}
+          onUse={aimed ? use : null}
+        />
       </div>
 
-      {target && next !== null && (
+      {aimed && next !== null && (
         <footer className={MODVIEW_RAIL.foot}>
-          <Button variant="primary" onClick={() => onPrefill(offense, next)}>
+          <Button variant="primary" onClick={() => use(next)}>
             {applied.length === 0
-              ? MODVIEW_PANEL_COPY.prefill.replace('{name}', target.name)
+              ? MODVIEW_PANEL_COPY.prefill.replace('{name}', aimed.name)
               : MODVIEW_PANEL_COPY.next}
           </Button>
           {third !== null && third !== next && (
-            <Button variant="secondary" onClick={() => onPrefill(offense, third)}>
+            <Button variant="secondary" onClick={() => use(third)}>
               {MODVIEW_PANEL_COPY.third}
             </Button>
           )}

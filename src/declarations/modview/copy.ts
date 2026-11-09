@@ -267,7 +267,9 @@ export const MODVIEW_PANEL_COPY = {
   third: 'Palier 3',
   prefill: 'Pré-écrire pour {name}',
   noGesture: 'Ce palier ne porte aucune action de Mod. à envoyer : applique-le à la main.',
-  pickTarget: 'Choisis un viewer dans le chat pour pré-écrire une sanction.',
+  pickPlaceholder: 'Tape le pseudo d’un viewer',
+  pickNone: 'Aucun viewer ne correspond.',
+  copied: 'Commande copiée',
 } as const
 
 /**

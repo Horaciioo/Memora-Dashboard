@@ -27,7 +27,9 @@ export interface SanctionsDrawerProps {
   levelIcon: IconName | null
   target: Chatter | null
   memory: PanelMemory
-  onPrefill: (offense: SanctionOffenseCard, rung: number) => void
+  onPrefill: (offense: SanctionOffenseCard, rung: number, chatter: Chatter) => void
+  // Viewers the rail field offers
+  chatters: Chatter[]
   // Commands ready to paste, on a real live
   suggest?: SuggestionListProps
   // Viewers under watch, under the offences
@@ -52,6 +54,7 @@ export const SanctionsDrawer = ({
   target,
   memory,
   onPrefill,
+  chatters,
   suggest,
   watch,
   isHidden,
@@ -171,6 +174,7 @@ export const SanctionsDrawer = ({
             offense={opened}
             target={target}
             applied={target ? (memory[target.id]?.[opened.id] ?? []) : []}
+            chatters={chatters}
             onPrefill={onPrefill}
             onClose={() => setOpenId(null)}
           />

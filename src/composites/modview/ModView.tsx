@@ -22,6 +22,7 @@ import { useSideWidth } from '@/core/hooks/interaction/layout/rail/useSideWidth'
 import { useBareShell } from '@/core/hooks/interaction/layout/useBareShell'
 import { useModPreferenceProfile } from '@/core/hooks/interaction/state/moderation/useModPreferences'
 import { useModLayout } from '@/core/hooks/interaction/layout/useModLayout'
+import { recentChatters } from '@/core/lib/modview/compose'
 import { useModViewActions } from '@/core/hooks/interaction/state/moderation/useModViewActions'
 import { useSuggestions } from '@/core/hooks/interaction/state/moderation/useSuggestions'
 import { useWatchlist } from '@/core/hooks/interaction/state/moderation/useWatchlist'
@@ -156,6 +157,13 @@ export const ModView = ({
   })
   const { gate, picked, setPicked, memory } = actions
   const watchlist = useWatchlist(state.messages)
+  // Speakers first, then the rest of the room
+  const candidates = useMemo(() => {
+    const { moderators, vips, viewers } = state.community
+    const all = [...recentChatters(state.messages), ...viewers, ...vips, ...moderators]
+
+    return all.filter((one, index) => all.findIndex((other) => other.id === one.id) === index)
+  }, [state.messages, state.community])
   const { suggestions, dismiss } = useSuggestions(state, panel, memory, actions.acted)
 
   // A sanction by hand counts on the rung the viewer's suggestion stood for
@@ -521,6 +529,7 @@ export const ModView = ({
             target={picked}
             memory={memory}
             onPrefill={actions.prefill}
+            chatters={candidates}
             watch={{ watchlist, gate, onAct: act, onPick: setPicked }}
             suggest={
               isWorkspace

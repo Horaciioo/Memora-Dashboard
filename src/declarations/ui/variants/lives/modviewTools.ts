@@ -68,7 +68,7 @@ export const MODVIEW_SUGGEST = {
  */
 
 export const MODVIEW_RAIL = {
-  root: 'surface-enter flex max-h-full min-h-0 w-72 shrink-0 flex-col self-start overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-md)]',
+  root: 'surface-enter flex max-h-full min-h-0 w-72 shrink-0 flex-col self-start overflow-hidden select-text rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-md)]',
   head: 'flex items-center justify-between gap-2 border-b border-[var(--color-border)] py-2 pr-2 pl-4',
   title: 'min-w-0 text-base leading-tight font-bold tracking-tight',
   body: 'flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4',
@@ -83,7 +83,25 @@ export const MODVIEW_RAIL = {
     'z-10 flex size-6 shrink-0 items-center justify-center rounded-[var(--radius-xs)] bg-[var(--color-surface-sunken)] text-xs font-bold tabular-nums',
   numberNext: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   stepBody: 'flex min-w-0 flex-col gap-0.5 pt-0.5',
+  // Rung that writes its command once a viewer is chosen
+  stepButton:
+    'w-full cursor-pointer rounded-[var(--radius-sm)] text-left transition-colors hover:bg-[var(--color-hover)]',
   stepDone: 'line-through opacity-50',
+} as const
+
+/**
+ * Viewer name field of the offence rail
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_PICKER = {
+  root: 'relative',
+  input:
+    'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none placeholder:text-[var(--color-ink-subtle)] focus:border-[var(--color-ink-subtle)]',
+  list: 'absolute inset-x-0 top-full z-10 mt-1 flex max-h-48 flex-col overflow-y-auto rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1 shadow-[var(--shadow-md)]',
+  option:
+    'w-full rounded-[var(--radius-sm)] px-2 py-1.5 text-left text-sm font-semibold transition-colors hover:bg-[var(--color-hover)]',
+  empty: 'px-2 py-1.5 text-xs text-[var(--color-ink-subtle)] italic',
 } as const
 
 /**
