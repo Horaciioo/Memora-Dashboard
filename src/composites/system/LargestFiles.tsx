@@ -2,7 +2,7 @@ import { STORAGE_BUCKETS } from '@/declarations/system/storage'
 import { Dotted } from '@/components/elements/display/Dotted'
 import { CONSOLE_BLOCK } from '@/declarations/ui/blocks'
 import type { LargeFile } from '@/core/services/system/ConsoleService'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 import { formatBytes } from '@/utils/format/numbers'
 
 export interface LargestFilesProps {

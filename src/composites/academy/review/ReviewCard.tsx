@@ -29,7 +29,7 @@ import { ACTION_COPY } from '@/declarations/ui/copy'
 import { useMenu } from '@/managers/front-end'
 import type { AcademyReviewView } from '@/types/academy'
 import { AcademyStages, ReviewAdvices, ReviewStatuses } from '@/utils/constants/hierarchy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface ReviewCardProps {
   review: AcademyReviewView

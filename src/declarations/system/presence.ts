@@ -1,5 +1,11 @@
 import type { PresenceStatus } from '@/types/presence'
 
+// Element a member can stand on
+export const PRESENCE_ANCHOR_ATTRIBUTE = 'data-presence-anchor'
+
+// Floating layers of a field
+export const PRESENCE_PICKER_SELECTOR = '[role="listbox"], [role="dialog"]'
+
 /**
  * Copy of live presence
  * @type {Record<string, string>}

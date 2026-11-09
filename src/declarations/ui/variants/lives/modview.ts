@@ -1,4 +1,5 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
+import { TEAM_ROLES } from '@/declarations/modview/roles'
 import type { ChatTier, ModActTone } from '@/types/modview'
 
 /**
@@ -52,7 +53,7 @@ export const MODVIEW_WINDOW = {
   // Lit by a scene
   lit: 'z-20 scale-[1.01] shadow-[0_0_0_2px_var(--color-brand-600),0_0_0_8px_color-mix(in_oklab,var(--color-brand-600)_35%,transparent),var(--shadow-md)]',
   // Heading band tinted apart from the body, as on Twitch
-  head: 'flex items-center gap-2 bg-[var(--twitch-head)] px-3 py-2',
+  head: 'flex h-11 shrink-0 items-center gap-2 bg-[var(--twitch-head)] px-3',
   title: 'min-w-0 flex-1 truncate text-sm font-bold tracking-tight text-[var(--color-ink-accent)]',
   headAction:
     'rounded-[var(--radius-md)] px-2 py-1 text-xs font-bold text-[var(--color-brand-800)] transition-colors hover:bg-[var(--color-hover)]',
@@ -92,9 +93,26 @@ export const MODVIEW_STREAM = {
   viewers:
     'flex shrink-0 items-center gap-1.5 text-sm font-bold tabular-nums text-[var(--color-danger)]',
   viewersIcon: 'h-4 w-4',
+  timers: 'flex shrink-0 items-center gap-3',
+  timer: 'flex items-center gap-1.5 text-xs font-bold tabular-nums text-[var(--color-ink-subtle)]',
+  timerRefresh:
+    'rounded-[var(--radius-xs)] text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  timerSynced: 'text-[var(--color-success)]',
   category: 'text-xs text-[var(--color-ink-subtle)]',
   tags: 'mt-1.5 flex flex-wrap gap-1',
   tag: 'rounded-[var(--radius-xs)] border border-[var(--color-border)] px-1.5 py-0.5 text-xs font-semibold',
+} as const
+
+/**
+ * Rise of a figure over the live
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_DELTA = {
+  wrap: 'inline-flex shrink-0 items-center gap-0.5 self-center text-xs leading-none font-bold tabular-nums',
+  glyph: 'h-3.5 w-3.5 shrink-0',
+  good: 'text-[var(--color-success)]',
+  bad: 'text-[var(--color-danger)]',
 } as const
 
 /**
@@ -115,6 +133,7 @@ export const MODVIEW_FEED = {
   main: 'flex min-w-0 flex-1 flex-col gap-0.5 text-sm',
   target: 'w-fit font-bold underline underline-offset-2 hover:text-[var(--color-brand-800)]',
   line: 'text-[var(--color-ink-subtle)]',
+  repeat: 'ml-1.5 text-xs font-bold text-[var(--color-danger)] tabular-nums',
   who: 'font-semibold text-[var(--color-ink)]',
   whoLink: 'cursor-pointer font-semibold text-[var(--color-ink)] hover:underline',
   quote:
@@ -143,9 +162,9 @@ export const MODVIEW_VERB: Record<ModActTone, string> = {
 
 export const MODVIEW_TIER: Record<ChatTier, string> = {
   creator: 'gold-shimmer font-bold',
-  admin: 'text-[var(--color-danger)]',
-  responsable: 'text-[var(--color-apple-orange)]',
-  moderator: 'text-[var(--color-info)]',
+  admin: `${TEAM_ROLES.admin.tone} font-bold`,
+  responsable: TEAM_ROLES.responsable.tone,
+  moderator: TEAM_ROLES.moderator.tone,
   viewer: 'text-[var(--page-ink-subtle)]',
 }
 
@@ -158,7 +177,6 @@ export const MODVIEW_CHAT = {
   hint: 'px-3 pt-2 text-xs font-semibold text-[var(--color-danger)]',
   root: 'lg:h-full',
   scroller: 'min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto',
-  time: 'mr-1.5 font-[family-name:var(--font-mono)] text-micro text-[var(--color-ink-subtle)]',
   deletedText: 'text-[var(--color-ink-subtle)] line-through',
   deletedNote: 'ml-1.5 text-xs text-[var(--color-ink-subtle)] italic',
   triggerLit: 'ring-2 ring-[var(--color-pick)]',
@@ -170,6 +188,7 @@ export const MODVIEW_CHAT = {
   lineLit: 'bg-[color-mix(in_oklab,var(--color-caution)_18%,transparent)]',
   firstTag: 'mb-0.5 block text-xs font-semibold text-[var(--color-brand-800)]',
   badge: 'mr-1 inline-block h-4 w-4 align-[-2px]',
+  avatar: 'mr-1.5 inline-flex !h-5 !w-5 align-middle text-[0.5rem]',
   name: 'cursor-pointer font-bold hover:underline',
   deleted: 'text-[var(--color-ink-subtle)] italic',
   // Gestures, always at the start of the line
@@ -243,6 +262,8 @@ export const MODVIEW_CHAT = {
 export const MODVIEW_WARN = {
   body: 'flex flex-col gap-3',
   field: 'min-h-28 w-full',
+  quote:
+    'rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-3 py-2 text-sm text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -255,7 +276,7 @@ export const MODVIEW_MODES = {
     'flex items-center gap-1.5 rounded-[var(--radius-md)] px-2 py-1 text-xs font-bold transition-colors hover:bg-[var(--color-hover)]',
   triggerIcon: 'h-4 w-4',
   panel:
-    'absolute top-11 right-2 z-30 flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[var(--shadow-md)]',
+    "absolute top-12 right-2 z-30 flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[var(--shadow-md)] before:absolute before:-top-1.5 before:left-[var(--arrow-x,90%)] before:h-3 before:w-3 before:-translate-x-1/2 before:rotate-45 before:border-t before:border-l before:border-[var(--color-border)] before:bg-[var(--color-surface-raised)] before:content-['']",
   row: 'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-2 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent',
   // Option a scene is setting
   rowLit: 'bg-[var(--color-brand-soft)] ring-2 ring-[var(--color-pick)]',
@@ -289,7 +310,9 @@ export const MODVIEW_COMMUNITY = {
   groupLit: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-pick)]',
   groupHead: 'flex items-center gap-2 py-1 text-sm font-bold',
   groupIcon: 'h-5 w-5 shrink-0',
-  member: 'w-fit cursor-pointer text-sm font-semibold hover:underline',
+  member:
+    'flex w-full cursor-pointer items-center gap-2 py-0.5 text-sm font-semibold hover:underline',
+  memberAvatar: 'shrink-0 !h-6 !w-6 text-[0.5rem]',
   empty: 'text-xs text-[var(--color-ink-subtle)] italic',
 } as const
 
@@ -305,23 +328,34 @@ export const MODVIEW_USER = {
   docked:
     'relative flex min-h-0 shrink-0 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)] transition-[width] duration-300 ease-out motion-reduce:transition-none',
   close: 'absolute top-2 right-2',
-  head: 'relative flex flex-col items-center gap-1.5 px-4 pt-6 pb-4 text-center',
-  glyph: 'h-9 w-9',
-  name: 'max-w-full truncate text-2xl font-bold tracking-tight',
+  head: 'relative isolate flex min-h-40 flex-col items-center justify-end gap-1.5 overflow-hidden px-4 pt-6 pb-4 text-center',
+  // Channel banner behind the identity, faded into the card
+  banner:
+    'absolute inset-0 -z-10 h-full w-full object-cover opacity-60 [mask-image:linear-gradient(to_bottom,black_40%,transparent)]',
+  portrait: '!h-14 !w-14 shrink-0 ring-2 ring-[var(--twitch-background)]',
+  identity: 'relative z-10 flex max-w-full items-center justify-center gap-3',
+  identityLink: 'transition-opacity hover:opacity-80',
+  name: 'min-w-0 truncate text-2xl font-bold tracking-tight',
   watch: 'mt-1',
-  tabs: 'relative flex flex-nowrap items-center justify-center gap-0.5 px-2 pb-3',
+  tabs: 'relative mt-4 flex flex-nowrap items-center justify-center gap-0.5 px-2 pb-3',
   // Box gliding under the open tab
   tabBox:
     'pointer-events-none absolute top-0 left-0 rounded-full bg-[var(--twitch-head)] opacity-0',
   tab: 'relative rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap text-[var(--twitch-muted)] transition-colors hover:text-[var(--color-ink)]',
   tabOn: 'text-[var(--color-ink)]',
+  // Bold button version, for the lists inside the box
+  buttons: 'relative grid auto-cols-fr grid-flow-col gap-2 px-3 pb-3',
+  buttonBox:
+    'pointer-events-none absolute top-0 left-0 rounded-[var(--radius-md)] bg-[color-mix(in_oklab,var(--color-ink-accent)_30%,transparent)] opacity-0',
+  button:
+    'relative rounded-[var(--radius-md)] bg-[color-mix(in_oklab,var(--color-ink)_8%,transparent)] px-3 py-2 text-sm font-bold text-[var(--twitch-muted)] transition-colors hover:text-[var(--color-ink)]',
   stats:
-    'mx-4 grid auto-cols-fr grid-flow-col divide-x divide-[color-mix(in_oklab,var(--color-ink)_22%,transparent)] rounded-[var(--radius-md)] bg-[var(--twitch-head)] py-3',
-  stat: 'flex min-w-0 flex-col items-center gap-1 px-2 text-center',
+    'mx-4 mb-8 grid auto-cols-fr grid-flow-col divide-x divide-[color-mix(in_oklab,var(--color-ink)_22%,transparent)] rounded-[var(--radius-md)] bg-[var(--twitch-head)] py-3',
+  stat: 'flex min-w-0 items-center justify-center gap-3 px-2',
   statIcon: 'h-6 w-6',
   statValue: 'text-2xl leading-none font-bold tabular-nums',
   body: 'flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-4',
-  section: 'flex flex-col gap-2',
+  section: 'flex flex-col gap-8',
   label: 'text-xs font-bold tracking-wide text-[var(--color-ink-accent)] uppercase',
   messages:
     'flex max-h-60 flex-col overflow-y-auto rounded-[var(--radius-md)] bg-[var(--twitch-head)] px-3 py-1',
@@ -334,21 +368,50 @@ export const MODVIEW_USER = {
   commentAuthor: 'text-sm font-bold text-[var(--color-ink-accent)]',
   commentDate: 'shrink-0 text-xs text-[var(--twitch-muted)]',
   commentBody: 'text-sm break-words whitespace-pre-wrap',
-  group: 'flex flex-col gap-1.5',
-  groupHead: 'flex items-center gap-1.5 text-xs font-bold text-[var(--twitch-muted)]',
+  group: 'flex flex-col gap-3',
+  groupHead:
+    'flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--twitch-muted)]',
   groupIcon: 'h-4 w-4',
-  presets: 'grid grid-cols-3 gap-1.5',
+  presets: 'grid grid-cols-3 gap-2',
   presetWide: 'col-span-3',
-  pager: 'flex items-center justify-between gap-2',
-  pagerLabel: 'text-xs font-bold tabular-nums text-[var(--twitch-muted)]',
-  messageRow: 'flex items-start gap-2',
-  messageText: 'min-w-0 flex-1',
-  messageTool:
-    'flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-30',
   preset:
-    'rounded-[var(--radius-md)] bg-[var(--twitch-head)] py-2 text-center text-xs font-bold transition-colors hover:brightness-125 disabled:cursor-not-allowed disabled:opacity-40',
+    'rounded-[var(--radius-md)] bg-[var(--twitch-head)] py-2.5 text-center text-xs font-bold transition-colors hover:brightness-125 disabled:cursor-not-allowed disabled:opacity-40',
   actions: 'grid grid-cols-2 gap-2',
+  actionWide: 'col-span-2',
   lock: 'text-xs text-[var(--twitch-muted)]',
+  // Situation: figures and gestures scroll above, the lists take the rest
+  situation: 'flex flex-1 flex-col',
+  // Metrics and open tab scroll together
+  scroll: 'flex min-h-0 flex-1 flex-col overflow-y-auto',
+  gestures: 'flex flex-col gap-8 px-4 pb-8',
+  statRow: 'flex items-center justify-center gap-1.5',
+  banBox:
+    'rounded-[var(--radius-md)] bg-[color-mix(in_oklab,var(--color-danger)_16%,var(--twitch-head))] px-3 py-2.5 text-sm leading-snug font-semibold',
+  listsTitle:
+    'mx-4 mb-3 flex items-center justify-center text-xs font-bold text-[var(--twitch-muted)]',
+  lists:
+    'mx-4 mb-8 flex min-h-64 flex-1 flex-col overflow-hidden rounded-[var(--radius-md)] bg-[var(--twitch-head)] pt-3',
+  listBody: 'min-h-0 flex-1 overflow-y-auto px-4 py-2',
+  dayHead:
+    'sticky top-0 z-10 -mx-4 mt-4 mb-1 flex items-center gap-3 bg-[var(--twitch-head)] px-4 py-2 text-xs font-bold tracking-wide text-[var(--color-ink-accent)] uppercase before:h-px before:flex-1 before:bg-current before:opacity-30 after:h-px after:flex-1 after:bg-current after:opacity-30 first:mt-0',
+  line: 'flex items-start gap-2 py-1 text-sm leading-snug break-words',
+  lineRemoved: 'opacity-50',
+  // Hour on the left, aligned with the first row of text
+  lineTime:
+    'shrink-0 pt-px font-[family-name:var(--font-mono)] text-micro text-[var(--twitch-muted)] tabular-nums',
+  lineTag: 'ml-1.5 text-xs font-bold text-[var(--twitch-muted)]',
+  more: 'mx-auto my-2 block text-xs font-bold text-[var(--color-ink-accent)] hover:underline',
+  note: 'pb-2 text-xs text-[var(--twitch-muted)]',
+  sanction:
+    'relative flex flex-col gap-1 py-3 after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-[color-mix(in_oklab,var(--color-ink)_14%,transparent)] last:after:hidden',
+  sanctionHead: 'flex items-baseline justify-between gap-3',
+  sanctionDate: 'shrink-0 text-xs font-bold tabular-nums text-[var(--twitch-muted)]',
+  sanctionTag: 'min-w-0 text-sm font-bold',
+  sanctionReason: 'text-sm leading-snug break-words',
+  sanctionLink: 'w-fit text-left text-xs font-bold text-[var(--color-ink-accent)] hover:underline',
+  sanctionQuote:
+    'rounded-[var(--radius-sm)] bg-[color-mix(in_oklab,var(--color-ink)_8%,transparent)] px-2.5 py-1.5 text-sm break-words',
+  notes: 'flex flex-1 flex-col gap-4 p-4',
 } as const
 
 /**
@@ -370,8 +433,6 @@ export const MODVIEW_SANCTIONS = {
     'bg-[var(--twitch-head)] px-3 py-2 text-sm font-bold tracking-tight text-[var(--color-ink-accent)]',
   bottomBody: 'flex min-h-0 flex-1 flex-col overflow-y-auto',
   suggestion: 'my-3 flex flex-col gap-3',
-  suggestionTitle: 'flex items-center gap-2 text-base font-bold tracking-tight',
-  suggestionIcon: 'h-5 w-5 shrink-0',
   level: 'mb-3 flex items-center gap-2 text-xs font-bold tracking-wide uppercase',
   group: 'mb-4 flex flex-col gap-1.5',
   groupTitle: `${PROPERTY_LABEL} text-[var(--accent)]`,
@@ -388,11 +449,10 @@ export const MODVIEW_SANCTIONS = {
   hint: 'text-xs text-[var(--color-ink-subtle)] italic',
   empty: 'text-sm text-[var(--color-ink-subtle)] italic',
   // Second version: centred level, search, glyph tabs, then text boxes
-  head: 'flex flex-col items-center gap-1 pb-3 text-center',
-  headGlyph: 'h-8 w-8',
-  headName: 'text-sm font-bold tracking-wide uppercase',
+  head: 'flex items-center gap-2',
+  headGlyph: 'size-7 shrink-0',
   search:
-    'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
+    'min-w-0 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
   list: 'flex flex-col gap-2',
   title:
     'w-full cursor-pointer rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-3 py-2 text-left text-sm font-bold transition-colors hover:bg-[color-mix(in_oklab,var(--color-ink)_12%,var(--color-surface-sunken))]',
@@ -467,8 +527,8 @@ export const MODVIEW_SIDEBAR = {
   divider: 'h-px w-6 bg-[var(--color-border)]',
   creator: 'flex size-10 items-center justify-center',
   // Leave dialog: two full width choices split by a line
-  leaveChoices: 'flex w-full flex-col gap-3',
-  leaveDivider: 'h-px w-full bg-[var(--color-border)]',
+  leaveChoices: 'grid w-full grid-cols-1 gap-3 sm:grid-cols-3',
+  leaveButton: 'w-full min-w-0',
   stack: 'flex flex-col items-center gap-3',
   group: 'relative flex flex-col items-center gap-1',
   button:
@@ -480,7 +540,7 @@ export const MODVIEW_SIDEBAR = {
   // Centred on its glyph, the arrow points at it
   // Room for a list with its own controls
   panelNormal: 'w-72',
-  panelWide: 'w-[28rem]',
+  panelWide: 'w-80 !max-h-[88dvh]',
   panelTop: 'top-1/2 -translate-y-1/2',
   panelBottom: 'top-1/2 -translate-y-1/2',
   arrow:

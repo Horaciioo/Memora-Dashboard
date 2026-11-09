@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PlayHistory } from '@/composites/play/mobile/PlayHistory'
 import { PlayHistoryFilter } from '@/composites/play/mobile/PlayHistoryFilter'
 import { listPlayHistory } from '@/core/services/play'

@@ -23,6 +23,8 @@ export type NotificationTargetName =
   | 'home'
   | 'page'
   | 'identity'
+  | 'playGame'
+  | 'playGroup'
 
 /**
  * Where one notification leads
@@ -63,6 +65,8 @@ const NOTIFICATION_TARGET_MAP: Record<NotificationTargetName, NotificationTarget
   home: { label: 'tes tâches', route: () => ROUTES.home },
   // Opened by Memora, never a page
   identity: { label: 'l’identifiant', route: () => null },
+  playGame: { label: 'la partie', route: (id) => (id ? ROUTES.playSession(id) : ROUTES.play) },
+  playGroup: { label: 'le groupe', route: () => ROUTES.play },
   page: { label: 'la page', route: (id) => (id ? ROUTES.page(id) : ROUTES.pages) },
   calendar: {
     label: 'le calendrier',

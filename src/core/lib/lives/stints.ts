@@ -1,3 +1,5 @@
+import { SECOND_MS } from '@/utils/constants/time'
+
 /**
  * Stretch a member moderated
  * @typedef {Object} StintRow
@@ -40,7 +42,7 @@ export const foldStints = (rows: StintRow[], cap: Date): StintTotal[] =>
     .map(([accountId, list]) => {
       const ends = list.map((row) => Math.max(+row.startedAt, +(row.stoppedAt ?? cap)))
       const seconds = list.reduce(
-        (sum, row, index) => sum + (ends[index] - +row.startedAt) / 1000,
+        (sum, row, index) => sum + (ends[index] - +row.startedAt) / SECOND_MS,
         0
       )
 
@@ -73,8 +75,8 @@ export const windowFit = (
     const start = +row.startedAt
     const end = Math.max(start, +(row.stoppedAt ?? cap))
     const shared = Math.max(0, Math.min(end, +hours.to) - Math.max(start, +hours.from))
-    inside += shared / 1000
-    outside += (end - start - shared) / 1000
+    inside += shared / SECOND_MS
+    outside += (end - start - shared) / SECOND_MS
   })
 
   return { inside: Math.round(inside), outside: Math.round(outside) }

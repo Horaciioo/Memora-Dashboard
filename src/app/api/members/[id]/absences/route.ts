@@ -1,7 +1,7 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { ABSENCE_FIELDS, createAbsence } from '@/core/services/absences/AbsenceService'
 import { recordEvent } from '@/core/services/system/ActivityService'
-import { formatDayRange } from '@/utils/format/dates'
+import { formatDayRange } from '@/utils/format/time/dates'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const POST = createProtectedRoute({

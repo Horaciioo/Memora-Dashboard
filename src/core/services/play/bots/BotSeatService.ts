@@ -3,13 +3,14 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
-import { seatBoundsOf } from '@/core/lib/play/seats'
+import { botRoomOf, seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict } from '@/core/lib/errors'
 import { pickSeatColor } from '@/core/lib/play'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { signalPlay } from '@/core/lib/play/signal'
 import { botLevelsOf, PLAY_BOT_AVATARS, PLAY_BOT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
+import { areBotsAwake } from '@/declarations/play/bots'
 import { announceInChat } from '@/core/services/play/PlayChatService'
 import { lockSession, requireHost } from '@/core/services/play/PlaySessionService'
 import { PlayMessageKinds, PlayStatuses } from '@/utils/constants/play'
@@ -77,8 +78,11 @@ const seatBots = async (
   const present = session.seats.filter(isPresent)
   const names = new Set(present.map((seat) => seat.account.displayName))
   const colors = present.map((seat) => seat.color)
-  const free = Math.min(count, seatBoundsOf(session.game, session.settings).max - present.length)
-  if (free <= 0) throw conflict(PLAY_ERRORS.full)
+  const seats = seatBoundsOf(session.game, session.settings).max
+  const room = botRoomOf(present.filter((seat) => seat.account.botKind).length)
+  if (seats <= present.length) throw conflict(PLAY_ERRORS.full)
+  if (room <= 0) throw conflict(PLAY_ERRORS.botsFull)
+  const free = Math.min(count, seats - present.length, room)
 
   // Callsigns not yet at the table
   const indexes = PLAY_BOT_SETTINGS.callsigns
@@ -120,6 +124,7 @@ export const addBots = async (
     const session = await lockSession(tx, sessionId)
     requireHost(session, hostId)
     if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
+    if (!areBotsAwake(session.game)) throw conflict(PLAY_ERRORS.botsOff)
 
     return seatBots(tx, session, {
       level: readBotLevel(session, level),

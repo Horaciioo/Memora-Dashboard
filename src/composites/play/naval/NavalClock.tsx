@@ -2,8 +2,8 @@
 
 import type { CSSProperties } from 'react'
 
-import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
-import { NAVAL_HUD } from '@/declarations/ui/variants/naval'
+import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
+import { NAVAL_HUD } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 import { SECOND_MS } from '@/utils/constants/time'
 

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 import { PlayGroupPanel } from '@/composites/play/group/PlayGroupPanel'
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { readPlayGroup } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_GROUP_COPY } from '@/declarations/play'

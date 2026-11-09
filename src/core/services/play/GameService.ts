@@ -9,6 +9,7 @@ import { mayEnter, mayOversee } from '@/core/lib/play/access'
 import { signalPlay } from '@/core/lib/play/signal'
 import { clearSessionTimers, scheduleDeadline } from '@/core/lib/play/timers'
 import { PLAY_ERRORS } from '@/declarations/play'
+import { areBotsAwake } from '@/declarations/play/bots'
 import type { EngineStep } from '@/core/engines/play'
 import { driveBots } from '@/core/engines/play/players/BotDriver'
 import { logger } from '@/core/lib/logger'
@@ -27,15 +28,21 @@ import { isPresent, toEngineSession } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { toSessionView } from '@/core/lib/play/views'
 import { PlayStatuses } from '@/utils/constants/play'
+import type { PlayGameName } from '@/utils/constants/play'
 
 /**
  * Follow up an engine move
  * @param {string} sessionId - Game
+ * @param {PlayGameName} game - Game kind
  * @param {EngineStep} step - Move result
  * @return {Promise<void>} - Applied
  */
 
-const applyStep = async (sessionId: string, step: EngineStep): Promise<void> => {
+const applyStep = async (
+  sessionId: string,
+  game: PlayGameName,
+  step: EngineStep
+): Promise<void> => {
   if (step.finished) {
     clearSessionTimers(sessionId)
     await finishSession(sessionId)
@@ -47,7 +54,7 @@ const applyStep = async (sessionId: string, step: EngineStep): Promise<void> => 
   if (step.changed || step.finished) await signalPlay(sessionId, step.finished, !step.finished)
   // Bots answer the new board
   if (step.changed && !step.finished) {
-    void driveBots(sessionId, playMove).catch((error: unknown) =>
+    void driveBots(sessionId, game, playMove).catch((error: unknown) =>
       logger.warn('[play] bots stalled', error)
     )
   }
@@ -64,7 +71,7 @@ export const settleSession = async (sessionId: string): Promise<LoadedSession> =
   if (session.status !== PlayStatuses.Running) return session
 
   const step = await engineOf(session.game).settle(toEngineSession(session))
-  await applyStep(sessionId, step)
+  await applyStep(sessionId, session.game, step)
 
   return step.changed || step.finished ? loadSession(sessionId) : session
 }
@@ -126,6 +133,10 @@ export const startSession = async (sessionId: string, hostId: string): Promise<v
     const locked = await lockSession(tx, sessionId)
     requireHost(locked, hostId)
     if (locked.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
+    // Sleeping bots never take a turn
+    if (!areBotsAwake(locked.game) && locked.seats.some((seat) => isPresent(seat) && seat.account.botKind)) {
+      throw conflict(PLAY_ERRORS.botsSeated)
+    }
     if (locked.seats.filter(isPresent).length < seatBoundsOf(locked.game, locked.settings).min) {
       throw conflict(PLAY_ERRORS.tooFewPlayers)
     }
@@ -140,7 +151,11 @@ export const startSession = async (sessionId: string, hostId: string): Promise<v
 
   // A table that failed to open goes back to the lobby, never stuck running
   try {
-    await applyStep(sessionId, await engineOf(session.game).start(toEngineSession(session)))
+    await applyStep(
+      sessionId,
+      session.game,
+      await engineOf(session.game).start(toEngineSession(session))
+    )
   } catch (error) {
     await prisma.playSession.update({
       where: { id: sessionId },
@@ -190,6 +205,7 @@ const playMove = async (
 
   await applyStep(
     sessionId,
+    session.game,
     await engineOf(session.game).act(toEngineSession(session), accountId, raw)
   )
 }

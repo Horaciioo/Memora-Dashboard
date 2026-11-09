@@ -3,14 +3,14 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { LiveActions } from '@/composites/lives/LiveActions'
 import type { LiveActionsProps } from '@/composites/lives/LiveActions'
-import { LiveCoordinator } from '@/composites/lives/LiveCoordinator'
+import { LiveCoordinator } from '@/composites/lives/coordination/LiveCoordinator'
 import { Permissions } from '@/utils/constants/permissions'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_TILE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatClock } from '@/utils/format/dates'
+import { formatClock } from '@/utils/format/time/dates'
 
 /**
  * Live still to come, a compact portrait tile

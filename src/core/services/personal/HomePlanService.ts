@@ -8,7 +8,7 @@ import type { HomePlanned } from '@/types/personal'
 import { AttendanceStatuses, CalendarSources } from '@/utils/constants/workflow'
 import type { CalendarSourceName } from '@/utils/constants/workflow'
 import { Permissions } from '@/utils/constants/permissions'
-import { addDays, startOfDay } from '@/utils/format/days'
+import { addDays, startOfDay } from '@/utils/format/time/days'
 
 // Told apart on the home: birthdays have their own box, absences stay on the calendar
 const LEFT_OUT: CalendarSourceName[] = [CalendarSources.Birthday, CalendarSources.Absence]

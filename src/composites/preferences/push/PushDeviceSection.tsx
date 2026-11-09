@@ -38,11 +38,11 @@ export const PushDeviceSection = ({
   onDisable,
   onTrial,
 }: PushDeviceSectionProps) => {
-  const { support, endpoint, isBusy } = device
+  const { support, endpoint, isBusy, isChecked } = device
   const isOn = Boolean(endpoint)
 
   // Unknown until the browser answers
-  if (!support) return null
+  if (!support || !isChecked) return null
 
   const blocked = !isConfigured
     ? PUSH_COPY.notConfigured

@@ -14,7 +14,7 @@ import {
   YARD_STEP,
 } from '@/core/lib/play/ludo'
 import type { LudoBoardState, LudoLineView } from '@/core/lib/play/ludo'
-import { useLudoPlayedStore } from '@/core/store/ludoPlayed'
+import { useLudoPlayedStore } from '@/core/store/play/ludoPlayed'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { LUDO_MIX } from '@/declarations/play/ludo/sounds'
 

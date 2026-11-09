@@ -11,7 +11,7 @@ import type { EditableEntry } from '@/components/structures/inline/EditableDetai
 import { ObserveBox } from '@/composites/recruitment/candidate/ObserveBox'
 import { useStartInterview } from '@/composites/recruitment/file/useStartInterview'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { useClock } from '@/core/hooks/interaction/state/useClock'
+import { useClock } from '@/core/hooks/interaction/state/time/useClock'
 import { useObserving } from '@/core/hooks/data/recruitment/useObserving'
 import type { RecordFile } from '@/core/hooks/data/work/useRecordFile'
 import { pickedOptions } from '@/core/lib/forms/options'

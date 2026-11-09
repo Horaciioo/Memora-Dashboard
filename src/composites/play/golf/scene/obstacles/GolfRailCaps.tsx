@@ -5,7 +5,7 @@ import { DoubleSide, Matrix4, Quaternion, Vector3 } from 'three'
 import type { InstancedMesh } from 'three'
 
 import { railCaps } from '@/composites/play/golf/scene/obstacles/edges'
-import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import type { GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'

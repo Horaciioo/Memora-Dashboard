@@ -19,7 +19,7 @@ import {
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { useQuestionnaire } from '@/core/hooks/data/recruitment/useQuestionnaire'
-import { useInterviewStep } from '@/core/hooks/interaction/state/useInterviewStep'
+import { useInterviewStep } from '@/core/hooks/interaction/state/recruitment/useInterviewStep'
 import { useExercisePick } from '@/core/hooks/interaction/scenes/useExercisePick'
 import { isInterviewLocked } from '@/core/lib/recruitment/interviewLock'
 import { offeredExercises } from '@/core/lib/recruitment/exercises'

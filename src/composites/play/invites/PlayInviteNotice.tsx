@@ -3,7 +3,7 @@
 import { PlayInviteSentence } from '@/composites/play/invites/PlayInviteSentence'
 import { usePlayNoticeAnswer } from '@/core/hooks/data/play/usePlayNoticeAnswer'
 import { noticeLabels } from '@/core/lib/play/notices'
-import { usePendingNotice } from '@/core/store/playNotices'
+import { usePendingNotice } from '@/core/store/play/playNotices'
 import { PLAY_INVITE_COPY } from '@/declarations/play/invites'
 import { RELEASE_NOTICE } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'

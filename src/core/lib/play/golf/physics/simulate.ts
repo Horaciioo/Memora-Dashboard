@@ -1,0 +1,187 @@
+import type { GolfBody } from '@/core/lib/play/golf/physics/body'
+import { createBody, halt, isInPlay, speedOf, wake } from '@/core/lib/play/golf/physics/body'
+import { canRest, pushBody } from '@/core/lib/play/golf/physics/forces'
+import { pathPoint } from '@/core/lib/play/golf/physics/frames'
+import { contactsOf } from '@/core/lib/play/golf/physics/contacts'
+import { settleGround } from '@/core/lib/play/golf/physics/ground'
+import { isIced } from '@/core/lib/play/golf/physics/obstacles'
+import { shotSpeed } from '@/core/lib/play/golf/rules'
+import { padHeight } from '@/core/lib/play/golf/physics/terrain'
+import type { GolfWorld } from '@/core/lib/play/golf/physics/world'
+import { createWorld } from '@/core/lib/play/golf/physics/world'
+import type { GolfShotInput, GolfShotResult } from '@/core/lib/play/golf/types'
+import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { SECOND_MS } from '@/utils/constants/time'
+
+const { physics } = GOLF_SETTINGS
+
+// Most substeps of one step
+const MAX_SUBSTEPS = 16
+
+/**
+ * Substeps keeping each move under half a radius
+ * @param {GolfBody[]} moving - Moving bodies
+ * @param {number} dt - Step seconds
+ * @return {number} - Substeps
+ */
+
+const substepsOf = (moving: GolfBody[], dt: number): number => {
+  const fastest = Math.max(...moving.map(speedOf))
+  const smallest = Math.min(...moving.map((body) => body.radius))
+
+  return Math.min(MAX_SUBSTEPS, Math.max(1, Math.ceil((fastest * dt) / (smallest * 0.5))))
+}
+
+/**
+ * Write every body's spot on the frame track
+ * @param {GolfWorld} world - Simulation
+ * @return {void}
+ */
+
+const record = (world: GolfWorld): void => {
+  for (const body of world.bodies) body.path.push(...pathPoint(body.x, body.y, body.z))
+  world.frames += 1
+}
+
+/**
+ * One fixed step of the simulation
+ * @param {GolfWorld} world - Simulation
+ * @param {number} step - Step index
+ * @return {void}
+ */
+
+const advance = (world: GolfWorld, step: number): void => {
+  const dt = 1 / physics.stepHz
+  const at = world.input.at + step * dt * SECOND_MS
+  const context = {
+    hazards: world.hazards,
+    hole: world.input.hole,
+    at,
+    seconds: (at - world.input.holeStart) / SECOND_MS,
+  }
+  const moving = world.bodies.filter((body) => body.isMoving)
+  for (const body of moving) pushBody(body, context, dt)
+
+  // Small moves, contacts after each
+  const substeps = substepsOf(moving, dt)
+  for (let index = 0; index < substeps; index += 1) {
+    for (const body of world.bodies) {
+      body.lastX = body.x
+      body.lastZ = body.z
+      if (!body.isMoving) continue
+      body.x += (body.vx * dt) / substeps
+      body.z += (body.vz * dt) / substeps
+    }
+    contactsOf(world, at)
+    for (const body of world.bodies) {
+      if (body.isMoving) settleGround(world, body, { at, dt: dt / substeps })
+    }
+  }
+
+  // Slow bodies come to rest
+  const iced = isIced(world.hazards, at)
+  for (const body of world.bodies) {
+    if (body.isMoving && canRest(body, iced)) {
+      halt(body)
+      settleGround(world, body, { at, dt: 0 }, true)
+    }
+  }
+}
+
+/**
+ * Where each moved ball ends
+ * @param {GolfWorld} world - Simulation
+ * @return {GolfShotResult['outcomes']} - Outcomes
+ */
+
+const outcomesOf = (world: GolfWorld): GolfShotResult['outcomes'] =>
+  Object.fromEntries(
+    world.bodies
+      .filter((body) => body.hasMoved)
+      .map((body) => [
+        body.id,
+        {
+          x: isInPlay(body) || body.isHoled ? body.x : body.originX,
+          z: isInPlay(body) || body.isHoled ? body.z : body.originZ,
+          isHoled: body.isHoled,
+          hasFallen: body.hasFallen,
+        },
+      ])
+  )
+
+/**
+ * Balls already rolling carry on, a replay
+ * @param {GolfWorld} world - Simulation
+ * @return {void}
+ */
+
+const carryOn = (world: GolfWorld): void => {
+  const motions = world.input.motions ?? {}
+  for (const body of world.bodies) {
+    const motion = motions[body.id]
+    if (!motion) continue
+    body.vx = motion.vx
+    body.vz = motion.vz
+    // Airborne above its floor
+    const floor = body.pad ? padHeight(body.pad, body.x, body.z) : -Infinity
+    if (motion.y > floor + physics.stepUp) {
+      body.y = motion.y
+      body.vy = motion.vy
+      body.isAirborne = true
+      body.pad = null
+    }
+    wake(body)
+  }
+}
+
+/**
+ * Play one stroke to the end
+ * @param {GolfShotInput} input - Shot
+ * @return {GolfShotResult} - Tracks and outcomes
+ */
+
+export const simulateShot = (input: GolfShotInput): GolfShotResult => {
+  const world = createWorld(
+    input,
+    input.balls.map((ball) => createBody(ball, input))
+  )
+  carryOn(world)
+  const shooter = world.bodies.find((body) => body.id === input.shooterId)
+  if (shooter) {
+    // Stroke speed, angle zero toward +z
+    const speed = shotSpeed(input.power, shooter.powerScale)
+    shooter.vx = Math.sin(input.angle) * speed
+    shooter.vz = Math.cos(input.angle) * speed
+    // Lob leaves the ground
+    if (shooter.isLob) {
+      shooter.vy = speed * GOLF_SETTINGS.powers.lob.lift
+      shooter.isAirborne = true
+      shooter.pad = null
+    }
+    wake(shooter)
+    world.emit('hit', shooter.id, speed)
+  }
+
+  // Fixed steps until all rest
+  record(world)
+  const maxSteps = Math.ceil(physics.maxSeconds * physics.stepHz)
+  for (let step = 1; step <= maxSteps && world.bodies.some((body) => body.isMoving); step += 1) {
+    advance(world, step)
+    if (step % physics.frameEvery === 0) record(world)
+  }
+  record(world)
+  for (const body of world.bodies) if (body.isMoving) halt(body)
+
+  return {
+    frameMs: (SECOND_MS * physics.frameEvery) / physics.stepHz,
+    frames: world.frames,
+    paths: Object.fromEntries(
+      world.bodies.filter((body) => body.hasMoved).map((body) => [body.id, body.path])
+    ),
+    outcomes: outcomesOf(world),
+    events: world.events,
+    bumperHits: world.bumperHits,
+    pickups: world.pickups,
+    flashId: shooter?.isFlash ? shooter.id : null,
+  }
+}

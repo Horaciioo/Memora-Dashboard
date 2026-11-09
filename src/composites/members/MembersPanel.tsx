@@ -30,6 +30,7 @@ import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { AcceptedCandidate, MemberSummary } from '@/types/members'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
+import { withToggled } from '@/utils/format/arrays'
 
 export interface MembersPanelProps {
   initialMembers: MemberSummary[]
@@ -112,15 +113,7 @@ export const MembersPanel = ({
   const [flipped, setFlipped] = useState<Set<string>>(new Set())
   const ChevronIcon = ICONS.expand
 
-  const toggleGroup = (key: string) => {
-    setFlipped((current) => {
-      const next = new Set(current)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-
-      return next
-    })
-  }
+  const toggleGroup = (key: string) => setFlipped((current) => withToggled(current, key))
 
   const isFiltered =
     search.trim().length > 0 || Object.values(filters).some((value) => value.length > 0)

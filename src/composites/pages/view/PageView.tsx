@@ -12,14 +12,10 @@ import { PageHistory } from '@/composites/pages/view/PageHistory'
 import { PageMenu } from '@/composites/pages/view/PageMenu'
 import { PageTopBar } from '@/composites/pages/view/PageTopBar'
 import { TrashedBanner } from '@/composites/pages/view/TrashedBanner'
-import { usePageWidth } from '@/core/hooks/interaction/state/usePageWidth'
-import {
-  usePageActions,
-  usePageDoc,
-  usePageLive,
-  usePageMeta,
-  usePagePresence,
-} from '@/core/hooks/data/pages'
+import { usePageWidth } from '@/core/hooks/interaction/state/saved/usePageWidth'
+import { usePageActions, usePageLive, usePageMeta } from '@/core/hooks/data/pages'
+import { usePageDoc } from '@/core/hooks/data/pages/usePageDoc'
+import { usePagePresence } from '@/core/hooks/data/pages/usePagePresence'
 import { levelAllows } from '@/core/lib/pages'
 import { tintOf } from '@/core/lib/realtime/tint'
 import { PAGES_COPY } from '@/declarations/pages/copy'

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-import { useComfortStore } from '@/core/store/comfort'
+import { useComfortStore } from '@/core/store/appearance/comfort'
 import { COMFORT_DEFAULTS } from '@/declarations/preferences/comfort'
 import type { ComfortKey } from '@/declarations/preferences/comfort'
 

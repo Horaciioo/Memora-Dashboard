@@ -7,7 +7,7 @@ import { SECURITY_COPY } from '@/declarations/preferences/settings'
 import { ICONS } from '@/declarations/ui/icons'
 import { SESSION_LIST } from '@/declarations/ui/variants'
 import { deviceLabel, readDevice } from '@/utils/format/device'
-import { formatSince } from '@/utils/format/dates'
+import { formatSince } from '@/utils/format/time/dates'
 
 export interface SessionsSectionProps {
   state: SessionsState

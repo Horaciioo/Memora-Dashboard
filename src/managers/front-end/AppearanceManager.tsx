@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-import { useAppearanceStore } from '@/core/store/appearance'
+import { useAppearanceStore } from '@/core/store/appearance/appearance'
 
 /**
  * Sync appearance

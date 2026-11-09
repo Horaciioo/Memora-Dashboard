@@ -5,7 +5,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { PAGES_COPY } from '@/declarations/pages/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { PAGES_HOME_STYLES } from '@/declarations/ui/variants'
-import { formatSince } from '@/utils/format/dates'
+import { formatSince } from '@/utils/format/time/dates'
 
 export interface PageListProps {
   pages: { id: string; title: string; icon: string | null; hint?: string; updatedAt?: string }[]

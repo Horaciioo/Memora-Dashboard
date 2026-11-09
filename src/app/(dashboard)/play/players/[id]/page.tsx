@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 
 import { PlayGameLevels } from '@/composites/play/member/stats/PlayGameLevels'
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PlayPlayerHero } from '@/composites/play/member/stats/PlayPlayerHero'
 import { PlayPlayerPresence } from '@/composites/play/member/stats/PlayPlayerPresence'
 import { PlayProfileSections } from '@/composites/play/member/stats/PlayProfileSections'

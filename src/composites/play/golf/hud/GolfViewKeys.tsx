@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { GolfSettings } from '@/composites/play/golf/hud/GolfSettings'
-import { usePlayStageStore } from '@/core/store/playStage'
+import { usePlayStageStore } from '@/core/store/play/playStage'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { GOLF_BOARD } from '@/declarations/ui/variants'

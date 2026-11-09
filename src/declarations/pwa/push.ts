@@ -32,11 +32,18 @@ export const PUSH_INPUT_LIMITS = { endpoint: 1024, key: 256 } as const
 export const PUSH_KEY_PATTERN = /^[A-Za-z0-9_-]+=*$/
 
 /**
- * Push service topic, collapses a resent push
- * @type {RegExp}
+ * Characters of a push topic
+ * @type {number}
  */
 
-export const PUSH_TOPIC_PATTERN = /^[A-Za-z0-9_-]{1,32}$/
+export const PUSH_TOPIC_LENGTH = 32
+
+/**
+ * Browser key of a deliberate opt-out
+ * @type {string}
+ */
+
+export const PUSH_OPT_OUT_KEY = 'memora:push-off'
 
 /**
  * Query key of the journal page cursor

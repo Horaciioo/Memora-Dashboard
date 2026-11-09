@@ -6,7 +6,7 @@ import { useAuth } from '@/core/hooks/auth/useAuth'
 import { useSessionUser } from '@/core/hooks/auth/useSessionUser'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
-import { setActiveZone } from '@/utils/format/zone'
+import { setActiveZone } from '@/utils/format/time/zone'
 
 /**
  * Auth context

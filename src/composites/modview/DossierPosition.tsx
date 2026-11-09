@@ -1,7 +1,6 @@
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { nextRung } from '@/core/lib/modview/commands'
-import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MODVIEW_DOSSIER } from '@/declarations/ui/variants'
 import { MODVIEW_DOSSIER_COPY as COPY } from '@/declarations/modview/watch'
 import type { SanctionOffenseCard } from '@/types/sanctions'
@@ -23,12 +22,6 @@ export interface DossierPositionProps {
 
 export const DossierPosition = ({ ladders, chatter, onPrefill }: DossierPositionProps) => (
   <div className={MODVIEW_DOSSIER.section}>
-    <div className={MODVIEW_DOSSIER.head}>
-      <h4 className={MODVIEW_DOSSIER.label}>{COPY.positionTitle}</h4>
-      <span className={MODVIEW_DOSSIER.note}>
-        {COPY.window.replace('{days}', String(LIVE_SETTINGS.dossierWindowDays))}
-      </span>
-    </div>
     {ladders.length === 0 ? (
       <EmptyState compact figure="moderation" title={COPY.ladderEmpty} />
     ) : (

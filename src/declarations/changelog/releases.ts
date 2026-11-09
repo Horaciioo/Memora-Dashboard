@@ -127,26 +127,14 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: '0.11.0',
-    date: '2026-11-08',
+    version: '0.11.1',
+    date: '2026-11-09',
     title: 'Memora Play sur son 31',
     intro:
-      'Memora Play passe à la vitesse supérieure : une Bataille navale, des bots pour compléter les tables, des groupes, neuf nouvelles maps de Golf, et une chasse aux bugs sans précédent, avec 45 corrections dans cette version.',
+      'Memora Play passe à la vitesse supérieure : des bots pour compléter les tables, des groupes, neuf nouvelles maps de Golf, et une chasse aux bugs sans précédent, avec 54 corrections dans cette version.',
     description:
-      'Les parties de Memora Play manquaient de joueurs à certaines heures, se perdaient dans des tables oubliées et cachaient plusieurs défauts de jeu, du Golf au Ludo en passant par la Bombe et le Baccalauréat. Cette version ajoute la Bataille navale, les bots, les parties privées, les groupes, l’historique et la carrière de chaque joueur, refait les maps du Golf et corrige un nombre record de bugs, autant dans le jeu que dans l’Academy, le Recrutement et le Panel de sanctions. Les Formateurs deviennent des Référents partout, et chaque candidat accepté confirme désormais son identité Discord avant d’entrer.',
+      'Les parties de Memora Play manquaient de joueurs à certaines heures, se perdaient dans des tables oubliées et cachaient plusieurs défauts de jeu, du Golf au Ludo en passant par la Bombe et le Baccalauréat. Cette version ajoute les bots, les parties privées, les groupes, l’historique et la carrière de chaque joueur, refait les maps du Golf et corrige un nombre record de bugs, autant dans le jeu que dans l’Academy, le Recrutement et le Panel de sanctions. Les Formateurs deviennent des Référents partout, et chaque candidat accepté confirme désormais son identité Discord avant d’entrer.',
     items: [
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.play,
-        permission: Permissions.PlayAccess,
-        text: 'Ajout d’une nouvelle fonctionnalité nommée « Bataille navale » : chaque capitaine place sa flotte sur la mer puis tire case par case, en Duel, en Tournoi de deux à huit capitaines ou en Chacun pour soi, sur une mer Rapide (10 x 10), Standard (12 x 12) ou Océan (36 x 36).',
-      },
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.play,
-        permission: Permissions.PlayAccess,
-        text: 'Ajout de cinq armes dans la « Bataille navale » : le Canon, la Frappe aérienne, la Bordée, l’Obus éclairant qui révèle une zone sans toucher, et la Torpille qui file jusqu’au premier navire.',
-      },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.play,
@@ -245,6 +233,60 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Ajout d’une alerte de Memora, en rouge, quand un candidat ne retrouve pas son compte : le Responsable saisit le bon identifiant Discord, vérifie qui se cache derrière et copie un nouveau lien à lui envoyer.',
       },
       {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Chat interne » dans la « Vue Modérateur » : l’équipe du live s’écrit sans quitter la vue, avec des mentions (Tout le monde, Équipe Twitch, Coordinateur, Responsables, Référent) et une alerte quand on t’appelle.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout des photos de profil des viewers devant leurs messages dans le chat de la « Vue Modérateur ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout du délai du stream Twitch à côté des minuteurs de la « Vue Modérateur », pour savoir de combien de secondes tu as de retard sur le direct.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout des réglages de la « Vue Modérateur » enregistrés sur ton compte : ils te suivent d’un appareil à l’autre.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une refonte de la fiche d’un viewer dans la « Vue Modérateur » : quatre onglets (Situations, Notes, Messages, Sanctions), le nombre de messages envoyés, le total des sanctions et la possibilité d’écrire une note.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de l’historique des messages d’un viewer dans sa fiche : ses messages sont gardés d’un live à l’autre, avec un bouton « Messages plus anciens » pour remonter le temps.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de la photo de profil et de la bannière de chaîne du viewer en haut de sa fiche, à la place du logo Twitch.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout, dans le volet des paliers de sanctions de la « Vue Modérateur », d’un champ où taper le pseudo d’un viewer : un clic sur un palier écrit sa commande dans la zone de saisie et la copie.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de notifications sur téléphone pour « Memora Play » : une invitation à une partie ou à un groupe, et le début d’une partie que tu suis, arrivent dans tes notifications, avec une catégorie « Jeux » à régler dans les paramètres.',
+      },
+      {
         tag: ChangelogTags.Improved,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
@@ -308,6 +350,63 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         page: ROUTES.changelog,
         text: 'Amélioration de la page « Nouveautés » : la présentation animée disparaît, chaque note s’ouvre directement sur son contenu.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la fenêtre qui s’ouvre quand tu quittes la « Vue Modérateur » : trois choix côte à côte (« Rester sur la vue », « Non, je continue », « Oui, j’arrête de modérer ») et une phrase qui explique quand Memora te considère encore en train de modérer.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la « Vue Modérateur » en thème clair : elle reprend les couleurs de la page, et les pseudos du chat restent lisibles sur fond clair comme sur fond sombre.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration des menus « Modes » et « Options » du chat : une petite flèche les relie au bouton qui les ouvre.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de l’équipe dans la « Vue Modérateur » : chaque rôle a la même couleur dans la liste et dans le chat interne, la liste est triée par rôle, et une arrivée est signalée au survol.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveLogRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration du « Bilan » d’un live : chaque geste de modération est rattaché à son modérateur, et une note signale les moments où aucun modérateur n’était connecté à Memora, avec leur durée.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des repères de présence : la pastille d’un membre se pose sur l’élément précis qu’il regarde ou modifie.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de « Memora Play » sur téléphone : le jeu s’ouvre désormais sans restriction.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de la salle de « Memora Play » : un décor de brumes qui dérivent derrière les parties.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration des bots de « Memora Play » : trois bots au plus par partie, et ils ne jouent plus au « Golf 3D ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la vitesse de Memora : la visite guidée, la recherche, l’assistant et la dernière note de mise à jour ne se chargent qu’au moment de s’en servir, le « Calendrier » et les coordinateurs font moins d’appels, et les reflets qui tournent en boucle sont plus fluides.',
       },
       {
         tag: ChangelogTags.Fixed,
@@ -579,6 +678,51 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.sanctions,
         permission: Permissions.SanctionRead,
         text: 'Correction d’un bug dans « Panel de sanctions » qui ouvrait le panel des lives aux équipes Discord et Animation.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui empêchait un candidat accepté d’être reconnu à sa connexion.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui cassait le retour de connexion Twitch, YouTube et Discord depuis les anciennes adresses.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.trainings,
+        text: 'Correction d’un bug dans les exercices de mise en situation qui laissait la bonne question affichée après une vérification ratée.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        text: 'Correction d’un bug dans la visite guidée du « Calendrier » qui demandait de cliquer sur un bouton « Menu » absent.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.preferences,
+        text: 'Correction d’un bug qui coupait les notifications du téléphone quand le navigateur perdait son abonnement : Memora le rétablit seul, sauf si tu les as désactivées toi-même.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui perdait l’ouverture d’une notification touchée sur téléphone.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui laissait un écran blanc au lancement d’une partie.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui ralentissait la partie quand plusieurs bots jouaient.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Memora Play » qui ouvrait deux tables ou rejouait un geste sur un double clic.',
       },
     ],
     comments: [

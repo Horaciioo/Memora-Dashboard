@@ -1,6 +1,6 @@
 import { DEFAULT_ZONE } from '@/declarations/ui/dates'
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
-import { instantToWall, isInstantText, isWallClock, wallToInstant } from '@/utils/format/zone'
+import { instantToWall, isInstantText, isWallClock, wallToInstant } from '@/utils/format/time/zone'
 
 /**
  * Build blank values from declarations

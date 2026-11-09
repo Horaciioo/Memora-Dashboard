@@ -83,3 +83,10 @@ export interface PushPayload {
   badge: string
   at: string
 }
+
+/**
+ * Subscription API path
+ * @type {string}
+ */
+
+export const WORKER_SUBSCRIPTION_PATH = '/api/push/subscription'

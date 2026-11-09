@@ -1,6 +1,6 @@
 'use client'
 
-import { useServerAlarm } from '@/core/hooks/interaction/state/useServerAlarm'
+import { useServerAlarm } from '@/core/hooks/interaction/state/time/useServerAlarm'
 import { golfPhase } from '@/core/lib/play/golf'
 import type { GolfBoardState } from '@/core/lib/play/golf'
 import type { GolfPhaseName } from '@/utils/constants/play'

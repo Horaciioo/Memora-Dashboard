@@ -22,7 +22,7 @@ import type { FieldDefinition } from '@/types/forms'
 import type { LegacyTrackSummary } from '@/types/legacy'
 import { cn } from '@/utils/classnames'
 import { LegacyStatuses } from '@/utils/constants/hierarchy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface LegacyBoardProps {
   tracks: LegacyTrackSummary[]

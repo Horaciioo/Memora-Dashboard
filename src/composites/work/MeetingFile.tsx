@@ -10,7 +10,6 @@ import { OverdueMark } from '@/composites/work/OverdueMark'
 import { Button } from '@/components/elements/actions/Button'
 import { EmojiPicker } from '@/components/elements/forms/pickers/EmojiPicker'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { ActivityTimeline } from '@/components/structures/data/ActivityTimeline'
 import { AddRow } from '@/components/structures/inline/AddRow'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import {
@@ -30,14 +29,14 @@ import { useRecordFile } from '@/core/hooks/data/work/useRecordFile'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
 import { MEETING_COPY, MEETING_FIELD_COPY } from '@/declarations/work/copy'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { FieldDefinition } from '@/types/forms'
 import { WorkComments } from '@/composites/work/WorkComments'
 import type { MeetingDetail, MeetingTopicEntry } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
+import { WorkLogsTab } from '@/composites/work/WorkLogsTab'
 
 export interface MeetingFileProps {
   detail: MeetingDetail
@@ -342,24 +341,7 @@ export const MeetingFile = ({
     </div>
   )
 
-  const logsTab = () => (
-    <Section title={MEETING_COPY.tabLogs} maturity="beta" bare>
-      <div className="flex flex-col gap-4">
-        {activity.length === 0 ? (
-          <EmptyState
-            figure="notes"
-            title={MEETING_COPY.logsEmptyTitle}
-            description={MEETING_COPY.logsEmptyDescription}
-            action={<Status label={MEETING_COPY.tabLogs} tone="neutral" />}
-          />
-        ) : (
-          <div className={cn(SECTION_STYLES.panel, SECTION_STYLES.panelPadded)}>
-            <ActivityTimeline entries={activity} />
-          </div>
-        )}
-      </div>
-    </Section>
-  )
+  const logsTab = () => <WorkLogsTab copy={MEETING_COPY} activity={activity} />
 
   return (
     <div className="flex flex-col gap-8">

@@ -1,7 +1,7 @@
 'use client'
 
 import { Picker } from '@/composites/preferences/DisplayPreferences'
-import { useComfortStore } from '@/core/store/comfort'
+import { useComfortStore } from '@/core/store/appearance/comfort'
 import { COMFORT_SETTINGS } from '@/declarations/preferences/comfort'
 import { PICKER_CARD, SETTINGS_GROUP } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'

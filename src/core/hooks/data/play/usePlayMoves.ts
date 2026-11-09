@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { apiPatch, apiPost } from '@/core/lib/api/client'
@@ -21,6 +22,8 @@ import type { PlayBotKindName, PlayInviteRoleName } from '@/utils/constants/play
 export const usePlayMoves = () => {
   const router = useRouter()
   const { isSaving, run } = useMutation()
+  // A second click while one gesture runs is dropped
+  const busy = useRef(false)
 
   // Each gesture lands on a page, or refreshes this one with the signal it raised
   const go = async <T>(
@@ -28,7 +31,11 @@ export const usePlayMoves = () => {
     done: string,
     to: ((result: T) => string) | null
   ): Promise<boolean> => {
-    const result = await run(action, done)
+    if (busy.current) return false
+    busy.current = true
+    const result = await run(action, done).finally(() => {
+      busy.current = false
+    })
     if (result === null) return false
     if (to) router.push(to(result))
     else queueRefresh(() => router.refresh())

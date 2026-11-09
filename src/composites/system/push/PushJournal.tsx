@@ -15,7 +15,7 @@ import { PUSH_CONSOLE_COPY } from '@/declarations/pwa/copy'
 import { PUSH_STATUS_TONES } from '@/declarations/pwa/push'
 import { PUSH_STYLES } from '@/declarations/ui/variants'
 import type { PushDeliveryView, PushJournalPage } from '@/types/push'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 import { deviceLabel } from '@/utils/format/device'
 import { PUSH_DELIVERY_STATUSES } from '@/utils/constants/push'
 

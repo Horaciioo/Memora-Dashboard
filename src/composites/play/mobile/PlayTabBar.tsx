@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation'
 
-import { PlayNote } from '@/composites/play/hub/PlayNote'
-import { usePlayNote } from '@/core/hooks/interaction/state/usePlayNote'
+import { PlayNote } from '@/composites/play/hub/notices/PlayNote'
+import { usePlayNote } from '@/core/hooks/interaction/state/play/usePlayNote'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayMeMenu } from '@/composites/play/mobile/PlayMeMenu'
 import { PlayTabGlyph } from '@/composites/play/mobile/PlayTabGlyphs'
@@ -22,7 +22,7 @@ import type { PlayNoticeView, PlayPresence } from '@/types/play'
 import { cn } from '@/utils/classnames'
 
 // Pages where a game fills the screen
-const SESSION_PREFIX = '/play/sessions/'
+const SESSION_PREFIX = ROUTES.playSession('')
 
 export interface PlayTabBarProps {
   player: { name: string; avatarUrl: string | null }

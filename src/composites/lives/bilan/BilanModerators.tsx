@@ -6,13 +6,13 @@ import { useLiveData } from '@/core/hooks/data/lives/useLiveData'
 import { InlineText } from '@/components/structures/inline/InlineText'
 import { Section } from '@/components/structures/page/Section'
 import { ModSpan } from '@/composites/lives/ModSpan'
-import { ReinforcementTag } from '@/composites/lives/ReinforcementTag'
+import { ReinforcementTag } from '@/composites/lives/coordination/ReinforcementTag'
 import { timeTicks } from '@/core/lib/lives/timeTicks'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
 import type { LiveModTime } from '@/types/lives'
 import { cn } from '@/utils/classnames'
-import { formatHourMark } from '@/utils/format/dates'
+import { formatHourMark } from '@/utils/format/time/dates'
 
 export interface BilanModeratorsProps {
   team: LiveModTime[]

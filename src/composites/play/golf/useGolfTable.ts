@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { createRig, teeYaw } from '@/composites/play/golf/scene/rig'
+import { createRig, teeYaw } from '@/composites/play/golf/scene/camera/rig'
 import { createMotion, syncShots } from '@/core/lib/play/golf'
 import type { GolfBoardState, GolfHole } from '@/core/lib/play/golf'
 import { GolfPhases } from '@/utils/constants/play'

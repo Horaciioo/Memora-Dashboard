@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 import { PlayFeedBox } from '@/composites/play/dock/PlayFeedBox'
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { listNotices, listPlayHistory, readPlayPresence } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_MOBILE_COPY } from '@/declarations/play'

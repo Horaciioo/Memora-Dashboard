@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { ReactNode } from 'react'
 
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { nextRoute, unlockedRoutes } from '@/core/lib/tour/progress'

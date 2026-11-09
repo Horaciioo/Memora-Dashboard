@@ -8,6 +8,7 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { FunctionNames } from '@/declarations/reference/fixed'
 import type { SessionUser } from '@/types/auth'
 import { ADMIN_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Verdicts per live and member, until when they hold
 const countCache = new Map<string, { allowed: boolean; until: number }>()
@@ -52,7 +53,10 @@ export const mayCountTime = async (liveId: string, member: SessionUser): Promise
 
   const allowed = await judgeCount(liveId, member)
   if (countCache.size >= COUNT_CACHE_LIMIT) countCache.clear()
-  countCache.set(key, { allowed, until: Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * 1000 })
+  countCache.set(key, {
+    allowed,
+    until: Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * SECOND_MS,
+  })
 
   return allowed
 }
@@ -99,14 +103,13 @@ const judgeCount = async (liveId: string, member: SessionUser): Promise<boolean>
  * @param {Object} beat - Beat
  * @param {boolean} beat.visible - Tab shown
  * @param {boolean} beat.active - Member acting recently
- * @param {boolean} beat.closing - Tab closing
  * @return {Promise<void>} - Counted
  */
 
 export const beatPresence = async (
   liveId: string,
   accountId: string,
-  beat: { visible: boolean; active: boolean; closing: boolean }
+  beat: { visible: boolean; active: boolean }
 ): Promise<void> => {
   const now = new Date()
 
@@ -130,26 +133,21 @@ export const beatPresence = async (
     }
 
     if (!open) {
-      if (!beat.closing) {
-        await tx.modViewPresence.create({
-          data: { liveId, accountId, openedAt: now, lastBeatAt: now },
-        })
-      }
+      await tx.modViewPresence.create({
+        data: { liveId, accountId, openedAt: now, lastBeatAt: now },
+      })
 
-      return { stoppedAt: stale, opened: !beat.closing }
+      return { stoppedAt: stale, opened: true }
     }
 
     // Several tabs beat the same presence
     const next = tallyBeat(open, { at: now, ...beat }, LIVE_SETTINGS.heartbeatSeconds * 2)
     await tx.modViewPresence.update({
       where: { id: open.id },
-      data: {
-        ...next,
-        ...(beat.closing ? { closedAt: now, closeReason: 'CLOSED' as const } : {}),
-      },
+      data: next,
     })
 
-    return { stoppedAt: beat.closing ? now : null, opened: false }
+    return { stoppedAt: null, opened: false }
   })
 
   // Moderating follows the presence
@@ -181,7 +179,7 @@ export const closeLivePresences = async (liveId: string): Promise<void> => {
  */
 
 export const sweepStalePresences = async (): Promise<number> => {
-  const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * 1000)
+  const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * SECOND_MS)
   const stale = await prisma.modViewPresence.findMany({
     where: { closedAt: null, lastBeatAt: { lt: horizon } },
     select: { id: true, lastBeatAt: true, liveId: true, accountId: true },
@@ -209,13 +207,25 @@ export const sweepStalePresences = async (): Promise<number> => {
  * @return {Promise<string[]>} - Connected accounts
  */
 
-export const connectedMemberIds = async (liveId: string): Promise<string[]> => {
-  const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * 1000)
+export const connectedMemberIds = async (liveId: string): Promise<string[]> =>
+  Object.keys(await connectedArrivals(liveId))
+
+/**
+ * Connected members with the moment their open presence began
+ * @param {string} liveId - Live
+ * @return {Promise<Record<string, string>>} - ISO arrival by account
+ */
+
+export const connectedArrivals = async (liveId: string): Promise<Record<string, string>> => {
+  const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * SECOND_MS)
   const rows = await prisma.modViewPresence.findMany({
     where: { liveId, closedAt: null, lastBeatAt: { gte: horizon } },
-    select: { accountId: true },
-    distinct: ['accountId'],
+    select: { accountId: true, openedAt: true },
+    orderBy: { openedAt: 'desc' },
   })
 
-  return rows.map((row) => row.accountId)
+  // Latest open presence wins
+  return Object.fromEntries(
+    [...rows].reverse().map((row) => [row.accountId, row.openedAt.toISOString()])
+  )
 }

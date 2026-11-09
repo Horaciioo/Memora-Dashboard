@@ -10,7 +10,7 @@ import { ASSISTANT_COPY, ASSISTANT_SLOT_LABELS } from '@/declarations/assistant/
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import type { AssistantChoice, AssistantProposal, AssistantSlot } from '@/types/assistant'
 import type { FieldOption } from '@/types/forms'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import { Permissions } from '@/utils/constants/permissions'
 
 // Choice resolved, asked or failed

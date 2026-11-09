@@ -4,6 +4,7 @@ import { conflict } from '@/core/lib/errors'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { IDEMPOTENCY_HEADER } from '@/declarations/system/security/idempotency'
 import { runtime } from '@/managers/infrastructure/Core/runtime'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Pending or settled answer
 type Entry = { state: 'pending' } | { state: 'done'; data: unknown }
@@ -53,7 +54,7 @@ const claim = async (key: string): Promise<Entry | null> => {
   const slot = local.get(key)
   if (slot) return slot.entry
 
-  local.set(key, { entry: { state: 'pending' }, expiresAt: now + ttlSeconds() * 1000 })
+  local.set(key, { entry: { state: 'pending' }, expiresAt: now + ttlSeconds() * SECOND_MS })
 
   return null
 }
@@ -69,7 +70,7 @@ const settle = async (key: string, entry: Entry | null): Promise<void> => {
     return
   }
 
-  if (entry) local.set(key, { entry, expiresAt: Date.now() + ttlSeconds() * 1000 })
+  if (entry) local.set(key, { entry, expiresAt: Date.now() + ttlSeconds() * SECOND_MS })
   else local.delete(key)
 }
 

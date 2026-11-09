@@ -17,7 +17,7 @@ import type { ViewerSanction } from '@/types/lives'
 import type { Chatter, ModViewState } from '@/types/modview'
 import type { SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
-import { formatDayTime, formatSince } from '@/utils/format/dates'
+import { formatDayTime, formatSince } from '@/utils/format/time/dates'
 import { formatDuration } from '@/utils/format/modview'
 
 // Acts that sanction a viewer

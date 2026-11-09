@@ -23,7 +23,7 @@ import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { isFinishedAbsence } from '@/utils/format/absences'
 import { toDayKey } from '@/utils/format/calendar'
-import { startOfDay } from '@/utils/format/days'
+import { startOfDay } from '@/utils/format/time/days'
 
 // The example declaration saves nothing
 const SAVE_NOTHING = async () => true

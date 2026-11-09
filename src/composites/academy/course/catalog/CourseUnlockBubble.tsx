@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'

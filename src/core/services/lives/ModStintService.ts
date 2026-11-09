@@ -13,6 +13,7 @@ import type { LiveModTime, LiveSpan } from '@/types/lives'
 import { LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import { LiveStatuses } from '@/utils/constants/lives'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Roles that supervise lives
 const LEAD_ROLES: string[] = LEADERSHIP_ROLES
@@ -101,7 +102,7 @@ export const closeLiveStints = async (liveId: string): Promise<void> => {
 
   for (const { accountId } of open) {
     const last = lastBeat.get(accountId) ?? null
-    const isGone = last !== null && +now - +last > LIVE_SETTINGS.staleSeconds * 1000
+    const isGone = last !== null && +now - +last > LIVE_SETTINGS.staleSeconds * SECOND_MS
 
     await stopStintAt(liveId, accountId, isGone && last ? last : now)
   }

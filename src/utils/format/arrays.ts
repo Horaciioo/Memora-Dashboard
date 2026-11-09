@@ -39,3 +39,36 @@ export function areArraysDifferent<T>(array1: T[], array2: T[]): boolean {
 
   return false
 }
+
+/**
+ * Text entries of a stored list
+ * @param {string} raw - Stored JSON
+ * @return {string[]} - Text entries
+ */
+
+export const parseStringList = (raw: string): string[] => {
+  try {
+    const parsed: unknown = JSON.parse(raw)
+
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is string => typeof item === 'string')
+      : []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Set with one key flipped
+ * @param {Set<T>} current - Current set
+ * @param {T} key - Key to flip
+ * @return {Set<T>} - New set
+ */
+
+export const withToggled = <T>(current: Set<T>, key: T): Set<T> => {
+  const next = new Set(current)
+  if (next.has(key)) next.delete(key)
+  else next.add(key)
+
+  return next
+}

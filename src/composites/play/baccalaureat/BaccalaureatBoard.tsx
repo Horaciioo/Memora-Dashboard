@@ -16,11 +16,14 @@ import { secondsTo, spanSeconds } from '@/composites/play/baccalaureat/types'
 import type { BacBoardView, BacPlayer } from '@/composites/play/baccalaureat/types'
 import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
-import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
+import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import { BaccalaureatPhases } from '@/core/lib/play/baccalaureat/phase'
 import { BAC_BOARD_COPY, BAC_SESSION_COPY, BACCALAUREAT_SETTINGS } from '@/declarations/play'
 import { BAC_BOARD } from '@/declarations/ui/variants'
 import { PlayGames } from '@/utils/constants/play'
+
+// Server settles first
+const DEADLINE_REFRESH_MS = 1200
 
 export interface BaccalaureatBoardProps {
   sessionId: string
@@ -63,7 +66,7 @@ export const BaccalaureatBoard = ({
   // The server moves on at the deadline, read it again then
   useEffect(() => {
     if (left !== 0) return
-    const timer = window.setTimeout(() => router.refresh(), 1200)
+    const timer = window.setTimeout(() => router.refresh(), DEADLINE_REFRESH_MS)
 
     return () => window.clearTimeout(timer)
   }, [left, router])

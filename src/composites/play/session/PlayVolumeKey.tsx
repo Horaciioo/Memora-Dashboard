@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
-import { usePlaySoundStore } from '@/core/store/playSound'
+import { usePlaySoundStore } from '@/core/store/play/playSound'
 import { PLAY_SOUND_COPY } from '@/declarations/play/sounds'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION } from '@/declarations/ui/variants'

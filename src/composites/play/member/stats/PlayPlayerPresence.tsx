@@ -10,7 +10,7 @@ import { PLAY_PROFILE } from '@/declarations/ui/variants'
 import type { PlayPresence } from '@/types/play'
 import { cn } from '@/utils/classnames'
 import { PlayStatuses } from '@/utils/constants/play'
-import { formatSince } from '@/utils/format/dates'
+import { formatSince } from '@/utils/format/time/dates'
 
 export interface PlayPlayerPresenceProps {
   playerId: string

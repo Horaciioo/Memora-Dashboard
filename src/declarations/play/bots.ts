@@ -9,6 +9,17 @@ import type { Bounds } from '@/declarations/configurations/readers'
 import { PlayBotKinds, PlayGames } from '@/utils/constants/play'
 import type { PlayBotKindName, PlayGameName } from '@/utils/constants/play'
 
+// Games whose bots sleep
+const ASLEEP_GAMES: readonly PlayGameName[] = [PlayGames.Golf]
+
+/**
+ * Bots of a game are awake
+ * @param {PlayGameName} game - Game
+ * @return {boolean} - Awake
+ */
+
+export const areBotsAwake = (game: PlayGameName): boolean => !ASLEEP_GAMES.includes(game)
+
 // Raw nodes
 const ludo = readNode(bots.ludo, 'play/bots.ludo')
 const bomb = readNode(bots.bomb, 'play/bots.bomb')
@@ -61,6 +72,8 @@ const writeAt = readNode(baccalaureat.writeAt, 'play/bots.baccalaureat.writeAt')
  */
 
 export const PLAY_BOT_SETTINGS = {
+  // Bots at one table
+  maxPerGame: readNumber(bots.maxPerGame, { path: 'play/bots.maxPerGame', fallback: 3, min: 0 }),
   callsigns: readStringList(bots.callsigns, { path: 'play/bots.callsigns', fallback: ['Alpha'] }),
   ludo: { thinkMs: delay(ludo.thinkMs, 'play/bots.ludo.thinkMs') },
   naval: {

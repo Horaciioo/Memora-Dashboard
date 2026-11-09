@@ -8,8 +8,8 @@ import { Section } from '@/components/structures/page/Section'
 import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { HomeFacts } from '@/composites/personal/HomeFacts'
 import { HomeTaskDetail } from '@/composites/personal/HomeTaskDetail'
-import { AttendanceHoursDialog } from '@/composites/calendar/AttendanceHoursDialog'
-import { CoordinationAnswer } from '@/composites/lives/CoordinationAnswer'
+import { AttendanceHoursDialog } from '@/composites/calendar/attendance/AttendanceHoursDialog'
+import { CoordinationAnswer } from '@/composites/lives/coordination/CoordinationAnswer'
 import { HomeTaskGroups } from '@/composites/personal/HomeTaskGroups'
 import { HomeTaskStepper } from '@/composites/personal/HomeTaskStepper'
 import { useCoordinationReply } from '@/core/hooks/data/lives/useCoordinationReply'
@@ -35,14 +35,14 @@ import type { HomeEntry, HomeTask } from '@/types/personal'
 import { AbsenceStatuses, AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AbsenceStatusName, AttendanceStatusName } from '@/utils/constants/workflow'
 import { absenceReasonText, absenceSpan } from '@/utils/format/absences'
-import { initialHours } from '@/utils/format/hours'
+import { initialHours } from '@/utils/format/time/hours'
 import {
   formatClock,
   formatDay,
   formatDayTime,
   formatRelativeDay,
   toDateTimeInput,
-} from '@/utils/format/dates'
+} from '@/utils/format/time/dates'
 
 export interface HomeQueueProps {
   absences: MemberAbsence[]

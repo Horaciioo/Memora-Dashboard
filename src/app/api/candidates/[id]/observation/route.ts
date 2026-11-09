@@ -3,8 +3,8 @@ import { signalCandidate } from '@/core/lib/recruitment/signal'
 import { candidateSession } from '@/core/services/recruitment'
 import { recruitmentModeOf } from '@/core/services/recruitment/access'
 import { readCandidate } from '@/core/services/recruitment/CandidateService'
-import { maskForObserver } from '@/core/services/recruitment/ObserverMask'
-import { setObserving } from '@/core/services/recruitment/ObserverService'
+import { maskForObserver } from '@/core/services/recruitment/observers/ObserverMask'
+import { setObserving } from '@/core/services/recruitment/observers/ObserverService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PUT = createProtectedRoute({

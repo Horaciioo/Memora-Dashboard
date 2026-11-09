@@ -11,7 +11,7 @@ import { PAGE_HISTORY_COPY } from '@/declarations/pages/copy'
 import { PAGE_VIEW_STYLES } from '@/declarations/ui/variants'
 import type { PageDocument, PageRevisionSummary } from '@/types/pages'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface PageHistoryProps {
   pageId: string

@@ -7,7 +7,7 @@ import { GolfViewKeys } from '@/composites/play/golf/hud/GolfViewKeys'
 import type { GolfFace } from '@/composites/play/golf/types'
 import { seatPaint } from '@/composites/play/golf/types'
 import { useGolfClockSound } from '@/composites/play/golf/useGolfClockSound'
-import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
+import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import type { GolfBoardState } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
@@ -15,9 +15,10 @@ import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { ICONS } from '@/declarations/ui/icons'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatCountdown } from '@/utils/format/countdown'
+import { formatCountdown } from '@/utils/format/time/countdown'
 import { GolfPhases } from '@/utils/constants/play'
 import type { GolfPhaseName } from '@/utils/constants/play'
+import { SECOND_MS } from '@/utils/constants/time'
 
 export interface GolfHudProps {
   board: GolfBoardState
@@ -53,7 +54,7 @@ export const GolfHud = ({
   isSeated,
 }: GolfHudProps) => {
   const now = useServerNow(new Date(board.serverTime))
-  const left = phase === GolfPhases.Playing ? (board.endsAt - now) / 1000 : 0
+  const left = phase === GolfPhases.Playing ? (board.endsAt - now) / SECOND_MS : 0
   useGolfClockSound(left)
   const DoneIcon = ICONS.golfFlag
 
@@ -95,7 +96,7 @@ export const GolfHud = ({
             )}
           >
             {formatCountdown(
-              phase === GolfPhases.Countdown ? (board.endsAt - board.startsAt) / 1000 : left
+              phase === GolfPhases.Countdown ? (board.endsAt - board.startsAt) / SECOND_MS : left
             )}
           </span>
         </div>

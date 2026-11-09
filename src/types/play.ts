@@ -75,6 +75,10 @@ export interface PlayEngine {
   ) => Promise<EngineStep>
   settle: (session: EngineSession) => Promise<EngineStep>
   view: (session: EngineSession, viewerId: string) => Promise<unknown>
+  // Same board for every reader
+  isViewShared?: boolean
+  // Light board read once per bot pass
+  botView?: (session: EngineSession) => Promise<unknown>
   extraStats: (sessionId: string) => Promise<Map<string, Record<string, number>>>
   // XP factor of the winner
   winnerMultiplier?: (settings: Prisma.JsonValue) => number
@@ -297,13 +301,14 @@ export interface PlayPlayer {
  * Move a bot plans
  * @typedef {Object} PlayBotMove
  * @property {string} key - Board state it answers
- * @property {Record<string, unknown>} raw - Action body
+ * @property {Record<string, unknown> | (() => Promise<Record<string, unknown>>)} raw - Action body
  * @property {Date} at - When to play
  */
 
 export interface PlayBotMove {
   key: string
-  raw: Record<string, unknown>
+  // Costly bodies computed when played
+  raw: Record<string, unknown> | (() => Promise<Record<string, unknown>>)
   at: Date
 }
 

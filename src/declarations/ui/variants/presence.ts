@@ -4,6 +4,8 @@
  */
 
 export const PRESENCE_STYLES = {
+  // Sits on the touched element
+  marker: 'absolute -top-2 right-0 z-10 flex -space-x-1.5',
   stack: 'mr-1 flex items-center -space-x-1.5',
   seat: 'relative inline-flex rounded-full transition-opacity hover:z-10 focus-visible:z-10',
   seatJump:

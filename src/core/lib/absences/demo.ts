@@ -1,6 +1,6 @@
 import type { AbsenceAutopilot } from '@/declarations/absences/demo'
 import { toDayKey } from '@/utils/format/calendar'
-import { addDays } from '@/utils/format/days'
+import { addDays } from '@/utils/format/time/days'
 
 /**
  * Days of the example absence, long enough to be worth declaring

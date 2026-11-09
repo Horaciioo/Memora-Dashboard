@@ -1,6 +1,6 @@
 /**
  * Topics of the live bus
- * @type {{ lives: string, channel: string, live: (id: string) => string, room: (id: string) => string, connection: (id: string) => string }}
+ * @type {{ lives: string, channel: string, live: (id: string) => string, room: (id: string) => string, connection: (id: string) => string, team: (id: string) => string, teamLiveIdOf: (topic: string) => string | null }}
  */
 
 export const LIVE_TOPICS = {
@@ -15,6 +15,9 @@ export const LIVE_TOPICS = {
   connection: (id: string) => `live:${id}:connection`,
   // Instance that watches the lives
   watchLease: 'lives:watcher',
+  // Internal chat of a live
+  team: (id: string) => `live:${id}:team`,
+  teamLiveIdOf: (topic: string): string | null => /^live:([^:]+):team$/.exec(topic)?.[1] ?? null,
 }
 
 /**

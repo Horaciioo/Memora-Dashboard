@@ -2,10 +2,10 @@ import { apiGet } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { editableProps, hintOf, readTaskFile } from '@/core/lib/assistant/scenarios/task/data'
 import { TASK_SCENARIO_COPY as COPY } from '@/declarations/assistant/scenarios/task'
-import { SCENARIO_COPY } from '@/declarations/assistant/scenarios/shared'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import type { ScenarioChoice, ScenarioMove, ScenarioStep } from '@/types/scenario'
 import { fillTemplate } from '@/utils/format/strings'
+import { fileOfferStep, filePropsStep } from '@/core/lib/assistant/scenarios/fileSteps'
 
 // One task found by the search
 interface Found {
@@ -130,17 +130,7 @@ export const menuAnswer: ScenarioStep = async (context, answer) =>
  * @return {Promise<ScenarioMove>} - Oui or non
  */
 
-export const fileOffer: ScenarioStep = async (context) => ({
-  say: [fillTemplate(COPY.fileAsk, { name: context.data.name })],
-  ask: {
-    kind: 'choices',
-    choices: [
-      { value: 'yes', label: SCENARIO_COPY.yes },
-      { value: 'no', label: SCENARIO_COPY.no },
-    ],
-  },
-  next: 'fileAnswer',
-})
+export const fileOffer: ScenarioStep = fileOfferStep(COPY.fileAsk)
 
 /**
  * Oui lists the properties to tick
@@ -165,11 +155,7 @@ export const fileAnswer: ScenarioStep = async (context, answer) =>
  * @return {Promise<ScenarioMove>} - First of the queue
  */
 
-export const fileProps: ScenarioStep = async (context, answer) => ({
-  say: [COPY.fileGo],
-  next: 'nextProp',
-  data: { mode: 'queue', queue: answer?.value ?? '' },
-})
+export const fileProps: ScenarioStep = filePropsStep(COPY.fileGo)
 
 /**
  * Next property of the queue, or the end

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { subscribeLive } from '@/core/lib/lives/bus'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const encoder = new TextEncoder()
 
@@ -79,7 +80,7 @@ export const liveStreamOf = (write: (payload: unknown) => string) => {
           })
           const keepAlive = setInterval(
             () => send(KEEP_ALIVE),
-            LIVE_SETTINGS.streamKeepAliveSeconds * 1000
+            LIVE_SETTINGS.streamKeepAliveSeconds * SECOND_MS
           )
 
           release = () => {

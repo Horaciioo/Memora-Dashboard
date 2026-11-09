@@ -12,7 +12,7 @@ import {
 } from '@/core/services/recruitment'
 import { recruitmentModeOf } from '@/core/services/recruitment/access'
 import { readCandidate } from '@/core/services/recruitment/CandidateService'
-import { maskForObserver } from '@/core/services/recruitment/ObserverMask'
+import { maskForObserver } from '@/core/services/recruitment/observers/ObserverMask'
 import { candidateSessionId } from '@/core/services/recruitment/reach'
 import { applyFirstSlot } from '@/core/services/recruitment/SlotRules'
 import { assertInterviewOpen } from '@/core/services/recruitment/InterviewService'

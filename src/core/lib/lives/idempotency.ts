@@ -2,6 +2,7 @@ import 'server-only'
 
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { runtime } from '@/managers/infrastructure/Core/runtime'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Survives dev hot reloads
 const globalForKeys = globalThis as unknown as { liveActKeys?: Map<string, number> }
@@ -37,7 +38,7 @@ export const claimGestureKey = async (key: string): Promise<boolean> => {
   for (const [stored, expiresAt] of keys) if (expiresAt < now) keys.delete(stored)
   if (keys.has(key)) return false
 
-  keys.set(key, now + ttlSeconds * 1000)
+  keys.set(key, now + ttlSeconds * SECOND_MS)
 
   return true
 }

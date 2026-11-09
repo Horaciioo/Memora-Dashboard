@@ -21,7 +21,7 @@ import { PROJECT_FIELD_COPY, WORK_DISCORD_COPY } from '@/declarations/work/copy'
 import { useMenu } from '@/managers/front-end'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { CommunicationEntry } from '@/types/work'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface CommunicationCardProps {
   entry: CommunicationEntry

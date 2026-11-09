@@ -12,7 +12,7 @@ import { ILLUSTRATIONS } from '@/declarations/ui/illustrations'
 import { BILAN, INTERVIEW } from '@/declarations/ui/variants'
 import type { CandidateView } from '@/types/recruitment'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 import { AnswerAppreciations } from '@/utils/constants/recruitment'
 
 // Prompt longer than this folds

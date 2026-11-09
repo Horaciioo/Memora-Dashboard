@@ -6,7 +6,7 @@ import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 import { OptionLead } from '@/components/elements/forms/selects/OptionLead'
 import { OptionMark } from '@/components/elements/forms/selects/OptionMark'
-import { useAnchoredPanel } from '@/core/hooks/interaction/layout/useAnchoredPanel'
+import { useAnchoredPanel } from '@/core/hooks/interaction/layout/overlay/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import {

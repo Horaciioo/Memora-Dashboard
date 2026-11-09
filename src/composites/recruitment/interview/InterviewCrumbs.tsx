@@ -1,6 +1,7 @@
 import Link from '@/components/elements/navigation/AppLink'
 
 import { INTERVIEW } from '@/declarations/ui/variants'
+import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 
 /**
  * One step of the trail
@@ -24,7 +25,7 @@ export interface Crumb {
  */
 
 export const InterviewCrumbs = ({ crumbs }: { crumbs: Crumb[] }) => (
-  <nav aria-label="Fil d’Ariane" className={INTERVIEW.crumbs}>
+  <nav aria-label={NAV_COPY.breadcrumbs} className={INTERVIEW.crumbs}>
     {crumbs.map((crumb, index) => {
       const isCurrent = index === crumbs.length - 1
 

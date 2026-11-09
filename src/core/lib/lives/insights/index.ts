@@ -1,7 +1,7 @@
 import { heatRows, repeatTargets, topReasons } from './breakdowns'
 import { buildSlices, cumulate } from './series'
 import type { InsightAction, InsightSample, LiveInsights } from './types'
-import { HOUR_MS, MINUTE_MS } from '@/utils/constants/time'
+import { HOUR_MS, MINUTE_MS, SECOND_MS } from '@/utils/constants/time'
 
 export { compareToBaseline } from './compare'
 export type { BaselineRow } from './compare'
@@ -49,7 +49,7 @@ const viewerFigures = (samples: InsightSample[]): LiveInsights['viewers'] => {
 
 const medianGap = (done: InsightAction[]): number | null => {
   const times = done.map((action) => action.occurredAt.getTime()).sort((a, b) => a - b)
-  const gaps = times.slice(1).map((time, index) => (time - times[index]!) / 1000)
+  const gaps = times.slice(1).map((time, index) => (time - times[index]!) / SECOND_MS)
   if (gaps.length === 0) return null
 
   return gaps.sort((a, b) => a - b)[Math.floor(gaps.length / 2)]!

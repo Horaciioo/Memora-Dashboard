@@ -165,6 +165,7 @@ export const PLAY_HUB_COPY = {
   botsTitle: 'Bots',
   botsAdd: 'Ajouter',
   botsFill: 'Compléter la table',
+  botsPaused: 'En pause pour l’instant',
   inviteAsSpectator: 'Spectateur',
   inviteSearch: 'Chercher un membre',
   inviteNobody: 'Personne ne correspond.',

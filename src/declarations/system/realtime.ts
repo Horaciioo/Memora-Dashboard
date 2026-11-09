@@ -154,6 +154,7 @@ export const REALTIME_CLOSE = {
 
 export const REALTIME_OPS = {
   playAct: 'play:act',
+  teamChatSend: 'live:team:send',
   presenceSet: 'presence:set',
   docSync: 'doc:sync',
   docUpdate: 'doc:update',

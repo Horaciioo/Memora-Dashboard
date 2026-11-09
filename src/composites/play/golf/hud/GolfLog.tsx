@@ -2,7 +2,7 @@
 
 import type { GolfFace } from '@/composites/play/golf/types'
 import { seatPaint } from '@/composites/play/golf/types'
-import { useServerAlarm } from '@/core/hooks/interaction/state/useServerAlarm'
+import { useServerAlarm } from '@/core/hooks/interaction/state/time/useServerAlarm'
 import type { GolfBoardState } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_BOARD_COPY, GOLF_FEED_COPY } from '@/declarations/play/golf/copy'

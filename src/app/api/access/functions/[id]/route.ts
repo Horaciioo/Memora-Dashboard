@@ -8,18 +8,7 @@ import { ACCESS_EDITABLE } from '@/declarations/access/editing'
 import { ACCESS_CATEGORY_REGISTRY, readCategory } from '@/declarations/access/categories'
 import { MemberRoles } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
-
-/**
- * Read a nullable text field
- * @param {unknown} value - Raw value
- * @return {string | null} - Trimmed value or nothing
- */
-
-const readNullable = (value: unknown): string | null => {
-  const text = typeof value === 'string' ? value.trim() : ''
-
-  return text.length > 0 ? text : null
-}
+import { optionalText } from '@/utils/format/strings'
 
 export const PUT = createProtectedRoute({
   permission: Permissions.AccessManage,
@@ -43,9 +32,9 @@ export const PUT = createProtectedRoute({
       name: typeof raw.name === 'string' ? raw.name.trim() : undefined,
       category,
       kind: raw.kind === undefined ? undefined : readKind(String(raw.kind)),
-      summary: 'summary' in raw ? readNullable(raw.summary) : undefined,
-      ...('accent' in raw ? { accent: readNullable(raw.accent) } : {}),
-      ...('icon' in raw ? { icon: readNullable(raw.icon) } : {}),
+      summary: 'summary' in raw ? optionalText(raw.summary) : undefined,
+      ...('accent' in raw ? { accent: optionalText(raw.accent) } : {}),
+      ...('icon' in raw ? { icon: optionalText(raw.icon) } : {}),
     })
 
     await recordEvent({

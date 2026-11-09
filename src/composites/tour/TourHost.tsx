@@ -1,9 +1,22 @@
 'use client'
 
-import { PageTour } from '@/composites/tour/PageTour'
-import { TourCelebration } from '@/composites/tour/TourCelebration'
-import { WelcomeFlow } from '@/composites/tour/WelcomeFlow'
+import dynamic from 'next/dynamic'
+
 import { useTour } from '@/managers/front-end/TourManager'
+
+// Loaded for the first visit only
+const PageTour = dynamic(
+  () => import('@/composites/tour/PageTour').then((module) => module.PageTour),
+  { ssr: false }
+)
+const TourCelebration = dynamic(
+  () => import('@/composites/tour/TourCelebration').then((module) => module.TourCelebration),
+  { ssr: false }
+)
+const WelcomeFlow = dynamic(
+  () => import('@/composites/tour/WelcomeFlow').then((module) => module.WelcomeFlow),
+  { ssr: false }
+)
 
 /**
  * Whatever the first visit shows right now

@@ -1,6 +1,6 @@
 'use client'
 
-import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 
 const { eraser } = GOLF_SCENE

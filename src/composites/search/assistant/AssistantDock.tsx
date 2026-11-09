@@ -1,7 +1,8 @@
 'use client'
 
+import dynamic from 'next/dynamic'
+
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
-import { FloatingChat } from '@/composites/search/assistant/FloatingChat'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
 import { useNudgeCycle } from '@/core/hooks/interaction/state/useNudgeCycle'
 import { URGENT_SCENARIO, useAssistantDock } from '@/core/store/assistantDock'
@@ -12,6 +13,12 @@ import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
 import { FLOATING_ADD_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+
+// Loaded when the chat opens
+const FloatingChat = dynamic(
+  () => import('@/composites/search/assistant/FloatingChat').then((module) => module.FloatingChat),
+  { ssr: false }
+)
 
 export interface AssistantDockProps {
   viewContext: ViewContext

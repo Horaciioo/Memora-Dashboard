@@ -6,10 +6,11 @@ import { RoundedBox } from '@react-three/drei'
 import type { Group } from 'three'
 
 import { FLAT } from '@/composites/play/golf/scene/obstacles/flat'
-import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import type { GolfSpinner as GolfSpinnerEntry } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { spinner } = GOLF_SCENE
 const THICKNESS = GOLF_SETTINGS.physics.spinnerThickness
@@ -39,7 +40,7 @@ export const GolfSpinner = ({
   const reach = entry.length / 2 + THICKNESS
   useFrame(() => {
     // Same angle as the physics
-    const angle = entry.phase + entry.speed * ((serverNow() - startsAt) / 1000)
+    const angle = entry.phase + entry.speed * ((serverNow() - startsAt) / SECOND_MS)
     if (bar.current) bar.current.rotation.y = -angle
   })
 

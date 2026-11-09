@@ -3,7 +3,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { MEMBER_ADMIN } from '@/declarations/ui/variants'
 import type { MemberAdminState } from '@/types/members'
 import { cn } from '@/utils/classnames'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface MemberStateListProps {
   state: MemberAdminState

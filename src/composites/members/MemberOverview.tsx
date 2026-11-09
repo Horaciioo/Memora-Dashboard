@@ -12,7 +12,7 @@ import type { PlayPresence } from '@/types/play'
 import { cn } from '@/utils/classnames'
 import { absenceReasonText } from '@/utils/format/absences'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
-import { formatDay, formatDayRange } from '@/utils/format/dates'
+import { formatDay, formatDayRange } from '@/utils/format/time/dates'
 
 export interface MemberOverviewProps {
   member: ParticipantIdentity

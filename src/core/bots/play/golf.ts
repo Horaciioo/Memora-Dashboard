@@ -10,19 +10,27 @@ import {
   teleportReach,
 } from '@/core/lib/play/golf'
 import type { GolfHole, GolfShotInput } from '@/core/lib/play/golf'
-import type { golfView } from '@/core/services/play/golf/GolfViewService'
+import type { golfBotView } from '@/core/services/play/golf/GolfViewService'
 import { PLAY_BOT_SETTINGS } from '@/declarations/play/bots'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPhases, GolfPowers } from '@/utils/constants/play'
+import type { PlayBotKindName } from '@/utils/constants/play'
 import type { PlayBotStrategy } from '@/types/play'
 
-type GolfBoardView = Awaited<ReturnType<typeof golfView>>
+type GolfBoardView = Awaited<ReturnType<typeof golfBotView>>
 
 // Aim searched around the cup line
 const SPREAD = Math.PI / 2
 
 // Cost of a ball lost
 const FALL_COST = 1000
+
+/**
+ * Give the event loop back
+ * @return {Promise<void>} - Resumed
+ */
+
+const breathe = (): Promise<void> => new Promise((resolve) => setImmediate(resolve))
 
 // Shot tried by the bot
 interface GolfAim {
@@ -64,13 +72,13 @@ const targetOf = (hole: GolfHole): [number, number] => {
  * Best aim of a grid toward the cup
  * @param {Omit<GolfShotInput, 'angle' | 'power'>} input - Shot without aim
  * @param {[number, number]} from - Ball spot
- * @return {GolfAim} - Aim
+ * @return {Promise<GolfAim>} - Aim
  */
 
-const searchAim = (
+const searchAim = async (
   input: Omit<GolfShotInput, 'angle' | 'power'>,
   [x, z]: [number, number]
-): GolfAim => {
+): Promise<GolfAim> => {
   const { candidates } = PLAY_BOT_SETTINGS.golf
   const [targetX, targetZ] = targetOf(input.hole)
   const straight = Math.atan2(targetX - x, targetZ - z)
@@ -81,10 +89,14 @@ const searchAim = (
   // Grid of angles and pulls
   let best = { aim: { angle: straight, power: 0.5 }, cost: Infinity }
   for (let row = -side; row <= side; row += 1) {
+    // Other requests between rows
+    await breathe()
     const angle = straight + (SPREAD * row) / side
     for (let column = 1; column <= powers; column += 1) {
       const aim = { angle, power: column / powers }
       const cost = costOf(input, aim)
+      // Any cup ends a plain hole
+      if (cost < 0 && !input.hole.isScoring) return aim
       if (cost < best.cost) best = { aim, cost }
     }
   }
@@ -95,23 +107,20 @@ const searchAim = (
 /**
  * Shot of a ball on the course it sees
  * @param {GolfBoardView} board - Board
- * @param {string} botId - Bot
- * @param {Date} now - Clock
- * @return {GolfAim | null} - Clean aim
+ * @param {GolfBoardView['players'][number]} me - Bot ball
+ * @return {Promise<GolfAim>} - Clean aim
  */
 
-const aimFor = (board: GolfBoardView, botId: string, now: Date): GolfAim | null => {
-  const me = board.players.find((player) => player.accountId === botId)
-  if (!me) return null
+const aimFor = (board: GolfBoardView, me: GolfBoardView['players'][number]): Promise<GolfAim> => {
   const hole: GolfHole = holeFor(holesOf(board.settings)[board.hole], board.settings)
 
   return searchAim(
     {
       hole,
-      at: now.getTime(),
+      at: Date.now(),
       holeStart: new Date(board.startsAt).getTime(),
-      shooterId: botId,
-      balls: [{ id: botId, x: me.x, z: me.z, effects: me.effects, canPick: false }],
+      shooterId: me.accountId,
+      balls: [{ id: me.accountId, x: me.x, z: me.z, effects: me.effects, canPick: false }],
       hazards: board.hazards,
       orbs: board.orbs,
       collisions: board.settings.collisions,
@@ -178,6 +187,31 @@ const powerFor = (board: GolfBoardView, me: GolfBoardView['players'][number]) =>
 }
 
 /**
+ * Stroke body, searched when played
+ * @param {GolfBoardView} board - Board
+ * @param {GolfBoardView['players'][number]} me - Bot ball
+ * @param {PlayBotKindName} level - Bot level
+ * @return {Promise<Record<string, unknown>>} - Action body
+ */
+
+const shotBody = async (
+  board: GolfBoardView,
+  me: GolfBoardView['players'][number],
+  level: PlayBotKindName
+) => {
+  const { angleNoise, powerNoise } = PLAY_BOT_SETTINGS.golf
+  const aim = await aimFor(board, me)
+  // Hand noise by level
+  const power = aim.power * (1 + noise(powerNoise[level]))
+
+  return {
+    type: 'shot',
+    angle: aim.angle + noise(angleNoise[level]),
+    power: Math.min(1, Math.max(GOLF_SETTINGS.physics.minPower * 2, power)),
+  }
+}
+
+/**
  * Golf bot, aim with a shaky hand
  * @type {PlayBotStrategy}
  */
@@ -188,7 +222,7 @@ export const GOLF_BOT: PlayBotStrategy = {
     if (board.phase !== GolfPhases.Countdown && board.phase !== GolfPhases.Playing) return null
     const me = board.players.find((player) => player.accountId === botId)
     if (!me || me.isDone) return null
-    const { angleNoise, powerNoise, thinkMs } = PLAY_BOT_SETTINGS.golf
+    const { thinkMs } = PLAY_BOT_SETTINGS.golf
     const at = latest(now, new Date(board.startsAt), new Date(me.restsAt))
     // Powers before the stroke, ball at rest
     const cast = board.phase === GolfPhases.Playing ? powerFor(board, me) : null
@@ -199,19 +233,9 @@ export const GOLF_BOT: PlayBotStrategy = {
         at: pauseAfter(at, thinkMs),
       }
     }
-    const aim = aimFor(board, botId, now)
-    if (!aim) return null
-
-    // Hand noise by level
-    const power = aim.power * (1 + noise(powerNoise[level]))
-
     return {
       key: `shot:${board.hole}:${me.strokes}:${me.restsAt}`,
-      raw: {
-        type: 'shot',
-        angle: aim.angle + noise(angleNoise[level]),
-        power: Math.min(1, Math.max(GOLF_SETTINGS.physics.minPower * 2, power)),
-      },
+      raw: () => shotBody(board, me, level),
       at: pauseAfter(at, thinkMs),
     }
   },

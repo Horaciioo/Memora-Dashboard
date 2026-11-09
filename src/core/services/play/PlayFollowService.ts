@@ -8,8 +8,9 @@ import { logger } from '@/core/lib/logger'
 import { mayEnter } from '@/core/lib/play/access'
 import { isPresent } from '@/core/lib/play/session'
 import { signalNotices } from '@/core/lib/play/signal'
+import { notify } from '@/core/services/system/NotificationService'
 import { loadSession } from '@/core/services/play/PlaySessionService'
-import { PLAY_ERRORS } from '@/declarations/play'
+import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
 import { PLAY_OPEN_STATUSES, PlayNoticeKinds, PlayStatuses } from '@/utils/constants/play'
 import type { PlayNoticeView } from '@/types/play'
 
@@ -87,6 +88,17 @@ const notifyFollowers = async (sessionId: string, kind: PlayNoticeKind): Promise
     skipDuplicates: true,
   })
   await signalNotices(followers.map(({ accountId }) => accountId))
+
+  // The start reaches phones
+  if (kind !== PlayNoticeKind.STARTED) return
+  await notify({
+    kind: 'PlayFollowedStarted',
+    recipients: followers.map(({ accountId }) => accountId),
+    target: 'playGame',
+    targetId: sessionId,
+    subject: PLAY_GAMES.label(session.game),
+    once: true,
+  })
 }
 
 /**

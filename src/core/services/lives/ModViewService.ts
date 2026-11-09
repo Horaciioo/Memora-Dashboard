@@ -41,7 +41,7 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MODVIEW_LOCK_COPY } from '@/declarations/modview/copy'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import type { LiveView } from '@/types/lives'
 import type {
   ActContext,
@@ -52,6 +52,7 @@ import type {
 } from '@/types/modview'
 import { LivePlatforms, LiveStatuses } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * What a Mod View opens on
@@ -84,6 +85,7 @@ const baseState = (live: LiveView): ModViewState => ({
   connection: 'disconnected',
   notice: null,
   readOnly: false,
+  liveStartedAt: live.startedAt,
 })
 
 // Moderators confirmed lately, by seat
@@ -161,7 +163,7 @@ const seatOf = async (
 
 const retryAfter = (error: PlatformError): number =>
   error.resetAt
-    ? Math.max(1, Math.ceil((error.resetAt - Date.now()) / 1000))
+    ? Math.max(1, Math.ceil((error.resetAt - Date.now()) / SECOND_MS))
     : LIVE_SETTINGS.rateLimitRetrySeconds
 
 /**
@@ -228,7 +230,7 @@ export const channelAccess = async (
     return { allowed: false, notice: (await translateRefusal(error, viewerId)).message }
   }
   pruneCache(moderatorCache, (until) => until)
-  moderatorCache.set(key, Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * 1000)
+  moderatorCache.set(key, Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * SECOND_MS)
 
   return { allowed: true, found }
 }
@@ -307,6 +309,7 @@ export const openModView = async (
       community: community ? { ...state.community, ...community } : state.community,
       title: stream?.title ?? state.title,
       viewers: stream?.viewers ?? null,
+      streamStartedAt: stream?.startedAt ?? null,
       pinned,
       channel: {
         ...state.channel,
@@ -437,6 +440,18 @@ export const actOnLive = async (input: {
   }
   await settleGesture(logId, true)
 
+  // A warning takes its message down, logged once
+  if (input.intent.kind === 'warn' && input.intent.messageId) {
+    try {
+      await performOnTwitch(
+        { kind: 'delete', messageId: input.intent.messageId, chatterId: input.intent.chatterId },
+        found.seat
+      )
+    } catch (error) {
+      throw await translateRefusal(error, input.viewerId)
+    }
+  }
+
   // The pin shows at once
   if (input.intent.kind === 'pin' || input.intent.kind === 'unpin') {
     void pollLiveState({
@@ -482,7 +497,7 @@ export const readLiveEmotes = async (
     let base = emoteCache.get(seat.broadcasterId)
     if (!base || base.until <= Date.now()) {
       base = {
-        until: Date.now() + LIVE_SETTINGS.emoteCacheSeconds * 1000,
+        until: Date.now() + LIVE_SETTINGS.emoteCacheSeconds * SECOND_MS,
         emotes: await readEmotes(seat),
       }
       pruneCache(emoteCache, (entry) => entry.until)
@@ -493,7 +508,7 @@ export const readLiveEmotes = async (
     let owned = ownedCache.get(ownedKey)
     if (!owned || owned.until <= Date.now()) {
       owned = {
-        until: Date.now() + LIVE_SETTINGS.ownedEmoteCacheSeconds * 1000,
+        until: Date.now() + LIVE_SETTINGS.ownedEmoteCacheSeconds * SECOND_MS,
         owned: await readOwnedEmoteIds(seat),
       }
       pruneCache(ownedCache, (entry) => entry.until)

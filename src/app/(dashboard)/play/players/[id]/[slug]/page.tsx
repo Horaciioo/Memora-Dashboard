@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PlayPlayerHero } from '@/composites/play/member/stats/PlayPlayerHero'
 import { openGameOfSlug, readPlayPlayer } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'

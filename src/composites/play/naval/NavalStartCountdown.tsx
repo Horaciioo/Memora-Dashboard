@@ -2,7 +2,7 @@
 
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
-import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
+import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { PlayGames } from '@/utils/constants/play'

@@ -2,6 +2,7 @@ import { addDays, dayOfMonth, readAt, readNumber } from '@/core/lib/assistant/da
 import { tokenize } from '@/core/lib/assistant/normalize'
 import type { AssistantToken } from '@/core/lib/assistant/normalize'
 import { ASSISTANT_MONTHS, ASSISTANT_PERIOD_UNITS } from '@/declarations/assistant/lexicon'
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * Days of a period read in a sentence
@@ -26,8 +27,6 @@ interface Mention {
 
 // Words that lead a bare day number
 const DAY_LEADS = new Set(['du', 'au', 'le', 'jusqu', 'et', 'entre'])
-
-const DAY_MS = 86_400_000
 
 // Written day number
 const isDay = (word: string | undefined): word is string => Boolean(word && /^\d{1,2}$/.test(word))

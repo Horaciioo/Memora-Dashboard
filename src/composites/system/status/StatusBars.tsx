@@ -2,7 +2,7 @@ import type { StatusDay } from '@/core/services/system/StatusService'
 import { STATUS_COPY } from '@/declarations/system/monitoring/status'
 import { STATUS_BAR_COLOURS, STATUS_HISTORY_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 // Days kept near each edge
 const EDGE_DAYS = 12

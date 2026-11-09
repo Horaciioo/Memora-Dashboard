@@ -2,6 +2,7 @@
 
 import { visibleNavGroups } from '@/declarations/navigation'
 import { FAVORITE_COPY } from '@/declarations/ui/favorites'
+import { useFeatures } from '@/managers/front-end/FeaturesManager'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
@@ -16,8 +17,9 @@ export const useRailEntries = (viewContext: ViewContext) => {
   const { can, session } = useAuthContext()
   // The first visit shows pages as it explains them
   const { isUnlocked } = useTour()
+  const { isPathOpen } = useFeatures()
 
-  const entries = visibleNavGroups(viewContext.view, session, can)
+  const entries = visibleNavGroups(viewContext.view, session, can, isPathOpen)
   // Shortcuts leave the groups too
   const shortcuts = entries
     .flatMap((group) => group.items)
@@ -30,7 +32,7 @@ export const useRailEntries = (viewContext: ViewContext) => {
     .filter((group) => group.items.length > 0)
 
   // Starred pages lead the menu
-  const favorites = session?.favorites ?? []
+  const favorites = (session?.favorites ?? []).filter((page) => isPathOpen(page.path))
   const starred = favorites.length
     ? [
         {

@@ -6,7 +6,7 @@ import {
 } from '@/components/elements/actions/SegmentedControl'
 import { THEME_REGISTRY, type ThemePreference } from '@/declarations/access/preferences'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import { useThemeStore } from '@/core/store/theme'
+import { useThemeStore } from '@/core/store/appearance/theme'
 
 // Compact captions
 const OPTIONS: SegmentedOption<ThemePreference>[] = THEME_REGISTRY.keys.map((key) => ({

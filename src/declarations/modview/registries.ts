@@ -1,4 +1,5 @@
 import { createRegistry } from '@/core/lib/registry'
+import { TEAM_ROLES } from '@/declarations/modview/roles'
 import type { IconName } from '@/declarations/ui/icons'
 import { LivePlatforms } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
@@ -190,20 +191,19 @@ export const MODVIEW_COMMUNITY_GROUPS = createRegistry(COMMUNITY_GROUP_MAP)
  */
 
 export const TIER_BADGE_ICONS: Partial<Record<ChatTier, IconName>> = {
-  admin: 'crown',
-  responsable: 'legacy',
-  moderator: 'shield',
+  admin: TEAM_ROLES.admin.icon,
+  responsable: TEAM_ROLES.responsable.icon,
+  moderator: TEAM_ROLES.moderator.icon,
 }
 
 /**
  * Default lengths of the chat gestures
- * @type {{ quickTimeout: number, slowMode: number, messagesPerPage: number }}
+ * @type {{ quickTimeout: number, slowMode: number }}
  */
 
 export const MODVIEW_DEFAULTS = {
   quickTimeout: 600,
   slowMode: 30,
-  messagesPerPage: 5,
 }
 
 /**

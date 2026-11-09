@@ -8,6 +8,7 @@ import { isPresent } from '@/core/lib/play/session'
 import { signalNotices, signalPlay } from '@/core/lib/play/signal'
 import { startSession } from '@/core/services/play/GameService'
 import { joinSession } from '@/core/services/play/LobbyService'
+import { notifyPlayInvite } from '@/core/services/play/PlayInviteNotifier'
 import { loadSession, requireSeat } from '@/core/services/play/PlaySessionService'
 import { PLAY_ERRORS, PLAY_SETTINGS } from '@/declarations/play'
 import type { PlayNoticeView } from '@/types/play'
@@ -73,6 +74,8 @@ export const inviteToSession = async (
   }
   await signalPlay(sessionId, true)
   await signalNotices(ids)
+  // A call to all stays in Play
+  await notifyPlayInvite(sessionId, inviterId, ids ?? [])
 }
 
 /**

@@ -10,7 +10,7 @@ import { cn } from '@/utils/classnames'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { AbsenceReason } from '@/components/elements/display/AbsenceReason'
 import { absenceReasonText, absenceSpan } from '@/utils/format/absences'
-import { parseDay, startOfDay } from '@/utils/format/days'
+import { parseDay, startOfDay } from '@/utils/format/time/days'
 
 export interface AbsenceListProps {
   absences: MemberAbsence[]

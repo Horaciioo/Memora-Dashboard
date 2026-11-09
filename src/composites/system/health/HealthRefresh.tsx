@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { HEALTH_COPY, HEALTH_SETTINGS } from '@/declarations/system/monitoring/health'
 import { SECOND_MS } from '@/utils/constants/time'
-import { formatClock } from '@/utils/format/dates'
+import { formatClock } from '@/utils/format/time/dates'
 
 export interface HealthRefreshProps {
   takenAt: string

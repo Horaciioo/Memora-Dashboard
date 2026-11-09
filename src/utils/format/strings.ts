@@ -73,3 +73,15 @@ export function foldText(text: string): string {
 export function fillTemplate(template: string, values: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match)
 }
+
+/**
+ * Trimmed text or nothing
+ * @param {unknown} value - Raw value
+ * @return {string | null} - Text
+ */
+
+export const optionalText = (value: unknown): string | null => {
+  const text = typeof value === 'string' ? value.trim() : ''
+
+  return text.length > 0 ? text : null
+}

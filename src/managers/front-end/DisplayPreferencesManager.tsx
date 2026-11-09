@@ -4,9 +4,9 @@ import { useEffect, useRef } from 'react'
 
 import { apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { useAppearanceStore } from '@/core/store/appearance'
-import { useColorVisionStore } from '@/core/store/colorVision'
-import { useThemeStore } from '@/core/store/theme'
+import { useAppearanceStore } from '@/core/store/appearance/appearance'
+import { useColorVisionStore } from '@/core/store/appearance/colorVision'
+import { useThemeStore } from '@/core/store/appearance/theme'
 import type { DisplayPreferences } from '@/types/auth'
 
 export interface DisplayPreferencesManagerProps {

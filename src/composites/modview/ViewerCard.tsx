@@ -1,29 +1,32 @@
 'use client'
 
-import { Byline } from '@/components/elements/display/Byline'
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Tip } from '@/components/elements/feedback/Tip'
-import { ChatText } from '@/composites/modview/ChatText'
+import { Avatar } from '@/components/elements/display/Avatar'
+import { DossierPosition } from '@/composites/modview/DossierPosition'
+import { climbedLadders } from '@/composites/modview/DossierLadders'
+import { ViewerBanBox } from '@/composites/modview/ViewerBanBox'
+import { ViewerChatHistory } from '@/composites/modview/ViewerChatHistory'
+import { ViewerMetrics } from '@/composites/modview/ViewerMetrics'
+import { ViewerNotes } from '@/composites/modview/ViewerNotes'
+import { ViewerSanctionList } from '@/composites/modview/ViewerSanctionList'
 import { ViewerSanctions } from '@/composites/modview/ViewerSanctions'
-import { ViewerDossier } from '@/composites/modview/ViewerDossier'
-import type { ViewerDossierProps } from '@/composites/modview/ViewerDossier'
+import { ViewerTabs } from '@/composites/modview/ViewerTabs'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
-import { useGlideBox } from '@/core/hooks/interaction/layout/useGlideBox'
-import { useViewerComments } from '@/core/hooks/data/lives/useViewerComments'
+import { useAvatar } from '@/core/hooks/data/lives/useAvatars'
+import { useBanDetail } from '@/core/hooks/data/lives/useBanDetail'
+import { useViewerChat } from '@/core/hooks/data/lives/useViewerChat'
 import { useViewerDossier } from '@/core/hooks/data/lives/useViewerDossier'
-import { MODVIEW_COPY, MODVIEW_USER_COPY } from '@/declarations/modview/copy'
-import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
-import { MODVIEW_DEFAULTS } from '@/declarations/modview/registries'
-import { ICONS } from '@/declarations/ui/icons'
-import type { IconName } from '@/declarations/ui/icons'
+import type { PanelMemory } from '@/core/lib/modview/commands'
+import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_USER } from '@/declarations/ui/variants'
 import type { ChatMessage, Chatter } from '@/types/modview'
+import type { SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
 
-type ViewerTab = 'dossier' | 'comments'
+type ViewerTab = 'sanctions' | 'notes' | 'situations'
+type ListTab = 'messages' | 'sanctions'
 
 export interface ViewerCardProps {
   chatter: Chatter
@@ -35,16 +38,23 @@ export interface ViewerCardProps {
   onClose: () => void
   isWatched: boolean
   onWatch: () => void
+  // Viewer card on Twitch's mod view
+  twitchUrl?: string | null
   // Sits in the right column instead of over the stage
   isDocked?: boolean
   // Width of the docked column, in pixels
   width?: number
   // Dossier of a real live
-  dossier?: { liveId: string } & Omit<ViewerDossierProps, 'chatter' | 'history'>
+  dossier?: {
+    liveId: string
+    panel: SanctionPanelView | null
+    memory: PanelMemory
+    onPrefill: (offense: SanctionOffenseCard, rung: number, chatter: Chatter) => void
+  }
 }
 
 /**
- * One viewer: their Twitch, three figures, what they said and the gestures
+ * One viewer: their Twitch, two figures, where they stand, what they said and the gestures
  * @param {ViewerCardProps} props - Card props
  * @return {JSX.Element}
  */
@@ -58,57 +68,47 @@ export const ViewerCard = ({
   onClose,
   isWatched,
   onWatch,
+  twitchUrl,
   isDocked,
   width,
   dossier,
 }: ViewerCardProps) => {
-  const [draft, setDraft] = useState('')
-  const [page, setPage] = useState(1)
-  const [tab, setTab] = useState<ViewerTab>('dossier')
-  const { history } = useViewerDossier(dossier?.liveId ?? null, chatter.id)
-  const { comments, isSaving, add } = useViewerComments(
-    dossier?.liveId ?? null,
-    chatter.id,
-    chatter.login
-  )
-  const chatterId = chatter.id
+  const [tab, setTab] = useState<ViewerTab>('sanctions')
+  const [list, setList] = useState<ListTab>('messages')
+  const liveId = dossier?.liveId ?? null
+  const { history } = useViewerDossier(liveId, chatter.id)
+  const chat = useViewerChat(liveId, chatter.id)
   const lastLine = [...messages].reverse().find((message) => !message.deletedBy)
-  const moderate = gate({ kind: 'ban', chatterId, reason: null })
-  // Newest first, a few at a time
-  const pageCount = Math.max(1, Math.ceil(messages.length / MODVIEW_DEFAULTS.messagesPerPage))
-  const currentPage = Math.min(page, pageCount)
-  const pageMessages = [...messages]
-    .reverse()
-    .slice(
-      (currentPage - 1) * MODVIEW_DEFAULTS.messagesPerPage,
-      currentPage * MODVIEW_DEFAULTS.messagesPerPage
-    )
-  const DeleteIcon = ICONS.modDelete
-  const TwitchIcon = ICONS.twitch
+  const { detail } = useBanDetail(liveId, chatter.id)
+  const picture = useAvatar(chatter.id) ?? detail?.avatar ?? null
+  const banner = detail?.banner ?? null
+  const identity = (
+    <>
+      <Avatar
+        name={chatter.name}
+        src={picture}
+        size="lg"
+        title=""
+        className={MODVIEW_USER.portrait}
+      />
+      <h3 className={MODVIEW_USER.name}>{chatter.name}</h3>
+    </>
+  )
 
-  // Comments need a real live to hang on
+  // Notes need a real live to hang on
   const tabs: { key: ViewerTab; label: string }[] = [
-    { key: 'dossier', label: MODVIEW_USER_COPY.tabDossier },
-    ...(dossier ? [{ key: 'comments' as const, label: MODVIEW_USER_COPY.tabComments }] : []),
+    { key: 'sanctions', label: MODVIEW_USER_COPY.tabSanctions },
+    ...(dossier
+      ? [
+          { key: 'notes' as const, label: MODVIEW_USER_COPY.tabNotes },
+          { key: 'situations' as const, label: MODVIEW_USER_COPY.tabSituation },
+        ]
+      : []),
   ]
 
-  const { listRef, boxRef } = useGlideBox<HTMLDivElement>(`${tab}:${tabs.length}`)
-
-  const send = async () => {
-    const text = draft.trim()
-    if (!text) return
-    if (await add(text)) setDraft('')
-  }
-
-  // Glyphs only, the name rides in the tip
-  const figures: { icon: IconName; label: string; value: string }[] = [
-    { icon: 'chat', label: MODVIEW_USER_COPY.statMessages, value: String(messages.length) },
-    {
-      icon: 'sanctionsPanel',
-      label: MODVIEW_USER_COPY.statTotal,
-      value: history ? String(history.length) : '–',
-    },
-    { icon: 'stream', label: MODVIEW_USER_COPY.statLive, value: String(liveSanctions) },
+  const lists: { key: ListTab; label: string }[] = [
+    { key: 'messages', label: MODVIEW_USER_COPY.tabMessages },
+    { key: 'sanctions', label: MODVIEW_USER_COPY.tabSanctions },
   ]
 
   return (
@@ -125,162 +125,71 @@ export const ViewerCard = ({
           aria-label={MODVIEW_USER_COPY.close}
           onClick={onClose}
         />
-        <TwitchIcon className={MODVIEW_USER.glyph} aria-hidden="true" />
-        <h3 className={MODVIEW_USER.name}>{chatter.name}</h3>
-        <Button
-          variant={isWatched ? 'secondary' : 'ghost'}
-          icon="visible"
-          className={MODVIEW_USER.watch}
-          aria-label={isWatched ? MODVIEW_WATCH_COPY.stop : MODVIEW_WATCH_COPY.start}
-          title={isWatched ? MODVIEW_WATCH_COPY.stop : MODVIEW_WATCH_COPY.start}
-          onClick={onWatch}
-        />
+        {banner && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={banner} alt="" className={MODVIEW_USER.banner} />
+        )}
+        {twitchUrl ? (
+          <a
+            href={twitchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={MODVIEW_USER_COPY.openOnTwitch}
+            className={cn(MODVIEW_USER.identity, MODVIEW_USER.identityLink)}
+          >
+            {identity}
+          </a>
+        ) : (
+          <div className={MODVIEW_USER.identity}>{identity}</div>
+        )}
       </header>
 
-      <div ref={listRef} className={MODVIEW_USER.tabs} role="tablist">
-        <span ref={boxRef} className={MODVIEW_USER.tabBox} aria-hidden="true" />
-        {tabs.map((entry) => (
-          <button
-            key={entry.key}
-            type="button"
-            role="tab"
-            aria-selected={tab === entry.key}
-            className={cn(MODVIEW_USER.tab, tab === entry.key && MODVIEW_USER.tabOn)}
-            onClick={() => setTab(entry.key)}
-          >
-            {entry.label}
-          </button>
-        ))}
-      </div>
+      <ViewerTabs tabs={tabs} value={tab} onChange={setTab} />
 
-      <div className={MODVIEW_USER.stats}>
-        {figures.map(({ icon, label, value }) => {
-          const Icon = ICONS[icon]
+      <div className={MODVIEW_USER.scroll}>
+        <ViewerMetrics
+          messages={dossier ? chat.total : messages.length}
+          sanctions={dossier ? (history?.length ?? null) : liveSanctions}
+          liveMessages={dossier ? messages.length : 0}
+          liveSanctions={dossier ? liveSanctions : 0}
+        />
 
-          return (
-            <Tip key={icon} label={label} className={MODVIEW_USER.stat}>
-              <Icon className={MODVIEW_USER.statIcon} aria-hidden="true" />
-              <span className={MODVIEW_USER.statValue}>{value}</span>
-              <span className="sr-only">{label}</span>
-            </Tip>
-          )
-        })}
-      </div>
-
-      <div className={MODVIEW_USER.body}>
-        {tab === 'dossier' && (
-          <>
-            <ViewerSanctions chatter={chatter} lastLine={lastLine} gate={gate} onAct={onAct} />
-
-            <section className={MODVIEW_USER.section}>
-              <h4 className={MODVIEW_USER.label}>{MODVIEW_USER_COPY.messages}</h4>
-              {messages.length === 0 ? (
-                <p className={MODVIEW_USER.empty}>{MODVIEW_USER_COPY.messagesEmpty}</p>
-              ) : (
-                <ul className={MODVIEW_USER.messages}>
-                  {pageMessages.map((message) => (
-                    <li
-                      key={message.id}
-                      className={cn(MODVIEW_USER.message, MODVIEW_USER.messageRow)}
-                    >
-                      <span className={MODVIEW_USER.messageText}>
-                        <ChatText
-                          text={message.text}
-                          fragments={message.fragments}
-                          flagged={message.flagged}
-                        />
-                      </span>
-                      {!message.deletedBy && (
-                        <button
-                          type="button"
-                          className={MODVIEW_USER.messageTool}
-                          disabled={!moderate.allowed}
-                          title={moderate.reason ?? MODVIEW_USER_COPY.deleteMessage}
-                          aria-label={MODVIEW_USER_COPY.deleteMessage}
-                          onClick={() =>
-                            onAct({ kind: 'delete', messageId: message.id, chatterId })
-                          }
-                        >
-                          <DeleteIcon className="h-4 w-4" aria-hidden="true" />
-                        </button>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {pageCount > 1 && (
-                <nav className={MODVIEW_USER.pager} aria-label={MODVIEW_USER_COPY.messages}>
-                  <Button
-                    variant="ghost"
-                    icon="back"
-                    aria-label={MODVIEW_COPY.pagePrevious}
-                    title={MODVIEW_COPY.pagePrevious}
-                    disabled={currentPage <= 1}
-                    onClick={() => setPage(currentPage - 1)}
-                  />
-                  <span className={MODVIEW_USER.pagerLabel}>
-                    {MODVIEW_COPY.pageOf
-                      .replace('{page}', String(currentPage))
-                      .replace('{total}', String(pageCount))}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    icon="forward"
-                    aria-label={MODVIEW_COPY.pageNext}
-                    title={MODVIEW_COPY.pageNext}
-                    disabled={currentPage >= pageCount}
-                    onClick={() => setPage(currentPage + 1)}
-                  />
-                </nav>
-              )}
-            </section>
-
-            {dossier && <ViewerDossier chatter={chatter} history={history} {...dossier} />}
-          </>
-        )}
-        {tab === 'comments' && (
-          <>
-            <section className={MODVIEW_USER.section}>
-              <textarea
-                className={MODVIEW_USER.comment}
-                placeholder={MODVIEW_USER_COPY.commentPlaceholder}
-                aria-label={MODVIEW_USER_COPY.commentField}
-                value={draft}
-                disabled={!moderate.allowed}
-                onChange={(event) => setDraft(event.target.value)}
+        {tab === 'sanctions' && (
+          <div className={MODVIEW_USER.situation}>
+            <div className={MODVIEW_USER.gestures}>
+              <ViewerBanBox liveId={liveId} chatterId={chatter.id} />
+              <ViewerSanctions
+                chatter={chatter}
+                lastLine={lastLine}
+                gate={gate}
+                onAct={onAct}
+                isWatched={isWatched}
+                onWatch={onWatch}
               />
-              <Button
-                variant="primary"
-                isLoading={isSaving}
-                disabled={!moderate.allowed || !draft.trim()}
-                title={moderate.reason ?? undefined}
-                onClick={() => void send()}
-              >
-                {MODVIEW_USER_COPY.commentSend}
-              </Button>
-            </section>
+            </div>
 
-            {comments !== null && comments.length === 0 ? (
-              <p className={MODVIEW_USER.empty}>{MODVIEW_USER_COPY.commentsEmpty}</p>
-            ) : (
-              <div className={MODVIEW_USER.messages}>
-                {(comments ?? []).map((comment) => (
-                  <article key={comment.id} className={MODVIEW_USER.message}>
-                    <div className={MODVIEW_USER.commentHead}>
-                      <span className={MODVIEW_USER.commentAuthor}>
-                        <Byline
-                          name={comment.authorName}
-                          avatar={comment.authorAvatar}
-                          date={formatDayTime(comment.createdAt)}
-                        />
-                      </span>
-                    </div>
-                    <p className={MODVIEW_USER.commentBody}>{comment.body}</p>
-                  </article>
-                ))}
-              </div>
-            )}
-          </>
+            <p className={MODVIEW_USER.listsTitle}>{MODVIEW_USER_COPY.historyTitle}</p>
+            <section className={MODVIEW_USER.lists}>
+              <ViewerTabs isBold tabs={lists} value={list} onChange={setList} />
+              {list === 'messages' ? (
+                <ViewerChatHistory liveId={liveId} chatterId={chatter.id} liveMessages={messages} />
+              ) : (
+                <ViewerSanctionList history={history} />
+              )}
+            </section>
+          </div>
+        )}
+        {tab === 'situations' && dossier && (
+          <div className={MODVIEW_USER.notes}>
+            <DossierPosition
+              ladders={climbedLadders(dossier.memory[chatter.id], dossier.panel)}
+              chatter={chatter}
+              onPrefill={dossier.onPrefill}
+            />
+          </div>
+        )}
+        {tab === 'notes' && dossier && (
+          <ViewerNotes liveId={dossier.liveId} chatter={chatter} gate={gate} />
         )}
       </div>
     </aside>

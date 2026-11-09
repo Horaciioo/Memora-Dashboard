@@ -2,10 +2,11 @@
 
 import type { CSSProperties } from 'react'
 
-import { useCountdown } from '@/core/hooks/interaction/state/useCountdown'
+import { useCountdown } from '@/core/hooks/interaction/state/time/useCountdown'
 import { EXERCISE_COPY } from '@/declarations/recruitment/exerciseCopy'
 import { EXERCISE_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+import { SECOND_MS } from '@/utils/constants/time'
 
 export interface StepClockProps {
   // Null when the step is untimed
@@ -33,7 +34,7 @@ export const StepClock = ({ seconds, onEnd }: StepClockProps) => {
       <span className={EXERCISE_STYLES.clockBar}>
         <span
           className={EXERCISE_STYLES.clockFill}
-          style={{ '--drain-ms': `${seconds * 1000}ms` } as CSSProperties}
+          style={{ '--drain-ms': `${seconds * SECOND_MS}ms` } as CSSProperties}
         />
       </span>
     </div>

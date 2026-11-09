@@ -12,7 +12,7 @@ import { ANNUAL_REVIEW_COPY } from '@/declarations/calendar/copy'
 import { CALENDAR_DETAIL } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
 import type { FieldOption } from '@/types/forms'
-import { formatClock, formatWeekday } from '@/utils/format/dates'
+import { formatClock, formatWeekday } from '@/utils/format/time/dates'
 
 export interface AnnualSlotAdminProps {
   entry: CalendarEntry

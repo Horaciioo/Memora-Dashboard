@@ -11,7 +11,7 @@ import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { TrainingStatuses } from '@/utils/constants/hierarchy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 /**
  * Progression of the junior: finished courses on the left, past lives on the right

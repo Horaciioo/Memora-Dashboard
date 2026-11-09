@@ -31,7 +31,7 @@ import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/type
 import { cn } from '@/utils/classnames'
 import { toDayKey, toFieldValue } from '@/utils/format/calendar'
 import { aimedPhrase } from '@/utils/format/grammar'
-import { shiftToZone } from '@/utils/format/zone'
+import { shiftToZone } from '@/utils/format/time/zone'
 
 export interface FormDrawerProps {
   open: boolean

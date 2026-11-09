@@ -2,7 +2,7 @@
 
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
-import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
+import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Drop a line now and then
@@ -25,11 +26,11 @@ export const useNudgeCycle = (lines: readonly string[], isActive: boolean): stri
     const speak = () => {
       setShown(lines[turn % lines.length])
       turn += 1
-      hide = setTimeout(() => setShown(null), nudgeShowSeconds * 1000)
+      hide = setTimeout(() => setShown(null), nudgeShowSeconds * SECOND_MS)
     }
 
-    const first = setTimeout(speak, nudgeFirstSeconds * 1000)
-    const every = setInterval(speak, nudgeEverySeconds * 1000)
+    const first = setTimeout(speak, nudgeFirstSeconds * SECOND_MS)
+    const every = setInterval(speak, nudgeEverySeconds * SECOND_MS)
 
     return () => {
       clearTimeout(first)

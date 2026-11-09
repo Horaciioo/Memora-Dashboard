@@ -1,5 +1,5 @@
 import { playSound, preloadSounds } from '@/core/lib/play/sounds'
-import { playLevelOf } from '@/core/store/playSound'
+import { playLevelOf } from '@/core/store/play/playSound'
 import { BOMB_SOUNDS, BOMB_TAKES } from '@/declarations/play/bomb/sounds'
 import type { BombSoundName, BombTakeName } from '@/declarations/play/bomb/sounds'
 import { PlayGames } from '@/utils/constants/play'

@@ -13,7 +13,7 @@ import type { FieldOption } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import type { MentionEntry } from '@/utils/format/discord'
 import { toDisplay, toRaw } from '@/utils/format/discord'
-import { caretSpot } from '@/utils/format/caret'
+import { caretSpot } from '@/utils/format/chat/caret'
 import { foldText } from '@/utils/format/strings'
 
 // Menu footprint, width and the room it needs

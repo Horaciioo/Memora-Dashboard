@@ -5,7 +5,7 @@ import { emptyCounts } from '@/core/lib/lives/insights/series'
 import type { LiveBaseline } from '@/core/lib/lives/insights'
 import { GROUP_OF_KIND, REPORT_GROUPS } from '@/declarations/lives/reportGroups'
 import { LiveStatuses } from '@/utils/constants/lives'
-import { HOUR_SECONDS } from '@/utils/constants/time'
+import { HOUR_SECONDS, SECOND_MS } from '@/utils/constants/time'
 
 // Lives averaged
 const BASELINE_LIVES = 5
@@ -61,7 +61,8 @@ export const readBaseline = async (
   const total = REPORT_GROUPS.reduce((sum, group) => sum + counts[group], 0)
 
   const seconds = lives.reduce(
-    (sum, live) => sum + Math.max(0, (live.endedAt!.getTime() - live.startedAt!.getTime()) / 1000),
+    (sum, live) =>
+      sum + Math.max(0, (live.endedAt!.getTime() - live.startedAt!.getTime()) / SECOND_MS),
     0
   )
   const mean = (values: number[]) =>

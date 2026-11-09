@@ -6,7 +6,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import { GolfVoteAvatar } from '@/composites/play/golf/vote/GolfVoteAvatar'
 import type { GolfVoter } from '@/composites/play/golf/vote/GolfVoteAvatar'
 import { GOLF_VOTE } from '@/declarations/ui/variants'
-import type { VoteLook } from '@/declarations/ui/variants/golf'
+import type { VoteLook } from '@/declarations/ui/variants/games/golf'
 import { cn } from '@/utils/classnames'
 
 /**

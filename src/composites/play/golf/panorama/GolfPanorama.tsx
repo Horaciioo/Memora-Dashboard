@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { GOLF_COURSES } from '@/declarations/play/golf/courses'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_PANORAMA } from '@/declarations/ui/variants'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { panorama } = GOLF_SCENE
 
@@ -48,7 +49,7 @@ export const GolfPanorama = ({ course: held }: { course?: string }) => {
             { id, course: GOLF_COURSES.keys[id % GOLF_COURSES.keys.length] },
           ]
         }),
-      panorama.seconds * 1000
+      panorama.seconds * SECOND_MS
     )
 
     return () => clearInterval(tick)

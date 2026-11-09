@@ -6,7 +6,7 @@ import { useSessionState } from '@/composites/academy/session/SessionFileContext
 import { toJuniorEditFields } from '@/core/lib/academy/juniorForm'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 /**
  * Drawers and confirmations of an academy session file

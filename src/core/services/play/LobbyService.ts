@@ -10,9 +10,12 @@ import { pickSeatColor, readBodyInteger, readBodyText, seatBoundsOf } from '@/co
 import { clearSessionTimers } from '@/core/lib/play/timers'
 import { signalNotices, signalLobbies, signalPlay } from '@/core/lib/play/signal'
 import { PLAY_ERRORS, PLAY_GAMES, PLAY_JOURNAL, PLAY_SETTINGS } from '@/declarations/play'
+import { isFeatureOn, isFeatureOpen } from '@/core/services/features'
+import { gameFeatureKey } from '@/declarations/features'
 import { announceInChat } from '@/core/services/play/PlayChatService'
 import { sweepIdleGames } from '@/core/services/play/PlayIdleService'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
+import { notifyPlayInvite } from '@/core/services/play/PlayInviteNotifier'
 import {
   cloneTable,
   currentSessionId,
@@ -74,17 +77,42 @@ const tournamentLength = (raw: Record<string, unknown>): number | null => {
 const settingsOf = (raw: Record<string, unknown>): Record<string, unknown> =>
   (raw.settings ?? {}) as Record<string, unknown>
 
+// Creations under way, a double click lands on the same table
+const creating = new Map<string, ReturnType<typeof openSession>>()
+
 /**
  * Open a lobby, its creator hosting
  * @param {string} accountId - Host
  * @param {Record<string, unknown>} raw - Body with game, settings and games
+ * @param {boolean} [isAdmin] - Host holds the system
  * @return {Promise<{ id: string }>} - New game
  */
 
-export const createSession = async (accountId: string, raw: Record<string, unknown>) => {
+export const createSession = (accountId: string, raw: Record<string, unknown>, isAdmin = false) => {
+  const running = creating.get(accountId)
+  if (running) return running
+
+  const opening = openSession(accountId, raw, isAdmin).finally(() => creating.delete(accountId))
+  creating.set(accountId, opening)
+
+  return opening
+}
+
+/**
+ * Lobby written to the database
+ * @param {string} accountId - Host
+ * @param {Record<string, unknown>} raw - Body
+ * @return {Promise<{ id: string }>} - New game
+ */
+
+const openSession = async (accountId: string, raw: Record<string, unknown>, isAdmin: boolean) => {
   const game = gameNamed(readBodyText(raw, 'game', PLAY_ERRORS.unknownGame))
+  // A game switched off opens no table
+  if (!(await isFeatureOpen(gameFeatureKey(PLAY_GAMES.get(game).slug), isAdmin))) {
+    throw forbidden(PLAY_ERRORS.unplayable)
+  }
   const settings = engineOf(game).readSettings(settingsOf(raw), null)
-  const games = tournamentLength(raw)
+  const games = (await isFeatureOn('play.tournaments')) ? tournamentLength(raw) : null
   const isPrivate = raw.visibility === PlayVisibilities.Private
 
   const session = await prisma.$transaction(async (tx) => {
@@ -445,7 +473,7 @@ const tournamentLink = async (
   // Only a first game, only when asked
   if (!('games' in raw) || (session.tournamentIndex ?? 0) > 0) return {}
 
-  const games = tournamentLength(raw)
+  const games = (await isFeatureOn('play.tournaments')) ? tournamentLength(raw) : null
   const known = session.tournament
 
   // Longer or shorter tournament
@@ -544,6 +572,7 @@ export const rematchSession = async (sessionId: string, accountId: string) => {
   })
   await signalPlay(sessionId, true)
   await signalNotices(called)
+  await notifyPlayInvite(id, accountId, called)
 
   return { id }
 }

@@ -1,7 +1,6 @@
 import { isReviewMissing } from '@/core/lib/recruitment/review'
 import type { CandidateView, RecruitmentOutcomeView } from '@/types/recruitment'
-
-const MINUTE_MS = 60_000
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Figures of an interviewer

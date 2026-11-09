@@ -12,6 +12,7 @@ import type { LiveReport } from '@/core/lib/lives/report'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
 import type { LiveLogLine, LiveModTime, LiveNote } from '@/types/lives'
 import { formatClock } from '@/utils/format/modview'
+import { SECOND_MS } from '@/utils/constants/time'
 
 export interface BilanModerationProps {
   team: LiveModTime[]
@@ -58,7 +59,7 @@ export const BilanModeration = ({
 
   const stats = useMemo(() => {
     const frame = { start: new Date(start), end: new Date(end), bucketMinutes }
-    const span = Math.max(1, (Date.parse(end) - Date.parse(start)) / 1000)
+    const span = Math.max(1, (Date.parse(end) - Date.parse(start)) / SECOND_MS)
 
     return new Map<string, ModStat>(
       options.map((option) => {

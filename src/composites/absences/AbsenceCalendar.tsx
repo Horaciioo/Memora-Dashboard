@@ -8,7 +8,7 @@ import { PICKER_COPY } from '@/declarations/ui/copy'
 import { ABSENCE_PAGE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { monthGrid, toDayKey } from '@/utils/format/calendar'
-import { addMonths, monthLabel, parseDay, startOfMonth } from '@/utils/format/days'
+import { addMonths, monthLabel, parseDay, startOfMonth } from '@/utils/format/time/days'
 
 // Days of a week
 const WEEK = 7

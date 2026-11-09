@@ -9,7 +9,7 @@ import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { PageOptions } from '@/components/structures/page/PageOptions'
-import { LiveEndedDialog } from '@/composites/lives/LiveEndedDialog'
+import { LiveEndedDialog } from '@/composites/lives/notices/LiveEndedDialog'
 import { LiveRecent } from '@/composites/lives/LiveRecent'
 import { LiveStage } from '@/composites/lives/LiveStage'
 import { LiveTile } from '@/composites/lives/LiveTile'
@@ -33,7 +33,6 @@ export interface LivesBoardProps {
   canReport: boolean
   canDelete: boolean
   canCreatorReport: boolean
-  // Dev only: simulated live controls
 }
 
 /**

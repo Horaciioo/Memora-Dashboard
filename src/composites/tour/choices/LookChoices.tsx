@@ -1,7 +1,7 @@
 'use client'
 
-import { useAppearanceStore } from '@/core/store/appearance'
-import { useThemeStore } from '@/core/store/theme'
+import { useAppearanceStore } from '@/core/store/appearance/appearance'
+import { useThemeStore } from '@/core/store/appearance/theme'
 import { FONT_SCALE_REGISTRY, THEME_REGISTRY } from '@/declarations/access/preferences'
 import type { FontScale, ThemePreference } from '@/declarations/access/preferences'
 import { TOUR_COPY } from '@/declarations/tour/copy'

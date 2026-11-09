@@ -3,6 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { logger } from '@/core/lib/logger'
 import { pruneSessions } from '@/core/services/auth/SessionService'
+import { purgeChatMessages } from '@/core/services/lives/ChatHistoryService'
 import { purgeModerationLog } from '@/core/services/lives/ModerationLogService'
 import { pruneOrphanFiles } from '@/core/services/system/FileService'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
@@ -28,6 +29,7 @@ export interface MaintenanceReport {
   pushDeliveries: number
   activityLogs: number
   moderationLogs: number
+  chatMessages: number
   candidates: number
   bans: number
   files: number
@@ -138,6 +140,7 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     pushDeliveries,
     activityLogs,
     moderationLogs,
+    chatMessages,
     candidates,
     bans,
     files,
@@ -148,6 +151,7 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     pruneActivityLogs(),
     // A table not migrated yet keeps nothing to purge
     purgeModerationLog().catch(() => 0),
+    purgeChatMessages().catch(() => 0),
     pruneRejectedCandidates(),
     pruneBans(),
     pruneOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
@@ -159,6 +163,7 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     pushDeliveries,
     activityLogs,
     moderationLogs,
+    chatMessages,
     candidates,
     bans,
     files,

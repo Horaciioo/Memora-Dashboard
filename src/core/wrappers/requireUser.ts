@@ -70,6 +70,18 @@ export const requireSystem = async (): Promise<GuardedSession> => {
 }
 
 /**
+ * Require the root administrator alone
+ * @return {Promise<GuardedSession>} - Session and helpers
+ */
+
+export const requireRoot = async (): Promise<GuardedSession> => {
+  const guarded = await requireUser()
+  if (!guarded.session.isRoot) forbidden()
+
+  return guarded
+}
+
+/**
  * Require a membership status on a server component
  * @param {MemberStatusName | MemberStatusName[]} status - Statuses the page is meant for
  * @return {Promise<GuardedSession>} - Session and helpers

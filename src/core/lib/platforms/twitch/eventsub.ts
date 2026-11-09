@@ -3,6 +3,8 @@ import { fragmentsOf } from '@/core/lib/platforms/twitch/fragments'
 import { twitchChatter } from '@/core/lib/platforms/twitch/helix'
 import { TWITCH_EVENT_COPY } from '@/declarations/platforms/copy'
 import type { ChatBadge, ChatReply, ModAct, ModActKind } from '@/types/modview'
+import { SECOND_MS } from '@/utils/constants/time'
+import { child } from '@/core/lib/platforms/twitch/payload'
 
 /**
  * What one notification means for Memora
@@ -45,19 +47,6 @@ const MODE_ACTIONS = new Set([
  */
 
 const text = (value: unknown): string => (typeof value === 'string' ? value : '')
-
-/**
- * Read a nested object
- * @param {Payload} payload - Parent
- * @param {string} key - Field
- * @return {Payload} - Child
- */
-
-const child = (payload: Payload, key: string): Payload => {
-  const value = payload[key]
-
-  return value && typeof value === 'object' && !Array.isArray(value) ? (value as Payload) : {}
-}
 
 /**
  * Read a user of a payload
@@ -171,7 +160,7 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
             targetId: target.id || null,
             reason: text(detail.reason) || null,
             durationSeconds: Number.isFinite(expiresAt)
-              ? Math.max(1, Math.round((expiresAt - Date.parse(at)) / 1000))
+              ? Math.max(1, Math.round((expiresAt - Date.parse(at)) / SECOND_MS))
               : null,
           }),
         }),
@@ -184,7 +173,10 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
       return [
         scene({
           kind: 'act',
-          act: actOf(id, 'unban', event, at, { target: target.name || target.login }),
+          act: actOf(id, 'unban', event, at, {
+            target: target.name || target.login,
+            targetId: target.id || null,
+          }),
         }),
       ]
     }

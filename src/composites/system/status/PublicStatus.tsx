@@ -11,7 +11,7 @@ import {
 } from '@/declarations/ui/variants'
 import type { Tone } from '@/declarations/ui/theme'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 // Colour of each level
 const HEALTH_TONES: Record<'up' | 'degraded' | 'down', Tone> = {

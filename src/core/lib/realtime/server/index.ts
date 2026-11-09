@@ -5,6 +5,10 @@ import { createHub } from '@/core/lib/realtime/server/hub'
 import type { RealtimeHub } from '@/core/lib/realtime/server/hub'
 import { DOC_REALTIME_REQUESTS, flushDocs } from '@/core/lib/realtime/server/docs'
 import { PRESENCE_REALTIME_REQUESTS } from '@/core/lib/realtime/server/presence'
+import {
+  TEAM_CHAT_REALTIME_REQUESTS,
+  TEAM_CHAT_REALTIME_TOPICS,
+} from '@/core/services/lives/TeamChatRealtimeService'
 import { PAGE_REALTIME_TOPICS } from '@/core/services/pages/PageRealtimeService'
 import {
   PLAY_REALTIME_REQUESTS,
@@ -32,11 +36,13 @@ export const wireRealtime = (): void => {
       ...RECRUITMENT_REALTIME_TOPICS,
       ...PAGE_REALTIME_TOPICS,
       ...SECTION_REALTIME_TOPICS,
+      ...TEAM_CHAT_REALTIME_TOPICS,
     ],
     requests: {
       ...PLAY_REALTIME_REQUESTS,
       ...PRESENCE_REALTIME_REQUESTS,
       ...DOC_REALTIME_REQUESTS,
+      ...TEAM_CHAT_REALTIME_REQUESTS,
     },
   })
   // Open documents written before the sockets go

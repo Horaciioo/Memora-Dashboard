@@ -6,7 +6,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { PAGE_VIEW_STYLES } from '@/declarations/ui/variants'
 import type { PageCommentView } from '@/types/pages'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface PageCommentItemProps {
   comment: PageCommentView

@@ -132,6 +132,7 @@ export const joinPresence = (topic: string, connection: RealtimeConnection): (()
     activity: 'active',
     place: null,
     at: Date.now(),
+    seenAt: Date.now(),
   })
   room.departed.delete(session.id)
   schedule(topic)
@@ -172,7 +173,10 @@ export const PRESENCE_REALTIME_REQUESTS: Record<string, RealtimeRequest> = {
     // Not seated yet, the next beat retries
     if (!seat) return { isSeated: false }
 
-    Object.assign(seat, state, { at: Date.now() })
+    // Idle reports keep the moment activity stopped
+    const now = Date.now()
+    if (seat.activity === 'active' || state.activity === 'active') seat.seenAt = now
+    Object.assign(seat, state, { at: now })
     schedule(topic)
 
     return { isSeated: true }

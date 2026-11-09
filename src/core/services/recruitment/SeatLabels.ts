@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { readHiddenSeats } from '@/core/services/recruitment/SeatReader'
+import { readHiddenSeats } from '@/core/services/recruitment/readers/SeatReader'
 import { SEAT_COPY } from '@/declarations/members/seats'
 
 /**

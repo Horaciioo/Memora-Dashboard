@@ -7,7 +7,7 @@ import { PUSH_COPY } from '@/declarations/pwa/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { PREFERENCE_STYLES, PUSH_STYLES } from '@/declarations/ui/variants'
 import type { PushDeviceView } from '@/types/push'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import { deviceLabel, readDevice } from '@/utils/format/device'
 
 export interface PushDevicesSectionProps {

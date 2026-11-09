@@ -8,7 +8,7 @@ import type { OceanCell } from '@/composites/play/naval/ocean/useOceanGestures'
 import type { NavalCamera } from '@/core/lib/play/naval/camera'
 import { NAVAL_SHIP_NAMES } from '@/declarations/play/naval/copy'
 import { NAVAL_VIEW } from '@/declarations/play/naval/view'
-import { NAVAL_PLACE } from '@/declarations/ui/variants/naval'
+import { NAVAL_PLACE } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 
 export interface NavalDockProps {

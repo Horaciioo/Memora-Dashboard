@@ -1,5 +1,6 @@
 import { PlatformError } from '@/core/lib/platforms/http'
 import { TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Tokens a platform handed over
@@ -72,6 +73,6 @@ export const postGrant = async (
     accessToken: payload.access_token,
     refreshToken: payload.refresh_token,
     scopes: scopes ?? [],
-    expiresAt: new Date(Date.now() + (payload.expires_in ?? 0) * 1000),
+    expiresAt: new Date(Date.now() + (payload.expires_in ?? 0) * SECOND_MS),
   }
 }

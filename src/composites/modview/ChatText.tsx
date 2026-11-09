@@ -2,7 +2,7 @@ import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { LinkedText } from '@/composites/modview/LinkedText'
 import { MODVIEW_CHAT } from '@/declarations/ui/variants'
 import type { ChatFragment } from '@/types/modview'
-import { twitchEmoteUrl } from '@/utils/format/emotes'
+import { twitchEmoteUrl } from '@/utils/format/chat/emotes'
 
 export interface ChatTextProps {
   text: string

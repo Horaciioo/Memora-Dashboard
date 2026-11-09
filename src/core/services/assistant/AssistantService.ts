@@ -12,7 +12,7 @@ import type { Resolver, ResolverContext } from '@/core/services/assistant/reply'
 import { resolveCreateTask } from '@/core/services/assistant/tasks'
 import type { AssistantIntentName } from '@/declarations/assistant/lexicon'
 import type { AssistantProposal, AssistantRequest } from '@/types/assistant'
-import { instantToWall } from '@/utils/format/zone'
+import { instantToWall } from '@/utils/format/time/zone'
 
 // One resolver per intent
 const RESOLVERS: Record<AssistantIntentName, Resolver> = {

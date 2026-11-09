@@ -3,7 +3,7 @@
 import { Byline } from '@/components/elements/display/Byline'
 import { useState } from 'react'
 
-import { useHotComments } from '@/core/hooks/interaction/state/useHotComments'
+import { useHotComments } from '@/core/hooks/interaction/state/moderation/useHotComments'
 import { CommentComposer } from '@/components/structures/data/CommentComposer'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { AddRow } from '@/components/structures/inline/AddRow'
@@ -16,7 +16,7 @@ import { useMenu } from '@/managers/front-end'
 import type { CommentView } from '@/types/comments'
 import type { FieldDefinition, FieldIssue, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface CommentThreadProps {
   comments: CommentView[]

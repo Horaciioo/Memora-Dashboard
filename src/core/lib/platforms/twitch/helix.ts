@@ -32,14 +32,14 @@ export interface TwitchSeat {
  * @typedef {Object} HelixCall
  * @property {'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'} method - Verb
  * @property {string} path - Helix path
- * @property {Record<string, string>} query - Query string
+ * @property {Record<string, string | string[]>} query - Query string, a list repeats its key
  * @property {unknown} [body] - JSON body
  */
 
 export interface HelixCall {
   method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
   path: string
-  query: Record<string, string>
+  query: Record<string, string | string[]>
   body?: unknown
 }
 
@@ -249,7 +249,11 @@ export const runHelix = <T>(
   call: HelixCall
 ) => {
   const url = new URL(`${TWITCH_ENDPOINTS.helix}${call.path}`)
-  url.search = new URLSearchParams(call.query).toString()
+  url.search = new URLSearchParams(
+    Object.entries(call.query).flatMap(([key, value]) =>
+      [value].flat().map((entry): [string, string] => [key, entry])
+    )
+  ).toString()
 
   return platformRequest<T>({
     url: url.toString(),
@@ -415,7 +419,9 @@ export const readUnbanRequests = async (seat: TwitchSeat): Promise<UnbanRequest[
 
 export const readBanDetail = async (seat: TwitchSeat, userId: string): Promise<BanDetail> => {
   const [user, ban] = await Promise.all([
-    runHelix<{ data: { profile_image_url?: string; created_at?: string }[] }>(seat, {
+    runHelix<{
+      data: { profile_image_url?: string; offline_image_url?: string; created_at?: string }[]
+    }>(seat, {
       method: 'GET',
       path: HELIX_PATHS.users,
       query: { id: userId },
@@ -438,11 +444,36 @@ export const readBanDetail = async (seat: TwitchSeat, userId: string): Promise<B
 
   return {
     avatar: account?.profile_image_url || null,
+    banner: account?.offline_image_url || null,
     accountCreatedAt: account?.created_at ?? null,
     bannedBy: entry?.moderator_name || entry?.moderator_login || null,
     bannedAt: entry?.created_at ?? null,
     reason: entry?.reason || null,
   }
+}
+
+/**
+ * Profile pictures of several accounts in one call
+ * @param {TwitchSeat} seat - Seat
+ * @param {string[]} userIds - Accounts, a hundred at most
+ * @return {Promise<Map<string, string>>} - Picture address by account
+ */
+
+export const readAvatars = async (
+  seat: TwitchSeat,
+  userIds: string[]
+): Promise<Map<string, string>> => {
+  const answer = await runHelix<{ data: { id: string; profile_image_url?: string }[] }>(seat, {
+    method: 'GET',
+    path: HELIX_PATHS.users,
+    query: { id: userIds },
+  })
+
+  return new Map(
+    (answer?.data ?? []).flatMap((row) =>
+      row.profile_image_url ? [[row.id, row.profile_image_url] as [string, string]] : []
+    )
+  )
 }
 
 /**

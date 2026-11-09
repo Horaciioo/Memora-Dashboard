@@ -9,7 +9,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { HOME_PLAN } from '@/declarations/ui/variants'
 import type { HomePlanned as PlannedEntry } from '@/types/personal'
 import { cn } from '@/utils/classnames'
-import { formatClock } from '@/utils/format/dates'
+import { formatClock } from '@/utils/format/time/dates'
 
 // Day alone until the pointer asks for the hour
 const dayLabel = (iso: string): string =>

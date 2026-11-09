@@ -17,7 +17,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { HISTORY_COPY } from '@/declarations/recruitment/historyCopy'
 import type { MenuItem } from '@/managers/front-end'
 import type { HistoryEntry, HistoryPassage } from '@/types/recruitment'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 // Value of the only filter
 const BANNED = 'banned'

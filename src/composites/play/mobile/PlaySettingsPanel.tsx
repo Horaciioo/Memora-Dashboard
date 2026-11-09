@@ -2,7 +2,7 @@
 
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
-import { usePlayMotionStore } from '@/core/store/playMotion'
+import { usePlayMotionStore } from '@/core/store/play/playMotion'
 import { PLAY_MOBILE_COPY } from '@/declarations/play'
 import { PLAY_ONLINE } from '@/declarations/ui/variants'
 

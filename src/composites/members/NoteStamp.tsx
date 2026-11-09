@@ -2,7 +2,7 @@ import { Byline } from '@/components/elements/display/Byline'
 import { Status } from '@/components/elements/display/Status'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { MemberNote } from '@/types/members'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface NoteStampProps {
   note: MemberNote

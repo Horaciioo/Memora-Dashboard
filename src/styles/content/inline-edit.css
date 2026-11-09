@@ -1,3 +1,8 @@
+/* Holds collaborator portraits */
+[data-presence-anchor] {
+  position: relative;
+}
+
 /* Editor laid exactly over the read value it replaces */
 .inline-cell :is(input:not([type='checkbox']), textarea) {
   width: calc(100% + 0.75rem);

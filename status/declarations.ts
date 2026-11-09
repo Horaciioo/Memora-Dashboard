@@ -45,14 +45,14 @@ export const COMPONENTS: ProbeTarget[] = [
     label: 'Application',
     lead: 'Le site Memora',
     kind: 'http',
-    target: read('STATUS_APP_URL', 'http://app:3000/connexion'),
+    target: read('STATUS_APP_URL', 'http://app:3000/login'),
   },
   {
     id: 'api',
     label: 'API',
     lead: 'Les échanges de données de Memora',
     kind: 'http',
-    target: read('STATUS_API_URL', 'http://app:3000/api/sante'),
+    target: read('STATUS_API_URL', 'http://app:3000/api/health'),
   },
   {
     id: 'database',

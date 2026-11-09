@@ -9,7 +9,7 @@ import { LIVE_STREAM_EVENTS, LIVE_TOPICS } from '@/declarations/lives/topics'
 import { runtime } from '@/managers/infrastructure/Core/runtime'
 import type { ModViewState } from '@/types/modview'
 import { LivePlatforms } from '@/utils/constants/lives'
-import { HOUR_SECONDS } from '@/utils/constants/time'
+import { HOUR_SECONDS, SECOND_MS } from '@/utils/constants/time'
 
 // A live's memory outlives it this long at most
 const ROOM_TTL_SECONDS = LIVE_SETTINGS.memoryHours * HOUR_SECONDS
@@ -137,7 +137,7 @@ const flushRoom = async (liveId: string, room: LiveRoom): Promise<void> => {
   room.shareTimer ??= setTimeout(() => {
     room.shareTimer = null
     void shareMemory(liveId, room)
-  }, LIVE_SETTINGS.memoryShareSeconds * 1000)
+  }, LIVE_SETTINGS.memoryShareSeconds * SECOND_MS)
 }
 
 /**

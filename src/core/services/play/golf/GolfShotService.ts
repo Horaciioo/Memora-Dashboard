@@ -34,6 +34,7 @@ import { PLAY_ERRORS } from '@/declarations/play'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import type { EngineSession, EngineStep } from '@/types/play'
 import { GolfPowers } from '@/utils/constants/play'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Number field of a stroke
@@ -193,7 +194,7 @@ const writeCourse = async ({ tx, game, hole, now }: GolfTable, result: GolfShotR
     .filter((hazard) => isEffectKept(hazard, now.getTime()))
   const orbs = hole.orbs.map((_, index) => orbsOf(game.orbs)[index] ?? 0)
   for (const pickup of result.pickups) {
-    orbs[pickup.orb] = pickup.at + GOLF_SETTINGS.orbs.respawnSeconds * 1000
+    orbs[pickup.orb] = pickup.at + GOLF_SETTINGS.orbs.respawnSeconds * SECOND_MS
   }
 
   await tx.golfGame.update({

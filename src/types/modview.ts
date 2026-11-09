@@ -245,9 +245,22 @@ export interface ModPreferences {
 }
 
 /**
+ * Preferences kept on the server
+ * @typedef {Object} StoredPreferences
+ * @property {boolean} isStored - Moderator saved something
+ * @property {Partial<ModPreferences>} values - Account values under channel ones
+ */
+
+export interface StoredPreferences {
+  isStored: boolean
+  values: Partial<ModPreferences>
+}
+
+/**
  * What Twitch says of a banned viewer
  * @typedef {Object} BanDetail
  * @property {string | null} avatar - Profile picture address
+ * @property {string | null} banner - Channel banner address
  * @property {string | null} accountCreatedAt - ISO moment the account was made
  * @property {string | null} bannedBy - Moderator who banned
  * @property {string | null} bannedAt - ISO moment of the ban
@@ -256,6 +269,7 @@ export interface ModPreferences {
 
 export interface BanDetail {
   avatar: string | null
+  banner: string | null
   accountCreatedAt: string | null
   bannedBy: string | null
   bannedAt: string | null
@@ -326,6 +340,10 @@ export interface ModViewState {
   }
   // Spectators watching now
   viewers?: number | null
+  // Twitch stream start, ISO
+  streamStartedAt?: string | null
+  // Memora live start, ISO
+  liveStartedAt?: string | null
   // Message pinned at the top of the chat
   pinned?: PinnedMessage | null
   // Livecon level in force
@@ -361,7 +379,7 @@ export interface ChatScript {
 
 export type ModViewIntent =
   | { kind: 'delete'; messageId: string; chatterId: string }
-  | { kind: 'warn'; chatterId: string; reason: string }
+  | { kind: 'warn'; chatterId: string; reason: string; messageId?: string }
   | { kind: 'timeout'; chatterId: string; seconds: number; reason: string | null }
   | { kind: 'ban'; chatterId: string; reason: string | null }
   | { kind: 'unban'; chatterId: string }
@@ -410,10 +428,12 @@ export interface ActContext {
  * @property {ModViewState} state - Current state
  * @property {(intent: ModViewIntent, context?: ActContext) => Promise<boolean>} act - Carry out a gesture, false when refused
  * @property {ModViewTarget | null} spotlight - Part lit by a scene
+ * @property {() => Promise<void>} [reload] - Resync the feed, live only
  */
 
 export interface ModViewDriver {
   state: ModViewState
   act: (intent: ModViewIntent, context?: ActContext) => Promise<boolean>
   spotlight: ModViewTarget | null
+  reload?: () => Promise<void>
 }

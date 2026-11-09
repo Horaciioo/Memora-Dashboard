@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
-import { PlayRankingBox } from '@/composites/play/hub/PlayRankingBox'
+import { PlayRankingBox } from '@/composites/play/hub/leaderboard/PlayRankingBox'
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { PlaySignal } from '@/composites/play/hub/PlaySignal'
+import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { readCatalog, readLeaderboards } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_MOBILE_COPY, playGameOfSlug } from '@/declarations/play'
@@ -23,10 +23,10 @@ interface PlayRankingPageProps {
  */
 
 export default async function PlayRankingPage({ searchParams }: PlayRankingPageProps) {
-  const { session } = await requirePermission(Permissions.PlayAccess)
+  const { session, access } = await requirePermission(Permissions.PlayAccess)
   const query = await searchParams
-  const games = readCatalog()
-    .games.filter((entry) => entry.playable)
+  const games = (await readCatalog(access.isSystem)).games
+    .filter((entry) => entry.playable)
     .map((entry) => entry.game)
   const asked = typeof query.game === 'string' ? playGameOfSlug(query.game) : null
   // No game asked: every game together

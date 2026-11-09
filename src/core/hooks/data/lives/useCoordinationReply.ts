@@ -9,8 +9,8 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { LIVE_COORDINATION_COPY } from '@/declarations/lives/copy'
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
 import type { CoordinationRequest, LiveGap } from '@/types/lives'
-import { formatClock } from '@/utils/format/dates'
-import { wallToInstant } from '@/utils/format/zone'
+import { formatClock } from '@/utils/format/time/dates'
+import { wallToInstant } from '@/utils/format/time/zone'
 
 /**
  * Hours a member offers on a live, as wall clocks of the form

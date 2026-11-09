@@ -11,7 +11,7 @@ import { PAGES_COPY } from '@/declarations/pages/copy'
 import { BUTTON_STYLES, PAGES_HOME_STYLES } from '@/declarations/ui/variants'
 import type { TrashedPage } from '@/types/pages'
 import { cn } from '@/utils/classnames'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface PageTrashProps {
   initial: TrashedPage[]

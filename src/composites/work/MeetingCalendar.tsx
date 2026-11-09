@@ -11,7 +11,7 @@ import { MEETING_CALENDAR } from '@/declarations/ui/variants'
 import type { MeetingCalendarView } from '@/types/work'
 import { cn } from '@/utils/classnames'
 import { monthGrid, periodLabel, shiftAnchor, toDayKey } from '@/utils/format/calendar'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface MeetingCalendarProps {
   view: MeetingCalendarView

@@ -70,7 +70,11 @@ export const pollLiveState = async (input: {
   // An answer that failed stays silent
   const viewers = stream === undefined ? told.viewers : (stream?.viewers ?? null)
   if (viewers !== told.viewers && viewers !== undefined) {
-    pushRoomEvent(input.liveId, { kind: 'stream', viewers })
+    pushRoomEvent(input.liveId, {
+      kind: 'stream',
+      viewers,
+      startedAt: stream?.startedAt ?? null,
+    })
   }
   const key = pin === undefined ? told.pin : pinKey(pin)
   if (key !== told.pin && pin !== undefined) {

@@ -1,6 +1,8 @@
 import type { LiveAccess } from '@/core/lib/lives/access'
 import type { ModerationKind, ModerationOrigin, ModerationStatus } from '@prisma/client'
+import type { TeamMentionKind } from '@/declarations/lives/teamChat'
 import type { IconName } from '@/declarations/ui/icons'
+import type { MemoraRank } from '@/types/modview'
 import type {
   CoordinationStatusName,
   LivePlatformName,
@@ -16,6 +18,7 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
  * @property {string} name - Display name
  * @property {string | null} avatar - Avatar address
  * @property {boolean} [isReinforcement] - Called in on the day
+ * @property {MemoraRank} [rank] - Memora rank, none for a Junior
  */
 
 export interface LivePerson {
@@ -23,6 +26,7 @@ export interface LivePerson {
   name: string
   avatar: string | null
   isReinforcement?: boolean
+  rank?: MemoraRank
 }
 
 /**
@@ -248,7 +252,7 @@ export interface MemberModerationView {
  * @property {string | null} avatar - Avatar address
  * @property {AttendanceStatusName} status - Answer in force
  * @property {boolean} isJunior - Counted for a PIM
- * @property {string | null} plannedFrom - ISO hour they said they would be there, for Responsables
+ * @property {string | null} plannedFrom - ISO hour they said they would be there, for coordinators and Responsables
  * @property {boolean} isReinforcement - Called in on the day
  */
 
@@ -268,6 +272,7 @@ export interface LiveRosterPerson {
  * @property {string} liveId - Live identifier
  * @property {boolean} canManage - Viewer may move people
  * @property {string[]} connectedIds - Members with a Mod View open
+ * @property {Record<string, string>} arrivals - ISO arrival of each connected member
  * @property {LiveRosterPerson[]} people - Convened members
  */
 
@@ -275,6 +280,7 @@ export interface LiveRoster {
   liveId: string
   canManage: boolean
   connectedIds: string[]
+  arrivals: Record<string, string>
   people: LiveRosterPerson[]
 }
 
@@ -307,6 +313,7 @@ export interface LiveFocusView {
  * @property {ModerationKind} kind - Gesture
  * @property {number | null} durationSeconds - Timeout length
  * @property {string | null} reason - Reason
+ * @property {string | null} messageExcerpt - Message it answered
  * @property {string | null} actorName - Who did it, hidden from a Modo for a colleague
  * @property {string} liveTitle - Live it happened on
  * @property {boolean} fromPanel - Applied from the panel
@@ -320,6 +327,7 @@ export interface ViewerSanction {
   kind: ModerationKind
   durationSeconds: number | null
   reason: string | null
+  messageExcerpt: string | null
   actorName: string | null
   liveTitle: string
   fromPanel: boolean
@@ -344,6 +352,46 @@ export interface ViewerComment {
   authorName: string | null
   authorAvatar: string | null
   createdAt: string
+}
+
+/**
+ * One stored chat message
+ * @typedef {Object} ChatHistoryMessage
+ * @property {string} id - Identifier
+ * @property {string} body - Text
+ * @property {string} sentAt - ISO moment
+ * @property {string | null} liveId - Live it was sent in
+ * @property {'LIVE' | 'IMPORT'} source - Where it comes from
+ * @property {boolean} deleted - Removed by a moderator
+ */
+
+export interface ChatHistoryMessage {
+  id: string
+  body: string
+  sentAt: string
+  liveId: string | null
+  source: 'LIVE' | 'IMPORT'
+  deleted: boolean
+}
+
+/**
+ * Chat history of a viewer on a channel
+ * @typedef {Object} ViewerChatHistory
+ * @property {ChatHistoryMessage[]} messages - Newest first
+ * @property {string | null} nextCursor - Following page
+ * @property {number} total - Messages known
+ * @property {string | null} firstKnownAt - Earliest known message
+ * @property {'LIVE' | 'IMPORT' | null} firstSource - Source of the earliest one
+ * @property {boolean} isComplete - Nothing earlier exists
+ */
+
+export interface ViewerChatHistory {
+  messages: ChatHistoryMessage[]
+  nextCursor: string | null
+  total: number
+  firstKnownAt: string | null
+  firstSource: 'LIVE' | 'IMPORT' | null
+  isComplete: boolean
 }
 
 /**
@@ -395,4 +443,34 @@ export interface LiveNote {
   viewerLogin: string
   body: string
   at: string
+}
+
+/**
+ * Message of the internal chat of a live
+ * @typedef {Object} LiveTeamMessage
+ * @property {string} id - Message
+ * @property {string} authorId - Author
+ * @property {string} body - Text
+ * @property {TeamMentionKind[]} mentions - Who it calls
+ * @property {string} createdAt - Sent moment
+ */
+
+export interface LiveTeamMessage {
+  id: string
+  authorId: string
+  body: string
+  mentions: TeamMentionKind[]
+  createdAt: string
+}
+
+/**
+ * Page of internal chat, oldest first
+ * @typedef {Object} LiveTeamPage
+ * @property {LiveTeamMessage[]} messages - Messages
+ * @property {string | null} nextCursor - Older page, none at the start
+ */
+
+export interface LiveTeamPage {
+  messages: LiveTeamMessage[]
+  nextCursor: string | null
 }

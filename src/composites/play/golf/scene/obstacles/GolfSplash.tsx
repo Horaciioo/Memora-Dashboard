@@ -7,7 +7,7 @@ import { Object3D } from 'three'
 import type { Group, InstancedMesh, Mesh, MeshBasicMaterial } from 'three'
 
 import { FLAT } from '@/composites/play/golf/scene/obstacles/flat'
-import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import type { GolfMotion } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 

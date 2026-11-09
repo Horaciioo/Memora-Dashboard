@@ -1,6 +1,7 @@
 import { sightOf } from '@/composites/play/naval/ocean/paint/frame'
 import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
 import { NAVAL_WATER } from '@/declarations/play/naval/skins'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Swell lines per square, and their drift speed in squares per second
 const LINES_PER_SQUARE = 0.5
@@ -30,7 +31,7 @@ const paintBed = ({ ctx, width }: OceanFrame): void => {
 const paintSwell = (frame: OceanFrame): void => {
   const { ctx, cell, left, top, now, width } = frame
   const { y0, y1 } = sightOf(frame)
-  const seconds = now / 1000
+  const seconds = now / SECOND_MS
   const gap = 1 / LINES_PER_SQUARE
   ctx.lineWidth = Math.max(1, cell * 0.05)
   for (const [layer, alpha] of [

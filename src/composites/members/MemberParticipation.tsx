@@ -8,7 +8,7 @@ import Link from '@/components/elements/navigation/AppLink'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { Section } from '@/components/structures/page/Section'
 import { useSeatActions } from '@/core/hooks/data/people/useSeatActions'
-import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
+import { useActionMenu } from '@/core/hooks/interaction/layout/overlay/useActionMenu'
 import { SEAT_COPY } from '@/declarations/members/seats'
 import type { SeatAction, SeatFamily, TemporaryKind } from '@/declarations/members/seats'
 import {
@@ -22,7 +22,7 @@ import { EMPTY_VALUE } from '@/declarations/ui/variants'
 import type { MenuItem } from '@/managers/front-end'
 import type { MemberParticipation as Participation } from '@/types/members'
 import { cn } from '@/utils/classnames'
-import { formatDay, formatDayRange } from '@/utils/format/dates'
+import { formatDay, formatDayRange } from '@/utils/format/time/dates'
 import { formatSpent } from '@/utils/format/modview'
 
 // Sessions previewed before sending to the path tab

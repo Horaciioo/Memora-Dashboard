@@ -2,8 +2,8 @@
 
 import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { useFocusTrap } from '@/core/hooks/interaction/layout/useFocusTrap'
-import { useScrollLock } from '@/core/hooks/interaction/layout/useScrollLock'
+import { useFocusTrap } from '@/core/hooks/interaction/layout/overlay/useFocusTrap'
+import { useScrollLock } from '@/core/hooks/interaction/layout/overlay/useScrollLock'
 import { useSwipe } from '@/core/hooks/interaction/gestures/useSwipe'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { STORY_DECK } from '@/declarations/ui/variants'

@@ -1,5 +1,6 @@
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { ChatOptionName } from '@/declarations/modview/registries'
+import { TWITCH_EVENT_COPY } from '@/declarations/platforms/copy'
 import type {
   ChatMessage,
   ChatReply,
@@ -13,6 +14,7 @@ import type {
   PinnedMessage,
   UnbanRequest,
 } from '@/types/modview'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * One thing a scene makes happen
@@ -41,6 +43,7 @@ export type SceneEvent =
       categoryArt?: string | null
       tags?: string[]
       viewers?: number | null
+      startedAt?: string | null
     }
   | { kind: 'pin'; pin: PinnedMessage | null }
   | { kind: 'chatOption'; option: ChatOptionName; enabled: boolean }
@@ -69,6 +72,30 @@ export interface ModViewScene {
   initial: ModViewState
   steps: SceneStep[]
   maxMessages?: number
+}
+
+// Seconds a platform removal and the gesture behind it may arrive apart
+const CORRELATION_SECONDS = 15
+
+// Acts that clear every line of their target
+const CLEARING_ACTS = new Set<ModAct['kind']>(['ban', 'timeout'])
+
+/**
+ * Moderator whose ban or timeout just cleared a chatter
+ * @param {ModAct[]} acts - Recent acts, newest first
+ * @param {string} chatterId - Chatter cleared
+ * @return {string | null} - Moderator, none when no act explains it
+ */
+
+const clearerOf = (acts: ModAct[], chatterId: string): string | null => {
+  const act = acts.find(
+    (line) =>
+      CLEARING_ACTS.has(line.kind) &&
+      line.targetId === chatterId &&
+      Math.abs(Date.now() - Date.parse(line.at)) <= CORRELATION_SECONDS * SECOND_MS
+  )
+
+  return act?.moderator ?? null
 }
 
 // Chat lines kept by default
@@ -141,7 +168,17 @@ export const applySceneEvent = (
             event.act.moderator,
             true
           )
-        : view.messages
+        : CLEARING_ACTS.has(event.act.kind) && event.act.targetId
+          ? // The platform mark gives way to the moderator's name
+            strike(
+              view.messages,
+              (line) =>
+                line.author.id === event.act.targetId &&
+                line.deletedBy === TWITCH_EVENT_COPY.twitch,
+              event.act.moderator,
+              true
+            )
+          : view.messages
 
       // Bounded logs
       const acts = [event.act, ...view.acts].slice(0, LIVE_SETTINGS.roomActs)
@@ -199,7 +236,7 @@ export const applySceneEvent = (
             (line) =>
               (event.messageIds?.includes(line.id) ?? false) ||
               (event.chatterId !== undefined && line.author.id === event.chatterId),
-            event.by
+            event.chatterId ? (clearerOf(view.acts, event.chatterId) ?? event.by) : event.by
           ),
         },
       }
@@ -236,6 +273,7 @@ export const applySceneEvent = (
           ...view,
           title: event.title ?? view.title,
           viewers: event.viewers === undefined ? view.viewers : event.viewers,
+          streamStartedAt: event.startedAt === undefined ? view.streamStartedAt : event.startedAt,
           channel: {
             ...view.channel,
             ...(event.category === undefined ? {} : { category: event.category }),
@@ -332,6 +370,7 @@ export const applySceneIntent = (
       return applySceneEvent(state, {
         kind: 'act',
         act: act({ kind: 'warn', target: nameOf(view, intent.chatterId), reason: intent.reason }),
+        deleteMessageId: intent.messageId,
       })
     case 'timeout':
     case 'ban': {

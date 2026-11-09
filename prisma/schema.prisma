@@ -225,6 +225,12 @@ enum LivePlatform {
   YOUTUBE
 }
 
+// Where a stored chat message comes from
+enum ChatSource {
+  LIVE
+  IMPORT
+}
+
 // Gesture of a moderation log line
 enum ModerationKind {
   DELETE
@@ -325,6 +331,7 @@ model Account {
 
   sessions              Session[]
   pushSubscriptions     PushSubscription[]
+  modViewPreferences    ModViewPreference[]
   pushDeliveries        PushDelivery[]
   discordToken          DiscordToken?
   twoFactor             TwoFactorCredential?
@@ -387,6 +394,7 @@ model Account {
   platformAccounts      PlatformAccount[]
   livesAnnounced        Live[]                   @relation("LiveAnnouncer")
   liveCoordinations     LiveCoordination[]
+  liveTeamMessages      LiveTeamMessage[]
   liveSeats             LiveMember[]
   playSessionsHosted    PlaySession[]            @relation("PlaySessionHost")
   playTournamentsHosted PlayTournament[]         @relation("PlayTournamentHost")
@@ -707,6 +715,8 @@ model Youtuber {
   discordIdentifiers  DiscordIdentifier[]
   lives               Live[]
   viewerComments      ViewerComment[]
+  chatMessages        LiveChatMessage[]
+  chatStats           ViewerChatStat[]
   sanctionOffenses    SanctionOffense[]
 
   recruitmentSessions      RecruitmentSession[]
@@ -1960,8 +1970,11 @@ model Live {
   actions        ModerationAction[]
   presences      ModViewPresence[]
   stints         LiveModStint[]
+  watchPeriods   LiveWatchPeriod[]
   focuses        ModViewFocus[]
   samples        LiveSample[]
+  chatMessages   LiveChatMessage[]
+  teamMessages   LiveTeamMessage[]
 
   @@unique([platform, streamExternalId])
   @@index([status])
@@ -2085,6 +2098,21 @@ model LiveModStint {
   @@map("live_mod_stints")
 }
 
+// Stretch the platform feed of a live was received, the rest is a blind spot of the log
+model LiveWatchPeriod {
+  id         String    @id @default(cuid())
+  liveId     String
+  startedAt  DateTime  @default(now())
+  // Last proof the feed was alive, closes a period a crash left open
+  lastBeatAt DateTime  @default(now())
+  endedAt    DateTime?
+
+  live Live @relation(fields: [liveId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, startedAt])
+  @@map("live_watch_periods")
+}
+
 // Private comment a member leaves on a viewer of a creator's channel
 model ViewerComment {
   id              String       @id @default(cuid())
@@ -2103,6 +2131,81 @@ model ViewerComment {
 
   @@index([youtuberId, platform, platformUserId, createdAt], map: "viewer_comments_viewer_idx")
   @@map("viewer_comments")
+}
+
+// Chat message of a viewer, kept for the dossier
+model LiveChatMessage {
+  id             String       @id @default(cuid())
+  youtuberId     String
+  platform       LivePlatform
+  // Platform user identifier of the chatter
+  platformUserId String
+  viewerLogin    String
+  // Message identifier on the platform
+  externalId     String
+  // Encrypted at rest
+  body           String
+  sentAt         DateTime
+  liveId         String?
+  source         ChatSource   @default(LIVE)
+  deletedAt      DateTime?
+
+  youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  live     Live?    @relation(fields: [liveId], references: [id], onDelete: SetNull)
+
+  @@unique([youtuberId, platform, externalId], map: "live_chat_messages_external_key")
+  @@index([youtuberId, platform, platformUserId, sentAt], map: "live_chat_messages_viewer_idx")
+  @@index([sentAt])
+  @@map("live_chat_messages")
+}
+
+// Internal chat between the team of one live
+model LiveTeamMessage {
+  id        String   @id @default(cuid())
+  liveId    String
+  authorId  String
+  // Encrypted at rest
+  body      String
+  // Mention kinds the author picked
+  mentions  String[]
+  createdAt DateTime @default(now())
+
+  live   Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  author Account @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, createdAt])
+  @@map("live_team_messages")
+}
+
+// What is known of a viewer's chat on one channel
+model ViewerChatStat {
+  youtuberId     String
+  platform       LivePlatform
+  platformUserId String
+  messageCount   Int          @default(0)
+  firstMessageAt DateTime
+  firstSource    ChatSource   @default(LIVE)
+  // False while earlier messages may exist
+  isComplete     Boolean      @default(false)
+
+  youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+
+  @@id([youtuberId, platform, platformUserId])
+  @@map("viewer_chat_stats")
+}
+
+// Mod View choices of a moderator, one row for the account and one per channel
+model ModViewPreference {
+  accountId String
+  // Empty for the account, the creator identifier for a channel
+  scope     String   @default("")
+  values    Json     @default("{}")
+  updatedAt DateTime @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([accountId, scope])
+  @@map("mod_view_preferences")
 }
 
 // Viewer count read from the platform while a live runs
@@ -3681,4 +3784,17 @@ model PlayGroupMessage {
 
   @@index([groupId, createdAt])
   @@map("play_group_messages")
+}
+
+// A feature switched away from its default, one row per feature
+model FeatureSwitch {
+  key         String   @id
+  // OFF for everyone, or ADMINS for the system holders only
+  mode        String
+  // Words members read where the feature used to be
+  note        String?
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("feature_switches")
 }

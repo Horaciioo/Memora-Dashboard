@@ -12,6 +12,8 @@ import { requireUser } from '@/core/wrappers/requireUser'
 import { reachableViews } from '@/core/services/auth/ViewService'
 import { readPushSettings } from '@/core/services/push'
 import { dockCandidatesOf } from '@/core/lib/pwa/dock'
+import { readClosedFeatures } from '@/core/services/features'
+import { isPathOpenIn } from '@/declarations/features'
 import { visibleNavGroups } from '@/declarations/navigation'
 import { isPushConfigured, VAPID_KEYS } from '@/declarations/pwa/vapid'
 import { APP_ENVIRONMENT } from '@/declarations/system/environments'
@@ -70,8 +72,9 @@ export default async function PreferencesPage({ searchParams }: PreferencesPageP
   ])
 
   // Every page the member opens in any view they reach
+  const closed = await readClosedFeatures(access.isSystem)
   const reached = reachableViews(session).flatMap((view) =>
-    visibleNavGroups(view, session, access.can)
+    visibleNavGroups(view, session, access.can, (path) => isPathOpenIn(closed, path))
   )
   const candidates = dockCandidatesOf(reached, heldRoutes(APP_ENVIRONMENT).phone)
 

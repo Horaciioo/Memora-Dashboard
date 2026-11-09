@@ -1,4 +1,4 @@
-import { instantToWall, wallToInstant } from '@/utils/format/zone'
+import { instantToWall, wallToInstant } from '@/utils/format/time/zone'
 
 // Last millisecond of the final minute
 const END_OF_MINUTE = 59_999

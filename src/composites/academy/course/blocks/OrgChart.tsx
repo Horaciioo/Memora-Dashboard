@@ -3,7 +3,7 @@
 import { useEffect, useId, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { useInView } from '@/core/hooks/interaction/layout/useInView'
+import { useInView } from '@/core/hooks/interaction/layout/measure/useInView'
 import { linkPoints, ORG_NODE_SIZE, ORG_TURN_RADIUS, roundedPath } from '@/core/lib/academy/orgPath'
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import type { OrgNode, ReadBlock } from '@/declarations/academy/curriculum/types'

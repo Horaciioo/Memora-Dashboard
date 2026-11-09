@@ -1,4 +1,5 @@
 import type { ModerationKind } from '@prisma/client'
+import type { LiveCoverage } from '@/core/lib/lives/coverage'
 import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
@@ -61,6 +62,8 @@ export interface LiveReport {
   peak: { at: string; count: number } | null
   levels: { level: number; name: string; from: string; to: string | null }[]
   teamActiveSeconds: number
+  // Where the platform feed was lost, set by the service
+  coverage?: LiveCoverage | null
 }
 
 /**

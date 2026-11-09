@@ -6,9 +6,10 @@ import { pickHello } from '@/core/lib/assistant/hello'
 import { ASSISTANT_GREETINGS } from '@/declarations/assistant/copy'
 import type { AssistantHello } from '@/declarations/assistant/copy'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
-import { instantToWall } from '@/utils/format/zone'
+import { instantToWall } from '@/utils/format/time/zone'
 import type { ScenarioId } from '@/types/scenario'
 import type { AssistantOffer } from '@/declarations/assistant/offers'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Creation offered by the open page
@@ -128,6 +129,6 @@ export const useAssistantDock = create<AssistantDockStore>()((set, get) => ({
 
     set({ handoff: null })
 
-    return Date.now() - handoff.at < ASSISTANT_SETTINGS.handoffSeconds * 1000
+    return Date.now() - handoff.at < ASSISTANT_SETTINGS.handoffSeconds * SECOND_MS
   },
 }))

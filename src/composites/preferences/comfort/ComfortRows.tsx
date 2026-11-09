@@ -2,7 +2,7 @@
 
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { SettingRow } from '@/composites/preferences/SettingRow'
-import { useComfortStore } from '@/core/store/comfort'
+import { useComfortStore } from '@/core/store/appearance/comfort'
 import { COMFORT_SETTINGS } from '@/declarations/preferences/comfort'
 import type { ComfortKey } from '@/declarations/preferences/comfort'
 import { PREFERENCE_STYLES } from '@/declarations/ui/variants'

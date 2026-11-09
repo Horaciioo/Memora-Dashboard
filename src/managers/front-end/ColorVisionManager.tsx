@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 
 import { COLOR_VISION_REGISTRY } from '@/declarations/access/preferences'
-import { useColorVisionStore } from '@/core/store/colorVision'
+import { useColorVisionStore } from '@/core/store/appearance/colorVision'
 
 /**
  * Sync color vision mode

@@ -6,7 +6,7 @@ import { markReportRead } from '@/core/services/system/NotificationService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { LIVE_REPORT, PAGE_STYLES } from '@/declarations/ui/variants'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: LIVE_REPORT_COPY.title }

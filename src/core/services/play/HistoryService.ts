@@ -6,8 +6,7 @@ import { PLAY_SETTINGS, pickHistoryFact } from '@/declarations/play'
 import type { PlayHistoryPage } from '@/types/play'
 import { PlayStatuses } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
-
-const MS = 1000
+import { SECOND_MS } from '@/utils/constants/time'
 
 interface PlayHistoryQuery {
   game?: PlayGameName | null
@@ -79,7 +78,7 @@ export const listPlayHistory = async (
         session.startedAt && session.finishedAt
           ? Math.max(
               0,
-              Math.round((session.finishedAt.getTime() - session.startedAt.getTime()) / MS)
+              Math.round((session.finishedAt.getTime() - session.startedAt.getTime()) / SECOND_MS)
             )
           : null,
       fact: pickHistoryFact(session.game, stats[index].get(accountId)),

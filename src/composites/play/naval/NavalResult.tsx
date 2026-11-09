@@ -4,11 +4,11 @@ import { useEffect } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { playNaval } from '@/composites/play/naval/sound'
-import type { NavalCaptainView } from '@/composites/play/naval/captains'
+import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import { PlayPodium } from '@/composites/play/results/PlayPodium'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
-import { NAVAL_RESULT } from '@/declarations/ui/variants/naval'
+import { NAVAL_RESULT } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
 
 /**

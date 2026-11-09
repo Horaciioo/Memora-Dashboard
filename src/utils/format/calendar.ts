@@ -15,8 +15,8 @@ import {
   startOfMonth,
   startOfWeek,
   timeLabel,
-} from '@/utils/format/days'
-import { isInstantText, shiftToZone, wallToInstant } from '@/utils/format/zone'
+} from '@/utils/format/time/days'
+import { isInstantText, shiftToZone, wallToInstant } from '@/utils/format/time/zone'
 
 /**
  * One day of a rendered grid

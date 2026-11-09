@@ -6,7 +6,7 @@ import {
   listReviewQueue,
 } from '@/core/services/absences/AbsenceService'
 import { recordEvent } from '@/core/services/system/ActivityService'
-import { formatDayRange } from '@/utils/format/dates'
+import { formatDayRange } from '@/utils/format/time/dates'
 import { Permissions } from '@/utils/constants/permissions'
 import type { MemberAbsence } from '@/types/members'
 

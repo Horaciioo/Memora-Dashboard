@@ -41,7 +41,7 @@ export const VIEWER_COMMENT_FIELDS: FieldDefinition[] = [
  * @return {Promise<{ youtuberId: string, platform: 'TWITCH' | 'YOUTUBE' }>} - Channel
  */
 
-const channelOf = async (liveId: string, scope: AccessScope) => {
+export const channelOf = async (liveId: string, scope: AccessScope) => {
   const live = await prisma.live.findFirst({
     where: scopedWhere('live', scope, { id: liveId }),
     select: { youtuberId: true, platform: true },

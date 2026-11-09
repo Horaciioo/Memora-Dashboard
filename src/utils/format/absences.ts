@@ -1,7 +1,7 @@
 import { DATE_LOCALE } from '@/declarations/ui/dates'
 import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
-import { parseDay, startOfDay } from '@/utils/format/days'
+import { parseDay, startOfDay } from '@/utils/format/time/days'
 
 /**
  * What the member wrote for their team

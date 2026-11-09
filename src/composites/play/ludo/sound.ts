@@ -1,5 +1,5 @@
 import { playSound, preloadSounds } from '@/core/lib/play/sounds'
-import { playLevelOf } from '@/core/store/playSound'
+import { playLevelOf } from '@/core/store/play/playSound'
 import { LUDO_SOUNDS, LUDO_TAKES } from '@/declarations/play/ludo/sounds'
 import type { LudoSoundName, LudoTakeName } from '@/declarations/play/ludo/sounds'
 import { PlayGames } from '@/utils/constants/play'

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
-import { LiveEndedDialog } from '@/composites/lives/LiveEndedDialog'
+import { LiveEndedDialog } from '@/composites/lives/notices/LiveEndedDialog'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'

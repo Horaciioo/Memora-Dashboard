@@ -7,7 +7,7 @@ import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
-import { entrySpan } from '@/utils/format/entrySpan'
+import { entrySpan } from '@/utils/format/time/entrySpan'
 
 export interface CalendarEntryPreviewProps {
   entry: CalendarEntry

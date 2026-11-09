@@ -7,10 +7,10 @@ import {
   readCandidate,
 } from '@/core/lib/assistant/scenarios/candidate/data'
 import { CANDIDATE_SCENARIO_COPY as COPY } from '@/declarations/assistant/scenarios/candidate'
-import { SCENARIO_COPY } from '@/declarations/assistant/scenarios/shared'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import type { ScenarioChoice, ScenarioMove, ScenarioStep } from '@/types/scenario'
 import { fillTemplate } from '@/utils/format/strings'
+import { fileOfferStep, filePropsStep } from '@/core/lib/assistant/scenarios/fileSteps'
 
 // One candidate found by the search
 interface Found {
@@ -154,17 +154,7 @@ export const menu: ScenarioStep = async (context) => {
  * @return {Promise<ScenarioMove>} - Oui or non
  */
 
-export const fileOffer: ScenarioStep = async (context) => ({
-  say: [fillTemplate(COPY.fileAsk, { name: context.data.name })],
-  ask: {
-    kind: 'choices',
-    choices: [
-      { value: 'yes', label: SCENARIO_COPY.yes },
-      { value: 'no', label: SCENARIO_COPY.no },
-    ],
-  },
-  next: 'fileAnswer',
-})
+export const fileOffer: ScenarioStep = fileOfferStep(COPY.fileAsk)
 
 /**
  * Oui lists the properties to tick
@@ -189,11 +179,7 @@ export const fileAnswer: ScenarioStep = async (context, answer) =>
  * @return {Promise<ScenarioMove>} - First of the queue
  */
 
-export const fileProps: ScenarioStep = async (context, answer) => ({
-  say: [COPY.fileGo],
-  next: 'nextProp',
-  data: { mode: 'queue', queue: answer?.value ?? '' },
-})
+export const fileProps: ScenarioStep = filePropsStep(COPY.fileGo)
 
 /**
  * Next property of the queue, or the end

@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import type { Group, MeshBasicMaterial } from 'three'
 
 import { FLAT } from '@/composites/play/golf/scene/obstacles/flat'
-import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import { floorHeight } from '@/core/lib/play/golf'
 import type { GolfHole, GolfTotem as GolfTotemEntry } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'

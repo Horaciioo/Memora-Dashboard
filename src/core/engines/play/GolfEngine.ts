@@ -3,6 +3,7 @@ import 'server-only'
 import { conflict } from '@/core/lib/errors'
 import { golfDefaults, readGolfSettings } from '@/core/lib/play/golf'
 import {
+  golfBotView,
   golfStats,
   golfView,
   openCourse,
@@ -39,5 +40,7 @@ export const GOLF_ENGINE: PlayEngine = {
   },
   settle: settleCourse,
   view: golfView,
+  isViewShared: true,
+  botView: golfBotView,
   extraStats: golfStats,
 }

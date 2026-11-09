@@ -7,7 +7,7 @@ import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Input } from '@/components/elements/forms/inputs/Input'
 import { MarshaDetail, type MarshaViewer } from '@/composites/moderation/MarshaDetail'
-import { useMediaQuery } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useMediaQuery } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import {
   MARSHA_CATEGORIES,

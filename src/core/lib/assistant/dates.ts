@@ -5,6 +5,7 @@ import {
   ASSISTANT_NUMBERS,
   ASSISTANT_WEEKDAYS,
 } from '@/declarations/assistant/lexicon'
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * Date read in a sentence
@@ -17,8 +18,6 @@ export interface DueMatch {
   value: string
   indices: number[]
 }
-
-const DAY_MS = 86_400_000
 
 // Words that only lead a date
 const LEADS = new Set(['pour', 'avant', 'le', 'd', 'ici', 'jusqu', 'au'])

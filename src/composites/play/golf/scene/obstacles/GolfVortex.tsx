@@ -6,7 +6,7 @@ import type { Mesh } from 'three'
 
 import { FLAT } from '@/composites/play/golf/scene/obstacles/flat'
 import { spiralTexture } from '@/composites/play/golf/scene/obstacles/textures'
-import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import { floorHeight } from '@/core/lib/play/golf'
 import type { GolfCircle, GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'

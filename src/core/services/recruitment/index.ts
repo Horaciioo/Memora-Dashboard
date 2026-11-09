@@ -1,6 +1,6 @@
 export { candidateFields, proseFields, sessionFields, stepFields } from './fields'
 export { candidateSession, reachableSession, stepSession } from './reach'
-export { listSessions, readSession } from './SessionReader'
+export { listSessions, readSession } from './readers/SessionReader'
 export { listAcceptedCandidates } from './AcceptedService'
 export { closeSession } from './ClosureService'
 export { createSession, removeSession, saveInstructions, updateSession } from './SessionService'
@@ -14,5 +14,5 @@ export {
   saveReview,
   updateCandidate,
 } from './CandidateService'
-export { addComment, commentSubject, pinComment, removeComment } from './CommentService'
+export { addComment, commentSubject, pinComment, removeComment } from './comments/CommentService'
 export { createStep, removeStep, setStepDone, updateStep } from './StepService'

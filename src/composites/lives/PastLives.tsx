@@ -12,7 +12,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { BUTTON_STYLES, LIVE_REPORT } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
 import { cn } from '@/utils/classnames'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface PastLivesProps {
   lives: LiveView[]

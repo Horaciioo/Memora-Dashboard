@@ -1,19 +1,14 @@
 'use client'
 
 import { useCallback, useSyncExternalStore } from 'react'
+import { subscribeTo } from '@/utils/subscribeTo'
 
 export type CalendarRailView = 'calendar' | 'classic'
 
 const STORAGE_KEY = 'memora:calendar-rail-view'
 const listeners = new Set<() => void>()
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener)
-
-  return () => {
-    listeners.delete(listener)
-  }
-}
+const subscribe = subscribeTo(listeners)
 
 const readView = (): CalendarRailView => {
   try {

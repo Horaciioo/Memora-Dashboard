@@ -11,8 +11,8 @@ import {
 } from '@/declarations/play'
 import { PLAY_HISTORY } from '@/declarations/ui/variants'
 import type { PlayHistoryEntry } from '@/types/play'
-import { formatDayTime } from '@/utils/format/dates'
-import { formatPlayDuration } from '@/utils/format/playDuration'
+import { formatDayTime } from '@/utils/format/time/dates'
+import { formatPlayDuration } from '@/utils/format/time/playDuration'
 
 // Avatars shown before the count
 const AVATARS_SHOWN = 4

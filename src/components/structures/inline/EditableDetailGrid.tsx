@@ -5,6 +5,7 @@ import type { FocusEvent, KeyboardEvent, ReactNode } from 'react'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { FieldControl } from '@/components/elements/forms/FieldControl'
 import { isSameValue } from '@/core/lib/forms/compare'
+import { presenceAnchor } from '@/core/lib/realtime/anchors'
 import { DETAIL_BLOCK } from '@/declarations/ui/blocks'
 import { DATE_COPY } from '@/declarations/ui/dates'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
@@ -229,7 +230,7 @@ export const EditableDetailGrid = ({
         )
 
         return (
-          <div key={field.name} className={entryClass}>
+          <div key={field.name} className={entryClass} {...presenceAnchor(field.name)}>
             {label && <dt className={DETAIL_BLOCK.label}>{label}</dt>}
             {isGhost ? (
               <dd

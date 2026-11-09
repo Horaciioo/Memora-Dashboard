@@ -26,6 +26,7 @@ import {
 } from '@/core/services/play/golf/lookups'
 import type { GolfTable, GolfTrack } from '@/core/services/play/golf/lookups'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Rolling ball picked up mid course
@@ -47,7 +48,7 @@ interface GolfRolling {
  */
 
 const runningShots = async (table: GolfTable) => {
-  const since = new Date(table.now.getTime() - GOLF_SETTINGS.physics.maxSeconds * 1000)
+  const since = new Date(table.now.getTime() - GOLF_SETTINGS.physics.maxSeconds * SECOND_MS)
   const moves = await table.tx.golfMove.findMany({
     where: {
       sessionId: table.session.id,

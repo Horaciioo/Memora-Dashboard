@@ -5,5 +5,5 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.PlayAccess,
   descriptor: { summary: 'Read the Play games and their choices', tags: ['play'] },
-  handler: async () => readCatalog(),
+  handler: async ({ access }) => readCatalog(access.isSystem),
 })

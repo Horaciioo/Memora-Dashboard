@@ -20,7 +20,7 @@ import {
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { FloatingFocus } from '@/composites/search/assistant/FloatingFocus'
-import { useClock } from '@/core/hooks/interaction/state/useClock'
+import { useClock } from '@/core/hooks/interaction/state/time/useClock'
 import { useCandidateRecord } from '@/core/hooks/data/recruitment/useCandidateRecord'
 import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
 import { candidateStates, progressOf } from '@/core/lib/recruitment/candidateTimeline'

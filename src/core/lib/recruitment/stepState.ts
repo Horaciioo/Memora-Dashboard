@@ -1,6 +1,6 @@
 import type { TimelineState } from '@/components/structures/data/Timeline'
 import type { RecruitmentStepView } from '@/types/recruitment'
-import { isOverdue } from '@/utils/format/dates'
+import { isOverdue } from '@/utils/format/time/dates'
 
 // Order every list of steps is read in
 export const STEP_ORDER = [{ offset: 'asc' }, { position: 'asc' }] as const

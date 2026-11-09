@@ -14,18 +14,7 @@ import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { ENCADREMENT_ROLES, ROLE_REGISTRY } from '@/declarations/access/roles'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
-
-/**
- * Read a nullable colour or glyph string
- * @param {unknown} value - Raw value
- * @return {string | null} - Trimmed value or nothing
- */
-
-const readNullable = (value: unknown): string | null => {
-  const text = typeof value === 'string' ? value.trim() : ''
-
-  return text.length > 0 ? text : null
-}
+import { optionalText } from '@/utils/format/strings'
 
 export const GET = createProtectedRoute({
   permission: Permissions.AccessManage,
@@ -56,8 +45,8 @@ export const PUT = createProtectedRoute({
     // An appearance edit carries a colour and a glyph rather than an overwrite list
     if (role && ROLE_REGISTRY.has(role) && raw.appearance === true) {
       await saveRoleAppearance(role as MemberRoleName, {
-        accent: readNullable(raw.accent),
-        icon: readNullable(raw.icon),
+        accent: optionalText(raw.accent),
+        icon: optionalText(raw.icon),
       })
     } else if (role && ROLE_REGISTRY.has(role)) {
       await assertUnsealed(access)

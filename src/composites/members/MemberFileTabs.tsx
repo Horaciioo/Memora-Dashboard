@@ -83,8 +83,8 @@ import type {
 } from '@/types/members'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { absenceReasonText, isFinishedAbsence } from '@/utils/format/absences'
-import { formatDay, formatDayRange } from '@/utils/format/dates'
-import { startOfDay } from '@/utils/format/days'
+import { formatDay, formatDayRange } from '@/utils/format/time/dates'
+import { startOfDay } from '@/utils/format/time/days'
 
 export interface MemberFileTabsProps {
   detail: MemberDetail

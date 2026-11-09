@@ -4,7 +4,7 @@ import { useEffect, useEffectEvent, useState } from 'react'
 
 import { GOLF_VOTE_COPY } from '@/declarations/play/golf/vote'
 import { GOLF_VOTE } from '@/declarations/ui/variants'
-import type { VoteLook } from '@/declarations/ui/variants/golf'
+import type { VoteLook } from '@/declarations/ui/variants/games/golf'
 import { MINUTE_MS } from '@/utils/constants/time'
 import { cn } from '@/utils/classnames'
 

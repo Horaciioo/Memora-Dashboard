@@ -10,6 +10,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { EXERCISE_SETTINGS } from '@/declarations/configurations/settings'
 import { EXERCISE_COPY } from '@/declarations/recruitment/exerciseCopy'
 import type { ExerciseLinkView } from '@/types/recruitment'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Written-context links of one candidate
@@ -43,7 +44,7 @@ export const useExerciseLinks = (candidateId: string, isEnabled = true): Exercis
     queryKey,
     queryFn: () => apiGet<ExerciseLinkView[]>(API_ROUTES.candidateExercises(candidateId)),
     enabled: isEnabled,
-    refetchInterval: EXERCISE_SETTINGS.pollSeconds * 1000,
+    refetchInterval: EXERCISE_SETTINGS.pollSeconds * SECOND_MS,
   })
 
   const generate = useCallback(

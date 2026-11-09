@@ -2,6 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
+import { SECOND_MS } from '@/utils/constants/time'
 
 // Last sample per live
 const lastSampled = new Map<string, number>()
@@ -16,7 +17,7 @@ const lastSampled = new Map<string, number>()
 export const sampleViewers = async (liveId: string, viewers: number): Promise<void> => {
   // One sample per interval
   const now = Date.now()
-  if (now - (lastSampled.get(liveId) ?? 0) < LIVE_SETTINGS.sampleSeconds * 1000) return
+  if (now - (lastSampled.get(liveId) ?? 0) < LIVE_SETTINGS.sampleSeconds * SECOND_MS) return
   lastSampled.set(liveId, now)
 
   await prisma.liveSample.create({ data: { liveId, viewers } }).catch(() => null)

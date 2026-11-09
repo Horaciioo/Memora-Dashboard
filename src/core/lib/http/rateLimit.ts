@@ -1,5 +1,6 @@
 import { RATE_LIMIT_REGISTRY, RATE_LIMIT_SCOPES } from '@/declarations/system/security/rateLimits'
 import type { RateLimitName, RateLimitPolicy } from '@/declarations/system/security/rateLimits'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Outcome of one attempt
@@ -75,14 +76,14 @@ const memoryStore: RateLimitStore = {
 
     const current = windows.get(key)
     if (!current || current.expiresAt <= now) {
-      windows.set(key, { count: 1, expiresAt: now + windowSeconds * 1000 })
+      windows.set(key, { count: 1, expiresAt: now + windowSeconds * SECOND_MS })
 
       return { count: 1, resetSeconds: windowSeconds }
     }
 
     current.count += 1
 
-    return { count: current.count, resetSeconds: Math.ceil((current.expiresAt - now) / 1000) }
+    return { count: current.count, resetSeconds: Math.ceil((current.expiresAt - now) / SECOND_MS) }
   },
 }
 

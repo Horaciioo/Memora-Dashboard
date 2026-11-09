@@ -2,8 +2,10 @@ import 'server-only'
 
 import { sendNotification, WebPushError } from 'web-push'
 
+import { logger } from '@/core/lib/logger'
+import { pushOutcomeOf } from '@/core/lib/push/outcome'
+import { pushTopicOf } from '@/core/lib/push/topic'
 import { APPLICATION_SETTINGS } from '@/declarations/configurations/settings'
-import { PUSH_TOPIC_PATTERN } from '@/declarations/pwa/push'
 import { VAPID_KEYS } from '@/declarations/pwa/vapid'
 import type { PushPayload } from '@/declarations/pwa/worker'
 
@@ -46,12 +48,19 @@ export const sendPush = async (
         TTL: APPLICATION_SETTINGS.pushTtlSeconds,
         urgency: isUrgent ? 'high' : 'normal',
         // A retried push replaces its first copy
-        ...(PUSH_TOPIC_PATTERN.test(payload.tag) ? { topic: payload.tag } : {}),
+        topic: pushTopicOf(payload.tag),
       }
     )
 
     return response.statusCode
   } catch (error) {
-    return error instanceof WebPushError ? error.statusCode : null
+    if (!(error instanceof WebPushError)) return null
+
+    // Refusal reason for the logs
+    if (pushOutcomeOf(error.statusCode) === 'failed') {
+      logger.warn('[push] refused', { statusCode: error.statusCode, reason: error.body })
+    }
+
+    return error.statusCode
   }
 }

@@ -1,5 +1,5 @@
 import { playChime, playSound, playSweep } from '@/core/lib/play/sounds'
-import { playLevelOf } from '@/core/store/playSound'
+import { playLevelOf } from '@/core/store/play/playSound'
 import { GOLF_SOUNDS } from '@/declarations/play/golf/sounds'
 import type { GolfSoundName } from '@/declarations/play/golf/sounds'
 import { PlayGames } from '@/utils/constants/play'

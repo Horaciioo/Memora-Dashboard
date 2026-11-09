@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from 'react'
 
 import { roundBlocks } from '@/composites/play/golf/scene/obstacles/blocks'
-import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import type { GolfHole } from '@/core/lib/play/golf'
 
 /**

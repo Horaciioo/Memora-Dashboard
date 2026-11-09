@@ -5,7 +5,7 @@ import { isSessionTokenValid } from '@/core/lib/auth/getSession'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { readPublicOrigin } from '@/core/lib/http/origin'
 import { buildContentSecurityPolicy } from '@/declarations/system/security/contentSecurityPolicy'
-import { NONCE_HEADER } from '@/declarations/system/security/securityHeaders'
+import { NONCE_HEADER, PATH_HEADER } from '@/declarations/system/security/securityHeaders'
 import { DEMO_EVENT_ID, EVENT_ID_PATTERN } from '@/core/lib/share/sharedEvent'
 import { ROUTES } from '@/declarations/navigation'
 import { MANIFEST_PATH } from '@/declarations/pwa/manifest'
@@ -56,6 +56,7 @@ const withPolicy = (request: NextRequest): NextResponse => {
   // The document reads the nonce back off its own request headers
   const headers = new Headers(request.headers)
   headers.set(NONCE_HEADER, nonce)
+  headers.set(PATH_HEADER, request.nextUrl.pathname)
   headers.set('content-security-policy', policy)
 
   const response = NextResponse.next({ request: { headers } })

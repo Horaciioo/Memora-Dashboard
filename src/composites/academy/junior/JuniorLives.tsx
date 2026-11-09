@@ -9,7 +9,7 @@ import { LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { ACCOMPANIED_LIVES, LIST_STYLES } from '@/declarations/ui/variants'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 /**
  * Lives the junior was called on since their PIM began, with who came and who did not

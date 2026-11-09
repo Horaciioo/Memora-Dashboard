@@ -10,6 +10,7 @@ import { bilanFigures } from '@/core/lib/lives/bilanFigures'
 import type { LiveBaseline, LiveInsights } from '@/core/lib/lives/insights'
 import type { LiveReport } from '@/core/lib/lives/report'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
+import { SECOND_MS } from '@/utils/constants/time'
 
 export interface CreatorBilanProps {
   report: LiveReport
@@ -36,7 +37,7 @@ export const CreatorBilan = ({
   stem,
   creator,
 }: CreatorBilanProps) => {
-  const durationSeconds = Math.max(0, Math.round((Date.parse(end) - Date.parse(start)) / 1000))
+  const durationSeconds = Math.max(0, Math.round((Date.parse(end) - Date.parse(start)) / SECOND_MS))
   const figures = bilanFigures(report, insights, durationSeconds)
 
   return (

@@ -12,7 +12,7 @@ import type { SeaMark } from '@/core/lib/play/naval/sea'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_WATER } from '@/declarations/play/naval/skins'
 import { NAVAL_VIEW } from '@/declarations/play/naval/view'
-import { NAVAL_OCEAN } from '@/declarations/ui/variants/naval'
+import { NAVAL_OCEAN } from '@/declarations/ui/variants/games/naval'
 
 // Colour of each mark on the map
 const MARK_COLOURS: Partial<Record<SeaMark, string>> = {

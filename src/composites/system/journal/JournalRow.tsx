@@ -4,7 +4,7 @@ import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import { JOURNAL_COPY, JOURNAL_LEVEL_TONES } from '@/declarations/system/monitoring/journal'
 import { JOURNAL_TABLE_STYLES } from '@/declarations/ui/variants'
 import { EVENT_TYPES, LOG_LEVELS } from '@/utils/constants/events'
-import { formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 
 export interface JournalRowProps {
   entry: ActivityEntry

@@ -9,18 +9,7 @@ import { ACCESS_CATEGORY_REGISTRY, readCategory } from '@/declarations/access/ca
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { MemberRoles } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
-
-/**
- * Read a nullable text field
- * @param {unknown} value - Raw value
- * @return {string | null} - Trimmed value or nothing
- */
-
-const readNullable = (value: unknown): string | null => {
-  const text = typeof value === 'string' ? value.trim() : ''
-
-  return text.length > 0 ? text : null
-}
+import { optionalText } from '@/utils/format/strings'
 
 export const POST = createProtectedRoute({
   permission: Permissions.AccessManage,
@@ -44,9 +33,9 @@ export const POST = createProtectedRoute({
       name,
       category,
       kind: readKind(String(raw.kind ?? '')),
-      accent: readNullable(raw.accent),
-      icon: readNullable(raw.icon),
-      summary: readNullable(raw.summary),
+      accent: optionalText(raw.accent),
+      icon: optionalText(raw.icon),
+      summary: optionalText(raw.summary),
     })
 
     await recordEvent({

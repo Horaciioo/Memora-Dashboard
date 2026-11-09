@@ -10,6 +10,7 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import type { LiveRoster } from '@/types/lives'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Roll-call state and its one move
@@ -38,7 +39,7 @@ export const useLiveRoster = (liveId: string, isLive = false): LiveRosterState =
   const { data } = useQuery({
     queryKey: key,
     queryFn: ({ signal }) => apiGet<LiveRoster>(API_ROUTES.liveRoster(liveId), signal),
-    refetchInterval: isLive ? LIVE_SETTINGS.focusPollSeconds * 1000 : false,
+    refetchInterval: isLive ? LIVE_SETTINGS.focusPollSeconds * SECOND_MS : false,
   })
   const { isSaving, run } = useMutation()
 

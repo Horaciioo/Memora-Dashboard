@@ -3,7 +3,7 @@ import 'server-only'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { cache } from 'react'
 
-import { bindZoneReader, isKnownZone } from '@/utils/format/zone'
+import { bindZoneReader, isKnownZone } from '@/utils/format/time/zone'
 
 // Zone held by one request
 interface ZoneSlot {

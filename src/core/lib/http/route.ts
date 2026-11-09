@@ -20,6 +20,9 @@ import { fail, succeed } from '@/core/lib/http/response'
 import { logger } from '@/core/lib/logger'
 import { runWithOrigin } from '@/core/lib/http/requestOrigin'
 import { reportFailure, reportRefusal } from '@/core/services/system/FailureReport'
+import { isFeatureOpen } from '@/core/services/features'
+import { featureOfApi } from '@/declarations/features'
+import { FEATURE_COPY } from '@/declarations/features/copy'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { readScope } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -289,6 +292,18 @@ const assertWritable = (request: NextRequest, session: SessionUser): void => {
 }
 
 /**
+ * Refuse an endpoint whose feature is switched off
+ * @param {NextRequest} request - Incoming request
+ * @param {boolean} isAdmin - Caller holds the system
+ * @return {Promise<void>}
+ */
+
+const assertFeatureOpen = async (request: NextRequest, isAdmin: boolean): Promise<void> => {
+  const key = featureOfApi(request.nextUrl.pathname)
+  if (key && !(await isFeatureOpen(key, isAdmin))) throw forbidden(FEATURE_COPY.apiClosed)
+}
+
+/**
  * Resolve the session behind a guarded route
  * @param {NextRequest} request - Incoming request
  * @param {RouteOptions} options - Route options
@@ -312,6 +327,7 @@ const authenticate = async (
   // Permission gate
   const access = resolvePermissions(session)
   assertPermission(access, permission)
+  await assertFeatureOpen(request, access.isSystem)
 
   return { session, access }
 }
@@ -327,6 +343,7 @@ export const createPublicRoute = <T>(options: PublicRouteOptions<T>): RouteHandl
     runWithOrigin(request, async () => {
       try {
         await guard(request, options.rateLimit)
+        await assertFeatureOpen(request, false)
 
         const routeContext = await buildContext(request, context, options)
 

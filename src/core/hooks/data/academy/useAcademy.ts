@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { useSyncedState } from '@/core/hooks/interaction/state/useSyncedState'
+import { useSyncedState } from '@/core/hooks/interaction/state/saved/useSyncedState'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { entityFeedback } from '@/declarations/ui/copy'
 import type { JuniorView, MyTrainingAction, MyTrainingView, SessionSummary } from '@/types/academy'

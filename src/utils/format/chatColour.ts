@@ -1,6 +1,6 @@
 import { CHAT_DEFAULT_COLOURS } from '@/declarations/modview/registries'
 import type { Chatter } from '@/types/modview'
-import { readableOnDark } from '@/utils/format/colour'
+import { readableOnTheme } from '@/utils/format/colour'
 
 /**
  * Colour of a chatter's name: the one they picked, else the one Twitch gives from the login
@@ -9,10 +9,10 @@ import { readableOnDark } from '@/utils/format/colour'
  */
 
 export const chatColour = (chatter: Chatter): string => {
-  if (chatter.colour) return readableOnDark(chatter.colour)
+  if (chatter.colour) return readableOnTheme(chatter.colour)
 
   // Same login, same colour, as on Twitch
   const sum = [...chatter.login].reduce((total, letter) => total + letter.charCodeAt(0), 0)
 
-  return readableOnDark(CHAT_DEFAULT_COLOURS[sum % CHAT_DEFAULT_COLOURS.length] ?? '#ffffff')
+  return readableOnTheme(CHAT_DEFAULT_COLOURS[sum % CHAT_DEFAULT_COLOURS.length] ?? '#ffffff')
 }

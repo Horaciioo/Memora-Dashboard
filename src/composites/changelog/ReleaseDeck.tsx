@@ -1,7 +1,7 @@
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import type { ChangelogRelease } from '@/declarations/changelog/releases'
 import { CHANGELOG_BOARD } from '@/declarations/ui/blocks'
-import { dayMonthLabel } from '@/utils/format/days'
+import { dayMonthLabel } from '@/utils/format/time/days'
 
 export interface ReleaseDeckProps {
   release: ChangelogRelease

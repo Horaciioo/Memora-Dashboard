@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
 
-import { flatAxes } from '@/composites/play/golf/scene/rig'
+import { flatAxes } from '@/composites/play/golf/scene/camera/rig'
 import { GOLF_KEYS } from '@/declarations/play/golf/keys'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'

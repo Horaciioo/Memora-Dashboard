@@ -9,6 +9,7 @@ import {
 } from '@/core/lib/auth/oauthState'
 import { PLATFORM_STATE_COOKIE } from '@/core/lib/auth/session'
 import { notAuthenticated } from '@/core/lib/errors'
+import { logger } from '@/core/lib/logger'
 import { createRedirectRoute } from '@/core/lib/http/route'
 import type { RouteHandler } from '@/core/lib/http/route'
 import { PLATFORM_LINKERS } from '@/core/lib/platforms/linkers'
@@ -68,6 +69,12 @@ export const createLinkReturnRoute = (platform: LivePlatformName): RouteHandler 
 
       // The handshake is single use whatever happens next
       cookieStore.delete(PLATFORM_STATE_COOKIE)
+
+      // The platform refused before any code existed
+      const refusal = query.get('error')
+      if (refusal) {
+        logger.warn(`[oauth] ${platform} refused`, refusal, query.get('error_description') ?? '')
+      }
 
       const code = query.get('code') ?? ''
       if (!session || !handshake || code.length === 0) throw notAuthenticated()

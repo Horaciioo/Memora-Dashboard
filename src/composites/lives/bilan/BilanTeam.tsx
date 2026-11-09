@@ -22,6 +22,14 @@ export const BilanTeam = ({ report }: BilanTeamProps) => {
         description={LIVE_REPORT_COPY.moderatorsLead}
         padded
       >
+        {report.coverage && report.coverage.blindSeconds > 0 && (
+          <p className={LIVE_REPORT.empty}>
+            {LIVE_REPORT_COPY.blindNotice.replace(
+              '{time}',
+              formatSpan(report.coverage.blindSeconds)
+            )}
+          </p>
+        )}
         {report.moderators.length === 0 ? (
           <p className={LIVE_REPORT.empty}>{LIVE_REPORT_COPY.logEmpty}</p>
         ) : (

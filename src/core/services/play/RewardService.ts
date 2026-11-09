@@ -4,6 +4,7 @@ import { PlayNoticeKind } from '@prisma/client'
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
+import { isFeatureOn } from '@/core/services/features'
 import { outcomeXp, rankScores } from '@/core/lib/play'
 import { PLAY_JOURNAL, PLAY_OUTCOME_LABELS, PLAY_SETTINGS } from '@/declarations/play'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
@@ -72,7 +73,8 @@ const writeResults = async (
   const standings = rankScores(new Map(seats.map((seat) => [seat.accountId, seat.score])), gone)
 
   // Tournament games pay at the end of the tournament
-  const pays = !session.tournamentId && isRewarded(session, seconds)
+  const pays =
+    !session.tournamentId && isRewarded(session, seconds) && (await isFeatureOn('play.xp'))
   // A first game on this game pays more
   const veterans = await veteransOf(
     tx,

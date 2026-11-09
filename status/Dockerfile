@@ -2,6 +2,8 @@
 FROM node:22-bookworm-slim
 WORKDIR /app
 COPY status/ ./
+# Volume writable by node
+RUN mkdir -p /data && chown node:node /data
 ENV NODE_ENV=production
 EXPOSE 3001
 USER node

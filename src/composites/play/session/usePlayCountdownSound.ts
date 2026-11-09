@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 import { playSound, preloadSounds } from '@/core/lib/play/sounds'
-import { playLevelOf } from '@/core/store/playSound'
+import { playLevelOf } from '@/core/store/play/playSound'
 import { PLAY_COUNTDOWN_SOUNDS } from '@/declarations/play/sounds'
 import type { PlayGameName } from '@/utils/constants/play'
 

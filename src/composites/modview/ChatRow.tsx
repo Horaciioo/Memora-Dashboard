@@ -15,11 +15,10 @@ import type { ChatOptionName } from '@/declarations/modview/registries'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
-import { MODVIEW_CHAT, MODVIEW_TIER } from '@/declarations/ui/variants'
+import { MODVIEW_CHAT, MODVIEW_TIER, MODVIEW_WARN } from '@/declarations/ui/variants'
 import type { ChatBadge, ChatMessage, Chatter, MemoraRank, ModViewIntent } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { chatColour } from '@/utils/format/chatColour'
-import { formatClock } from '@/utils/format/modview'
 
 // Badge glyphs
 const BADGE_ICONS: Record<ChatBadge, IconName> = {
@@ -191,11 +190,6 @@ const ChatLineBody = ({
         </span>
       )}
       {toolsPosition === 'left' && toolsNode}
-      {options.timestamps && (
-        <time className={MODVIEW_CHAT.time} dateTime={message.sentAt}>
-          {formatClock(message.sentAt)}
-        </time>
-      )}
       {options.badges &&
         badgeIcons.map((icon) => {
           const Badge = ICONS[icon]
@@ -247,9 +241,11 @@ const ChatLineBody = ({
           description={MODVIEW_COPY.warnLead.replace('{name}', message.author.name)}
           placeholder={MODVIEW_COPY.warnPlaceholder}
           confirmLabel={MODVIEW_COPY.warnConfirm}
-          onConfirm={(reason) => onAct({ kind: 'warn', chatterId, reason })}
+          onConfirm={(reason) => onAct({ kind: 'warn', chatterId, reason, messageId: message.id })}
           onClose={() => setWarning(false)}
-        />
+        >
+          <p className={MODVIEW_WARN.quote}>{message.text}</p>
+        </ReasonDialog>
       )}
     </li>
   )

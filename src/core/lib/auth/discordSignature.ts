@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 
 import { DISCORD_WEBHOOK } from '@/declarations/access/discord'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Wrap a raw public key in the DER header an Ed25519 verifier expects
@@ -44,7 +45,7 @@ export const isSignedByDiscord = ({
   // An old timestamp is a replay
   const sentAt = Number(timestamp)
   if (!Number.isFinite(sentAt)) return false
-  if (Math.abs(Date.now() / 1000 - sentAt) > DISCORD_WEBHOOK.toleranceSeconds) return false
+  if (Math.abs(Date.now() / SECOND_MS - sentAt) > DISCORD_WEBHOOK.toleranceSeconds) return false
 
   try {
     return crypto.verify(

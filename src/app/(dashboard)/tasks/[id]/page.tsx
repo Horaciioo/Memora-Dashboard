@@ -5,12 +5,13 @@ import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { TaskFile } from '@/composites/work/TaskFile'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
 import { lockTaskFields, readTask, taskFields } from '@/core/services/work/TaskService'
-import { assertTaskVisible, currentWorkViewer, workViewer } from '@/core/services/work/visibility'
+import { assertTaskVisible, workViewer } from '@/core/services/work/visibility'
 import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { TASK_COPY } from '@/declarations/work/copy'
 import { Permissions } from '@/utils/constants/permissions'
+import { workFileMetadata } from '@/core/wrappers/workFileMetadata'
 
 /**
  * Name the browser tab after the task
@@ -26,18 +27,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params
 
-  try {
-    // A hidden file lends no title
-    const viewer = await currentWorkViewer()
-    if (!viewer) return { title: TASK_COPY.title }
-
+  return workFileMetadata(TASK_COPY.title, async (viewer) => {
     await assertTaskVisible(id, viewer)
-    const task = await readTask(id)
 
-    return { title: task.title }
-  } catch {
-    return { title: TASK_COPY.title }
-  }
+    return (await readTask(id)).title
+  })
 }
 
 /**

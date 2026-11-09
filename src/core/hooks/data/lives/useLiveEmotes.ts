@@ -7,6 +7,7 @@ import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { LiveEmotes } from '@/types/modview'
+import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Emotes of Twitch and of the live's channel
@@ -20,7 +21,7 @@ export const useLiveEmotes = (liveId: string | null) => {
     queryFn: ({ signal }) => apiGet<LiveEmotes>(API_ROUTES.liveEmotes(liveId ?? ''), signal),
     enabled: liveId !== null,
     // Kept as long as the server keeps them
-    staleTime: LIVE_SETTINGS.emoteCacheSeconds * 1000,
+    staleTime: LIVE_SETTINGS.emoteCacheSeconds * SECOND_MS,
     retry: false,
   })
 

@@ -1,25 +1,10 @@
 import type { ModViewScene, SceneStep } from '@/core/lib/modview/scene'
 import type { ChatMessage, Chatter } from '@/types/modview'
 import { LivePlatforms } from '@/utils/constants/lives'
+import { chatter } from '@/declarations/modview/sceneKit'
 
 // Fixed clock so the scene reads the same every time
 const START = '2026-10-03T20:00:00.000Z'
-
-/**
- * Build one chatter of the scene
- * @param {string} login - Login
- * @param {Partial<Chatter>} [extra] - Badges
- * @return {Chatter} - Chatter
- */
-
-const chatter = (login: string, extra: Partial<Chatter> = {}): Chatter => ({
-  id: `demo-${login}`,
-  login,
-  name: login,
-  colour: null,
-  badges: [],
-  ...extra,
-})
 
 const CAST = {
   creator: chatter('michou', { name: 'Michou', badges: ['broadcaster'], colour: '#d12f78' }),

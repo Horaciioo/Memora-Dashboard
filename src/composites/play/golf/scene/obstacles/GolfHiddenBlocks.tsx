@@ -7,7 +7,7 @@ import type { Group } from 'three'
 
 import { roundBlockGeometry } from '@/composites/play/golf/scene/obstacles/blocks'
 import { useReveal } from '@/composites/play/golf/scene/obstacles/useReveal'
-import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import type { GolfBlock, GolfMotion } from '@/core/lib/play/golf'
 
 // Rise of a revealed block, ms

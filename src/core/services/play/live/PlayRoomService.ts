@@ -60,9 +60,12 @@ const sendBoards = async (sessionId: string, room: PlayRoom): Promise<void> => {
     byViewer.set(member.session.id, [...(byViewer.get(member.session.id) ?? []), member])
   }
 
+  // One read when boards match
+  const shared = engine.isViewShared ? engine.view(table, '') : null
+
   await Promise.all(
     [...byViewer].map(async ([viewerId, members]) => {
-      const board = await engine.view(table, viewerId)
+      const board = await (shared ?? engine.view(table, viewerId))
       const frame = eventFrame(topic, PLAY_STREAM_EVENTS.board, { board })
       for (const member of members) member.send(frame)
     })

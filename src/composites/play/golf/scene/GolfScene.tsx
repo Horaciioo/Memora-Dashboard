@@ -5,33 +5,33 @@ import type { RefObject } from 'react'
 import { Canvas } from '@react-three/fiber'
 import type { Group } from 'three'
 
-import { GolfBalls } from '@/composites/play/golf/scene/GolfBalls'
-import { GolfCameraRig } from '@/composites/play/golf/scene/GolfCameraRig'
-import { GolfConfetti } from '@/composites/play/golf/scene/GolfConfetti'
-import { GolfControls } from '@/composites/play/golf/scene/GolfControls'
-import { GolfCourse } from '@/composites/play/golf/scene/GolfCourse'
-import { GolfCupCheer } from '@/composites/play/golf/scene/GolfCupCheer'
-import { GolfDecorCubes } from '@/composites/play/golf/scene/GolfDecorCubes'
-import { GolfFixtures } from '@/composites/play/golf/scene/GolfFixtures'
-import { GolfGridGlow } from '@/composites/play/golf/scene/GolfGridGlow'
-import { GolfGusts } from '@/composites/play/golf/scene/GolfGusts'
-import { GolfHitboxes } from '@/composites/play/golf/scene/GolfHitboxes'
-import { courseMap, neighboursOf, takenRects } from '@/composites/play/golf/scene/map'
-import { GolfNeighbours } from '@/composites/play/golf/scene/GolfNeighbours'
-import { GolfLowMist } from '@/composites/play/golf/scene/GolfLowMist'
-import { GolfMist } from '@/composites/play/golf/scene/GolfMist'
-import { GolfObstacles } from '@/composites/play/golf/scene/GolfObstacles'
-import { GolfProbe } from '@/composites/play/golf/scene/GolfProbe'
-import { GolfScenery } from '@/composites/play/golf/scene/GolfScenery'
-import { GolfMotionDriver } from '@/composites/play/golf/scene/GolfMotionDriver'
-import { GolfSpecks } from '@/composites/play/golf/scene/GolfSpecks'
-import { GolfStageTransition } from '@/composites/play/golf/scene/GolfStageTransition'
-import { GolfSun } from '@/composites/play/golf/scene/GolfSun'
-import { readPaint, seatColor } from '@/composites/play/golf/scene/paint'
-import type { GolfRig } from '@/composites/play/golf/scene/rig'
+import { GolfBalls } from '@/composites/play/golf/scene/ball/GolfBalls'
+import { GolfCameraRig } from '@/composites/play/golf/scene/camera/GolfCameraRig'
+import { GolfConfetti } from '@/composites/play/golf/scene/ball/GolfConfetti'
+import { GolfControls } from '@/composites/play/golf/scene/camera/GolfControls'
+import { GolfCourse } from '@/composites/play/golf/scene/course/GolfCourse'
+import { GolfCupCheer } from '@/composites/play/golf/scene/ball/GolfCupCheer'
+import { GolfDecorCubes } from '@/composites/play/golf/scene/decor/GolfDecorCubes'
+import { GolfFixtures } from '@/composites/play/golf/scene/decor/GolfFixtures'
+import { GolfGridGlow } from '@/composites/play/golf/scene/decor/GolfGridGlow'
+import { GolfGusts } from '@/composites/play/golf/scene/weather/GolfGusts'
+import { GolfHitboxes } from '@/composites/play/golf/scene/course/GolfHitboxes'
+import { courseMap, neighboursOf, takenRects } from '@/composites/play/golf/scene/course/map'
+import { GolfNeighbours } from '@/composites/play/golf/scene/decor/GolfNeighbours'
+import { GolfLowMist } from '@/composites/play/golf/scene/weather/GolfLowMist'
+import { GolfMist } from '@/composites/play/golf/scene/weather/GolfMist'
+import { GolfObstacles } from '@/composites/play/golf/scene/course/GolfObstacles'
+import { GolfProbe } from '@/composites/play/golf/scene/course/GolfProbe'
+import { GolfScenery } from '@/composites/play/golf/scene/decor/GolfScenery'
+import { GolfMotionDriver } from '@/composites/play/golf/scene/ball/GolfMotionDriver'
+import { GolfSpecks } from '@/composites/play/golf/scene/weather/GolfSpecks'
+import { GolfStageTransition } from '@/composites/play/golf/scene/camera/GolfStageTransition'
+import { GolfSun } from '@/composites/play/golf/scene/weather/GolfSun'
+import { readPaint, seatColor } from '@/composites/play/golf/scene/decor/paint'
+import type { GolfRig } from '@/composites/play/golf/scene/camera/rig'
 import type { GolfFace } from '@/composites/play/golf/types'
 import { activePowers, courseAt, floorHeight } from '@/core/lib/play/golf'
-import { useGolfPrefsStore } from '@/core/store/golfPrefs'
+import { useGolfPrefsStore } from '@/core/store/play/golfPrefs'
 import type {
   GolfBoardState,
   GolfHazard,
@@ -55,6 +55,10 @@ const { light, fog } = GOLF_SCENE
 
 // Hole outside any map
 const ORIGIN: GolfPoint = [0, 0]
+
+// Wait before a canvas with no frame is redrawn, and how many times
+const BLANK_CHECK_MS = 2500
+const BLANK_RETRIES = 3
 
 export interface GolfSceneProps {
   board: GolfBoardState
@@ -129,6 +133,7 @@ const GolfScene = ({
   const isLite = isSlow || isLight
   // Bumped to draw a fresh canvas after a lost graphics context
   const [epoch, setEpoch] = useState(0)
+  const retries = useRef(0)
   const lawn = useRef<Group>(null)
   const serverNow = useCallback(() => Date.now() + serverOffset, [serverOffset])
   const seatOf = useCallback(
@@ -173,6 +178,14 @@ const GolfScene = ({
           event.preventDefault()
           setEpoch((value) => value + 1)
         })
+        // A canvas that never drew a frame is redrawn, a few times at most
+        window.setTimeout(() => {
+          const isBlank = gl.info.render.frame === 0 || gl.getContext().isContextLost()
+          if (isBlank && retries.current < BLANK_RETRIES) {
+            retries.current += 1
+            setEpoch((value) => value + 1)
+          }
+        }, BLANK_CHECK_MS)
       }}
       className={GOLF_SCENE_UI.canvas}
       dpr={[1, isLite ? render.liteDpr : render.maxDpr]}

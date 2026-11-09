@@ -19,6 +19,7 @@ import { BILAN_COPY } from '@/declarations/lives/bilan'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
 import type { LiveLogLine, LiveModTime, LiveNote } from '@/types/lives'
+import { SECOND_MS } from '@/utils/constants/time'
 
 export interface LiveReportViewProps {
   report: LiveReport
@@ -62,7 +63,7 @@ export const LiveReportView = ({
   liveId,
   canEdit,
 }: LiveReportViewProps) => {
-  const durationSeconds = Math.max(0, Math.round((Date.parse(end) - Date.parse(start)) / 1000))
+  const durationSeconds = Math.max(0, Math.round((Date.parse(end) - Date.parse(start)) / SECOND_MS))
   const figures = bilanFigures(report, insights, durationSeconds)
   const [view, setView] = useState<'general' | 'moderation' | 'creator'>('general')
 

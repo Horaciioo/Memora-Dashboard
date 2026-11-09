@@ -9,8 +9,7 @@ import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { parseDuration } from '@/core/lib/modview/commands'
 import { MODVIEW_COPY, MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import { TIMEOUT_PRESETS } from '@/declarations/modview/registries'
-import { MODVIEW_DOSSIER_COPY as COPY } from '@/declarations/modview/watch'
-import { ICONS } from '@/declarations/ui/icons'
+import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
 import { MODVIEW_USER } from '@/declarations/ui/variants'
 import type { ChatMessage, Chatter } from '@/types/modview'
 import { formatDuration } from '@/utils/format/modview'
@@ -23,6 +22,8 @@ export interface ViewerSanctionsProps {
   lastLine: ChatMessage | undefined
   gate: GateCheck
   onAct: ActRunner
+  isWatched: boolean
+  onWatch: () => void
 }
 
 /**
@@ -31,12 +32,18 @@ export interface ViewerSanctionsProps {
  * @return {JSX.Element}
  */
 
-export const ViewerSanctions = ({ chatter, lastLine, gate, onAct }: ViewerSanctionsProps) => {
+export const ViewerSanctions = ({
+  chatter,
+  lastLine,
+  gate,
+  onAct,
+  isWatched,
+  onWatch,
+}: ViewerSanctionsProps) => {
   const [pending, setPending] = useState<Pending | null>(null)
   const [custom, setCustom] = useState('')
   const chatterId = chatter.id
   const moderate = gate({ kind: 'ban', chatterId, reason: null })
-  const TimeoutIcon = ICONS.modTimeout
   const customSeconds = parseDuration(custom)
   const seconds = pending?.kind === 'timeout' ? (pending.seconds ?? customSeconds) : null
 
@@ -64,13 +71,8 @@ export const ViewerSanctions = ({ chatter, lastLine, gate, onAct }: ViewerSancti
 
   return (
     <section className={MODVIEW_USER.section}>
-      <h4 className={MODVIEW_USER.label}>{COPY.ladderTitle}</h4>
-
       <div className={MODVIEW_USER.group}>
-        <p className={MODVIEW_USER.groupHead}>
-          <TimeoutIcon className={MODVIEW_USER.groupIcon} aria-hidden="true" />
-          {MODVIEW_USER_COPY.timeoutGroup}
-        </p>
+        <p className={MODVIEW_USER.groupHead}>{MODVIEW_USER_COPY.timeoutGroup}</p>
         <div className={MODVIEW_USER.presets}>
           {TIMEOUT_PRESETS.map((length) => (
             <button
@@ -134,6 +136,15 @@ export const ViewerSanctions = ({ chatter, lastLine, gate, onAct }: ViewerSancti
             onClick={() => onAct({ kind: 'unban', chatterId })}
           >
             {MODVIEW_USER_COPY.unban}
+          </Button>
+          <Button
+            className={MODVIEW_USER.actionWide}
+            variant={isWatched ? 'primary' : 'secondary'}
+            icon="visible"
+            aria-pressed={isWatched}
+            onClick={onWatch}
+          >
+            {isWatched ? MODVIEW_WATCH_COPY.stop : MODVIEW_WATCH_COPY.start}
           </Button>
         </div>
       </div>

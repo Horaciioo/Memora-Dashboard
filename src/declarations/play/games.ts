@@ -7,6 +7,7 @@ import { LUDO_FELT } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { NAVAL_SEA } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
+import { APP_ENVIRONMENT } from '@/declarations/system/environments'
 import { PLAY_PAPER } from '@/declarations/play/paper'
 import { BACCALAUREAT_SETTINGS } from '@/declarations/play/settings'
 import { PlayGames } from '@/utils/constants/play'
@@ -104,7 +105,7 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: NAVAL_SEA.ground,
     minPlayers: NAVAL_SETTINGS.minPlayers,
     maxPlayers: NAVAL_SETTINGS.maxPlayers,
-    playable: true,
+    playable: APP_ENVIRONMENT === 'dev',
   },
 })
 

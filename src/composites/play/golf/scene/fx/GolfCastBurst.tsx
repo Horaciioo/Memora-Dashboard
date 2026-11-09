@@ -8,7 +8,7 @@ import type { Group, InstancedMesh, Mesh, MeshBasicMaterial } from 'three'
 
 import { fxStage } from '@/composites/play/golf/scene/fx/stage'
 import type { GolfPowerClock } from '@/composites/play/golf/scene/fx/stage'
-import type { GolfPaint } from '@/composites/play/golf/scene/paint'
+import type { GolfPaint } from '@/composites/play/golf/scene/decor/paint'
 import { GOLF_POWER_FX } from '@/declarations/play/golf/fx'
 import { GOLF_POWERS } from '@/declarations/play/golf/powers'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'

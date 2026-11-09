@@ -24,10 +24,18 @@ export const useHoldKey = (
     if (!isActive) return
 
     let isHeld = false
+    let focused: Element | null = null
     const set = (next: boolean) => {
       if (next === isHeld) return
       isHeld = next
       handler.current(next)
+
+      // The release gives focus back
+      if (next) focused = document.activeElement
+      else if (focused instanceof HTMLElement && document.activeElement === document.body) {
+        window.focus()
+        focused.focus({ preventScroll: true })
+      }
     }
 
     const onDown = (event: KeyboardEvent) => {

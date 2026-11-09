@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
-import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
 import type { Notification } from '@/managers/infrastructure/Network/NotificationsManager'
 import { TONE_ICON, TONES } from '@/declarations/ui/theme'

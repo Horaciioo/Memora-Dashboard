@@ -3,7 +3,7 @@
 import { Button } from '@/components/elements/actions/Button'
 import { THEME_REGISTRY } from '@/declarations/access/preferences'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import { useThemeStore } from '@/core/store/theme'
+import { useThemeStore } from '@/core/store/appearance/theme'
 
 export interface ThemeIconButtonProps {
   className?: string

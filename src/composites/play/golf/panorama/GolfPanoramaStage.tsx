@@ -5,16 +5,17 @@ import { useFrame } from '@react-three/fiber'
 import { Vector3 } from 'three'
 
 import { GolfFlyCamera } from '@/composites/play/golf/fly/GolfFlyCamera'
-import { GolfNeighbours } from '@/composites/play/golf/scene/GolfNeighbours'
-import { courseMap, neighboursOf } from '@/composites/play/golf/scene/map'
-import { readPaint } from '@/composites/play/golf/scene/paint'
+import { GolfNeighbours } from '@/composites/play/golf/scene/decor/GolfNeighbours'
+import { courseMap, neighboursOf } from '@/composites/play/golf/scene/course/map'
+import { readPaint } from '@/composites/play/golf/scene/decor/paint'
 import { GOLF_COURSES } from '@/declarations/play/golf/courses'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
+import { SECOND_MS } from '@/utils/constants/time'
 
 const { panorama, light, sun } = GOLF_SCENE
 
 // Seconds since the page opened
-const clock = (): number => performance.now() / 1000
+const clock = (): number => performance.now() / SECOND_MS
 
 /**
  * Camera high over the whole map, swaying and pushing in slowly unless still
@@ -45,7 +46,7 @@ const PanoramaCamera = ({
     // Eased push-in, from far to close
     const left = isStill
       ? 0
-      : Math.max(0, 1 - seconds / (panorama.seconds + panorama.fadeMs / 1000))
+      : Math.max(0, 1 - seconds / (panorama.seconds + panorama.fadeMs / SECOND_MS))
     const reach = distance * (1 + panorama.push * left * left)
     camera.position.set(
       center.x + Math.sin(yaw) * Math.cos(panorama.pitch) * reach,

@@ -92,8 +92,23 @@
   }
 }
 
+/* Admin name: red with the same band of light */
+.danger-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--color-danger) 30%,
+    color-mix(in srgb, var(--color-danger) 35%, white) 50%,
+    var(--color-danger) 70%
+  );
+  background-size: 250% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: gold-sweep 3.5s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .gold-shimmer {
+  .gold-shimmer,
+  .danger-shimmer {
     animation: none;
   }
 }

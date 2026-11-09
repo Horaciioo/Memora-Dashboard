@@ -15,7 +15,7 @@ import {
 } from '@/core/services/work/visibility'
 import { searchPages, viewerOf } from '@/core/services/pages'
 import { PAGES_COPY } from '@/declarations/pages/copy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 import type { SessionUser } from '@/types/auth'
 import type { SearchHit, SearchSection } from '@/types/search'
 import { Permissions } from '@/utils/constants/permissions'

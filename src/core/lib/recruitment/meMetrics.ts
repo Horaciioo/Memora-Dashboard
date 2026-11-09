@@ -2,9 +2,9 @@ import { MONTH_LABELS } from '@/declarations/ui/dates'
 import { RECRUITMENT_SETTINGS } from '@/declarations/configurations/recruitment'
 import { OutcomeNames } from '@/declarations/reference/fixed'
 import type { CandidateView, RecruitmentOutcomeView, RecruitmentRef } from '@/types/recruitment'
-import { formatDayKey } from '@/utils/format/days'
+import { formatDayKey } from '@/utils/format/time/days'
+import { MINUTE_MS } from '@/utils/constants/time'
 
-const MINUTE_MS = 60_000
 const HOUR_MINUTES = 60
 
 // Days drawn in each chart

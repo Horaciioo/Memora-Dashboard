@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 
 import { PlayInviteBubble } from '@/composites/play/invites/PlayInviteBubble'
 import { usePlayNoticeFeed } from '@/core/hooks/data/play/usePlayNoticeFeed'
-import { usePendingNotice } from '@/core/store/playNotices'
+import { usePendingNotice } from '@/core/store/play/playNotices'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_FEED_BEACON } from '@/declarations/ui/beacons'
 import { PLAY_INVITE_CALL } from '@/declarations/ui/variants'

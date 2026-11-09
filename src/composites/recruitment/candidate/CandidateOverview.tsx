@@ -10,7 +10,7 @@ import { RECRUITMENT_COPY, RECRUITMENT_FIELD_COPY } from '@/declarations/recruit
 import { COMMENT_COPY } from '@/declarations/ui/copy'
 import { accentVars } from '@/declarations/ui/theme'
 import { PASTEL_TAG } from '@/declarations/ui/variants'
-import { formatWeekdayTime } from '@/utils/format/dates'
+import { formatWeekdayTime } from '@/utils/format/time/dates'
 import type { ReactNode } from 'react'
 
 export interface CandidateOverviewProps {

@@ -3,7 +3,7 @@ import { Section } from '@/components/structures/page/Section'
 import { TRAINING_FEEDBACK_COPY } from '@/declarations/academy/copy'
 import { TRAINING_FEEDBACK } from '@/declarations/ui/variants'
 import type { TrainingFeedbackSummary } from '@/types/academy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/time/dates'
 
 export interface TrainingFeedbackPanelProps {
   summary: TrainingFeedbackSummary

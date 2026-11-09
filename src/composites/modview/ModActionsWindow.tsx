@@ -1,11 +1,16 @@
 'use client'
 
+import { useMemo } from 'react'
+
 import { DotMark } from '@/components/elements/display/Dotted'
 import { ActSentence } from '@/composites/modview/ActSentence'
 import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { memberMenu, memberNamed } from '@/composites/modview/memberMenu'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
+import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
+import { repeatRanks } from '@/core/lib/modview/repeats'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { useMenu } from '@/managers/front-end'
 import { MODVIEW_ACT_COPY, MODVIEW_COPY, MODVIEW_INSPECT_COPY } from '@/declarations/modview/copy'
 import { MOD_ACTS } from '@/declarations/modview/registries'
@@ -13,13 +18,15 @@ import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_FEED } from '@/declarations/ui/variants'
 import type { ModAct } from '@/types/modview'
 import { cn } from '@/utils/classnames'
-import { formatSince } from '@/utils/format/dates'
+import { formatSince } from '@/utils/format/time/dates'
 import { formatDuration } from '@/utils/format/modview'
 
 export interface ModActionsWindowProps {
   acts: ModAct[]
   isLit: boolean
-  onPickTarget: (name: string) => void
+  onPickTarget: (act: ModAct) => void
+  // Name colour of a viewer
+  colourOf: (id: string | null | undefined, name: string | null) => string | undefined
   // Moderator followed in Focus mode
   focusLogin?: string | null
   // Right click on a moderator
@@ -30,7 +37,8 @@ export interface ModActionsWindowProps {
  * Every moderation act of the team
  * @param {ModAct[]} acts - Acts
  * @param {boolean} isLit - Lit by a scene
- * @param {(name: string) => void} onPickTarget - Open a viewer card
+ * @param {(act: ModAct) => void} onPickTarget - Open a viewer card
+ * @param {Function} colourOf - Name colour lookup
  * @param {string | null} [focusLogin] - Moderator followed
  * @param {TeamTools} [team] - Focus gestures
  * @return {JSX.Element}
@@ -40,10 +48,13 @@ export const ModActionsWindow = ({
   acts,
   isLit,
   onPickTarget,
+  colourOf,
   focusLogin,
   team,
 }: ModActionsWindowProps) => {
   const { contextMenu } = useMenu()
+  const { preferences } = useModPreferences()
+  const ranks = useMemo(() => repeatRanks(acts, LIVE_SETTINGS.repeatWindowMinutes), [acts])
 
   return (
     <ModWindow title={MODVIEW_COPY.modActions} isLit={isLit} grow>
@@ -71,7 +82,12 @@ export const ModActionsWindow = ({
                     <button
                       type="button"
                       className={MODVIEW_FEED.target}
-                      onClick={() => onPickTarget(act.target!)}
+                      style={{
+                        color: preferences.colouredNames
+                          ? colourOf(act.targetId, act.target)
+                          : undefined,
+                      }}
+                      onClick={() => onPickTarget(act)}
                     >
                       {act.target}
                     </button>
@@ -100,7 +116,11 @@ export const ModActionsWindow = ({
                       : ''}
                     <DotMark />
                     {act.pending ? MODVIEW_COPY.pending : formatSince(act.at)}
+                    {(ranks.get(act.id) ?? 0) > 1 && (
+                      <span className={MODVIEW_FEED.repeat}>{`x${ranks.get(act.id)}`}</span>
+                    )}
                   </p>
+                  {act.reason && <p className={MODVIEW_FEED.line}>{act.reason}</p>}
                   {act.quote && (
                     <p className={MODVIEW_FEED.quote}>
                       <FlaggedText text={act.quote} />
