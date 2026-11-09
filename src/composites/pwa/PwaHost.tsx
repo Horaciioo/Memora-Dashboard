@@ -1,7 +1,6 @@
 'use client'
 
 import { InstallHint } from '@/composites/pwa/InstallHint'
-import { UpdateBanner } from '@/composites/pwa/UpdateBanner'
 import {
   useAppBadge,
   useInstallOffer,
@@ -31,7 +30,6 @@ export const PwaHost = ({ isPushReady }: PwaHostProps) => {
 
   return (
     <>
-      <UpdateBanner />
       <InstallHint />
     </>
   )

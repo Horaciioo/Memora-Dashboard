@@ -105,12 +105,10 @@ export const useServiceWorker = (): void => {
     if (!('serviceWorker' in navigator)) return
 
     let lastCheck = Date.now()
-    const hadController = Boolean(navigator.serviceWorker.controller)
 
-    // A first install takes over silently, an update let in elsewhere keeps the banner
+    // Reload once the version asked for leads
     const swap = () => {
-      if (isRequested) return window.location.reload()
-      if (hadController) usePwaStore.getState().setWaiting(navigator.serviceWorker.controller)
+      if (isRequested) window.location.reload()
     }
 
     // Back in front, at most once per gap

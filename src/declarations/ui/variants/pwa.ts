@@ -1,11 +1,10 @@
 /**
- * Installed application surfaces: update, offline, install hint
+ * Installed application surfaces: offline, install hint
  * @type {Record<string, string>}
  */
 
 export const PWA_STYLES = {
   // New version, covers the whole screen
-  update: 'fixed inset-0 z-[61] overflow-y-auto bg-[var(--color-page)] print:hidden',
   // Lost network, a strip above the page
   offline:
     'flex items-center justify-center gap-2 bg-[var(--color-ink)] px-4 py-2 text-center text-xs font-medium text-[var(--color-page)] print:hidden',
