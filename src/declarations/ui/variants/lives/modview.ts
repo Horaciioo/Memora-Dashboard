@@ -276,7 +276,7 @@ export const MODVIEW_MODES = {
     'flex items-center gap-1.5 rounded-[var(--radius-md)] px-2 py-1 text-xs font-bold transition-colors hover:bg-[var(--color-hover)]',
   triggerIcon: 'h-4 w-4',
   panel:
-    'absolute top-11 right-2 z-30 flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[var(--shadow-md)]',
+    "absolute top-12 right-2 z-30 flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[var(--shadow-md)] before:absolute before:-top-1.5 before:left-[var(--arrow-x,90%)] before:h-3 before:w-3 before:-translate-x-1/2 before:rotate-45 before:border-t before:border-l before:border-[var(--color-border)] before:bg-[var(--color-surface-raised)] before:content-['']",
   row: 'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-2 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent',
   // Option a scene is setting
   rowLit: 'bg-[var(--color-brand-soft)] ring-2 ring-[var(--color-pick)]',

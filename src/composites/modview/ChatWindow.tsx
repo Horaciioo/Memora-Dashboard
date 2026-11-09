@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { ChatComposer } from '@/composites/modview/ChatComposer'
@@ -78,6 +78,9 @@ export const ChatWindow = ({
 }: ChatWindowProps) => {
   const [menu, setMenu] = useState<'modes' | 'options' | null>(null)
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null)
+  const menusRef = useRef<HTMLDivElement>(null)
+  const modesRef = useRef<HTMLButtonElement>(null)
+  const optionsRef = useRef<HTMLButtonElement>(null)
   const { preferences, update } = useModPreferences()
   const { emotes } = useLiveEmotes(liveId)
 
@@ -94,6 +97,16 @@ export const ChatWindow = ({
   useHoldKey('Alt', hold, preferences.pauseMode === 'alt')
   const chatters = useMemo(() => recentChatters(state.messages), [state.messages])
 
+  // Caret of the open menu points at its own title
+  useLayoutEffect(() => {
+    const menuEl = menusRef.current?.firstElementChild as HTMLElement | null
+    const trigger = openMenu === 'modes' ? modesRef.current : optionsRef.current
+    if (!menuEl || !trigger) return
+    const box = trigger.getBoundingClientRect()
+    const x = box.left + box.width / 2 - menuEl.getBoundingClientRect().left
+    menuEl.style.setProperty('--arrow-x', `${Math.max(16, x)}px`)
+  }, [openMenu])
+
   const activeModes = CHAT_MODES.keys.filter((mode) =>
     mode === 'slow' ? state.modes.slowSeconds !== null : state.modes[mode]
   ).length
@@ -108,6 +121,7 @@ export const ChatWindow = ({
       actions={
         <>
           <button
+            ref={modesRef}
             type="button"
             className={cn(MODVIEW_MODES.trigger, spotlight === 'modes' && MODVIEW_CHAT.triggerLit)}
             aria-expanded={openMenu === 'modes'}
@@ -116,6 +130,7 @@ export const ChatWindow = ({
             {`${MODVIEW_COPY.modes} (${activeModes})`}
           </button>
           <button
+            ref={optionsRef}
             type="button"
             className={cn(
               MODVIEW_MODES.trigger,
@@ -129,43 +144,45 @@ export const ChatWindow = ({
         </>
       }
     >
-      {openMenu === 'modes' && (
-        <ChatModesMenu state={state} gate={gate} onAct={onAct} hasTerms={hasTerms} />
-      )}
-      {openMenu === 'options' && (
-        <div className={MODVIEW_MODES.panel} role="menu" aria-label={MODVIEW_COPY.preferences}>
-          <p className={MODVIEW_MODES.section}>{MODVIEW_COPY.preferencesDisplay}</p>
-          {CHAT_OPTIONS.keys.map((key) => (
-            <div
-              key={key}
-              className={cn(MODVIEW_MODES.row, script?.lit === key && MODVIEW_MODES.rowLit)}
-            >
-              <span className={MODVIEW_MODES.rowLabel}>{CHAT_OPTIONS.label(key)}</span>
-              <Toggle
-                bare
-                checked={shown[key]}
-                label={CHAT_OPTIONS.label(key)}
-                onChange={(checked) => update({ [key]: checked })}
-              />
-            </div>
-          ))}
+      <div ref={menusRef} className="contents">
+        {openMenu === 'modes' && (
+          <ChatModesMenu state={state} gate={gate} onAct={onAct} hasTerms={hasTerms} />
+        )}
+        {openMenu === 'options' && (
+          <div className={MODVIEW_MODES.panel} role="menu" aria-label={MODVIEW_COPY.preferences}>
+            <p className={MODVIEW_MODES.section}>{MODVIEW_COPY.preferencesDisplay}</p>
+            {CHAT_OPTIONS.keys.map((key) => (
+              <div
+                key={key}
+                className={cn(MODVIEW_MODES.row, script?.lit === key && MODVIEW_MODES.rowLit)}
+              >
+                <span className={MODVIEW_MODES.rowLabel}>{CHAT_OPTIONS.label(key)}</span>
+                <Toggle
+                  bare
+                  checked={shown[key]}
+                  label={CHAT_OPTIONS.label(key)}
+                  onChange={(checked) => update({ [key]: checked })}
+                />
+              </div>
+            ))}
 
-          <PreferenceChoices
-            title={MODVIEW_COPY.preferencesPause}
-            keys={PAUSE_MODES.keys}
-            value={preferences.pauseMode}
-            label={PAUSE_MODES.label}
-            onPick={(mode) => update({ pauseMode: mode })}
-          />
-          <PreferenceChoices
-            title={MODVIEW_COPY.preferencesTools}
-            keys={TOOLS_POSITIONS.keys}
-            value={preferences.toolsPosition}
-            label={TOOLS_POSITIONS.label}
-            onPick={(position) => update({ toolsPosition: position })}
-          />
-        </div>
-      )}
+            <PreferenceChoices
+              title={MODVIEW_COPY.preferencesPause}
+              keys={PAUSE_MODES.keys}
+              value={preferences.pauseMode}
+              label={PAUSE_MODES.label}
+              onPick={(mode) => update({ pauseMode: mode })}
+            />
+            <PreferenceChoices
+              title={MODVIEW_COPY.preferencesTools}
+              keys={TOOLS_POSITIONS.keys}
+              value={preferences.toolsPosition}
+              label={TOOLS_POSITIONS.label}
+              onPick={(position) => update({ toolsPosition: position })}
+            />
+          </div>
+        )}
+      </div>
 
       {state.pinned && <PinnedBar pin={state.pinned} gate={gate} onAct={onAct} />}
 
