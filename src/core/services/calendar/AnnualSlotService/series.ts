@@ -274,14 +274,23 @@ export const syncAnnualProjectStates = async (): Promise<void> => {
   ])
   const now = new Date()
 
+  // One read for every project
+  const taken = await prisma.calendarEvent.groupBy({
+    by: ['projectId'],
+    where: {
+      projectId: { in: projects.map((project) => project.id) },
+      kind: CalendarKinds.Event,
+      accountId: { not: null },
+    },
+    _min: { startsAt: true },
+    _max: { endsAt: true },
+  })
+  const spans = new Map(taken.map((row) => [row.projectId, row]))
+
   for (const project of projects) {
-    const taken = await prisma.calendarEvent.aggregate({
-      where: { projectId: project.id, kind: CalendarKinds.Event, accountId: { not: null } },
-      _min: { startsAt: true },
-      _max: { endsAt: true },
-    })
-    const first = taken._min.startsAt
-    const last = taken._max.endsAt
+    const span = spans.get(project.id)
+    const first = span?._min.startsAt
+    const last = span?._max.endsAt
 
     const stateId = !first || first > now ? todo : last && last <= now ? done?.id : doing?.id
     if (stateId && stateId !== project.stateId) {

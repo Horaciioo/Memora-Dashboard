@@ -119,7 +119,7 @@ export const coordinatorPicks = async (
   coordinators: FieldOption[]
 ): Promise<Record<string, string[]>> => {
   const youtuberIds = [...new Set(coordinators.flatMap((option) => option.owners ?? []))]
-  const picks: Record<string, string[]> = {}
+  const holders = new Map<string, string[]>()
 
   for (const youtuberId of youtuberIds) {
     const members = await prisma.account.findMany({
@@ -133,16 +133,19 @@ export const coordinatorPicks = async (
       },
       select: { id: true },
     })
-    const ids = members.map((member) => member.id)
-    if (ids.length === 0) continue
+    if (members.length) holders.set(youtuberId, members.map((member) => member.id))
+  }
 
-    const last = await prisma.liveCoordination.groupBy({
-      by: ['accountId'],
-      where: { accountId: { in: ids } },
-      _max: { askedAt: true },
-    })
-    const askedAt = new Map(last.map((row) => [row.accountId, row._max.askedAt?.getTime() ?? 0]))
+  // One read for every creator
+  const last = await prisma.liveCoordination.groupBy({
+    by: ['accountId'],
+    where: { accountId: { in: [...new Set([...holders.values()].flat())] } },
+    _max: { askedAt: true },
+  })
+  const askedAt = new Map(last.map((row) => [row.accountId, row._max.askedAt?.getTime() ?? 0]))
+  const picks: Record<string, string[]> = {}
 
+  for (const [youtuberId, ids] of holders) {
     picks[youtuberId] = ids
       .sort((left, right) => (askedAt.get(left) ?? 0) - (askedAt.get(right) ?? 0))
       .slice(0, PROPOSED_COORDINATORS)

@@ -37,6 +37,7 @@ import type { FieldCondition } from '@/types/forms'
 import { Permissions } from '@/utils/constants/permissions'
 import { CalendarKinds, CalendarSources, EventVisibilities } from '@/utils/constants/workflow'
 import type { CalendarKindName, EventVisibilityName } from '@/utils/constants/workflow'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Add a rule at the end of the chain of a display rule
@@ -243,6 +244,27 @@ const rollCallRosters = async (
   )
 }
 
+// Sweeps cost, a read stays light
+const SWEEP_EVERY_MS = MINUTE_MS
+
+let sweptAt = 0
+
+/**
+ * Lazy calendar chores, once per minute
+ * @return {Promise<void>} - Swept
+ */
+
+const runCalendarSweeps = async (): Promise<void> => {
+  if (Date.now() - sweptAt < SWEEP_EVERY_MS) return
+  sweptAt = Date.now()
+
+  // Reminders, then check-ins of periods about to end
+  await sweepDueReminders()
+  await openDueReviews().catch((error: unknown) => logger.error('calendar.reviews', error))
+  await sweepAnnualReminders().catch((error: unknown) => logger.error('calendar.annual', error))
+  await syncAnnualProjectStates().catch((error: unknown) => logger.error('calendar.annual', error))
+}
+
 /**
  * Read the entries of one window
  * @param {Object} input - Read context
@@ -270,11 +292,7 @@ export const listEntries = async ({
   scope: AccessScope
   sessionId?: string
 }): Promise<CalendarEntry[]> => {
-  // Reminders fire lazily, and so do the check-ins of periods about to end
-  await sweepDueReminders()
-  await openDueReviews().catch((error: unknown) => logger.error('calendar.reviews', error))
-  await sweepAnnualReminders().catch((error: unknown) => logger.error('calendar.annual', error))
-  await syncAnnualProjectStates().catch((error: unknown) => logger.error('calendar.annual', error))
+  await runCalendarSweeps()
 
   const rows = await prisma.calendarEvent.findMany({
     where: scopedWhere('calendarEvent', scope, {
