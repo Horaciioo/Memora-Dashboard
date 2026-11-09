@@ -724,6 +724,18 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.PlayAccess,
         text: 'Correction d’un bug dans « Memora Play » qui ouvrait deux tables ou rejouait un geste sur un double clic.',
       },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui écrasait la map en un petit bandeau sur iPhone et empêchait de jouer.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans le vote du « Golf » qui faisait dépasser les noms des maps de leur étiquette sur mobile.',
+      },
     ],
     comments: [
       {
