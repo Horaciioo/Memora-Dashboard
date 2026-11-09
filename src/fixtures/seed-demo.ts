@@ -4,6 +4,7 @@ import { seedReference } from './steps/reference.ts'
 import { seedPeople } from './steps/people.ts'
 import { seedWork } from './steps/work.ts'
 import { seedAbsences, seedCalendar, seedLivecon } from './steps/life.ts'
+import { seedLives } from './steps/lives.ts'
 import { seedPipeline } from './steps/pipeline.ts'
 import { seedJournal } from './steps/journal.ts'
 
@@ -22,6 +23,7 @@ const main = async (): Promise<void> => {
   const absences = await seedAbsences(cast)
   const livecon = await seedLivecon(reference, cast)
   const rollCalls = await seedCalendar(reference, cast, work)
+  const lives = await seedLives(reference, cast)
   const pipeline = await seedPipeline(reference, cast)
   const journal = await seedJournal(cast)
 
@@ -36,6 +38,7 @@ const main = async (): Promise<void> => {
     Absences: absences.length,
     'Changements de Livecon': livecon.length,
     'Appels de présence': rollCalls.length,
+    'Lives terminés': lives,
     Juniors: pipeline.juniorIds.length,
     Candidats: pipeline.candidateCount,
     'Lignes de journal': journal.logs,

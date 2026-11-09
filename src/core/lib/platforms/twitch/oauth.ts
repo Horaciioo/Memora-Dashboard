@@ -6,6 +6,8 @@ import {
   HELIX_PATHS,
   TWITCH_CREDENTIALS,
   TWITCH_ENDPOINTS,
+  TWITCH_MOCK_ORIGIN,
+  TWITCH_MOCK_PATH,
   TWITCH_SCOPES,
 } from '@/declarations/platforms/twitch'
 import { MINUTE_MS } from '@/utils/constants/time'
@@ -47,8 +49,10 @@ export const helixHeaders = (accessToken: string): Record<string, string> => ({
 
 export const buildTwitchAuthorizeUrl = (state: string): string => {
   const { clientId, redirectUri } = requireCredentials()
-  const url = new URL(TWITCH_ENDPOINTS.authorize)
-
+  const url = new URL(
+    TWITCH_MOCK_ORIGIN ? `${TWITCH_MOCK_PATH}/oauth2/authorize` : TWITCH_ENDPOINTS.authorize,
+    'http://app.invalid'
+  )
   url.search = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
@@ -59,7 +63,8 @@ export const buildTwitchAuthorizeUrl = (state: string): string => {
     force_verify: 'true',
   }).toString()
 
-  return url.toString()
+  // The fake consent page opens on the app's own address, forwarded to the fake Twitch
+  return TWITCH_MOCK_ORIGIN ? `${url.pathname}${url.search}` : url.toString()
 }
 
 /**

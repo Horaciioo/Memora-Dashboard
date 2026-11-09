@@ -19,6 +19,10 @@ const { version } = JSON.parse(
 // Branch decides the stage
 const deployedBranch = process.env.APP_ENV || ''
 
+// Fake Twitch consent page, served on the app's own address while testing
+const mockOrigin =
+  deployedBranch === 'dev' ? process.env.TWITCH_MOCK_URL?.replace(/\/+$/, '') : undefined
+
 const nextConfig: NextConfig = {
   // No framework banner
   poweredByHeader: false,
@@ -28,6 +32,8 @@ const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_APP_VERSION: displayVersion(version, stageOfBranch(deployedBranch)) },
   // Old French addresses keep working
   redirects: async () => LEGACY_REDIRECTS.map((entry) => ({ ...entry, permanent: false })),
+  rewrites: async () =>
+    mockOrigin ? [{ source: '/faux-twitch/:path*', destination: `${mockOrigin}/:path*` }] : [],
   // The content security policy carries a per-request nonce
   headers: async () => [
     { source: '/:path*', headers: STATIC_SECURITY_HEADERS },
