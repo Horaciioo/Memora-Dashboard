@@ -19,6 +19,7 @@ export interface PageBannerProps {
   image?: string | null
   // Portrait standing before the title
   lead?: ReactNode
+  trailingTools?: ReactNode
   // Small line under the title
   children?: ReactNode
 }
@@ -32,6 +33,7 @@ export interface PageBannerProps {
  * @param {string} [heroDescription] - Faint line under the title
  * @param {string | null} [image] - Picture replacing the area's own
  * @param {ReactNode} [lead] - Portrait before the title
+ * @param {ReactNode} [trailingTools] - Extra controls
  * @param {ReactNode} [children] - Line under the title
  * @return {JSX.Element}
  */
@@ -43,6 +45,7 @@ export const PageBanner = ({
   heroDescription,
   image,
   lead,
+  trailingTools,
   children,
 }: PageBannerProps) => {
   const Title = isLabel ? 'p' : 'h1'
@@ -53,7 +56,7 @@ export const PageBanner = ({
         <BannerArt image={image} />
         <div className={PAGE_STYLES.bannerBar}>
           <Breadcrumbs current={title} />
-          <BannerTools title={title} />
+          <BannerTools title={title} trailingTools={trailingTools} />
         </div>
         {!isBare && (
           <div className={PAGE_STYLES.bannerFoot}>

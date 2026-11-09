@@ -6,7 +6,6 @@ import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_HUB_STYLES } from '@/declarations/ui/variants'
 import type { LiveHubCreator } from '@/types/lives'
-import { cn } from '@/utils/classnames'
 import { formatClock } from '@/utils/format/time/dates'
 
 /**
@@ -23,7 +22,7 @@ export const LiveHubBubble = ({ creator }: { creator: LiveHubCreator }) => {
     <div className={LIVE_HUB_STYLES.speech}>
       <span className={LIVE_HUB_STYLES.dotLarge} aria-hidden="true" />
       <span className={LIVE_HUB_STYLES.dotSmall} aria-hidden="true" />
-      <div className={cn(LIVE_HUB_STYLES.bubble, LIVE_HUB_STYLES.bubbleGlass)}>
+      <div className={LIVE_HUB_STYLES.bubble}>
         <div className={LIVE_HUB_STYLES.bubbleBody}>
           <h2 className={LIVE_HUB_STYLES.bubbleTitle}>
             {PlatformIcon && live && (
