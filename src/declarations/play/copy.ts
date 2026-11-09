@@ -37,6 +37,7 @@ export const PLAY_ERRORS = {
   inviteRole: 'Choisis joueur ou spectateur.',
   inviteMissing: 'Cette invitation n’existe plus.',
   botLevel: 'Choisis un niveau de bot.',
+  botsFull: 'Cette partie a déjà son maximum de bots.',
   codeUnknown: 'Aucune partie ne porte ce code.',
   privateGame: 'Cette partie est privée, il faut une invitation.',
   sessionClosed: 'Cette partie est terminée.',

@@ -3,7 +3,7 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
-import { seatBoundsOf } from '@/core/lib/play/seats'
+import { botRoomOf, seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict } from '@/core/lib/errors'
 import { pickSeatColor } from '@/core/lib/play'
 import { isPresent } from '@/core/lib/play/session'
@@ -77,8 +77,11 @@ const seatBots = async (
   const present = session.seats.filter(isPresent)
   const names = new Set(present.map((seat) => seat.account.displayName))
   const colors = present.map((seat) => seat.color)
-  const free = Math.min(count, seatBoundsOf(session.game, session.settings).max - present.length)
-  if (free <= 0) throw conflict(PLAY_ERRORS.full)
+  const seats = seatBoundsOf(session.game, session.settings).max
+  const room = botRoomOf(seats, present.filter((seat) => seat.account.botKind).length)
+  if (seats <= present.length) throw conflict(PLAY_ERRORS.full)
+  if (room <= 0) throw conflict(PLAY_ERRORS.botsFull)
+  const free = Math.min(count, seats - present.length, room)
 
   // Callsigns not yet at the table
   const indexes = PLAY_BOT_SETTINGS.callsigns

@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client'
 
 import { navalSeatsOf } from '@/core/lib/play/naval/settings'
+import { PLAY_BOT_SETTINGS } from '@/declarations/play/bots'
 import { PLAY_GAMES } from '@/declarations/play/games'
 import { PLAY_SETTINGS } from '@/declarations/play/settings'
 import { PlayGames } from '@/utils/constants/play'
@@ -29,6 +30,16 @@ export const pickSeatColor = (taken: string[], random: () => number = Math.rando
 
   return free[Math.floor(random() * free.length)] ?? seatColorKey(used.size)
 }
+
+/**
+ * Bots a table still accepts
+ * @param {number} seats - Table seats
+ * @param {number} seated - Bots seated
+ * @return {number} - Bots allowed
+ */
+
+export const botRoomOf = (seats: number, seated: number): number =>
+  Math.max(0, Math.floor(seats * PLAY_BOT_SETTINGS.seatShare) - seated)
 
 /**
  * Seats a table accepts, a mode may narrow the game

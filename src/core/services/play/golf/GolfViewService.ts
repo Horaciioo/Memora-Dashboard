@@ -34,37 +34,17 @@ const feedKindOf = (move: { kind: string; strokes: number | null; power: string 
 }
 
 /**
- * Board of a golf game
+ * Course and balls of a game
  * @param {EngineSession} session - Game
- * @return {Promise<object>} - Board
+ * @param {Date} now - Clock
+ * @return {Promise<object>} - Course board
  */
 
-export const golfView = async (session: EngineSession) => {
+const courseBoard = async (session: EngineSession, now: Date) => {
   const where = { sessionId: session.id }
-  const now = new Date()
-  const since = after(now, -GOLF_SETTINGS.shotsKeptSeconds)
-  const [game, players, shots, feed] = await Promise.all([
+  const [game, players] = await Promise.all([
     prisma.golfGame.findUnique({ where }),
     prisma.golfPlayer.findMany({ where, orderBy: { id: 'asc' } }),
-    prisma.golfMove.findMany({
-      where: { ...where, kind: 'SHOT', createdAt: { gte: since } },
-      orderBy: { createdAt: 'asc' },
-      select: { id: true, accountId: true, createdAt: true, path: true },
-    }),
-    prisma.golfMove.findMany({
-      where: { ...where, kind: { not: 'SHOT' } },
-      orderBy: { createdAt: 'desc' },
-      take: GOLF_SETTINGS.feedSize,
-      select: {
-        id: true,
-        kind: true,
-        accountId: true,
-        createdAt: true,
-        strokes: true,
-        power: true,
-        hole: true,
-      },
-    }),
   ])
   const settings = golfSettingsOf(session.settings)
   const holes = holesOf(settings).length
@@ -108,12 +88,69 @@ export const golfView = async (session: EngineSession) => {
       powers: [...activePowers(effectsOf(player.effects), at)],
       hasLeft: !present.has(player.accountId),
     })),
-    shots: shots.map((shot) => ({
-      id: shot.id,
-      accountId: shot.accountId,
-      at: shot.createdAt,
-      track: shot.path as unknown as GolfTrack,
-    })),
+  }
+}
+
+/**
+ * Board a bot reads, no tracks
+ * @param {EngineSession} session - Game
+ * @return {Promise<object>} - Course board
+ */
+
+export const golfBotView = (session: EngineSession) => courseBoard(session, new Date())
+
+/**
+ * Stroke still rolling
+ * @param {GolfTrack} track - Stroke track
+ * @param {number} elapsed - Ms since stroke
+ * @return {boolean} - Still rolling
+ */
+
+const isRolling = (track: GolfTrack, elapsed: number): boolean =>
+  elapsed < Math.max(0, track.frames - 1) * track.frameMs
+
+/**
+ * Board of a golf game
+ * @param {EngineSession} session - Game
+ * @return {Promise<object>} - Board
+ */
+
+export const golfView = async (session: EngineSession) => {
+  const where = { sessionId: session.id }
+  const now = new Date()
+  const since = after(now, -GOLF_SETTINGS.shotsKeptSeconds)
+  const [board, shots, feed] = await Promise.all([
+    courseBoard(session, now),
+    prisma.golfMove.findMany({
+      where: { ...where, kind: 'SHOT', createdAt: { gte: since } },
+      orderBy: { createdAt: 'asc' },
+      select: { id: true, accountId: true, createdAt: true, path: true },
+    }),
+    prisma.golfMove.findMany({
+      where: { ...where, kind: { not: 'SHOT' } },
+      orderBy: { createdAt: 'desc' },
+      take: GOLF_SETTINGS.feedSize,
+      select: {
+        id: true,
+        kind: true,
+        accountId: true,
+        createdAt: true,
+        strokes: true,
+        power: true,
+        hole: true,
+      },
+    }),
+  ])
+
+  return {
+    ...board,
+    // Finished tracks draw nothing
+    shots: shots.flatMap((shot) => {
+      const track = shot.path as unknown as GolfTrack
+      if (!isRolling(track, now.getTime() - shot.createdAt.getTime())) return []
+
+      return [{ id: shot.id, accountId: shot.accountId, at: shot.createdAt, track }]
+    }),
     feed: feed.map((move) => ({
       id: move.id,
       kind: feedKindOf(move),
