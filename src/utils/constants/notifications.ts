@@ -48,6 +48,9 @@ export const NOTIFICATION_KINDS = createEnumeration({
   CommentReplied: { id: 38, label: 'Réponse à un commentaire' },
   PimReferentAssigned: { id: 39, label: 'Junior attribué' },
   IdentityAlert: { id: 40, label: 'Identifiant à corriger' },
+  PlayInvited: { id: 41, label: 'Invitation à jouer' },
+  PlayGroupInvited: { id: 42, label: 'Invitation de groupe' },
+  PlayFollowedStarted: { id: 43, label: 'Partie suivie lancée' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids

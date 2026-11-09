@@ -15,6 +15,7 @@ import { gameFeatureKey } from '@/declarations/features'
 import { announceInChat } from '@/core/services/play/PlayChatService'
 import { sweepIdleGames } from '@/core/services/play/PlayIdleService'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
+import { notifyPlayInvite } from '@/core/services/play/PlayInviteNotifier'
 import {
   cloneTable,
   currentSessionId,
@@ -76,7 +77,6 @@ const tournamentLength = (raw: Record<string, unknown>): number | null => {
 const settingsOf = (raw: Record<string, unknown>): Record<string, unknown> =>
   (raw.settings ?? {}) as Record<string, unknown>
 
-/**
 // Creations under way, a double click lands on the same table
 const creating = new Map<string, ReturnType<typeof openSession>>()
 

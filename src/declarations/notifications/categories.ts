@@ -16,6 +16,7 @@ export type PushCategoryName =
   | 'recruitment'
   | 'academy'
   | 'announcements'
+  | 'play'
 
 /**
  * How one push family reads in the settings
@@ -70,6 +71,12 @@ const PUSH_CATEGORY_MAP: Record<PushCategoryName, PushCategoryOption> = {
     label: 'Formations et Academy',
     description: 'Formations, compétences, parcours Legacy, PIM et appels de présence.',
     icon: 'academy',
+  },
+  play: {
+    label: 'Jeux',
+    description: 'Invitations à jouer, groupes et parties que tu suis.',
+    icon: 'play',
+    urgent: true,
   },
   announcements: {
     label: 'Annonces et accès',
@@ -129,4 +136,7 @@ export const PUSH_CATEGORY_OF_KIND: Record<NotificationKindName, PushCategoryNam
   AccessChanged: 'announcements',
   CommunicationPublished: 'announcements',
   PushTrial: 'announcements',
+  PlayInvited: 'play',
+  PlayGroupInvited: 'play',
+  PlayFollowedStarted: 'play',
 }

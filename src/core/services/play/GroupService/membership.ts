@@ -3,7 +3,9 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { readBodyList } from '@/core/lib/play'
+import { logger } from '@/core/lib/logger'
 import { signalGroups } from '@/core/lib/play/signal'
+import { notify } from '@/core/services/system/NotificationService'
 import {
   fillPlayMessage,
   PLAY_GROUP_COPY,
@@ -129,6 +131,14 @@ export const invitePlayGroup = async (
     skipDuplicates: true,
   })
   await signalGroups([...memberIds, ...people.map(({ id }) => id)])
+  await notify({
+    kind: 'PlayGroupInvited',
+    recipients: people.map(({ id }) => id),
+    actorId: accountId,
+    target: 'playGroup',
+    targetId: group.id,
+    once: true,
+  }).catch((error: unknown) => logger.warn('[play] group invitation not notified', error))
 }
 
 /**
