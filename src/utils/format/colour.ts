@@ -1,9 +1,6 @@
 // Shorthand and full length hexadecimal notations
 const HEX_PATTERN = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i
 
-// Lowest OKLCH lightness a name keeps on a dark ground
-const READABLE_LIGHTNESS = 0.7
-
 /**
  * Tell a stored accent apart from a tone key
  * @param {string | null | undefined} raw - Stored accent
@@ -45,14 +42,14 @@ export const visionSafe = (hex: string): string =>
   `oklch(from ${hex} l c calc(h + var(--vision-shift-green) * max(0, 1 - abs(h - 140) / 45) + var(--vision-shift-red) * max(0, 1 - abs(h - 25) / 30)))`
 
 /**
- * Lighten a chat colour until it reads on a dark ground
+ * Bring a chat colour into the lightness range of the theme, set by the chat tokens
  * @param {string} hex - Colour a chatter picked
  * @return {string} - Readable CSS colour
  */
 
-export const readableOnDark = (hex: string): string => {
+export const readableOnTheme = (hex: string): string => {
   const normal = normaliseHex(hex)
 
-  // Perceived lightness raised to a floor, pure blue included
-  return normal ? `oklch(from ${normal} max(l, ${READABLE_LIGHTNESS}) c h)` : hex
+  // Perceived lightness held between the floor and the ceiling of the theme
+  return normal ? `oklch(from ${normal} clamp(var(--chat-l-min), l, var(--chat-l-max)) c h)` : hex
 }

@@ -57,6 +57,27 @@
   --chat-creator: #ffd600;
   --chat-vip: #e005b9;
   --chat-bot: #5b8def;
+  /* Lightness a chat name keeps: raised on a dark ground, lowered on a light one */
+  --chat-l-min: 0.7;
+  --chat-l-max: 1;
+}
+
+/* The live Mod View follows the page theme: Twitch panels in dark, the page palette in light */
+:root:not(.dark) {
+  --chat-l-min: 0;
+  --chat-l-max: 0.58;
+}
+
+:root:not(.dark) .modview-bleed {
+  --twitch-background: var(--color-surface-raised);
+  --twitch-ground: var(--color-surface-sunken);
+  --twitch-head: color-mix(in srgb, var(--color-ink) 7%, var(--color-surface-raised));
+  --twitch-line: var(--color-border);
+  --twitch-text: var(--color-ink);
+  --twitch-muted: color-mix(in srgb, var(--color-ink) 66%, var(--color-surface-raised));
+  --twitch-border: var(--color-border);
+  --twitch-border-strong: var(--color-border-strong);
+  --twitch-flag: rgb(235 4 40 / 0.14);
 }
 
 /* The Mod View of a Twitch lesson wears Twitch's dark panels and purple in both themes */
@@ -85,4 +106,6 @@
   background: var(--twitch-ground);
   color: var(--twitch-text);
   color-scheme: dark;
+  --chat-l-min: 0.7;
+  --chat-l-max: 1;
 }

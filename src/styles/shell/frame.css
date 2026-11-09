@@ -58,8 +58,8 @@ body {
   --color-ink-subtle: var(--color-ink);
 }
 
-/* Black ground of the live page */
-.page-wash:has(.modview-bleed) {
+/* Black ground of the live page, in the dark theme only */
+:root.dark .page-wash:has(.modview-bleed) {
   background-color: var(--twitch-ground);
 }
 
