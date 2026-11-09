@@ -419,7 +419,9 @@ export const readUnbanRequests = async (seat: TwitchSeat): Promise<UnbanRequest[
 
 export const readBanDetail = async (seat: TwitchSeat, userId: string): Promise<BanDetail> => {
   const [user, ban] = await Promise.all([
-    runHelix<{ data: { profile_image_url?: string; created_at?: string }[] }>(seat, {
+    runHelix<{
+      data: { profile_image_url?: string; offline_image_url?: string; created_at?: string }[]
+    }>(seat, {
       method: 'GET',
       path: HELIX_PATHS.users,
       query: { id: userId },
@@ -442,6 +444,7 @@ export const readBanDetail = async (seat: TwitchSeat, userId: string): Promise<B
 
   return {
     avatar: account?.profile_image_url || null,
+    banner: account?.offline_image_url || null,
     accountCreatedAt: account?.created_at ?? null,
     bannedBy: entry?.moderator_name || entry?.moderator_login || null,
     bannedAt: entry?.created_at ?? null,

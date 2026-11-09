@@ -328,13 +328,16 @@ export const MODVIEW_USER = {
   docked:
     'relative flex min-h-0 shrink-0 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)] transition-[width] duration-300 ease-out motion-reduce:transition-none',
   close: 'absolute top-2 right-2',
-  head: 'relative flex flex-col items-center gap-1.5 px-4 pt-6 pb-4 text-center',
-  identity: 'flex max-w-full items-center justify-center gap-3',
+  head: 'relative isolate flex min-h-40 flex-col items-center justify-end gap-1.5 overflow-hidden px-4 pt-6 pb-4 text-center',
+  // Channel banner behind the identity, faded into the card
+  banner:
+    'absolute inset-0 -z-10 h-full w-full object-cover opacity-60 [mask-image:linear-gradient(to_bottom,black_40%,transparent)]',
+  portrait: '!h-14 !w-14 shrink-0 ring-2 ring-[var(--twitch-background)]',
+  identity: 'relative z-10 flex max-w-full items-center justify-center gap-3',
   identityLink: 'transition-opacity hover:opacity-80',
-  glyph: 'h-9 w-9 shrink-0',
   name: 'min-w-0 truncate text-2xl font-bold tracking-tight',
   watch: 'mt-1',
-  tabs: 'relative flex flex-nowrap items-center justify-center gap-0.5 px-2 pb-3',
+  tabs: 'relative mt-4 flex flex-nowrap items-center justify-center gap-0.5 px-2 pb-3',
   // Box gliding under the open tab
   tabBox:
     'pointer-events-none absolute top-0 left-0 rounded-full bg-[var(--twitch-head)] opacity-0',

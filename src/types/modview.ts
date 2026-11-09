@@ -260,6 +260,7 @@ export interface StoredPreferences {
  * What Twitch says of a banned viewer
  * @typedef {Object} BanDetail
  * @property {string | null} avatar - Profile picture address
+ * @property {string | null} banner - Channel banner address
  * @property {string | null} accountCreatedAt - ISO moment the account was made
  * @property {string | null} bannedBy - Moderator who banned
  * @property {string | null} bannedAt - ISO moment of the ban
@@ -268,6 +269,7 @@ export interface StoredPreferences {
 
 export interface BanDetail {
   avatar: string | null
+  banner: string | null
   accountCreatedAt: string | null
   bannedBy: string | null
   bannedAt: string | null

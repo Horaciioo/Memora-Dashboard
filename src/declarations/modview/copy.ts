@@ -171,8 +171,6 @@ export const MODVIEW_USER_COPY = {
   bannedPlain: 'Ce viewer est actuellement banni du stream. Aucun motif n’est connu.',
   historyLoading: 'Chargement des messages',
   messagesEmpty: 'Aucun message connu pour ce viewer.',
-  historySince: 'Premier message connu le {date}',
-  historySinceAtLeast: 'Au moins {total} messages, depuis le {date}',
   historyOlder: 'Messages plus anciens',
   messageRemoved: 'Supprimé',
   imported: 'Importé',

@@ -72,16 +72,6 @@ export const ViewerChatHistory = ({ liveId, chatterId, liveMessages }: ViewerCha
 
   return (
     <div className={MODVIEW_USER.listBody}>
-      {liveId !== null && chat.firstKnownAt && (
-        <p className={MODVIEW_USER.note}>
-          {(chat.isComplete
-            ? MODVIEW_USER_COPY.historySince
-            : MODVIEW_USER_COPY.historySinceAtLeast
-          )
-            .replace('{total}', String(chat.total ?? ''))
-            .replace('{date}', dayOf(chat.firstKnownAt))}
-        </p>
-      )}
       {lines.map((line, index) => (
         <Fragment key={line.id}>
           {(index === 0 || dayOf(lines[index - 1]!.sentAt) !== dayOf(line.sentAt)) && (

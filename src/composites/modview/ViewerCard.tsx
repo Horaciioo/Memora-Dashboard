@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { DossierPosition } from '@/composites/modview/DossierPosition'
 import { climbedLadders } from '@/composites/modview/DossierLadders'
 import { ViewerBanBox } from '@/composites/modview/ViewerBanBox'
@@ -13,11 +14,12 @@ import { ViewerSanctionList } from '@/composites/modview/ViewerSanctionList'
 import { ViewerSanctions } from '@/composites/modview/ViewerSanctions'
 import { ViewerTabs } from '@/composites/modview/ViewerTabs'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
+import { useAvatar } from '@/core/hooks/data/lives/useAvatars'
+import { useBanDetail } from '@/core/hooks/data/lives/useBanDetail'
 import { useViewerChat } from '@/core/hooks/data/lives/useViewerChat'
 import { useViewerDossier } from '@/core/hooks/data/lives/useViewerDossier'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
-import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_USER } from '@/declarations/ui/variants'
 import type { ChatMessage, Chatter } from '@/types/modview'
 import type { SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
@@ -77,7 +79,21 @@ export const ViewerCard = ({
   const { history } = useViewerDossier(liveId, chatter.id)
   const chat = useViewerChat(liveId, chatter.id)
   const lastLine = [...messages].reverse().find((message) => !message.deletedBy)
-  const TwitchIcon = ICONS.twitch
+  const { detail } = useBanDetail(liveId, chatter.id)
+  const picture = useAvatar(chatter.id) ?? detail?.avatar ?? null
+  const banner = detail?.banner ?? null
+  const identity = (
+    <>
+      <Avatar
+        name={chatter.name}
+        src={picture}
+        size="lg"
+        title=""
+        className={MODVIEW_USER.portrait}
+      />
+      <h3 className={MODVIEW_USER.name}>{chatter.name}</h3>
+    </>
+  )
 
   // Notes need a real live to hang on
   const tabs: { key: ViewerTab; label: string }[] = [
@@ -109,6 +125,10 @@ export const ViewerCard = ({
           aria-label={MODVIEW_USER_COPY.close}
           onClick={onClose}
         />
+        {banner && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={banner} alt="" className={MODVIEW_USER.banner} />
+        )}
         {twitchUrl ? (
           <a
             href={twitchUrl}
@@ -117,14 +137,10 @@ export const ViewerCard = ({
             title={MODVIEW_USER_COPY.openOnTwitch}
             className={cn(MODVIEW_USER.identity, MODVIEW_USER.identityLink)}
           >
-            <TwitchIcon className={MODVIEW_USER.glyph} aria-hidden="true" />
-            <h3 className={MODVIEW_USER.name}>{chatter.name}</h3>
+            {identity}
           </a>
         ) : (
-          <div className={MODVIEW_USER.identity}>
-            <TwitchIcon className={MODVIEW_USER.glyph} aria-hidden="true" />
-            <h3 className={MODVIEW_USER.name}>{chatter.name}</h3>
-          </div>
+          <div className={MODVIEW_USER.identity}>{identity}</div>
         )}
       </header>
 
