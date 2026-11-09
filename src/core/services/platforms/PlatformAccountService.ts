@@ -9,10 +9,13 @@ import { PLATFORM_LINKERS } from '@/core/lib/platforms/linkers'
 import { refreshTwitchGrant } from '@/core/lib/platforms/twitch/oauth'
 import { rankOfRole } from '@/core/lib/modview/tier'
 import { attributePlatformGestures } from '@/core/services/lives/ModerationLogService'
-import { isTwitchConfigured } from '@/declarations/platforms/twitch'
+import type { TwitchSeat } from '@/core/lib/platforms/twitch/helix'
+import { isTwitchConfigured, TWITCH_POLL_SCOPE } from '@/declarations/platforms/twitch'
 import { LivePlatforms } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
-import type { MemoraRank } from '@/types/modview'
+import { HELD_FUNCTIONS, toMemberFunctions } from '@/core/services/reference/functions'
+import type { MemberRoleName } from '@/utils/constants/hierarchy'
+import type { MemoraRank, SeatEmblem } from '@/types/modview'
 import type { PlatformLinkView } from '@/types/platforms'
 import { MINUTE_MS } from '@/utils/constants/time'
 
@@ -27,6 +30,30 @@ const REFRESH_MARGIN_MS = MINUTE_MS
 export type SeatLookup =
   | { ok: true; accessToken: string; moderatorId: string; login: string }
   | { ok: false; reason: 'notLinked' | 'revoked' | 'notConfigured' }
+
+/**
+ * Seat of the channel owner, when linked with the poll right
+ * @param {string} broadcasterId - Channel
+ * @return {Promise<{ accountId: string, seat: TwitchSeat } | null>} - Seat
+ */
+
+export const readChannelOwnerSeat = async (
+  broadcasterId: string
+): Promise<{ accountId: string; seat: TwitchSeat } | null> => {
+  const stored = await prisma.platformAccount.findFirst({
+    where: { platform: LivePlatforms.Twitch, externalUserId: broadcasterId, revokedAt: null },
+    select: { accountId: true, scopes: true },
+  })
+  if (!stored?.scopes.includes(TWITCH_POLL_SCOPE)) return null
+
+  const found = await readTwitchSeat(stored.accountId)
+  if (!found.ok) return null
+
+  return {
+    accountId: stored.accountId,
+    seat: { accessToken: found.accessToken, moderatorId: found.moderatorId, broadcasterId },
+  }
+}
 
 /**
  * Keep a platform grant
@@ -203,5 +230,30 @@ export const readTwitchRoster = async (): Promise<Record<string, MemoraRank>> =>
 
       return rank ? [[row.externalUserId, rank]] : []
     })
+  )
+}
+
+/**
+ * Role and functions of the linked Twitch accounts, for the glyphs of the chat
+ * @return {Promise<Record<string, SeatEmblem>>} - Emblem by Twitch user
+ */
+
+export const readTwitchEmblems = async (): Promise<Record<string, SeatEmblem>> => {
+  const rows = await prisma.platformAccount.findMany({
+    where: { platform: LivePlatforms.Twitch, revokedAt: null },
+    select: { externalUserId: true, account: { select: { role: true, ...HELD_FUNCTIONS } } },
+  })
+
+  return Object.fromEntries(
+    rows.map((row) => [
+      row.externalUserId,
+      {
+        role: row.account.role as MemberRoleName,
+        functions: toMemberFunctions(row.account.functions).map(({ kind, icon }) => ({
+          kind,
+          icon,
+        })),
+      },
+    ])
   )
 }

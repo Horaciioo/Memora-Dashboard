@@ -1,6 +1,7 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
+import { useGlidePill } from '@/core/hooks/interaction/layout/useGlidePill'
 import { useUnbanQueue } from '@/core/hooks/interaction/state/moderation/useUnbanQueue'
 import type { UnbanOrder } from '@/core/hooks/interaction/state/moderation/useUnbanQueue'
 import { MODVIEW_UNBAN_COPY as COPY } from '@/declarations/modview/copy'
@@ -21,6 +22,8 @@ export interface UnbanQueueProps {
   // Request open in the desk, none in the popover
   selectedId?: string | null
   onSelect: (request: UnbanRequest) => void
+  // Roomy rows with a gliding pill, for the desk
+  isLarge?: boolean
 }
 
 /**
@@ -28,11 +31,21 @@ export interface UnbanQueueProps {
  * @param {UnbanRequest[]} requests - Pending requests
  * @param {string | null} [selectedId] - Request open in the desk
  * @param {(request: UnbanRequest) => void} onSelect - Row handler
+ * @param {boolean} [isLarge] - Desk rows
  * @return {JSX.Element}
  */
 
-export const UnbanQueue = ({ requests, selectedId = null, onSelect }: UnbanQueueProps) => {
+export const UnbanQueue = ({
+  requests,
+  selectedId = null,
+  onSelect,
+  isLarge = false,
+}: UnbanQueueProps) => {
   const queue = useUnbanQueue(requests)
+  const { itemsRef, pillRef } = useGlidePill(
+    selectedId ?? '',
+    `${queue.page}:${queue.order}:${queue.total}`
+  )
   const BackIcon = ICONS.back
   const ForwardIcon = ICONS.forward
 
@@ -60,25 +73,37 @@ export const UnbanQueue = ({ requests, selectedId = null, onSelect }: UnbanQueue
       {queue.total === 0 ? (
         <p className={MODVIEW_UNBAN.empty}>{COPY.empty}</p>
       ) : (
-        <ul className={MODVIEW_UNBAN.rows}>
+        <ul className={cn(MODVIEW_UNBAN.rows, isLarge && MODVIEW_UNBAN.rowsLarge)}>
           {queue.items.map((request) => (
             <li key={request.id}>
               <button
+                ref={(node) => {
+                  if (node) itemsRef.current.set(request.id, node)
+                  else itemsRef.current.delete(request.id)
+                }}
                 type="button"
-                className={cn(MODVIEW_UNBAN.row, request.id === selectedId && MODVIEW_UNBAN.rowOn)}
+                className={cn(
+                  MODVIEW_UNBAN.row,
+                  request.id === selectedId && MODVIEW_UNBAN.rowOn,
+                  isLarge && MODVIEW_UNBAN.rowLarge,
+                  isLarge && request.id === selectedId && MODVIEW_UNBAN.rowLargeOn
+                )}
                 aria-current={request.id === selectedId || undefined}
                 onClick={() => onSelect(request)}
               >
-                <Avatar name={request.author.name} size="sm" />
+                <Avatar name={request.author.name} size={isLarge ? 'md' : 'sm'} />
                 <span className={MODVIEW_UNBAN.rowBody}>
-                  <span className={MODVIEW_UNBAN.rowName}>{request.author.name}</span>
-                  <span className={MODVIEW_UNBAN.rowMeta}>
+                  <span className={cn(MODVIEW_UNBAN.rowName, isLarge && MODVIEW_UNBAN.nameLarge)}>
+                    {request.author.name}
+                  </span>
+                  <span className={cn(MODVIEW_UNBAN.rowMeta, isLarge && MODVIEW_UNBAN.metaLarge)}>
                     {`${formatSince(request.at)} • ${request.text}`}
                   </span>
                 </span>
               </button>
             </li>
           ))}
+          {isLarge && <span ref={pillRef} className={MODVIEW_UNBAN.pill} aria-hidden="true" />}
         </ul>
       )}
 

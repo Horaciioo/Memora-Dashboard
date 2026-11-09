@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { Prisma } from '@prisma/client'
+
 import { prisma } from '@/core/lib/db'
 import { sanitizePreferences } from '@/core/lib/modview/preferences'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -61,10 +63,11 @@ export const writePreferences = async (
   // Merge into the row
   const current = await prisma.modViewPreference.findUnique({ where })
   const values = { ...sanitizePreferences(current?.values), ...sanitizePreferences(patch) }
+  const json = values as unknown as Prisma.InputJsonObject
   await prisma.modViewPreference.upsert({
     where,
-    create: { accountId, scope: key, values },
-    update: { values },
+    create: { accountId, scope: key, values: json },
+    update: { values: json },
   })
 
   return values

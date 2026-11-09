@@ -100,7 +100,7 @@ export const WindowControls = ({ chrome, title }: WindowControlsProps) => {
         draggable={false}
         onClick={open}
       >
-        <ICONS.more className={MODVIEW_WINDOW.controlIcon} aria-hidden="true" />
+        <ICONS.moreVertical className={MODVIEW_WINDOW.controlMore} aria-hidden="true" />
       </button>
     </span>
   )

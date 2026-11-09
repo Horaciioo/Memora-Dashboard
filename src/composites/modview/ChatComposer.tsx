@@ -90,10 +90,11 @@ export const ChatComposer = ({
     if (commands) {
       return {
         title: MODVIEW_COPY.commandsTitle,
+        hasTitle: false,
         entries: commands.map<MenuEntry>((option) => ({
           key: option.name,
           label: `/${option.name}`,
-          hint: [option.usage, option.description].filter(Boolean).join(' - '),
+          hint: option.description,
           group: COMMAND_CATEGORY[option.name] ?? null,
           locked:
             option.probe && !gate(option.probe).allowed ? (gate(option.probe).reason ?? '') : null,
@@ -107,6 +108,7 @@ export const ChatComposer = ({
 
     return {
       title: MODVIEW_COPY.mentionsTitle,
+      hasTitle: true,
       entries: matchChatters(chatters, word.query).map<MenuEntry>((chatter) => ({
         key: chatter.id,
         label: chatter.name,
@@ -174,7 +176,7 @@ export const ChatComposer = ({
 
       {isOpen && menu && (
         <div className={MODVIEW_CHAT.menu} role="listbox" aria-label={menu.title}>
-          <p className={MODVIEW_CHAT.menuTitle}>{menu.title}</p>
+          {menu.hasTitle && <p className={MODVIEW_CHAT.menuTitle}>{menu.title}</p>}
           {menu.entries.map((entry, index) => (
             <Fragment key={entry.key}>
               {entry.group && entry.group !== menu.entries[index - 1]?.group && (
@@ -191,8 +193,11 @@ export const ChatComposer = ({
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => pick(entry)}
               >
-                <span className={entry.group ? MODVIEW_CHAT.menuTag : MODVIEW_CHAT.menuName}>
-                  {entry.label}
+                <span className="flex shrink-0 items-baseline gap-0.5">
+                  <span className={entry.group ? MODVIEW_CHAT.menuTag : MODVIEW_CHAT.menuName}>
+                    {entry.label}
+                  </span>
+                  {entry.group && <span className={MODVIEW_CHAT.menuHint}>:</span>}
                 </span>
                 {entry.hint && <span className={MODVIEW_CHAT.menuHint}>{entry.hint}</span>}
               </button>

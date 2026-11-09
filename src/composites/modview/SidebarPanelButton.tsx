@@ -79,7 +79,12 @@ export const PanelButton = ({
           )}
         >
           <div className={MODVIEW_SIDEBAR.titleRow}>
-            <p className={MODVIEW_SIDEBAR.title}>{label}</p>
+            <div className={MODVIEW_SIDEBAR.titleHead}>
+              <span className={MODVIEW_SIDEBAR.titleTile} aria-hidden="true">
+                <Icon className={MODVIEW_SIDEBAR.titleIcon} />
+              </span>
+              <p className={MODVIEW_SIDEBAR.title}>{label}</p>
+            </div>
             {action}
           </div>
           {children}

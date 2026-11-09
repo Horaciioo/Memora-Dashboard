@@ -10,10 +10,15 @@ import {
 } from '@/core/lib/modview/commands'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { gateIntent } from '@/core/lib/modview/gate'
-import { MODVIEW_COMMAND_COPY, MODVIEW_PANEL_COPY } from '@/declarations/modview/copy'
+import {
+  MODVIEW_COMMAND_COPY,
+  MODVIEW_PANEL_COPY,
+  MODVIEW_POLL_COPY,
+} from '@/declarations/modview/copy'
 import type { ActContext, Chatter, ModViewDriver, ModViewIntent } from '@/types/modview'
 import type { SanctionOffenseCard } from '@/types/sanctions'
 import { SanctionKinds } from '@/utils/constants/moderation'
+import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 // Gestures that settle what was suggested about a viewer
@@ -73,6 +78,7 @@ export const useModViewActions = (input: {
   const [draft, setDraft] = useState('')
   const [hint, setHint] = useState<string | null>(null)
   const [pending, setPending] = useState<PendingRung | null>(null)
+  const [pollForm, setPollForm] = useState<'create' | 'denied' | null>(null)
   const [memory, setMemory] = useState<PanelMemory>(initialMemory)
   // Viewers sanctioned from here, with the moment
   const [acted, setActed] = useState<Record<string, string>>({})
@@ -209,6 +215,34 @@ export const useModViewActions = (input: {
       return
     }
 
+    if (parsed.kind === 'pollForm') {
+      setDraft('')
+      setPending(null)
+      setHint(null)
+      if (!permissions.includes(Permissions.LivePoll)) {
+        setPollForm('denied')
+        return
+      }
+
+      const check = gate({ kind: 'pollEnd', pollId: '' })
+      if (!check.allowed) {
+        setHint(MODVIEW_COMMAND_COPY.refused.replace('{reason}', check.reason ?? ''))
+      } else if (state.poll?.status === 'active') {
+        setHint(MODVIEW_POLL_COPY.running)
+      } else {
+        setPollForm('create')
+      }
+      return
+    }
+
+    if (parsed.kind === 'open') {
+      setPicked(parsed.target)
+      setDraft('')
+      setHint(null)
+      setPending(null)
+      return
+    }
+
     if (parsed.kind === 'say') {
       act({ kind: 'say', text: parsed.text, ...(replyToId ? { replyToId } : {}) })
     } else {
@@ -248,6 +282,8 @@ export const useModViewActions = (input: {
   return {
     picked,
     setPicked,
+    pollForm,
+    closePollForm: () => setPollForm(null),
     draft,
     hint,
     memory,

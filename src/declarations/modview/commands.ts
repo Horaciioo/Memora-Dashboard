@@ -150,22 +150,22 @@ export const CHAT_COMMANDS: readonly ChatCommandOption[] = [
  */
 
 export const COMMAND_CATEGORY: Record<string, string> = {
-  user: 'Utilisateurs',
-  warn: 'Sanctions',
-  timeout: 'Sanctions',
-  ban: 'Sanctions',
-  unban: 'Sanctions',
+  user: 'Modération',
+  warn: 'Modération',
+  timeout: 'Modération',
+  ban: 'Modération',
+  unban: 'Modération',
   poll: 'Chat',
-  slow: 'Modes du chat',
-  slowoff: 'Modes du chat',
-  emoteonly: 'Modes du chat',
-  emoteonlyoff: 'Modes du chat',
-  subscribers: 'Modes du chat',
-  subscribersoff: 'Modes du chat',
-  followers: 'Modes du chat',
-  followersoff: 'Modes du chat',
-  shield: 'Modes du chat',
-  shieldoff: 'Modes du chat',
+  slow: 'Chat',
+  slowoff: 'Chat',
+  emoteonly: 'Chat',
+  emoteonlyoff: 'Chat',
+  subscribers: 'Chat',
+  subscribersoff: 'Chat',
+  followers: 'Chat',
+  followersoff: 'Chat',
+  shield: 'Chat',
+  shieldoff: 'Chat',
 }
 
 /**

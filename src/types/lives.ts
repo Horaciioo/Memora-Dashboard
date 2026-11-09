@@ -2,7 +2,7 @@ import type { LiveAccess } from '@/core/lib/lives/access'
 import type { ModerationKind, ModerationOrigin, ModerationStatus } from '@prisma/client'
 import type { TeamMentionKind } from '@/declarations/lives/teamChat'
 import type { IconName } from '@/declarations/ui/icons'
-import type { MemoraRank } from '@/types/modview'
+import type { MemoraRank, SeatEmblem } from '@/types/modview'
 import type {
   CoordinationStatusName,
   LivePlatformName,
@@ -19,6 +19,8 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
  * @property {string | null} avatar - Avatar address
  * @property {boolean} [isReinforcement] - Called in on the day
  * @property {MemoraRank} [rank] - Memora rank, none for a Junior
+ * @property {boolean} [isReferent] - Holds the referent seat of an active Junior
+ * @property {SeatEmblem} [emblem] - Role and functions, for the glyphs
  */
 
 export interface LivePerson {
@@ -27,6 +29,8 @@ export interface LivePerson {
   avatar: string | null
   isReinforcement?: boolean
   rank?: MemoraRank
+  isReferent?: boolean
+  emblem?: SeatEmblem
 }
 
 /**
@@ -473,4 +477,60 @@ export interface LiveTeamMessage {
 export interface LiveTeamPage {
   messages: LiveTeamMessage[]
   nextCursor: string | null
+}
+
+/**
+ * One figure of the Live hub, the last 30 days against the 30 before
+ * @typedef {Object} LiveHubFigure
+ * @property {'infractions' | 'time' | 'messages' | 'lives'} key - What it counts
+ * @property {number} value - Last 30 days
+ * @property {number} previous - The 30 days before
+ */
+
+export interface LiveHubFigure {
+  key: 'infractions' | 'time' | 'messages' | 'lives'
+  value: number
+  previous: number
+}
+
+/**
+ * Live of a creator the hub points at
+ * @typedef {Object} LiveHubLive
+ * @property {string} id - Live identifier
+ * @property {string} title - Title
+ * @property {LivePlatformName} platform - Platform
+ * @property {boolean} isOnAir - Running now
+ * @property {string} plannedStartAt - ISO planned start
+ * @property {string | null} plannedEndAt - ISO planned end
+ */
+
+export interface LiveHubLive {
+  id: string
+  title: string
+  platform: LivePlatformName
+  isOnAir: boolean
+  plannedStartAt: string
+  plannedEndAt: string | null
+}
+
+/**
+ * Everything the Live hub shows for one creator
+ * @typedef {Object} LiveHubCreator
+ * @property {string} id - Creator identifier
+ * @property {string} name - Creator name
+ * @property {string | null} avatarUrl - Portrait
+ * @property {string | null} banner - Banner picture
+ * @property {LiveHubFigure[]} figures - Four figures of the member
+ * @property {MemberLiveSummary[]} recent - Latest lives the member moderated
+ * @property {LiveHubLive | null} live - Live on air, else the next planned one
+ */
+
+export interface LiveHubCreator {
+  id: string
+  name: string
+  avatarUrl: string | null
+  banner: string | null
+  figures: LiveHubFigure[]
+  recent: MemberLiveSummary[]
+  live: LiveHubLive | null
 }

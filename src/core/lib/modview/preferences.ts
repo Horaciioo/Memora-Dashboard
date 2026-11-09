@@ -1,3 +1,4 @@
+import { sanitizeActions } from '@/core/lib/modview/actions'
 import { MODVIEW_PREFERENCES } from '@/declarations/modview/preferences'
 import type { PreferenceDefinition } from '@/declarations/modview/preferences'
 import type { ModPreferences } from '@/types/modview'
@@ -11,11 +12,13 @@ export const MODVIEW_DEFAULTS = Object.fromEntries(
   Object.entries(MODVIEW_PREFERENCES).map(([name, rule]) => [name, rule.default])
 ) as unknown as ModPreferences
 
-// Value the rule accepts
-const isValid = (rule: PreferenceDefinition, value: unknown): boolean =>
-  rule.kind === 'toggle'
-    ? typeof value === 'boolean'
-    : typeof value === 'string' && rule.options.includes(value)
+// Value the rule accepts, cleaned, undefined when refused
+const readValue = (rule: PreferenceDefinition, value: unknown): unknown => {
+  if (rule.kind === 'toggle') return typeof value === 'boolean' ? value : undefined
+  if (rule.kind === 'actions') return sanitizeActions(value) ?? undefined
+
+  return typeof value === 'string' && rule.options.includes(value) ? value : undefined
+}
 
 /**
  * Keep what the registry accepts
@@ -29,8 +32,8 @@ export const sanitizePreferences = (raw: unknown): Partial<ModPreferences> => {
 
   return Object.fromEntries(
     Object.entries(MODVIEW_PREFERENCES)
-      .filter(([name, rule]) => isValid(rule, source[name]))
-      .map(([name]) => [name, source[name]])
+      .map(([name, rule]) => [name, readValue(rule, source[name])] as const)
+      .filter(([, value]) => value !== undefined)
   ) as Partial<ModPreferences>
 }
 

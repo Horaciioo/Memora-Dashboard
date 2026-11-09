@@ -158,7 +158,13 @@ export const MODVIEW_DOSSIER = {
  */
 
 export const MODVIEW_TEAM = {
-  list: 'flex flex-col p-2',
+  list: 'flex flex-col gap-3 p-2',
+  section: 'flex flex-col',
+  // Title centred between two rules
+  sectionHead: 'flex items-center gap-3 px-2 pb-1 text-sm font-bold',
+  sectionRule: 'h-px min-w-4 flex-1 bg-[var(--color-border-strong)]',
+  sectionTitle: 'flex items-center gap-2',
+  sectionGlyph: 'size-4 shrink-0',
   member:
     'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-2 text-left transition-colors hover:bg-[var(--color-hover)]',
   memberFocus:
@@ -166,6 +172,9 @@ export const MODVIEW_TEAM = {
   name: 'min-w-0 flex-1 truncate text-sm font-semibold',
   memberCoordinator: 'bg-[color-mix(in_srgb,var(--color-gold-400)_14%,transparent)]',
   portrait: 'relative shrink-0',
+  // Role and function glyphs after the portrait
+  glyphs: 'flex shrink-0 items-center gap-1',
+  glyph: 'size-5',
   badge:
     'absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
   badgeGlyph: 'size-3',
@@ -194,9 +203,17 @@ export const MODVIEW_UNBAN = {
   sort: 'flex shrink-0 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] p-0.5',
   sortButton:
     'rounded-[var(--radius-sm)] px-2 py-1 text-xs font-bold text-[var(--color-ink-subtle)] aria-pressed:bg-[var(--color-hover)] aria-pressed:text-[var(--color-ink)]',
-  rows: 'flex min-h-0 flex-1 flex-col overflow-y-auto',
+  rows: 'relative flex min-h-0 flex-1 flex-col overflow-y-auto',
+  rowsLarge: 'gap-1 p-1',
   row: 'flex w-full items-center gap-2.5 px-2 py-2.5 text-left transition-colors hover:bg-[var(--color-hover)]',
   rowOn: 'bg-[var(--color-hover)]',
+  // Desk rows: roomy, the pill glides under the open one
+  rowLarge:
+    'relative z-10 gap-3.5 rounded-[var(--radius-lg)] px-4 py-3.5 hover:bg-[var(--color-hover)]',
+  rowLargeOn: 'bg-transparent hover:bg-transparent',
+  nameLarge: 'text-base',
+  metaLarge: 'text-sm',
+  pill: 'tab-indicator glass-pill pointer-events-none absolute top-0 left-0 rounded-[var(--radius-lg)]',
   rowBody: 'flex min-w-0 flex-1 flex-col',
   rowName: 'truncate text-sm font-bold',
   rowMeta: 'truncate text-xs text-[var(--color-ink-subtle)]',
@@ -211,9 +228,10 @@ export const MODVIEW_UNBAN = {
   deskTitle:
     'min-w-0 flex-1 truncate text-sm font-bold tracking-tight text-[var(--color-ink-accent)]',
   deskBody: 'flex min-h-0 flex-1',
-  deskList: 'flex min-h-0 w-80 shrink-0 flex-col border-r border-[var(--color-border)] py-2',
+  deskList:
+    'glass-thick m-3 flex min-h-0 w-[26rem] shrink-0 flex-col rounded-[var(--radius-xl)] border p-3',
   detail: 'flex min-h-0 min-w-0 flex-1 flex-col',
-  detailScroll: 'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4',
+  detailScroll: 'page-swap flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4',
   who: 'flex items-center gap-3',
   whoName: 'text-lg font-bold',
   whoNote: 'text-xs text-[var(--color-ink-subtle)]',
@@ -265,7 +283,9 @@ export const MODVIEW_TEAM_CHAT = {
     'popover-enter glass-panel absolute right-2 bottom-full left-2 z-10 mb-1 flex flex-col overflow-hidden rounded-xl border border-[var(--color-border-strong)] p-1 shadow-[var(--shadow-lg)]',
   suggestItem:
     'flex w-full cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[0.8125rem] font-semibold',
-  suggestOn: 'bg-[var(--color-hover)] text-[var(--color-ink)]',
+  suggestOn: 'text-[var(--color-ink)] hover:bg-transparent',
+  // Glass pill gliding under the open item
+  pill: 'tab-indicator glass-pill pointer-events-none absolute top-0 left-0 rounded-[var(--radius-lg)]',
   send: 'grid size-9 shrink-0 cursor-pointer place-items-center rounded-full bg-[color-mix(in_srgb,var(--color-ink)_12%,transparent)] text-[var(--color-ink)] hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-40',
   // Unread point on the glyph
   unread:
@@ -275,4 +295,130 @@ export const MODVIEW_TEAM_CHAT = {
     'popover-enter glass-panel absolute left-full z-[60] ml-4 flex w-64 cursor-pointer flex-col gap-0.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3 text-left text-sm shadow-[var(--shadow-lg)]',
   bubbleTitle: 'text-xs font-bold text-[var(--color-ink-accent)]',
   bubbleBody: 'line-clamp-3 break-words',
+} as const
+
+/**
+ * Custom action buttons
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_ACTION = {
+  bar: 'inline-flex shrink-0 items-center gap-0.5 align-middle',
+  button:
+    'inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-[var(--radius-sm)] px-0.5 text-xs font-bold whitespace-nowrap opacity-80 hover:bg-[var(--color-hover)] hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-25',
+  // Chosen colour stays on hover
+  buttonFilled: 'px-1.5 opacity-100 hover:bg-transparent hover:brightness-110',
+  icon: 'h-4 w-4 shrink-0',
+} as const
+
+/**
+ * Editor of the custom actions
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_ACTION_EDITOR = {
+  preview:
+    'rounded-[var(--radius-lg)] border border-[var(--glass-thick-line)] bg-[var(--twitch-head)] p-4 shadow-[var(--glass-thick-shadow)]',
+  toolbar: 'flex flex-wrap items-center gap-2',
+  hint: 'mr-auto text-sm text-[var(--color-ink-subtle)]',
+  // Glass over the glow, tone only on the tile
+  card: 'glass-thick flex flex-col gap-3 rounded-[var(--radius-lg)] border p-4',
+  tile: 'flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--tone)_18%,transparent)] text-[var(--tone)]',
+  tileIcon: 'h-6 w-6 shrink-0',
+  dragging: 'opacity-40',
+  cardRow: 'flex items-center gap-3',
+  cardBody: 'flex min-w-0 flex-1 flex-col gap-0.5',
+  cardTitle: 'text-base font-bold',
+  cardLine: 'text-sm text-[var(--color-ink-subtle)]',
+  cardSide: 'flex shrink-0 items-center gap-3 px-3',
+  cardButtons: 'flex shrink-0 flex-col items-start',
+  list: 'flex flex-col gap-2',
+  item: 'flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2',
+  row: 'flex items-center gap-2',
+  grip: 'flex cursor-grab text-[var(--color-ink-subtle)] active:cursor-grabbing',
+  summary: 'flex min-w-0 flex-1 items-center justify-between gap-2 text-left text-sm font-bold',
+  off: 'text-[var(--color-ink-subtle)] line-through',
+  turned: 'rotate-180',
+  fold: 'text-xs text-[var(--color-ink-subtle)] italic',
+  editor: 'flex flex-col gap-4 border-t border-[var(--color-border)] pt-3',
+  field: 'flex flex-col gap-1.5',
+  label: 'text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  icons: 'grid grid-cols-5 gap-1',
+  iconButton:
+    'flex h-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] hover:bg-[var(--color-hover)]',
+  iconOn: 'border-[var(--color-ink)] bg-[var(--color-hover)]',
+  iconGlyph: 'h-4 w-4 shrink-0',
+  looks: 'flex flex-wrap items-center gap-2',
+} as const
+
+/**
+ * Poll banner and its form
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_POLL = {
+  root: 'relative z-10 m-2 flex shrink-0 flex-col overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] text-sm shadow-[var(--shadow-md)]',
+  timer: 'h-1 w-full bg-[var(--color-hover)]',
+  timerFill: 'h-full bg-[var(--color-brand-600)] transition-[width] duration-1000 ease-linear',
+  body: 'flex flex-col gap-1.5 px-3 py-2',
+  head: 'flex items-center gap-1.5 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  headIcon: 'h-3.5 w-3.5 shrink-0',
+  headText: 'min-w-0 truncate',
+  tools: 'ml-auto flex shrink-0 items-center gap-1',
+  end: 'rounded-[var(--radius-sm)] px-1.5 py-0.5 text-micro font-bold normal-case hover:bg-[var(--color-hover)]',
+  fold: 'flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)]',
+  foldIcon: 'h-3.5 w-3.5 transition-transform duration-[var(--motion-duration-fast)]',
+  foldIconClosed: '-rotate-90',
+  question: 'font-bold [overflow-wrap:anywhere]',
+  questionFolded: 'truncate font-bold',
+  choices: 'flex flex-col gap-1',
+  choice:
+    'relative flex items-center gap-2 overflow-hidden rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-2 py-1.5',
+  choiceFill:
+    'absolute inset-y-0 left-0 transition-[width] duration-[var(--motion-duration-panel)]',
+  choiceFillRest: 'bg-[var(--color-brand-600)]/30',
+  choiceFillTop: 'bg-[var(--color-brand-600)]/60',
+  choiceName: 'relative min-w-0 flex-1 truncate font-medium',
+  choiceVotes: 'relative shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  choiceShare: 'relative w-10 shrink-0 text-right font-bold tabular-nums',
+  foot: 'flex items-center justify-between text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  form: 'flex flex-col gap-4',
+  field: 'flex flex-col gap-1.5',
+  label: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  choiceRow: 'flex items-center gap-2',
+  addChoice:
+    'rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-3 py-2 text-sm font-medium text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)]',
+  durations: 'flex flex-wrap gap-1.5',
+  duration: 'rounded-[var(--radius-full)] px-3 py-1.5 text-sm font-medium',
+  durationOff: 'bg-[var(--color-hover)]',
+  durationOn: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
+  pointsRow: 'flex items-center justify-between gap-3',
+  pointsLabel: 'text-sm font-medium',
+  denied: 'text-body',
+} as const
+
+/**
+ * Settings box of the Mod View
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_SETTINGS = {
+  root: 'flex h-[min(34rem,70vh)] flex-col gap-4 sm:flex-row sm:gap-6',
+  nav: 'glass-thick relative flex shrink-0 flex-row gap-2 self-start rounded-[var(--radius-xl)] border p-3 sm:w-56 sm:flex-col',
+  item: 'relative z-10 flex items-center gap-3 rounded-[var(--radius-lg)] px-4 py-3 text-left text-sm font-bold text-[var(--color-ink-subtle)] transition-[background-color,color,transform] duration-[var(--motion-duration-base)] active:scale-[0.97] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  itemOn: 'text-[var(--color-ink)] hover:bg-transparent hover:text-[var(--color-ink)]',
+  // Glass pill gliding under the open item
+  pill: 'tab-indicator glass-pill pointer-events-none absolute top-0 left-0 rounded-[var(--radius-lg)]',
+  icon: 'h-4 w-4 shrink-0 transition-transform duration-[var(--motion-duration-base)]',
+  iconOn: 'scale-110',
+  // Switches together, the choices below
+  groups: 'flex flex-col gap-5',
+  list: 'glass-thick flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border px-5',
+  row: 'flex items-center justify-between gap-4 py-4 text-base font-medium',
+  choice: 'w-48 shrink-0',
+  gesture:
+    'flex w-full items-center py-4 text-left text-base font-medium hover:text-[var(--color-ink-accent)]',
+  // Scrollbar rides the dialog edge, past the body padding
+  page: 'min-h-0 min-w-0 flex-1 overflow-y-auto p-1 -mr-5 pr-5 sm:-mr-8 sm:pr-8',
+  swap: 'page-swap',
 } as const

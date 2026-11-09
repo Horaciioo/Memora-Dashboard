@@ -1,3 +1,4 @@
+import { POLL_LIMITS } from '@/declarations/modview/polls'
 import { CHAT_MODES } from '@/declarations/modview/registries'
 import type { ChatModeName, ModViewIntent } from '@/types/modview'
 
@@ -16,6 +17,33 @@ const textOf = (value: unknown, required = true): string | null => {
   const trimmed = value.trim().slice(0, MAX_TEXT)
 
   return required && trimmed.length === 0 ? null : trimmed
+}
+
+/**
+ * Read a poll sent by the browser
+ * @param {Record<string, unknown>} raw - Body
+ * @return {ModViewIntent | null} - Poll
+ */
+
+const readPoll = (raw: Record<string, unknown>): ModViewIntent | null => {
+  const title = textOf(raw.title)?.slice(0, POLL_LIMITS.titleLength)
+  const seconds = Number(raw.seconds)
+  const choices = Array.isArray(raw.choices)
+    ? raw.choices.flatMap((entry) => textOf(entry)?.slice(0, POLL_LIMITS.choiceLength) ?? [])
+    : []
+  const fits =
+    choices.length >= POLL_LIMITS.minChoices &&
+    choices.length <= POLL_LIMITS.maxChoices &&
+    Number.isInteger(seconds) &&
+    seconds >= POLL_LIMITS.minSeconds &&
+    seconds <= POLL_LIMITS.maxSeconds
+  if (!title || !fits) return null
+
+  const points = Number(raw.points)
+  const hasPoints =
+    Number.isInteger(points) && points >= POLL_LIMITS.minPoints && points <= POLL_LIMITS.maxPoints
+
+  return { kind: 'poll', title, choices, seconds, ...(hasPoints ? { points } : {}) }
 }
 
 /**
@@ -101,6 +129,12 @@ export const readIntent = (raw: Record<string, unknown>): ModViewIntent | null =
     case 'unpin': {
       const messageId = textOf(raw.messageId)
       return messageId ? { kind: 'unpin', messageId } : null
+    }
+    case 'poll':
+      return readPoll(raw)
+    case 'pollEnd': {
+      const pollId = textOf(raw.pollId)
+      return pollId ? { kind: 'pollEnd', pollId } : null
     }
     default:
       return null

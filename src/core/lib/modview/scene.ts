@@ -11,6 +11,7 @@ import type {
   ModViewIntent,
   ModViewState,
   ModViewTarget,
+  LivePoll,
   PinnedMessage,
   UnbanRequest,
 } from '@/types/modview'
@@ -46,6 +47,7 @@ export type SceneEvent =
       startedAt?: string | null
     }
   | { kind: 'pin'; pin: PinnedMessage | null }
+  | { kind: 'poll'; poll: LivePoll | null }
   | { kind: 'chatOption'; option: ChatOptionName; enabled: boolean }
 
 /**
@@ -284,6 +286,8 @@ export const applySceneEvent = (
       }
     case 'pin':
       return { ...state, view: { ...view, pinned: event.pin } }
+    case 'poll':
+      return { ...state, view: { ...view, poll: event.poll } }
     case 'chatMenu':
       return {
         ...state,
@@ -484,6 +488,31 @@ export const applySceneIntent = (
     }
     case 'unpin':
       return applySceneEvent(state, { kind: 'pin', pin: null })
+    case 'poll': {
+      const now = Date.now()
+
+      return applySceneEvent(state, {
+        kind: 'poll',
+        poll: {
+          id: actor.id,
+          title: intent.title,
+          choices: intent.choices.map((title, index) => ({
+            id: `${actor.id}-${index}`,
+            title,
+            votes: 0,
+          })),
+          status: 'active',
+          startedBy: actor.name,
+          startedAt: new Date(now).toISOString(),
+          endsAt: new Date(now + intent.seconds * SECOND_MS).toISOString(),
+        },
+      })
+    }
+    case 'pollEnd':
+      return applySceneEvent(state, {
+        kind: 'poll',
+        poll: view.poll ? { ...view.poll, status: 'ended' } : null,
+      })
     case 'say':
       return applySceneEvent(state, {
         kind: 'message',

@@ -1,3 +1,4 @@
+import type { HelixPoll } from '@/core/lib/modview/poll'
 import { PlatformError, platformRequest } from '@/core/lib/platforms/http'
 import { helixHeaders } from '@/core/lib/platforms/twitch/oauth'
 import { HELIX_PATHS, TWITCH_ENDPOINTS, TWITCH_LIMITS } from '@/declarations/platforms/twitch'
@@ -193,6 +194,28 @@ export const helixCallOf = (
         method: 'DELETE',
         path: HELIX_PATHS.pins,
         query: { ...channel, message_id: intent.messageId },
+      }
+    case 'poll':
+      return {
+        method: 'POST',
+        path: HELIX_PATHS.polls,
+        query: {},
+        body: {
+          broadcaster_id: seat.broadcasterId,
+          title: intent.title,
+          choices: intent.choices.map((title) => ({ title })),
+          duration: intent.seconds,
+          ...(intent.points
+            ? { channel_points_voting_enabled: true, channel_points_per_vote: intent.points }
+            : {}),
+        },
+      }
+    case 'pollEnd':
+      return {
+        method: 'PATCH',
+        path: HELIX_PATHS.polls,
+        query: {},
+        body: { broadcaster_id: seat.broadcasterId, id: intent.pollId, status: 'TERMINATED' },
       }
   }
 }
@@ -679,6 +702,22 @@ export const readPin = async (seat: TwitchSeat): Promise<PinnedMessage | null> =
     pinnedBy: row.pinned_by_user_name || row.pinned_by_user_login,
     endsAt: row.ends_at,
   }
+}
+
+/**
+ * Latest poll of the channel, read with its owner's token
+ * @param {TwitchSeat} seat - Channel owner's seat
+ * @return {Promise<HelixPoll | null>} - Poll
+ */
+
+export const readLatestPoll = async (seat: TwitchSeat): Promise<HelixPoll | null> => {
+  const answer = await runHelix<{ data: HelixPoll[] }>(seat, {
+    method: 'GET',
+    path: HELIX_PATHS.polls,
+    query: { broadcaster_id: seat.broadcasterId, first: '1' },
+  })
+
+  return answer?.data[0] ?? null
 }
 
 /**

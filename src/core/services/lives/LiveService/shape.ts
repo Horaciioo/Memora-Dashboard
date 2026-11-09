@@ -5,8 +5,10 @@ import { isReopenable, liveAccess } from '@/core/lib/lives/access'
 import { livePermissions } from '@/core/lib/lives/permissions'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { isIconName } from '@/declarations/ui/icons'
+import { HELD_FUNCTIONS, toMemberFunctions } from '@/core/services/reference/functions'
 import type { LivePerson, LiveView } from '@/types/lives'
-import { LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
+import type { MemberRoleName } from '@/utils/constants/hierarchy'
+import { AcademyJuniorStatuses, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import { CoordinationStatuses } from '@/utils/constants/lives'
 import type { LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
@@ -36,7 +38,20 @@ export const LIVE_SHAPE = {
     },
   },
   members: {
-    include: { account: { select: { ...PERSON.select, role: true } } },
+    include: {
+      account: {
+        select: {
+          ...PERSON.select,
+          role: true,
+          ...HELD_FUNCTIONS,
+          referredJuniors: {
+            where: { status: AcademyJuniorStatuses.Active },
+            select: { id: true },
+            take: 1,
+          },
+        },
+      },
+    },
     orderBy: { convokedAt: 'asc' },
   },
   liveconEntries: {
@@ -136,6 +151,14 @@ export const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): 
               ...person,
               isReinforcement: seat.reinforcement,
               rank: rankOfRole(seat.account.role),
+              isReferent: seat.account.referredJuniors.length > 0,
+              emblem: {
+                role: seat.account.role as MemberRoleName,
+                functions: toMemberFunctions(seat.account.functions).map(({ kind, icon }) => ({
+                  kind,
+                  icon,
+                })),
+              },
             },
           ]
         : []

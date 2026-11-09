@@ -8,6 +8,7 @@ import { ChatModesMenu } from '@/composites/modview/ChatModesMenu'
 import { ChatRow } from '@/composites/modview/ChatRow'
 import { ModWindow } from '@/composites/modview/ModWindow'
 import { PinnedBar } from '@/composites/modview/PinnedBar'
+import { PollBar } from '@/composites/modview/PollBar'
 import { PreferenceChoices } from '@/composites/modview/PreferenceChoices'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { useLiveEmotes } from '@/core/hooks/data/lives/useLiveEmotes'
@@ -43,6 +44,8 @@ export interface ChatWindowProps {
   hasTerms?: boolean
   // Real live whose Twitch emotes the box offers
   liveId?: string | null
+  // Opens the settings box
+  onSettings?: () => void
 }
 
 /**
@@ -59,6 +62,7 @@ export interface ChatWindowProps {
  * @param {string | null} hint - Why the last line was not sent
  * @param {boolean} [hasTerms] - Terms drawers offered
  * @param {string | null} [liveId] - Real live whose emotes the box offers
+ * @param {() => void} [onSettings] - Opens the settings box
  * @return {JSX.Element}
  */
 
@@ -75,6 +79,7 @@ export const ChatWindow = ({
   hint,
   hasTerms,
   liveId = null,
+  onSettings,
 }: ChatWindowProps) => {
   const [menu, setMenu] = useState<'modes' | 'options' | null>(null)
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null)
@@ -95,6 +100,11 @@ export const ChatWindow = ({
   )
   // Alt held freezes the chat
   useHoldKey('Alt', hold, preferences.pauseMode === 'alt')
+  // Bots stay out when asked
+  const visible = useMemo(
+    () => (shown.hideBots ? lines.filter((line) => !line.author.badges.includes('bot')) : lines),
+    [lines, shown.hideBots]
+  )
   const chatters = useMemo(() => recentChatters(state.messages), [state.messages])
 
   // Caret of the open menu points at its own title
@@ -137,7 +147,9 @@ export const ChatWindow = ({
               spotlight === 'chatOptions' && MODVIEW_CHAT.triggerLit
             )}
             aria-expanded={openMenu === 'options'}
-            onClick={() => setMenu(menu === 'options' ? null : 'options')}
+            onClick={() =>
+              onSettings ? onSettings() : setMenu(menu === 'options' ? null : 'options')
+            }
           >
             {MODVIEW_COPY.preferences}
           </button>
@@ -184,20 +196,32 @@ export const ChatWindow = ({
         )}
       </div>
 
-      {state.pinned && <PinnedBar pin={state.pinned} gate={gate} onAct={onAct} />}
+      {state.poll && <PollBar key={state.poll.id} poll={state.poll} gate={gate} onAct={onAct} />}
+      {state.pinned && (
+        <PinnedBar key={state.pinned.messageId} pin={state.pinned} gate={gate} onAct={onAct} />
+      )}
 
       <div className={MODVIEW_CHAT.scroller} ref={listRef} data-keep-menu {...listHandlers}>
         <p className={MODVIEW_CHAT.welcome}>
           {MODVIEW_COPY.welcome.replace('{channel}', state.channel.name)}
         </p>
-        <ul className={MODVIEW_CHAT.list}>
-          {lines.map((message) => (
+        <ul
+          className={cn(
+            MODVIEW_CHAT.list,
+            MODVIEW_CHAT.size[preferences.textSize],
+            MODVIEW_CHAT.gap[preferences.density]
+          )}
+        >
+          {visible.map((message) => (
             <ChatRow
               key={message.id}
               message={message}
               options={shown}
               toolsPosition={preferences.toolsPosition}
+              actions={preferences.actions}
+              confirmHarsh={preferences.confirmHarsh}
               roster={state.roster}
+              emblems={state.emblems}
               gate={gate}
               onAct={onAct}
               onPick={onPick}

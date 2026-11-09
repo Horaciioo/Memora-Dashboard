@@ -1,5 +1,7 @@
 import type { ChatOptionName } from '@/declarations/modview/registries'
 import type { LivePlatformName } from '@/utils/constants/lives'
+import type { MemberRoleName } from '@/utils/constants/hierarchy'
+import type { FunctionKindName } from '@/utils/constants/workflow'
 
 /**
  * Badge drawn before a chatter's name
@@ -169,6 +171,33 @@ export interface UnbanRequest {
 }
 
 /**
+ * One answer of a poll
+ * @typedef {Object} LivePollChoice
+ */
+
+export interface LivePollChoice {
+  id: string
+  title: string
+  votes: number
+}
+
+/**
+ * Poll shown above the chat
+ * @typedef {Object} LivePoll
+ * @property {string | null} startedBy - Member who launched it, none from Twitch
+ */
+
+export interface LivePoll {
+  id: string
+  title: string
+  choices: LivePollChoice[]
+  status: 'active' | 'ended'
+  startedBy: string | null
+  startedAt: string
+  endsAt: string
+}
+
+/**
  * Message pinned at the top of the chat
  * @typedef {Object} PinnedMessage
  * @property {string} messageId - Message identifier
@@ -229,8 +258,13 @@ export interface LiveEmotes {
  * @property {boolean} firstMessages - First lines framed
  * @property {boolean} colouredNames - Names in their own colour
  * @property {'hover' | 'alt'} pauseMode - What stands the chat still
- * @property {'left' | 'hover'} toolsPosition - Where the gestures of a line show
+ * @property {'left' | 'hover' | 'right' | 'card'} toolsPosition - Where the gestures of a line show
  * @property {boolean} keepResolved - Handled held messages stay in the queue
+ * @property {ModActionConfig[]} actions - Sanction buttons, in order
+ * @property {boolean} confirmHarsh - Ban and long timeouts ask first
+ * @property {boolean} hideBots - Lines of bots left out
+ * @property {'small' | 'normal' | 'large'} textSize - Size of the chat text
+ * @property {'compact' | 'normal' | 'airy'} density - Room around each line
  */
 
 export interface ModPreferences {
@@ -240,8 +274,44 @@ export interface ModPreferences {
   firstMessages: boolean
   colouredNames: boolean
   pauseMode: 'hover' | 'alt'
-  toolsPosition: 'left' | 'hover'
+  toolsPosition: 'left' | 'hover' | 'right' | 'card'
   keepResolved: boolean
+  actions: ModActionConfig[]
+  confirmHarsh: boolean
+  hideBots: boolean
+  textSize: 'small' | 'normal' | 'large'
+  density: 'compact' | 'normal' | 'airy'
+}
+
+/**
+ * Kind of a custom action
+ * @typedef {'timeout' | 'ban' | 'unban' | 'delete' | 'warn' | 'purge'} ModActionKind
+ */
+
+export type ModActionKind = 'timeout' | 'ban' | 'unban' | 'delete' | 'warn' | 'purge'
+
+/**
+ * One custom sanction button
+ * @typedef {Object} ModActionConfig
+ * @property {string} id - Stable key
+ * @property {ModActionKind} kind - What it does
+ * @property {number | null} seconds - Timeout length
+ * @property {string | null} reason - Reason filled in advance
+ * @property {string} icon - Glyph key
+ * @property {'icon' | 'label' | 'both'} look - What the button shows
+ * @property {string | null} colour - Hexadecimal, null for the kind tone
+ * @property {boolean} isOn - Shown or set aside
+ */
+
+export interface ModActionConfig {
+  id: string
+  kind: ModActionKind
+  seconds: number | null
+  reason: string | null
+  icon: string
+  look: 'icon' | 'label' | 'both'
+  colour: string | null
+  isOn: boolean
 }
 
 /**
@@ -346,6 +416,8 @@ export interface ModViewState {
   liveStartedAt?: string | null
   // Message pinned at the top of the chat
   pinned?: PinnedMessage | null
+  // Poll above the chat
+  poll?: LivePoll | null
   // Livecon level in force
   liveconLevel: number | null
   // Scene-driven chat menu
@@ -356,6 +428,20 @@ export interface ModViewState {
   readOnly?: boolean
   // Memora ranks by Twitch user identifier
   roster?: Record<string, MemoraRank>
+  // Role and functions of the same accounts, for their glyphs
+  emblems?: Record<string, SeatEmblem>
+}
+
+/**
+ * Role and held functions of a linked member, what their glyphs are drawn from
+ * @typedef {Object} SeatEmblem
+ * @property {MemberRoleName} role - Hierarchy level
+ * @property {{ kind: FunctionKindName, icon: string | null }[]} functions - Held functions, principal first
+ */
+
+export interface SeatEmblem {
+  role: MemberRoleName
+  functions: { kind: FunctionKindName; icon: string | null }[]
 }
 
 /**
@@ -390,6 +476,8 @@ export type ModViewIntent =
   | { kind: 'say'; text: string; replyToId?: string }
   | { kind: 'pin'; messageId: string; seconds?: number }
   | { kind: 'unpin'; messageId: string }
+  | { kind: 'poll'; title: string; choices: string[]; seconds: number; points?: number }
+  | { kind: 'pollEnd'; pollId: string }
 
 /**
  * Window of the Mod View grid

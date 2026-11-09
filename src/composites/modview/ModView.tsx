@@ -1,5 +1,6 @@
 'use client'
 
+import { ModSettings } from '@/composites/modview/actions/ModSettings'
 import { useEffect, useMemo, useState } from 'react'
 
 import type { PageOption } from '@/components/structures/page/PageOptions'
@@ -10,6 +11,8 @@ import { FocusBanner } from '@/composites/modview/FocusBanner'
 import { InspectWindow } from '@/composites/modview/InspectWindow'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { ModActionsWindow } from '@/composites/modview/ModActionsWindow'
+import { PollDeniedDialog } from '@/composites/modview/PollDeniedDialog'
+import { PollDialog } from '@/composites/modview/PollDialog'
 import { ModViewSidebar } from '@/composites/modview/ModViewSidebar'
 import { SanctionsDrawer } from '@/composites/modview/SanctionsDrawer'
 import { StreamWindow } from '@/composites/modview/StreamWindow'
@@ -140,6 +143,7 @@ export const ModView = ({
   const side = useSideWidth()
   const [inspected, setInspected] = useState<string | null>(null)
   const [actInPlace, setActInPlace] = useState(false)
+  const [isSettingsOpen, setSettingsOpen] = useState(false)
   // Unban requests desk filling the stage, with the request opened first
   const [unbanDesk, setUnbanDesk] = useState<{ initialId: string | null } | null>(null)
   const focus = useLiveFocus(live?.id ?? null)
@@ -312,6 +316,7 @@ export const ModView = ({
             hint={actions.hint}
             hasTerms={isWorkspace}
             liveId={live?.id ?? null}
+            onSettings={() => setSettingsOpen(true)}
           />
         )
       case 'community':
@@ -418,9 +423,17 @@ export const ModView = ({
         !isWorkspace && state.platform === LivePlatforms.Twitch && 'skin-twitch'
       )}
     >
+      {isSettingsOpen && (
+        <ModSettings options={pageOptions} onClose={() => setSettingsOpen(false)} />
+      )}
+      {actions.pollForm === 'create' && (
+        <PollDialog onStart={(intent) => act(intent)} onClose={actions.closePollForm} />
+      )}
+      {actions.pollForm === 'denied' && <PollDeniedDialog onClose={actions.closePollForm} />}
+
       {isWorkspace && (
         <ModViewSidebar
-          options={pageOptions}
+          onSettings={() => setSettingsOpen(true)}
           team={
             team && live
               ? {
@@ -447,11 +460,17 @@ export const ModView = ({
           leaveLiveId={live?.id}
           endLiveId={live?.canEnd ? live.id : undefined}
           creator={{ name: state.channel.name, avatar: state.channel.avatar }}
+          viewer={live?.members.find((member) => member.id === live.viewerId)}
           unban={
             state.platform === LivePlatforms.Twitch
               ? {
                   requests: state.unbanRequests,
-                  onOpen: (requestId) => setUnbanDesk({ initialId: requestId }),
+                  onClose: () => setUnbanDesk(null),
+                  // The glyph clicked again puts the desk away
+                  onOpen: (requestId) =>
+                    setUnbanDesk((current) =>
+                      requestId === null && current ? null : { initialId: requestId }
+                    ),
                 }
               : undefined
           }

@@ -106,9 +106,39 @@
   animation: gold-sweep 3.5s linear infinite;
 }
 
+/* Team name: its own bright tone, a band of light and a soft halo */
+.team-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--shine) 30%,
+    color-mix(in srgb, var(--shine) 45%, white) 50%,
+    var(--shine) 70%
+  );
+  background-size: 250% 100%;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--shine) 35%, transparent));
+  animation: gold-sweep 3.5s linear infinite;
+}
+
+/* Team glyph: the same tone, twinkling */
+.team-glyph {
+  color: var(--shine);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--shine) 55%, transparent));
+  animation: team-twinkle 2.6s ease-in-out infinite;
+}
+
+@keyframes team-twinkle {
+  50% {
+    filter: brightness(1.3) drop-shadow(0 0 7px color-mix(in srgb, var(--shine) 75%, transparent));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gold-shimmer,
-  .danger-shimmer {
+  .danger-shimmer,
+  .team-shimmer,
+  .team-glyph {
     animation: none;
   }
 }

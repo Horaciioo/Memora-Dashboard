@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { pushRoomEvent } from '@/core/lib/lives/room'
+import { forgetLivePoll, syncLivePoll } from '@/core/services/lives/LivePollService'
 import {
   readCategoryArt,
   readChannelTags,
@@ -60,6 +61,7 @@ export const pollLiveState = async (input: {
     readPin(holder).catch(() => undefined),
     readChannelTags(holder).catch(() => undefined),
   ])
+  void syncLivePoll(input.liveId, input.broadcasterId).catch(() => null)
   const told = lastTold.get(input.liveId) ?? {
     viewers: undefined,
     pin: undefined,
@@ -112,4 +114,5 @@ export const pollLiveState = async (input: {
 
 export const forgetLiveState = (liveId: string): void => {
   lastTold.delete(liveId)
+  forgetLivePoll(liveId)
 }

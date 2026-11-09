@@ -63,11 +63,14 @@ const JUNIOR_TONES: Partial<Record<FrameTone, FrameTone>> = {
 
 /**
  * Tint of a member's role glyph
- * @param {MemberSummary} member - Member to describe
+ * @param {{ role: MemberRoleName, functions: Pick<MemberFunction, 'kind' | 'icon'>[] }} member - Role and functions held
  * @return {FrameTone} - Tint to paint
  */
 
-export const roleTone = (member: MemberSummary): FrameTone => {
+export const roleTone = (member: {
+  role: MemberRoleName
+  functions: Pick<MemberFunction, 'kind' | 'icon'>[]
+}): FrameTone => {
   const emblem = ROLE_EMBLEMS[member.role]
   if (!emblem.tinted) return emblem.tone
 
@@ -87,5 +90,5 @@ export const roleTone = (member: MemberSummary): FrameTone => {
  * @return {LucideIcon | null} - Glyph component
  */
 
-export const functionGlyph = (entry: MemberFunction): LucideIcon | null =>
+export const functionGlyph = (entry: Pick<MemberFunction, 'icon'>): LucideIcon | null =>
   entry.icon && isIconName(entry.icon) ? ICONS[entry.icon] : null
