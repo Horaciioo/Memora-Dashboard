@@ -56,6 +56,10 @@ const { light, fog } = GOLF_SCENE
 // Hole outside any map
 const ORIGIN: GolfPoint = [0, 0]
 
+// Wait before a canvas with no frame is redrawn, and how many times
+const BLANK_CHECK_MS = 2500
+const BLANK_RETRIES = 3
+
 export interface GolfSceneProps {
   board: GolfBoardState
   hole: GolfHole
@@ -129,6 +133,7 @@ const GolfScene = ({
   const isLite = isSlow || isLight
   // Bumped to draw a fresh canvas after a lost graphics context
   const [epoch, setEpoch] = useState(0)
+  const retries = useRef(0)
   const lawn = useRef<Group>(null)
   const serverNow = useCallback(() => Date.now() + serverOffset, [serverOffset])
   const seatOf = useCallback(
@@ -173,6 +178,14 @@ const GolfScene = ({
           event.preventDefault()
           setEpoch((value) => value + 1)
         })
+        // A canvas that never drew a frame is redrawn, a few times at most
+        window.setTimeout(() => {
+          const isBlank = gl.info.render.frame === 0 || gl.getContext().isContextLost()
+          if (isBlank && retries.current < BLANK_RETRIES) {
+            retries.current += 1
+            setEpoch((value) => value + 1)
+          }
+        }, BLANK_CHECK_MS)
       }}
       className={GOLF_SCENE_UI.canvas}
       dpr={[1, isLite ? render.liteDpr : render.maxDpr]}
