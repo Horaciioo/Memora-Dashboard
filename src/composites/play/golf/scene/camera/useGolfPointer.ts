@@ -5,7 +5,10 @@ import type { RefObject } from 'react'
 import { useThree } from '@react-three/fiber'
 
 import { bindPointer } from '@/composites/play/golf/scene/camera/pointer'
-import type { GolfPointerInput, GolfPointerState } from '@/composites/play/golf/scene/camera/pointer'
+import type {
+  GolfPointerInput,
+  GolfPointerState,
+} from '@/composites/play/golf/scene/camera/pointer'
 
 /**
  * Pointer gestures of the course, handlers always the latest

@@ -133,7 +133,11 @@ export const coordinatorPicks = async (
       },
       select: { id: true },
     })
-    if (members.length) holders.set(youtuberId, members.map((member) => member.id))
+    if (members.length)
+      holders.set(
+        youtuberId,
+        members.map((member) => member.id)
+      )
   }
 
   // One read for every creator

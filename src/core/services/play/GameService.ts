@@ -134,7 +134,10 @@ export const startSession = async (sessionId: string, hostId: string): Promise<v
     requireHost(locked, hostId)
     if (locked.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
     // Sleeping bots never take a turn
-    if (!areBotsAwake(locked.game) && locked.seats.some((seat) => isPresent(seat) && seat.account.botKind)) {
+    if (
+      !areBotsAwake(locked.game) &&
+      locked.seats.some((seat) => isPresent(seat) && seat.account.botKind)
+    ) {
       throw conflict(PLAY_ERRORS.botsSeated)
     }
     if (locked.seats.filter(isPresent).length < seatBoundsOf(locked.game, locked.settings).min) {

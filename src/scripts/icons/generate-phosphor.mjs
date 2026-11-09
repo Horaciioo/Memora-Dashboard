@@ -46,7 +46,9 @@ const lines = []
 for (const name of [...wanted.keys()].sort()) {
   const { default: weights } = await import(pathToFileURL(resolve(DEFS, `${name}.es.js`)).href)
   const kept = [...wanted.get(name)].sort().map((weight) => [weight, shapesOf(weights.get(weight))])
-  lines.push(`export const ${name} = phosphorIcon('${name}Icon', ${JSON.stringify(Object.fromEntries(kept))})`)
+  lines.push(
+    `export const ${name} = phosphorIcon('${name}Icon', ${JSON.stringify(Object.fromEntries(kept))})`
+  )
 }
 
 writeFileSync(

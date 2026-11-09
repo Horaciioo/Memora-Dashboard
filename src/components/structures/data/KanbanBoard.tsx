@@ -3,7 +3,10 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { AddRow } from '@/components/structures/inline/AddRow'
-import { useIsMobileShell, useMediaQuery } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
+import {
+  useIsMobileShell,
+  useMediaQuery,
+} from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { useDragAndDrop } from '@/core/hooks/interaction/gestures/useDragAndDrop'
 import { SELECTABLE_ATTRIBUTE, useMarquee } from '@/core/hooks/interaction/gestures/useMarquee'
 import { ACTION_COPY } from '@/declarations/ui/copy'

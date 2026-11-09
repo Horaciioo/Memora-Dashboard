@@ -7,7 +7,10 @@ import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
 import { Textarea } from '@/components/elements/forms/inputs/Textarea'
 import { Drawer } from '@/components/structures/overlays/Drawer'
 import { NewIdentifierRow } from '@/composites/recruitment/file/NewIdentifierRow'
-import { LIVE_PALETTE, renderPlanningPng } from '@/composites/recruitment/file/planning/planningImage'
+import {
+  LIVE_PALETTE,
+  renderPlanningPng,
+} from '@/composites/recruitment/file/planning/planningImage'
 import { RangePlanning } from '@/composites/recruitment/file/planning/RangePlanning'
 import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { unknownTokens } from '@/core/lib/discord/identifiers'
