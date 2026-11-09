@@ -3785,3 +3785,16 @@ model PlayGroupMessage {
   @@index([groupId, createdAt])
   @@map("play_group_messages")
 }
+
+// A feature switched away from its default, one row per feature
+model FeatureSwitch {
+  key         String   @id
+  // OFF for everyone, or ADMINS for the system holders only
+  mode        String
+  // Words members read where the feature used to be
+  note        String?
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("feature_switches")
+}
