@@ -10,12 +10,12 @@ const EASE = 'duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
  */
 
 export const PLAY_TABS = {
-  bar: `fixed inset-x-0 bottom-0 z-50 flex items-stretch gap-1 border-t border-white/70 ${SILVER} px-1.5 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] shadow-[0_-0.25rem_1rem_rgb(0_0_0/0.18)] md:inset-x-auto md:bottom-4 md:left-1/2 md:w-[min(48rem,calc(100%-9.5rem))] md:-translate-x-1/2 md:rounded-3xl md:border md:pb-1.5`,
+  bar: `fixed inset-x-0 bottom-0 z-50 flex items-stretch gap-1 border-t border-white/70 ${SILVER} px-1.5 pt-1 pb-[max(0.75rem,calc(env(safe-area-inset-bottom)*0.8))] shadow-[0_-0.25rem_1rem_rgb(0_0_0/0.18)] md:inset-x-auto md:bottom-4 md:left-1/2 md:w-[min(48rem,calc(100%-9.5rem))] md:-translate-x-1/2 md:rounded-3xl md:border md:pb-1.5`,
   // Open tab takes more width, the others share the rest, a divider between each
-  tab: `group relative flex min-h-16 min-w-0 flex-1 flex-col items-center justify-center rounded-2xl transition-[flex-grow] ${EASE} before:absolute before:inset-0 before:rounded-2xl before:opacity-0 before:transition-opacity before:duration-500 before:ease-[cubic-bezier(0.22,1,0.36,1)] before:bg-[linear-gradient(180deg,var(--play-key),color-mix(in_srgb,var(--play-key)_70%,var(--play-night)))] before:shadow-[inset_0_2px_0_rgb(255_255_255/0.35),0_0.2rem_0_rgb(0_0_0/0.4)] after:absolute after:top-3 after:-right-0.5 after:bottom-3 after:w-px after:bg-black/15 last:after:hidden has-[+[aria-current=page]]:after:hidden has-[+[aria-expanded=true]]:after:hidden active:scale-95 disabled:opacity-50`,
+  tab: `group relative flex min-h-[3.75rem] min-w-0 flex-1 flex-col items-center justify-end pb-1 rounded-2xl transition-[flex-grow] ${EASE} before:absolute before:inset-0 before:rounded-2xl before:opacity-0 before:transition-opacity before:duration-500 before:ease-[cubic-bezier(0.22,1,0.36,1)] before:bg-[linear-gradient(180deg,var(--play-key),color-mix(in_srgb,var(--play-key)_70%,var(--play-night)))] before:shadow-[inset_0_2px_0_rgb(255_255_255/0.35),0_0.2rem_0_rgb(0_0_0/0.4)] after:absolute after:top-3 after:-right-0.5 after:bottom-3 after:w-px after:bg-black/15 last:after:hidden has-[+[aria-current=page]]:after:hidden has-[+[aria-expanded=true]]:after:hidden active:scale-95 disabled:opacity-50`,
   tabOn: 'grow-[1.7] before:opacity-100 after:hidden',
-  lift: `relative z-10 transition-transform ${EASE} group-aria-[current=page]:-translate-y-1 group-aria-expanded:-translate-y-1`,
-  icon: `size-11 transition-[scale,filter] ${EASE} group-hover:scale-115 group-active:scale-90`,
+  lift: `relative z-10 -mt-3 transition-transform ${EASE} group-aria-[current=page]:-translate-y-3 group-aria-expanded:-translate-y-3`,
+  icon: `size-14 transition-[scale,filter] ${EASE} group-hover:scale-115 group-active:scale-90`,
   // Open: full colour and glow. Rest: smaller, muted
   iconOn: 'scale-110',
   iconRest: 'scale-90 saturate-[0.6] brightness-[0.85]',
