@@ -1,3 +1,4 @@
+import { headers } from 'next/headers'
 import { Suspense } from 'react'
 import type { ReactNode } from 'react'
 import { AppShell } from '@/layouts/AppShell'
@@ -9,12 +10,16 @@ import { readTwoFactorState } from '@/core/services/auth/TwoFactorService'
 import { readViewContext } from '@/core/services/auth/ViewService'
 import { needsHistoryConsent } from '@/core/services/preferences/ConsentService'
 import { readTourState } from '@/core/services/tour/TourService'
+import { readClosedFeatures } from '@/core/services/features'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
 import { VisitTracker } from '@/composites/shell/VisitTracker'
 import { GuideHost } from '@/composites/shell/GuideHost'
 import { openRoutes } from '@/core/lib/tour/progress'
+import { FeaturesProvider } from '@/managers/front-end/FeaturesManager'
+import { isPathOpenIn } from '@/declarations/features'
 import { NavigationViews, visibleNavGroups } from '@/declarations/navigation'
+import { PATH_HEADER } from '@/declarations/system/security/securityHeaders'
 import { APP_ENVIRONMENT } from '@/declarations/system/environments'
 import { heldRoutes } from '@/declarations/ui/responsive'
 import { isPushConfigured } from '@/declarations/pwa/vapid'
@@ -54,7 +59,15 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   }
 
   // The visit covers what the member's role and functions open, whatever the view on screen
-  const open = openRoutes(visibleNavGroups(NavigationViews.Moderation, session, access.can))
+  const closed = await readClosedFeatures(access.isSystem)
+  const open = openRoutes(
+    visibleNavGroups(NavigationViews.Moderation, session, access.can, (path) =>
+      isPathOpenIn(closed, path)
+    )
+  )
+  // A hard load never runs a page whose feature is off, the gate covers soft navigation
+  const hardPath = (await headers()).get(PATH_HEADER) ?? ''
+  const isHeld = !isPathOpenIn(closed, hardPath)
 
   const [unreadCount, viewContext, twoFactor, seal, tour] = await Promise.all([
     countUnread(session.id),
@@ -65,20 +78,22 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   ])
 
   return (
-    <AppShell
-      unreadCount={unreadCount}
-      viewContext={viewContext}
-      twoFactor={twoFactor}
-      seal={seal}
-      tour={tour}
-      heldRoutes={heldRoutes(APP_ENVIRONMENT)}
-      isPushReady={isPushConfigured()}
-    >
-      {children}
-      <VisitTracker />
-      <Suspense fallback={null}>
-        <GuideHost />
-      </Suspense>
-    </AppShell>
+    <FeaturesProvider closed={closed} isAdmin={access.isSystem} canSwitch={session.isRoot}>
+      <AppShell
+        unreadCount={unreadCount}
+        viewContext={viewContext}
+        twoFactor={twoFactor}
+        seal={seal}
+        tour={tour}
+        heldRoutes={heldRoutes(APP_ENVIRONMENT)}
+        isPushReady={isPushConfigured()}
+      >
+        {isHeld ? null : children}
+        <VisitTracker />
+        <Suspense fallback={null}>
+          <GuideHost />
+        </Suspense>
+      </AppShell>
+    </FeaturesProvider>
   )
 }

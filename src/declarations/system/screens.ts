@@ -1,5 +1,6 @@
 import { VIEW_COPY } from '@/declarations/access/copy'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
+import { FEATURE_COPY } from '@/declarations/features/copy'
 import { PAGE_REGISTRY_COPY } from '@/declarations/pages/copy'
 import { PUSH_CONSOLE_COPY } from '@/declarations/pwa/copy'
 import type { MaturityName } from '@/declarations/maturity/registries'
@@ -21,6 +22,7 @@ export type SystemRouteKey =
   | 'privileged'
   | 'administration'
   | 'systemPages'
+  | 'features'
 
 /**
  * Hub groups
@@ -49,6 +51,7 @@ export const SYSTEM_GROUPS: { key: SystemGroupKey; label: string }[] = [
  * @property {string} description - What the screen opens
  * @property {IconName} icon - Icon key
  * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
+ * @property {boolean} [rootOnly] - Listed for the root administrator alone
  */
 
 export interface SystemScreen {
@@ -58,6 +61,7 @@ export interface SystemScreen {
   description: string
   icon: IconName
   maturity?: MaturityName
+  rootOnly?: boolean
 }
 
 /**
@@ -123,6 +127,14 @@ export const SYSTEM_SCREENS: SystemScreen[] = [
     icon: 'metrics',
   },
   {
+    route: 'features',
+    group: 'administration',
+    label: FEATURE_COPY.title,
+    description: FEATURE_COPY.lead,
+    icon: 'settings',
+    rootOnly: true,
+  },
+  {
     route: 'privileged',
     group: 'administration',
     label: SYSTEM_COPY.privilegedTitle,
@@ -141,8 +153,9 @@ export const SYSTEM_SCREENS: SystemScreen[] = [
 /**
  * Screens of one hub group
  * @param {SystemGroupKey} group - Hub group
+ * @param {boolean} [isRoot] - Viewer is the root administrator
  * @return {SystemScreen[]} - Screens in display order
  */
 
-export const systemScreensOfGroup = (group: SystemGroupKey): SystemScreen[] =>
-  SYSTEM_SCREENS.filter((screen) => screen.group === group)
+export const systemScreensOfGroup = (group: SystemGroupKey, isRoot = false): SystemScreen[] =>
+  SYSTEM_SCREENS.filter((screen) => screen.group === group && (isRoot || !screen.rootOnly))

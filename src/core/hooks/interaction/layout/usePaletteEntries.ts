@@ -12,6 +12,7 @@ import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { SEARCH_SETTINGS } from '@/declarations/configurations/settings'
 import { NavigationViews, visibleNavGroups } from '@/declarations/navigation'
 import type { NavigationItem } from '@/declarations/navigation'
+import { useFeatures } from '@/managers/front-end/FeaturesManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 
 export interface PaletteEntries {
@@ -27,10 +28,11 @@ export interface PaletteEntries {
 
 export const usePaletteEntries = (): PaletteEntries => {
   const { can, session } = useAuthContext()
+  const { isPathOpen } = useFeatures()
   const pathname = usePathname()
   const { pages } = usePageTree()
   const { visited } = useVisitedPaths()
-  const items = visibleNavGroups(NavigationViews.Administration, session, can).flatMap(
+  const items = visibleNavGroups(NavigationViews.Administration, session, can, isPathOpen).flatMap(
     (group) => group.items
   )
   const reached = new Map(items.map((item) => [item.href, item.icon]))

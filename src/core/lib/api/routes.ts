@@ -262,6 +262,7 @@ export const API_ROUTES = {
   mobileDock: '/api/preferences/bar',
   access: '/api/access',
   accessStream: '/api/access/stream',
+  features: '/api/features',
   accessFunctions: '/api/access/functions',
   accessFunction: (id: string) => `/api/access/functions/${id}`,
   accessMembers: '/api/access/members',

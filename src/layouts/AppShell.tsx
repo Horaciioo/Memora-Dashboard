@@ -7,6 +7,7 @@ import { BrandSplash } from '@/composites/splash/BrandSplash'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { PlayInviteHost } from '@/composites/play/invites/PlayInviteHost'
 import { AccessSignalListener } from '@/composites/access/AccessSignalListener'
+import { FeatureGate } from '@/composites/features/FeatureGate'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { TourHost } from '@/composites/tour/TourHost'
@@ -24,6 +25,7 @@ import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import type { HeldRoutes } from '@/declarations/ui/responsive'
 import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { useAutoRefresh } from '@/core/hooks/interaction/state/useAutoRefresh'
+import { useFeatures } from '@/managers/front-end/FeaturesManager'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
 import { TourProvider } from '@/managers/front-end/TourManager'
 import type { ViewContext } from '@/types/access'
@@ -102,6 +104,7 @@ const AppShellFrame = ({
 }: Omit<AppShellProps, 'tour'>) => {
   const { session, can } = useAuthContext()
   const { isClaimed, isBare, setSlot } = useRailSlot()
+  const { isOpen } = useFeatures()
 
   useAutoRefresh()
 
@@ -124,7 +127,9 @@ const AppShellFrame = ({
           <OfflineBanner />
           {session && <MobileTopBar />}
           <main className={APP_SHELL.content} {...beaconProps(TOUR_BEACONS.page)}>
-            <MobileHold routes={heldRoutes}>{children}</MobileHold>
+            <MobileHold routes={heldRoutes}>
+              <FeatureGate>{children}</FeatureGate>
+            </MobileHold>
           </main>
         </div>
 
@@ -139,9 +144,11 @@ const AppShellFrame = ({
         )}
         {session && <PwaHost isPushReady={isPushReady} />}
         {session && <NudgeHost />}
-        {session && !isBare && <AssistantDock viewContext={viewContext} />}
-        {session && !isBare && can(Permissions.PlayAccess) && <PlayInviteHost />}
-        {session && <TourHost />}
+        {session && !isBare && isOpen('assistant') && <AssistantDock viewContext={viewContext} />}
+        {session && !isBare && can(Permissions.PlayAccess) && isOpen('play.notices') && (
+          <PlayInviteHost />
+        )}
+        {session && isOpen('tour') && <TourHost />}
         {session && <AccessSignalListener />}
         {session && can(Permissions.LiveRead) && <LiveSignalListener />}
       </div>

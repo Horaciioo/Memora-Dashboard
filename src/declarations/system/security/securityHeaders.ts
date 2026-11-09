@@ -5,6 +5,13 @@
 
 export const NONCE_HEADER = 'x-nonce'
 
+/**
+ * Request header carrying the path the proxy saw, read by layouts
+ * @type {string}
+ */
+
+export const PATH_HEADER = 'x-memora-path'
+
 // One year
 const HSTS_MAX_AGE = 63_072_000
 

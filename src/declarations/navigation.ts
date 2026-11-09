@@ -108,6 +108,7 @@ export const ROUTES = {
   health: '/system/health',
   privileged: '/system/employees',
   systemPages: '/system/pages',
+  features: '/system/features',
   pages: '/pages',
   page: (id: string) => `/pages/${id}`,
   pageBlock: (id: string, blockId: string) => `/pages/${id}${BLOCK_HASH_PREFIX}${blockId}`,
@@ -521,6 +522,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   activity: 'Activité',
   health: 'Santé',
   employees: 'Employés',
+  features: 'Fonctionnalités',
   pages: 'Pages privées',
   trash: 'Corbeille',
   preview: 'Aperçu',
@@ -597,13 +599,15 @@ export const groupLabelOfPath = (pathname: string): string | null => {
  * @param {MemberStatusName} member.status - Membership status
  * @param {MemberRoleName} member.role - Hierarchy level
  * @param {(permission: PermissionName) => boolean} can - Permission check
+ * @param {(path: string) => boolean} [isPathOpen] - Screen is not switched off
  * @return {NavigationGroup[]} - Groups holding only their visible items
  */
 
 export const visibleNavGroups = (
   view: NavigationViewName,
   member: { status: MemberStatusName; role: MemberRoleName } | null,
-  can: (permission: PermissionName) => boolean
+  can: (permission: PermissionName) => boolean,
+  isPathOpen?: (path: string) => boolean
 ): NavigationGroup[] => {
   // A page reachable through two entries shows once, under the first
   const seen = new Set<string>()
@@ -615,7 +619,8 @@ export const visibleNavGroups = (
         const isVisible =
           itemInView(item, group, view) &&
           (!item.permission || can(item.permission)) &&
-          (!member || matchesNavigation(item.visibleWhen, member))
+          (!member || matchesNavigation(item.visibleWhen, member)) &&
+          (!isPathOpen || isPathOpen(item.href))
         if (!isVisible || seen.has(item.href)) return false
 
         seen.add(item.href)

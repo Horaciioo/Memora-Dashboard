@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: SYSTEM_COPY.title }
  */
 
 export default async function SystemPage() {
-  await requireSystem()
+  const { session } = await requireSystem()
 
   return (
     <div className={PAGE_STYLES.wrapper}>
@@ -27,7 +27,7 @@ export default async function SystemPage() {
         {SYSTEM_GROUPS.map((group) => (
           <Section key={group.key} title={group.label} bare>
             <div className={HOME_STYLES.rows}>
-              {systemScreensOfGroup(group.key).map((screen) => (
+              {systemScreensOfGroup(group.key, session.isRoot).map((screen) => (
                 <ConsoleRow
                   key={screen.route}
                   href={ROUTES[screen.route]}
