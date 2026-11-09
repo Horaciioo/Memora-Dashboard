@@ -7,6 +7,7 @@ import { apiDelete, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { browserSnapshot } from '@/core/lib/pwa/browserSnapshot'
 import { decodeKey, readPushSupport } from '@/core/lib/pwa/platform'
+import { restoreSubscription, writePushOptOut } from '@/core/lib/pwa/restoreSubscription'
 import { readSubscriptionBody } from '@/core/lib/pwa/subscription'
 import { PUSH_COPY } from '@/declarations/pwa/copy'
 import type { PushDeviceView } from '@/types/push'
@@ -17,6 +18,7 @@ import type { PushSupport } from '@/types/pwa'
  * @typedef {Object} PushDeviceState
  * @property {PushSupport | null} support - Unknown until mounted
  * @property {string | null} endpoint - Subscription of this browser
+ * @property {boolean} isChecked - Browser answered
  * @property {boolean} isBusy - Request in flight
  * @property {() => Promise<PushDeviceView | null>} enable - Asks, subscribes, records
  * @property {() => Promise<boolean>} disable - Unsubscribes, forgets
@@ -25,6 +27,7 @@ import type { PushSupport } from '@/types/pwa'
 export interface PushDeviceState {
   support: PushSupport | null
   endpoint: string | null
+  isChecked: boolean
   isBusy: boolean
   enable: () => Promise<PushDeviceView | null>
   disable: () => Promise<boolean>
@@ -41,18 +44,19 @@ export const usePushDevice = (publicKey: string | null): PushDeviceState => {
   // A refused prompt changes the answer
   const [answered, setAnswered] = useState<PushSupport | null>(null)
   const [endpoint, setEndpoint] = useState<string | null>(null)
+  const [isResolved, setIsResolved] = useState(false)
   const { isSaving, run } = useMutation()
   const support = answered ?? initial
 
-  // This browser may already be subscribed
+  // Known or restored subscription
   useEffect(() => {
     if (readPushSupport() !== 'available') return
 
-    void navigator.serviceWorker.ready
-      .then((registration) => registration.pushManager.getSubscription())
-      .then((subscription) => setEndpoint(subscription?.endpoint ?? null))
+    void restoreSubscription(publicKey)
+      .then(setEndpoint)
       .catch(() => undefined)
-  }, [])
+      .finally(() => setIsResolved(true))
+  }, [publicKey])
 
   // Permission is asked inside the tap, iOS refuses it otherwise
   const enable = useCallback(async () => {
@@ -76,6 +80,7 @@ export const usePushDevice = (publicKey: string | null): PushDeviceState => {
         readSubscriptionBody(subscription)
       )
       setEndpoint(subscription.endpoint)
+      writePushOptOut(false)
 
       return device
     }, PUSH_COPY.enabledToast)
@@ -85,6 +90,7 @@ export const usePushDevice = (publicKey: string | null): PushDeviceState => {
     const done = await run(async () => {
       const registration = await navigator.serviceWorker.ready
       const subscription = await registration.pushManager.getSubscription()
+      writePushOptOut(true)
       if (!subscription) return true
 
       await apiDelete(API_ROUTES.pushSubscription, { endpoint: subscription.endpoint })
@@ -97,5 +103,7 @@ export const usePushDevice = (publicKey: string | null): PushDeviceState => {
     return Boolean(done)
   }, [run])
 
-  return { support, endpoint, isBusy: isSaving, enable, disable }
+  const isChecked = isResolved || (support !== null && support !== 'available')
+
+  return { support, endpoint, isChecked, isBusy: isSaving, enable, disable }
 }

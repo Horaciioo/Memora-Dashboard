@@ -17,7 +17,9 @@ export const HomePushInvite = ({ publicKey }: HomePushInviteProps) => {
   const device = usePushDevice(publicKey)
 
   // Only offered when one tap can finish the job
-  if (!publicKey || device.support !== 'available' || device.endpoint) return null
+  if (!publicKey || device.support !== 'available' || device.endpoint || !device.isChecked) {
+    return null
+  }
 
   return (
     <PushDeviceCard

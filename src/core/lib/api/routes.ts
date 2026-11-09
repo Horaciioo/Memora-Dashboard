@@ -1,5 +1,6 @@
 import { SANCTION_PARAMS } from '@/declarations/sanctions/params'
 import { PUSH_JOURNAL_CURSOR } from '@/declarations/pwa/push'
+import { WORKER_SUBSCRIPTION_PATH } from '@/declarations/pwa/worker'
 
 /**
  * Single source of every API path
@@ -253,7 +254,7 @@ export const API_ROUTES = {
   notification: (id: string) => `/api/notifications/${id}`,
   notificationUnread: (id: string) => `/api/notifications/${id}/unread`,
   push: '/api/push',
-  pushSubscription: '/api/push/subscription',
+  pushSubscription: WORKER_SUBSCRIPTION_PATH,
   pushDevice: (id: string) => `/api/push/devices/${id}`,
   pushTrial: '/api/push/trial',
   pushJournal: (after?: string) =>

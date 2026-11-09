@@ -1,17 +1,25 @@
 /// <reference lib="webworker" />
 
+import { readSubscriptionBody } from '@/core/lib/pwa/subscription'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
 import {
   WORKER_ASSET_PREFIX,
   WORKER_CACHES,
   WORKER_MESSAGES,
   WORKER_PARAMS,
+  WORKER_SUBSCRIPTION_PATH,
 } from '@/declarations/pwa/worker'
 import type { PushPayload } from '@/declarations/pwa/worker'
 import { INSTALL_COPY } from '@/declarations/pwa/copy'
 import { staysQuiet } from '@/worker/quiet'
 
 declare const self: ServiceWorkerGlobalScope
+
+// Absent from the DOM typings
+type PushChange = ExtendableEvent & {
+  newSubscription?: PushSubscription | null
+  oldSubscription?: PushSubscription | null
+}
 
 // Settings handed over by the page through the script address
 const params = new URL(self.location.href).searchParams
@@ -63,7 +71,8 @@ const dropStaleCaches = async (): Promise<void> => {
 }
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(storeShell())
+  // A failed fallback never blocks pushes
+  event.waitUntil(storeShell().catch(() => undefined))
 })
 
 self.addEventListener('activate', (event) => {
@@ -189,32 +198,59 @@ self.addEventListener('push', (event) => {
  */
 
 const openFrom = async (payload: PushPayload | null): Promise<void> => {
-  // Seen on the phone, settled on the server
-  if (payload?.readUrl) {
-    await fetch(payload.readUrl, {
-      method: 'PATCH',
-      credentials: 'same-origin',
-      headers: { 'content-type': 'application/json' },
-      body: '{}',
-    }).catch(() => undefined)
-  }
+  // Runs beside the opening, the tap expires
+  const settled = payload?.readUrl
+    ? fetch(payload.readUrl, {
+        method: 'PATCH',
+        credentials: 'same-origin',
+        headers: { 'content-type': 'application/json' },
+        body: '{}',
+      }).catch(() => undefined)
+    : undefined
 
   const url = new URL(payload?.url ?? '/', self.location.origin).href
   const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
   const open = windows.find((window) => new URL(window.url).origin === self.location.origin)
 
   if (!open) {
-    await self.clients.openWindow(url)
+    await Promise.all([self.clients.openWindow(url), settled])
 
     return
   }
 
   // The page routes itself, its state stays
   open.postMessage({ type: WORKER_MESSAGES.opened, url, notificationId: payload?.notificationId })
-  await open.focus()
+  await Promise.all([open.focus(), settled])
 }
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   event.waitUntil(openFrom((event.notification.data as PushPayload | undefined) ?? null))
+})
+
+/**
+ * Replace a subscription the browser rotated
+ * @param {PushChange} change - Rotation event
+ * @return {Promise<void>} - Recorded
+ */
+
+const renew = async ({ newSubscription, oldSubscription }: PushChange): Promise<void> => {
+  const subscription =
+    newSubscription ??
+    (oldSubscription
+      ? await self.registration.pushManager.subscribe(oldSubscription.options)
+      : null)
+  if (!subscription) return
+
+  await fetch(WORKER_SUBSCRIPTION_PATH, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(readSubscriptionBody(subscription)),
+  })
+}
+
+self.addEventListener('pushsubscriptionchange', (event) => {
+  const change = event as PushChange
+  change.waitUntil(renew(change).catch(() => undefined))
 })
