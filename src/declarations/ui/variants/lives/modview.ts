@@ -524,8 +524,8 @@ export const MODVIEW_SIDEBAR = {
   divider: 'h-px w-6 bg-[var(--color-border)]',
   creator: 'flex size-10 items-center justify-center',
   // Leave dialog: two full width choices split by a line
-  leaveChoices: 'flex w-full flex-col gap-3',
-  leaveDivider: 'h-px w-full bg-[var(--color-border)]',
+  leaveChoices: 'grid w-full grid-cols-1 gap-3 sm:grid-cols-3',
+  leaveButton: 'w-full min-w-0',
   stack: 'flex flex-col items-center gap-3',
   group: 'relative flex flex-col items-center gap-1',
   button:

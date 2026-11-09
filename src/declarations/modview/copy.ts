@@ -14,7 +14,11 @@ export const MODVIEW_COPY = {
   windows: 'Fenêtres',
   back: 'Retourner à l’Accueil',
   leaveTitle: 'Tu t’arrêtes là ?',
-  leaveLead: 'Si tu continues, ton temps de modération reste compté.',
+  leaveLeadBefore: 'Tu peux décider de quitter la ',
+  leaveLeadStrong: 'Vue Modérateur',
+  leaveLeadAfter:
+    ', sans pour autant te mettre absent. Cependant, si tu ne reviens pas au bout d’un certain temps, Memora ne te considérera plus en train de modérer.',
+  leaveStay: 'Rester sur la vue',
   leaveStop: 'Oui, j’arrête de modérer',
   leaveKeep: 'Non, je continue',
   settings: 'Paramètres',

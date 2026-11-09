@@ -29,6 +29,9 @@ export const LeaveModViewButton = ({ liveId }: LeaveModViewButtonProps) => {
   const router = useRouter()
   const ExitIcon = ICONS.signOut
 
+  // Leave, still moderating
+  const leave = () => router.push(ROUTES.dashboard)
+
   // Stop moderating then leave
   const stop = async () => {
     const stopped = await run(() => apiPost(API_ROUTES.liveModStop(liveId), {}))
@@ -50,21 +53,28 @@ export const LeaveModViewButton = ({ liveId }: LeaveModViewButtonProps) => {
         open={isAsking}
         onClose={() => setAsking(false)}
         title={MODVIEW_COPY.leaveTitle}
-        size="xs"
+        size="lg"
         footer={
           <div className={MODVIEW_SIDEBAR.leaveChoices}>
             <Button
-              variant="success"
-              className="w-full"
+              variant="secondary"
+              className={MODVIEW_SIDEBAR.leaveButton}
               disabled={isSaving}
               onClick={() => setAsking(false)}
             >
+              {MODVIEW_COPY.leaveStay}
+            </Button>
+            <Button
+              variant="success"
+              className={MODVIEW_SIDEBAR.leaveButton}
+              disabled={isSaving}
+              onClick={leave}
+            >
               {MODVIEW_COPY.leaveKeep}
             </Button>
-            <div className={MODVIEW_SIDEBAR.leaveDivider} role="separator" />
             <Button
               variant="danger"
-              className="w-full"
+              className={MODVIEW_SIDEBAR.leaveButton}
               isLoading={isSaving}
               onClick={() => void stop()}
             >
@@ -73,7 +83,13 @@ export const LeaveModViewButton = ({ liveId }: LeaveModViewButtonProps) => {
           </div>
         }
       >
-        <p className="text-sm text-[var(--color-ink-subtle)]">{MODVIEW_COPY.leaveLead}</p>
+        <p className="text-sm text-[var(--color-ink-subtle)]">
+          {MODVIEW_COPY.leaveLeadBefore}
+          <strong className="font-bold text-[var(--color-ink)]">
+            {MODVIEW_COPY.leaveLeadStrong}
+          </strong>
+          {MODVIEW_COPY.leaveLeadAfter}
+        </p>
       </Dialog>
     </>
   )
