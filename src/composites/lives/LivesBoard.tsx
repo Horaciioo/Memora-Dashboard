@@ -9,6 +9,7 @@ import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { PageOptions } from '@/components/structures/page/PageOptions'
+import { FakeLivePanel } from '@/composites/lives/FakeLivePanel'
 import { LiveEndedDialog } from '@/composites/lives/notices/LiveEndedDialog'
 import { LiveRecent } from '@/composites/lives/LiveRecent'
 import { LiveStage } from '@/composites/lives/LiveStage'
@@ -33,6 +34,8 @@ export interface LivesBoardProps {
   canReport: boolean
   canDelete: boolean
   canCreatorReport: boolean
+  // Dev only: simulated live controls
+  showFakeLive?: boolean
 }
 
 /**
@@ -44,6 +47,7 @@ export interface LivesBoardProps {
  * @param {boolean} canReport - Viewer reads the Bilan
  * @param {boolean} canDelete - Viewer erases past lives
  * @param {boolean} canCreatorReport - Viewer reads the creator Bilan
+ * @param {boolean} [showFakeLive] - Dev controls of the fake live
  * @return {JSX.Element}
  */
 
@@ -55,6 +59,7 @@ export const LivesBoard = ({
   canReport,
   canDelete,
   canCreatorReport,
+  showFakeLive = false,
 }: LivesBoardProps) => {
   const { lives, recent, isSaving, endedId, dismissEnded, move, reopen } = useLives(
     initialLives,
@@ -165,6 +170,8 @@ export const LivesBoard = ({
           onClick={() => router.push(ROUTES.calendarNew(LIVE_PRESET))}
         />
       )}
+
+      {showFakeLive && <FakeLivePanel />}
 
       <LiveEndedDialog liveId={canReport ? endedId : null} onClose={dismissEnded} />
     </div>

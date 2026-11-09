@@ -13,6 +13,8 @@ export const teardown = async (): Promise<number> => {
   const steps = [
     () => prisma.notification.deleteMany({ where: OWN }),
     () => prisma.activityLog.deleteMany({ where: OWN }),
+    () => prisma.live.deleteMany({ where: OWN }),
+    () => prisma.viewerComment.deleteMany({ where: OWN }),
     () => prisma.eventAttendance.deleteMany({ where: OWN }),
     () => prisma.calendarEvent.deleteMany({ where: OWN }),
     () => prisma.juniorAnswer.deleteMany({ where: OWN }),
