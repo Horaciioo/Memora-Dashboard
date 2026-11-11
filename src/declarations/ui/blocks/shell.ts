@@ -80,8 +80,6 @@ export const LEFT_SIDEBAR = {
   rail: 'rail-ground relative z-40 font-[family-name:var(--font-system)] hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:fixed md:inset-y-0 md:left-0 md:flex md:transition-[width] md:duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none print:hidden',
   // Calendar menu or classic menu, plain buttons
   viewButtons: 'flex shrink-0 gap-2 px-4 pb-3',
-  // Line between the page types and the shortcuts
-  viewDivider: 'mx-4 h-px shrink-0 bg-[var(--color-border)]',
   viewButton:
     'flex h-8 flex-1 items-center justify-center rounded-[var(--radius-lg)] border border-transparent text-caption font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   viewButtonActive:
@@ -123,16 +121,22 @@ export const LEFT_SIDEBAR = {
   navGroupChevronCollapsed: '-rotate-90',
   navGroupItems: 'flex flex-col gap-px',
   navLink:
-    'group flex items-center gap-2.5 rounded-[var(--radius-lg)] px-3 py-1 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
+    'group relative flex items-center gap-2.5 rounded-[var(--radius-lg)] px-3 py-1 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
   navLinkActive: 'font-semibold text-[var(--color-ink)]',
   navLabel: 'rail-fold relative',
   // A creator is on air: red text breathing a soft glow
   navLabelLive: 'live-glow font-semibold text-[var(--color-live-400)]',
+  navLiveAvatar:
+    'absolute -right-1 -bottom-1 !size-7 ring-2 ring-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
   // Elbow joins each page opened under a destination: straight down, then a tight turn
   subPage:
     'relative ml-[1.375rem] pl-5 before:absolute before:top-0 before:left-0 before:h-4 before:w-3.5 before:rounded-bl-[0.5rem] before:border-b-2 before:border-l-2 before:border-[var(--color-ink-subtle)]/60',
   // First level starts right under the destination glyph
   subPageRoot: '-mt-1.5',
+  // Siblings hang from one trunk, each with its own elbow
+  branches: 'relative ml-[1.375rem] flex flex-col pt-0.5',
+  branch:
+    'rail-branch relative pl-5 before:absolute before:top-0 before:left-0 before:h-4 before:w-3.5 before:rounded-bl-[0.5rem] before:border-b-2 before:border-l-2 before:border-[var(--color-ink-subtle)]/60 not-last:after:absolute not-last:after:top-4 not-last:after:bottom-0 not-last:after:left-0 not-last:after:border-l-2 not-last:after:border-[var(--color-ink-subtle)]/60',
   subLink:
     'flex h-8 items-center rounded-[var(--radius-md)] px-2 text-caption font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   subLinkActive: 'font-semibold text-[var(--color-ink)]',

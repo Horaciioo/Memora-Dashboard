@@ -10,6 +10,7 @@ export {
   PAGINATION_STYLES,
   MEMBER_ADMIN,
 } from '@/declarations/ui/variants/data/tables'
+export { MANAGEMENT_BOARD } from '@/declarations/ui/variants/data/management'
 export {
   CALENDAR_AGENDA,
   CALENDAR_MOBILE,

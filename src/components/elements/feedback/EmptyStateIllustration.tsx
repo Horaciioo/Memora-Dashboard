@@ -363,6 +363,45 @@ export const TasksIllustration: FC<EmptyStateIllustrationProps> = ({ className }
   />
 )
 
+/**
+ * Two speech bubbles answering each other
+ * @param {EmptyStateIllustrationProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const ChatIllustration: FC<EmptyStateIllustrationProps> = ({ className }) => (
+  <Scene
+    className={className}
+    render={({ fill, lift, deep }) => (
+      <>
+        <path
+          d="M40 40h82a14 14 0 0 1 14 14v38a14 14 0 0 1-14 14H76l-20 18v-18h-16a14 14 0 0 1-14-14V54a14 14 0 0 1 14-14Z"
+          transform="translate(-10 0)"
+          fill={fill}
+        />
+        <rect x="46" y="58" width="60" height="8" rx="4" fill={LIGHT} />
+        <rect x="46" y="76" width="42" height="8" rx="4" fill={LIGHT} opacity="0.7" />
+        <path
+          d="M80 100h78a14 14 0 0 1 14 14v22a14 14 0 0 1-14 14h-6v16l-18-16H80a14 14 0 0 1-14-14v-22a14 14 0 0 1 14-14Z"
+          fill={lift}
+          stroke="var(--color-brand-200)"
+          strokeWidth="1.5"
+        />
+        <circle cx="94" cy="125" r="5" fill={deep} />
+        <circle cx="112" cy="125" r="5" fill={deep} opacity="0.75" />
+        <circle cx="130" cy="125" r="5" fill={deep} opacity="0.5" />
+        <Sparks
+          paint={lift}
+          items={[
+            { x: 160, y: 46, size: 8 },
+            { x: 28, y: 128, size: 6, soft: true },
+          ]}
+        />
+      </>
+    )}
+  />
+)
+
 // Columns and rows of the calendar days
 const DAY_COLUMNS = [58, 80, 102, 124] as const
 const DAY_ROWS = [84, 106, 128] as const

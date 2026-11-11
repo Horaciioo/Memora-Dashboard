@@ -46,6 +46,8 @@ export interface FilterBarProps {
   onFilter: (name: string, value: string) => void
   onReset: () => void
   isFiltered: boolean
+  // Control standing before the filter icon
+  leading?: ReactNode
   action?: ReactNode
 }
 
@@ -59,6 +61,7 @@ export interface FilterBarProps {
  * @param {(name: string, value: string) => void} onFilter - Filter handler
  * @param {() => void} onReset - Clears every filter
  * @param {boolean} isFiltered - At least one filter is set
+ * @param {ReactNode} [leading] - Control before the filter icon
  * @param {ReactNode} [action] - Control aligned to the right
  * @return {JSX.Element}
  */
@@ -72,6 +75,7 @@ export const FilterBar = ({
   onFilter,
   onReset,
   isFiltered,
+  leading,
   action,
 }: FilterBarProps) => {
   const [isPanelOpen, setPanelOpen] = useState(false)
@@ -89,6 +93,7 @@ export const FilterBar = ({
   return (
     <div>
       <div className={FILTER_STYLES.bar}>
+        {leading}
         {filters.length > 0 && (
           <button
             type="button"

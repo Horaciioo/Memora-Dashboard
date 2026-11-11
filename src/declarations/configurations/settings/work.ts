@@ -1,6 +1,7 @@
 import absences from '@/configurations/system/absences.json'
 import agenda from '@/configurations/system/agenda.json'
 import home from '@/configurations/system/home.json'
+import management from '@/configurations/system/management.json'
 import calendar from '@/configurations/system/calendar.json'
 import gestures from '@/configurations/system/gestures.json'
 import notifications from '@/configurations/system/notifications.json'
@@ -408,5 +409,33 @@ export const TOUR_SETTINGS = {
     path: 'system/tour.graceMs',
     fallback: 700,
     min: 0,
+  }),
+}
+
+/**
+ * Management board bounds
+ * @type {{ rowLimit: number, recentNoteDays: number, newcomerDays: number, veteranDays: number }}
+ */
+
+export const MANAGEMENT_SETTINGS = {
+  rowLimit: readInteger(management.rowLimit, {
+    path: 'system/management.rowLimit',
+    fallback: 500,
+    min: 1,
+  }),
+  recentNoteDays: readInteger(management.recentNoteDays, {
+    path: 'system/management.recentNoteDays',
+    fallback: 30,
+    min: 1,
+  }),
+  newcomerDays: readInteger(management.newcomerDays, {
+    path: 'system/management.newcomerDays',
+    fallback: 30,
+    min: 1,
+  }),
+  veteranDays: readInteger(management.veteranDays, {
+    path: 'system/management.veteranDays',
+    fallback: 365,
+    min: 1,
   }),
 }

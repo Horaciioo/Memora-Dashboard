@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 
 import { useTabSlide } from '@/core/hooks/interaction/layout/useTabSlide'
 import { Tabs, type TabItem } from '@/components/elements/navigation/Tabs'
+import { useTabMemory } from '@/managers/front-end'
 
 /**
  * One tab of a file surface
@@ -45,13 +47,20 @@ export interface FileTabsProps {
 
 export const FileTabs = ({ label, tabs, initial, value, onChange, centered }: FileTabsProps) => {
   const visible = tabs.filter((entry) => entry.visible !== false)
-  const [internalTab, setInternalTab] = useState(initial ?? visible[0]?.value ?? '')
+  const { remembered, remember } = useTabMemory(usePathname(), label)
+  // Coming back to a page reopens the tab it was left on
+  const [internalTab, setInternalTab] = useState(remembered ?? initial ?? visible[0]?.value ?? '')
   const tab = value ?? internalTab
   const setTab = onChange ?? setInternalTab
 
   // A tab losing its permission mid-session falls back rather than showing nothing
   const current = visible.find((entry) => entry.value === tab) ?? visible[0]
   const slide = useTabSlide(current ? visible.indexOf(current) : 0)
+
+  // The trail names the open tab
+  useEffect(() => {
+    if (current) remember({ value: current.value, label: current.label })
+  }, [current, remember])
 
   return (
     <>

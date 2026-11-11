@@ -1,4 +1,5 @@
 import type { MaturityName } from '@/declarations/maturity/registries'
+import { MANAGEMENT_BASE, MANAGEMENT_PAGES, managementHref } from '@/declarations/management/pages'
 import { BLOCK_HASH_PREFIX } from '@/declarations/pages/editor'
 import { PUSH_CONSOLE_COPY } from '@/declarations/pwa/copy'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
@@ -26,6 +27,7 @@ export const ROUTES = {
   exercise: (token: string) => `/exercise/${token}`,
   dashboard: '/dashboard',
   members: '/members',
+  management: MANAGEMENT_BASE,
   member: (id: string) => `/members/${id}`,
   projects: '/projects',
   project: (id: string) => `/projects/${id}`,
@@ -36,6 +38,7 @@ export const ROUTES = {
   meeting: (id: string) => `/meetings/${id}`,
   absences: '/absences',
   lives: '/lives',
+  modView: '/mod-view',
   live: (id: string) => `/lives/${id}`,
   liveReport: (id: string) => `/lives/${id}/report`,
   liveCreatorReport: (id: string) => `/lives/${id}/creator-report`,
@@ -192,6 +195,20 @@ export interface NavigationCondition {
 export const TRAININGS_DONE_PARAM = 'completed'
 
 /**
+ * Page unfolded under an entry
+ * @typedef {Object} NavigationChild
+ * @property {string} href - Destination
+ * @property {string} label - Display label
+ * @property {PermissionName} permission - Permission needed
+ */
+
+export interface NavigationChild {
+  href: string
+  label: string
+  permission: PermissionName
+}
+
+/**
  * Navigation entry
  * @typedef {Object} NavigationItem
  * @property {string} href - Destination
@@ -204,6 +221,7 @@ export const TRAININGS_DONE_PARAM = 'completed'
  * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
  * @property {boolean} [onLive] - Lights up while a live is open
  * @property {boolean} [quick] - Glyph box under the search
+ * @property {NavigationChild[]} [children] - Pages unfolded beneath, the entry needs one of them
  */
 
 export interface NavigationItem {
@@ -217,6 +235,7 @@ export interface NavigationItem {
   maturity?: MaturityName
   onLive?: boolean
   quick?: boolean
+  children?: NavigationChild[]
 }
 
 /**
@@ -301,12 +320,14 @@ export const NAVIGATION: NavigationGroup[] = [
       },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences', maturity: 'new' },
       { href: ROUTES.changelog, label: 'Nouveautés', icon: 'news', quick: true },
+      { href: ROUTES.pages, label: NAV_COPY.railPrivate, icon: 'page', maturity: 'alpha' },
       {
         href: ROUTES.play,
         label: 'Play',
         icon: 'play',
         permission: Permissions.PlayAccess,
         maturity: 'alpha',
+        quick: true,
       },
       {
         href: ROUTES.calendar,
@@ -362,6 +383,18 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.CommunicationRead,
         maturity: 'new',
       },
+      {
+        href: ROUTES.management,
+        label: NAV_COPY.management,
+        icon: 'settingsLine',
+        from: NavigationViews.Lead,
+        maturity: 'new',
+        children: MANAGEMENT_PAGES.map((page) => ({
+          href: managementHref(page.key),
+          label: page.label,
+          permission: page.permission,
+        })),
+      },
       // The Observateurs read the sessions from the moderator view, Programmes holds them above
       {
         href: ROUTES.recruitments,
@@ -415,12 +448,11 @@ export const NAVIGATION: NavigationGroup[] = [
     items: [
       {
         href: ROUTES.lives,
-        label: 'Live',
+        label: 'Lives',
         icon: 'liveDot',
         permission: Permissions.LiveRead,
         maturity: 'alpha',
         onLive: true,
-        quick: true,
       },
       {
         href: ROUTES.sanctions,
@@ -489,13 +521,20 @@ export interface Crumb {
 export const SEGMENT_LABELS: Record<string, string> = {
   dashboard: NAV_COPY.home,
   members: 'Modérateurs',
+  management: NAV_COPY.management,
+  networks: 'Réseaux',
+  notes: 'Notes',
+  birthdays: 'Anniversaires',
+  arrivals: 'Arrivées',
+  functions: 'Fonctions',
   teams: 'Équipes',
   projects: 'Projets',
   tasks: 'Tâches',
   meetings: 'Réunions',
   communications: 'Communications',
   absences: 'Absences',
-  lives: 'Live en cours',
+  lives: 'Lives',
+  'mod-view': 'Mod. View',
   calendar: 'Calendrier',
   trainings: 'Formations',
   academy: 'Marsha Academy',
@@ -615,18 +654,25 @@ export const visibleNavGroups = (
   return NAVIGATION.filter((group) => groupInView(group, view))
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => {
-        const isVisible =
-          itemInView(item, group, view) &&
-          (!item.permission || can(item.permission)) &&
-          (!member || matchesNavigation(item.visibleWhen, member)) &&
-          (!isPathOpen || isPathOpen(item.href))
-        if (!isVisible || seen.has(item.href)) return false
+      items: group.items
+        .filter((item) => {
+          const isVisible =
+            itemInView(item, group, view) &&
+            (!item.permission || can(item.permission)) &&
+            (!item.children || item.children.some((child) => can(child.permission))) &&
+            (!member || matchesNavigation(item.visibleWhen, member)) &&
+            (!isPathOpen || isPathOpen(item.href))
+          if (!isVisible || seen.has(item.href)) return false
 
-        seen.add(item.href)
+          seen.add(item.href)
 
-        return true
-      }),
+          return true
+        })
+        .map((item) =>
+          item.children
+            ? { ...item, children: item.children.filter((child) => can(child.permission)) }
+            : item
+        ),
     }))
     .filter((group) => group.items.length > 0)
 }
