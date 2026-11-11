@@ -30,6 +30,7 @@ export type ArgType = (typeof ARG_TYPES)[number]
  * @property {number} [max] - Highest integer, longest string
  * @property {readonly string[]} [values] - Allowed enum values
  * @property {string} [entity] - Argument naming the entity a field or pairs belong to
+ * @property {boolean} [links] - Pairs may also set foreign keys
  * @property {string | number | boolean} [fallback] - Value when absent
  */
 
@@ -41,6 +42,7 @@ export interface ArgSpec {
   max?: number
   values?: readonly string[]
   entity?: string
+  links?: boolean
   fallback?: string | number | boolean
 }
 
@@ -49,12 +51,14 @@ export interface ArgSpec {
  * @typedef {Object} ColumnInfo
  * @property {string} type - Prisma scalar or enum name
  * @property {boolean} editable - A command may set it
+ * @property {boolean} [linkable] - A foreign key a creation may set
  * @property {readonly string[]} [enumValues] - Values when an enum
  */
 
 export interface ColumnInfo {
   type: string
   editable: boolean
+  linkable?: boolean
   enumValues?: readonly string[]
 }
 
@@ -243,8 +247,8 @@ const checkPairs = (
     const name = comma === -1 ? raw : raw.slice(0, comma)
     const column = columns?.[name]
 
-    if (comma === -1 || !column?.editable)
-      return { error: `colonne ${name} introuvable ou protégée` }
+    const settable = column?.editable || (spec.links && column?.linkable)
+    if (comma === -1 || !settable) return { error: `colonne ${name} introuvable ou protégée` }
     if (name in pairs) return { error: `colonne ${name} donnée deux fois` }
 
     const converted = convertColumnValue(column, raw.slice(comma + 1))

@@ -4,7 +4,7 @@ import * as client from '@prisma/client'
 
 import type { ArgContext, ColumnInfo } from '@/core/lib/nexus/args'
 import { isMaskedColumn } from '@/core/lib/nexus/redact'
-import { readModels } from '@/core/lib/nexus/schema'
+import { columnsOfModel, detailsOf, readModels } from '@/core/lib/nexus/schema'
 import { ENTITY_INVENTORY, GAME_INVENTORY } from '@/declarations/nexus/inventory'
 
 // Columns no command rewrites
@@ -47,6 +47,13 @@ const columnsOf = (key: string): Record<string, ColumnInfo> | null => {
   if (!model) return null
 
   const writable = entry.exposure === 'full'
+  const details = detailsOf(key)
+  const locked = new Set(
+    (details ? columnsOfModel(details) : []).flatMap((field) =>
+      field.id || field.updatedAt ? [field.name] : []
+    )
+  )
+  const foreign = new Set(details?.fields.flatMap((field) => field.relation?.fields ?? []) ?? [])
 
   return Object.fromEntries(
     model.fields
@@ -58,7 +65,11 @@ const columnsOf = (key: string): Record<string, ColumnInfo> | null => {
           editable:
             writable &&
             !FIXED_COLUMNS.includes(field.name) &&
+            !locked.has(field.name) &&
+            !foreign.has(field.name) &&
             !isMaskedColumn(field.name, entry.hidden),
+          linkable:
+            writable && foreign.has(field.name) && !isMaskedColumn(field.name, entry.hidden),
           enumValues: field.kind === 'enum' ? enumValuesOf(field.type) : undefined,
         },
       ])
