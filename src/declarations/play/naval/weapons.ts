@@ -1,5 +1,5 @@
 import naval from '@/configurations/play/naval.json'
-import { readChoice, readInteger, readNode } from '@/declarations/configurations/readers'
+import { readBoolean, readChoice, readInteger, readNode } from '@/declarations/configurations/readers'
 import { NavalShapes, NavalWeapons } from '@/utils/constants/play'
 import type { NavalShapeName, NavalWeaponName } from '@/utils/constants/play'
 
@@ -12,16 +12,16 @@ const weapons = readNode(naval.weapons, 'play/naval.weapons')
  * @property {NavalWeaponName} name - Key
  * @property {NavalShapeName} shape - Footprint
  * @property {number} reach - Footprint size
- * @property {number} cost - Ammo spent
- * @property {number} weight - Draw weight, zero never drawn
+ * @property {number} weight - Draw weight
+ * @property {boolean} ramps - Drawn more often as a game goes on
  */
 
 export interface NavalWeapon {
   name: NavalWeaponName
   shape: NavalShapeName
   reach: number
-  cost: number
   weight: number
+  ramps: boolean
 }
 
 /**
@@ -41,9 +41,9 @@ const readWeapon = (name: NavalWeaponName): NavalWeapon => {
       fallback: NavalShapes.Point,
       allowed: Object.values(NavalShapes),
     }),
-    reach: readInteger(node.reach, { path: `${path}.reach`, fallback: 0, min: 0, max: 36 }),
-    cost: readInteger(node.cost, { path: `${path}.cost`, fallback: 0, min: 0 }),
+    reach: readInteger(node.reach, { path: `${path}.reach`, fallback: 0, min: 0, max: 90 }),
     weight: readInteger(node.weight, { path: `${path}.weight`, fallback: 0, min: 0 }),
+    ramps: readBoolean(node.ramps, { path: `${path}.ramps`, fallback: false }),
   }
 }
 

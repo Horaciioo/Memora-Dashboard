@@ -68,6 +68,31 @@ const paintEdge = ({ ctx, cell, left, top, size }: OceanFrame): void => {
 }
 
 /**
+ * Permanent grid over the water
+ * @param {OceanFrame} frame - Frame
+ * @return {void}
+ */
+
+const paintGrid = (frame: OceanFrame): void => {
+  const { ctx, cell, left, top, size } = frame
+  const { x0, x1, y0, y1 } = sightOf(frame)
+  ctx.strokeStyle = NAVAL_WATER.grid
+  ctx.lineWidth = Math.max(1, cell * 0.025)
+  ctx.beginPath()
+  for (let column = x0; column <= x1 + 1; column += 1) {
+    const x = left + column * cell
+    ctx.moveTo(x, top + y0 * cell)
+    ctx.lineTo(x, top + Math.min(size, y1 + 1) * cell)
+  }
+  for (let row = y0; row <= y1 + 1; row += 1) {
+    const y = top + row * cell
+    ctx.moveTo(left + x0 * cell, y)
+    ctx.lineTo(left + Math.min(size, x1 + 1) * cell, y)
+  }
+  ctx.stroke()
+}
+
+/**
  * Animated water of a sea
  * @param {OceanFrame} frame - Frame
  * @return {void}
@@ -76,5 +101,6 @@ const paintEdge = ({ ctx, cell, left, top, size }: OceanFrame): void => {
 export const paintWater = (frame: OceanFrame): void => {
   paintBed(frame)
   paintSwell(frame)
+  paintGrid(frame)
   paintEdge(frame)
 }

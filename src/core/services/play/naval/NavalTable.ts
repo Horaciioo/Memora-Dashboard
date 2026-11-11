@@ -25,8 +25,7 @@ export interface NavalCaptain {
   eliminatedAt: Date | null
   place: number | null
   strikes: number
-  ammo: number
-  offer: string[]
+  weapon: string
 }
 
 /**

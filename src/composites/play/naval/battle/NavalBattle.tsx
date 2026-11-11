@@ -14,9 +14,7 @@ import { NavalArsenal } from '@/composites/play/naval/battle/NavalArsenal'
 import { NavalBracket } from '@/composites/play/naval/NavalBracket'
 import { NavalFoes } from '@/composites/play/naval/battle/NavalFoes'
 import { NavalHud } from '@/composites/play/naval/NavalHud'
-import { NavalMine } from '@/composites/play/naval/battle/NavalMine'
 import { NavalResult } from '@/composites/play/naval/NavalResult'
-import { NavalSide } from '@/composites/play/naval/battle/NavalSide'
 import { NavalStartCountdown } from '@/composites/play/naval/NavalStartCountdown'
 import { NavalTargetSea } from '@/composites/play/naval/battle/NavalTargetSea'
 import { useNavalAim } from '@/composites/play/naval/battle/useNavalAim'
@@ -24,10 +22,9 @@ import { useNavalCues } from '@/composites/play/naval/battle/useNavalCues'
 import { useNavalPlayback } from '@/composites/play/naval/battle/useNavalPlayback'
 import { NavalCodes } from '@/core/lib/play/naval/state'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
-import { NAVAL_MODE_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { NAVAL_BOARD } from '@/declarations/ui/variants/games/naval'
-import { NavalModes, NavalPhases } from '@/utils/constants/play'
+import { NavalModes, NavalPhases, NavalWeapons } from '@/utils/constants/play'
 
 /**
  * Battle screen: foes, the sea aimed at, the arsenal and the viewer's own fleet
@@ -76,14 +73,17 @@ export const NavalBattle = ({
     size: board.sea.size,
     target: target >= 0 ? captains[target].accountId : null,
     canFire,
-    arms: { ammo: board.you?.ammo ?? 0, offer: board.you?.offer ?? [] },
+    weapon: board.you?.weapon ?? NavalWeapons.Cannon,
+    reachScale: board.sea.reachScale,
     resetKey: `${target}:${matchIndex}:${board.rev}`,
   })
   useNavalCues({ isMyTurn: Boolean(isMyTurn) && !playback.isBusy, event })
 
   // Placement may leave the page scrolled
   const root = useRef<HTMLDivElement>(null)
-  useEffect(() => root.current?.scrollIntoView({ block: 'start' }), [])
+  useEffect(() => {
+    root.current?.scrollIntoView({ block: 'start' })
+  }, [])
 
   if (board.phase === NavalPhases.Over && !playback.isBusy) {
     const sunkBy = (seat: number) =>
@@ -93,12 +93,16 @@ export const NavalBattle = ({
   }
 
   const { call, tone } = callOf({ board, match: matchIndex, viewer, captains, playback })
+  // Attacked or waiting for the turn: the viewer's own sea, else the sea aimed at
+  const isIncoming = playing?.strike.match === matchIndex && playing.strike.target === viewer
+  const isOwnShown =
+    isFighter && match?.status === 'LIVE' && (isIncoming || (!isMyTurn && !playing))
+  const mineMarks = viewer >= 0 ? marksOf(viewer) : []
+  const mineWrecks = isOwnShown ? shipsShown(board, mineMarks, matchIndex, viewer) : []
   const onTarget =
     playing && playing.strike.match === matchIndex && playing.strike.target === target
       ? playing
       : null
-  const mineMarks = viewer >= 0 ? marksOf(viewer) : []
-  const wrecks = viewer >= 0 ? shipsShown(board, mineMarks, matchIndex, viewer) : []
   const chips = foes.map((seat) => ({
     captain: captains[seat],
     afloat: afloatOf(seat),
@@ -118,74 +122,54 @@ export const NavalBattle = ({
 
   return (
     <div ref={root} className={NAVAL_BOARD.root}>
-      {match && <NavalStartCountdown startsAt={match.startsAt} serverTime={board.serverTime} />}
+      {match && <NavalStartCountdown startsAt={match.startsAt} serverTime={board.serverTime} map={board.settings.map} />}
       <div className={NAVAL_BOARD.battle}>
-        <div className={NAVAL_BOARD.hud}>
-          <NavalHud
-            mode={NAVAL_MODE_COPY[board.settings.mode].title}
-            call={call}
-            tone={tone}
-            clock={clock}
-          />
-        </div>
-        <div className={NAVAL_BOARD.left}>
-          {foes.length > 1 && (
-            <div className={NAVAL_BOARD.foes}>
-              <NavalFoes
-                chips={chips}
-                total={board.sea.fleet.length}
-                selected={target}
-                canPick
-                onPick={setPickedFoe}
-              />
-            </div>
-          )}
-          {viewer >= 0 && board.you?.fleet && (
-            <div className={NAVAL_BOARD.mine}>
-              <NavalMine
-                size={board.sea.size}
-                marks={mineMarks}
-                ships={board.you.fleet.map((ship) => ({
-                  ship,
-                  isWreck: wrecks.some((entry) => entry.ship.id === ship.id),
-                }))}
-                playing={playing && playing.strike.target === viewer ? playing : null}
-              />
-            </div>
-          )}
-        </div>
-        <div className={NAVAL_BOARD.sea}>
+        <div className={NAVAL_BOARD.stage}>
+          <NavalHud call={call} tone={tone} clock={clock} />
           {target >= 0 && (
             <NavalTargetSea
               size={board.sea.size}
-              seaKey={`${matchIndex}:${target}`}
-              target={captains[target]}
-              marks={marksOf(target)}
-              ships={shipsShown(board, marksOf(target), matchIndex, target)}
-              playing={onTarget}
+              target={captains[isOwnShown ? viewer : target]}
+              isMine={isOwnShown}
+              marks={isOwnShown ? mineMarks : marksOf(target)}
+              ships={
+                isOwnShown
+                  ? (board.you?.fleet ?? []).map((ship) => ({
+                      ship,
+                      isWreck: mineWrecks.some((entry) => entry.ship.id === ship.id),
+                    }))
+                  : shipsShown(board, marksOf(target), matchIndex, target)
+              }
+              playing={isOwnShown ? (isIncoming ? playing : null) : onTarget}
               aim={aim}
               callout={
                 event && event.strike.match === matchIndex ? { event, captains, viewer } : null
               }
             />
           )}
-        </div>
-        {isFighter && (
-          <div className={NAVAL_BOARD.fire}>
+          {isFighter && (
             <NavalArsenal
               weapon={aim.weapon}
+              drawKey={String(board.rev)}
               orientation={aim.orientation}
-              arms={{ ammo: board.you?.ammo ?? 0, offer: board.you?.offer ?? [] }}
               isMyTurn={Boolean(isMyTurn)}
               canFire={aim.isOpen && Boolean(aim.aim)}
               waitCall={call}
-              onPick={aim.pick}
               onTurn={aim.turn}
               onFire={aim.fire}
             />
-          </div>
-        )}
-        <div className={NAVAL_BOARD.side}>
+          )}
+        </div>
+        <div className={NAVAL_BOARD.rail}>
+          {foes.length > 1 && (
+            <NavalFoes
+              chips={chips}
+              total={board.sea.fleet.length}
+              selected={target}
+              canPick
+              onPick={setPickedFoe}
+            />
+          )}
           {board.settings.mode === NavalModes.Bracket && (
             <NavalBracket
               board={board}
@@ -194,9 +178,6 @@ export const NavalBattle = ({
               viewer={viewer}
               onWatch={setPickedMatch}
             />
-          )}
-          {board.settings.mode === NavalModes.Melee && (
-            <NavalSide captains={captains} afloatOf={afloatOf} />
           )}
         </div>
       </div>

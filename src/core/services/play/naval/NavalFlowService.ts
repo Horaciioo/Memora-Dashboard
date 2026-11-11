@@ -66,7 +66,7 @@ const openRound = async (
       },
     })
     table.matches.push(match)
-    if (match.turnId) await armCaptain(table, match.turnId, true)
+    if (match.turnId) await armCaptain(table, match, match.turnId)
   }
   table.isDirty = true
 }

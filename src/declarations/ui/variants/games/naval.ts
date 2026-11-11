@@ -14,20 +14,16 @@ const KEY =
  */
 
 export const NAVAL_BOARD = {
-  root: 'relative mx-auto flex w-full max-w-[74rem] flex-col gap-3 px-3 pt-2 pb-28 text-[var(--play-naval-ink)] select-none lg:px-6',
-  // Phones stack, wide screens set three columns
-  battle:
-    'grid grid-cols-1 gap-3 lg:grid-cols-[minmax(15rem,1fr)_minmax(0,34rem)_minmax(15rem,1fr)] lg:items-start [grid-template-areas:"hud"_"foes"_"sea"_"fire"_"mine"_"side"] lg:[grid-template-areas:"hud_hud_hud"_"left_sea_side"_"left_fire_side"]',
-  hud: '[grid-area:hud]',
-  // Phones keep the strip and the fleet apart, wide screens stack them on the left
-  left: 'contents lg:flex lg:flex-col lg:gap-3 lg:[grid-area:left]',
-  foes: '[grid-area:foes] lg:[grid-area:auto]',
-  sea: 'mx-auto flex w-[min(100%,calc(100dvh-25rem))] min-w-[18rem] flex-col gap-2 [grid-area:sea] lg:w-full lg:min-w-0',
-  fire: 'mx-auto w-full max-w-[34rem] [grid-area:fire]',
-  mine: 'flex flex-col gap-3 [grid-area:mine] lg:[grid-area:auto]',
-  side: 'flex flex-col gap-3 [grid-area:side]',
+  root: 'relative mx-auto flex min-h-[calc(100dvh-9rem)] w-full max-w-[80rem] flex-col gap-3 px-3 pt-2 pb-28 lg:pb-6 text-[var(--play-naval-ink)] select-none lg:px-6',
+  // Phones stack, wide screens set the sea beside a slim rail
+  battle: 'my-auto flex flex-col items-center gap-4',
+  // Bar, sea and weapon share the width of the sea, as large as the screen allows
+  stage:
+    'mx-auto flex w-[min(100%,calc(100dvh-17rem))] min-w-[19rem] flex-col gap-2.5',
+  rail: 'flex w-full max-w-[34rem] flex-col gap-3 empty:hidden',
   target: 'relative mx-auto w-full',
-  mineSea: 'mx-auto mt-2 w-[min(100%,15rem)] lg:w-full',
+  mineTag:
+    'pointer-events-none absolute inset-x-0 top-3 z-10 text-center text-lg font-black tracking-[0.14em] text-white uppercase [text-shadow:0_0.1rem_0.6rem_rgb(0_0_0/0.8)]',
   panel: PANEL,
   title: 'text-xs font-black tracking-[0.14em] uppercase text-[var(--play-naval-ink-soft)]',
   sub: 'text-sm font-semibold text-[var(--play-naval-ink-soft)]',
@@ -39,13 +35,12 @@ export const NAVAL_BOARD = {
  */
 
 export const NAVAL_HUD = {
-  bar: `${PANEL} flex items-center gap-3`,
-  lead: 'flex min-w-0 flex-1 flex-col',
-  mode: 'text-xs font-black tracking-[0.14em] uppercase text-[var(--play-naval-glow)]',
+  bar: 'flex items-center justify-center',
+  lead: 'flex min-w-0 flex-1 flex-col items-center gap-1 text-center',
   call: 'truncate text-lg leading-6 font-black text-[var(--play-naval-ink)] sm:text-xl',
   callMine: 'text-[var(--play-naval-reticle)]',
   callDanger: 'text-[var(--play-naval-danger)]',
-  clockRow: 'flex items-center gap-2',
+  clockRow: 'flex w-full max-w-xs items-center gap-2',
   clock: 'naval-clock h-1.5 flex-1 overflow-hidden rounded-full bg-white/10',
   clockFill: 'naval-clock-fill block h-full w-full rounded-full bg-[var(--play-naval-glow)]',
   clockAlert: 'bg-[var(--play-naval-danger)]',
@@ -78,28 +73,24 @@ export const NAVAL_FOES = {
  */
 
 export const NAVAL_PLACE = {
-  root: 'mx-auto grid w-full max-w-[56rem] grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,34rem)_1fr] lg:items-start',
-  sea: 'mx-auto w-[min(100%,calc(100dvh-24rem))] min-w-[18rem] lg:w-full lg:min-w-0',
-  side: 'flex flex-col gap-3',
-  dock: 'flex flex-wrap gap-2',
-  ship: 'naval-dock-ship flex min-h-12 touch-none items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 text-sm font-bold transition-[transform,border-color,opacity] duration-150 active:scale-95',
-  shipName: 'hidden lg:inline',
-  shipOn: 'border-[var(--play-naval-reticle)] bg-white/15',
+  root: 'mx-auto flex min-h-[calc(100dvh-9rem)] w-full max-w-[96rem] flex-col items-center gap-3 px-3 pt-2 pb-28 lg:px-8 lg:pb-6 text-[var(--play-naval-ink)] select-none',
+  // Title and timer above, the sea beside its ships and keys
+  stage: 'my-auto flex w-full flex-col items-center gap-4',
+  head: 'flex w-full max-w-md flex-col items-center gap-2 text-center',
+  heading: 'text-2xl font-black',
+  body: 'grid w-full grid-cols-1 items-center gap-6 lg:grid-cols-[min(72rem,calc(100dvh-12rem))_minmax(14rem,20rem)] lg:justify-start',
+  sea: 'mx-auto w-[min(100%,calc(100dvh-24rem))] lg:w-full',
+  side: 'flex flex-col items-center gap-4 lg:items-stretch',
+  dock: 'flex flex-wrap items-center justify-center gap-x-4 gap-y-2 lg:flex-col lg:items-start',
+  ship: 'naval-dock-ship shrink-0 touch-none rounded-lg px-1.5 py-2 transition-[transform,opacity,background-color] duration-150 active:scale-95',
+  sprite: 'block',
+  spriteCell: 30,
+  shipOn: 'bg-white/20',
   shipDone: 'opacity-45',
-  cells: 'flex gap-0.5',
-  cellBlock: 'size-3 rounded-[0.2rem] bg-[var(--play-naval-hull)]',
-  keys: 'flex gap-2 [&>button]:flex-auto [&>button]:px-2 [&>button]:text-xs [&>button]:whitespace-nowrap lg:flex-wrap lg:[&>button]:px-4 lg:[&>button]:text-sm',
+  keys: 'flex w-full flex-wrap gap-2 lg:flex-col [&>button]:flex-auto [&>button]:px-2 [&>button]:text-xs [&>button]:whitespace-nowrap lg:[&>button]:px-4 lg:[&>button]:text-sm',
   key: `${KEY} bg-white/10 text-[var(--play-naval-ink)] hover:bg-white/20`,
   keyMain: `${KEY} bg-[var(--play-naval)] text-white hover:bg-[#2b8bbd]`,
-  roster: 'hidden lg:block',
-  ready: 'flex flex-col gap-1.5',
-  readyRow: 'flex items-center gap-2 text-sm font-semibold',
-  readyOff: 'opacity-55',
-  heading: 'text-xl font-black',
-  skins: 'mt-2 grid grid-cols-4 gap-1.5 lg:grid-cols-2 lg:gap-2',
-  skin: 'flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/5 px-1 text-xs font-bold lg:min-h-11 lg:flex-row lg:justify-start lg:gap-2 lg:px-2.5 lg:text-sm',
-  skinOn: 'border-[var(--play-naval-reticle)] bg-white/15',
-  swatch: 'h-3 w-7 rounded-full',
+  sub: 'text-sm font-semibold text-[var(--play-naval-ink-soft)]',
 } as const
 
 /**
@@ -173,7 +164,7 @@ export const NAVAL_HUB = {
 } as const
 
 /**
- * Canvas sea and its mini map
+ * Canvas sea
  * @type {Record<string, string>}
  */
 
@@ -181,25 +172,35 @@ export const NAVAL_OCEAN = {
   box: 'naval-ocean relative aspect-square w-full touch-none select-none',
   dim: 'naval-ocean-dim',
   canvas: 'naval-ocean-canvas block size-full rounded-[1rem]',
-  map: 'absolute top-2 right-2 z-10 aspect-square w-[22%] max-w-32 cursor-pointer rounded-lg border border-white/20 [image-rendering:pixelated]',
 } as const
 
 /**
- * Weapon row, ammo line and action key
+ * Weapon drawn and action key
  * @type {Record<string, string>}
  */
 
 export const NAVAL_ARSENAL = {
-  root: 'flex flex-col gap-2 rounded-2xl border border-white/10 bg-[var(--play-naval-panel)] p-2.5 backdrop-blur-sm',
+  root: 'flex items-stretch gap-2 rounded-2xl border border-white/10 bg-[var(--play-naval-panel)] p-2 backdrop-blur-sm',
   idle: 'opacity-80',
-  row: 'grid grid-cols-5 gap-1.5',
-  key: 'relative grid aspect-square min-h-12 place-items-center rounded-xl border border-white/10 bg-white/5 text-[var(--play-naval-ink)] transition-[transform,opacity] duration-150 active:scale-95 disabled:opacity-30',
-  keyOn: 'border-[var(--play-naval-reticle)] bg-white/15 text-[var(--play-naval-reticle)]',
-  glyph: 'size-7 fill-current',
-  cost: 'absolute top-0.5 right-1 text-[0.65rem] font-black tabular-nums',
-  ammo: 'flex gap-1',
-  pip: 'h-1.5 flex-1 rounded-full bg-white/10',
-  pipOn: 'bg-[var(--play-naval-reticle)]',
-  fire: 'min-h-12 rounded-xl bg-[var(--play-naval-hit)] px-4 text-lg font-black text-white transition-transform active:scale-[0.98] disabled:bg-white/10 disabled:text-[var(--play-naval-ink-soft)]',
-  wait: 'grid min-h-12 place-items-center text-center text-base font-black text-[var(--play-naval-ink-soft)]',
+  card: 'naval-draw flex min-w-0 flex-1 items-center gap-3 rounded-xl bg-white/10 px-2.5 py-1.5 text-left text-[var(--play-naval-ink)] transition-transform active:scale-[0.98]',
+  cardFixed: 'cursor-default active:scale-100 disabled:opacity-100',
+  glyphBox: 'grid size-12 shrink-0 place-items-center rounded-lg bg-black/25 text-[var(--play-naval-reticle)]',
+  glyph: 'size-9 fill-current',
+  text: 'flex min-w-0 flex-col',
+  name: 'truncate text-lg leading-6 font-black',
+  note: 'truncate text-xs font-semibold text-[var(--play-naval-ink-soft)]',
+  fire: 'min-h-14 min-w-28 rounded-xl bg-[var(--play-naval-hit)] px-5 text-lg font-black text-white transition-transform active:scale-[0.97] disabled:bg-white/10 disabled:text-[var(--play-naval-ink-soft)]',
+  wait: 'grid min-h-14 w-full place-items-center text-center text-base font-black text-[var(--play-naval-ink-soft)]',
+} as const
+
+/**
+ * Map card of the launch vote: drawn picture, size badge
+ * @type {Record<string, string>}
+ */
+
+export const NAVAL_MAP_CARD = {
+  shot: 'absolute inset-0 size-full object-cover',
+  // Soft tint while the picture is being drawn
+  pending: 'absolute inset-0 animate-pulse bg-white/10',
+  size: 'absolute right-2 bottom-2 rounded-full bg-black/55 px-2 py-0.5 text-xs font-extrabold tabular-nums text-white backdrop-blur-sm sm:text-sm',
 } as const

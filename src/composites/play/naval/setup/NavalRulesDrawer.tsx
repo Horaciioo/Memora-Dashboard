@@ -3,6 +3,7 @@
 import { PlayRulesDrawer } from '@/composites/play/rules/PlayRulesDrawer'
 import type { NavalGameSettings } from '@/core/lib/play/naval/settings'
 import { fillPlayMessage } from '@/declarations/play/copy'
+import { navalMapTitle } from '@/declarations/play/naval/maps'
 import {
   NAVAL_MODE_COPY,
   NAVAL_RULE_COPY,
@@ -32,7 +33,7 @@ export const NavalRulesDrawer = ({
   const seconds = (value: number) => fillPlayMessage(NAVAL_SETUP_COPY.seconds, { seconds: value })
   const rows = [
     { label: NAVAL_RULES_COPY.mode, value: NAVAL_MODE_COPY[settings.mode].title },
-    { label: NAVAL_RULES_COPY.format, value: NAVAL_SETUP_COPY[settings.format] },
+    { label: NAVAL_RULES_COPY.map, value: navalMapTitle(settings.map) },
     { label: NAVAL_RULES_COPY.turn, value: seconds(settings.turnSeconds) },
     { label: NAVAL_RULES_COPY.placement, value: seconds(settings.placementSeconds) },
     ...(Object.keys(NAVAL_RULE_COPY) as NavalRuleName[]).map((name) => ({

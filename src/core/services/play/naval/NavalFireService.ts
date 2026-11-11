@@ -4,7 +4,6 @@ import type { NavalMatch, NavalShot } from '@prisma/client'
 
 import { conflict } from '@/core/lib/errors'
 import {
-  canWield,
   cellsOf,
   chooseSquare,
   indexOf,
@@ -17,7 +16,7 @@ import {
   weaponOf,
 } from '@/core/lib/play/naval'
 import type { NavalCell, NavalKnowledge, NavalStrikeCell } from '@/core/lib/play/naval'
-import { armCaptain, spendWeapon } from '@/core/services/play/naval/NavalArmsService'
+import { armCaptain } from '@/core/services/play/naval/NavalArmsService'
 import { finishMatch, eliminate } from '@/core/services/play/naval/NavalOutcomeService'
 import {
   aliveIn,
@@ -66,7 +65,7 @@ export const passTurn = async (table: NavalTable, match: NavalMatch): Promise<vo
   const alive = new Set(aliveIn(table, match))
   const nextId = nextShooter(match.fighters, alive, match.turnId)
   await saveMatch(table, match, { turnId: nextId, turnEndsAt: clockFrom(table) })
-  if (nextId) await armCaptain(table, nextId, true)
+  if (nextId) await armCaptain(table, match, nextId)
 }
 
 /**
@@ -96,7 +95,7 @@ const strikeCells = (
   { targetId, cell, weapon, orientation }: NavalStrikeAsk
 ): NavalStrikeCell[] =>
   strike({
-    weapon: weaponOf(weapon),
+    weapon: weaponOf(weapon, table.sea.reachScale),
     origin: cell,
     orientation,
     fleet: captainOf(table, targetId)?.fleet ?? [],
@@ -140,7 +139,6 @@ export const fireShot = async (
   })
   table.shots.push(...shots)
   table.isDirty = true
-  await spendWeapon(table, shooterId, weapon)
 
   // A sunk fleet leaves the fight, a bracket waits for its match to close
   const isFleetDown = shipsAfloat(fleet, shotsAt(table, match.id, targetId)).length === 0
@@ -163,7 +161,7 @@ export const fireShot = async (
     turnId: nextId,
     turnEndsAt: clockFrom(table, playbackMs(isSunk)),
   })
-  if (nextId) await armCaptain(table, nextId, !keeps)
+  if (nextId) await armCaptain(table, match, nextId)
 
   return shots
 }
@@ -257,11 +255,11 @@ export const checkShot = (
   const target = targetId ?? (enemies.length === 1 ? enemies[0] : null)
   if (!target || !enemies.includes(target)) throw conflict(PLAY_ERRORS.badTarget)
 
-  // Weapon held, paid for and turned a valid way
+  // Weapon drawn and turned a valid way
   const shooter = captainOf(table, shooterId)
   const isTurned =
     Number.isInteger(orientation) && orientation >= 0 && orientation < turnsOf(weaponOf(weapon))
-  if (!shooter || !canWield(weapon, shooter) || !isTurned) throw conflict(PLAY_ERRORS.badWeapon)
+  if (!shooter || shooter.weapon !== weapon || !isTurned) throw conflict(PLAY_ERRORS.badWeapon)
 
   // Inside the sea, something left to strike
   const isAimed = isInside(cell.x, cell.y, table.sea.size)

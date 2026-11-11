@@ -27,7 +27,7 @@ export const NavalBoard = ({ sessionId, board: initial, faces, viewerId }: Naval
   const viewer = board.players.findIndex((player) => player.accountId === viewerId)
 
   return board.phase === NavalPhases.Placement ? (
-    <NavalPlacement sessionId={sessionId} board={board} captains={captains} viewer={viewer} />
+    <NavalPlacement sessionId={sessionId} board={board} viewer={viewer} />
   ) : (
     <NavalBattle sessionId={sessionId} board={board} captains={captains} viewer={viewer} />
   )

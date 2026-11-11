@@ -2,6 +2,7 @@ import { resolveShot } from '@/core/lib/play/naval/battle'
 import type { NavalCell } from '@/core/lib/play/naval/battle'
 import { cellsOf, isInside } from '@/core/lib/play/naval/fleet'
 import type { NavalShip, Rng } from '@/core/lib/play/naval/fleet'
+import type { NavalRamp } from '@/declarations/play/naval/maps'
 import { NAVAL_WEAPONS } from '@/declarations/play/naval/weapons'
 import type { NavalWeapon } from '@/declarations/play/naval/weapons'
 import { NavalResults, NavalShapes, NavalWeapons } from '@/utils/constants/play'
@@ -19,7 +20,7 @@ export interface NavalStrikeCell extends NavalCell {
 // Orientations a weapon takes, four for the torpedo
 export const NAVAL_TURNS = { line: 2, ray: 4 } as const
 
-// Torpedo heading per orientation: east, south, west, north
+// Gunship heading per orientation: east, south, west, north
 const HEADINGS = [
   [1, 0],
   [0, 1],
@@ -28,13 +29,17 @@ const HEADINGS = [
 ]
 
 /**
- * Weapon of the catalogue
+ * Weapon of the catalogue, its reach grown by the theatre
  * @param {NavalWeaponName} name - Key
+ * @param {number} [reachScale] - Theatre multiplier
  * @return {NavalWeapon} - Weapon
  */
 
-export const weaponOf = (name: NavalWeaponName): NavalWeapon =>
-  NAVAL_WEAPONS.find((weapon) => weapon.name === name) ?? NAVAL_WEAPONS[0]
+export const weaponOf = (name: NavalWeaponName, reachScale = 1): NavalWeapon => {
+  const weapon = NAVAL_WEAPONS.find((entry) => entry.name === name) ?? NAVAL_WEAPONS[0]
+
+  return reachScale === 1 ? weapon : { ...weapon, reach: Math.round(weapon.reach * reachScale) }
+}
 
 /**
  * Wire code of a weapon
@@ -182,48 +187,32 @@ export const strike = ({
     struck.push({ ...cell, result })
     history.push(cell)
     done.add(key(cell))
-    if (weapon.shape === NavalShapes.Ray && result !== NavalResults.Miss) break
   }
 
   return struck
 }
 
 /**
- * Weapons offered for a turn, drawn by weight, the cannon apart
- * @param {number} count - Weapons drawn
- * @param {Rng} [rng] - Random source
- * @return {NavalWeaponName[]} - Weapons
+ * Weight multiplier of strong weapons at a turn, a slow capped climb
+ * @param {NavalRamp} ramp - Theatre ramp
+ * @param {number} turn - Strikes the captain already fired
+ * @return {number} - Multiplier, 1 at the start
  */
 
-export const drawOffer = (count: number, rng: Rng = Math.random): NavalWeaponName[] => {
-  const pool = NAVAL_WEAPONS.filter((weapon) => weapon.weight > 0)
-  const offer: NavalWeaponName[] = []
-  while (offer.length < count && pool.length) {
-    const total = pool.reduce((sum, weapon) => sum + weapon.weight, 0)
-    let roll = rng() * total
-    const at = pool.findIndex((weapon) => (roll -= weapon.weight) < 0)
-    const [picked] = pool.splice(at < 0 ? pool.length - 1 : at, 1)
-    offer.push(picked.name)
-  }
-
-  return offer
-}
+export const rampAt = ({ everyTurns, step, max }: NavalRamp, turn: number): number =>
+  Math.min(max, 1 + step * Math.floor(Math.max(0, turn) / everyTurns))
 
 /**
- * Weapon a captain may fire now
- * @param {NavalWeaponName} name - Weapon
- * @param {Object} arms - Captain arms
- * @param {number} arms.ammo - Ammo held
- * @param {string[]} arms.offer - Weapons offered
- * @return {boolean} - Allowed
+ * Weapon drawn for a turn, by weight, strong weapons grown by the ramp
+ * @param {Rng} [rng] - Random source
+ * @param {number} [boost] - Multiplier of strong weapons
+ * @return {NavalWeaponName} - Weapon
  */
 
-export const canWield = (
-  name: NavalWeaponName,
-  { ammo, offer }: { ammo: number; offer: string[] }
-) => {
-  const weapon = weaponOf(name)
-  const isOffered = weapon.cost === 0 || offer.includes(name)
+export const drawWeapon = (rng: Rng = Math.random, boost = 1): NavalWeaponName => {
+  const weightOf = (weapon: NavalWeapon) => weapon.weight * (weapon.ramps ? boost : 1)
+  const total = NAVAL_WEAPONS.reduce((sum, weapon) => sum + weightOf(weapon), 0)
+  let roll = rng() * total
 
-  return isOffered && ammo >= weapon.cost
+  return (NAVAL_WEAPONS.find((weapon) => (roll -= weightOf(weapon)) < 0) ?? NAVAL_WEAPONS[0]).name
 }

@@ -1,51 +1,40 @@
 import 'server-only'
 
-import { drawOffer, weaponOf } from '@/core/lib/play/naval'
+import type { NavalMatch } from '@prisma/client'
+
+import { drawWeapon, rampAt } from '@/core/lib/play/naval'
 import { captainOf, saveCaptain } from '@/core/services/play/naval/NavalTable'
 import type { NavalTable } from '@/core/services/play/naval/NavalTable'
-import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
-import type { NavalWeaponName } from '@/utils/constants/play'
 
 /**
- * Arm a captain for a turn: weapons drawn, ammo on a new turn
+ * Strikes a captain already fired in a match, one revision per strike
  * @param {NavalTable} table - Table
+ * @param {NavalMatch} match - Match
  * @param {string} accountId - Captain
- * @param {boolean} isNewTurn - Turn just handed over
+ * @return {number} - Strikes
+ */
+
+const strikesFired = (table: NavalTable, match: NavalMatch, accountId: string): number =>
+  new Set(
+    table.shots
+      .filter((shot) => shot.matchId === match.id && shot.shooterId === accountId)
+      .map((shot) => shot.rev)
+  ).size
+
+/**
+ * Draw the weapon a captain fires next, strong weapons slowly more frequent
+ * @param {NavalTable} table - Table
+ * @param {NavalMatch} match - Match being fought
+ * @param {string} accountId - Captain
  * @return {Promise<void>} - Written
  */
 
 export const armCaptain = async (
   table: NavalTable,
-  accountId: string,
-  isNewTurn: boolean
+  match: NavalMatch,
+  accountId: string
 ): Promise<void> => {
-  const captain = captainOf(table, accountId)
-  if (!captain) return
-  const { perTurn, max } = NAVAL_SETTINGS.ammo
-  await saveCaptain(table, accountId, {
-    ammo: isNewTurn ? Math.min(max, captain.ammo + perTurn) : captain.ammo,
-    offer: drawOffer(NAVAL_SETTINGS.offerSize),
-  })
-}
-
-/**
- * Pay for a weapon fired
- * @param {NavalTable} table - Table
- * @param {string} accountId - Captain
- * @param {NavalWeaponName} name - Weapon
- * @return {Promise<void>} - Written
- */
-
-export const spendWeapon = async (
-  table: NavalTable,
-  accountId: string,
-  name: NavalWeaponName
-): Promise<void> => {
-  const captain = captainOf(table, accountId)
-  const { cost } = weaponOf(name)
-  if (!captain || cost === 0) return
-  await saveCaptain(table, accountId, {
-    ammo: captain.ammo - cost,
-    offer: captain.offer.filter((entry) => entry !== name),
-  })
+  if (!captainOf(table, accountId)) return
+  const boost = rampAt(table.sea.ramp, strikesFired(table, match, accountId))
+  await saveCaptain(table, accountId, { weapon: drawWeapon(Math.random, boost) })
 }

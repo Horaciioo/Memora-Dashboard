@@ -1,3 +1,9 @@
+import {
+  paintGrenade,
+  paintGunship,
+  paintMuzzle,
+  paintSubmarine,
+} from '@/composites/play/naval/ocean/paint/arms'
 import { centreOf, clamp01, noise } from '@/composites/play/naval/ocean/paint/frame'
 import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
 import { isHitCode, NavalCodes } from '@/core/lib/play/naval/state'
@@ -23,14 +29,31 @@ const CHAIN_MS = 90
 const DEBRIS = 7
 
 /**
+ * Weapon name of a strike
+ * @param {NavalStrikeView} strike - Strike
+ * @return {string} - Name
+ */
+
+const weaponOfStrike = (strike: NavalStrikeView): string =>
+  NAVAL_WEAPONS[strike.weapon]?.name ?? NavalWeapons.Cannon
+
+/**
  * Landing time of each square, from the strike start
  * @param {NavalStrikeView} strike - Strike
  * @param {number} index - Square order
  * @return {number} - Milliseconds
  */
 
-export const landingOf = (strike: NavalStrikeView, index: number): number =>
-  NAVAL_SETTINGS.flightMs + index * CHAIN_MS
+export const landingOf = (strike: NavalStrikeView, index: number): number => {
+  const weapon = weaponOfStrike(strike)
+  const last = Math.max(1, strike.cells.length - 1)
+  const { flightMs } = NAVAL_SETTINGS
+  // The helicopter sweeps the line, the torpedoes run along it
+  if (weapon === NavalWeapons.Gunship) return flightMs * 0.25 + (index / last) * flightMs * 1.5
+  if (weapon === NavalWeapons.Torpedo) return flightMs * 0.5 + (index / last) * flightMs * 0.7
+
+  return flightMs + index * CHAIN_MS
+}
 
 /**
  * Shell in flight: arc above the sea, shadow below that grows as it falls
@@ -174,36 +197,6 @@ const paintPlanes = (frame: OceanFrame, strike: NavalStrikeView, age: number): v
 }
 
 /**
- * Wake of a torpedo running from its edge to the last square
- * @param {OceanFrame} frame - Frame
- * @param {NavalStrikeView} strike - Strike
- * @param {number} age - Milliseconds since the start
- * @return {void}
- */
-
-const paintWake = (frame: OceanFrame, strike: NavalStrikeView, age: number): void => {
-  const { ctx, cell } = frame
-  const from = centreOf(frame, strike.cells[0].x, strike.cells[0].y)
-  const last = strike.cells.at(-1) ?? strike.cells[0]
-  const to = centreOf(frame, last.x, last.y)
-  const run = clamp01(age / NAVAL_SETTINGS.flightMs)
-  const head = { x: from.x + (to.x - from.x) * run, y: from.y + (to.y - from.y) * run }
-  ctx.strokeStyle = NAVAL_WATER.wake
-  ctx.lineCap = 'round'
-  ctx.lineWidth = cell * 0.18
-  ctx.globalAlpha = 0.7
-  ctx.beginPath()
-  ctx.moveTo(from.x, from.y)
-  ctx.lineTo(head.x, head.y)
-  ctx.stroke()
-  ctx.globalAlpha = 1
-  ctx.fillStyle = frame.skin.shell
-  ctx.beginPath()
-  ctx.arc(head.x, head.y, cell * 0.12, 0, Math.PI * 2)
-  ctx.fill()
-}
-
-/**
  * Flare rising, then drifting down under its chute, its light spreading
  * @param {OceanFrame} frame - Frame
  * @param {NavalStrikeView} strike - Strike
@@ -246,15 +239,6 @@ const paintFlare = (frame: OceanFrame, strike: NavalStrikeView, age: number): vo
 }
 
 /**
- * Weapon name of a strike
- * @param {NavalStrikeView} strike - Strike
- * @return {string} - Name
- */
-
-const weaponOfStrike = (strike: NavalStrikeView): string =>
-  NAVAL_WEAPONS[strike.weapon]?.name ?? NavalWeapons.Cannon
-
-/**
  * Whole strike: delivery by weapon, then every impact on time
  * @param {OceanFrame} frame - Frame
  * @param {OceanStrike} playing - Strike on screen
@@ -264,8 +248,13 @@ const weaponOfStrike = (strike: NavalStrikeView): string =>
 export const paintStrike = (frame: OceanFrame, { strike, startedAt }: OceanStrike): number => {
   const age = frame.now - startedAt
   const weapon = weaponOfStrike(strike)
+  const landings = strike.cells.map((_, index) => landingOf(strike, index))
+  const isDelivered = weapon === NavalWeapons.Gunship || weapon === NavalWeapons.Torpedo
   if (weapon === NavalWeapons.Airstrike) paintPlanes(frame, strike, age)
-  if (weapon === NavalWeapons.Torpedo) paintWake(frame, strike, age)
+  if (weapon === NavalWeapons.Gunship) paintGunship(frame, strike, age, landings)
+  if (weapon === NavalWeapons.Torpedo) paintSubmarine(frame, strike, age, landings)
+  if (!isDelivered && weapon !== NavalWeapons.Flare && weapon !== NavalWeapons.Airstrike)
+    paintMuzzle(frame, age)
   if (weapon === NavalWeapons.Flare) {
     paintFlare(frame, strike, age)
 
@@ -273,16 +262,16 @@ export const paintStrike = (frame: OceanFrame, { strike, startedAt }: OceanStrik
   }
   let shake = 0
   strike.cells.forEach((cell, index) => {
-    const landing =
-      weapon === NavalWeapons.Torpedo && index < strike.cells.length - 1
-        ? -1
-        : landingOf(strike, index)
-    if (landing < 0) return
+    const landing = landings[index]
     const progress = age / landing
-    if (progress < 1 && weapon !== NavalWeapons.Torpedo) {
+    if (progress < 1 && !isDelivered) {
       const start = weapon === NavalWeapons.Airstrike ? 0.55 : 0
-      if (progress >= start)
-        paintShell(frame, centreOf(frame, cell.x, cell.y), (progress - start) / (1 - start))
+      if (progress < start) return
+      const to = centreOf(frame, cell.x, cell.y)
+      const flight = (progress - start) / (1 - start)
+      if (weapon === NavalWeapons.Grenade) paintGrenade(frame, to, flight)
+      else paintShell(frame, to, flight)
+
       return
     }
     if (progress < 1) return

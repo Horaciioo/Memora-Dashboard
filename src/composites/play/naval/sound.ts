@@ -45,17 +45,22 @@ export const playNavalTake = (take: NavalTakeName, level = 1, delayMs = 0): void
 }
 
 /**
- * Departure of a strike: gun, planes, torpedo or rocket
+ * Departure of a strike: guns, planes, helicopter, submarine or flare
  * @param {string} weapon - Weapon
  * @param {number} level - Zero to one
  * @return {void}
  */
 
 const launch = (weapon: string, level: number): void => {
-  if (weapon === NavalWeapons.Airstrike) return playNaval('planes', level)
+  if (weapon === NavalWeapons.Airstrike || weapon === NavalWeapons.Gunship)
+    return playNaval('planes', level)
   if (weapon === NavalWeapons.Torpedo) return playNaval('torpedo', level)
   if (weapon === NavalWeapons.Flare) return playNaval('flare', level)
-  playNavalTake('cannon', level)
+
+  // Guns that fire several times in a row
+  const rounds = weapon === NavalWeapons.Volley ? 3 : weapon === NavalWeapons.Pair ? 2 : 1
+  for (let round = 0; round < rounds; round += 1)
+    playNavalTake('cannon', level, round * NAVAL_MIX.chainMs)
 }
 
 /**

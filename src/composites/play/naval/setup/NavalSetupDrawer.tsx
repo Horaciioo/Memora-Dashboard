@@ -6,13 +6,13 @@ import { InfoHint } from '@/components/elements/feedback/InfoHint'
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
-import { SetupChips, SetupSection, SetupStepper } from '@/composites/play/setup/PlaySetupFields'
+import { SetupSection, SetupStepper } from '@/composites/play/setup/PlaySetupFields'
 import { navalSettingsOf } from '@/core/lib/play/naval/settings'
 import type { NavalGameSettings } from '@/core/lib/play/naval/settings'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { NAVAL_MODE_COPY, NAVAL_RULE_COPY, NAVAL_SETUP_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
-import type { NavalFormatName, NavalRuleName } from '@/declarations/play/naval/settings'
+import type { NavalRuleName } from '@/declarations/play/naval/settings'
 import { FIELD_STYLES } from '@/declarations/ui/variants'
 import { NAVAL_SETUP } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
@@ -23,12 +23,6 @@ const TABS = [
   { value: 'game', label: NAVAL_SETUP_COPY.tabGame, icon: 'playPawn' as const },
   { value: 'rules', label: NAVAL_SETUP_COPY.tabRules, icon: 'playRules' as const },
 ]
-
-// Formats as chips
-const FORMATS = (Object.keys(NAVAL_SETTINGS.formats) as NavalFormatName[]).map((value) => ({
-  value,
-  label: NAVAL_SETUP_COPY[value],
-}))
 
 // House rules, in reading order
 const RULES = Object.keys(NAVAL_RULE_COPY) as NavalRuleName[]
@@ -87,14 +81,6 @@ export const NavalSetupDrawer = ({
                     </button>
                   ))}
                 </div>
-              </SetupSection>
-              <SetupSection styles={NAVAL_SETUP} title={NAVAL_SETUP_COPY.format}>
-                <SetupChips
-                  styles={NAVAL_SETUP}
-                  options={FORMATS}
-                  value={settings.format}
-                  onChange={set('format')}
-                />
               </SetupSection>
               <SetupSection
                 styles={NAVAL_SETUP}

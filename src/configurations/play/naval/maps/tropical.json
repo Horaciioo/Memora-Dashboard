@@ -1,0 +1,94 @@
+{
+  "legacyFormat": "compact",
+  "theatre": {
+    "size": 14,
+    "fleet": [
+      5,
+      4,
+      3,
+      3,
+      2
+    ],
+    "reachScale": 1,
+    "ramp": {
+      "everyTurns": 1,
+      "step": 0.25,
+      "max": 6
+    }
+  },
+  "frame": {
+    "band": {
+      "north": 5,
+      "east": 5,
+      "south": 2,
+      "west": 2
+    }
+  },
+  "light": {
+    "sun": [
+      -0.55,
+      -0.8
+    ],
+    "tint": "rgba(255,236,170,0.10)",
+    "shade": "rgba(8,40,60,0.28)"
+  },
+  "water": {
+    "deep": "#0b4f86",
+    "mid": "#1690bb",
+    "shallow": "#46cfd0",
+    "lagoon": "#8ff0dc",
+    "foam": "#f4fffb",
+    "sheen": "rgba(220,255,250,0.22)",
+    "grid": "rgba(255,255,255,0.26)"
+  },
+  "land": {
+    "sand": "#f4e3b5",
+    "sandDark": "#d6b97c",
+    "wet": "#c9b088",
+    "leaf": "#3e9a48",
+    "leafDark": "#1f6634",
+    "leafLight": "#8fd26a",
+    "trunk": "#80593a",
+    "rock": "#8c9196",
+    "rockDark": "#565b61",
+    "rockLight": "#c3c8cc"
+  },
+  "decor": [
+    {
+      "kind": "island",
+      "side": "north",
+      "at": 0.74,
+      "depth": 0.45,
+      "scale": 1
+    },
+    {
+      "kind": "rocks",
+      "side": "north",
+      "at": 0.22,
+      "depth": 0.35,
+      "scale": 0.55
+    },
+    {
+      "kind": "rocks",
+      "side": "east",
+      "at": 0.42,
+      "depth": 0.5,
+      "scale": 0.7
+    },
+    {
+      "kind": "rocks",
+      "side": "east",
+      "at": 0.82,
+      "depth": 0.4,
+      "scale": 0.45
+    }
+  ],
+  "life": {
+    "clouds": 4,
+    "birds": 3
+  },
+  "preview": {
+    "span": 21,
+    "focus": 0.2
+  }
+}

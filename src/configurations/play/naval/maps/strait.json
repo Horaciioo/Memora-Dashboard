@@ -1,0 +1,121 @@
+{
+  "theatre": {
+    "size": 20,
+    "fleet": [
+      5,
+      4,
+      3,
+      3,
+      2
+    ],
+    "reachScale": 1.5,
+    "ramp": {
+      "everyTurns": 1,
+      "step": 0.25,
+      "max": 6
+    }
+  },
+  "frame": {
+    "band": {
+      "north": 3,
+      "east": 6,
+      "south": 10,
+      "west": 3
+    }
+  },
+  "light": {
+    "sun": [
+      0.35,
+      -0.95
+    ],
+    "tint": "rgba(200,212,224,0.10)",
+    "shade": "rgba(12,20,28,0.38)"
+  },
+  "water": {
+    "deep": "#16293a",
+    "mid": "#28465a",
+    "shallow": "#46677a",
+    "lagoon": "#5d7a88",
+    "foam": "#e3ebef",
+    "sheen": "rgba(220,232,240,0.14)",
+    "grid": "rgba(230,240,248,0.16)"
+  },
+  "land": {
+    "concrete": "#9ba1a4",
+    "concreteDark": "#5f666b",
+    "concreteLight": "#c4c9cb",
+    "roof": "#56707f",
+    "roofDark": "#3a4e5a",
+    "roofWarm": "#a4583f",
+    "crane": "#e2ae37",
+    "craneDark": "#9a7420",
+    "lamp": "#ffd66e",
+    "steel": "#3b444c",
+    "rust": "#8a4b2c",
+    "rock": "#6f7578",
+    "rockDark": "#41474b",
+    "rockLight": "#a3a9ac",
+    "flare": "rgba(255,140,40,0.55)",
+    "beacon": "rgba(255,236,170,0.22)"
+  },
+  "decor": [
+    {
+      "kind": "harbour",
+      "side": "south",
+      "at": 0.45,
+      "depth": 0.5,
+      "scale": 1
+    },
+    {
+      "kind": "factory",
+      "side": "east",
+      "at": 0.3,
+      "depth": 0.5,
+      "scale": 1
+    },
+    {
+      "kind": "rig",
+      "side": "northeast",
+      "at": 0.5,
+      "depth": 0.5,
+      "scale": 0.9
+    },
+    {
+      "kind": "lighthouse",
+      "side": "southwest",
+      "at": 0.5,
+      "depth": 0.5,
+      "scale": 0.8
+    },
+    {
+      "kind": "wreck",
+      "side": "north",
+      "at": 0.3,
+      "depth": 0.5,
+      "scale": 0.7
+    },
+    {
+      "kind": "wreck",
+      "side": "east",
+      "at": 0.78,
+      "depth": 0.5,
+      "scale": 0.6
+    },
+    {
+      "kind": "wreck",
+      "side": "west",
+      "at": 0.6,
+      "depth": 0.5,
+      "scale": 0.6
+    }
+  ],
+  "life": {
+    "clouds": 4,
+    "birds": 2,
+    "mist": 0.2
+  },
+  "preview": {
+    "span": 22,
+    "focus": 0.55
+  }
+}

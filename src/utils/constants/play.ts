@@ -238,6 +238,10 @@ export const NavalWeapons = {
   Broadside: 'broadside',
   Flare: 'flare',
   Torpedo: 'torpedo',
+  Pair: 'pair',
+  Volley: 'volley',
+  Grenade: 'grenade',
+  Gunship: 'gunship',
 } as const
 
 export type NavalWeaponName = (typeof NavalWeapons)[keyof typeof NavalWeapons]
