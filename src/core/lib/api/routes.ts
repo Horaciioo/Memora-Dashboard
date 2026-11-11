@@ -109,6 +109,7 @@ export const API_ROUTES = {
   juniorFile: (id: string) => `/api/juniors/${id}/file`,
   academyFollow: '/api/academy/follow',
   academyReferents: '/api/academy/referents',
+  academyHistory: '/api/academy/history',
   taskDone: (id: string) => `/api/tasks/${id}/done`,
   meetings: '/api/meetings',
   meeting: (id: string) => `/api/meetings/${id}`,

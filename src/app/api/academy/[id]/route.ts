@@ -20,12 +20,11 @@ export const PATCH = createProtectedRoute({
   permission: Permissions.AcademyManage,
   descriptor: { summary: 'Edit an academy session', tags: ['academy'] },
   handler: async ({ params, raw, session, access }) => {
-    const fields = await sessionFields()
-    const parsed = parseFormValues(fields, raw, { fillMissing: true })
-    if (!parsed.ok) throw invalidInput(parsed.issues)
-
     const scope = academyScope(session, access)
     const before = await readSession(params.id, scope)
+    const fields = await sessionFields(undefined, before.summary.values.referentIds as string[])
+    const parsed = parseFormValues(fields, raw, { fillMissing: true })
+    if (!parsed.ok) throw invalidInput(parsed.issues)
     const sessions = await updateSession(params.id, scope, parsed.values)
     const after = sessions.find((entry) => entry.id === params.id)
 
