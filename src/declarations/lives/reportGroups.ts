@@ -28,6 +28,8 @@ export const GROUP_OF_KIND: Record<ModerationKind, ReportGroup> = {
   UNBAN_REQUEST_APPROVE: 'other',
   UNBAN_REQUEST_DENY: 'other',
   MESSAGE_SEND: 'other',
+  ROLE_CHANGE: 'other',
+  WARN_ACK: 'other',
 }
 
 /**

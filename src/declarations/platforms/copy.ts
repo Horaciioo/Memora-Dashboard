@@ -20,6 +20,12 @@ export const TWITCH_EVENT_COPY: {
     subscribersoff: 'Ouvert aux non-abonnés',
     emoteonly: 'Émoticônes uniquement',
     emoteonlyoff: 'Émoticônes uniquement coupé',
+    shield: 'Mode bouclier activé',
+    shieldoff: 'Mode bouclier coupé',
+    mod: 'Modérateur ajouté',
+    unmod: 'Modérateur retiré',
+    vip: 'VIP ajouté',
+    unvip: 'VIP retiré',
   },
   automodCategories: {
     aggression: 'Agressivité',

@@ -64,6 +64,11 @@ const kindOf = (action: string, event: Payload): ModerationKind | null => {
       return child(event, 'unban_request').is_approved === true
         ? 'UNBAN_REQUEST_APPROVE'
         : 'UNBAN_REQUEST_DENY'
+    case 'mod':
+    case 'unmod':
+    case 'vip':
+    case 'unvip':
+      return 'ROLE_CHANGE'
     default:
       return MODE_ACTIONS.has(action) ? 'MODE_CHANGE' : null
   }
@@ -100,6 +105,22 @@ export const logEntryOf = (
       durationSeconds: null,
       reason: null,
       messageExcerpt: text(child(event, 'message').text),
+      occurredAt: meta.at,
+    }
+  }
+
+  // The viewer who read the warning is the target, never an actor
+  if (type === 'channel.warning.acknowledge') {
+    return {
+      kind: 'WARN_ACK',
+      externalEventId: meta.id,
+      actorPlatformUserId: null,
+      actorLogin: null,
+      targetPlatformUserId: text(event.user_id),
+      targetLogin: text(event.user_login),
+      durationSeconds: null,
+      reason: null,
+      messageExcerpt: null,
       occurredAt: meta.at,
     }
   }

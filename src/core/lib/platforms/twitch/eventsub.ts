@@ -240,17 +240,44 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
         }),
       ]
     }
-    default:
-      if (!MODE_ACTIONS.has(action)) return []
+    case 'mod':
+    case 'unmod':
+    case 'vip':
+    case 'unvip': {
+      const target = userOf(child(event, action), 'user')
 
       return [
         scene({
           kind: 'act',
-          act: actOf(id, 'mode', event, at, {
-            quote: TWITCH_EVENT_COPY.modeActions[action] ?? action,
+          act: actOf(id, 'role', event, at, {
+            target: target.name || target.login,
+            targetId: target.id || null,
+            quote: TWITCH_EVENT_COPY.modeActions[action],
           }),
         }),
       ]
+    }
+    default: {
+      if (!MODE_ACTIONS.has(action)) return []
+      const detail = child(event, action)
+      const seconds = Number(detail.wait_time_seconds)
+      const minutes = Number(detail.follow_duration_minutes)
+      const label = TWITCH_EVENT_COPY.modeActions[action] ?? action
+      // Delay of the slow mode, age of the follower mode
+      const suffix =
+        action === 'slow' && seconds > 0
+          ? ` (${seconds} s)`
+          : action === 'followers' && minutes > 0
+            ? ` (${minutes} min)`
+            : ''
+
+      return [
+        scene({
+          kind: 'act',
+          act: actOf(id, 'mode', event, at, { quote: `${label}${suffix}` }),
+        }),
+      ]
+    }
   }
 }
 
@@ -343,6 +370,23 @@ export const translateTwitchEvent = (
       return [scene({ kind: 'modes', modes: { shield: type === 'channel.shield_mode.begin' } })]
     case 'channel.moderate':
       return moderateSignals(event, meta.id, meta.at)
+    case 'channel.warning.acknowledge': {
+      const viewer = userOf(event, 'user')
+
+      return [
+        scene({
+          kind: 'act',
+          act: {
+            id: meta.id,
+            kind: 'warnAck',
+            target: null,
+            moderator: viewer.name || viewer.login,
+            at: meta.at,
+            targetId: viewer.id || null,
+          },
+        }),
+      ]
+    }
     case 'automod.message.hold': {
       const author = userOf(event, 'user')
       const message = text(child(event, 'message').text)
