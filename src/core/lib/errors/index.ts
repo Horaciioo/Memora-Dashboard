@@ -126,6 +126,14 @@ export const rateLimited = (retryAfterSeconds: number, message?: string): AppErr
   new AppError(ErrorCodes.RateLimited, message, [], retryAfterSeconds)
 
 /**
+ * Mode not armed
+ * @param {string} [message] - Override message
+ * @return {AppError} - Error
+ */
+
+export const locked = (message?: string): AppError => new AppError(ErrorCodes.Locked, message)
+
+/**
  * Normalise an unknown throw
  * @param {unknown} error - Caught value
  * @return {AppError} - Error

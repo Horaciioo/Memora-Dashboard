@@ -38,5 +38,13 @@
   "moderation": {
     "windowSeconds": 60,
     "max": 240
+  },
+  "nexus": {
+    "windowSeconds": 60,
+    "max": 60
+  },
+  "nexusWrite": {
+    "windowSeconds": 60,
+    "max": 10
   }
 }

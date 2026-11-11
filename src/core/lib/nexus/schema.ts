@@ -56,10 +56,3 @@ export const readModels = (): NexusModel[] =>
       isRelation: field.kind === 'object',
     })),
   }))
-
-/**
- * Enums of the data schema
- * @return {string[]} - Enum names
- */
-
-export const readEnumNames = (): string[] => Prisma.dmmf.datamodel.enums.map((entry) => entry.name)

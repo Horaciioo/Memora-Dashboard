@@ -57,7 +57,7 @@ export const NEXUS_PASSWORD = {
 
 /**
  * Handshake and reauthentication bounds
- * @type {{ pendingSeconds: number, dangerReauthSeconds: number }}
+ * @type {{ pendingSeconds: number, dangerReauthSeconds: number, reauthAlwaysSeconds: number }}
  */
 
 export const NEXUS_SESSION = {
@@ -72,6 +72,12 @@ export const NEXUS_SESSION = {
     fallback: 300,
     min: 30,
     max: 3600,
+  }),
+  reauthAlwaysSeconds: readInteger(session.reauthAlwaysSeconds, {
+    path: 'system/nexus.session.reauthAlwaysSeconds',
+    fallback: 60,
+    min: 10,
+    max: 600,
   }),
 }
 

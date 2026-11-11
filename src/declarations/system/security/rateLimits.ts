@@ -60,6 +60,8 @@ const RATE_LIMIT_MAP = {
   lookup: policy('lookup', 'Account lookup', RATE_LIMIT_SCOPES.Address, 60, 30),
   // A busy live calls for many gestures a minute
   moderation: policy('moderation', 'Mod View gesture', RATE_LIMIT_SCOPES.Account, 60, 240),
+  nexus: policy('nexus', 'Console command', RATE_LIMIT_SCOPES.Account, 60, 60),
+  nexusWrite: policy('nexusWrite', 'Console change', RATE_LIMIT_SCOPES.Account, 60, 10),
   // Autosave fires on every pause in typing
 } satisfies Record<string, RateLimitPolicy>
 

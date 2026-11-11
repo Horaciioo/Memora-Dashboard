@@ -8,12 +8,18 @@
   },
   "session": {
     "pendingSeconds": 180,
-    "dangerReauthSeconds": 300
+    "dangerReauthSeconds": 300,
+    "reauthAlwaysSeconds": 60
   },
   "attempts": {
     "windowMinutes": 15,
     "maxFailures": 5,
-    "backoffSeconds": [1, 2, 4, 8],
+    "backoffSeconds": [
+      1,
+      2,
+      4,
+      8
+    ],
     "lockoutMinutes": 30,
     "dayFailures": 20,
     "dayLockoutHours": 24
@@ -33,7 +39,15 @@
     "auditPageSize": 50
   },
   "redaction": {
-    "patterns": ["token", "secret", "password", "hash", "key", "cookie", "vapid"]
+    "patterns": [
+      "token",
+      "secret",
+      "password",
+      "hash",
+      "key",
+      "cookie",
+      "vapid"
+    ]
   },
   "retention": {
     "auditDays": 365,

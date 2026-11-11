@@ -480,4 +480,11 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'key',
     search: [],
   },
+  nexusAudit: {
+    model: 'NexusAudit',
+    exposure: 'excluded',
+    reason: 'Lu par les commandes d’audit seulement',
+    display: 'id',
+    search: [],
+  },
 }

@@ -35,6 +35,40 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // The console runs nothing it was not written to run
+  {
+    files: [
+      'src/**/nexus/**/*.{ts,tsx}',
+      'src/core/wrappers/requireNexus.ts',
+      'src/declarations/nexus/**/*.ts',
+    ],
+    rules: {
+      'no-eval': 'error',
+      'no-new-func': 'error',
+      'no-implied-eval': 'error',
+      'no-restricted-properties': [
+        'error',
+        { property: '$queryRawUnsafe', message: 'No free SQL in the console.' },
+        { property: '$executeRawUnsafe', message: 'No free SQL in the console.' },
+      ],
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: ['child_process', 'node:child_process', 'vm', 'node:vm', 'worker_threads'].map(
+            (name) => ({ name, message: 'The console never spawns or evaluates.' })
+          ),
+        },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        { selector: 'TSEnumDeclaration', message: 'Use an as const object, see skill code-style.' },
+        {
+          selector: "ImportExpression[source.type!='Literal']",
+          message: 'No import with a computed path.',
+        },
+      ],
+    },
+  },
   globalIgnores([
     '.next/**',
     '.next-*/**',

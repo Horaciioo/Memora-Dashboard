@@ -9,6 +9,7 @@ export const ErrorCodes = {
   ImmutableResource: 'ImmutableResource',
   SystemFailure: 'SystemFailure',
   TimedOut: 'TimedOut',
+  Locked: 'Locked',
 } as const
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes]
@@ -29,6 +30,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCodes.ImmutableResource]: 'Cet élément ne peut pas être modifié.',
   [ErrorCodes.SystemFailure]: 'Quelque chose a cassé de notre côté.',
   [ErrorCodes.TimedOut]: 'Le serveur met trop de temps à répondre, réessaie.',
+  [ErrorCodes.Locked]: 'Cette action est verrouillée.',
 }
 
 /**
@@ -47,6 +49,7 @@ export const ERROR_STATUSES: Record<ErrorCode, number> = {
   [ErrorCodes.ImmutableResource]: 409,
   [ErrorCodes.SystemFailure]: 500,
   [ErrorCodes.TimedOut]: 504,
+  [ErrorCodes.Locked]: 423,
 }
 
 /**

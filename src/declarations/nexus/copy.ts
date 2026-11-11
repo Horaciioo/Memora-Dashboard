@@ -21,5 +21,6 @@ export const NEXUS_COPY = {
   tooManyArguments: 'Trop d’arguments',
   busy: 'Une commande est déjà en cours',
   timedOut: 'Délai dépassé',
+  confirmWrong: 'Confirmation refusée',
   forbiddenEnvironment: 'Commande interdite dans cet environnement',
 } as const
