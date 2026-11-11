@@ -1,15 +1,9 @@
-import { loopSound, playSound, preloadSounds } from '@/core/lib/play/sounds'
-import type { SoundLoop } from '@/core/lib/play/sounds'
+import { playSound, preloadSounds } from '@/core/lib/play/sounds'
 import type { NavalTimeline } from '@/core/lib/play/naval/choreography'
 import { isFlareCode, isHitCode, NavalCodes } from '@/core/lib/play/naval/state'
 import type { NavalStrikeView } from '@/core/lib/play/naval/state'
 import { playLevelOf } from '@/core/store/play/playSound'
-import {
-  NAVAL_MIX,
-  NAVAL_SEA_LOOP,
-  NAVAL_SOUNDS,
-  NAVAL_TAKES,
-} from '@/declarations/play/naval/sounds'
+import { NAVAL_MIX, NAVAL_SOUNDS, NAVAL_TAKES } from '@/declarations/play/naval/sounds'
 import type { NavalSoundName, NavalTakeName } from '@/declarations/play/naval/sounds'
 import { NAVAL_WEAPONS } from '@/declarations/play/naval/weapons'
 import { NavalWeapons, PlayGames } from '@/utils/constants/play'
@@ -101,25 +95,9 @@ export const cueStrike = (
 }
 
 /**
- * Sea bed under the battle
- * @return {SoundLoop} - Loop
- */
-
-export const startSea = (): SoundLoop => {
-  const loop = loopSound(NAVAL_SEA_LOOP)
-  loop.set(playLevelOf(PlayGames.Naval) * NAVAL_MIX.sea, 1)
-
-  return loop
-}
-
-/**
  * Every naval file fetched ahead
  * @return {void}
  */
 
 export const preloadNavalSounds = (): void =>
-  preloadSounds([
-    ...Object.values(NAVAL_SOUNDS),
-    ...Object.values(NAVAL_TAKES).flat(),
-    NAVAL_SEA_LOOP,
-  ])
+  preloadSounds([...Object.values(NAVAL_SOUNDS), ...Object.values(NAVAL_TAKES).flat()])

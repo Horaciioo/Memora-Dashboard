@@ -33,16 +33,12 @@ export const NAVAL_TAKES = {
 
 export type NavalTakeName = keyof typeof NAVAL_TAKES
 
-// Sea bed, looped under the battle
-export const NAVAL_SEA_LOOP = `${ROOT}/mer.mp3`
-
 /**
  * Levels of the mix, zero to one
  * @type {Object}
  */
 
 export const NAVAL_MIX = {
-  sea: 0.22,
   // Sound of a strike not aimed at or from the viewer
   distant: 0.55,
   // Gap between the blasts of one strike, in milliseconds

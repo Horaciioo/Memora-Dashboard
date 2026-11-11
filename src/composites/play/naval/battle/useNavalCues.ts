@@ -2,11 +2,11 @@
 
 import { useEffect, useRef } from 'react'
 
-import { playNaval, preloadNavalSounds, startSea } from '@/composites/play/naval/sound'
+import { playNaval, preloadNavalSounds } from '@/composites/play/naval/sound'
 import type { NavalCallout } from '@/composites/play/naval/fx/useNavalDirector'
 
 /**
- * Sea bed, the bell when the turn comes round and when a captain goes down
+ * The bell when the turn comes round and when a captain goes down
  * @param {Object} input - Table
  * @param {boolean} input.isMyTurn - The viewer may fire
  * @param {NavalCallout | null} input.callout - Last strike shown
@@ -22,13 +22,8 @@ export const useNavalCues = ({
 }): void => {
   const wasMine = useRef(false)
 
-  // Sea bed for the whole battle
-  useEffect(() => {
-    preloadNavalSounds()
-    const sea = startSea()
-
-    return () => sea.stop()
-  }, [])
+  // Files fetched ahead
+  useEffect(() => preloadNavalSounds(), [])
 
   // Bell once, when the turn comes round
   useEffect(() => {
