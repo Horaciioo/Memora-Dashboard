@@ -21,6 +21,8 @@ export interface ResolvedCommand {
  * @property {string} category - Family
  * @property {string} level - Mode it needs
  * @property {string[]} args - Argument names
+ * @property {string[]} pattern - Path segments
+ * @property {{ name: string, required: boolean, values?: string[] }[]} options - Argument hints
  */
 
 export interface CommandProjection {
@@ -30,6 +32,8 @@ export interface CommandProjection {
   category: string
   level: string
   args: string[]
+  pattern: string[]
+  options: { name: string; required: boolean; values?: string[] }[]
 }
 
 /**
@@ -130,6 +134,12 @@ export const buildCommandRegistry = (
       category: command.category,
       level: command.level,
       args: command.args.map((arg) => arg.name),
+      pattern: command.pattern,
+      options: command.args.map((arg) => ({
+        name: arg.name,
+        required: Boolean(arg.required),
+        values: arg.values ? [...arg.values] : undefined,
+      })),
     }))
 
   return { commands, resolve, project }

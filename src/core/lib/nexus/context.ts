@@ -5,7 +5,7 @@ import * as client from '@prisma/client'
 import type { ArgContext, ColumnInfo } from '@/core/lib/nexus/args'
 import { isMaskedColumn } from '@/core/lib/nexus/redact'
 import { readModels } from '@/core/lib/nexus/schema'
-import { ENTITY_INVENTORY } from '@/declarations/nexus/inventory'
+import { ENTITY_INVENTORY, GAME_INVENTORY } from '@/declarations/nexus/inventory'
 
 // Columns no command rewrites
 const FIXED_COLUMNS = ['id', 'createdAt', 'updatedAt']
@@ -71,3 +71,13 @@ const columnsOf = (key: string): Record<string, ColumnInfo> | null => {
  */
 
 export const NEXUS_ARG_CONTEXT: ArgContext = { hasEntity: isExposed, columnsOf }
+
+/**
+ * Values the screen may complete in variable segments
+ * @type {Record<string, string[]>}
+ */
+
+export const NEXUS_VARIABLE_VALUES: Record<string, string[]> = {
+  entity: Object.keys(ENTITY_INVENTORY).filter(isExposed),
+  game: Object.keys(GAME_INVENTORY),
+}
