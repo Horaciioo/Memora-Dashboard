@@ -90,8 +90,6 @@
     }
   },
   "strikesToForfeit": 3,
-  "flightMs": 1500,
-  "impactMs": 900,
   "sunkMs": 1500,
   "roundPauseSeconds": 5,
   "alertSeconds": 5,

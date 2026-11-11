@@ -3,10 +3,10 @@
 import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 
-import { blankLayer, freeLayer } from '@/composites/play/naval/ocean/layers'
+import { freeLayer } from '@/composites/play/naval/ocean/layers'
 import { oceanLoop } from '@/composites/play/naval/ocean/loop'
 import { recordPaint } from '@/composites/play/naval/ocean/monitor'
-import { paintOcean } from '@/composites/play/naval/ocean/paintOcean'
+import { createPen, paintOcean } from '@/composites/play/naval/ocean/paintOcean'
 import type { OceanPen, OceanScene } from '@/composites/play/naval/ocean/paintOcean'
 import { currentTier, reportFrame } from '@/composites/play/naval/ocean/tier'
 import { NAVAL_QUALITY } from '@/declarations/play/naval/quality'
@@ -53,7 +53,7 @@ const fitCanvas = (element: HTMLCanvasElement, pen: OceanPen, ceiling: number): 
  */
 
 const shakeOf = ({ playing }: OceanScene, share: number, tierShake: number): string => {
-  const weapon = playing ? NAVAL_WEAPONS[playing.strike.weapon]?.name : undefined
+  const weapon = playing[0] ? NAVAL_WEAPONS[playing[0].strike.weapon]?.name : undefined
   const amount = weapon ? share * NAVAL_SHAKE[weapon] * tierShake : 0
 
   return amount ? `${(Math.random() - 0.5) * amount}px ${(Math.random() - 0.5) * amount}px` : ''
@@ -68,25 +68,17 @@ const shakeOf = ({ playing }: OceanScene, share: number, tierShake: number): str
  */
 
 const startOcean = (element: HTMLCanvasElement, ctx: CanvasRenderingContext2D, feed: OceanFeed) => {
-  const pen: OceanPen = {
-    ctx,
-    width: element.clientWidth,
-    ratio: 1,
-    still: blankLayer(),
-    marked: blankLayer(),
-    sinking: new Map(),
-    isFirst: true,
-    marks: new Uint8Array(),
-    marksVersion: 0,
-  }
+  const pen = createPen(ctx, element.clientWidth)
   const isCalm = prefersReducedMotion()
   let paintedAt = -Infinity
   let busyAt: number | null = null
   const tick = (now: number) => {
-    const { name, tier } = currentTier()
+    const { name, tier: picked } = currentTier()
+    // Reduced motion: still sea, flash and mark only
+    const tier = isCalm ? { ...picked, life: 0, follow: false, shake: 0 } : picked
     const scene = feed.scene.current
     const fps = name === NavalQualities.Minimal ? NAVAL_QUALITY.ecoFps : NAVAL_VIEW.idleFps
-    const isBusy = Boolean(scene.playing)
+    const isBusy = scene.playing.length > 0 || pen.stage.pool.live > 0
     if (!isBusy && !feed.isDirty.current && now - paintedAt < SECOND_MS / fps) return
     if (isBusy && busyAt !== null) reportFrame(now - busyAt, now)
     busyAt = isBusy ? now : null
@@ -95,8 +87,11 @@ const startOcean = (element: HTMLCanvasElement, ctx: CanvasRenderingContext2D, f
     fitCanvas(element, pen, tier.pixelRatio)
     const started = performance.now()
     const share = paintOcean(pen, scene, now, tier)
-    recordPaint(performance.now() - started, name)
-    element.style.translate = shakeOf(scene, share, isCalm ? 0 : tier.shake)
+    recordPaint(performance.now() - started, name, {
+      particles: pen.stage.pool.live,
+      strikes: scene.playing.length,
+    })
+    element.style.translate = shakeOf(scene, share, tier.shake)
   }
   const wake = () => {
     pen.width = element.clientWidth

@@ -4,7 +4,7 @@ import { useMemo, useRef } from 'react'
 import type { CSSProperties, RefObject } from 'react'
 
 import type { OceanShip } from '@/composites/play/naval/ocean/paint/ships'
-import type { OceanStrike } from '@/composites/play/naval/ocean/paint/strike'
+import type { OceanStrike } from '@/composites/play/naval/fx/paintStrikes'
 import type { OceanZone } from '@/composites/play/naval/ocean/paint/zone'
 import { useOceanGestures } from '@/composites/play/naval/ocean/useOceanGestures'
 import type { OceanCell, OceanHandlers } from '@/composites/play/naval/ocean/useOceanGestures'
@@ -25,7 +25,7 @@ export interface NavalOceanProps extends OceanHandlers {
   ships?: OceanShip[]
   hover?: OceanCell | null
   zone?: OceanZone | null
-  playing?: OceanStrike | null
+  playing?: OceanStrike[]
   isFlat?: boolean
   isDim?: boolean
   // Ships of the other side
@@ -33,6 +33,9 @@ export interface NavalOceanProps extends OceanHandlers {
   label: string
   boxRef?: RefObject<HTMLDivElement | null>
 }
+
+// Stable empty list, no repaint on each render
+const NO_STRIKES: OceanStrike[] = []
 
 /**
  * A sea painted on a canvas, whole in view with the decor of its map around it
@@ -47,7 +50,7 @@ export const NavalOcean = ({
   ships = [],
   hover = null,
   zone = null,
-  playing = null,
+  playing = NO_STRIKES,
   isFlat,
   isDim,
   isFoe,

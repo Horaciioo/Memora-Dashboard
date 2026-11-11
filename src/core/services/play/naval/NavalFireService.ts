@@ -8,6 +8,7 @@ import {
   chooseSquare,
   indexOf,
   isInside,
+  longestStrikeMs,
   nextShooter,
   shipsAfloat,
   strike,
@@ -27,6 +28,7 @@ import {
   shotsAt,
 } from '@/core/services/play/naval/NavalTable'
 import type { NavalTable } from '@/core/services/play/naval/NavalTable'
+import { NAVAL_CHOREOGRAPHIES, NAVAL_DIRECTION } from '@/declarations/play/naval/choreographies'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
 import { NavalModes, NavalResults, NavalWeapons, PlayBotKinds } from '@/utils/constants/play'
@@ -34,13 +36,16 @@ import type { NavalWeaponName } from '@/utils/constants/play'
 import { SECOND_MS } from '@/utils/constants/time'
 
 /**
- * Milliseconds the screens need to play a shot
+ * Milliseconds the screens need to play a strike
+ * @param {NavalWeaponName} weapon - Weapon
+ * @param {number} count - Squares struck
  * @param {boolean} isSunk - A ship went down
  * @return {number} - Duration
  */
 
-const playbackMs = (isSunk: boolean): number =>
-  NAVAL_SETTINGS.flightMs + NAVAL_SETTINGS.impactMs + (isSunk ? NAVAL_SETTINGS.sunkMs : 0)
+const playbackMs = (weapon: NavalWeaponName, count: number, isSunk: boolean): number =>
+  longestStrikeMs(NAVAL_CHOREOGRAPHIES[weapon], count, NAVAL_DIRECTION.variety.variance) +
+  (isSunk ? NAVAL_SETTINGS.sunkMs : 0)
 
 /**
  * Clock of the next shooter, the last shot left to play out first
@@ -159,7 +164,7 @@ export const fireShot = async (
   const isSunk = cells.some(({ result }) => result === NavalResults.Sunk)
   await saveMatch(table, match, {
     turnId: nextId,
-    turnEndsAt: clockFrom(table, playbackMs(isSunk)),
+    turnEndsAt: clockFrom(table, playbackMs(weapon, cells.length, isSunk)),
   })
   if (nextId) await armCaptain(table, match, nextId)
 

@@ -108,8 +108,6 @@ export const NAVAL_SETTINGS = {
     fallback: 3,
     min: 1,
   }),
-  flightMs: readInteger(naval.flightMs, { path: 'play/naval.flightMs', fallback: 1500, min: 200 }),
-  impactMs: readInteger(naval.impactMs, { path: 'play/naval.impactMs', fallback: 900, min: 100 }),
   sunkMs: readInteger(naval.sunkMs, { path: 'play/naval.sunkMs', fallback: 1500, min: 100 }),
   roundPauseSeconds: readInteger(naval.roundPauseSeconds, {
     path: 'play/naval.roundPauseSeconds',

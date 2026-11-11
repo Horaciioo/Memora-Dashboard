@@ -247,6 +247,38 @@ export const NavalWeapons = {
 export type NavalWeaponName = (typeof NavalWeapons)[keyof typeof NavalWeapons]
 
 /**
+ * Painted actors of a strike
+ * @type {Record<string, string>}
+ */
+
+export const NavalActors = {
+  Muzzle: 'muzzle',
+  Shell: 'shell',
+  Mortar: 'mortar',
+  Plane: 'plane',
+  Bomb: 'bomb',
+  Gunship: 'gunship',
+  Submarine: 'submarine',
+  Missile: 'missile',
+  Flare: 'flare',
+} as const
+
+export type NavalActorName = (typeof NavalActors)[keyof typeof NavalActors]
+
+/**
+ * Look of a landing
+ * @type {Record<string, string>}
+ */
+
+export const NavalImpacts = {
+  Blast: 'blast',
+  Shockwave: 'shockwave',
+  Light: 'light',
+} as const
+
+export type NavalImpactName = (typeof NavalImpacts)[keyof typeof NavalImpacts]
+
+/**
  * Effect tiers of a sea, auto picks one
  * @type {Object}
  */

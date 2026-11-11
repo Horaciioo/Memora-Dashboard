@@ -1,35 +1,54 @@
 import { clamp01, sightOf } from '@/composites/play/naval/ocean/paint/frame'
 import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
+import { joltOf, listOf, paintDamage } from '@/composites/play/naval/ocean/paint/damage'
 import { paintHull } from '@/composites/play/naval/ocean/paint/hull'
+import { paintSinking, SINK_MS } from '@/composites/play/naval/ocean/paint/sinking'
+import { cellsOf } from '@/core/lib/play/naval/fleet'
 import type { NavalShip } from '@/core/lib/play/naval/fleet'
+import { SeaMarks } from '@/core/lib/play/naval/sea'
+import type { SeaMark } from '@/core/lib/play/naval/sea'
 import { hullOf } from '@/declarations/play/naval/fleets'
 import { NAVAL_WATER } from '@/declarations/play/naval/skins'
 
 /**
  * Ship to paint and its state
  * @typedef {Object} OceanShip
+ * @property {boolean} [isKnown] - Silhouette shown before it sinks
+ * @property {number} [sinkFrom] - Clock it starts to sink
+ * @property {number} [joltAt] - Clock of its last hit
  */
 
 export interface OceanShip {
   ship: NavalShip
   isWreck?: boolean
   isGhost?: boolean
-  // Clock the ship started to sink, none when it lies still
+  isKnown?: boolean
   sinkFrom?: number
+  joltAt?: number
 }
 
-// Length of the sinking, in milliseconds
-export const SINK_MS = 1800
-
 /**
- * Pose of a ship: centre, angle, swell
- * @param {OceanFrame} frame - Frame
- * @param {NavalShip} ship - Ship
- * @return {{ x: number; y: number; angle: number; bob: number }} - Pose
+ * How far down a wreck is
+ * @param {OceanShip} entry - Ship
+ * @param {number} now - Clock
+ * @return {number} - Zero to one, minus one before it sinks
  */
 
-const poseOf = ({ cell, left, top, now, skin }: OceanFrame, ship: NavalShip) => {
-  const phase = ship.id * 1.7 + ship.x * 0.3
+export const sunkOf = ({ isWreck, sinkFrom }: OceanShip, now: number): number => {
+  if (!isWreck) return -1
+  if (sinkFrom === undefined) return 1
+
+  return now < sinkFrom ? -1 : clamp01((now - sinkFrom) / SINK_MS)
+}
+
+/**
+ * Pose of a ship: centre and angle
+ * @param {OceanFrame} frame - Frame
+ * @param {NavalShip} ship - Ship
+ * @return {{ x: number; y: number; angle: number }} - Pose
+ */
+
+const poseOf = ({ cell, left, top }: OceanFrame, ship: NavalShip) => {
   const across = ship.isHorizontal ? ship.length : 1
   const down = ship.isHorizontal ? 1 : ship.length
 
@@ -37,7 +56,6 @@ const poseOf = ({ cell, left, top, now, skin }: OceanFrame, ship: NavalShip) => 
     x: left + (ship.x + across / 2) * cell,
     y: top + (ship.y + down / 2) * cell,
     angle: ship.isHorizontal ? 0 : Math.PI / 2,
-    bob: Math.sin((now * hullOf(skin, ship).sway) / 1300 + phase),
   }
 }
 
@@ -56,63 +74,92 @@ const isInSight = (sight: ReturnType<typeof sightOf>, ship: NavalShip): boolean 
 }
 
 /**
- * A wreck: hull broken in two, halves leaning apart and going under
+ * Hit squares along a hull, stern first
+ * @param {NavalShip} ship - Ship
+ * @param {SeaMark[]} marks - Marks
+ * @param {number} size - Squares per side
+ * @return {number[]} - Positions on the hull
+ */
+
+const holesOf = (ship: NavalShip, marks: SeaMark[], size: number): number[] =>
+  cellsOf(ship).flatMap(({ x, y }, index) => (marks[y * size + x] === SeaMarks.Hit ? [index] : []))
+
+/**
+ * Ship afloat: rocking, shoved when hit, listing when badly damaged
  * @param {OceanFrame} frame - Frame
  * @param {OceanShip} entry - Ship
+ * @param {SeaMark[]} marks - Marks
  * @return {void}
  */
 
-const paintWreck = (frame: OceanFrame, { ship, sinkFrom }: OceanShip): void => {
+const paintAfloat = (frame: OceanFrame, entry: OceanShip, marks: SeaMark[]): void => {
   const { ctx, cell, now } = frame
-  const sunk = sinkFrom === undefined ? 1 : clamp01((now - sinkFrom) / SINK_MS)
-  const span = ship.length * cell
-  for (const side of [-1, 1]) {
-    ctx.save()
-    ctx.beginPath()
-    ctx.rect(side < 0 ? -span / 2 : 0, -cell, span / 2, cell * 2)
-    ctx.clip()
-    ctx.translate(side * sunk * cell * 0.12, sunk * cell * 0.05)
-    ctx.rotate(side * sunk * 0.16)
-    ctx.translate(-span / 2, 0)
-    ctx.globalAlpha = 1 - sunk * 0.55
-    paintHull(frame, ship)
-    ctx.restore()
-  }
-  ctx.globalAlpha = sunk * 0.45
-  ctx.fillStyle = NAVAL_WATER.deep
-  ctx.fillRect(-span / 2, -cell / 2, span, cell)
-  ctx.globalAlpha = 1
+  const { ship } = entry
+  const holes = holesOf(ship, marks, frame.size)
+  const jolt = entry.joltAt === undefined ? 0 : joltOf(now - entry.joltAt, cell)
+  const bob = Math.sin((now * hullOf(frame.skin, ship).sway) / 1300 + ship.id * 1.7 + ship.x * 0.3)
+  ctx.translate(jolt, bob * cell * 0.03)
+  ctx.rotate(bob * 0.025 + listOf(holes.length / ship.length))
+  ctx.save()
+  ctx.translate(-(ship.length * cell) / 2, 0)
+  paintHull(frame, ship)
+  ctx.restore()
+  paintDamage(frame, ship, holes)
 }
 
 /**
- * Ships of a sea, each rocking on its own phase
+ * One ship at its pose, shadow first
  * @param {OceanFrame} frame - Frame
- * @param {OceanShip[]} ships - Ships
+ * @param {OceanShip} entry - Ship
+ * @param {(entry: OceanShip) => void} paint - Body painter
  * @return {void}
  */
 
-export const paintShips = (frame: OceanFrame, ships: OceanShip[]): void => {
+const atPose = (frame: OceanFrame, entry: OceanShip, paint: (entry: OceanShip) => void) => {
   const { ctx, cell } = frame
+  const pose = poseOf(frame, entry.ship)
+  const span = entry.ship.length * cell
+  ctx.save()
+  ctx.translate(pose.x, pose.y)
+  ctx.rotate(pose.angle)
+  ctx.globalAlpha = entry.isGhost ? 0.5 : 1
+  ctx.fillStyle = NAVAL_WATER.shadow
+  ctx.fillRect(-span / 2 + cell * 0.1, cell * 0.22, span - cell * 0.2, cell * 0.12)
+  paint(entry)
+  ctx.restore()
+}
+
+/**
+ * Ships of a sea: afloat, or going down by their class
+ * @param {OceanFrame} frame - Frame
+ * @param {OceanShip[]} ships - Ships, wrecks at rest left out
+ * @param {SeaMark[]} marks - Marks shown
+ * @return {void}
+ */
+
+export const paintShips = (frame: OceanFrame, ships: OceanShip[], marks: SeaMark[]): void => {
   const sight = sightOf(frame)
   for (const entry of ships) {
     if (!isInSight(sight, entry.ship)) continue
-    const pose = poseOf(frame, entry.ship)
-    ctx.save()
-    ctx.translate(pose.x, pose.y + (entry.isWreck ? 0 : pose.bob * cell * 0.03))
-    ctx.rotate(pose.angle + (entry.isWreck ? 0 : pose.bob * 0.025))
-    ctx.globalAlpha = entry.isGhost ? 0.5 : 1
-    ctx.fillStyle = NAVAL_WATER.shadow
-    ctx.fillRect(
-      -(entry.ship.length * cell) / 2 + cell * 0.1,
-      cell * 0.22,
-      entry.ship.length * cell - cell * 0.2,
-      cell * 0.12
+    const sunk = sunkOf(entry, frame.now)
+    // A hidden ship shows only once it sinks
+    if (entry.isWreck && sunk < 0 && !entry.isKnown) continue
+    atPose(frame, entry, () =>
+      sunk < 0 ? paintAfloat(frame, entry, marks) : paintSinking(frame, entry.ship, sunk)
     )
-    if (entry.isWreck) paintWreck(frame, entry)
-    else {
-      ctx.translate(-(entry.ship.length * cell) / 2, 0)
-      paintHull(frame, entry.ship)
-    }
-    ctx.restore()
+  }
+}
+
+/**
+ * Wrecks at rest, painted once into the still layer
+ * @param {OceanFrame} frame - Frame
+ * @param {OceanShip[]} wrecks - Wrecks down
+ * @return {void}
+ */
+
+export const paintWrecks = (frame: OceanFrame, wrecks: OceanShip[]): void => {
+  const sight = sightOf(frame)
+  for (const entry of wrecks) {
+    if (isInSight(sight, entry.ship)) atPose(frame, entry, () => paintSinking(frame, entry.ship, 1))
   }
 }

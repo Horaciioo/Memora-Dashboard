@@ -3,22 +3,22 @@
 import { useEffect, useRef } from 'react'
 
 import { playNaval, preloadNavalSounds, startSea } from '@/composites/play/naval/sound'
-import type { NavalEvent } from '@/composites/play/naval/battle/useNavalPlayback'
+import type { NavalCallout } from '@/composites/play/naval/fx/useNavalDirector'
 
 /**
  * Sea bed, the bell when the turn comes round and when a captain goes down
  * @param {Object} input - Table
  * @param {boolean} input.isMyTurn - The viewer may fire
- * @param {NavalEvent | null} input.event - Last strike shown
+ * @param {NavalCallout | null} input.callout - Last strike shown
  * @return {void}
  */
 
 export const useNavalCues = ({
   isMyTurn,
-  event,
+  callout,
 }: {
   isMyTurn: boolean
-  event: NavalEvent | null
+  callout: NavalCallout | null
 }): void => {
   const wasMine = useRef(false)
 
@@ -37,7 +37,7 @@ export const useNavalCues = ({
   }, [isMyTurn])
 
   // Bell for a captain out
-  const eliminatedId = event?.isEliminated ? event.id : 0
+  const eliminatedId = callout?.isEliminated ? callout.id : 0
   useEffect(() => {
     if (eliminatedId) playNaval('bell')
   }, [eliminatedId])

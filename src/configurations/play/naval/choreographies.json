@@ -1,0 +1,122 @@
+{
+  "variance": 0.08,
+  "takes": 3,
+  "entryJitter": 0.18,
+  "follow": { "zoom": 0.12, "inMs": 450, "outMs": 550 },
+  "bursts": {
+    "miss": { "spray": 12, "spark": 0, "debris": 0, "smoke": 0 },
+    "hit": { "spray": 4, "spark": 10, "debris": 7, "smoke": 3 },
+    "sunk": { "spray": 8, "spark": 18, "debris": 14, "smoke": 6 }
+  },
+  "takeScales": [1, 1.35, 0.75],
+  "sinkBubbles": 12,
+  "lanes": 3,
+  "backlog": 3,
+  "weapons": {
+    "cannon": {
+      "landing": { "at": 1100, "step": 0, "span": 0 },
+      "impactMs": 900,
+      "impact": "blast",
+      "tracks": [
+        { "actor": "muzzle", "at": 0, "duration": 240 },
+        { "actor": "shell", "perCell": true, "lead": 1100, "lift": 0.35 }
+      ],
+      "short": {
+        "landing": { "at": 450, "step": 0, "span": 0 },
+        "tracks": [{ "actor": "shell", "perCell": true, "lead": 450, "lift": 0.2 }]
+      }
+    },
+    "broadside": {
+      "landing": { "at": 1000, "step": 120, "span": 650 },
+      "impactMs": 900,
+      "impact": "blast",
+      "tracks": [
+        { "actor": "muzzle", "perCell": true, "lead": 1000, "duration": 240 },
+        { "actor": "shell", "perCell": true, "lead": 1000, "lift": 0.3 }
+      ],
+      "short": {
+        "landing": { "at": 150, "step": 60, "span": 400 },
+        "tracks": []
+      }
+    },
+    "airstrike": {
+      "landing": { "at": 1100, "step": 110, "span": 500 },
+      "impactMs": 900,
+      "impact": "shockwave",
+      "tracks": [
+        { "actor": "plane", "at": 0, "tail": 400 },
+        { "actor": "bomb", "perCell": true, "lead": 480 }
+      ],
+      "short": {
+        "landing": { "at": 150, "step": 70, "span": 400 },
+        "tracks": []
+      }
+    },
+    "gunship": {
+      "landing": { "at": 450, "step": 140, "span": 1350 },
+      "impactMs": 700,
+      "impact": "blast",
+      "tracks": [{ "actor": "gunship", "at": 0, "tail": 700 }],
+      "short": {
+        "landing": { "at": 150, "step": 40, "span": 500 },
+        "tracks": []
+      }
+    },
+    "torpedo": {
+      "landing": { "at": 850, "step": 120, "span": 800 },
+      "impactMs": 900,
+      "impact": "blast",
+      "tracks": [{ "actor": "submarine", "at": 0, "tail": 500 }],
+      "short": {
+        "landing": { "at": 200, "step": 50, "span": 400 },
+        "tracks": []
+      }
+    },
+    "volley": {
+      "landing": { "at": 900, "step": 140, "span": 700 },
+      "impactMs": 850,
+      "impact": "blast",
+      "tracks": [
+        { "actor": "muzzle", "perCell": true, "lead": 900, "duration": 200 },
+        { "actor": "missile", "perCell": true, "lead": 900, "lift": 0.28 }
+      ],
+      "short": {
+        "landing": { "at": 150, "step": 80, "span": 400 },
+        "tracks": []
+      }
+    },
+    "pair": {
+      "landing": { "at": 800, "step": 130, "span": 260 },
+      "impactMs": 850,
+      "impact": "blast",
+      "tracks": [{ "actor": "missile", "perCell": true, "lead": 800, "lift": 0.06 }],
+      "short": {
+        "landing": { "at": 150, "step": 80, "span": 160 },
+        "tracks": []
+      }
+    },
+    "grenade": {
+      "landing": { "at": 1300, "step": 50, "span": 250 },
+      "impactMs": 800,
+      "impact": "blast",
+      "tracks": [
+        { "actor": "muzzle", "at": 0, "duration": 200 },
+        { "actor": "mortar", "perCell": true, "lead": 1300, "lift": 0.6 }
+      ],
+      "short": {
+        "landing": { "at": 150, "step": 30, "span": 150 },
+        "tracks": []
+      }
+    },
+    "flare": {
+      "landing": { "at": 700, "step": 0, "span": 0 },
+      "impactMs": 1400,
+      "impact": "light",
+      "tracks": [{ "actor": "flare", "at": 0, "tail": 1400 }],
+      "short": {
+        "landing": { "at": 100, "step": 0, "span": 0 },
+        "tracks": [{ "actor": "flare", "at": 0, "tail": 600 }]
+      }
+    }
+  }
+}

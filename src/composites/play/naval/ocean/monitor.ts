@@ -20,16 +20,23 @@ interface NavalBudget {
   p95: number
   tier: NavalTierName
   painted: number
+  particles: number
+  strikes: number
 }
 
 /**
  * Script time of one painted frame, summed up in development
  * @param {number} ms - Script time
  * @param {NavalTierName} tier - Tier in use
+ * @param {{ particles: number; strikes: number }} load - Effects on screen
  * @return {void}
  */
 
-export const recordPaint = (ms: number, tier: NavalTierName): void => {
+export const recordPaint = (
+  ms: number,
+  tier: NavalTierName,
+  load: { particles: number; strikes: number }
+): void => {
   if (!script) return
   script.add(ms)
   painted += 1
@@ -39,6 +46,7 @@ export const recordPaint = (ms: number, tier: NavalTierName): void => {
     p95: Number(script.percentile(0.95).toFixed(2)),
     tier,
     painted,
+    ...load,
   }
   ;(window as Window & { __navalBudget?: NavalBudget }).__navalBudget = budget
 }

@@ -28,8 +28,12 @@ export type NavalEvent =
   | { kind: 'eliminated'; player: number }
   | { kind: 'ended'; winner: number | null }
 
-// Share of a ship hit that tips it into heavy damage
-const HEAVY_SHARE = 0.5
+/**
+ * Hit share of heavy damage
+ * @type {number}
+ */
+
+export const HEAVY_SHARE = 0.5
 
 /**
  * Whether a square belongs to a ship

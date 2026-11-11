@@ -1,7 +1,7 @@
+import type { ActorPainter } from '@/composites/play/naval/fx/actors/scene'
 import { centreOf, clamp01, noise } from '@/composites/play/naval/ocean/paint/frame'
 import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
 import type { NavalStrikeView } from '@/core/lib/play/naval/state'
-import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { NAVAL_WATER } from '@/declarations/play/naval/skins'
 
 // Colours of the machines, kept here as they belong to no other layer
@@ -11,7 +11,8 @@ const MACHINE = {
   sub: '#2c4a52',
   subTop: '#3e6670',
   tracer: '#ffd66b',
-  grenade: '#5d6b3a',
+  rotorDisc: 'rgba(255,255,255,0.28)',
+  blade: 'rgba(20,24,28,0.8)',
 } as const
 
 // Size of the machines against a square
@@ -21,8 +22,6 @@ const MACHINE_SCALE = { heli: 1.9, sub: 1.5 } as const
 const ROTOR_MS = 22
 // How long a tracer stays drawn, in milliseconds
 const TRACER_MS = 140
-
-type Point = { x: number; y: number }
 
 /**
  * Pixel ends of a strike line and its heading
@@ -41,72 +40,13 @@ const lineOf = (frame: OceanFrame, strike: NavalStrikeView) => {
 }
 
 /**
- * Flash of the guns at the foot of the sea as a strike leaves
- * @param {OceanFrame} frame - Frame
- * @param {number} age - Milliseconds since the start
- * @return {void}
- */
-
-export const paintMuzzle = (frame: OceanFrame, age: number): void => {
-  const { ctx, cell, width } = frame
-  const life = clamp01(age / 220)
-  if (life >= 1) return
-  const glow = ctx.createRadialGradient(width / 2, width, 0, width / 2, width, cell * 2.4)
-  glow.addColorStop(0, 'white')
-  glow.addColorStop(0.3, NAVAL_WATER.fire)
-  glow.addColorStop(1, 'transparent')
-  ctx.globalAlpha = 1 - life
-  ctx.fillStyle = glow
-  ctx.fillRect(width / 2 - cell * 3, width - cell * 3, cell * 6, cell * 3)
-  ctx.globalAlpha = 1
-}
-
-/**
- * Grenade tumbling through the air, spinning as it falls
- * @param {OceanFrame} frame - Frame
- * @param {Point} to - Pixel target
- * @param {number} progress - Zero to one
- * @return {void}
- */
-
-export const paintGrenade = (frame: OceanFrame, to: Point, progress: number): void => {
-  const { ctx, cell, width } = frame
-  const from = { x: width / 2, y: width + cell * 2 }
-  const lift = Math.sin(Math.PI * progress) * Math.hypot(to.x - from.x, to.y - from.y) * 0.45
-  const x = from.x + (to.x - from.x) * progress
-  const ground = from.y + (to.y - from.y) * progress
-  ctx.fillStyle = NAVAL_WATER.shadow
-  ctx.beginPath()
-  ctx.ellipse(x, ground, cell * 0.16, cell * 0.08, 0, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.save()
-  ctx.translate(x, ground - lift)
-  ctx.rotate(progress * Math.PI * 7)
-  ctx.fillStyle = MACHINE.grenade
-  ctx.beginPath()
-  ctx.ellipse(0, 0, cell * 0.17, cell * 0.22, 0, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.fillStyle = NAVAL_WATER.hit
-  ctx.fillRect(-cell * 0.03, -cell * 0.3, cell * 0.06, cell * 0.12)
-  ctx.restore()
-}
-
-/**
  * Combat helicopter sweeping the whole line, tracers falling on each square as it passes
- * @param {OceanFrame} frame - Frame
- * @param {NavalStrikeView} strike - Strike
- * @param {number} age - Milliseconds since the start
- * @param {number[]} landings - Landing time of each square
- * @return {void}
+ * @type {ActorPainter}
  */
 
-export const paintGunship = (
-  frame: OceanFrame,
-  strike: NavalStrikeView,
-  age: number,
-  landings: number[]
-): void => {
+export const paintGunship: ActorPainter = ({ frame, strike, age, timeline }) => {
   const { ctx, cell, now } = frame
+  const { landings } = timeline
   const { from, to, angle } = lineOf(frame, strike)
   const first = landings[0]
   const lastAt = landings.at(-1) ?? first
@@ -150,12 +90,12 @@ export const paintGunship = (
   ctx.ellipse(big * 0.3, 0, big * 0.2, big * 0.14, 0, 0, Math.PI * 2)
   ctx.fill()
   ctx.restore()
-  ctx.strokeStyle = 'rgba(255,255,255,0.28)'
+  ctx.strokeStyle = MACHINE.rotorDisc
   ctx.lineWidth = big * 0.05
   ctx.beginPath()
   ctx.arc(at.x, at.y, big * 0.85, 0, Math.PI * 2)
   ctx.stroke()
-  ctx.strokeStyle = 'rgba(20,24,28,0.8)'
+  ctx.strokeStyle = MACHINE.blade
   ctx.lineWidth = big * 0.09
   for (const blade of [0, Math.PI / 2]) {
     const turn = now / ROTOR_MS + blade
@@ -168,24 +108,16 @@ export const paintGunship = (
 
 /**
  * Submarine surfacing behind the line, its torpedoes running along it
- * @param {OceanFrame} frame - Frame
- * @param {NavalStrikeView} strike - Strike
- * @param {number} age - Milliseconds since the start
- * @param {number[]} landings - Landing time of each square
- * @return {void}
+ * @type {ActorPainter}
  */
 
-export const paintSubmarine = (
-  frame: OceanFrame,
-  strike: NavalStrikeView,
-  age: number,
-  landings: number[]
-): void => {
+export const paintSubmarine: ActorPainter = ({ frame, strike, age, timeline }) => {
   const { ctx, cell, now } = frame
+  const { landings } = timeline
   const { from, to, angle } = lineOf(frame, strike)
   const unit = { x: Math.cos(angle), y: Math.sin(angle) }
   const base = { x: from.x - unit.x * cell * 1.4, y: from.y - unit.y * cell * 1.4 }
-  const end = landings.at(-1) ?? NAVAL_SETTINGS.flightMs
+  const end = landings.at(-1) ?? 0
   const surfaced = clamp01(age / 350) * (1 - clamp01((age - end) / 500))
   if (surfaced <= 0) return
 
@@ -210,7 +142,7 @@ export const paintSubmarine = (
   ctx.fillRect(big * 0.1, -big * 0.02, big * 0.35, big * 0.04)
   ctx.restore()
   for (let bubble = 0; bubble < 5; bubble += 1) {
-    const life = ((now / 900 + noise(bubble)) % 1)
+    const life = (now / 900 + noise(bubble)) % 1
     ctx.beginPath()
     ctx.arc(
       base.x + (noise(bubble + 3) - 0.5) * big * 1.6,

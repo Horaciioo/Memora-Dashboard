@@ -1,7 +1,10 @@
+import type { NavalPlayback } from '@/composites/play/naval/fx/useNavalDirector'
+import type { OceanStrike } from '@/composites/play/naval/fx/paintStrikes'
 import type { OceanShip as SeaShip } from '@/composites/play/naval/ocean/paint/ships'
+import { cellsOf } from '@/core/lib/play/naval/fleet'
 import { marksOf, shipsDown } from '@/core/lib/play/naval/sea'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
-import { sunkToward } from '@/core/lib/play/naval/state'
+import { NavalCodes, sunkToward } from '@/core/lib/play/naval/state'
 import type { NavalBoardState, NavalShotView } from '@/core/lib/play/naval/state'
 import { NavalPhases } from '@/utils/constants/play'
 
@@ -82,4 +85,64 @@ export const watchedMatch = (board: NavalBoardState, picked: number | null): num
   const live = board.matches.findIndex((match) => match.status === 'LIVE')
 
   return live >= 0 ? live : mine ? board.myMatch : board.matches.length - 1
+}
+
+/**
+ * Clock a wreck starts down, from the strike sinking it
+ * @param {SeaShip} entry - Ship
+ * @param {OceanStrike[]} playing - Strikes on this sea
+ * @return {SeaShip} - Ship with its clock
+ */
+
+const withSinkClock = (entry: SeaShip, playing: OceanStrike[]): SeaShip => {
+  if (!entry.isWreck) return entry
+  const squares = new Set(cellsOf(entry.ship).map(({ x, y }) => `${x}:${y}`))
+  for (const { strike, startedAt, timeline } of playing) {
+    const index = strike.cells.findIndex(
+      (cell) => cell.code === NavalCodes.Sunk && squares.has(`${cell.x}:${cell.y}`)
+    )
+    if (index >= 0) return { ...entry, sinkFrom: startedAt + (timeline.landings[index] ?? 0) }
+  }
+
+  return entry
+}
+
+/**
+ * What one sea shows: marks in flight included, ships, strikes on it
+ * @param {Object} input - Sea
+ * @param {NavalBoardState} input.board - Board
+ * @param {NavalPlayback} input.playback - Playback
+ * @param {number} input.match - Match
+ * @param {number} input.seat - Captain fired at
+ * @param {boolean} input.isMine - The viewer's own fleet
+ * @return {{ marks: SeaMark[]; ships: SeaShip[]; playing: OceanStrike[] }} - Sea
+ */
+
+export const seaShown = ({
+  board,
+  playback,
+  match,
+  seat,
+  isMine,
+}: {
+  board: NavalBoardState
+  playback: NavalPlayback
+  match: number
+  seat: number
+  isMine: boolean
+}) => {
+  const marks = marksToward(board, playback.drawn, match, seat)
+  const playing = playback.playing.filter(
+    ({ strike }) => strike.match === match && strike.target === seat
+  )
+  const down = shipsShown(board, marks, match, seat)
+  const ships: SeaShip[] = isMine
+    ? (board.you?.fleet ?? []).map((ship) => ({
+        ship,
+        isKnown: true,
+        isWreck: down.some((entry) => entry.isWreck && entry.ship.id === ship.id),
+      }))
+    : down
+
+  return { marks, ships: ships.map((entry) => withSinkClock(entry, playing)), playing }
 }
