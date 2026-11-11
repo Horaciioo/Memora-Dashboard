@@ -246,6 +246,8 @@ enum ModerationKind {
   UNBAN_REQUEST_APPROVE
   UNBAN_REQUEST_DENY
   MESSAGE_SEND
+  ROLE_CHANGE
+  WARN_ACK
 }
 
 // Where a moderation gesture was made
