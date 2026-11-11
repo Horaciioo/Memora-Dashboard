@@ -10,6 +10,7 @@ export const ErrorCodes = {
   SystemFailure: 'SystemFailure',
   TimedOut: 'TimedOut',
   Locked: 'Locked',
+  Unavailable: 'Unavailable',
 } as const
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes]
@@ -31,6 +32,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCodes.SystemFailure]: 'Quelque chose a cassé de notre côté.',
   [ErrorCodes.TimedOut]: 'Le serveur met trop de temps à répondre, réessaie.',
   [ErrorCodes.Locked]: 'Cette action est verrouillée.',
+  [ErrorCodes.Unavailable]: 'Memora est en maintenance, reviens dans un moment.',
 }
 
 /**
@@ -50,6 +52,7 @@ export const ERROR_STATUSES: Record<ErrorCode, number> = {
   [ErrorCodes.SystemFailure]: 500,
   [ErrorCodes.TimedOut]: 504,
   [ErrorCodes.Locked]: 423,
+  [ErrorCodes.Unavailable]: 503,
 }
 
 /**

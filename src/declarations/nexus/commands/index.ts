@@ -1,4 +1,5 @@
 import { ACCESS_COMMANDS } from '@/declarations/nexus/commands/access'
+import { SYSTEM_COMMANDS } from '@/declarations/nexus/commands/system'
 import { DB_COMMANDS } from '@/declarations/nexus/commands/db'
 import { MEMORA_COMMANDS, NEXUS_COMMANDS_ON_SELF } from '@/declarations/nexus/commands/memora'
 import { OBSERVABILITY_COMMANDS } from '@/declarations/nexus/commands/observability'
@@ -14,5 +15,6 @@ export const NEXUS_COMMAND_LIST: NexusCommand[] = [
   ...MEMORA_COMMANDS,
   ...OBSERVABILITY_COMMANDS,
   ...DB_COMMANDS,
+  ...SYSTEM_COMMANDS,
   ...NEXUS_COMMANDS_ON_SELF,
 ]

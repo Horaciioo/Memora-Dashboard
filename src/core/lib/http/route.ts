@@ -36,6 +36,7 @@ import type { RateLimitName } from '@/declarations/system/security/rateLimits'
 import { MEDIA_HEADERS, MEDIA_VISIBILITIES } from '@/declarations/system/storage'
 import { STREAM_HEADERS } from '@/declarations/system/streams'
 import type { MediaVisibility } from '@/declarations/system/storage'
+import { assertNotInMaintenance } from '@/core/services/system/MaintenanceModeService'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import { ErrorCodes } from '@/utils/constants/errors'
@@ -330,6 +331,8 @@ const authenticate = async (
   const session = await getSession()
   if (!session) throw notAuthenticated()
 
+  // Members wait outside during maintenance
+  await assertNotInMaintenance(session.discordId)
   await guard(request, options.rateLimit, session.id)
 
   // Simulated view reads only

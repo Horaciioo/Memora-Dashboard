@@ -76,8 +76,18 @@ export const CONFIGURATION_FILES: Record<ConfigurationFolder, string[]> = {
 }
 
 /**
- * Files an overlay may change, none before the configuration module
+ * Files an overlay may change, security and infrastructure ones stay out
  * @type {string[]}
  */
 
-export const EDITABLE_CONFIGURATIONS: string[] = []
+export const EDITABLE_CONFIGURATIONS: string[] = [
+  ...CONFIGURATION_FILES.system
+    .filter(
+      (file) =>
+        !['admin-identity', 'authentication', 'two-factor', 'nexus', 'rate-limits'].includes(
+          file
+        ) && !['versioning', 'perimeter'].includes(file)
+    )
+    .map((file) => `system/${file}`),
+  ...CONFIGURATION_FILES.play.map((file) => `play/${file}`),
+]

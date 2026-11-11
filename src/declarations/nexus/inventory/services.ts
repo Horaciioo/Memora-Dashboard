@@ -19,7 +19,7 @@ export interface ServiceEntry {
 
 export const SERVICE_INVENTORY: Record<ConfigSubject, ServiceEntry> = {
   database: { restartable: false, dependsOn: [] },
-  redis: { restartable: true, dependsOn: [] },
+  redis: { restartable: false, dependsOn: [] },
   queues: { restartable: true, dependsOn: ['redis'] },
   storage: { restartable: false, dependsOn: [] },
   encryption: { restartable: false, dependsOn: [] },

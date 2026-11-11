@@ -11,6 +11,7 @@ import { readViewContext } from '@/core/services/auth/ViewService'
 import { needsHistoryConsent } from '@/core/services/preferences/ConsentService'
 import { readTourState } from '@/core/services/tour/TourService'
 import { readClosedFeatures } from '@/core/services/features'
+import { maintenanceFor } from '@/core/services/system/MaintenanceModeService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
 import { VisitTracker } from '@/composites/shell/VisitTracker'
@@ -25,6 +26,7 @@ import { heldRoutes } from '@/declarations/ui/responsive'
 import { isNexusConfigured } from '@/declarations/nexus/owner'
 import { isPushConfigured } from '@/declarations/pwa/vapid'
 import { PENDING_ACCOUNT_COPY } from '@/declarations/onboarding/copy'
+import { MAINTENANCE_COPY } from '@/declarations/system/maintenanceCopy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
 
@@ -37,6 +39,23 @@ import { MemberStatuses } from '@/utils/constants/hierarchy'
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const { session, access } = await requireUser()
+
+  // Members wait outside while the owner works
+  const maintenance = await maintenanceFor(session.discordId)
+  if (maintenance) {
+    return (
+      <AuthShell
+        title={MAINTENANCE_COPY.title}
+        subtitle={maintenance.message ?? MAINTENANCE_COPY.lead}
+      >
+        {maintenance.until && (
+          <p className="text-sm text-[var(--color-ink-subtle)]">
+            {MAINTENANCE_COPY.until} {maintenance.until.toLocaleString('fr-FR')}
+          </p>
+        )}
+      </AuthShell>
+    )
+  }
 
   // Nothing of the dashboard opens before the agreement is on record
   if (needsHistoryConsent(session)) {

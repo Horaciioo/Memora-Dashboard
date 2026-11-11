@@ -22,6 +22,10 @@ export const register = async (): Promise<void> => {
 
   await import('../sentry.server.config')
 
+  // Owner settings first, readers run once
+  const { loadConfigOverlay } = await import('@/core/lib/configuration/loadOverlay')
+  await loadConfigOverlay()
+
   const { startRuntime } = await import('@/managers/infrastructure/Core/runtime')
 
   try {

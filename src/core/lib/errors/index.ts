@@ -134,6 +134,15 @@ export const rateLimited = (retryAfterSeconds: number, message?: string): AppErr
 export const locked = (message?: string): AppError => new AppError(ErrorCodes.Locked, message)
 
 /**
+ * Service closed for maintenance
+ * @param {string} [message] - Override message
+ * @return {AppError} - 503 error
+ */
+
+export const unavailable = (message?: string): AppError =>
+  new AppError(ErrorCodes.Unavailable, message)
+
+/**
  * Normalise an unknown throw
  * @param {unknown} error - Caught value
  * @return {AppError} - Error

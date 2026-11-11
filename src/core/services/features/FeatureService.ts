@@ -187,3 +187,12 @@ export const resetFeatures = async (): Promise<number> => {
 
   return count
 }
+
+/**
+ * Forget the cached switches
+ * @return {void} - Cleared
+ */
+
+export const clearFeatureCache = (): void => {
+  cache = null
+}

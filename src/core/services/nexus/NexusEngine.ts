@@ -4,6 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { rateLimited } from '@/core/lib/errors'
 import { consume } from '@/core/lib/http/rateLimit'
 import { NEXUS_ARG_CONTEXT } from '@/core/lib/nexus/context'
+import { NEXUS_VARIABLES } from '@/core/lib/nexus/variables'
 import { buildCommandRegistry } from '@/core/lib/nexus/registry'
 import { recordAudit } from '@/core/services/nexus/NexusAuditService'
 import { dispatchCommand } from '@/core/services/nexus/NexusDispatcher'
@@ -20,7 +21,7 @@ import { APP_ENVIRONMENT } from '@/declarations/system/environments'
 export const NEXUS_REGISTRY = buildCommandRegistry(
   NEXUS_COMMAND_LIST,
   Object.keys(NEXUS_HANDLERS),
-  { entity: NEXUS_ARG_CONTEXT.hasEntity }
+  NEXUS_VARIABLES
 )
 
 // Real dependencies of the pipeline

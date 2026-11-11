@@ -1,3 +1,5 @@
+import { overlayValue, recordSpec } from '@/declarations/configurations/overlay'
+
 interface NumberContext {
   path: string
   fallback: number
@@ -60,8 +62,10 @@ const reject = <T>(path: string, reason: string, value: unknown, fallback: T): T
  * @return {number}
  */
 
-export const readNumber = (value: unknown, context: NumberContext): number => {
+export const readNumber = (raw: unknown, context: NumberContext): number => {
   const { path, fallback, min, max } = context
+  const value = overlayValue(path) ?? raw
+  recordSpec(path, { kind: 'number', min, max })
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     return reject(path, 'is not a number', value, fallback)
   }
@@ -81,11 +85,15 @@ export const readNumber = (value: unknown, context: NumberContext): number => {
  * @return {number}
  */
 
-export const readInteger = (value: unknown, context: NumberContext): number => {
+export const readInteger = (raw: unknown, context: NumberContext): number => {
+  const value = overlayValue(context.path) ?? raw
   if (typeof value === 'number' && !Number.isInteger(value)) {
     return reject(context.path, 'is not an integer', value, context.fallback)
   }
-  return readNumber(value, context)
+  const result = readNumber(raw, context)
+  recordSpec(context.path, { kind: 'integer', min: context.min, max: context.max })
+
+  return result
 }
 
 /**
@@ -95,7 +103,9 @@ export const readInteger = (value: unknown, context: NumberContext): number => {
  * @return {string}
  */
 
-export const readString = (value: unknown, context: StringContext): string => {
+export const readString = (raw: unknown, context: StringContext): string => {
+  const value = overlayValue(context.path) ?? raw
+  recordSpec(context.path, { kind: 'string' })
   if (typeof value !== 'string' || value.length === 0) {
     return reject(context.path, 'is not a non-empty string', value, context.fallback)
   }
@@ -109,7 +119,9 @@ export const readString = (value: unknown, context: StringContext): string => {
  * @return {boolean}
  */
 
-export const readBoolean = (value: unknown, context: BooleanContext): boolean => {
+export const readBoolean = (raw: unknown, context: BooleanContext): boolean => {
+  const value = overlayValue(context.path) ?? raw
+  recordSpec(context.path, { kind: 'boolean' })
   if (typeof value !== 'boolean') {
     return reject(context.path, 'is not a boolean', value, context.fallback)
   }
@@ -184,7 +196,9 @@ export const readNode = (value: unknown, path: string): Record<string, unknown> 
  * @return {string[]}
  */
 
-export const readStringList = (value: unknown, context: StringListContext): string[] => {
+export const readStringList = (raw: unknown, context: StringListContext): string[] => {
+  const value = overlayValue(context.path) ?? raw
+  recordSpec(context.path, { kind: 'list', allowed: context.allowed })
   if (!Array.isArray(value)) {
     return reject(context.path, 'is not an array', value, context.fallback)
   }
@@ -215,9 +229,11 @@ export const readStringList = (value: unknown, context: StringListContext): stri
  */
 
 export const readChoice = <TValue extends string>(
-  value: unknown,
+  raw: unknown,
   context: ChoiceContext<TValue>
 ): TValue => {
+  const value = overlayValue(context.path) ?? raw
+  recordSpec(context.path, { kind: 'choice', allowed: context.allowed })
   if (typeof value !== 'string' || !context.allowed.includes(value as TValue)) {
     return reject(
       context.path,
