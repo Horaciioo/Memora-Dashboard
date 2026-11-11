@@ -1,0 +1,19 @@
+{
+  "files.watcherExclude": {
+    "**/.next*/**": true,
+    "**/logs/**": true,
+    "**/.yarn/**": true,
+    "**/node_modules/**": true,
+    "**/tsconfig.tsbuildinfo": true
+  },
+  "search.exclude": {
+    "**/.next*": true,
+    "**/logs": true,
+    "**/.yarn": true,
+    "**/tsconfig.tsbuildinfo": true
+  },
+  "files.exclude": {
+    "**/.next*": true
+  },
+  "typescript.tsserver.maxTsServerMemory": 4096
+}
