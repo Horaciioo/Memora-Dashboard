@@ -241,6 +241,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Ajout d’une page « Mod. View » : elle ouvre le live en cours, ou montre l’outil en lecture seule quand aucun live n’est ouvert, et un bouton flottant « Ouvrir la Mod. View » la rejoint depuis les Lives.',
       },
       {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un écran de chargement dans « Memora Play » : le logo Memora et une barre de progression s’affichent pour tous les joueurs dès que l’hôte clique sur « Lancer la partie », puis à l’ouverture d’une partie.',
+      },
+      {
         tag: ChangelogTags.Improved,
         page: ROUTES.lives,
         permission: Permissions.LiveRead,
