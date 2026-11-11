@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { apiPost } from '@/core/lib/api/client'
@@ -40,11 +40,6 @@ export const useFavoritePage = (path: string, label: string): FavoriteState => {
 
   // Optimistic until the refresh lands
   const isFavorite = pending ?? isHeld
-
-  // Server caught up
-  useEffect(() => {
-    if (pending !== null && pending === isHeld) setPending(null)
-  }, [pending, isHeld])
   const isFull = !isFavorite && held.length >= FAVORITE_LIMIT
 
   const toggle = () => {

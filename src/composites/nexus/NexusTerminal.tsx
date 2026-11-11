@@ -23,7 +23,9 @@ export const NexusTerminal = ({ console: nexus, preset }: NexusTerminalProps) =>
   const end = useRef<HTMLDivElement>(null)
 
   // Follow the newest block
-  useEffect(() => end.current?.scrollIntoView({ block: 'end' }), [nexus.blocks.length])
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: 'end' })
+  }, [nexus.blocks.length])
 
   return (
     <>

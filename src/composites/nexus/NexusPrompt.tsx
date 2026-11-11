@@ -44,7 +44,9 @@ export const NexusPrompt = ({ mode, isBusy, history, registry, preset, onSubmit,
   const isSecret = mode === 'password' || mode === 'reauth'
 
   // Focus on open and after each step
-  useEffect(() => field.current?.focus(), [mode, isBusy])
+  useEffect(() => {
+    field.current?.focus()
+  }, [mode, isBusy])
 
   const recall = (position: number) => {
     setCursor(position)
