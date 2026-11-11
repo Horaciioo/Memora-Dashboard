@@ -30,6 +30,7 @@ export type PlayBotKindName = (typeof PlayBotKinds)[keyof typeof PlayBotKinds]
 export const PlayStatuses = {
   Lobby: 'LOBBY',
   Running: 'RUNNING',
+  Paused: 'PAUSED',
   Finished: 'FINISHED',
   Abandoned: 'ABANDONED',
 } as const
@@ -44,6 +45,7 @@ export type PlayStatusName = (typeof PlayStatuses)[keyof typeof PlayStatuses]
 export const PLAY_OPEN_STATUSES: readonly PlayStatusName[] = [
   PlayStatuses.Lobby,
   PlayStatuses.Running,
+  PlayStatuses.Paused,
 ]
 
 /**

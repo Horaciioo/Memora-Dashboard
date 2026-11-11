@@ -2980,6 +2980,7 @@ enum PlayVisibility {
 enum PlaySessionStatus {
   LOBBY
   RUNNING
+  PAUSED
   FINISHED
   ABANDONED
 }
@@ -3025,6 +3026,10 @@ model PlaySession {
   settings        Json
   startedAt       DateTime?
   finishedAt      DateTime?
+  // Set while an Administration pause holds the game
+  pausedAt        DateTime?
+  pausedById      String?
+  pauseReason     String?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
@@ -4005,4 +4010,34 @@ model ErrorEvent {
   @@index([requestId])
   @@index([accountId, lastAt])
   @@map("error_events")
+}
+
+// Setting the owner changed from the console, applied at the next start
+model ConfigOverride {
+  id          String    @id @default(cuid())
+  // Folder and file, such as system/realtime
+  category    String
+  // Dotted key inside the file
+  path        String
+  value       Json
+  previous    Json?
+  updatedById String
+  expiresAt   DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([category, path])
+  @@map("config_overrides")
+}
+
+// Switch the owner flips from the console, kept apart from feature switches
+model SystemFlag {
+  key         String   @id
+  enabled     Boolean  @default(false)
+  // Words members read
+  message     String?
+  until       DateTime?
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_flags")
 }

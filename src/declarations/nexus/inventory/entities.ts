@@ -459,6 +459,20 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     search: [],
   },
   featureSwitch: { model: 'FeatureSwitch', exposure: 'full', display: 'key', search: [] },
+  configOverride: {
+    model: 'ConfigOverride',
+    exposure: 'readOnly',
+    reason: 'Écrit par les commandes de configuration',
+    display: 'path',
+    search: ['category', 'path'],
+  },
+  systemFlag: {
+    model: 'SystemFlag',
+    exposure: 'readOnly',
+    reason: 'Écrit par les commandes de maintenance',
+    display: 'key',
+    search: ['key'],
+  },
   nexusSession: {
     model: 'NexusSession',
     exposure: 'excluded',
