@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { NetworkLogo } from '@/components/elements/display/marks/NetworkLogo'
+import { Dotted } from '@/components/elements/display/Dotted'
 import { ActivityDetail } from '@/components/structures/data/ActivityDetail'
 import { Pagination } from '@/components/elements/navigation/Pagination'
 import { PAGINATION_SETTINGS } from '@/declarations/configurations/settings'
@@ -48,6 +50,12 @@ export const ActivityTimeline = ({ entries }: ActivityTimelineProps) => {
           const verb = entry.change?.verb ?? event?.verb
           const rest = entry.change?.rest ?? event?.target
 
+          // Precise subject, else the recorded line
+          const hasLines = (entry.change?.lines?.length ?? 0) > 0
+          const subject =
+            entry.subject ??
+            (verb && !hasLines && !entry.error && entry.summary ? { parts: [entry.summary] } : null)
+
           return (
             <li key={entry.id} className={JOURNAL_STYLES.item}>
               <div className={JOURNAL_STYLES.entry}>
@@ -64,6 +72,14 @@ export const ActivityTimeline = ({ entries }: ActivityTimelineProps) => {
                     </p>
                   ) : (
                     <p className={JOURNAL_STYLES.sentence}>{`${actor}, ${entry.origin}.`}</p>
+                  )}
+                  {subject && (
+                    <p className={JOURNAL_STYLES.subject}>
+                      {subject.network && (
+                        <NetworkLogo network={subject.network} className={JOURNAL_STYLES.subjectLogo} />
+                      )}
+                      <Dotted items={subject.parts} />
+                    </p>
                   )}
                   <ActivityDetail entry={entry} />
                 </div>

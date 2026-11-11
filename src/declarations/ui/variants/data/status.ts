@@ -13,6 +13,9 @@ export const JOURNAL_STYLES = {
   moment: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
   sentence: 'text-sm text-[var(--color-ink)]',
   verb: 'font-bold',
+  // What the entry is about
+  subject: 'flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-[var(--color-ink-muted)]',
+  subjectLogo: 'size-3.5 shrink-0',
   // Glyph leading the line
   glyph: 'mt-0.5 size-5 shrink-0',
   // Short rule set under the glyph

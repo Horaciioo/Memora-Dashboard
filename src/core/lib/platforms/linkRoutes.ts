@@ -89,6 +89,10 @@ export const createLinkReturnRoute = (platform: LivePlatformName): RouteHandler 
         eventType: 'PlatformLinked',
         actorId: session.id,
         summary: `${platformLogoOf(platform)?.label ?? platform}, ${identity.login}`,
+        subject: {
+          parts: [platformLogoOf(platform)?.label ?? platform, identity.login],
+          network: platform,
+        },
       })
 
       return linkDestination(platform, LINK_RESULT.linked)
