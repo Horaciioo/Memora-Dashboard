@@ -22,6 +22,8 @@ export const NAVAL_BOARD = {
     'mx-auto flex w-[min(100%,calc(100dvh-17rem))] min-w-[19rem] flex-col gap-2.5',
   rail: 'flex w-full max-w-[34rem] flex-col gap-3 empty:hidden',
   target: 'relative mx-auto w-full',
+  // Melee: a new sea fades in
+  seaIn: 'naval-sea-in',
   mineTag:
     'pointer-events-none absolute inset-x-0 top-3 z-10 text-center text-lg font-black tracking-[0.14em] text-white uppercase [text-shadow:0_0.1rem_0.6rem_rgb(0_0_0/0.8)]',
   panel: PANEL,
@@ -37,7 +39,7 @@ export const NAVAL_BOARD = {
 export const NAVAL_HUD = {
   bar: 'flex items-center justify-center',
   lead: 'flex min-w-0 flex-1 flex-col items-center gap-1 text-center',
-  call: 'truncate text-lg leading-6 font-black text-[var(--play-naval-ink)] sm:text-xl',
+  call: 'naval-call truncate text-lg leading-6 font-black text-[var(--play-naval-ink)] sm:text-xl',
   callMine: 'text-[var(--play-naval-reticle)]',
   callDanger: 'text-[var(--play-naval-danger)]',
   clockRow: 'flex w-full max-w-xs items-center gap-2',
@@ -120,6 +122,14 @@ export const NAVAL_BRACKET = {
 export const NAVAL_RESULT = {
   root: 'mx-auto flex w-full max-w-[40rem] flex-col gap-4 pt-4',
   banner: 'text-center text-4xl font-black text-[var(--play-naval-ink)]',
+  glow: 'naval-result-glow pointer-events-none fixed inset-0 -z-10',
+  glowWin: 'naval-result-win',
+  glowLose: 'naval-result-lose',
+  sea: 'relative mx-auto w-full max-w-[30rem]',
+  stats: `${PANEL} grid grid-cols-2 gap-3 sm:grid-cols-4`,
+  stat: 'flex flex-col items-center gap-0.5 text-center',
+  statValue: 'text-xl font-black tabular-nums text-[var(--play-naval-ink)]',
+  statLabel: 'text-xs font-bold tracking-[0.1em] uppercase text-[var(--play-naval-ink-soft)]',
   bannerWin: 'text-[var(--play-naval-reticle)]',
   list: `${PANEL} flex flex-col gap-1.5`,
   row: 'flex items-center gap-3 rounded-xl px-2 py-1.5 text-sm font-bold',

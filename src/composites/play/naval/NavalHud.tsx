@@ -25,6 +25,7 @@ export const NavalHud = ({
   <div className={NAVAL_HUD.bar}>
     <div className={NAVAL_HUD.lead}>
       <span
+        key={call}
         className={cn(
           NAVAL_HUD.call,
           tone === 'mine' && NAVAL_HUD.callMine,

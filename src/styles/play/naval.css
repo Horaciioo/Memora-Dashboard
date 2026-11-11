@@ -65,6 +65,49 @@
   touch-action: none;
 }
 
+/* Turn call slides in on change */
+.naval-call {
+  animation: naval-call 0.4s ease-out;
+}
+
+/* Melee: sea fades in */
+.naval-sea-in {
+  animation: naval-fade 0.35s ease-out;
+}
+
+/* Result light: brightens on a win, darkens on a loss */
+.naval-result-glow {
+  animation: naval-fade 1.4s ease-out both;
+}
+
+.naval-result-win {
+  background: radial-gradient(ellipse at 50% 20%, rgb(255 226 150 / 0.28), transparent 65%);
+}
+
+.naval-result-lose {
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.2));
+}
+
+@keyframes naval-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes naval-call {
+  0% {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes naval-callout {
   0% {
     opacity: 0;
@@ -108,6 +151,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .naval-callout,
+  .naval-call,
+  .naval-sea-in,
+  .naval-result-glow,
   .naval-draw,
   .naval-chip-hit {
     animation: none;

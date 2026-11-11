@@ -89,7 +89,15 @@ export const NavalBattle = ({
     const sunkBy = (seat: number) =>
       board.shots.filter((shot) => shot[2] === seat && shot[6] === NavalCodes.Sunk).length
 
-    return <NavalResult captains={captains} viewer={viewer} sunkBy={sunkBy} />
+    return (
+      <NavalResult
+        board={board}
+        captains={captains}
+        viewer={viewer}
+        match={matchIndex}
+        sunkBy={sunkBy}
+      />
+    )
   }
 
   const { call, tone } = callOf({ board, match: matchIndex, viewer, captains, playback })
@@ -140,6 +148,8 @@ export const NavalBattle = ({
           <NavalHud call={call} tone={tone} clock={clock} />
           {sea && (
             <NavalTargetSea
+              key={foes.length > 1 ? (isOwnShown ? viewer : target) : 0}
+              isFading={foes.length > 1}
               size={board.sea.size}
               map={board.settings.map}
               target={captains[isOwnShown ? viewer : target]}

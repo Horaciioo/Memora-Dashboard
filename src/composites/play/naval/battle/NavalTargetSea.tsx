@@ -18,6 +18,7 @@ export interface NavalTargetSeaProps {
   map: string
   target: NavalCaptainView
   isMine?: boolean
+  isFading?: boolean
   marks: SeaMark[]
   ships: OceanShip[]
   playing: OceanStrike[]
@@ -36,6 +37,7 @@ export const NavalTargetSea = ({
   map,
   target,
   isMine,
+  isFading,
   marks,
   ships,
   playing,
@@ -45,7 +47,7 @@ export const NavalTargetSea = ({
   const text = callout ? calloutOf(callout.callout, callout.captains, callout.viewer) : null
 
   return (
-    <div className={NAVAL_BOARD.target}>
+    <div className={cn(NAVAL_BOARD.target, isFading && NAVAL_BOARD.seaIn)}>
       <NavalOcean
         size={size}
         map={map}
