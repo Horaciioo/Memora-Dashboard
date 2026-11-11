@@ -82,14 +82,16 @@ export const NavSheet = ({
           if ((event.target as HTMLElement).closest('a')) onClose()
         }}
       >
-        {viewContext.switchable && (
-          <div className={NAV_SHEET.switch}>
-            <SimulationBanner viewContext={viewContext} />
-            <RoleSwitch viewContext={viewContext} />
-          </div>
-        )}
-        <div className={NAV_SHEET.searchRow}>
-          <SearchLauncher expanded className={SEARCH_LAUNCHER.sheetBar} onOpen={onClose} />
+        <div className={NAV_SHEET.accountRow}>
+          <button
+            type="button"
+            aria-label={NAV_COPY.account}
+            onClick={onAccount}
+            className={NAV_SHEET.account}
+          >
+            <Avatar name={session.displayName} src={session.avatarUrl} size="sm" />
+            <span className={NAV_SHEET.accountName}>{session.displayName}</span>
+          </button>
           <Link
             href={ROUTES.notifications}
             aria-label={NAV_COPY.notifications}
@@ -99,6 +101,13 @@ export const NavSheet = ({
             {unreadCount > 0 && <span className={NAV_SHEET.dot} aria-hidden="true" />}
           </Link>
         </div>
+        {viewContext.switchable && (
+          <div className={NAV_SHEET.switch}>
+            <SimulationBanner viewContext={viewContext} />
+            <RoleSwitch viewContext={viewContext} />
+          </div>
+        )}
+        <SearchLauncher expanded className={SEARCH_LAUNCHER.sheetBar} onOpen={onClose} />
         <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
         <RailNav
           groups={groups}
@@ -107,16 +116,6 @@ export const NavSheet = ({
           live={viewContext.live}
           mentions={viewContext.mentions}
         />
-        <hr className={NAV_SHEET.divider} />
-        <button
-          type="button"
-          aria-label={NAV_COPY.account}
-          onClick={onAccount}
-          className={NAV_SHEET.account}
-        >
-          <Avatar name={session.displayName} src={session.avatarUrl} size="sm" />
-          <span className={NAV_SHEET.accountName}>{session.displayName}</span>
-        </button>
       </div>
     </BottomSheet>
   )

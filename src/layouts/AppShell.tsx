@@ -12,6 +12,7 @@ import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { TourHost } from '@/composites/tour/TourHost'
 import { LeftSidebar } from '@/composites/shell/LeftSidebar'
+import { DockSwipe } from '@/composites/shell/mobile/DockSwipe'
 import { MobileDock } from '@/composites/shell/mobile/MobileDock'
 import { MobileTopBar } from '@/composites/shell/mobile/MobileTopBar'
 import { OfflineBanner } from '@/composites/pwa/OfflineBanner'
@@ -137,7 +138,13 @@ const AppShellFrame = ({
           {session && <MobileTopBar />}
           <main className={APP_SHELL.content} {...beaconProps(TOUR_BEACONS.page)}>
             <MobileHold routes={heldRoutes}>
-              <FeatureGate>{children}</FeatureGate>
+              {session ? (
+                <DockSwipe viewContext={viewContext} held={heldRoutes.phone}>
+                  <FeatureGate>{children}</FeatureGate>
+                </DockSwipe>
+              ) : (
+                <FeatureGate>{children}</FeatureGate>
+              )}
             </MobileHold>
           </main>
         </div>
