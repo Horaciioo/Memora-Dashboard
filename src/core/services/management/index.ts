@@ -1,0 +1,6 @@
+export { listManagedAbsences } from '@/core/services/management/absences'
+export { listManagedNotes } from '@/core/services/management/notes'
+export { listManagedSocials } from '@/core/services/management/socials'
+export { listManagedArrivals } from '@/core/services/management/arrivals'
+export { listManagedBirthdays } from '@/core/services/management/birthdays'
+export { listManagedFunctions } from '@/core/services/management/functions'
