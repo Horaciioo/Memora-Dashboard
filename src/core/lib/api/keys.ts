@@ -27,8 +27,9 @@ export const QUERY_KEYS = {
   liveInspect: (liveId: string, accountId: string) =>
     ['lives', 'inspect', liveId, accountId] as const,
   exerciseLinks: (candidateId: string) => ['recruitment', 'exercises', candidateId] as const,
-  recruitmentHistory: (search: string, bannedOnly: boolean) =>
-    ['recruitment', 'history', search, bannedOnly] as const,
+  recruitmentHistory: (filters: Record<string, string | boolean>) =>
+    ['recruitment', 'history', filters] as const,
+  academyHistory: (filters: Record<string, string>) => ['academy', 'history', filters] as const,
   workComments: (kind: string, id: string) => ['work', 'comments', kind, id] as const,
   playProfile: ['play', 'profile'] as const,
   liveBan: (liveId: string, viewerId: string) => ['lives', 'ban', liveId, viewerId] as const,

@@ -22,7 +22,15 @@ export default async function RecruitmentsPage() {
   // Managers read their creators, the others the sessions they sit in
   const perimeter = await scope()
 
-  const [sessions, fields] = await Promise.all([listSessions(perimeter), sessionFields(perimeter)])
+  const sessions = await listSessions(perimeter)
+
+  // Everyone already seated stays valid in the edit form
+  const seated = (key: 'observerIds' | 'recruiterIds' | 'responsableIds') =>
+    sessions.flatMap((entry) => entry.values[key] as string[])
+  const fields = await sessionFields(perimeter, undefined, seated('observerIds'), {
+    recruiters: seated('recruiterIds'),
+    responsables: seated('responsableIds'),
+  })
 
   return (
     <div className={PAGE_STYLES.wrapper}>

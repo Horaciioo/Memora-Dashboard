@@ -2,7 +2,7 @@ import { prisma } from '@/core/lib/db'
 import { activeFunctions } from '@/core/services/reference/lookups'
 import { functionOptions, toOptions } from '@/core/lib/forms/options'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { memberOptions, teamOptions, youtuberOptions } from '@/core/services/work/shared'
+import { memberOptions, teamOptions, withSeated, youtuberOptions } from '@/core/services/work/shared'
 import {
   JUNIOR_FUNCTION_OF,
   OBSERVER_FUNCTION,
@@ -25,53 +25,32 @@ const { shortTextMaxLength, longTextMaxLength, markdownMaxLength, noteMaxLength 
 import 'server-only'
 
 /**
- * Members holding the Observateurs function
- * @param {string[]} kept - Observers already in the file
- * @return {Promise<FieldOption[]>} - Select options
- */
-
-const observerOptions = async (kept: string[]): Promise<FieldOption[]> => {
-  const options = await teamOptions({ functionName: OBSERVER_FUNCTION })
-  const known = new Set(options.map((option) => option.value))
-  const missing = [...new Set(kept)].filter((id) => !known.has(id))
-  if (missing.length === 0) return options
-
-  const rows = await prisma.account.findMany({
-    where: { id: { in: missing } },
-    select: { id: true, displayName: true, avatarUrl: true },
-  })
-
-  // Seated before they lost the function
-  return [
-    ...options,
-    ...rows.map((row) => ({
-      value: row.id,
-      label: row.displayName,
-      image: row.avatarUrl ?? undefined,
-      disabled: true,
-    })),
-  ]
-}
-
-/**
  * Declarations of the session form
  * @param {AccessScope} scope - Perimeter
  * @param {string} [youtuberId] - Creator of an existing session
  * @param {string[]} [keptObservers] - Observers already seated
+ * @param {{ recruiters: string[], responsables: string[] }} [keptSeats] - Others already seated
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
 export const sessionFields = async (
   scope: AccessScope,
   youtuberId?: string,
-  keptObservers: string[] = []
+  keptObservers: string[] = [],
+  keptSeats: { recruiters: string[]; responsables: string[] } = { recruiters: [], responsables: [] }
 ): Promise<FieldDefinition[]> => {
   const [creators, functions, responsables, recruiters, observers, links] = await Promise.all([
     youtuberOptions(scope),
     activeFunctions(),
-    teamOptions({ role: MemberRoles.Responsable, youtuberId, withGlobal: true }),
-    teamOptions({ functionName: RECRUITER_FUNCTION, withGlobal: true }),
-    observerOptions(keptObservers),
+    teamOptions({ role: MemberRoles.Responsable, youtuberId, withGlobal: true }).then((options) =>
+      withSeated(options, keptSeats.responsables)
+    ),
+    teamOptions({ functionName: RECRUITER_FUNCTION, withGlobal: true }).then((options) =>
+      withSeated(options, keptSeats.recruiters)
+    ),
+    teamOptions({ functionName: OBSERVER_FUNCTION }).then((options) =>
+      withSeated(options, keptObservers)
+    ),
     prisma.youtuberFunction.findMany({ select: { youtuberId: true, functionId: true } }),
   ])
 
@@ -234,7 +213,9 @@ export const candidateFields = async (
 ): Promise<FieldDefinition[]> => {
   const [members, observers, outcomes, recruiters] = await Promise.all([
     memberOptions(),
-    observerOptions(keptObservers),
+    teamOptions({ functionName: OBSERVER_FUNCTION }).then((options) =>
+      withSeated(options, keptObservers)
+    ),
     prisma.recruitmentOutcome.findMany({
       where: { archived: false },
       orderBy: { position: 'asc' },
