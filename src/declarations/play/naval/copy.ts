@@ -198,3 +198,14 @@ export const NAVAL_WEAPON_COPY: Record<NavalWeaponName, { label: string; note: s
   [NavalWeapons.Volley]: { label: 'Salve', note: 'Trois cases en ligne' },
   [NavalWeapons.Grenade]: { label: 'Grenade', note: 'Une case et ses quatre voisines' },
 }
+
+/**
+ * Display settings
+ * @type {Record<string, string>}
+ */
+
+export const NAVAL_PREFS_COPY = {
+  autoZoom: 'Zoom automatique',
+  autoZoomHint:
+    'La caméra se rapproche de la zone touchée puis recule. Coupe-le pour garder la vue fixe.',
+} as const

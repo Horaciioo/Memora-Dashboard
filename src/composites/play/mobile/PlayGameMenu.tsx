@@ -50,7 +50,7 @@ export const PlayGameMenu = ({ sessionId, gameSlug, isSeated }: PlayGameMenuProp
             isSeated={isSeated}
             onLeft={() => setOpen(false)}
           />
-          <PlaySettingsPanel />
+          <PlaySettingsPanel gameSlug={gameSlug} />
         </div>
       </BottomSheet>
     </>

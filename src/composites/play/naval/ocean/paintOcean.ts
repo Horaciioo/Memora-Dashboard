@@ -1,4 +1,5 @@
 import { followOf } from '@/composites/play/naval/fx/follow'
+import { useNavalPrefsStore } from '@/core/store/play/navalPrefs'
 import { paintStrikes } from '@/composites/play/naval/fx/paintStrikes'
 import type { OceanStrike, StrikeStage } from '@/composites/play/naval/fx/paintStrikes'
 import {
@@ -200,7 +201,10 @@ export const paintOcean = (pen: OceanPen, scene: OceanScene, now: number, tier: 
   const frame = frameOf(base, scene.camera)
 
   // Camera leans toward the strike
-  const follow = tier.follow ? followOf(frame, scene.playing[0]) : null
+  const follow =
+    tier.follow && useNavalPrefsStore.getState().hasAutoZoom
+      ? followOf(frame, scene.playing[0])
+      : null
   const zoom = follow?.zoom ?? 1
   const shift = (1 - zoom) * ratio
   ctx.setTransform(

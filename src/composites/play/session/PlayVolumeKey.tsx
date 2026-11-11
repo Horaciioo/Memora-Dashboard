@@ -3,12 +3,14 @@
 import { useCallback, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { NavalAutoZoomToggle } from '@/composites/play/naval/NavalAutoZoomToggle'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { usePlaySoundStore } from '@/core/store/play/playSound'
 import { PLAY_SOUND_COPY } from '@/declarations/play/sounds'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 /**
@@ -41,6 +43,7 @@ export const PlayVolumeKey = ({ game }: { game: PlayGameName }) => {
       {isOpen && (
         <div className={BAC_SESSION.volumeCard} role="dialog" aria-label={PLAY_SOUND_COPY.game}>
           <PlayVolume game={game} />
+          {game === PlayGames.Naval && <NavalAutoZoomToggle />}
         </div>
       )}
     </div>
