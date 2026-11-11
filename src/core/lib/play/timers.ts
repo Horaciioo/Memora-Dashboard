@@ -5,9 +5,34 @@ import { logger } from '@/core/lib/logger'
 // Survives dev hot reloads
 const globalForTimers = globalThis as unknown as {
   playTimers?: Map<string, ReturnType<typeof setTimeout>>
+  playSettled?: Map<string, number>
 }
 
 const timers = (globalForTimers.playTimers ??= new Map())
+
+// Next timed move per game, nothing due before it
+const settled = (globalForTimers.playSettled ??= new Map())
+
+/**
+ * Remember when a game next has something due
+ * @param {string} sessionId - Game
+ * @param {Date | null} until - Next deadline, null when unknown
+ * @return {void}
+ */
+
+export const markSettled = (sessionId: string, until: Date | null): void => {
+  if (until) settled.set(sessionId, until.getTime())
+  else settled.delete(sessionId)
+}
+
+/**
+ * Game with nothing overdue, a settle would change nothing
+ * @param {string} sessionId - Game
+ * @return {boolean} - Up to date
+ */
+
+export const isSettled = (sessionId: string): boolean =>
+  (settled.get(sessionId) ?? 0) > Date.now()
 
 /**
  * Run a game's next deadline, replacing the previous one
@@ -75,6 +100,7 @@ export const botTimerKey = (sessionId: string, botId: string): string =>
 
 export const clearSessionTimers = (sessionId: string): void => {
   clearDeadline(sessionId)
+  settled.delete(sessionId)
   clearDeadline(timerKey('idle', sessionId))
   clearDeadline(timerKey('away', sessionId))
   // Every bot of the table

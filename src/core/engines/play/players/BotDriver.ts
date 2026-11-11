@@ -65,6 +65,14 @@ export const forgetBots = (sessionId: string): void => {
 }
 
 /**
+ * Table whose bots this process already drives
+ * @param {string} sessionId - Game
+ * @return {boolean} - Driven
+ */
+
+export const isDriven = (sessionId: string): boolean => tables.has(sessionId)
+
+/**
  * Play a planned move in turn
  * @param {string} sessionId - Game
  * @param {PlayPlayer} bot - Bot seat

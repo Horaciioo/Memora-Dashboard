@@ -12,6 +12,7 @@ import { PLAY_SESSION_TABLES } from '@/composites/play/session/sessionTables'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { inviteCandidates, listMessages, listSpectators, readSession } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
+import { nullIfMissing } from '@/core/lib/errors'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_GAMES, PLAY_HUB_COPY, playKeysOf } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
@@ -40,9 +41,9 @@ const STAGE_COPY: Record<string, string> = {
 export default async function PlaySessionPage({ params }: PlaySessionPageProps) {
   const { session, access } = await requirePermission(Permissions.PlayAccess)
   const { id } = await params
-  // Chat read beside the game, shown only once the game lets the reader in
+  // Chat read beside the game, shown only once the game lets the reader in, a breakdown shows the retry page
   const [game, messages] = await Promise.all([
-    readSession(id, session.id, access.can(Permissions.PlayManage)).catch(() => null),
+    readSession(id, session.id, access.can(Permissions.PlayManage)).catch(nullIfMissing),
     listMessages(id).catch(() => []),
   ])
   if (!game) notFound()

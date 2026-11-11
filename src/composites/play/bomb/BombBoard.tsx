@@ -35,7 +35,6 @@ export const BombBoard = ({
   board: initial,
   faces,
   viewerId,
-  isSeated,
 }: BombBoardProps) => {
   const board = usePlainBoard(sessionId, initial)
   const now = useServerNow(board.serverTime)

@@ -7,11 +7,16 @@ import { seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict, notFound, toAppError } from '@/core/lib/errors'
 import { mayEnter, mayOversee } from '@/core/lib/play/access'
 import { signalPlay } from '@/core/lib/play/signal'
-import { clearSessionTimers, scheduleDeadline } from '@/core/lib/play/timers'
+import {
+  clearSessionTimers,
+  isSettled,
+  markSettled,
+  scheduleDeadline,
+} from '@/core/lib/play/timers'
 import { PLAY_ERRORS } from '@/declarations/play'
 import { areBotsAwake } from '@/declarations/play/bots'
 import type { EngineStep } from '@/core/engines/play'
-import { driveBots } from '@/core/engines/play/players/BotDriver'
+import { driveBots, isDriven } from '@/core/engines/play/players/BotDriver'
 import { logger } from '@/core/lib/logger'
 import { forgetIdle, noteAction } from '@/core/services/play/PlayIdleService'
 import { tellFollowers } from '@/core/services/play/PlayFollowService'
@@ -51,6 +56,10 @@ const applyStep = async (
     await finishSession(sessionId)
   } else if (step.deadline) {
     scheduleDeadline(sessionId, step.deadline, () => settleSession(sessionId))
+    markSettled(sessionId, step.deadline)
+  } else if (step.changed && !step.isCosmetic) {
+    // Next move unknown, the next read settles
+    markSettled(sessionId, null)
   }
 
   // A running table draws from its board alone, the page moves at the end
@@ -72,12 +81,24 @@ const applyStep = async (
 export const settleSession = async (sessionId: string): Promise<LoadedSession> => {
   const session = await loadSession(sessionId)
   if (session.status !== PlayStatuses.Running) return session
+  // Bots lost with a restart move again
+  if (!isDriven(sessionId) && session.seats.some((seat) => isPresent(seat) && seat.account.botKind))
+    wakeBots(sessionId, session.game)
 
   const step = await engineOf(session.game).settle(toEngineSession(session))
   await applyStep(sessionId, session.game, step)
 
   return step.changed || step.finished ? loadSession(sessionId) : session
 }
+
+/**
+ * Game read for a page or a move, the locked settle skipped when nothing is due
+ * @param {string} sessionId - Game
+ * @return {Promise<LoadedSession>} - Game
+ */
+
+const freshSession = (sessionId: string): Promise<LoadedSession> =>
+  isSettled(sessionId) ? loadSession(sessionId) : settleSession(sessionId)
 
 /**
  * Next game of a finished tournament game
@@ -107,7 +128,7 @@ const nextGameId = async (session: LoadedSession): Promise<string | null> => {
  */
 
 export const readSession = async (sessionId: string, viewerId: string, canManage = false) => {
-  const session = await settleSession(sessionId)
+  const session = await freshSession(sessionId)
   // Private games stay shut to the uninvited, admins aside
   const isAllowed = mayOversee(session, canManage) || (await mayEnter(prisma, session, viewerId))
   if (!isAllowed) throw notFound(PLAY_ERRORS.sessionMissing)
@@ -220,7 +241,7 @@ const playMove = async (
   accountId: string,
   raw: Record<string, unknown>
 ): Promise<void> => {
-  const session = await settleSession(sessionId)
+  const session = await freshSession(sessionId)
   if (session.status !== PlayStatuses.Running) throw conflict(PLAY_ERRORS.notRunning)
   requireSeat(session, accountId)
 
