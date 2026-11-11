@@ -444,6 +444,36 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Improved,
         page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de « Live en cours » : la sélection du créateur apparaît désormais dans la bannière.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration visuelle de « Live en cours » : la bulle de diffusion ressort mieux sur l’image de couverture.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de « Live en cours » : l’alerte d’un direct met plus clairement en évidence le créateur et l’accès à la page.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la « Vue Modérateur » : les symboles des sections correspondent désormais aux rôles et aux fonctions de l’équipe.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la « Vue Modérateur » : le nom des Juniors ressort désormais avec sa propre couleur.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
         permission: Permissions.LiveLogRead,
         audience: ChangelogAudiences.Responsables,
         text: 'Amélioration du « Bilan » d’un live : chaque geste de modération est rattaché à son modérateur, et une note signale les moments où aucun modérateur n’était connecté à Memora, avec leur durée.',

@@ -33,10 +33,32 @@ export const LiveHub = ({ creators, initialId }: LiveHubProps) => {
     <div className={LIVE_HUB_STYLES.wrapper}>
       {/* Banner and body replay their entrance when the creator changes */}
       <div key={creator.id} className={LIVE_HUB_STYLES.fade}>
-        <PageBanner isBare title={LIVE_HUB_COPY.title} image={creator.banner} />
+        <PageBanner
+          isBare
+          title={LIVE_HUB_COPY.title}
+          image={creator.banner}
+          trailingTools={
+            creators.length > 1 && (
+              <SelectMenu
+                label={LIVE_HUB_COPY.creatorLabel}
+                value={creator.id}
+                onChange={setPicked}
+                mark="avatar"
+                size="compact"
+                isBare
+                className={LIVE_HUB_STYLES.picker}
+                options={creators.map((entry) => ({
+                  value: entry.id,
+                  label: entry.name,
+                  image: entry.avatarUrl,
+                }))}
+              />
+            )
+          }
+        />
       </div>
 
-      {/* Portrait straddling the banner foot, name and state beside it, actions at the far end */}
+      {/* Portrait below banner */}
       <div className={LIVE_HUB_STYLES.pickerRow}>
         <div className={LIVE_HUB_STYLES.identity}>
           <div className={LIVE_HUB_STYLES.portraitWrap}>
@@ -48,23 +70,6 @@ export const LiveHub = ({ creators, initialId }: LiveHubProps) => {
             />
           </div>
           <LiveHubBubble creator={creator} />
-        </div>
-        <div className={LIVE_HUB_STYLES.actions}>
-          {creators.length > 1 && (
-            <SelectMenu
-              label={LIVE_HUB_COPY.creatorLabel}
-              value={creator.id}
-              onChange={setPicked}
-              mark="avatar"
-              size="compact"
-              className={LIVE_HUB_STYLES.picker}
-              options={creators.map((entry) => ({
-                value: entry.id,
-                label: entry.name,
-                image: entry.avatarUrl,
-              }))}
-            />
-          )}
         </div>
       </div>
 

@@ -6,9 +6,11 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import Link from '@/components/elements/navigation/AppLink'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { ROUTES } from '@/declarations/navigation'
+import { RELEASE_NOTICE } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_NOTICE } from '@/declarations/ui/variants'
 import type { LiveBeacon } from '@/types/lives'
+import { cn } from '@/utils/classnames'
 import { LiveStatuses } from '@/utils/constants/lives'
 
 export interface LiveRailNoticeProps {
@@ -18,7 +20,7 @@ export interface LiveRailNoticeProps {
 }
 
 /**
- * Red card under the Live shortcut: the creator on air
+ * Live rail notice
  * @param {LiveBeacon | null} live - Open lives
  * @param {number} [pointedAt] - Draws the point under this share of the row
  * @return {JSX.Element | null}
@@ -33,34 +35,48 @@ export const LiveRailNotice = ({ live, pointedAt }: LiveRailNoticeProps) => {
   const CloseIcon = ICONS.close
 
   return (
-    <div className={LIVE_NOTICE.wrap}>
+    <div
+      className={cn(
+        RELEASE_NOTICE.wrap,
+        pointedAt !== undefined && RELEASE_NOTICE.wrapPointed
+      )}
+    >
       {pointedAt !== undefined && (
         <span
-          className={LIVE_NOTICE.caret}
+          className={RELEASE_NOTICE.caret}
           style={{ left: `calc(${pointedAt * 100}% - 0.375rem)` }}
           aria-hidden="true"
         />
       )}
-      <div className={LIVE_NOTICE.card}>
-        <Link href={ROUTES.lives} className={LIVE_NOTICE.link}>
-          <Avatar
-            name={onAir.creator}
-            src={onAir.creatorAvatar}
-            size="md"
-            className={LIVE_NOTICE.avatar}
-          />
-          <span className={LIVE_NOTICE.text}>
-            {LIVE_COPY.railLive.replace('{creator}', onAir.creator)}
+      <div className={RELEASE_NOTICE.frame}>
+        <span className={RELEASE_NOTICE.veil} aria-hidden="true" />
+        <Link href={ROUTES.lives} className={RELEASE_NOTICE.link}>
+          <span className={RELEASE_NOTICE.sheen} aria-hidden="true" />
+          <span className={RELEASE_NOTICE.kicker}>{LIVE_COPY.liveBadge}</span>
+          <span className={LIVE_NOTICE.creator}>
+            <Avatar
+              name={onAir.creator}
+              src={onAir.creatorAvatar}
+              size="md"
+              className={LIVE_NOTICE.avatar}
+            />
+            <span className={LIVE_NOTICE.text}>
+              {LIVE_COPY.railLive.replace('{creator}', onAir.creator)}
+            </span>
           </span>
-          <GoIcon className={LIVE_NOTICE.go} aria-hidden="true" />
+          <span className={RELEASE_NOTICE.cta}>
+            {LIVE_COPY.urgentOpen}
+            <GoIcon className={RELEASE_NOTICE.ctaIcon} aria-hidden="true" />
+          </span>
         </Link>
         <button
           type="button"
-          className={LIVE_NOTICE.close}
+          title={LIVE_COPY.dismiss}
+          className={RELEASE_NOTICE.dismiss}
           aria-label={LIVE_COPY.dismiss}
           onClick={() => setDismissedId(onAir.id)}
         >
-          <CloseIcon className={LIVE_NOTICE.closeGlyph} aria-hidden="true" />
+          <CloseIcon className={RELEASE_NOTICE.dismissIcon} aria-hidden="true" />
         </button>
       </div>
     </div>

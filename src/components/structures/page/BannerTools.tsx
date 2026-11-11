@@ -1,6 +1,7 @@
 'use client'
 
 import { useSyncExternalStore } from 'react'
+import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { SectionPresence } from '@/components/structures/presence/SectionPresence'
 import { FavoriteToggle } from '@/components/structures/page/FavoriteToggle'
@@ -11,6 +12,7 @@ import { PAGE_STYLES } from '@/declarations/ui/variants'
 export interface BannerToolsProps {
   // Name of the page when the trail holds none
   title: string
+  trailingTools?: ReactNode
 }
 
 // The host never changes under a mounted page
@@ -19,10 +21,11 @@ const subscribeNothing = () => () => {}
 /**
  * Page options and star: in the banner bar, in the top bar of a phone
  * @param {string} title - Page name stand-in for the star
+ * @param {ReactNode} [trailingTools] - Extra controls
  * @return {JSX.Element}
  */
 
-export const BannerTools = ({ title }: BannerToolsProps) => {
+export const BannerTools = ({ title, trailingTools }: BannerToolsProps) => {
   const isMobile = useIsMobileShell()
   const host = useSyncExternalStore(
     subscribeNothing,
@@ -35,6 +38,7 @@ export const BannerTools = ({ title }: BannerToolsProps) => {
       <SectionPresence />
       <div id={PAGE_OPTIONS_HOST_ID} className="contents" />
       <FavoriteToggle title={title} />
+      {trailingTools}
     </div>
   )
 

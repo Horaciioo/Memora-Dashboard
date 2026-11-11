@@ -7,12 +7,10 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls/fields'
 
 export const LIVE_HUB_STYLES = {
   wrapper: 'mx-auto flex w-full max-w-6xl flex-col gap-8',
-  pickerRow: 'relative z-10 -mt-28 flex items-start justify-between gap-x-6 px-2 sm:-mt-36 sm:px-3',
+  pickerRow: 'relative z-10 -mt-28 flex items-start px-2 sm:-mt-36 sm:px-3',
   // Portrait straddling the banner, its bubble beside it
   identity: 'flex min-w-0 flex-1 items-start gap-9',
   portraitWrap: 'relative shrink-0',
-  actions: 'mt-[4.5rem] flex shrink-0 items-center sm:mt-[6.5rem]',
-  pickerLabel: PROPERTY_LABEL,
   picker: 'max-w-56',
   // Replayed on every creator change
   swap: 'hub-swap',
@@ -48,13 +46,10 @@ export const LIVE_HUB_STYLES = {
   dotSmall:
     'absolute -top-2 -left-9 size-2.5 rounded-full bg-[var(--color-surface-raised)]/40 ring-1 ring-white/40 backdrop-blur-xl shadow-[var(--shadow-sm)]',
   bubble:
-    'relative flex min-w-0 flex-1 items-center gap-4 rounded-[var(--radius-xl)] px-5 py-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-md)]',
-  // Frosted over the banner
-  bubbleGlass:
-    'bg-[var(--color-surface-raised)]/40 backdrop-blur-2xl backdrop-saturate-200 ring-white/40',
+    'relative flex min-w-0 flex-1 items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface px-6 py-5 shadow-[var(--shadow-md)]',
   bubbleBody: 'flex min-w-0 flex-1 flex-col',
   bubbleTitle:
-    'flex items-center gap-2.5 text-2xl leading-tight font-bold tracking-tight break-words',
+    'flex items-center gap-2.5 text-3xl leading-tight font-bold tracking-tight break-words',
   bubbleGlyph: 'size-6 shrink-0',
   bubbleSub: 'pl-[2.125rem] text-sm text-[var(--color-ink-subtle)] italic',
   onAirTag:
@@ -71,16 +66,7 @@ export const LIVE_HUB_STYLES = {
  */
 
 export const LIVE_NOTICE = {
-  wrap: 'relative mx-4 pt-3 pb-1',
-  caret:
-    'pointer-events-none absolute top-1.5 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-danger)]/30 ring-1 ring-white/40 backdrop-blur-xl',
-  // Frosted red glass
-  card: 'rail-reset relative z-10 flex items-center rounded-[var(--radius-lg)] bg-[var(--color-danger)]/30 text-[var(--color-ink)] shadow-[var(--shadow-md)] ring-1 ring-white/40 backdrop-blur-xl backdrop-saturate-150 transition-shadow hover:shadow-[var(--shadow-lg)]',
-  link: 'flex min-w-0 flex-1 items-center gap-3 p-3',
+  creator: 'flex min-w-0 items-center gap-3',
   avatar: 'ring-2 ring-white/60',
   text: 'min-w-0 flex-1 text-sm leading-tight font-bold',
-  go: 'size-4 shrink-0',
-  close:
-    'mr-2 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/30 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  closeGlyph: 'size-4',
 } as const

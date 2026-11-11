@@ -3,7 +3,6 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { AddRow } from '@/components/structures/inline/AddRow'
 import { ReinforcementTag } from '@/composites/lives/coordination/ReinforcementTag'
-import { SeatGlyphs } from '@/composites/modview/SeatGlyphs'
 import { memberMenu } from '@/composites/modview/memberMenu'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { WindowEmpty } from '@/composites/modview/ModWindow'
@@ -16,10 +15,10 @@ import {
   TEAM_ORDER,
   TEAM_ROLES,
   TEAM_SECTIONS,
+  TEAM_JUNIOR_TONE,
   roleOf,
   sectionOf,
 } from '@/declarations/modview/roles'
-import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_TEAM_COPY as COPY } from '@/declarations/modview/watch'
 import { MODVIEW_TEAM } from '@/declarations/ui/variants'
 import type { LiveFocusView, LivePerson } from '@/types/lives'
@@ -71,7 +70,6 @@ const TeamMember = ({
 }: TeamMemberProps) => {
   const now = useClock()
   const role = roleOf(member.rank, isCoordinator)
-  const CoordinatorIcon = ICONS[TEAM_ROLES.coordinator.icon]
   // Only a connected member can be followed
   const handlers = useActionMenu(
     memberMenu(member, {
@@ -98,16 +96,12 @@ const TeamMember = ({
       <span className={MODVIEW_TEAM.portrait}>
         <Avatar name={member.name} src={member.avatar} size="sm" />
       </span>
-      <span className={MODVIEW_TEAM.glyphs}>
-        {isCoordinator && CoordinatorIcon && (
-          <CoordinatorIcon
-            className={cn(MODVIEW_TEAM.glyph, TEAM_ROLES.coordinator.glyph)}
-            aria-label={TEAM_ROLES.coordinator.label}
-          />
+      <span
+        className={cn(
+          MODVIEW_TEAM.name,
+          !isFollowed && (role ? TEAM_ROLES[role].tone : TEAM_JUNIOR_TONE)
         )}
-        {member.emblem && <SeatGlyphs emblem={member.emblem} glyphClassName={MODVIEW_TEAM.glyph} />}
-      </span>
-      <span className={cn(MODVIEW_TEAM.name, role && !isFollowed && TEAM_ROLES[role].tone)}>
+      >
         {member.name}
       </span>
       {member.isReinforcement && <ReinforcementTag />}
@@ -186,17 +180,14 @@ export const TeamPanel = ({
             (member) => sectionOf(member, coordinating.has(member.id)) === section.key
           )
           if (members.length === 0) return null
-          const SectionIcon = ICONS[section.icon]
+          const SectionGlyph = section.glyph
 
           return (
             <section key={section.key} className={MODVIEW_TEAM.section}>
               <h3 className={MODVIEW_TEAM.sectionHead}>
                 <span className={MODVIEW_TEAM.sectionRule} aria-hidden="true" />
                 <span className={MODVIEW_TEAM.sectionTitle}>
-                  <SectionIcon
-                    className={cn(MODVIEW_TEAM.sectionGlyph, section.tone)}
-                    aria-hidden="true"
-                  />
+                  <SectionGlyph className={MODVIEW_TEAM.sectionGlyph} />
                   {section.label}
                 </span>
                 <span className={MODVIEW_TEAM.sectionRule} aria-hidden="true" />
