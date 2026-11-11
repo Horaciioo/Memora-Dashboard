@@ -48,7 +48,10 @@
       "secret",
       "password",
       "hash",
-      "key",
+      "apikey",
+      "privatekey",
+      "secretkey",
+      "accesskey",
       "cookie",
       "vapid"
     ]
@@ -68,6 +71,9 @@
     "historySize": 200,
     "blocksKept": 100,
     "pollSeconds": 60,
+    "discordWaitSeconds": 180,
+    "discordCheckMs": 1000,
+    "typeStepMs": 16,
     "edgeMargin": 8
   },
   "observability": {

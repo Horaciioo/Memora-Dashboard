@@ -26,5 +26,8 @@ export const NEXUS_WINDOW = {
   historySize: size('historySize', 200, 10, 1000),
   blocksKept: size('blocksKept', 100, 10, 1000),
   pollSeconds: size('pollSeconds', 60, 10, 600),
+  discordWaitSeconds: size('discordWaitSeconds', 180, 30, 600),
+  discordCheckMs: size('discordCheckMs', 1000, 250, 5000),
+  typeStepMs: size('typeStepMs', 16, 4, 100),
   edgeMargin: size('edgeMargin', 8, 0, 64),
 } as const

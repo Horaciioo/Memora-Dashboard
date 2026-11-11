@@ -21,7 +21,7 @@ export interface NexusPromptProps {
 
 // Hint shown by the field
 const PLACEHOLDERS: Record<NexusPromptMode, string> = {
-  command: NEXUS_TERMINAL_COPY.unlockHint,
+  command: '',
   password: NEXUS_TERMINAL_COPY.passwordLabel,
   reauth: NEXUS_TERMINAL_COPY.reauth,
   discord: NEXUS_TERMINAL_COPY.discordWaiting,
@@ -33,7 +33,15 @@ const PLACEHOLDERS: Record<NexusPromptMode, string> = {
  * @return {JSX.Element}
  */
 
-export const NexusPrompt = ({ mode, isBusy, history, registry, preset, onSubmit, onClear }: NexusPromptProps) => {
+export const NexusPrompt = ({
+  mode,
+  isBusy,
+  history,
+  registry,
+  preset,
+  onSubmit,
+  onClear,
+}: NexusPromptProps) => {
   const [text, setText] = useState(preset)
   const [cursor, setCursor] = useState(history.length)
   // A lock empties the history under the cursor

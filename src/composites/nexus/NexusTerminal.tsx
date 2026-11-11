@@ -4,9 +4,11 @@ import { useEffect, useRef } from 'react'
 
 import { NexusBlockView } from '@/composites/nexus/NexusBlockView'
 import { NexusPrompt } from '@/composites/nexus/NexusPrompt'
+import { NexusSigil } from '@/composites/nexus/NexusSigil'
 import type { useNexusConsole } from '@/core/hooks/data/nexus/useNexusConsole'
 import type { NexusPreset } from '@/types/nexus'
 import { NEXUS_STYLES } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 export interface NexusTerminalProps {
   console: ReturnType<typeof useNexusConsole>
@@ -27,9 +29,16 @@ export const NexusTerminal = ({ console: nexus, preset }: NexusTerminalProps) =>
     end.current?.scrollIntoView({ block: 'end' })
   }, [nexus.blocks.length])
 
+  const isBare = nexus.stage === 'locked' && nexus.blocks.length === 0
+
   return (
     <>
-      <div className={NEXUS_STYLES.scroll} aria-live="polite">
+      <div className={cn(NEXUS_STYLES.scroll, 'relative')} aria-live="polite">
+        {isBare && (
+          <div className={NEXUS_STYLES.sigilWrap}>
+            <NexusSigil />
+          </div>
+        )}
         {nexus.blocks.map((block) => (
           <NexusBlockView
             key={block.id}

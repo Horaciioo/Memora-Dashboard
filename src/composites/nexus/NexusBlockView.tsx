@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { NexusOutput } from '@/composites/nexus/NexusOutput'
+import { NexusTrace } from '@/composites/nexus/NexusTrace'
 import { copyText } from '@/composites/nexus/NexusOutput/format'
 import { NEXUS_TERMINAL_COPY } from '@/declarations/nexus/terminal'
 import { ICONS } from '@/declarations/ui/icons'
@@ -31,7 +32,12 @@ export interface NexusBlockViewProps {
  * @return {JSX.Element}
  */
 
-export const NexusBlockView = ({ block, onConfirm, onCancel, needsRetype }: NexusBlockViewProps) => {
+export const NexusBlockView = ({
+  block,
+  onConfirm,
+  onCancel,
+  needsRetype,
+}: NexusBlockViewProps) => {
   const [isCopied, setCopied] = useState(false)
   const [retyped, setRetyped] = useState('')
   const tone = block.error ? TONES.error : TONES[block.reply?.level ?? 'info']
@@ -61,6 +67,7 @@ export const NexusBlockView = ({ block, onConfirm, onCancel, needsRetype }: Nexu
           </button>
         )}
       </div>
+      {block.trace && <NexusTrace lines={block.trace} />}
       {block.error && (
         <p className={cn(NEXUS_STYLES.levelRow, tone.style)} role="alert">
           <ToneIcon className={NEXUS_STYLES.levelIcon} aria-hidden="true" />

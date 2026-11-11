@@ -14,7 +14,7 @@ export const Cell = ({ value }: { value: unknown }) => {
   const { session } = useAuthContext()
   const text = formatValue(value, session?.timezone ?? undefined)
 
-  if (text === null) return <span className={NEXUS_STYLES.empty}>{NEXUS_TERMINAL_COPY.empty}</span>
+  if (text === null) return <span className={NEXUS_STYLES.empty}>{NEXUS_TERMINAL_COPY.emptyValue}</span>
 
   return <>{text}</>
 }

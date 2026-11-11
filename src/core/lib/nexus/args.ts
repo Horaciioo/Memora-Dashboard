@@ -264,13 +264,15 @@ const checkPairs = (
  * @param {ArgSpec[]} specs - Declared arguments
  * @param {ParsedArgs} args - Typed arguments
  * @param {ArgContext} context - Entity lookups
+ * @param {Record<string, string>} [params] - Variables read from the command path
  * @return {ArgResult} - Values or one error per argument
  */
 
 export const validateArgs = (
   specs: ArgSpec[],
   args: ParsedArgs,
-  context: ArgContext
+  context: ArgContext,
+  params: Record<string, string> = {}
 ): ArgResult => {
   const errors: Record<string, string> = {}
   const values: Record<string, ArgValue> = {}
@@ -295,7 +297,8 @@ export const validateArgs = (
       continue
     }
 
-    const checked = checkOne(spec, raw, values, context)
+    // Path variables count as entities for fields and pairs
+    const checked = checkOne(spec, raw, { ...params, ...values }, context)
     if ('error' in checked) errors[spec.name] = checked.error
     else values[spec.name] = checked.value
   }

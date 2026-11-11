@@ -12,36 +12,58 @@ import { NEXUS_PATHS } from '@/declarations/nexus/paths'
 import { NEXUS_TERMINAL_COPY } from '@/declarations/nexus/terminal'
 import { NEXUS_UNLOCK_COMMAND } from '@/declarations/nexus/unlock'
 import { NEXUS_WINDOW } from '@/declarations/nexus/window'
-import type { NexusBlock, NexusPromptMode, NexusReply } from '@/types/nexus'
+import type { NexusBlock, NexusPromptMode, NexusReply, NexusSessionView } from '@/types/nexus'
 import { ErrorCodes } from '@/utils/constants/errors'
 
 // Message of a failed call
 const messageOf = (error: unknown): string =>
   error instanceof Error ? error.message : NEXUS_COPY.timedOut
 
+// Only a refused password asks again, a lockout or lapse does not
+const staysAsking = (error: unknown): boolean =>
+  error instanceof ApiClientError &&
+  (error.code === ErrorCodes.InsufficientPermissions || error.code === ErrorCodes.ValidationFailed)
+
 /**
- * Open the Discord step in a popup and wait for its answer
- * @return {Promise<boolean>} - Second factor passed
+ * Open the Discord step in a popup
+ * @return {boolean} - Popup opened
  */
 
-const askDiscord = (): Promise<boolean> =>
-  new Promise((resolve) => {
-    const popup = window.open(NEXUS_PATHS.discord, 'nexus-discord', 'width=520,height=720')
-    if (!popup) return resolve(false)
+const openDiscord = (): boolean =>
+  window.open(NEXUS_PATHS.discord, 'nexus-discord', 'width=520,height=720') !== null
 
-    const finish = (passed: boolean) => {
-      window.removeEventListener('message', onMessage)
-      clearInterval(watch)
-      resolve(passed)
+/**
+ * Wait until the server says the owner is in, Discord can cut every link with the popup
+ * @param {() => Promise<NexusSessionView>} read - Session read
+ * @return {Promise<boolean>} - Console opened before the pending stage lapsed
+ */
+
+const waitForUnlock = async (read: () => Promise<NexusSessionView>): Promise<boolean> => {
+  const until = Date.now() + NEXUS_WINDOW.discordWaitSeconds * 1000
+  let isRefused = false
+
+  // The landing page says so when it still reaches its opener
+  const onMessage = (event: MessageEvent) => {
+    if (
+      event.origin === window.location.origin &&
+      (event.data as { nexus?: string })?.nexus === 'refused'
+    ) {
+      isRefused = true
     }
-    const onMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin || event.source !== popup) return
-      finish((event.data as { nexus?: string })?.nexus === 'unlocked')
+  }
+  window.addEventListener('message', onMessage)
+
+  try {
+    while (!isRefused && Date.now() < until) {
+      await new Promise((resolve) => setTimeout(resolve, NEXUS_WINDOW.discordCheckMs))
+      if ((await read()).unlocked) return true
     }
-    // A closed popup is a refusal
-    const watch = setInterval(() => popup.closed && finish(false), 500)
-    window.addEventListener('message', onMessage)
-  })
+
+    return false
+  } finally {
+    window.removeEventListener('message', onMessage)
+  }
+}
 
 /**
  * State and actions of the console
@@ -71,6 +93,17 @@ export const useNexusConsole = (isOpen: boolean) => {
 
     return id
   }, [])
+
+  // One more progress line
+  const note = useCallback(
+    (id: number, line: string) =>
+      setBlocks((current) =>
+        current.map((block) =>
+          block.id === id ? { ...block, trace: [...(block.trace ?? []), line] } : block
+        )
+      ),
+    []
+  )
 
   const patch = useCallback(
     (id: number, change: Partial<NexusBlock>) =>
@@ -134,25 +167,38 @@ export const useNexusConsole = (isOpen: boolean) => {
   const unlock = useCallback(
     async (password: string) => {
       setBusy(true)
+      const id = add({
+        input: NEXUS_UNLOCK_COMMAND,
+        state: 'running',
+        trace: [NEXUS_TERMINAL_COPY.traceSearching, NEXUS_TERMINAL_COPY.traceVerifying],
+      })
       try {
         await apiPost(NEXUS_PATHS.password, { password })
+        note(id, NEXUS_TERMINAL_COPY.traceVerified)
+        note(id, NEXUS_TERMINAL_COPY.traceDiscord)
         setMode('discord')
-        const passed = await askDiscord()
-        add({
-          input: NEXUS_UNLOCK_COMMAND,
-          state: passed ? 'done' : 'failed',
-          error: passed ? undefined : NEXUS_COPY.discordRefused,
-        })
+        // The session itself tells whether Discord let the owner in
+        const passed = openDiscord() && (await waitForUnlock(refresh))
+        if (passed) {
+          note(id, NEXUS_TERMINAL_COPY.traceDiscordOk)
+          note(id, NEXUS_TERMINAL_COPY.traceOpening)
+          patch(id, { state: 'done' })
+        } else {
+          note(id, NEXUS_TERMINAL_COPY.traceRefused)
+          patch(id, { state: 'failed', error: NEXUS_COPY.discordRefused })
+        }
         setMode('command')
-        if (passed) await refresh()
+        if (passed) note(id, NEXUS_TERMINAL_COPY.traceOpened)
       } catch (error) {
-        add({ input: NEXUS_UNLOCK_COMMAND, state: 'failed', error: messageOf(error) })
-        setMode('command')
+        note(id, NEXUS_TERMINAL_COPY.traceRefused)
+        patch(id, { state: 'failed', error: messageOf(error) })
+        // A wrong password asks again, never echoed as a command
+        setMode(staysAsking(error) ? 'password' : 'command')
       } finally {
         setBusy(false)
       }
     },
-    [add, refresh]
+    [add, note, patch, refresh]
   )
 
   const reauthenticate = useCallback(
@@ -167,7 +213,7 @@ export const useNexusConsole = (isOpen: boolean) => {
         if (again) await run(again)
       } catch (error) {
         add({ input: NEXUS_COPY.reauthNeeded, state: 'failed', error: messageOf(error) })
-        setMode('command')
+        if (!staysAsking(error)) setMode('command')
       } finally {
         setBusy(false)
       }

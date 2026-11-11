@@ -141,7 +141,12 @@ const prepare = (deps: DispatchDeps, request: DispatchRequest, progress: Progres
 
   // Arguments, the confirmation one is read apart
   progress.step = 'arguments'
-  const checked = validateArgs(resolved.command.args, parsed.value.args, deps.argContext)
+  const checked = validateArgs(
+    resolved.command.args,
+    parsed.value.args,
+    deps.argContext,
+    resolved.params
+  )
   if (!checked.ok) {
     throw invalidInput(
       Object.entries(checked.errors).map(([field, message]) => ({ field, message }))

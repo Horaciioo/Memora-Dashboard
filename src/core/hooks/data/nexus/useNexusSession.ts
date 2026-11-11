@@ -26,7 +26,7 @@ export const stageOf = (session: NexusSessionView | null, now: number): NexusSta
 /**
  * Console session, read once open and then on a slow beat
  * @param {boolean} isOpen - Window is open
- * @return {{ session: NexusSessionView | null, stage: NexusStage, refresh: () => Promise<void> }} - Session and refresh
+ * @return {{ session: NexusSessionView | null, stage: NexusStage, refresh: () => Promise<NexusSessionView> }} - Session and refresh
  */
 
 export const useNexusSession = (isOpen: boolean) => {
@@ -40,6 +40,8 @@ export const useNexusSession = (isOpen: boolean) => {
         .then((view) => {
           setSession(view)
           setNow(Date.now())
+
+          return view
         }),
     []
   )

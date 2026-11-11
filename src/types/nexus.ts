@@ -63,6 +63,8 @@ export interface NexusBlock {
   state: 'running' | 'done' | 'failed' | 'previewed'
   reply?: NexusReply
   error?: string
+  // Progress lines written while a step runs
+  trace?: string[]
 }
 
 /**
