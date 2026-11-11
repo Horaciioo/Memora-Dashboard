@@ -20,6 +20,7 @@ export {
   stateOptions,
   memberOptions,
   teamOptions,
+  withSeated,
   leadOptions,
   youtuberOptions,
   platformOptions,
