@@ -122,7 +122,7 @@ export const LivesBoard = ({
         </>
       )}
 
-      {canAnnounce && (lives.length > 0 || recent.length > 0) && (
+      {canAnnounce && (
         <FloatingAdd
           offer={ASSISTANT_OFFERS.live}
           onClick={() => router.push(ROUTES.calendarNew(LIVE_PRESET))}

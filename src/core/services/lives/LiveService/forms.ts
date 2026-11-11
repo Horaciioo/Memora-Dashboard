@@ -8,6 +8,8 @@ import { LIVE_FIELD_COPY } from '@/declarations/lives/copy'
 import { LIVE_PLATFORMS_SOON } from '@/declarations/lives/registries'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FormValues } from '@/types/forms'
+import { youtuberOptions } from '@/core/services/work/shared'
+import type { LivePlanning } from '@/types/lives'
 import { LivePlatforms } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
 import {
@@ -153,5 +155,24 @@ export const readLiveInput = async (values: FormValues): Promise<LiveInput> => {
     // The creator's live team is convened, nobody else is named
     pickedIds: [],
     instructions: readText(values, 'instructions'),
+  }
+}
+
+/**
+ * Platforms and creators a live can be planned on
+ * @param {AccessScope} scope - Creator perimeter
+ * @return {Promise<LivePlanning>} - Models and creators
+ */
+
+export const readLivePlanning = async (scope: AccessScope): Promise<LivePlanning> => {
+  const [templates, creators] = await Promise.all([readLiveTemplates(), youtuberOptions(scope)])
+
+  return {
+    platforms: [...templates].map(([templateId, platform]) => ({
+      platform,
+      templateId,
+      isSoon: LIVE_PLATFORMS_SOON.includes(platform),
+    })),
+    creators: creators.map((creator) => ({ id: creator.value, name: creator.label })),
   }
 }

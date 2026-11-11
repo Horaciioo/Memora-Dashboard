@@ -121,6 +121,8 @@ export const API_ROUTES = {
   lives: '/api/lives',
   fakeLive: '/api/dev/faux-live',
   livesStream: '/api/lives/stream',
+  livePlanning: '/api/lives/planning',
+  liveOwnFigures: '/api/lives/me/stats',
   live: (id: string) => `/api/lives/${id}`,
   liveGesture: (id: string, actionId: string) => `/api/lives/${id}/gestures/${actionId}`,
   liveModTime: (id: string, accountId: string) => `/api/lives/${id}/time/${accountId}`,

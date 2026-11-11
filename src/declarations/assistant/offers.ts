@@ -92,6 +92,7 @@ export const ASSISTANT_OFFERS = {
   live: {
     ask: 'On s’fait un p’tit live ?',
     href: ROUTES.lives,
+    scenario: 'live',
     nudges: ['Un live qui arrive ? On l’annonce ?', 'Tu veux prévenir l’équipe d’un live ?'],
   },
 } as const satisfies Record<string, AssistantOffer>

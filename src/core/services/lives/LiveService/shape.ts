@@ -96,6 +96,7 @@ export const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): 
 
   return {
     id: row.id,
+    calendarEventId: row.calendarEventId,
     access: liveAccess(
       { status: row.status, plannedStartAt: row.plannedStartAt },
       new Date(),

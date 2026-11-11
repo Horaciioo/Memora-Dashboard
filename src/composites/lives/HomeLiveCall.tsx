@@ -72,6 +72,12 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
 
             return (
               <article key={live.id} className={cn(HOME_LIVE.card, HOME_LIVE.tone[live.platform])}>
+                <Link
+                  href={ROUTES.livesOf(live.creatorId)}
+                  className={HOME_LIVE.cover}
+                  aria-label={live.creator}
+                  tabIndex={-1}
+                />
                 <div className={HOME_LIVE.body}>
                   <span className={HOME_LIVE.eyebrow}>
                     <DotIcon className={HOME_LIVE.pulse} aria-hidden="true" />
@@ -92,7 +98,7 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
                   </p>
                   <div className={HOME_LIVE.actions}>
                     <Link
-                      href={ROUTES.lives}
+                      href={ROUTES.livesOf(live.creatorId)}
                       className={cn(HOME_LIVE.join, HOME_LIVE.joinTone[live.platform])}
                     >
                       {LIVE_COPY.liveJoin}

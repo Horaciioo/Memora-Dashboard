@@ -38,6 +38,7 @@ export const ROUTES = {
   meeting: (id: string) => `/meetings/${id}`,
   absences: '/absences',
   lives: '/lives',
+  livesOf: (creatorId: string) => `/lives?creator=${creatorId}`,
   modView: '/mod-view',
   live: (id: string) => `/lives/${id}`,
   liveReport: (id: string) => `/lives/${id}/report`,

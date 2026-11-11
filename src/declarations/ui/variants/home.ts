@@ -148,7 +148,9 @@ export const HOME_LIVE = {
   text: 'text-lg leading-tight font-semibold tracking-tight text-balance sm:text-5xl',
   strong: 'font-bold',
   actions: 'flex flex-wrap items-center gap-3 sm:pt-2',
-  join: 'inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold sm:px-7 sm:py-3.5 sm:text-base shadow-[var(--shadow-md)] transition-transform hover:-translate-y-0.5',
+  // Whole card is a link, the button stays above it
+  cover: 'absolute inset-0 z-10 rounded-[inherit]',
+  join: 'relative z-20 inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold sm:px-7 sm:py-3.5 sm:text-base shadow-[var(--shadow-md)] transition-transform hover:-translate-y-0.5',
   joinGlyph: 'h-4 w-4',
   logo: 'relative hidden shrink-0 sm:block',
   logoRing: 'live-halo absolute -inset-3 rounded-full border-2 border-white/60',
