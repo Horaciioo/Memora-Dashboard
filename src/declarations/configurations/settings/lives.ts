@@ -32,7 +32,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, avatarCacheSeconds: number, avatarBatchMax: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number, chatFlushMs: number, chatBatchMax: number, chatBufferMax: number, chatPageSize: number, preferenceSaveMs: number, teamChatPageSize: number, teamChatMaxLength: number, teamChatBubbleSeconds: number, teamChatMentionAccountId: string }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, avatarCacheSeconds: number, avatarBatchMax: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number, chatFlushMs: number, chatBatchMax: number, chatBufferMax: number, chatPageSize: number, preferenceSaveMs: number, teamChatPageSize: number, teamChatMaxLength: number, teamChatBubbleSeconds: number, teamChatMentionAccountId: string, mobileStreamPercent: number, mobileFreezeSwipePx: number, mobileSuggestionTags: number }}
  */
 
 export const LIVE_SETTINGS = {
@@ -185,6 +185,25 @@ export const LIVE_SETTINGS = {
   // Member the designated mention reaches
   teamChatMentionAccountId:
     typeof lives.teamChatMentionAccountId === 'string' ? lives.teamChatMentionAccountId : '',
+  // Share of the phone height the stream takes in the Mod View
+  mobileStreamPercent: readInteger(lives.mobileStreamPercent, {
+    path: 'system/lives.mobileStreamPercent',
+    fallback: 20,
+    min: 10,
+    max: 50,
+  }),
+  // Upward swipe that freezes the chat
+  mobileFreezeSwipePx: readInteger(lives.mobileFreezeSwipePx, {
+    path: 'system/lives.mobileFreezeSwipePx',
+    fallback: 32,
+    min: 8,
+  }),
+  // Suggestion tags shown above the chat
+  mobileSuggestionTags: readInteger(lives.mobileSuggestionTags, {
+    path: 'system/lives.mobileSuggestionTags',
+    fallback: 3,
+    min: 1,
+  }),
   rateLimitRetrySeconds: readInteger(lives.rateLimitRetrySeconds, {
     path: 'system/lives.rateLimitRetrySeconds',
     fallback: 5,

@@ -269,6 +269,13 @@ export interface LiveEmotes {
  * @property {'compact' | 'normal' | 'airy'} density - Room around each line
  */
 
+/**
+ * Page of the phone Mod View
+ * @typedef {'settings' | 'team' | 'live' | 'feed'} MobilePageKey
+ */
+
+export type MobilePageKey = 'settings' | 'team' | 'live' | 'feed'
+
 export interface ModPreferences {
   timestamps: boolean
   badges: boolean
@@ -285,6 +292,10 @@ export interface ModPreferences {
   hideBots: boolean
   textSize: 'small' | 'normal' | 'large'
   density: 'compact' | 'normal' | 'airy'
+  // Stream above the chat on a phone
+  showStream: boolean
+  // Pages of the phone Mod View, left to right
+  pageOrder: MobilePageKey[]
 }
 
 /**

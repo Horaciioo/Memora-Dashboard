@@ -727,6 +727,7 @@ model Youtuber {
   lives               Live[]
   viewerComments      ViewerComment[]
   sharedWords         ModSharedWord[]
+  unbanRule           ModUnbanRule?
   chatMessages        LiveChatMessage[]
   chatStats           ViewerChatStat[]
   sanctionOffenses    SanctionOffense[]
@@ -2160,6 +2161,19 @@ model ModSharedWord {
 
   @@unique([youtuberId, termKey])
   @@map("mod_shared_words")
+}
+
+// How the team handles unban requests on a channel
+model ModUnbanRule {
+  id            String   @id @default(cuid())
+  youtuberId    String   @unique
+  // A refusal must carry a reason
+  requireReason Boolean  @default(false)
+  updatedAt     DateTime @updatedAt
+
+  youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+
+  @@map("mod_unban_rules")
 }
 
 // Chat message of a viewer, kept for the dossier

@@ -7,7 +7,7 @@ import { Button } from '@/components/elements/actions/Button'
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { ActionPreview } from '@/composites/modview/actions/ActionPreview'
 import { ActionRowEditor } from '@/composites/modview/actions/ActionRowEditor'
-import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
+import { useActionsDraft } from '@/composites/modview/actions/useActionsDraft'
 import { actionLabel } from '@/core/lib/modview/actions'
 import { formatDuration } from '@/core/lib/modview/commands'
 import { MODVIEW_ACTION_COPY } from '@/declarations/modview/actionCopy'
@@ -15,33 +15,33 @@ import {
   MODVIEW_ACTION_KINDS,
   MODVIEW_ACTION_KIND_NAMES,
   MODVIEW_ACTION_LIMITS,
-  MODVIEW_DEFAULT_ACTIONS,
 } from '@/declarations/modview/actions'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_ACTION_EDITOR, OFFENSE_SHEET } from '@/declarations/ui/variants'
 import { useMenu } from '@/managers/front-end'
-import type { ModActionConfig, ModActionKind } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 
-// Glyph of a row, in its tile
-const KindIcon = ({ icon }: { icon: string }) => {
+// Glyph of a row, in the tone of its kind
+const KindIcon = ({
+  icon,
+  colour,
+  isOn,
+}: {
+  icon: string
+  colour: string | null
+  isOn: boolean
+}) => {
   const Icon = ICONS[icon as IconName]
 
-  return <Icon className={MODVIEW_ACTION_EDITOR.tileIcon} aria-hidden="true" />
+  return (
+    <Icon
+      className={cn(MODVIEW_ACTION_EDITOR.glyph, !isOn && MODVIEW_ACTION_EDITOR.glyphOff)}
+      style={colour ? ({ '--tone': colour } as CSSProperties) : undefined}
+      aria-hidden="true"
+    />
+  )
 }
-
-// Fresh action of a kind
-const newAction = (kind: ModActionKind): ModActionConfig => ({
-  id: `a-${crypto.randomUUID().slice(0, 8)}`,
-  kind,
-  seconds: kind === 'timeout' ? MODVIEW_ACTION_LIMITS.newSeconds : null,
-  reason: null,
-  icon: MODVIEW_ACTION_KINDS[kind].icon,
-  look: 'icon',
-  colour: null,
-  isOn: true,
-})
 
 /**
  * Settings page where a moderator composes their sanction buttons
@@ -49,28 +49,13 @@ const newAction = (kind: ModActionKind): ModActionConfig => ({
  */
 
 export const ActionsPanel = () => {
-  const { preferences, preview } = useModPreferences()
-  const [draft, setDraft] = useState(preferences.actions)
+  const { draft, isFull, patch, move, add, remove, restore, clear } = useActionsDraft()
   const [openId, setOpenId] = useState<string | null>(null)
   const [dragId, setDragId] = useState<string | null>(null)
   const DragIcon = ICONS.drag
+  const AddIcon = ICONS.add
   const { openMenu } = useMenu()
 
-  // Every edit shows live, in the drawer and in the chat, until saved
-  const change = (next: ModActionConfig[]) => {
-    setDraft(next)
-    preview({ actions: next })
-  }
-  const patch = (id: string, values: Partial<ModActionConfig>) =>
-    change(draft.map((entry) => (entry.id === id ? { ...entry, ...values } : entry)))
-  const move = (from: string, to: string) => {
-    const fromIndex = draft.findIndex((entry) => entry.id === from)
-    const toIndex = draft.findIndex((entry) => entry.id === to)
-    if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return
-    const next = [...draft]
-    next.splice(toIndex, 0, next.splice(fromIndex, 1)[0]!)
-    change(next)
-  }
   return (
     <div className={OFFENSE_SHEET.column}>
       <div className={OFFENSE_SHEET.block}>
@@ -80,49 +65,14 @@ export const ActionsPanel = () => {
 
       <div className={OFFENSE_SHEET.block}>
         <div className={MODVIEW_ACTION_EDITOR.toolbar}>
-          <p className={MODVIEW_ACTION_EDITOR.hint}>{MODVIEW_ACTION_COPY.hint}</p>
-          <Button
-            variant="ghost"
-            icon="add"
-            iconAfter="expand"
-            disabled={draft.length >= MODVIEW_ACTION_LIMITS.maxTotal}
-            title={
-              draft.length >= MODVIEW_ACTION_LIMITS.maxTotal ? MODVIEW_ACTION_COPY.full : undefined
-            }
-            onClick={(event) => {
-              const box = event.currentTarget.getBoundingClientRect()
-              openMenu(
-                MODVIEW_ACTION_KIND_NAMES.map((kind) => ({
-                  id: kind,
-                  label: MODVIEW_ACTION_KINDS[kind].label,
-                  icon: MODVIEW_ACTION_KINDS[kind].icon as IconName,
-                  onSelect: () => {
-                    const fresh = newAction(kind)
-                    change([...draft, fresh])
-                    setOpenId(fresh.id)
-                  },
-                })),
-                { x: box.left, y: box.bottom }
-              )
-            }}
-          >
-            {MODVIEW_ACTION_COPY.add}
-          </Button>
-          <Button
-            variant="ghost"
-            icon="restore"
-            onClick={() => change([...MODVIEW_DEFAULT_ACTIONS])}
-          >
-            {MODVIEW_ACTION_COPY.restore}
-          </Button>
-          <Button
-            variant="ghost"
-            icon="remove"
-            disabled={draft.length === 0}
-            onClick={() => change([])}
-          >
-            {MODVIEW_ACTION_COPY.removeAll}
-          </Button>
+          <div className={MODVIEW_ACTION_EDITOR.tools}>
+            <Button variant="ghost" icon="restore" onClick={restore}>
+              {MODVIEW_ACTION_COPY.restore}
+            </Button>
+            <Button variant="ghost" icon="remove" disabled={draft.length === 0} onClick={clear}>
+              {MODVIEW_ACTION_COPY.removeAll}
+            </Button>
+          </div>
         </div>
         {draft.length === 0 && (
           <p className={OFFENSE_SHEET.placeholder}>{MODVIEW_ACTION_COPY.empty}</p>
@@ -146,15 +96,7 @@ export const ActionsPanel = () => {
                 <span className={MODVIEW_ACTION_EDITOR.grip} title={MODVIEW_ACTION_COPY.grab}>
                   <DragIcon className={MODVIEW_ACTION_EDITOR.iconGlyph} aria-hidden="true" />
                 </span>
-                <span
-                  className={cn(
-                    MODVIEW_ACTION_EDITOR.tile,
-                    !action.isOn && MODVIEW_ACTION_EDITOR.off
-                  )}
-                  style={action.colour ? ({ '--tone': action.colour } as CSSProperties) : undefined}
-                >
-                  <KindIcon icon={action.icon} />
-                </span>
+                <KindIcon icon={action.icon} colour={action.colour} isOn={action.isOn} />
                 <div className={MODVIEW_ACTION_EDITOR.cardBody}>
                   <p
                     className={cn(
@@ -195,11 +137,7 @@ export const ActionsPanel = () => {
                   >
                     {MODVIEW_ACTION_COPY.edit}
                   </Button>
-                  <Button
-                    variant="ghost"
-                    icon="remove"
-                    onClick={() => change(draft.filter((entry) => entry.id !== action.id))}
-                  >
+                  <Button variant="ghost" icon="remove" onClick={() => remove(action.id)}>
                     {MODVIEW_ACTION_COPY.remove}
                   </Button>
                 </div>
@@ -212,6 +150,29 @@ export const ActionsPanel = () => {
               )}
             </li>
           ))}
+          <li>
+            <button
+              type="button"
+              className={MODVIEW_ACTION_EDITOR.newBox}
+              disabled={isFull}
+              title={isFull ? MODVIEW_ACTION_COPY.full : undefined}
+              onClick={(event) => {
+                const box = event.currentTarget.getBoundingClientRect()
+                openMenu(
+                  MODVIEW_ACTION_KIND_NAMES.map((kind) => ({
+                    id: kind,
+                    label: MODVIEW_ACTION_KINDS[kind].label,
+                    icon: MODVIEW_ACTION_KINDS[kind].icon as IconName,
+                    onSelect: () => setOpenId(add(kind).id),
+                  })),
+                  { x: box.left, y: box.top }
+                )
+              }}
+            >
+              <AddIcon className={MODVIEW_ACTION_EDITOR.iconGlyph} aria-hidden="true" />
+              {MODVIEW_ACTION_COPY.add}
+            </button>
+          </li>
         </ul>
       </div>
     </div>

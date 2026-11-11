@@ -55,5 +55,8 @@
   "teamChatPageSize": 50,
   "teamChatMaxLength": 500,
   "teamChatBubbleSeconds": 5,
-  "teamChatMentionAccountId": ""
+  "teamChatMentionAccountId": "",
+  "mobileStreamPercent": 20,
+  "mobileFreezeSwipePx": 32,
+  "mobileSuggestionTags": 3
 }

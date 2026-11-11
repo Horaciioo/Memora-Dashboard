@@ -49,6 +49,8 @@ export interface TeamChatPanelProps {
   scopes: TeamChatScope[]
   // Written but never sent
   isLocked?: boolean
+  // Fills its parent height
+  isFilling?: boolean
 }
 
 /**
@@ -63,6 +65,7 @@ export const TeamChatPanel = ({
   seats,
   scopes,
   isLocked = false,
+  isFilling = false,
 }: TeamChatPanelProps) => {
   const [draft, setDraft] = useState('')
   const [scope, setScope] = useState<TeamChatScope>('all')
@@ -139,7 +142,7 @@ export const TeamChatPanel = ({
 
   return (
     <div
-      className={STYLES.box}
+      className={cn(STYLES.box, isFilling && STYLES.boxFill)}
       style={{ '--room': GLYPH_TINTS[TEAM_CHAT_SCOPE_TINTS[scope]].fillFrom } as CSSProperties}
     >
       {scopes.length > 1 && (

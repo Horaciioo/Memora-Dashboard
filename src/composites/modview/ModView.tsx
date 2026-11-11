@@ -13,6 +13,7 @@ import type { TeamTools } from '@/composites/modview/memberMenu'
 import { ModActionsWindow } from '@/composites/modview/ModActionsWindow'
 import { PollDeniedDialog } from '@/composites/modview/PollDeniedDialog'
 import { PollDialog } from '@/composites/modview/PollDialog'
+import { MobileModView } from '@/composites/modview/mobile/MobileModView'
 import { ModViewSidebar } from '@/composites/modview/ModViewSidebar'
 import { SanctionsDrawer } from '@/composites/modview/SanctionsDrawer'
 import { StreamWindow } from '@/composites/modview/StreamWindow'
@@ -21,6 +22,7 @@ import { ViewerCard } from '@/composites/modview/ViewerCard'
 import { ModWorkspace } from '@/composites/modview/workspace/ModWorkspace'
 import { useLiveFocus } from '@/core/hooks/data/lives/useLiveFocus'
 import { SplitHandle } from '@/composites/modview/workspace/SplitHandle'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { useSideWidth } from '@/core/hooks/interaction/layout/rail/useSideWidth'
 import { useBareShell } from '@/core/hooks/interaction/layout/useBareShell'
 import { useModPreferenceProfile } from '@/core/hooks/interaction/state/moderation/useModPreferences'
@@ -157,6 +159,7 @@ export const ModView = ({
   const { state, spotlight } = driver
   const isWorkspace = !embedded && !showcase && !only
   const side = useSideWidth()
+  const isMobile = useIsMobileShell()
   const [inspected, setInspected] = useState<string | null>(null)
   const [actInPlace, setActInPlace] = useState(false)
   const [isSettingsOpen, setSettingsOpen] = useState(false)
@@ -416,9 +419,13 @@ export const ModView = ({
       liveSanctions={sanctionsOn(state.acts, shownCard).length}
       gate={gate}
       onAct={act}
-      isDocked={isWorkspace}
+      isDocked={isWorkspace && !isMobile}
       width={
-        isWorkspace ? (isCardGrown ? Math.max(side.width, CARD_MIN_WIDTH) : side.width) : undefined
+        isWorkspace && !isMobile
+          ? isCardGrown
+            ? Math.max(side.width, CARD_MIN_WIDTH)
+            : side.width
+          : undefined
       }
       onClose={() => setPicked(null)}
       twitchUrl={twitchViewerCardUrl(state.embedUrl, shownCard.login)}
@@ -431,6 +438,56 @@ export const ModView = ({
       dossier={live ? { liveId: live.id, panel, memory, onPrefill: actions.prefill } : undefined}
     />
   ) : null
+
+  if (isWorkspace && isMobile) {
+    return (
+      <>
+        {actions.pollForm === 'create' && (
+          <PollDialog onStart={(intent) => act(intent)} onClose={actions.closePollForm} />
+        )}
+        {actions.pollForm === 'denied' && <PollDeniedDialog onClose={actions.closePollForm} />}
+        <MobileModView
+          state={state}
+          gate={gate}
+          onAct={act}
+          windows={available}
+          render={windowFor}
+          suggest={{
+            suggestions,
+            gate,
+            onAct: act,
+            onUse: useSuggestion,
+            onPick: setPicked,
+            onWatch: watchlist.watch,
+            onDismiss: dismiss,
+          }}
+          viewerCard={viewerCard}
+          options={pageOptions}
+          team={
+            team && live
+              ? {
+                  liveId: live.id,
+                  viewerId: live.viewerId,
+                  seats: {
+                    members: live.members,
+                    coordinatorIds: live.coordinatorIds,
+                    designatedId: LIVE_SETTINGS.teamChatMentionAccountId,
+                  },
+                  isLocked: watchOnly,
+                  tools: team,
+                  focuses: focus.focuses,
+                  coordinatorIds: live.coordinatorIds,
+                  canReinforce: !watchOnly && permissions.includes(Permissions.LiveAnnounce),
+                }
+              : undefined
+          }
+          leaveLiveId={live?.id}
+          endLiveId={live?.canEnd && !watchOnly ? live.id : undefined}
+          isWatchOnly={watchOnly || !live}
+        />
+      </>
+    )
+  }
 
   return (
     <div

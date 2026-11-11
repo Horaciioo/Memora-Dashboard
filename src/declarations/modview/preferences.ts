@@ -1,10 +1,11 @@
 import { MODVIEW_DEFAULT_ACTIONS } from '@/declarations/modview/actions'
+import { MODVIEW_MOBILE_PAGES } from '@/declarations/modview/mobile'
 import { MODVIEW_PERSONAL } from '@/declarations/modview/personal'
 import type { ModActionConfig, ModBadword, ModPreferences } from '@/types/modview'
 
 /**
  * One preference rule
- * @typedef {{ kind: 'toggle', default: boolean } | { kind: 'choice', options: readonly string[], default: string } | { kind: 'actions', default: readonly ModActionConfig[] } | { kind: 'words', max: number, default: readonly string[] } | { kind: 'badwords', max: number, default: readonly ModBadword[] }} PreferenceDefinition
+ * @typedef {{ kind: 'toggle', default: boolean } | { kind: 'choice', options: readonly string[], default: string } | { kind: 'actions', default: readonly ModActionConfig[] } | { kind: 'words', max: number, default: readonly string[] } | { kind: 'badwords', max: number, default: readonly ModBadword[] } | { kind: 'order', default: readonly string[] }} PreferenceDefinition
  */
 
 export type PreferenceDefinition =
@@ -13,6 +14,7 @@ export type PreferenceDefinition =
   | { kind: 'actions'; default: readonly ModActionConfig[] }
   | { kind: 'words'; max: number; default: readonly string[] }
   | { kind: 'badwords'; max: number; default: readonly ModBadword[] }
+  | { kind: 'order'; default: readonly string[] }
 
 /**
  * Every Mod View preference
@@ -35,4 +37,6 @@ export const MODVIEW_PREFERENCES = {
   hideBots: { kind: 'toggle', default: false },
   textSize: { kind: 'choice', options: ['small', 'normal', 'large'], default: 'normal' },
   density: { kind: 'choice', options: ['compact', 'normal', 'airy'], default: 'normal' },
+  showStream: { kind: 'toggle', default: true },
+  pageOrder: { kind: 'order', default: MODVIEW_MOBILE_PAGES },
 } as const satisfies Record<keyof ModPreferences, PreferenceDefinition>

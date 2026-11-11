@@ -54,7 +54,7 @@ const PAGES = {
     icon: 'settingsLine',
     Panel: PreferencesPanel,
   },
-  actions: { label: MODVIEW_ACTION_COPY.actionsPage, icon: 'modTimeout', Panel: ActionsPanel },
+  actions: { label: MODVIEW_ACTION_COPY.actionsPage, icon: 'modActions', Panel: ActionsPanel },
   windows: { label: MODVIEW_ACTION_COPY.windowsPage, icon: 'maximize', Panel: WindowsPanel },
 } as const satisfies Record<
   string,
