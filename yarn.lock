@@ -980,6 +980,145 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@node-rs/argon2-android-arm-eabi@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-android-arm-eabi@npm:2.2.2"
+  conditions: os=android & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-android-arm64@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-android-arm64@npm:2.2.2"
+  conditions: os=android & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-darwin-arm64@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-darwin-arm64@npm:2.2.2"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-darwin-x64@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-darwin-x64@npm:2.2.2"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-freebsd-x64@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-freebsd-x64@npm:2.2.2"
+  conditions: os=freebsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-linux-arm-gnueabihf@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-linux-arm-gnueabihf@npm:2.2.2"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-linux-arm64-gnu@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-linux-arm64-gnu@npm:2.2.2"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-linux-arm64-musl@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-linux-arm64-musl@npm:2.2.2"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-linux-x64-gnu@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-linux-x64-gnu@npm:2.2.2"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-linux-x64-musl@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-linux-x64-musl@npm:2.2.2"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-win32-arm64-msvc@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-win32-arm64-msvc@npm:2.2.2"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-win32-ia32-msvc@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-win32-ia32-msvc@npm:2.2.2"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2-win32-x64-msvc@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2-win32-x64-msvc@npm:2.2.2"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@node-rs/argon2@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "@node-rs/argon2@npm:2.2.2"
+  dependencies:
+    "@node-rs/argon2-android-arm-eabi": "npm:2.2.2"
+    "@node-rs/argon2-android-arm64": "npm:2.2.2"
+    "@node-rs/argon2-darwin-arm64": "npm:2.2.2"
+    "@node-rs/argon2-darwin-x64": "npm:2.2.2"
+    "@node-rs/argon2-freebsd-x64": "npm:2.2.2"
+    "@node-rs/argon2-linux-arm-gnueabihf": "npm:2.2.2"
+    "@node-rs/argon2-linux-arm64-gnu": "npm:2.2.2"
+    "@node-rs/argon2-linux-arm64-musl": "npm:2.2.2"
+    "@node-rs/argon2-linux-x64-gnu": "npm:2.2.2"
+    "@node-rs/argon2-linux-x64-musl": "npm:2.2.2"
+    "@node-rs/argon2-win32-arm64-msvc": "npm:2.2.2"
+    "@node-rs/argon2-win32-ia32-msvc": "npm:2.2.2"
+    "@node-rs/argon2-win32-x64-msvc": "npm:2.2.2"
+  dependenciesMeta:
+    "@node-rs/argon2-android-arm-eabi":
+      optional: true
+    "@node-rs/argon2-android-arm64":
+      optional: true
+    "@node-rs/argon2-darwin-arm64":
+      optional: true
+    "@node-rs/argon2-darwin-x64":
+      optional: true
+    "@node-rs/argon2-freebsd-x64":
+      optional: true
+    "@node-rs/argon2-linux-arm-gnueabihf":
+      optional: true
+    "@node-rs/argon2-linux-arm64-gnu":
+      optional: true
+    "@node-rs/argon2-linux-arm64-musl":
+      optional: true
+    "@node-rs/argon2-linux-x64-gnu":
+      optional: true
+    "@node-rs/argon2-linux-x64-musl":
+      optional: true
+    "@node-rs/argon2-win32-arm64-msvc":
+      optional: true
+    "@node-rs/argon2-win32-ia32-msvc":
+      optional: true
+    "@node-rs/argon2-win32-x64-msvc":
+      optional: true
+  checksum: 10c0/afa772d7021b9ae2895d870ed47b838d24f11f65386e84771230da065f66febd17c81ea116c7f14c6eadd779c511eeafafb71361a63abf4b6a06a20a1ae46e8f
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -6775,6 +6914,7 @@ __metadata:
   resolution: "memora-dashboard@workspace:."
   dependencies:
     "@logtail/node": "npm:^0.5.8"
+    "@node-rs/argon2": "npm:^2.2.2"
     "@phosphor-icons/react": "npm:^2.1.10"
     "@prisma/adapter-pg": "npm:^7.9.1"
     "@prisma/client": "npm:^7.9.1"
