@@ -46,7 +46,9 @@ export const readLocal = (input: string): { name: LocalCommand; rest: string } |
 export const helpReply = (view: RegistryView, name: string): NexusReply => {
   const wanted = name.replace(/^\$/, '')
   const found = wanted
-    ? view.commands.filter((command) => command.id === wanted || command.id.startsWith(`${wanted}.`))
+    ? view.commands.filter(
+        (command) => command.id === wanted || command.id.startsWith(`${wanted}.`)
+      )
     : view.commands
 
   if (found.length === 0) return reply('text', NEXUS_TERMINAL_COPY.helpEmpty)
@@ -60,7 +62,9 @@ export const helpReply = (view: RegistryView, name: string): NexusReply => {
       description: command.description,
       niveau: command.level,
       famille: command.category,
-      arguments: command.options.map((option) => `--${option.name}${option.required ? '*' : ''}`).join(' '),
+      arguments: command.options
+        .map((option) => `--${option.name}${option.required ? '*' : ''}`)
+        .join(' '),
     })
   }
 
@@ -83,7 +87,4 @@ export const helpReply = (view: RegistryView, name: string): NexusReply => {
 export const historyReply = (entries: string[]): NexusReply =>
   entries.length === 0
     ? reply('text', NEXUS_TERMINAL_COPY.historyEmpty)
-    : reply(
-        'table',
-        entries.map((input, index) => ({ n: index + 1, commande: input })).reverse()
-      )
+    : reply('table', entries.map((input, index) => ({ n: index + 1, commande: input })).reverse())

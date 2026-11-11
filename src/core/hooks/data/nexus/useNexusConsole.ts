@@ -60,10 +60,7 @@ export const useNexusConsole = (isOpen: boolean) => {
   const retry = useRef('')
 
   const csrf = session?.csrf
-  const csrfHeader = useMemo(
-    () => (csrf ? { [NEXUS_PATHS.csrfHeader]: csrf } : undefined),
-    [csrf]
-  )
+  const csrfHeader = useMemo(() => (csrf ? { [NEXUS_PATHS.csrfHeader]: csrf } : undefined), [csrf])
 
   const add = useCallback((block: Omit<NexusBlock, 'id' | 'at'>) => {
     counter.current += 1
@@ -141,7 +138,11 @@ export const useNexusConsole = (isOpen: boolean) => {
         await apiPost(NEXUS_PATHS.password, { password })
         setMode('discord')
         const passed = await askDiscord()
-        add({ input: NEXUS_UNLOCK_COMMAND, state: passed ? 'done' : 'failed', error: passed ? undefined : NEXUS_COPY.discordRefused })
+        add({
+          input: NEXUS_UNLOCK_COMMAND,
+          state: passed ? 'done' : 'failed',
+          error: passed ? undefined : NEXUS_COPY.discordRefused,
+        })
         setMode('command')
         if (passed) await refresh()
       } catch (error) {
@@ -189,8 +190,7 @@ export const useNexusConsole = (isOpen: boolean) => {
       if (!local) return void run(input)
       if (local.name === 'clear') return setBlocks([])
 
-      const reply =
-        local.name === 'help' ? helpReply(registry, local.rest) : historyReply(history)
+      const reply = local.name === 'help' ? helpReply(registry, local.rest) : historyReply(history)
       add({ input, state: 'done', reply })
     },
     [mode, stage, unlock, reauthenticate, run, registry, history, add]
@@ -204,7 +204,22 @@ export const useNexusConsole = (isOpen: boolean) => {
     [run]
   )
 
-  const cancel = useCallback((id: number) => patch(id, { state: 'failed', error: NEXUS_TERMINAL_COPY.cancelled }), [patch])
+  const cancel = useCallback(
+    (id: number) => patch(id, { state: 'failed', error: NEXUS_TERMINAL_COPY.cancelled }),
+    [patch]
+  )
 
-  return { session, stage, registry, blocks, history, mode, isBusy, submit, confirm, cancel, forget }
+  return {
+    session,
+    stage,
+    registry,
+    blocks,
+    history,
+    mode,
+    isBusy,
+    submit,
+    confirm,
+    cancel,
+    forget,
+  }
 }

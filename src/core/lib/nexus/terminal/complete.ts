@@ -67,7 +67,9 @@ const matchPath = (view: RegistryView, words: string[]): CommandProjection | und
       command.pattern.every((segment, at) => {
         const variable = VARIABLE.exec(segment)
 
-        return variable ? (view.values[variable[1]] ?? []).includes(words[at]) : segment === words[at]
+        return variable
+          ? (view.values[variable[1]] ?? []).includes(words[at])
+          : segment === words[at]
       })
   )
 
@@ -119,7 +121,10 @@ export const completeInput = (input: string, view: RegistryView): Completion => 
     const options = values.filter((value) => value.startsWith(enumMatch[2]))
     if (options.length === 0) return { text: input, options: [] }
 
-    return { text: input.slice(0, input.length - enumMatch[2].length) + commonStart(options), options }
+    return {
+      text: input.slice(0, input.length - enumMatch[2].length) + commonStart(options),
+      options,
+    }
   }
 
   const options = command.options
