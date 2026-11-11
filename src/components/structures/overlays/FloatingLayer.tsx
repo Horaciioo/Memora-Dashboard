@@ -14,4 +14,11 @@ export interface FloatingLayerProps {
  */
 
 export const FloatingLayer = ({ children }: FloatingLayerProps) =>
-  typeof document === 'undefined' ? null : createPortal(children, document.body)
+  typeof document === 'undefined'
+    ? null
+    : createPortal(
+        <div data-floating-layer className="contents">
+          {children}
+        </div>,
+        document.body
+      )
