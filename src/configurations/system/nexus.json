@@ -36,7 +36,11 @@
     "maxRows": 200,
     "pageSize": 50,
     "confirmSeconds": 120,
-    "auditPageSize": 50
+    "auditPageSize": 50,
+    "slowCommandMs": 500,
+    "readTimeoutMs": 2000,
+    "writeTimeoutMs": 10000,
+    "heavyRows": 2000
   },
   "redaction": {
     "patterns": [

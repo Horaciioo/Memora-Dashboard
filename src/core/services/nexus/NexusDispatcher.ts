@@ -8,6 +8,7 @@ import {
   readConfirmArgument,
   spendConfirmToken,
 } from '@/core/lib/nexus/confirm'
+import { logger } from '@/core/lib/logger'
 import { parseCommand } from '@/core/lib/nexus/parse'
 import { redactInput, redactRecord } from '@/core/lib/nexus/redact'
 import type { CommandRegistry } from '@/core/lib/nexus/registry'
@@ -317,9 +318,11 @@ const execute = async (
 ): Promise<HandlerResult> => {
   const command = progress.command as NexusCommand
   const handler = deps.handlers[command.handler]
-  const timeoutMs = command.limits.timeoutMs ?? NEXUS_COMMANDS.timeoutMs
+  const changes = command.level === 'write' || command.level === 'dangerous'
+  const timeoutMs =
+    command.limits.timeoutMs ?? (changes ? NEXUS_COMMANDS.writeTimeoutMs : NEXUS_COMMANDS.timeoutMs)
 
-  if (command.level !== 'write' && command.level !== 'dangerous') {
+  if (!changes) {
     return runWithTimeout(handler, { ...base, tx: null, dryRun: false }, timeoutMs)
   }
 
@@ -476,6 +479,12 @@ export const dispatchCommand = async (
           )
         )
         .catch(() => undefined)
+    }
+
+    // Slow ones leave a technical line
+    const durationMs = Date.now() - startedAt
+    if (durationMs > NEXUS_COMMANDS.slowCommandMs) {
+      logger.warn(`[nexus] slow command ${command.id} ${durationMs}ms`)
     }
 
     return toResult(command, result, startedAt, request.requestId)

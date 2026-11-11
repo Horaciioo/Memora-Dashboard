@@ -148,7 +148,7 @@ export const NEXUS_MODES = {
 
 /**
  * Command engine bounds
- * @type {{ maxLength: number, maxArguments: number, timeoutMs: number, maxRows: number, pageSize: number, confirmSeconds: number, auditPageSize: number }}
+ * @type {{ maxLength: number, maxArguments: number, timeoutMs: number, maxRows: number, pageSize: number, confirmSeconds: number, auditPageSize: number, slowCommandMs: number, readTimeoutMs: number, writeTimeoutMs: number, heavyRows: number }}
  */
 
 export const NEXUS_COMMANDS = {
@@ -193,6 +193,30 @@ export const NEXUS_COMMANDS = {
     fallback: 50,
     min: 1,
     max: 500,
+  }),
+  slowCommandMs: readInteger(commands.slowCommandMs, {
+    path: 'system/nexus.commands.slowCommandMs',
+    fallback: 500,
+    min: 50,
+    max: 60000,
+  }),
+  readTimeoutMs: readInteger(commands.readTimeoutMs, {
+    path: 'system/nexus.commands.readTimeoutMs',
+    fallback: 2000,
+    min: 100,
+    max: 60000,
+  }),
+  writeTimeoutMs: readInteger(commands.writeTimeoutMs, {
+    path: 'system/nexus.commands.writeTimeoutMs',
+    fallback: 10000,
+    min: 500,
+    max: 120000,
+  }),
+  heavyRows: readInteger(commands.heavyRows, {
+    path: 'system/nexus.commands.heavyRows',
+    fallback: 2000,
+    min: 100,
+    max: 1000000,
   }),
 }
 

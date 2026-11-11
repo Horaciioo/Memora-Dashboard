@@ -29,6 +29,7 @@ import type { HeldRoutes } from '@/declarations/ui/responsive'
 import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { useAutoRefresh } from '@/core/hooks/interaction/state/useAutoRefresh'
 import { useFeatures } from '@/managers/front-end/FeaturesManager'
+import { NexusProvider } from '@/managers/front-end/NexusManager'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
 import { TourProvider } from '@/managers/front-end/TourManager'
 import type { ViewContext } from '@/types/access'
@@ -74,23 +75,25 @@ export const AppShell = ({
   children,
 }: AppShellProps) => {
   return (
-    <RailSlotProvider>
-      <BrandSplash />
-      {/* A visit reset on the server starts over, a visit under way is left alone */}
-      <TourProvider key={String(tour !== null && !tour.isIntroSeen)} initial={tour}>
-        <AppShellFrame
-          unreadCount={unreadCount}
-          viewContext={viewContext}
-          twoFactor={twoFactor}
-          seal={seal}
-          heldRoutes={heldRoutes}
-          isPushReady={isPushReady}
-          isNexusReady={isNexusReady}
-        >
-          {children}
-        </AppShellFrame>
-      </TourProvider>
-    </RailSlotProvider>
+    <NexusProvider isReady={isNexusReady}>
+      <RailSlotProvider>
+        <BrandSplash />
+        {/* A visit reset on the server starts over, a visit under way is left alone */}
+        <TourProvider key={String(tour !== null && !tour.isIntroSeen)} initial={tour}>
+          <AppShellFrame
+            unreadCount={unreadCount}
+            viewContext={viewContext}
+            twoFactor={twoFactor}
+            seal={seal}
+            heldRoutes={heldRoutes}
+            isPushReady={isPushReady}
+            isNexusReady={isNexusReady}
+          >
+            {children}
+          </AppShellFrame>
+        </TourProvider>
+      </RailSlotProvider>
+    </NexusProvider>
   )
 }
 
