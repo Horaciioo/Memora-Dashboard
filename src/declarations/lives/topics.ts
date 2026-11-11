@@ -1,6 +1,6 @@
 /**
  * Topics of the live bus
- * @type {{ lives: string, channel: string, live: (id: string) => string, room: (id: string) => string, connection: (id: string) => string, team: (id: string) => string, teamLiveIdOf: (topic: string) => string | null }}
+ * @type {{ lives: string, channel: string, live: (id: string) => string, room: (id: string) => string, connection: (id: string) => string, team: (id: string) => string, teamLiveIdOf: (topic: string) => string | null, privateRoom: (id: string, scope: string) => string, scopedOf: (topic: string) => { liveId: string, scope: string } | null }}
  */
 
 export const LIVE_TOPICS = {
@@ -18,6 +18,13 @@ export const LIVE_TOPICS = {
   // Internal chat of a live
   team: (id: string) => `live:${id}:team`,
   teamLiveIdOf: (topic: string): string | null => /^live:([^:]+):team$/.exec(topic)?.[1] ?? null,
+  // Private room of the internal chat, referents or responsables
+  privateRoom: (id: string, scope: string) => `live:${id}:team:${scope}`,
+  scopedOf: (topic: string): { liveId: string; scope: string } | null => {
+    const found = /^live:([^:]+):team:([a-z]+)$/.exec(topic)
+
+    return found ? { liveId: found[1], scope: found[2] } : null
+  },
 }
 
 /**

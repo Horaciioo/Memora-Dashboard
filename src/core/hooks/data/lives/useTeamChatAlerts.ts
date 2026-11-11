@@ -7,6 +7,7 @@ import type { TeamChatState } from '@/core/hooks/data/lives/useTeamChat'
 import { isCalled } from '@/core/lib/lives/teamChat'
 import type { MentionSeats } from '@/core/lib/lives/teamChat'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
+import type { TeamChatScope } from '@/declarations/lives/teamChat'
 import type { LiveTeamMessage } from '@/types/lives'
 import { SECOND_MS } from '@/utils/constants/time'
 
@@ -16,6 +17,7 @@ import { SECOND_MS } from '@/utils/constants/time'
  * @property {TeamChatState} chat - Chat state
  * @property {boolean} hasUnread - Message waiting
  * @property {LiveTeamMessage | null} bubble - Mention to show
+ * @property {LiveTeamMessage | null} mention - Last mention, kept until the panel opens
  * @property {() => void} dismiss - Close the bubble
  */
 
@@ -23,6 +25,7 @@ export interface TeamChatAlerts {
   chat: TeamChatState
   hasUnread: boolean
   bubble: LiveTeamMessage | null
+  mention: LiveTeamMessage | null
   dismiss: () => void
 }
 
@@ -33,6 +36,7 @@ export interface TeamChatAlerts {
  * @param {string} input.viewerId - Signed-in member
  * @param {MentionSeats} input.seats - Team of the live
  * @param {boolean} input.isOpen - Panel open
+ * @param {TeamChatScope[]} input.scopes - Rooms the member reads
  * @return {TeamChatAlerts} - Chat and alerts
  */
 
@@ -41,14 +45,17 @@ export const useTeamChatAlerts = ({
   viewerId,
   seats,
   isOpen,
+  scopes,
 }: {
   liveId: string
   viewerId: string
   seats: MentionSeats
   isOpen: boolean
+  scopes: TeamChatScope[]
 }): TeamChatAlerts => {
   const [hasUnread, setHasUnread] = useState(false)
   const [bubble, setBubble] = useState<LiveTeamMessage | null>(null)
+  const [mention, setMention] = useState<LiveTeamMessage | null>(null)
   const [wasOpen, setWasOpen] = useState(isOpen)
 
   // Opening reads everything
@@ -57,15 +64,19 @@ export const useTeamChatAlerts = ({
     if (isOpen) {
       setHasUnread(false)
       setBubble(null)
+      setMention(null)
     }
   }
 
   // Messages heard while closed
-  const chat = useTeamChat(liveId, (message) => {
+  const chat = useTeamChat(liveId, scopes, viewerId, (message) => {
     if (message.authorId === viewerId || isOpen) return
     // Plain messages only mark a point
     setHasUnread(true)
-    if (isCalled(message.mentions, viewerId, seats)) setBubble(message)
+    if (isCalled(message.mentions, viewerId, seats, message.scope)) {
+      setBubble(message)
+      setMention(message)
+    }
   })
 
   // Bubble closes alone
@@ -79,5 +90,5 @@ export const useTeamChatAlerts = ({
     return () => window.clearTimeout(timer)
   }, [bubble])
 
-  return { chat, hasUnread, bubble, dismiss: () => setBubble(null) }
+  return { chat, hasUnread, bubble, mention, dismiss: () => setBubble(null) }
 }
