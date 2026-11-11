@@ -1,5 +1,7 @@
 import 'server-only'
-import { decisionEffect, fillDeparture } from '@/core/lib/academy/parkour'
+import { composeDeparture, periodOfStage } from '@/core/lib/academy/derank'
+import type { DerankEntry } from '@/core/lib/academy/derank'
+import { decisionEffect } from '@/core/lib/academy/parkour'
 import { prisma } from '@/core/lib/db'
 import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import { conflict, immutable, notFound } from '@/core/lib/errors'
@@ -9,8 +11,6 @@ import { notify } from '@/core/services/system/NotificationService'
 import { isRootIdentity } from '@/declarations/access/identity'
 import {
   DEPARTURE_EMOJIS,
-  DEPARTURE_TEMPLATES,
-  DEPARTURE_VERBS,
   GRADUATE_DIVISION_RANK,
 } from '@/declarations/academy/parkour'
 import { MEMBER_COPY } from '@/declarations/members/copy'
@@ -164,18 +164,22 @@ const closeNewcomer = async (
 
   // The announcement waits in the responsables' tasks
   const trade = tradeOfFunction(row.session.jobFunction.name)
+  const entry: DerankEntry = {
+    username: row.account.discordUsername ?? row.account.displayName,
+    discordId: row.account.discordId,
+    trade,
+    emoji: DEPARTURE_EMOJIS[trade] ?? '',
+    period: periodOfStage(row.stage),
+  }
   await prisma.departureNotice.create({
     data: {
       accountId: row.accountId,
       kind,
       functionName: trade,
-      body: fillDeparture(DEPARTURE_TEMPLATES[kind], DEPARTURE_VERBS, {
-        username: row.account.discordUsername ?? row.account.displayName,
-        discordId: row.account.discordId,
-        functionName: trade,
-        emoji: DEPARTURE_EMOJIS[trade] ?? '',
-        kind,
-      }),
+      username: entry.username,
+      discordId: entry.discordId,
+      period: dismissed ? entry.period : null,
+      body: composeDeparture(kind, { ...entry, period: dismissed ? entry.period : null }),
     },
   })
 }
@@ -248,7 +252,7 @@ export const resignJunior = async (
 
 /**
  * Departure announcements still to publish
- * @return {Promise<{ id: string, name: string, body: string, createdAt: Date }[]>} - Open notices
+ * @return {Promise<{ id: string, name: string, body: string, createdAt: Date, mergeable: boolean }[]>} - Open notices
  */
 
 export const openDepartures = async () => {
@@ -263,6 +267,9 @@ export const openDepartures = async () => {
     name: row.account.displayName,
     body: row.body,
     createdAt: row.createdAt,
+    // Dismissals still holding their pieces can be joined
+    mergeable:
+      row.kind === DepartureKinds.Dismissal && row.username !== null && row.mergedAt === null,
   }))
 }
 

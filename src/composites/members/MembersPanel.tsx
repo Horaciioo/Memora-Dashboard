@@ -11,7 +11,11 @@ import { FilterBar, type FilterDefinition } from '@/components/structures/data/F
 import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/page/Section'
+import { useDerank } from '@/core/hooks/data/people/useDerank'
 import { useMembers } from '@/core/hooks/data/people/useMembers'
+import { DepartureMessageDialog } from '@/composites/members/admin/DepartureMessageDialog'
+import { DerankPicker } from '@/composites/members/admin/DerankPicker'
+import { DERANK_COPY } from '@/declarations/academy/derank'
 import { foldText } from '@/utils/format/strings'
 import { toOptions } from '@/core/lib/forms/options'
 import { arrangeMembers, isListedRole } from '@/core/lib/members/arrange'
@@ -21,7 +25,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { CREATOR_GROUP } from '@/declarations/ui/blocks'
-import { GROUP_STYLES, LIST_STYLES } from '@/declarations/ui/variants'
+import { FILTER_STYLES, GROUP_STYLES, LIST_STYLES } from '@/declarations/ui/variants'
 import { AcceptedCandidates } from '@/composites/members/AcceptedCandidates'
 import { CreatorGroupBanner } from '@/composites/members/CreatorGroupBanner'
 import { MemberCard } from '@/composites/members/MemberCard'
@@ -44,6 +48,8 @@ export interface MembersPanelProps {
   creatorId: string | null
   canCreate: boolean
   canDelete: boolean
+  // Moderators the member may derank together
+  derankIds: string[]
   canReadNotes: boolean
 }
 
@@ -86,6 +92,7 @@ interface MemberGroup {
  * @param {string | null} creatorId - Creator the page is narrowed to
  * @param {boolean} canCreate - Member may add a moderator
  * @param {boolean} canDelete - Member may drop a moderator
+ * @param {string[]} derankIds - Moderators the member may derank together
  * @param {boolean} canReadNotes - Member may see the notes indicator
  * @return {JSX.Element}
  */
@@ -100,6 +107,7 @@ export const MembersPanel = ({
   creatorId,
   canCreate,
   canDelete,
+  derankIds,
   canReadNotes,
 }: MembersPanelProps) => {
   const router = useRouter()
@@ -111,12 +119,18 @@ export const MembersPanel = ({
   const [pendingDeletion, setPendingDeletion] = useState<MemberSummary | null>(null)
   // Groups flipped from their default, role groups open and creators folded
   const [flipped, setFlipped] = useState<Set<string>>(new Set())
+  const [isDeranking, setDeranking] = useState(false)
+  const [derankBody, setDerankBody] = useState<string | null>(null)
+  const { isSaving: isDerankSaving, derank } = useDerank()
   const ChevronIcon = ICONS.expand
 
   const toggleGroup = (key: string) => setFlipped((current) => withToggled(current, key))
 
   const isFiltered =
     search.trim().length > 0 || Object.values(filters).some((value) => value.length > 0)
+
+  // Matching boxes open by default while searching
+  const isSearching = search.trim().length > 0
 
   const visibleMembers = useMemo(() => {
     const term = foldText(search.trim())
@@ -275,6 +289,19 @@ export const MembersPanel = ({
           onFilter={(name, value) => setFilters((current) => ({ ...current, [name]: value }))}
           onReset={resetFilters}
           isFiltered={isFiltered}
+          leading={
+            derankIds.length > 0 ? (
+              <button
+                type="button"
+                aria-label={DERANK_COPY.action}
+                title={DERANK_COPY.action}
+                onClick={() => setDeranking(true)}
+                className={cn(FILTER_STYLES.iconButton, FILTER_STYLES.iconButtonDanger)}
+              >
+                <ICONS.actBan className={FILTER_STYLES.glyph} aria-hidden="true" />
+              </button>
+            ) : undefined
+          }
         />
 
         {isFiltered && visibleMembers.length === 0 ? (
@@ -304,7 +331,7 @@ export const MembersPanel = ({
           <div className={GROUP_STYLES.stack}>
             {groups.map((group, index) => {
               const key = group.key
-              const isOpen = flipped.has(key) !== Boolean(group.role)
+              const isOpen = flipped.has(key) !== (isSearching || Boolean(group.role))
 
               const renderCards = (list: MemberSummary[]) => (
                 <div className={LIST_STYLES.grid}>
@@ -400,6 +427,38 @@ export const MembersPanel = ({
           </div>
         )}
       </Section>
+
+      {isDeranking && (
+        <DerankPicker
+          open
+          title={DERANK_COPY.pickTitle}
+          description={DERANK_COPY.pickLead}
+          confirmLabel={DERANK_COPY.action}
+          minimum={1}
+          pending={isDerankSaving}
+          options={members
+            .filter((member) => derankIds.includes(member.id))
+            .map((member) => ({
+              id: member.id,
+              name: member.displayName,
+              avatarUrl: member.avatarUrl,
+            }))}
+          onClose={() => setDeranking(false)}
+          onConfirm={async (ids) => {
+            const departure = await derank(ids)
+            if (!departure) return
+
+            setDeranking(false)
+            setDerankBody(departure.body)
+          }}
+        />
+      )}
+
+      <DepartureMessageDialog
+        open={derankBody !== null}
+        body={derankBody ?? ''}
+        onClose={() => setDerankBody(null)}
+      />
 
       {canCreate && groups.length > 0 && (
         <FloatingAdd
