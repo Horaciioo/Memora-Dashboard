@@ -41,9 +41,9 @@ const fromStored = (handle: EntityHandle, stored: Row): Row =>
   )
 
 // Audit line that may be undone
-const loadLine = async (context: HandlerContext): Promise<Line> => {
+const loadLine = async (context: HandlerContext, auditId: string): Promise<Line> => {
   const row = await prisma.nexusAudit.findFirst({
-    where: { id: String(context.args['audit-id']), accountId: context.accountId },
+    where: { id: auditId, accountId: context.accountId },
   })
   if (!row) throw notFound(DB_COPY.auditMissing)
   if (row.status !== 'OK' || !row.reversible || !row.target) throw conflict(DB_COPY.notReversible)
@@ -86,11 +86,16 @@ const assertStill = (current: Row | null, expected: Row): Row => {
  * Describe and optionally undo one audit line
  * @param {HandlerContext} context - Handler context
  * @param {boolean} apply - Write the undo
+ * @param {string} [auditId] - Line to undo
  * @return {Promise<HandlerResult>} - Undo description
  */
 
-const undo = async (context: HandlerContext, apply: boolean): Promise<HandlerResult> => {
-  const line = await loadLine(context)
+export const undo = async (
+  context: HandlerContext,
+  apply: boolean,
+  auditId: string = String(context.args['audit-id'])
+): Promise<HandlerResult> => {
+  const line = await loadLine(context, auditId)
   const [key, id] = (line.target as string).split(':')
   const handle = entityOf(key)
   const client = apply && context.tx ? context.tx : prisma
@@ -98,7 +103,7 @@ const undo = async (context: HandlerContext, apply: boolean): Promise<HandlerRes
   const current = await readNow(client, handle, id)
   let result: { before: Row; after: Row }
 
-  if (line.commandId === 'db.update') {
+  if (line.commandId === 'db.update' || line.commandId === 'game.override.score') {
     assertStill(current, line.after)
     result = { before: pick(current as Row, Object.keys(line.before)), after: line.before }
     if (apply) await delegate.update({ where: { id }, data: fromStored(handle, line.before) })

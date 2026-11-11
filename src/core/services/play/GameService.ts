@@ -229,3 +229,16 @@ const playMove = async (
     await engineOf(session.game).act(toEngineSession(session), accountId, raw)
   )
 }
+
+/**
+ * Let the bots of a game move again
+ * @param {string} sessionId - Game
+ * @param {PlayGameName} game - Game kind
+ * @return {void} - Started
+ */
+
+export const wakeBots = (sessionId: string, game: PlayGameName): void => {
+  void driveBots(sessionId, game, playMove).catch((error: unknown) =>
+    logger.warn('[play] bots stalled', error)
+  )
+}

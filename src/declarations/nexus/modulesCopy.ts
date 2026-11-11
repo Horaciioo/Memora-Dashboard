@@ -48,3 +48,19 @@ export const SYSTEM_COPY = {
   maintenanceOn: 'Maintenance activée',
   maintenanceOff: 'Maintenance désactivée',
 } as const
+
+/**
+ * Game module wording
+ * @type {Record<string, string>}
+ */
+
+export const GAME_COPY = {
+  missing: 'Partie introuvable',
+  notCapable: 'Ce jeu ne supporte pas cette intervention',
+  notInGame: 'Ce joueur n’est pas assis à cette partie',
+  stillOn: 'Partie en cours, arrête-la d’abord',
+  stopped: 'Partie arrêtée',
+  nothingToClear: 'Aucune surcharge à annuler',
+  tournamentMissing: 'Tournoi introuvable',
+  groupMissing: 'Groupe introuvable',
+} as const

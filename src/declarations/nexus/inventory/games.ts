@@ -42,10 +42,13 @@ export interface GameEntry {
 export const GAME_INVENTORY: Record<PlayGameName, GameEntry> = {
   [PlayGames.Baccalaureat]: {
     moves: ['BaccalaureatRound', 'BaccalaureatAnswer', 'BaccalaureatVote'],
-    capabilities: [],
+    capabilities: ['pause', 'resume', 'kick', 'setScore'],
   },
-  [PlayGames.Golf]: { moves: ['GolfMove'], capabilities: [] },
-  [PlayGames.Bomb]: { moves: ['BombMove'], capabilities: [] },
-  [PlayGames.Ludo]: { moves: ['LudoMove'], capabilities: [] },
-  [PlayGames.Naval]: { moves: ['NavalShot'], capabilities: [] },
+  [PlayGames.Golf]: { moves: ['GolfMove'], capabilities: ['pause', 'resume', 'kick', 'setScore'] },
+  [PlayGames.Bomb]: { moves: ['BombMove'], capabilities: ['pause', 'resume', 'kick', 'setScore'] },
+  [PlayGames.Ludo]: { moves: ['LudoMove'], capabilities: ['pause', 'resume', 'kick', 'setScore'] },
+  [PlayGames.Naval]: {
+    moves: ['NavalShot'],
+    capabilities: ['pause', 'resume', 'kick', 'setScore'],
+  },
 }
