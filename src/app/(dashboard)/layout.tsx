@@ -22,6 +22,7 @@ import { NavigationViews, visibleNavGroups } from '@/declarations/navigation'
 import { PATH_HEADER } from '@/declarations/system/security/securityHeaders'
 import { APP_ENVIRONMENT } from '@/declarations/system/environments'
 import { heldRoutes } from '@/declarations/ui/responsive'
+import { isNexusConfigured } from '@/declarations/nexus/owner'
 import { isPushConfigured } from '@/declarations/pwa/vapid'
 import { PENDING_ACCOUNT_COPY } from '@/declarations/onboarding/copy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
@@ -87,6 +88,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         tour={tour}
         heldRoutes={heldRoutes(APP_ENVIRONMENT)}
         isPushReady={isPushConfigured()}
+        isNexusReady={session.isRoot && isNexusConfigured()}
       >
         {isHeld ? null : children}
         <VisitTracker />

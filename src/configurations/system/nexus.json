@@ -52,5 +52,18 @@
   "retention": {
     "auditDays": 365,
     "attemptDays": 30
+  },
+  "window": {
+    "shortcut": "Mod+Shift+M",
+    "defaultWidth": 760,
+    "defaultHeight": 460,
+    "minWidth": 420,
+    "minHeight": 260,
+    "maxWidth": 1400,
+    "maxHeight": 1000,
+    "historySize": 200,
+    "blocksKept": 100,
+    "pollSeconds": 60,
+    "edgeMargin": 8
   }
 }

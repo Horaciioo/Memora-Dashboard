@@ -17,6 +17,7 @@ import { LeftSidebar } from '@/composites/shell/LeftSidebar'
 import { MobileDock } from '@/composites/shell/mobile/MobileDock'
 import { MobileTopBar } from '@/composites/shell/mobile/MobileTopBar'
 import { OfflineBanner } from '@/composites/pwa/OfflineBanner'
+import { NexusLauncher } from '@/composites/nexus/NexusLauncher'
 import { PwaHost } from '@/composites/pwa/PwaHost'
 import { AssistantDock } from '@/composites/search/assistant/AssistantDock'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
@@ -43,6 +44,7 @@ export interface AppShellProps {
   tour: TourState | null
   heldRoutes: HeldRoutes
   isPushReady: boolean
+  isNexusReady: boolean
   children: ReactNode
 }
 
@@ -55,6 +57,7 @@ export interface AppShellProps {
  * @param {TourState | null} tour - First visit resolved server-side
  * @param {HeldRoutes} heldRoutes - Areas held back on small screens
  * @param {boolean} isPushReady - Pushes configured on the server
+ * @param {boolean} isNexusReady - Console open to this member
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
@@ -67,6 +70,7 @@ export const AppShell = ({
   tour,
   heldRoutes,
   isPushReady,
+  isNexusReady,
   children,
 }: AppShellProps) => {
   return (
@@ -81,6 +85,7 @@ export const AppShell = ({
           seal={seal}
           heldRoutes={heldRoutes}
           isPushReady={isPushReady}
+          isNexusReady={isNexusReady}
         >
           {children}
         </AppShellFrame>
@@ -102,6 +107,7 @@ const AppShellFrame = ({
   seal,
   heldRoutes,
   isPushReady,
+  isNexusReady,
   children,
 }: Omit<AppShellProps, 'tour'>) => {
   const { session, can } = useAuthContext()
@@ -147,6 +153,7 @@ const AppShellFrame = ({
           />
         )}
         {session && <PwaHost isPushReady={isPushReady} />}
+        {session && isNexusReady && <NexusLauncher />}
         {session && <NudgeHost />}
         {session && !isBare && !isLivesPage && isOpen('assistant') && (
           <AssistantDock viewContext={viewContext} />

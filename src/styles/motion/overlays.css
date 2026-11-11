@@ -377,3 +377,23 @@ body {
     animation: none;
   }
 }
+
+/* Console window, a short fade only */
+.nexus-enter {
+  animation: nexus-fade 120ms ease-out;
+}
+
+@keyframes nexus-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nexus-enter {
+    animation: none;
+  }
+}

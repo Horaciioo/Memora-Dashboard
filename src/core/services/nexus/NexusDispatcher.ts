@@ -87,6 +87,7 @@ export interface DispatchRequest {
  * @property {unknown} data - Structured companion
  * @property {{ page: number, total: number }} [pagination] - Page position
  * @property {string} [confirmToken] - Token to confirm a preview
+ * @property {'preview' | 'double'} [confirmKind] - Confirmation asked
  * @property {number} durationMs - Time taken
  * @property {string} requestId - Request identifier
  */
@@ -98,6 +99,7 @@ export interface NexusResult {
   data: unknown
   pagination?: { page: number; total: number }
   confirmToken?: string
+  confirmKind?: 'preview' | 'double'
   durationMs: number
   requestId: string
 }
@@ -377,6 +379,7 @@ const preview = async (
   return {
     ...toResult(command, described, startedAt, request.requestId),
     status: 'previewed',
+    confirmKind: command.confirm === 'double' ? 'double' : 'preview',
     confirmToken: issueConfirmToken(
       request.nexus?.tokenHash ?? '',
       request.input,
