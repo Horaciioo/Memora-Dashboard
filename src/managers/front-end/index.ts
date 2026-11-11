@@ -1,5 +1,11 @@
 export { AppearanceManager } from './AppearanceManager'
-export { BreadcrumbProvider, useBreadcrumbLabel, useBreadcrumbOverrides } from './BreadcrumbManager'
+export {
+  BreadcrumbProvider,
+  useBreadcrumbLabel,
+  useBreadcrumbOverrides,
+  useBreadcrumbTabs,
+  useTabMemory,
+} from './BreadcrumbManager'
 export { ColorVisionManager } from './ColorVisionManager'
 export { ComfortManager } from './ComfortManager'
 export { DisplayPreferencesManager } from './DisplayPreferencesManager'

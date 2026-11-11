@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
+import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { usePlaySoundStore } from '@/core/store/play/playSound'
 import { PLAY_SOUND_COPY } from '@/declarations/play/sounds'
 import { ICONS } from '@/declarations/ui/icons'
@@ -22,16 +23,12 @@ export const PlayVolumeKey = ({ game }: { game: PlayGameName }) => {
   const isMuted = usePlaySoundStore((state) => state.isMuted)
   const SoundIcon = isMuted ? ICONS.golfMute : ICONS.golfSound
 
-  useEffect(() => {
-    if (!isOpen) return
-    const close = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false)
-    window.addEventListener('keydown', close)
-
-    return () => window.removeEventListener('keydown', close)
-  }, [isOpen])
+  const holderRef = useRef<HTMLDivElement>(null)
+  const fold = useCallback(() => setOpen(false), [])
+  useOutsideDismiss(isOpen, holderRef, fold)
 
   return (
-    <div className={BAC_SESSION.keyHolder}>
+    <div ref={holderRef} className={BAC_SESSION.keyHolder}>
       <Button
         variant="arcadeGhost"
         className={BAC_SESSION.keyButton}

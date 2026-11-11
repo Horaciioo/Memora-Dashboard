@@ -89,6 +89,7 @@ export const API_ROUTES = {
   playMemberUnban: (id: string) => `/api/play/players/${id}/unban`,
   participations: '/api/participations',
   memberFreeze: (id: string) => `/api/members/${id}/admin/freeze`,
+  membersDerank: '/api/members/derank',
   memberDeparture: (id: string) => `/api/members/${id}/admin/departure`,
   memberSuspension: (id: string) => `/api/members/${id}/admin/suspension`,
   memberAccess: (id: string) => `/api/members/${id}/access`,
@@ -140,14 +141,16 @@ export const API_ROUTES = {
   liveBan: (id: string, viewerId: string) => `/api/lives/${id}/banned/${viewerId}`,
   liveViewerComments: (id: string, viewerId: string) =>
     `/api/lives/${id}/viewers/${viewerId}/comments`,
+  liveSharedWords: (id: string, wordId?: string) =>
+    `/api/lives/${id}/shared-words${wordId ? `/${wordId}` : ''}`,
   liveViewerChat: (id: string, viewerId: string, cursor?: string | null) =>
     `/api/lives/${id}/viewers/${viewerId}/chat${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
   liveInspect: (id: string, accountId: string) => `/api/lives/${id}/moderators/${accountId}`,
   modViewPreferences: (liveId?: string | null) =>
     `/api/modview/preferences${liveId ? `?live=${encodeURIComponent(liveId)}` : ''}`,
   liveFocus: (id: string) => `/api/lives/${id}/focus`,
-  liveTeamChat: (id: string, cursor?: string | null) =>
-    `/api/lives/${id}/team-chat${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
+  liveTeamChat: (id: string, scope: string, cursor?: string | null) =>
+    `/api/lives/${id}/team-chat?${new URLSearchParams({ scope, ...(cursor ? { cursor } : {}) })}`,
   sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>
     `/api/sanctions?${new URLSearchParams({
       [SANCTION_PARAMS.creator]: youtuberId,
@@ -177,6 +180,7 @@ export const API_ROUTES = {
   sessionLaunch: (id: string) => `/api/academy/${id}/launch`,
   sessionSecondPeriod: (id: string) => `/api/academy/${id}/period-2`,
   departure: (id: string) => `/api/departures/${id}`,
+  departuresMerge: '/api/departures/merge',
   junior: (id: string) => `/api/juniors/${id}`,
   juniorTrainings: (id: string) => `/api/juniors/${id}/trainings`,
   juniorReviews: (id: string) => `/api/juniors/${id}/reports`,

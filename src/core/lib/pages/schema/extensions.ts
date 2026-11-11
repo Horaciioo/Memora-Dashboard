@@ -65,6 +65,8 @@ export const pageSchemaExtensions = (generateId?: () => string): AnyExtension[] 
   TaskList,
   TaskItem.configure({
     nested: true,
+    // The live view omits it, the styles hook on it
+    HTMLAttributes: { 'data-type': 'taskItem' },
     a11y: {
       checkboxLabel: (node, checked) =>
         (checked ? PAGE_EDITOR_COPY.taskChecked : PAGE_EDITOR_COPY.taskOpen).replace(

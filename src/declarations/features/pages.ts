@@ -67,6 +67,14 @@ export const PAGE_FEATURES: FeatureDefinition[] = [
     api: ['/api/members/*/socials', '/api/socials'],
   },
   {
+    key: 'management',
+    label: 'Gestions',
+    description: 'Les absences, les réseaux, les notes, les anniversaires, les arrivées et les fonctions de toute l’équipe.',
+    kind: 'page',
+    section: 'team',
+    routes: ['/management', '/management/*'],
+  },
+  {
     key: 'absences',
     label: 'Absences',
     description: 'Déclarer et suivre les absences.',

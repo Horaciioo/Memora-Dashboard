@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import { GolfSettings } from '@/composites/play/golf/hud/GolfSettings'
+import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { usePlayStageStore } from '@/core/store/play/playStage'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -37,16 +38,12 @@ export const GolfViewKeys = ({
   const FullscreenIcon = isFullscreen ? ICONS.playWindowed : ICONS.playFullscreen
   const ChatIcon = ICONS.playChat
 
-  useEffect(() => {
-    if (!isOpen) return
-    const close = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false)
-    window.addEventListener('keydown', close)
-
-    return () => window.removeEventListener('keydown', close)
-  }, [isOpen])
+  const keysRef = useRef<HTMLDivElement>(null)
+  const fold = useCallback(() => setOpen(false), [])
+  useOutsideDismiss(isOpen, keysRef, fold)
 
   return (
-    <div className={GOLF_BOARD.keys}>
+    <div ref={keysRef} className={GOLF_BOARD.keys}>
       <div className={GOLF_BOARD.views}>
         <button
           type="button"
