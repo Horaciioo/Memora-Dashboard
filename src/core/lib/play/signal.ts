@@ -24,6 +24,20 @@ export const signalPlay = async (
 }
 
 /**
+ * Tell a game's players it is starting, they show the loading screen
+ * @param {string} sessionId - Game
+ * @return {Promise<void>} - Sent
+ */
+
+export const signalStarted = async (sessionId: string): Promise<void> => {
+  await publishLive(PLAY_TOPICS.session(sessionId), {
+    type: PLAY_STREAM_EVENTS.started,
+    sessionId,
+    at: Date.now(),
+  })
+}
+
+/**
  * Tell every Play page the tables moved
  * @return {Promise<void>} - Sent
  */

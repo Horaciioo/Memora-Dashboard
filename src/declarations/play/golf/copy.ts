@@ -110,7 +110,6 @@ export const GOLF_BOARD_COPY = {
   results: 'Résultats dans {seconds} s',
   power3d: 'Puissance',
   strokesCount: '{count} coups',
-  loading: 'Le parcours se prépare.',
 } as const
 
 /**

@@ -19,7 +19,6 @@ export const GOLF_BOARD = {
   // Flex fill, iOS drops percent heights
   stageFull: 'h-auto! min-h-0! flex-1 rounded-none! border-b-0! ring-0!',
   boardFull: 'min-h-0 flex-1 pb-0!',
-  loading: 'absolute inset-0 grid place-items-center text-sm font-bold text-[var(--play-ink-soft)]',
   // Top row: hole card, players, view keys
   top: 'golf-block-drop pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-3 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:pr-[3.75rem]',
   hole: `${GLASS} pointer-events-auto flex w-[40rem] max-w-full items-center gap-4 px-6 py-3.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:order-2`,

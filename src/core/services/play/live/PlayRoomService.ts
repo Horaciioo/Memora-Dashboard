@@ -38,7 +38,11 @@ const globalForRooms = globalThis as unknown as { playRooms?: Map<string, PlayRo
 const rooms = (globalForRooms.playRooms ??= new Map())
 
 // Signals handed on as they are, the board goes on its own
-const FORWARDED: string[] = [PLAY_STREAM_EVENTS.changed, PLAY_STREAM_EVENTS.chat]
+const FORWARDED: string[] = [
+  PLAY_STREAM_EVENTS.changed,
+  PLAY_STREAM_EVENTS.started,
+  PLAY_STREAM_EVENTS.chat,
+]
 
 /**
  * Read the game once, then send each reader its own board
