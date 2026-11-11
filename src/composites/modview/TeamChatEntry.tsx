@@ -3,8 +3,9 @@
 import { PanelButton } from '@/composites/modview/SidebarPanelButton'
 import { TeamChatPanel } from '@/composites/modview/TeamChatPanel'
 import { useTeamChatAlerts } from '@/core/hooks/data/lives/useTeamChatAlerts'
+import { canSeeScope } from '@/core/lib/lives/teamChat'
 import type { MentionSeats } from '@/core/lib/lives/teamChat'
-import { TEAM_CHAT_COPY as COPY } from '@/declarations/lives/teamChat'
+import { TEAM_CHAT_COPY as COPY, TEAM_CHAT_SCOPES } from '@/declarations/lives/teamChat'
 import { MODVIEW_TEAM_CHAT as STYLES } from '@/declarations/ui/variants'
 
 export interface TeamChatEntryProps {
@@ -13,6 +14,7 @@ export interface TeamChatEntryProps {
   seats: MentionSeats
   isOpen: boolean
   onToggle: () => void
+  isLocked?: boolean
 }
 
 /**
@@ -27,14 +29,19 @@ export const TeamChatEntry = ({
   seats,
   isOpen,
   onToggle,
+  isLocked = false,
 }: TeamChatEntryProps) => {
-  const { chat, hasUnread, bubble, dismiss } = useTeamChatAlerts({
+  const me = seats.members.find((member) => member.id === viewerId)
+  const scopes = TEAM_CHAT_SCOPES.filter((scope) => canSeeScope(me, scope))
+  const { chat, hasUnread, bubble, mention, dismiss } = useTeamChatAlerts({
     liveId,
     viewerId,
     seats,
     isOpen,
+    scopes,
   })
   const author = seats.members.find((member) => member.id === bubble?.authorId)
+  const caller = seats.members.find((member) => member.id === mention?.authorId)
 
   return (
     <PanelButton
@@ -45,6 +52,9 @@ export const TeamChatEntry = ({
       anchor="top"
       isWide
       hasUnread={hasUnread}
+      hint={
+        mention ? COPY.mentionedTip.replace('{author}', caller?.name ?? COPY.unknown) : undefined
+      }
       floating={
         bubble && (
           <button
@@ -63,7 +73,13 @@ export const TeamChatEntry = ({
         )
       }
     >
-      <TeamChatPanel chat={chat} viewerId={viewerId} seats={seats} />
+      <TeamChatPanel
+        chat={chat}
+        viewerId={viewerId}
+        seats={seats}
+        scopes={scopes}
+        isLocked={isLocked}
+      />
     </PanelButton>
   )
 }

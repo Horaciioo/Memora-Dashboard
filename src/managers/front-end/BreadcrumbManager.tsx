@@ -13,7 +13,24 @@ import type { ReactNode } from 'react'
 interface BreadcrumbContextValue {
   overrides: Record<string, string>
   setLabel: (href: string, label: string) => void
+  tabs: BreadcrumbTabs
+  setTab: (href: string, strip: string, tab: RememberedTab) => void
 }
+
+/**
+ * Tab left open on a page
+ * @typedef {Object} RememberedTab
+ * @property {string} value - Tab identifier
+ * @property {string} label - Tab display label
+ */
+
+export interface RememberedTab {
+  value: string
+  label: string
+}
+
+// Open tab per strip, per page path
+export type BreadcrumbTabs = Record<string, Record<string, RememberedTab>>
 
 const BreadcrumbContext = createContext<BreadcrumbContextValue | null>(null)
 
@@ -31,9 +48,20 @@ export const BreadcrumbProvider = ({ children }: { children: ReactNode }) => {
     setOverrides((current) => (current[href] === label ? current : { ...current, [href]: label }))
   }, [])
 
+  const [tabs, setTabs] = useState<BreadcrumbTabs>({})
+
+  const setTab = useCallback((href: string, strip: string, tab: RememberedTab) => {
+    setTabs((current) => {
+      const known = current[href]?.[strip]
+      if (known?.value === tab.value && known.label === tab.label) return current
+
+      return { ...current, [href]: { ...current[href], [strip]: tab } }
+    })
+  }, [])
+
   const value = useMemo<BreadcrumbContextValue>(
-    () => ({ overrides, setLabel }),
-    [overrides, setLabel]
+    () => ({ overrides, setLabel, tabs, setTab }),
+    [overrides, setLabel, tabs, setTab]
   )
 
   return <BreadcrumbContext.Provider value={value}>{children}</BreadcrumbContext.Provider>
@@ -61,4 +89,30 @@ export const useBreadcrumbLabel = (href: string, label: string | undefined): voi
   useEffect(() => {
     if (label && setLabel) setLabel(href, label)
   }, [href, label, setLabel])
+}
+
+/**
+ * Use remembered tabs
+ * @return {BreadcrumbTabs} - Open tabs by page path
+ */
+
+export const useBreadcrumbTabs = (): BreadcrumbTabs => useContext(BreadcrumbContext)?.tabs ?? {}
+
+/**
+ * Use tab memory
+ * @param {string} href - Page path
+ * @param {string} strip - Tab strip name
+ * @return {{ remembered: string | undefined, remember: (tab: RememberedTab) => void }} - Memory handle
+ */
+
+export const useTabMemory = (href: string, strip: string) => {
+  const context = useContext(BreadcrumbContext)
+  const setTab = context?.setTab
+
+  const remember = useCallback(
+    (tab: RememberedTab) => setTab?.(href, strip, tab),
+    [href, strip, setTab]
+  )
+
+  return { remembered: context?.tabs[href]?.[strip]?.value, remember }
 }

@@ -104,6 +104,8 @@ export const BANNER_SCENES: Record<string, BannerScene> = {
 export const BANNER_ROUTES: readonly { prefix: string; scene: string }[] = [
   { prefix: '/dashboard', scene: 'home' },
   { prefix: '/absences', scene: 'absences' },
+  { prefix: '/management/absences', scene: 'absences' },
+  { prefix: '/management', scene: 'people' },
   { prefix: '/calendar', scene: 'calendar' },
   { prefix: '/trainings', scene: 'formations' },
   { prefix: '/academy', scene: 'academy' },

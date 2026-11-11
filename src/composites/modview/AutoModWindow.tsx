@@ -1,13 +1,15 @@
 'use client'
 
 import { DotMark } from '@/components/elements/display/Dotted'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
+import { PersonalLine } from '@/composites/modview/PersonalLine'
 import { WatchPanel } from '@/composites/modview/WatchPanel'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
+import { personalLines } from '@/core/lib/modview/personal'
 import { useGlideBox } from '@/core/hooks/interaction/layout/useGlideBox'
 import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
 import type { Watchlist } from '@/core/hooks/interaction/state/moderation/useWatchlist'
@@ -15,7 +17,7 @@ import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
 import { MODVIEW_FEED, MODVIEW_SUGGEST, MODVIEW_TABS } from '@/declarations/ui/variants'
-import type { Chatter, HeldMessage, ModAct } from '@/types/modview'
+import type { ChatMessage, Chatter, HeldMessage, ModAct } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { chatColour } from '@/utils/format/chatColour'
 import { formatSince } from '@/utils/format/time/dates'
@@ -23,8 +25,13 @@ import { formatSince } from '@/utils/format/time/dates'
 // Resolved lines kept under the queue
 const MAX_RESOLVED = 50
 
+// Lines of personal badwords kept in the queue
+const MAX_PERSONAL = 50
+
 export interface AutoModWindowProps {
   held: HeldMessage[]
+  // Chat lines, read for the moderator's own badwords
+  messages: ChatMessage[]
   // Acts of the team, where the handled messages are read
   acts: ModAct[]
   isLit: boolean
@@ -50,6 +57,7 @@ type AutoModTab = 'queue' | 'watch'
 
 export const AutoModWindow = ({
   held,
+  messages,
   acts,
   isLit,
   gate,
@@ -61,6 +69,7 @@ export const AutoModWindow = ({
   colourOf,
 }: AutoModWindowProps) => {
   const [choice, setChoice] = useState<AutoModTab>('queue')
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set())
   const { preferences, update } = useModPreferences()
   const tab: AutoModTab = hasQueue && (choice === 'queue' || hasWatch) ? choice : 'watch'
 
@@ -89,9 +98,22 @@ export const AutoModWindow = ({
         .filter((act) => act.kind === 'automodApprove' || act.kind === 'automodDeny')
         .slice(0, MAX_RESOLVED)
     : []
+  const personal = useMemo(
+    () => personalLines(messages, preferences.badwords, MAX_PERSONAL),
+    [messages, preferences.badwords]
+  )
   const rows = [
-    ...held.map((entry) => ({ key: entry.id, at: entry.at, held: entry, act: null })),
-    ...resolved.map((act) => ({ key: act.id, at: act.at, held: null, act })),
+    ...held.map((entry) => ({ key: entry.id, at: entry.at, held: entry, act: null, line: null })),
+    ...resolved.map((act) => ({ key: act.id, at: act.at, held: null, act, line: null })),
+    ...personal
+      .filter((line) => !dismissed.has(line.message.id))
+      .map((line) => ({
+        key: line.message.id,
+        at: line.message.sentAt,
+        held: null,
+        act: null,
+        line,
+      })),
   ].sort((left, right) => Date.parse(right.at) - Date.parse(left.at))
 
   const { listRef, boxRef } = useGlideBox<HTMLSpanElement>(`${tab}:${tabs.length}`)
@@ -160,6 +182,17 @@ export const AutoModWindow = ({
         <ul className={MODVIEW_FEED.list}>
           {rows.map((row) => {
             const entry = row.held
+            if (row.line) {
+              return (
+                <PersonalLine
+                  key={row.key}
+                  line={row.line}
+                  onPick={onPick}
+                  onWatch={watchlist.watch}
+                  onDismiss={(id) => setDismissed((current) => new Set([...current, id]))}
+                />
+              )
+            }
             if (!entry) {
               return (
                 <ResolvedLine

@@ -5,8 +5,10 @@ import { Fragment, useState } from 'react'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
+import { WatchedTermsDrawer } from '@/composites/modview/WatchedTermsDrawer'
 import { TermsDrawer } from '@/composites/modview/TermsDrawer'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
+import { MODVIEW_PERSONAL_COPY } from '@/declarations/modview/personal'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import {
   CHAT_MODES,
@@ -65,6 +67,7 @@ const isOn = (modes: ModViewState['modes'], mode: ChatModeName): boolean =>
 export const ChatModesMenu = ({ state, gate, onAct, hasTerms }: ChatModesMenuProps) => {
   const OpenIcon = ICONS.next
   const [terms, setTerms] = useState<'blocked' | 'allowed' | null>(null)
+  const [isWatchedOpen, setWatchedOpen] = useState(false)
   // Validation then over-validation before the shield starts
   const [shieldStep, setShieldStep] = useState<0 | 1 | 2>(0)
 
@@ -158,6 +161,17 @@ export const ChatModesMenu = ({ state, gate, onAct, hasTerms }: ChatModesMenuPro
           )
         })}
 
+      <button
+        type="button"
+        className={MODVIEW_MODES.row}
+        aria-pressed={isWatchedOpen}
+        onClick={() => setWatchedOpen(!isWatchedOpen)}
+      >
+        <ICONS.visible className={MODVIEW_MODES.rowIcon} aria-hidden="true" />
+        <span className={MODVIEW_MODES.rowLabel}>{MODVIEW_PERSONAL_COPY.watchedTerms}</span>
+        <OpenIcon className={MODVIEW_MODES.rowIcon} aria-hidden="true" />
+      </button>
+
       <ConfirmDialog
         open={shieldStep === 1}
         title={MODVIEW_COPY.shieldAsk}
@@ -178,6 +192,8 @@ export const ChatModesMenu = ({ state, gate, onAct, hasTerms }: ChatModesMenuPro
         }}
         onCancel={() => setShieldStep(0)}
       />
+
+      {isWatchedOpen && <WatchedTermsDrawer onClose={() => setWatchedOpen(false)} />}
 
       {terms && (
         <TermsDrawer

@@ -10,9 +10,7 @@ import { CreatorAccountMenu } from '@/composites/shell/creator/CreatorAccountMen
 import { CreatorPickerButton, CreatorViewPanel } from '@/composites/shell/creator/CreatorSelect'
 import { CreatorSwitch } from '@/composites/shell/creator/CreatorSwitch'
 import { RailDeadlineBubbles } from '@/composites/shell/rail/RailDeadlineBubbles'
-import { RailNav } from '@/composites/shell/rail/RailNav'
-import { RailSectionSwitch } from '@/composites/shell/rail/RailSectionSwitch'
-import type { RailSection } from '@/composites/shell/rail/RailSectionSwitch'
+import { RailNav, type RailSection } from '@/composites/shell/rail/RailNav'
 import { RailSlides } from '@/composites/shell/rail/RailSlides'
 import { SimulationBanner } from '@/composites/shell/SimulationBanner'
 import { RailToolbar } from '@/composites/shell/rail/RailToolbar'
@@ -25,7 +23,6 @@ import { usePendingNotice } from '@/core/store/play/playNotices'
 import { useCalendarRail } from '@/core/hooks/interaction/calendar/useCalendarRail'
 import { useCalendarRailView } from '@/core/hooks/interaction/calendar/useCalendarRailView'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
-import { canOwnPages } from '@/core/lib/pages'
 import { useCourseRail } from '@/core/hooks/interaction/scenes/useCourseRail'
 import { useRailCompact } from '@/core/hooks/interaction/layout/rail/useRailCompact'
 import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
@@ -69,10 +66,16 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   const calendarRail = useCalendarRail()
   const [calendarView, chooseCalendarView] = useCalendarRailView()
   const [isRailCompact, toggleRailCompact] = useRailCompact()
-  // A private page opens on its own tab
+  // A private page opens the private pages in the rail
   const [section, setSection] = useState<RailSection>(
     pathname.startsWith(ROUTES.pages) ? 'private' : 'normal'
   )
+  const [lastPath, setLastPath] = useState(pathname)
+
+  if (lastPath !== pathname) {
+    setLastPath(pathname)
+    if (pathname.startsWith(ROUTES.pages)) setSection('private')
+  }
 
   // A lone creator sits on top
   const hasCreators = viewContext.creators.length === 1
@@ -85,9 +88,8 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   const isCalendarMenu =
     Boolean(calendarRail) && calendarView === 'calendar' && !isPointing && !isCompact
 
-  // Members without pages and the visit keep both, shared pages on top
-  const hasSections =
-    canOwnPages(session) && !isCompact && !courseRail && !isCalendarMenu && !isTouring
+  // The visit and a folded rail keep the destinations
+  const isPrivate = section === 'private' && !isCompact && !courseRail && !isTouring
 
   // Windows and panels read the rail width from the body
   useEffect(() => {
@@ -122,7 +124,9 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
       isTouring={isTouring}
       live={viewContext.live}
       mentions={viewContext.mentions}
-      section={hasSections ? section : undefined}
+      section={isPrivate ? 'private' : 'normal'}
+      onOpenPrivate={() => setSection('private')}
+      onBack={() => setSection('normal')}
     />
   )
 
@@ -164,9 +168,6 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
           />
         </div>
       )}
-
-      {hasSections && <RailSectionSwitch value={section} onChange={setSection} />}
-      {hasSections && !courseRail && <div className={LEFT_SIDEBAR.viewDivider} />}
 
       {isCalendarMenu && calendarRail && (
         <div className={LEFT_SIDEBAR.searchRow}>

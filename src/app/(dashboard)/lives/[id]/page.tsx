@@ -7,7 +7,7 @@ import { activeCoordinatorIds } from '@/core/lib/lives/coordination'
 import { focusableMembers } from '@/core/services/lives/FocusService'
 import { readPanelMemory } from '@/core/services/lives/LiveInsightService'
 import { readLive } from '@/core/services/lives/LiveService'
-import { channelAccess } from '@/core/services/lives/ModViewService'
+import { channelAccess, listModViewCreators } from '@/core/services/lives/ModViewService'
 import { listLevels, readCurrentState } from '@/core/services/livecon/LiveconService'
 import { readPanel } from '@/core/services/sanctions/SanctionService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -60,8 +60,8 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
 
   const live = await readLive(id, perimeter, session.id, session.permissions)
 
-  // Too early or over: nothing to enter
-  if (live.access !== 'open') {
+  // Closed lives stay unavailable
+  if (live.access === 'over') {
     return (
       <div className={MODVIEW_PAGE.wrapper}>
         <h1 className={MODVIEW_PAGE.title}>{`${LIVE_COPY.title}, ${live.youtuber.name}`}</h1>
@@ -82,7 +82,11 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
   }
 
   // Panel of the creator at the level in force
-  const [levels, state] = await Promise.all([listLevels(), readCurrentState(perimeter)])
+  const [levels, state, creators] = await Promise.all([
+    listLevels(),
+    readCurrentState(perimeter),
+    listModViewCreators(perimeter),
+  ])
   const creatorLevel = levelOfCreator(state, live.youtuber.id)?.level ?? levels[0] ?? null
   const inForce = creatorLevel?.id ?? null
   const panel = await readPanel(
@@ -106,6 +110,7 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
       <LiveGate live={live} canEdit={canEdit}>
         <LiveModView
           live={live}
+          creators={creators}
           panel={panel}
           fallbackLevel={creatorLevel ? { name: creatorLevel.name, icon: creatorLevel.icon } : null}
           tools={{

@@ -1,6 +1,6 @@
 'use client'
 
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { ChatComposer } from '@/composites/modview/ChatComposer'
@@ -12,10 +12,12 @@ import { PollBar } from '@/composites/modview/PollBar'
 import { PreferenceChoices } from '@/composites/modview/PreferenceChoices'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { useLiveEmotes } from '@/core/hooks/data/lives/useLiveEmotes'
+import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { useChatPause } from '@/core/hooks/interaction/state/moderation/useChatPause'
 import { useHoldKey } from '@/core/hooks/interaction/state/useHoldKey'
 import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
 import { recentChatters } from '@/core/lib/modview/compose'
+import { repeatCounts } from '@/core/lib/modview/duplicates'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import {
   CHAT_MODES,
@@ -87,6 +89,10 @@ export const ChatWindow = ({
   const modesRef = useRef<HTMLButtonElement>(null)
   const optionsRef = useRef<HTMLButtonElement>(null)
   const { preferences, update } = useModPreferences()
+  // A pointer elsewhere folds the menu, its drawers and dialogs excepted
+  const menuBounds = useMemo(() => [menusRef, modesRef, optionsRef], [])
+  const foldMenu = useCallback(() => setMenu(null), [])
+  useOutsideDismiss(menu !== null, menuBounds, foldMenu, '[role="dialog"], [aria-modal="true"]')
   const { emotes } = useLiveEmotes(liveId)
 
   // A scene drives the menu over the reader
@@ -106,6 +112,10 @@ export const ChatWindow = ({
     [lines, shown.hideBots]
   )
   const chatters = useMemo(() => recentChatters(state.messages), [state.messages])
+  const repeats = useMemo(
+    () => repeatCounts(state.messages, preferences.repeatWords),
+    [state.messages, preferences.repeatWords]
+  )
 
   // Caret of the open menu points at its own title
   useLayoutEffect(() => {
@@ -138,20 +148,6 @@ export const ChatWindow = ({
             onClick={() => setMenu(menu === 'modes' ? null : 'modes')}
           >
             {`${MODVIEW_COPY.modes} (${activeModes})`}
-          </button>
-          <button
-            ref={optionsRef}
-            type="button"
-            className={cn(
-              MODVIEW_MODES.trigger,
-              spotlight === 'chatOptions' && MODVIEW_CHAT.triggerLit
-            )}
-            aria-expanded={openMenu === 'options'}
-            onClick={() =>
-              onSettings ? onSettings() : setMenu(menu === 'options' ? null : 'options')
-            }
-          >
-            {MODVIEW_COPY.preferences}
           </button>
         </>
       }
@@ -220,6 +216,7 @@ export const ChatWindow = ({
               toolsPosition={preferences.toolsPosition}
               actions={preferences.actions}
               confirmHarsh={preferences.confirmHarsh}
+              repeat={repeats.get(message.id)}
               roster={state.roster}
               emblems={state.emblems}
               gate={gate}

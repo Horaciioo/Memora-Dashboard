@@ -62,8 +62,8 @@ export const LIVE_REPORT_COPY = {
   creatorKicker: 'Le bilan de ton live',
   teamHeading: 'Bilan de {name} du {day}',
   creatorHeading: 'Bilan créateur de {name} du {day}',
-  open: 'Bilan',
-  openCreator: 'Bilan {name}',
+  open: 'Bilan Mod.',
+  openCreator: 'Bilan Créa.',
   pastTitle: 'Lives passés',
   pastEmpty: 'Aucun live terminé pour l’instant.',
   unavailable:

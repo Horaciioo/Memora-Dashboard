@@ -254,6 +254,56 @@
   transform-origin: center;
 }
 
+/* Wave leaving a button outline, grows by the same distance on every side */
+@keyframes mod-wave {
+  0% {
+    opacity: 0.7;
+    inset: 0;
+  }
+
+  40%,
+  100% {
+    opacity: 0;
+    inset: -0.875rem;
+  }
+}
+
+.mod-wave {
+  opacity: 0;
+  animation: mod-wave 6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mod-wave {
+    display: none;
+  }
+}
+
+/* Slow wave leaving a portrait on air */
+@keyframes live-ring-wave {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+.live-ring-wave {
+  border: 2px solid var(--color-live-400);
+  animation: live-ring-wave 3s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-ring-wave {
+    display: none;
+  }
+}
+
 /* Label of a live destination glowing softly */
 @keyframes live-glow {
   0%,
@@ -559,7 +609,7 @@
 
 @keyframes push-orb-ring {
   from {
-    opacity: 0.55;
+    opacity: 0.7;
     transform: scale(1);
   }
   to {
@@ -712,4 +762,104 @@
 
 .hub-fade {
   animation: hub-fade var(--motion-duration-slow) ease-out both;
+}
+
+/* Timeline of lives: open chevron beside the rule, pointing at the date */
+.history-arrow {
+  background: var(--color-brand-600);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 5l7 7-7 7' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/* Rule draws down, boxes appear one by one */
+@keyframes history-card {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes history-draw {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+.history-list::before {
+  clip-path: inset(0 0 100% 0);
+}
+
+.history-list > li {
+  opacity: 0;
+  animation-delay: calc(var(--history-i, 0) * 0.25s);
+}
+
+.history-list > li:nth-child(2) {
+  --history-i: 1;
+}
+
+.history-list > li:nth-child(3) {
+  --history-i: 2;
+}
+
+.history-list > li:nth-child(4) {
+  --history-i: 3;
+}
+
+.history-list > li:nth-child(5) {
+  --history-i: 4;
+}
+
+.history-list > li:nth-child(6) {
+  --history-i: 5;
+}
+
+.history-list[data-shown]::before {
+  animation: history-draw 1.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.history-list[data-shown] > li {
+  animation-name: history-card;
+  animation-duration: 0.6s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-list::before,
+  .history-list > li,
+  .history-list[data-shown]::before,
+  .history-list[data-shown] > li {
+    opacity: 1;
+    clip-path: none;
+    animation: none;
+  }
+}
+
+@keyframes creator-stack-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.creator-stack-enter {
+  animation: creator-stack-enter var(--motion-duration-panel) var(--motion-ease-spring) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .creator-stack-enter {
+    animation: none;
+  }
 }

@@ -1,5 +1,6 @@
 export * from './AdminStateService'
 export * from './DepartureService'
+export * from './DerankService'
 export * from './FreezeService'
 export * from './SuspensionService'
 export * from './actor'

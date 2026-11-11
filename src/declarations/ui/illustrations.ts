@@ -1,6 +1,7 @@
 import {
   AbsencesIllustration,
   AcademyIllustration,
+  ChatIllustration,
   EmptyBoxIllustration,
   LiveconIllustration,
   MeetingsIllustration,
@@ -35,6 +36,7 @@ export const ILLUSTRATIONS = {
   teams: TeamsIllustration,
   projects: ProjectsIllustration,
   tasks: TasksIllustration,
+  chat: ChatIllustration,
   meetings: MeetingsIllustration,
   absences: AbsencesIllustration,
   livecon: LiveconIllustration,

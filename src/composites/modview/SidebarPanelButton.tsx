@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 
+import { Tip } from '@/components/elements/feedback/Tip'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_SIDEBAR, MODVIEW_TEAM_CHAT } from '@/declarations/ui/variants'
@@ -22,6 +23,8 @@ export interface PanelButtonProps {
   action?: ReactNode
   // Point on the glyph, something waits
   hasUnread?: boolean
+  // Tooltip replacing the label
+  hint?: string
   // Bubble hanging beside the glyph
   floating?: ReactNode
   children: ReactNode
@@ -43,24 +46,35 @@ export const PanelButton = ({
   tone,
   action,
   hasUnread,
+  hint,
   floating,
   children,
 }: PanelButtonProps) => {
   const Icon = ICONS[icon]
 
+  const trigger = (
+    <button
+      type="button"
+      className={cn(MODVIEW_SIDEBAR.button, isOpen && MODVIEW_SIDEBAR.buttonOpen)}
+      aria-label={label}
+      title={hint && !isOpen ? undefined : label}
+      aria-haspopup="true"
+      aria-expanded={isOpen}
+      onClick={onToggle}
+    >
+      <Icon className={cn(MODVIEW_SIDEBAR.icon, tone)} aria-hidden="true" />
+    </button>
+  )
+
   return (
     <div className={MODVIEW_SIDEBAR.group}>
-      <button
-        type="button"
-        className={cn(MODVIEW_SIDEBAR.button, isOpen && MODVIEW_SIDEBAR.buttonOpen)}
-        aria-label={label}
-        title={label}
-        aria-haspopup="true"
-        aria-expanded={isOpen}
-        onClick={onToggle}
-      >
-        <Icon className={cn(MODVIEW_SIDEBAR.icon, tone)} aria-hidden="true" />
-      </button>
+      {hint && !isOpen ? (
+        <Tip label={hint} floating>
+          {trigger}
+        </Tip>
+      ) : (
+        trigger
+      )}
 
       {hasUnread && !isOpen && <span className={MODVIEW_TEAM_CHAT.unread} aria-hidden="true" />}
 

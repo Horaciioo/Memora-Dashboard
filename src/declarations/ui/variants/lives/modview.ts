@@ -134,12 +134,16 @@ export const MODVIEW_FEED = {
   main: 'flex min-w-0 flex-1 flex-col gap-0.5 text-sm',
   target: 'w-fit font-bold underline underline-offset-2 hover:text-[var(--color-brand-800)]',
   line: 'text-[var(--color-ink-subtle)]',
-  repeat: 'ml-1.5 text-xs font-bold text-[var(--color-danger)] tabular-nums',
   who: 'font-semibold text-[var(--color-ink)]',
   whoLink: 'cursor-pointer font-semibold text-[var(--color-ink)] hover:underline',
   quote:
     'mt-1 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-2 py-1 text-xs [overflow-wrap:anywhere]',
   flagged: 'rounded-[2px] bg-[var(--twitch-flag)] px-0.5 text-inherit',
+  // Own colour of a personal word, set as --tint
+  tinted:
+    'rounded-[2px] bg-[color-mix(in_srgb,var(--tint)_32%,transparent)] px-0.5 text-inherit underline decoration-[var(--tint)] decoration-2 underline-offset-2',
+  // Text of a shared word, set as --tint
+  inked: 'bg-transparent font-semibold text-[var(--tint)]',
   category: `${PROPERTY_LABEL} text-[var(--color-ink-subtle)]`,
   actions: 'mt-1.5 flex flex-wrap gap-2',
 } as const
@@ -213,8 +217,10 @@ export const MODVIEW_CHAT = {
     'absolute top-0.5 right-2 hidden items-center gap-0.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-0.5 shadow-[var(--shadow-sm)] group-hover:flex group-focus-within:flex',
   // Gestures stuck to the right of the line
   toolsRight: 'float-right ml-2 inline-flex shrink-0 items-center gap-0.5 align-middle',
-  tool: 'flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] opacity-80 hover:bg-[var(--color-hover)] hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-25',
+  tool: 'flex h-5 w-5 items-center justify-center opacity-80 hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-25',
   toolIcon: 'h-4 w-4',
+  // Times a line was said, beside the name
+  repeat: 'ml-1 text-xs font-bold text-[var(--color-warning)] tabular-nums',
   link: 'text-[var(--twitch-lilac)] underline underline-offset-2 hover:text-[var(--twitch-purple)]',
   emote: 'mx-0.5 inline-block h-7 w-auto max-w-none align-middle',
   mention: 'font-bold text-[var(--twitch-lilac)]',
@@ -314,7 +320,15 @@ export const MODVIEW_MODES = {
 
 export const MODVIEW_TERMS = {
   form: 'flex items-center gap-2',
-  list: 'flex flex-wrap gap-2',
+  list: 'flex flex-wrap gap-1.5',
+  hint: 'text-sm text-[var(--color-ink-subtle)]',
+  // One small box per word, as the course boxes
+  item: 'inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] card-surface py-0.5 pr-0.5 pl-2.5 text-sm shadow-[var(--shadow-sm)]',
+  word: 'min-w-0 truncate font-medium',
+  tools: 'flex shrink-0 items-center gap-1.5',
+  remove:
+    'flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  removeIcon: 'h-3 w-3',
 } as const
 
 /**
@@ -403,6 +417,14 @@ export const MODVIEW_USER = {
   preset:
     'rounded-[var(--radius-md)] bg-[var(--twitch-head)] py-2.5 text-center text-xs font-bold transition-colors hover:brightness-125 disabled:cursor-not-allowed disabled:opacity-40',
   actions: 'grid grid-cols-2 gap-2',
+  // Base measure: preset tile
+  measure:
+    'rounded-[var(--radius-md)] px-2 py-2.5 text-center text-xs font-bold transition-colors hover:brightness-125 disabled:cursor-not-allowed disabled:opacity-40',
+  measureOn: 'bg-[var(--color-pick)]',
+  measureNeutral: 'bg-[var(--twitch-head)]',
+  // Warning tile: blue, full width
+  measureWarn:
+    'col-span-2 bg-[color-mix(in_oklab,var(--color-info)_40%,var(--twitch-head))] text-[var(--color-ink)] hover:brightness-110',
   actionWide: 'col-span-2',
   lock: 'text-xs text-[var(--twitch-muted)]',
   // Situation: figures and gestures scroll above, the lists take the rest
@@ -552,6 +574,14 @@ export const MODVIEW_SIDEBAR = {
   end: 'flex size-10 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
   divider: 'h-px w-6 bg-[var(--color-border)]',
   creator: 'flex size-10 items-center justify-center',
+  creatorPicker: 'relative flex size-10 flex-col items-center',
+  creatorButton:
+    'flex size-10 items-center justify-center rounded-full transition-[transform,box-shadow] hover:scale-105 hover:shadow-[var(--shadow-sm)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  creatorChoices:
+    'creator-stack-enter absolute top-full z-20 mt-2 flex flex-col gap-2 rounded-full border border-[var(--color-border)] card-surface p-1.5 shadow-[var(--shadow-md)]',
+  creatorChoice:
+    'flex size-10 items-center justify-center rounded-full transition-[transform,filter] hover:scale-105 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  creatorChoiceInactive: 'grayscale opacity-40 hover:opacity-70',
   // Leave dialog: two full width choices split by a line
   leaveChoices: 'grid w-full grid-cols-1 gap-3 sm:grid-cols-3',
   leaveButton: 'w-full min-w-0',
@@ -566,7 +596,7 @@ export const MODVIEW_SIDEBAR = {
   // Centred on its glyph, the arrow points at it
   // Room for a list with its own controls
   panelNormal: 'w-72',
-  panelWide: 'w-80 !max-h-[88dvh]',
+  panelWide: 'w-[26rem] !max-h-[55dvh]',
   panelTop: 'top-1/2 -translate-y-1/2',
   panelBottom: 'top-1/2 -translate-y-1/2',
   arrow:

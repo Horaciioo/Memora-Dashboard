@@ -10,7 +10,7 @@ export const LIVE_BOARD = {
   list: 'flex flex-col gap-6',
   group: 'flex flex-col gap-4',
   groupTitle: `${PROPERTY_LABEL} px-1`,
-  tiles: 'grid grid-cols-1 gap-6 lg:grid-cols-2',
+  tiles: 'grid grid-cols-1 gap-6',
   dotPulse: 'live-pulse h-3 w-3',
   // Coordinator and times on one line
   facts: 'flex flex-wrap items-center gap-x-6 gap-y-4 border-y border-[var(--color-border)] py-4',
@@ -69,7 +69,7 @@ export const LIVE_TILE = {
   root: 'relative flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]',
   cover: 'relative h-36 shrink-0 overflow-hidden bg-[image:var(--gradient-soft)]',
   coverImage: 'h-full w-full scale-125 object-cover blur-xl saturate-150',
-  body: 'flex flex-1 flex-col gap-5 px-6 pb-6',
+  body: 'flex flex-1 flex-col gap-5 p-5 sm:p-6',
   // Portrait and bubble side by side, straddling the cover edge
   head: 'relative z-10 -mt-28 mb-16 flex items-center gap-4',
   portrait:
@@ -388,12 +388,13 @@ export const LIVE_REPORT = {
   // Past lives on the lives page
   pastWrap: 'mx-auto w-full max-w-7xl',
   past: 'flex flex-col',
-  pastRow:
-    'flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] py-3 first:border-t-0',
-  pastWho: 'flex min-w-0 items-center gap-3',
+  pastRow: 'flex flex-col gap-3 border-t border-[var(--color-border)] py-3 first:border-t-0',
+  pastWho: 'flex w-full min-w-0 items-start gap-3',
+  pastBody: 'flex min-w-0 flex-1 flex-col',
   pastName: 'font-semibold',
   pastMeta: 'text-sm text-[var(--color-ink-subtle)]',
-  pastLinks: 'flex flex-wrap gap-2',
+  pastLinks: 'mt-3 grid w-full grid-flow-col auto-cols-fr gap-2',
+  pastLink: 'w-full text-center',
   // Creator report reads like a letter
   letter: 'mx-auto flex w-full max-w-3xl flex-col gap-8',
   sentence: 'text-lg leading-relaxed',
@@ -434,7 +435,7 @@ export const MEMBER_MODERATION = {
  */
 
 export const LIVE_ROSTER = {
-  root: 'flex w-full flex-col gap-4 border-t border-[var(--color-border)] pt-5',
+  root: 'flex w-full flex-col gap-4',
   head: 'flex flex-wrap items-baseline justify-between gap-2',
   title: PROPERTY_LABEL,
   columns: 'grid grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-3',
@@ -446,11 +447,27 @@ export const LIVE_ROSTER = {
   columnEmpty: 'text-xs text-[var(--color-ink-subtle)] italic',
   person:
     'flex w-full min-w-0 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2 py-1.5 text-sm font-semibold',
+  personPrivate: 'justify-center p-1.5',
+  personAvatar: 'ring-2 ring-[var(--color-surface-raised)]',
   name: 'min-w-0 truncate',
   personMovable: 'cursor-grab active:cursor-grabbing',
   personDragged: 'opacity-40',
   junior: 'ml-auto text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   toggle: 'self-start',
+} as const
+
+/**
+ * Planned live workspace
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_PREPARATION = {
+  root: 'flex flex-col gap-4',
+  grid: 'grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.45fr)_minmax(0,1fr)]',
+  card: 'flex min-w-0 flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',
+  title: PROPERTY_LABEL,
+  instructions: 'min-h-36 text-sm leading-relaxed',
+  instructionsEmpty: 'text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
 /**
@@ -463,17 +480,37 @@ export const LIVE_GATE = {
   head: 'flex flex-col gap-1',
   title: 'text-2xl font-bold tracking-tight',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
-  // Facts on the left, divider, instructions on the right
-  body: 'grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,18rem)_auto_minmax(0,1fr)]',
+  body: 'mx-auto flex w-full max-w-2xl flex-col gap-6',
+  stepper: 'flex items-center gap-2 border-b border-[var(--color-border)] pb-4',
+  step: 'flex shrink-0 items-center gap-2 rounded-full border-2 border-transparent py-0.5 pr-3 pl-0.5 text-xs font-semibold text-[var(--color-ink-subtle)]',
+  // Outline around the current step
+  stepActive: 'border-[var(--color-ink)] text-[var(--color-ink)]',
+  // Past step struck through
+  stepDone: 'text-[var(--color-ink-subtle)] line-through',
+  stepNumber:
+    'flex size-6 shrink-0 items-center justify-center rounded-full border border-current text-xs font-bold',
+  stepNumberDone: 'border-transparent bg-[var(--color-success)] text-[var(--color-on-solid)]',
+  stepGlyph: 'size-3.5',
+  stepName: 'whitespace-nowrap',
+  stepLine: 'h-px min-w-4 flex-1 bg-[var(--color-border-strong)]',
+  stepLineDone: 'bg-[var(--color-success)]',
+  heading: 'text-section font-bold tracking-tight text-[var(--color-ink)]',
   side: 'flex min-w-0 flex-col gap-6',
+  // Two boxes in one row
+  pair: 'grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2',
   group: 'flex min-w-0 flex-col gap-3',
   label: PROPERTY_LABEL,
-  people: 'flex flex-col gap-3',
-  person: 'flex min-w-0 items-center gap-3 text-sm font-semibold',
-  personName: 'min-w-0 truncate',
-  personText: 'flex min-w-0 flex-col',
+  people: 'flex items-center -space-x-2',
+  // Moderators then Juniors on one line
+  split: 'flex items-center gap-3',
+  // Thin line, as tall as a portrait
+  splitLine: 'h-10 w-px shrink-0 bg-[var(--color-border-strong)]',
+  portrait: 'ring-2 ring-[var(--color-surface-raised)]',
+  // Inner box, one per group
+  groupBox:
+    'flex min-w-0 flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-md)]',
   creator: 'text-xl leading-tight font-bold tracking-tight',
-  divider: 'h-px w-full bg-[var(--color-border)] md:h-auto md:w-px',
+  divider: 'h-px w-full bg-[var(--color-border)]',
   instructions: 'flex min-w-0 flex-col gap-3',
   // Only the text of the instructions, shadowed like a course box
   instructionsBox:
@@ -490,7 +527,7 @@ export const LIVE_GATE = {
   choiceTag: 'mt-1 block text-xs font-semibold opacity-90',
   // Centered box: drawn figure with its check, the sentence, then the edit button
   answeredBlock:
-    'mx-auto mt-6 flex w-full max-w-md flex-col items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-6 py-6 text-center',
+    'mx-auto mt-6 flex w-full max-w-md flex-col items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface px-6 py-6 text-center shadow-[var(--shadow-md)]',
   answeredFigure: 'relative inline-flex',
   answered: 'text-sm',
   answeredGlyph: 'size-14',
@@ -499,6 +536,7 @@ export const LIVE_GATE = {
   choiceMuted: 'opacity-50',
   choiceOn:
     'ring-2 ring-[var(--color-ink)] ring-offset-2 ring-offset-[var(--color-surface-raised)]',
+  footer: 'flex justify-end border-t border-[var(--color-border)] pt-5',
 } as const
 
 /**

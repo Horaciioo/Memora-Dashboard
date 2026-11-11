@@ -45,7 +45,7 @@ import { MODVIEW_WINDOWS } from '@/declarations/modview/registries'
 import type { ModViewProfileName } from '@/declarations/modview/profiles'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_FRAME, MODVIEW_SPOTLIGHT, MODVIEW_WORKSPACE } from '@/declarations/ui/variants'
-import type { LivePerson } from '@/types/lives'
+import type { LivePerson, ModViewCreator } from '@/types/lives'
 import type {
   ActContext,
   ModViewDriver,
@@ -101,6 +101,8 @@ export interface ModViewLiveTools {
 
 export interface ModViewProps {
   driver: ModViewDriver
+  // Everything shown, nothing playable: no live on air
+  watchOnly?: boolean
   permissions: PermissionName[]
   panel: SanctionPanelView | null
   levelName: string | null
@@ -113,6 +115,8 @@ export interface ModViewProps {
   only?: ModViewWindow[]
   // A real live
   live?: ModViewLiveTools
+  // Other creator workspaces
+  creators?: ModViewCreator[]
   // Seat the arrangement is made for, read from the permissions when absent
   profile?: ModViewProfileName
   // Brings the live instructions back
@@ -126,7 +130,8 @@ export interface ModViewProps {
  */
 
 export const ModView = ({
-  driver,
+  driver: liveDriver,
+  watchOnly = false,
   permissions,
   panel,
   levelName,
@@ -135,9 +140,20 @@ export const ModView = ({
   showcase = false,
   only,
   live,
+  creators,
   profile,
   onReread,
 }: ModViewProps) => {
+  const driver = useMemo(
+    () =>
+      watchOnly
+        ? {
+            ...liveDriver,
+            state: { ...liveDriver.state, readOnly: true, notice: MODVIEW_COPY.watchOnly },
+          }
+        : liveDriver,
+    [liveDriver, watchOnly]
+  )
   const { state, spotlight } = driver
   const isWorkspace = !embedded && !showcase && !only
   const side = useSideWidth()
@@ -218,8 +234,8 @@ export const ModView = ({
     ? {
         members: live.members.filter((member) => member.id !== live.viewerId),
         canInspect,
-        hasFocusRight: canFocus,
-        canFocus: (accountId) => canFocus && live.focusable.includes(accountId),
+        hasFocusRight: canFocus && !watchOnly,
+        canFocus: (accountId) => !watchOnly && canFocus && live.focusable.includes(accountId),
         followingId: following?.targetId ?? null,
         onFocus: (accountId) => void focus.start(accountId),
         onStopFocus: () => {
@@ -290,6 +306,7 @@ export const ModView = ({
         return (
           <AutoModWindow
             held={state.held}
+            messages={state.messages}
             acts={state.acts}
             isLit={lit('automod')}
             gate={gate}
@@ -445,9 +462,10 @@ export const ModView = ({
                     live.members.find((member) => member.id === live.viewerId)?.rank,
                     live.coordinatorIds.includes(live.viewerId)
                   ),
-                  canReinforce: permissions.includes(Permissions.LiveAnnounce),
+                  canReinforce: !watchOnly && permissions.includes(Permissions.LiveAnnounce),
                   chat: {
                     viewerId: live.viewerId,
+                    isLocked: watchOnly,
                     seats: {
                       members: live.members,
                       coordinatorIds: live.coordinatorIds,
@@ -458,8 +476,9 @@ export const ModView = ({
               : undefined
           }
           leaveLiveId={live?.id}
-          endLiveId={live?.canEnd ? live.id : undefined}
+          endLiveId={live?.canEnd && !watchOnly ? live.id : undefined}
           creator={{ name: state.channel.name, avatar: state.channel.avatar }}
+          creators={creators}
           viewer={live?.members.find((member) => member.id === live.viewerId)}
           unban={
             state.platform === LivePlatforms.Twitch

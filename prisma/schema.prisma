@@ -332,6 +332,7 @@ model Account {
   sessions              Session[]
   pushSubscriptions     PushSubscription[]
   modViewPreferences    ModViewPreference[]
+  sharedWordsAdded      ModSharedWord[]
   pushDeliveries        PushDelivery[]
   discordToken          DiscordToken?
   twoFactor             TwoFactorCredential?
@@ -395,6 +396,7 @@ model Account {
   livesAnnounced        Live[]                   @relation("LiveAnnouncer")
   liveCoordinations     LiveCoordination[]
   liveTeamMessages      LiveTeamMessage[]
+  liveTeamReactions     LiveTeamReaction[]
   liveSeats             LiveMember[]
   playSessionsHosted    PlaySession[]            @relation("PlaySessionHost")
   playTournamentsHosted PlayTournament[]         @relation("PlayTournamentHost")
@@ -456,6 +458,13 @@ model DepartureNotice {
   accountId     String
   kind          DepartureKind
   functionName  String
+  // Pieces kept for merging announcements, the account is anonymised
+  username      String?
+  discordId     String?
+  // Integration period not validated, empty outside the academy
+  period        String?
+  // Result of a merge or folded into one
+  mergedAt      DateTime?
   body          String
   publishedAt   DateTime?
   publishedById String?
@@ -715,6 +724,7 @@ model Youtuber {
   discordIdentifiers  DiscordIdentifier[]
   lives               Live[]
   viewerComments      ViewerComment[]
+  sharedWords         ModSharedWord[]
   chatMessages        LiveChatMessage[]
   chatStats           ViewerChatStat[]
   sanctionOffenses    SanctionOffense[]
@@ -2133,6 +2143,23 @@ model ViewerComment {
   @@map("viewer_comments")
 }
 
+// Watch word the team shares on a channel, shown on the live and sanctioning nothing
+model ModSharedWord {
+  id         String   @id @default(cuid())
+  youtuberId String
+  term       String
+  // Term without accents or case, once per channel
+  termKey    String
+  authorId   String?
+  createdAt  DateTime @default(now())
+
+  youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  author   Account? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@unique([youtuberId, termKey])
+  @@map("mod_shared_words")
+}
+
 // Chat message of a viewer, kept for the dossier
 model LiveChatMessage {
   id             String       @id @default(cuid())
@@ -2168,13 +2195,32 @@ model LiveTeamMessage {
   body      String
   // Mention kinds the author picked
   mentions  String[]
+  // Room it was written in, all or referents
+  scope     String   @default("all")
   createdAt DateTime @default(now())
 
-  live   Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
-  author Account @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  live      Live                 @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  author    Account              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reactions LiveTeamReaction[]
 
   @@index([liveId, createdAt])
   @@map("live_team_messages")
+}
+
+// Emoji a member left on an internal message
+model LiveTeamReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  accountId String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message LiveTeamMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  account Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, accountId, emoji])
+  @@index([messageId])
+  @@map("live_team_reactions")
 }
 
 // What is known of a viewer's chat on one channel

@@ -62,3 +62,16 @@ export const DONE_COURSES = {
   meta: 'truncate text-xs text-[var(--color-ink-subtle)]',
   check: 'size-5 shrink-0 text-[var(--color-success)]',
 } as const
+
+/**
+ * Pick list of the derank dialog
+ * @type {Record<string, string>}
+ */
+
+export const DERANK_PICKER = {
+  list: 'flex max-h-80 flex-col gap-1 overflow-y-auto',
+  row: 'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-left transition-colors hover:bg-[var(--color-hover)]',
+  rowOn: 'bg-[var(--color-surface-sunken)]',
+  name: 'min-w-0 flex-1 truncate text-sm font-bold',
+  mark: 'h-4 w-4 shrink-0 text-[var(--color-danger)]',
+} as const

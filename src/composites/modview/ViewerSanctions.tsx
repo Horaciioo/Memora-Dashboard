@@ -2,17 +2,20 @@
 
 import { useState } from 'react'
 
-import { Button } from '@/components/elements/actions/Button'
 import { Input } from '@/components/elements/forms/inputs/Input'
-import { ModActionTools } from '@/composites/modview/actions/ModActionTools'
+import { useActionRunner } from '@/composites/modview/actions/useActionRunner'
 import { ReasonDialog } from '@/composites/modview/ReasonDialog'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
+import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
+import { actionIntent } from '@/core/lib/modview/actions'
 import { parseDuration } from '@/core/lib/modview/commands'
+import { MODVIEW_BASE_MEASURES } from '@/declarations/modview/actions'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import { TIMEOUT_PRESETS } from '@/declarations/modview/registries'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
 import { MODVIEW_USER } from '@/declarations/ui/variants'
 import type { ChatMessage, Chatter } from '@/types/modview'
+import { cn } from '@/utils/classnames'
 import { formatDuration } from '@/utils/format/modview'
 
 // Sanction waiting for its reason, a null length means a free one
@@ -44,6 +47,9 @@ export const ViewerSanctions = ({
   const [pending, setPending] = useState<Pending | null>(null)
   const [custom, setCustom] = useState('')
   const chatterId = chatter.id
+  const { preferences } = useModPreferences()
+  const { run, dialog } = useActionRunner(onAct, preferences.confirmHarsh)
+  const target = { chatterId, ...(lastLine ? { messageId: lastLine.id } : {}) }
   const moderate = gate({ kind: 'ban', chatterId, reason: null })
   const customSeconds = parseDuration(custom)
   const seconds = pending ? (pending.seconds ?? customSeconds) : null
@@ -59,6 +65,27 @@ export const ViewerSanctions = ({
   const open = (next: Pending) => {
     setCustom('')
     setPending(next)
+  }
+
+  // One base measure as a tile
+  const measure = (id: string, tone: string = MODVIEW_USER.measureNeutral) => {
+    const item = MODVIEW_BASE_MEASURES.find((entry) => entry.id === id)
+    if (!item) return null
+    const intent = actionIntent(item, target)
+    const check = intent ? gate(intent) : null
+    const label = MODVIEW_USER_COPY[item.kind as 'warn' | 'ban' | 'unban']
+
+    return (
+      <button
+        type="button"
+        className={cn(MODVIEW_USER.measure, tone)}
+        disabled={!check?.allowed}
+        title={check?.reason ?? label}
+        onClick={() => run(item, target, chatter.name)}
+      >
+        {label}
+      </button>
+    )
   }
 
   return (
@@ -93,25 +120,26 @@ export const ViewerSanctions = ({
       <div className={MODVIEW_USER.group}>
         <p className={MODVIEW_USER.groupHead}>{MODVIEW_USER_COPY.otherGroup}</p>
         <div className={MODVIEW_USER.actions}>
-          <ModActionTools
-            target={{ chatterId, ...(lastLine ? { messageId: lastLine.id } : {}) }}
-            name={chatter.name}
-            gate={gate}
-            onAct={onAct}
-          />
-          <Button
-            className={MODVIEW_USER.actionWide}
-            variant={isWatched ? 'primary' : 'secondary'}
-            icon="visible"
+          {measure('base-warn', MODVIEW_USER.measureWarn)}
+          <button
+            type="button"
+            className={cn(
+              MODVIEW_USER.measure,
+              MODVIEW_USER.actionWide,
+              isWatched ? MODVIEW_USER.measureOn : MODVIEW_USER.measureNeutral
+            )}
             aria-pressed={isWatched}
             onClick={onWatch}
           >
             {isWatched ? MODVIEW_WATCH_COPY.stop : MODVIEW_WATCH_COPY.start}
-          </Button>
+          </button>
+          {measure('base-ban')}
+          {measure('base-unban')}
         </div>
       </div>
       {!moderate.allowed && <p className={MODVIEW_USER.lock}>{moderate.reason}</p>}
 
+      {dialog}
       {pending && (
         <ReasonDialog
           description={lead}

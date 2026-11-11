@@ -24,7 +24,8 @@ export const academySessionEntries = async ({
   to,
   access,
 }: ProjectionContext): Promise<CalendarEntry[]> => {
-  if (!access.can(Permissions.AcademyRead)) return []
+  // Everyone sees the length, only Academy readers open it
+  const canOpen = access.can(Permissions.AcademyRead)
 
   const rows = await prisma.academySession.findMany({
     where: {
@@ -45,9 +46,9 @@ export const academySessionEntries = async ({
       allDay: true,
       kind: CalendarKinds.Period,
       accent: row.jobFunction.accent,
-      description: row.summary,
+      description: canOpen ? row.summary : null,
       subjectName: null,
-      href: ROUTES.session(row.id),
+      href: canOpen ? ROUTES.session(row.id) : undefined,
     })
   )
 }
@@ -73,7 +74,8 @@ export const academyZoneEntries = async (
   { from, to, access }: ProjectionContext,
   sessionId?: string
 ): Promise<CalendarEntry[]> => {
-  if (!access.can(Permissions.AcademyRead)) return []
+  // Everyone sees the zones, only Academy readers open them
+  const canOpen = access.can(Permissions.AcademyRead)
 
   const rows = await prisma.academySession.findMany({
     where: {
@@ -122,7 +124,7 @@ export const academyZoneEntries = async (
           accent: zone.part === 'period' ? option.tone : null,
           description: null,
           subjectName: null,
-          href: ROUTES.session(row.id),
+          href: canOpen ? ROUTES.session(row.id) : undefined,
         })
       })
     })

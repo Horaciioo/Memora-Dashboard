@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react'
 
 import { actionMenuItems } from '@/composites/modview/actions/actionMenu'
 import type { GateCheck } from '@/composites/modview/types'
-import { actionIntent, actionLabel, inkOn } from '@/core/lib/modview/actions'
+import { actionIntent, actionLabel } from '@/core/lib/modview/actions'
 import type { ActionTarget } from '@/core/lib/modview/actions'
 import { MODVIEW_ACTION_COPY } from '@/declarations/modview/actionCopy'
 import { MODVIEW_ACTION_KINDS, MODVIEW_ACTION_LIMITS } from '@/declarations/modview/actions'
@@ -13,7 +13,6 @@ import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_ACTION } from '@/declarations/ui/variants'
 import { useMenu } from '@/managers/front-end'
 import type { ModActionConfig } from '@/types/modview'
-import { cn } from '@/utils/classnames'
 
 export interface ModActionBarProps {
   actions: ModActionConfig[]
@@ -24,11 +23,10 @@ export interface ModActionBarProps {
   isStatic?: boolean
 }
 
-// Look of one button: filled with the chosen colour, else the tone of its kind
-const styleOf = (action: ModActionConfig): CSSProperties =>
-  action.colour
-    ? { background: action.colour, color: inkOn(action.colour) }
-    : { color: MODVIEW_ACTION_KINDS[action.kind].tone }
+// Ink of one button: the chosen colour, else the tone of its kind
+const styleOf = (action: ModActionConfig): CSSProperties => ({
+  color: action.colour ?? MODVIEW_ACTION_KINDS[action.kind].tone,
+})
 
 /**
  * The moderator's own buttons, the same everywhere a viewer is sanctioned
@@ -57,7 +55,7 @@ export const ModActionBar = ({ actions, target, gate, run, isStatic }: ModAction
           <button
             key={action.id}
             type="button"
-            className={cn(MODVIEW_ACTION.button, action.colour && MODVIEW_ACTION.buttonFilled)}
+            className={MODVIEW_ACTION.button}
             style={styleOf(action)}
             disabled={isStatic ? false : !check?.allowed}
             tabIndex={isStatic ? -1 : undefined}

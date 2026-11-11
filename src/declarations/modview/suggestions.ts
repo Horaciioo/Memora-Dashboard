@@ -2,6 +2,9 @@ import type { SanctionMeasureView } from '@/types/sanctions'
 import { SanctionKinds } from '@/utils/constants/moderation'
 import type { SanctionKindName } from '@/utils/constants/moderation'
 
+// Chatters whose lines are never suggested nor queued
+export const EXEMPT_BADGES = ['broadcaster', 'moderator', 'bot']
+
 // Category used for a flagged chat line
 export const CHAT_FLAG_CATEGORY = 'blocked_term'
 

@@ -17,6 +17,8 @@ export interface ModViewPreviewProps {
   panel: SanctionPanelView | null
   levelNames: Record<string, string>
   actorName: string
+  showControls?: boolean
+  watchOnly?: boolean
 }
 
 /**
@@ -27,7 +29,13 @@ export interface ModViewPreviewProps {
  * @return {JSX.Element}
  */
 
-export const ModViewPreview = ({ panel, levelNames, actorName }: ModViewPreviewProps) => {
+export const ModViewPreview = ({
+  panel,
+  levelNames,
+  actorName,
+  showControls = true,
+  watchOnly = false,
+}: ModViewPreviewProps) => {
   const [seat, setSeat] = useState<PreviewSeat>('MODERATEUR')
   const [level, setLevel] = useState('3')
   const { driver, controls } = useModViewScene(DEMO_SCENE, { actorName })
@@ -40,25 +48,28 @@ export const ModViewPreview = ({ panel, levelNames, actorName }: ModViewPreviewP
 
   return (
     <div className={MODVIEW_PREVIEW.root}>
-      <div className={MODVIEW_PREVIEW.toolbar}>
-        <SegmentedControl
-          label={MODVIEW_PREVIEW_COPY.seat}
-          options={PREVIEW_SEATS}
-          value={seat}
-          onChange={setSeat}
-        />
-        <SegmentedControl
-          label={MODVIEW_PREVIEW_COPY.level}
-          options={PREVIEW_LEVELS}
-          value={level}
-          onChange={setLevel}
-        />
-        <Button variant="secondary" onClick={controls.restart}>
-          {MODVIEW_PREVIEW_COPY.restart}
-        </Button>
-      </div>
+      {showControls && (
+        <div className={MODVIEW_PREVIEW.toolbar}>
+          <SegmentedControl
+            label={MODVIEW_PREVIEW_COPY.seat}
+            options={PREVIEW_SEATS}
+            value={seat}
+            onChange={setSeat}
+          />
+          <SegmentedControl
+            label={MODVIEW_PREVIEW_COPY.level}
+            options={PREVIEW_LEVELS}
+            value={level}
+            onChange={setLevel}
+          />
+          <Button variant="secondary" onClick={controls.restart}>
+            {MODVIEW_PREVIEW_COPY.restart}
+          </Button>
+        </div>
+      )}
       <ModView
         driver={shown}
+        watchOnly={watchOnly}
         permissions={previewPermissions(seat)}
         panel={panel}
         levelName={levelNames[level] ?? null}

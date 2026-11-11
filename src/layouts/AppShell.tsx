@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { WindowFrame } from '@/components/structures/page/WindowFrame'
 import { MobileHold } from '@/components/structures/overlays/MobileHold'
@@ -8,6 +9,7 @@ import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { PlayInviteHost } from '@/composites/play/invites/PlayInviteHost'
 import { AccessSignalListener } from '@/composites/access/AccessSignalListener'
 import { FeatureGate } from '@/composites/features/FeatureGate'
+import { ROUTES } from '@/declarations/navigation'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { TourHost } from '@/composites/tour/TourHost'
@@ -105,6 +107,8 @@ const AppShellFrame = ({
   const { session, can } = useAuthContext()
   const { isClaimed, isBare, setSlot } = useRailSlot()
   const { isOpen } = useFeatures()
+  // The Lives page puts its Mod View button in Memora's corner
+  const isLivesPage = usePathname() === ROUTES.lives
 
   useAutoRefresh()
 
@@ -144,7 +148,9 @@ const AppShellFrame = ({
         )}
         {session && <PwaHost isPushReady={isPushReady} />}
         {session && <NudgeHost />}
-        {session && !isBare && isOpen('assistant') && <AssistantDock viewContext={viewContext} />}
+        {session && !isBare && !isLivesPage && isOpen('assistant') && (
+          <AssistantDock viewContext={viewContext} />
+        )}
         {session && !isBare && can(Permissions.PlayAccess) && isOpen('play.notices') && (
           <PlayInviteHost />
         )}

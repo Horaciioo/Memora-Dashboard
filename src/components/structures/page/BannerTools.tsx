@@ -12,6 +12,8 @@ import { PAGE_STYLES } from '@/declarations/ui/variants'
 export interface BannerToolsProps {
   // Name of the page when the trail holds none
   title: string
+  // Collaborative portraits stay out of personal spaces
+  showPresence?: boolean
   trailingTools?: ReactNode
 }
 
@@ -21,11 +23,12 @@ const subscribeNothing = () => () => {}
 /**
  * Page options and star: in the banner bar, in the top bar of a phone
  * @param {string} title - Page name stand-in for the star
+ * @param {boolean} [showPresence] - Shows collaborative portraits
  * @param {ReactNode} [trailingTools] - Extra controls
  * @return {JSX.Element}
  */
 
-export const BannerTools = ({ title, trailingTools }: BannerToolsProps) => {
+export const BannerTools = ({ title, showPresence = true, trailingTools }: BannerToolsProps) => {
   const isMobile = useIsMobileShell()
   const host = useSyncExternalStore(
     subscribeNothing,
@@ -35,7 +38,7 @@ export const BannerTools = ({ title, trailingTools }: BannerToolsProps) => {
 
   const tools = (
     <div className={PAGE_STYLES.bannerOptions}>
-      <SectionPresence />
+      {showPresence && <SectionPresence />}
       <div id={PAGE_OPTIONS_HOST_ID} className="contents" />
       <FavoriteToggle title={title} />
       {trailingTools}

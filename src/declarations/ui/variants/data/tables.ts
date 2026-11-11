@@ -152,6 +152,8 @@ export const FILTER_STYLES = {
   iconButton:
     'relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-border-strong)] hover:text-[var(--color-ink)]',
   iconButtonActive: 'border-[var(--color-brand-400)] text-[var(--color-ink-accent)]',
+  iconButtonDanger:
+    '!border-transparent !bg-[color-mix(in_srgb,var(--color-danger)_60%,#f4b0b0)] !text-black hover:!border-transparent hover:!text-black',
   glyph: 'h-4 w-4',
   tally:
     'absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-1 text-micro font-bold text-[var(--color-on-brand)] tabular-nums',

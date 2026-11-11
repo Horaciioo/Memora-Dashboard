@@ -41,7 +41,7 @@ export const AttendanceHoursDialog = ({
   return (
     <Dialog
       open
-      size="sm"
+      size="md"
       title={CALENDAR_COPY.hoursTitle}
       description={CALENDAR_COPY.hoursLead}
       onClose={onClose}

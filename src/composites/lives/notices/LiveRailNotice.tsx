@@ -35,12 +35,7 @@ export const LiveRailNotice = ({ live, pointedAt }: LiveRailNoticeProps) => {
   const CloseIcon = ICONS.close
 
   return (
-    <div
-      className={cn(
-        RELEASE_NOTICE.wrap,
-        pointedAt !== undefined && RELEASE_NOTICE.wrapPointed
-      )}
-    >
+    <div className={cn(RELEASE_NOTICE.wrap, pointedAt !== undefined && RELEASE_NOTICE.wrapPointed)}>
       {pointedAt !== undefined && (
         <span
           className={RELEASE_NOTICE.caret}

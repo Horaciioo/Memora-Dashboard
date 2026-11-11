@@ -1,8 +1,10 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useRef } from 'react'
 
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
+import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
 import { useNudgeCycle } from '@/core/hooks/interaction/state/useNudgeCycle'
 import { URGENT_SCENARIO, useAssistantDock } from '@/core/store/assistantDock'
@@ -35,6 +37,8 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
   const { session } = useAuthContext()
   const { shortcuts, groups } = useRailEntries(viewContext)
   const isOpen = greeting !== null
+  const dockRef = useRef<HTMLDivElement>(null)
+  useOutsideDismiss(isOpen, dockRef, close)
   // Creations of the pages the member reaches, this one apart
   const reached = new Map(
     [...shortcuts, ...groups.flatMap((group) => group.items)].map((item) => [item.href, item.icon])
@@ -52,6 +56,7 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
 
   return (
     <div
+      ref={dockRef}
       className={cn(
         FLOATING_ADD_STYLES.dock,
         focus?.scenario === URGENT_SCENARIO && FLOATING_ADD_STYLES.alert

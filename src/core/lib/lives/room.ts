@@ -23,7 +23,10 @@ const QUEUE_FACTOR = 4
  * @property {number} seq - Last flush
  */
 
-export type RoomMemory = Pick<ModViewState, 'messages' | 'acts' | 'held' | 'pinned' | 'poll' | 'viewers'> & {
+export type RoomMemory = Pick<
+  ModViewState,
+  'messages' | 'acts' | 'held' | 'pinned' | 'poll' | 'viewers'
+> & {
   seq: number
 }
 

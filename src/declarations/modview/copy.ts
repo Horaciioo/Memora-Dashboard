@@ -4,6 +4,8 @@
  */
 
 export const MODVIEW_COPY = {
+  title: 'Mod. View',
+  watchOnly: 'Aucun live en cours : tu peux tout voir, mais rien faire d’ici.',
   stream: 'Flux',
   modActions: 'Actions de modérateur',
   automod: 'File d’attente de l’AutoMod',

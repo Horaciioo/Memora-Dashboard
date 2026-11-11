@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound, rateLimited, systemFailure } from '@/core/lib/errors'
 import type { AppError } from '@/core/lib/errors'
 import { claimGestureKey, releaseGestureKey } from '@/core/lib/lives/idempotency'
@@ -45,7 +46,7 @@ import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MODVIEW_LOCK_COPY, MODVIEW_POLL_COPY } from '@/declarations/modview/copy'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
 import { formatDay } from '@/utils/format/time/dates'
-import type { LiveView } from '@/types/lives'
+import type { LiveView, ModViewCreator } from '@/types/lives'
 import type {
   ActContext,
   BanDetail,
@@ -69,6 +70,43 @@ export interface ModViewSnapshot {
   state: ModViewState
   channelLogin: string | null
   feedSeq: number
+}
+
+/**
+ * Creators reachable in Mod View
+ * @param {AccessScope} scope - Creator perimeter
+ * @return {Promise<ModViewCreator[]>} - Creator choices
+ */
+
+export const listModViewCreators = async (scope: AccessScope): Promise<ModViewCreator[]> => {
+  const creators = await prisma.youtuber.findMany({
+    where: { archived: false, ...(scope.isGlobal ? {} : { id: { in: scope.youtuberIds } }) },
+    select: {
+      id: true,
+      name: true,
+      avatarUrl: true,
+      lives: {
+        where: { status: { in: [LiveStatuses.Live, LiveStatuses.Announced] } },
+        select: { id: true, status: true },
+        orderBy: { plannedStartAt: 'asc' },
+        take: 1,
+      },
+    },
+    orderBy: { position: 'asc' },
+  })
+
+  return creators.map((creator) => {
+    const live =
+      creator.lives.find((entry) => entry.status === LiveStatuses.Live) ?? creator.lives[0]
+
+    return {
+      id: creator.id,
+      name: creator.name,
+      avatar: creator.avatarUrl,
+      liveId: live?.id ?? null,
+      isActive: live?.status === LiveStatuses.Live,
+    }
+  })
 }
 
 /**

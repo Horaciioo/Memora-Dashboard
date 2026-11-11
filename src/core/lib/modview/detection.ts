@@ -69,6 +69,31 @@ const isSame = (left: string, right: string): boolean =>
     left.slice(0, WORD_STEM) === right.slice(0, WORD_STEM))
 
 /**
+ * Pattern finding a word or phrase whole in a plain text, plural tolerated
+ * @param {string} term - Word or phrase, any case
+ * @return {RegExp | null} - Pattern, null for an empty term
+ */
+
+export const wordPattern = (term: string): RegExp | null => {
+  const word = plain(term)
+  if (!word) return null
+
+  const edge = '[^\\p{L}\\p{N}]'
+
+  return new RegExp(`(^|${edge})${escapeRegex(word)}s?(${edge}|$)`, 'u')
+}
+
+/**
+ * Whether a text holds a word or phrase whole
+ * @param {string} term - Word or phrase, any case
+ * @param {string} text - Text without accents or case
+ * @return {boolean} - Held
+ */
+
+export const holdsWord = (term: string, text: string): boolean =>
+  wordPattern(term)?.test(text) ?? false
+
+/**
  * Detection words a text holds
  * @param {SanctionOffenseCard} offense - Offence
  * @param {string} text - Text without accents or case
@@ -76,14 +101,7 @@ const isSame = (left: string, right: string): boolean =>
  */
 
 export const keywordHits = (offense: SanctionOffenseCard, text: string): string[] =>
-  offense.keywords.filter((keyword) => {
-    const word = plain(keyword)
-    if (!word) return false
-
-    // A whole word or phrase, plural tolerated
-    const edge = '[^\\p{L}\\p{N}]'
-    return new RegExp(`(^|${edge})${escapeRegex(word)}s?(${edge}|$)`, 'u').test(text)
-  })
+  offense.keywords.filter((keyword) => holdsWord(keyword, text))
 
 /**
  * Offence whose detection words the message holds, the one with the most words first

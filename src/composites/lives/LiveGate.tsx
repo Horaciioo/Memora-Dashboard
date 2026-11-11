@@ -6,12 +6,11 @@ import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Avatar } from '@/components/elements/display/Avatar'
 import { Markdown } from '@/components/elements/display/Markdown'
-import { SeatNote } from '@/composites/lives/coordination/LiveCoordinator'
+import { LiveGateStepper } from '@/composites/lives/LiveGateStepper'
+import { LiveGateTeam } from '@/composites/lives/LiveGateTeam'
 import { LivePresenceChoice } from '@/composites/lives/LivePresenceChoice'
 import type { PresenceDecision } from '@/composites/lives/LivePresenceChoice'
-import { gateState } from '@/core/lib/lives/gate'
 import { Dialog } from '@/components/structures/overlays/Dialog'
 import { InlineMarkdown } from '@/components/structures/inline/InlineMarkdown'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
@@ -21,61 +20,34 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
 import { ROUTES } from '@/declarations/navigation'
+import { PAGINATION_COPY } from '@/declarations/ui/copy'
 import { LIVE_GATE } from '@/declarations/ui/variants'
-import type { LiveCoordinatorSeat, LivePerson, LiveView } from '@/types/lives'
+import type { LiveView } from '@/types/lives'
 
-// Opens the instructions again from inside the Mod View
 const RereadContext = createContext<(() => void) | null>(null)
-
-/**
- * Gesture that brings the instructions back, none outside a gate
- * @return {(() => void) | null}
- */
 
 export const useReread = (): (() => void) | null => useContext(RereadContext)
 
 export interface LiveGateProps {
   live: LiveView
   canEdit: boolean
-  // The Mod View
   children: ReactNode
 }
 
 /**
- * Recap of the live read before the Mod View
- * @param {LiveView} live - Live
- * @param {boolean} canEdit - Viewer may rewrite the instructions
- * @param {ReactNode} children - Mod View
- * @return {JSX.Element}
+ * Live entry gate
+ * @param {LiveGateProps} props - Gate props
+ * @return {JSX.Element} - Entry flow
  */
 
 export const LiveGate = ({ live, canEdit, children }: LiveGateProps) => {
   const [isOpen, setOpen] = useState(false)
+  const [step, setStep] = useState(0)
   const [instructions, setInstructions] = useState(live.instructions)
+  const [decision, setDecision] = useState<PresenceDecision | null>(null)
   const { run, isSaving } = useMutation()
-
   const router = useRouter()
   const client = useQueryClient()
-
-  // Everyone says whether they stay before the Mod View
-  const [decision, setDecision] = useState<PresenceDecision | null>(null)
-  const canOpen = decision !== null || gateState(live, new Date()) === 'answered'
-
-  const open = async () => {
-    // Hours already given stand, nothing to send
-    if (decision) {
-      const hours = decision.to
-        ? { from: decision.from ?? new Date().toISOString(), to: decision.to }
-        : {}
-      const done = await run(() =>
-        apiPost(API_ROUTES.liveRoster(live.id), { status: decision.status, ...hours })
-      )
-      if (!done) return
-
-      await client.invalidateQueries({ queryKey: QUERY_KEYS.liveRoster(live.id) })
-    }
-    setOpen(true)
-  }
 
   const save = async (value: string) => {
     const saved = await run(
@@ -87,6 +59,20 @@ export const LiveGate = ({ live, canEdit, children }: LiveGateProps) => {
     return saved !== null
   }
 
+  const enter = async () => {
+    if (decision) {
+      const hours = decision.to
+        ? { from: decision.from ?? new Date().toISOString(), to: decision.to }
+        : {}
+      const saved = await run(() =>
+        apiPost(API_ROUTES.liveRoster(live.id), { status: decision.status, ...hours })
+      )
+      if (!saved) return
+      await client.invalidateQueries({ queryKey: QUERY_KEYS.liveRoster(live.id) })
+    }
+    setOpen(true)
+  }
+
   if (isOpen) {
     return (
       <RereadContext.Provider value={() => setOpen(false)}>
@@ -95,81 +81,77 @@ export const LiveGate = ({ live, canEdit, children }: LiveGateProps) => {
     )
   }
 
-  const group = (label: string, rows: { person: LivePerson; seat?: LiveCoordinatorSeat }[]) => (
-    <section className={LIVE_GATE.group}>
-      <h3 className={LIVE_GATE.label}>{label}</h3>
-      {rows.length === 0 ? (
-        <p className={LIVE_GATE.lead}>{LIVE_PAGE_COPY.recapNobody}</p>
-      ) : (
-        <ul className={LIVE_GATE.people}>
-          {rows.map(({ person, seat }) => (
-            <li key={person.id} className={LIVE_GATE.person}>
-              <Avatar name={person.name} src={person.avatar} size="sm" />
-              <span className={LIVE_GATE.personText}>
-                <span className={LIVE_GATE.personName}>{person.name}</span>
-                {seat && <SeatNote seat={seat} />}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  )
-
   return (
     <Dialog
       open
-      size="xl"
+      size="lg"
       title={LIVE_PAGE_COPY.recapTitle}
       description={LIVE_PAGE_COPY.recapLead}
       onClose={() => router.push(ROUTES.lives)}
-      footer={
-        <Button
-          variant="primary"
-          icon="forward"
-          disabled={!canOpen}
-          isLoading={isSaving}
-          onClick={() => void open()}
-        >
-          {LIVE_PAGE_COPY.open}
-        </Button>
-      }
     >
       <div className={LIVE_GATE.body}>
-        <div className={LIVE_GATE.side}>
-          <section className={LIVE_GATE.group}>
-            <h3 className={LIVE_GATE.label}>{LIVE_PAGE_COPY.recapLive}</h3>
-            <p className={LIVE_GATE.creator}>{live.title}</p>
+        <LiveGateStepper
+          steps={LIVE_PAGE_COPY.steps}
+          current={step}
+          label={LIVE_PAGE_COPY.recapTitle}
+        />
+
+        {step === 0 && (
+          <section className={LIVE_GATE.instructions}>
+            <h3 className={LIVE_GATE.heading}>{LIVE_PAGE_COPY.instructionsTitle}</h3>
+            <div className={LIVE_GATE.instructionsBox}>
+              {canEdit ? (
+                <InlineMarkdown
+                  id={`live-instructions-${live.id}`}
+                  value={instructions}
+                  placeholder={LIVE_PAGE_COPY.instructionsEmpty}
+                  maxLength={FORM_SETTINGS.markdownMaxLength}
+                  onCommit={save}
+                />
+              ) : instructions ? (
+                <Markdown source={instructions} />
+              ) : (
+                <p className={LIVE_GATE.lead}>{LIVE_PAGE_COPY.instructionsEmpty}</p>
+              )}
+            </div>
           </section>
-          {group(
-            LIVE_PAGE_COPY.recapResponsables,
-            live.responsables.map((person) => ({ person }))
+        )}
+
+        {step === 1 && <LiveGateTeam live={live} />}
+
+        {step === 2 && (
+          <LivePresenceChoice live={live} decision={decision} onDecide={setDecision} />
+        )}
+
+        <div className={LIVE_GATE.footer}>
+          {step > 0 && (
+            <Button
+              className="mr-auto"
+              disabled={isSaving}
+              onClick={() => setStep((current) => current - 1)}
+            >
+              {PAGINATION_COPY.previous}
+            </Button>
           )}
-          {group(
-            LIVE_PAGE_COPY.recapCoordinators,
-            live.coordinators.map((seat) => ({ person: seat.person, seat }))
+          {step < LIVE_PAGE_COPY.steps.length - 1 ? (
+            <Button
+              variant="primary"
+              icon="forward"
+              onClick={() => setStep((current) => current + 1)}
+            >
+              {LIVE_PAGE_COPY.next}
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              icon="forward"
+              isLoading={isSaving}
+              onClick={() => void enter()}
+            >
+              {LIVE_PAGE_COPY.enter}
+            </Button>
           )}
         </div>
-        <div className={LIVE_GATE.divider} role="separator" />
-        <section className={LIVE_GATE.instructions}>
-          <h3 className={LIVE_GATE.label}>{LIVE_PAGE_COPY.instructionsTitle}</h3>
-          <div className={LIVE_GATE.instructionsBox}>
-            {canEdit ? (
-              <InlineMarkdown
-                id={`live-instructions-${live.id}`}
-                value={instructions}
-                placeholder={LIVE_PAGE_COPY.instructionsEmpty}
-                maxLength={FORM_SETTINGS.markdownMaxLength}
-                onCommit={save}
-              />
-            ) : instructions ? (
-              <Markdown source={instructions} />
-            ) : (
-              <p className={LIVE_GATE.lead}>{LIVE_PAGE_COPY.instructionsEmpty}</p>
-            )}
-          </div>
-          <LivePresenceChoice live={live} decision={decision} onDecide={setDecision} />
-        </section>
       </div>
     </Dialog>
   )

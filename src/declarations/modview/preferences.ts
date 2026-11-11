@@ -1,15 +1,18 @@
 import { MODVIEW_DEFAULT_ACTIONS } from '@/declarations/modview/actions'
-import type { ModActionConfig, ModPreferences } from '@/types/modview'
+import { MODVIEW_PERSONAL } from '@/declarations/modview/personal'
+import type { ModActionConfig, ModBadword, ModPreferences } from '@/types/modview'
 
 /**
  * One preference rule
- * @typedef {{ kind: 'toggle', default: boolean } | { kind: 'choice', options: readonly string[], default: string } | { kind: 'actions', default: readonly ModActionConfig[] }} PreferenceDefinition
+ * @typedef {{ kind: 'toggle', default: boolean } | { kind: 'choice', options: readonly string[], default: string } | { kind: 'actions', default: readonly ModActionConfig[] } | { kind: 'words', max: number, default: readonly string[] } | { kind: 'badwords', max: number, default: readonly ModBadword[] }} PreferenceDefinition
  */
 
 export type PreferenceDefinition =
   | { kind: 'toggle'; default: boolean }
   | { kind: 'choice'; options: readonly string[]; default: string }
   | { kind: 'actions'; default: readonly ModActionConfig[] }
+  | { kind: 'words'; max: number; default: readonly string[] }
+  | { kind: 'badwords'; max: number; default: readonly ModBadword[] }
 
 /**
  * Every Mod View preference
@@ -25,6 +28,8 @@ export const MODVIEW_PREFERENCES = {
   pauseMode: { kind: 'choice', options: ['hover', 'alt'], default: 'hover' },
   toolsPosition: { kind: 'choice', options: ['left', 'hover', 'right', 'card'], default: 'left' },
   keepResolved: { kind: 'toggle', default: false },
+  repeatWords: { kind: 'words', max: MODVIEW_PERSONAL.maxRepeatWords, default: [] },
+  badwords: { kind: 'badwords', max: MODVIEW_PERSONAL.maxBadwords, default: [] },
   actions: { kind: 'actions', default: MODVIEW_DEFAULT_ACTIONS },
   confirmHarsh: { kind: 'toggle', default: true },
   hideBots: { kind: 'toggle', default: false },

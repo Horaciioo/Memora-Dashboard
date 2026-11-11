@@ -69,7 +69,7 @@ export type HomeTaskKind =
  * @property {string | null} guide - Detailed walkthrough
  * @property {string | null} destinationLabel - Name of the place it opens
  * @property {string | null} dueAt - ISO planned day
- * @property {{ id: string, body: string } | null} [announcement] - Text to copy then mark published
+ * @property {{ id: string, name: string, body: string, mergeable: boolean } | null} [announcement] - Text to copy then mark published
  */
 
 export interface HomeTask {
@@ -83,7 +83,7 @@ export interface HomeTask {
   guide: string | null
   destinationLabel: string | null
   dueAt: string | null
-  announcement?: { id: string; body: string } | null
+  announcement?: { id: string; name: string; body: string; mergeable: boolean } | null
 }
 
 /**

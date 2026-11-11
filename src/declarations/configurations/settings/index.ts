@@ -15,6 +15,7 @@ export {
   AGENDA_SETTINGS,
   HOME_SETTINGS,
   TOUR_SETTINGS,
+  MANAGEMENT_SETTINGS,
 } from '@/declarations/configurations/settings/work'
 export {
   LIVECON_SETTINGS,

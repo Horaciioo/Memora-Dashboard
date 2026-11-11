@@ -15,14 +15,16 @@ import type { TeamTools } from '@/composites/modview/memberMenu'
 import type { MentionSeats } from '@/core/lib/lives/teamChat'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { MODVIEW_COPY, MODVIEW_UNBAN_COPY } from '@/declarations/modview/copy'
+import { TEAM_CHAT_COPY } from '@/declarations/lives/teamChat'
 import { TEAM_ROLES } from '@/declarations/modview/roles'
 import type { TeamRole } from '@/declarations/modview/roles'
 import { MODVIEW_TEAM_COPY } from '@/declarations/modview/watch'
 import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
-import { MODVIEW_SIDEBAR } from '@/declarations/ui/variants'
-import type { LiveFocusView } from '@/types/lives'
+import { MODVIEW_SIDEBAR, MODVIEW_TEAM_CHAT } from '@/declarations/ui/variants'
+import type { LiveFocusView, ModViewCreator } from '@/types/lives'
 import type { Chatter, ModViewState, UnbanRequest } from '@/types/modview'
+import { cn } from '@/utils/classnames'
 
 export interface ModViewSidebarProps {
   // Opens the settings box
@@ -37,7 +39,7 @@ export interface ModViewSidebarProps {
     viewerRole: TeamRole | null
     canReinforce: boolean
     // Internal chat, kept off outside a real live
-    chat: { viewerId: string; seats: MentionSeats }
+    chat: { viewerId: string; seats: MentionSeats; isLocked?: boolean }
   }
   // Live left through the exit, which asks whether they stop moderating
   leaveLiveId?: string
@@ -52,6 +54,8 @@ export interface ModViewSidebarProps {
   }
   // Creator whose live it is, shown at the top
   creator?: { name: string; avatar: string | null }
+  // Other creator workspaces
+  creators?: ModViewCreator[]
   // Moderator signed in, shown at the bottom
   viewer?: { name: string; avatar: string | null }
   // Chat audience, opened from its glyph
@@ -75,11 +79,13 @@ export const ModViewSidebar = ({
   leaveLiveId,
   endLiveId,
   creator,
+  creators = [],
   viewer,
   unban,
   audience,
 }: ModViewSidebarProps) => {
   const [open, setOpen] = useState<SidebarPanel | null>(null)
+  const [isCreatorPickerOpen, setCreatorPickerOpen] = useState(false)
   // Drawer lives out of the panels: a click in it must not count as outside
   const [isReinforcing, setReinforcing] = useState(false)
   const rootRef = useRef<HTMLElement>(null)
@@ -99,9 +105,47 @@ export const ModViewSidebar = ({
     <nav ref={rootRef} className={MODVIEW_SIDEBAR.root} aria-label={MODVIEW_COPY.sidebar}>
       <div className={MODVIEW_SIDEBAR.stack}>
         {creator && (
-          <span className={MODVIEW_SIDEBAR.creator} title={creator.name}>
-            <Avatar name={creator.name} src={creator.avatar} size="md" />
-          </span>
+          <div className={MODVIEW_SIDEBAR.creatorPicker}>
+            <button
+              type="button"
+              className={MODVIEW_SIDEBAR.creatorButton}
+              aria-label={creator.name}
+              aria-expanded={creators.length > 1 ? isCreatorPickerOpen : undefined}
+              onClick={() => creators.length > 1 && setCreatorPickerOpen((value) => !value)}
+            >
+              <Avatar name={creator.name} src={creator.avatar} size="md" />
+            </button>
+            {isCreatorPickerOpen && (
+              <div className={MODVIEW_SIDEBAR.creatorChoices}>
+                {creators.map((entry) =>
+                  entry.liveId ? (
+                    <Link
+                      key={entry.id}
+                      href={ROUTES.live(entry.liveId)}
+                      className={cn(
+                        MODVIEW_SIDEBAR.creatorChoice,
+                        !entry.isActive && MODVIEW_SIDEBAR.creatorChoiceInactive
+                      )}
+                      aria-label={entry.name}
+                    >
+                      <Avatar name={entry.name} src={entry.avatar} size="md" />
+                    </Link>
+                  ) : (
+                    <span
+                      key={entry.id}
+                      className={cn(
+                        MODVIEW_SIDEBAR.creatorChoice,
+                        MODVIEW_SIDEBAR.creatorChoiceInactive
+                      )}
+                      title={entry.name}
+                    >
+                      <Avatar name={entry.name} src={entry.avatar} size="md" />
+                    </span>
+                  )
+                )}
+              </div>
+            )}
+          </div>
         )}
 
         {unban && (
@@ -152,14 +196,31 @@ export const ModViewSidebar = ({
             liveId={team.liveId}
             viewerId={team.chat.viewerId}
             seats={team.chat.seats}
+            isLocked={team.chat.isLocked}
             isOpen={open === 'chat'}
             onToggle={() => toggle('chat')}
           />
         )}
 
+        {!team && !leaveLiveId && (
+          <PanelButton
+            icon="teamChat"
+            label={TEAM_CHAT_COPY.title}
+            isOpen={open === 'chat'}
+            onToggle={() => toggle('chat')}
+            anchor="top"
+            isWide
+          >
+            <div className={MODVIEW_TEAM_CHAT.box}>
+              <p className={MODVIEW_TEAM_CHAT.empty}>{TEAM_CHAT_COPY.offline}</p>
+            </div>
+          </PanelButton>
+        )}
+
         <PanelButton
           icon="crowd"
           label={MODVIEW_COPY.community}
+          isWide
           isOpen={open === 'community'}
           onToggle={() => toggle('community')}
           anchor="top"

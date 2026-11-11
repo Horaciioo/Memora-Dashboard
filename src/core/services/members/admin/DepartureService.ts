@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { fillDeparture } from '@/core/lib/academy/parkour'
+import { composeDeparture, periodOfStage } from '@/core/lib/academy/derank'
 import { prisma } from '@/core/lib/db'
 import { conflict } from '@/core/lib/errors'
 import { endParkour } from '@/core/services/academy/parkour/ParkourService'
@@ -8,11 +8,7 @@ import { loadTarget } from '@/core/services/members/admin/guards'
 import type { AdminActor, TargetRow } from '@/core/services/members/admin/guards'
 import { clearVolunteeredDetails } from '@/core/services/members/MemberService'
 import { notify } from '@/core/services/system/NotificationService'
-import {
-  DEPARTURE_EMOJIS,
-  DEPARTURE_TEMPLATES,
-  DEPARTURE_VERBS,
-} from '@/declarations/academy/parkour'
+import { DEPARTURE_EMOJIS } from '@/declarations/academy/parkour'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { tradeOfFunction } from '@/declarations/reference/fixed'
 import type { MemberDeparture } from '@/types/members'
@@ -89,7 +85,7 @@ export const departMember = async (
   // A PIM in course closes through its own path
   const junior = await prisma.academyJunior.findFirst({
     where: { accountId: id, status: AcademyJuniorStatuses.Active },
-    select: { id: true },
+    select: { id: true, stage: true },
   })
 
   if (junior) {
@@ -152,18 +148,24 @@ export const departMember = async (
 
   // The announcement waits in the responsables' tasks
   const label = trades.length > 0 ? trades.join(' et ') : ROLE_REGISTRY.label(row.role)
+  const dismissed = kind === DepartureKinds.Dismissal
+  const entry = {
+    username: row.discordUsername ?? row.displayName,
+    discordId: row.discordId,
+    trade: label,
+    emoji: trades.map((trade) => DEPARTURE_EMOJIS[trade] ?? '').join(' '),
+    // Dropped in the academy before the end of a period
+    period: dismissed && junior ? periodOfStage(junior.stage) : null,
+  }
   const notice = await prisma.departureNotice.create({
     data: {
       accountId: id,
       kind,
       functionName: label,
-      body: fillDeparture(DEPARTURE_TEMPLATES[kind], DEPARTURE_VERBS, {
-        username: row.discordUsername ?? row.displayName,
-        discordId: row.discordId,
-        functionName: label,
-        emoji: trades.map((trade) => DEPARTURE_EMOJIS[trade] ?? '').join(' '),
-        kind,
-      }),
+      username: entry.username,
+      discordId: entry.discordId,
+      period: entry.period,
+      body: composeDeparture(kind, entry),
     },
   })
 
