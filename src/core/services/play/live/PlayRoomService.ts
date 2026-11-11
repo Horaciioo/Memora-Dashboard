@@ -60,12 +60,13 @@ const sendBoards = async (sessionId: string, room: PlayRoom): Promise<void> => {
     byViewer.set(member.session.id, [...(byViewer.get(member.session.id) ?? []), member])
   }
 
-  // One read when boards match
+  // One read when boards match, or one read drawn for each reader
   const shared = engine.isViewShared ? engine.view(table, '') : null
+  const drawFor = shared ? null : await engine.viewFor?.(table)
 
   await Promise.all(
     [...byViewer].map(async ([viewerId, members]) => {
-      const board = await (shared ?? engine.view(table, viewerId))
+      const board = drawFor ? drawFor(viewerId) : await (shared ?? engine.view(table, viewerId))
       const frame = eventFrame(topic, PLAY_STREAM_EVENTS.board, { board })
       for (const member of members) member.send(frame)
     })

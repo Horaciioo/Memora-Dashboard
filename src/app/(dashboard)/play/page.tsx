@@ -22,11 +22,11 @@ export const metadata: Metadata = { title: PLAY_HUB_COPY.pageTitle }
 
 export default async function PlayPage() {
   const { session, access } = await requirePermission(Permissions.PlayAccess)
-  const [profile, tables] = await Promise.all([
+  const [profile, tables, { games }] = await Promise.all([
     readPlayProfile(session.id),
     listLobbies(session.id, null, access.can(Permissions.PlayManage)),
+    readCatalog(access.isSystem),
   ])
-  const { games } = await readCatalog(access.isSystem)
   const everyTable = [...tables.running, ...tables.lobbies]
   const live = (className?: string) => (
     <PlayLiveTables

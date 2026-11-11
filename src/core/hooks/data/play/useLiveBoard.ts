@@ -22,6 +22,8 @@ export interface LiveBoardShape<View, State> {
 
 interface BoardSlot {
   board: unknown
+  // Last read offered, each block of the page hears the same push
+  raw: unknown
   listeners: Set<() => void>
 }
 
@@ -35,7 +37,7 @@ const slots = new Map<string, BoardSlot>()
  */
 
 const slotOf = (sessionId: string): BoardSlot => {
-  const slot = slots.get(sessionId) ?? { board: undefined, listeners: new Set() }
+  const slot = slots.get(sessionId) ?? { board: undefined, raw: undefined, listeners: new Set() }
   slots.set(sessionId, slot)
 
   return slot
@@ -55,6 +57,8 @@ const offerBoard = <View, State>(
   shape: LiveBoardShape<View, State>
 ): void => {
   const slot = slotOf(sessionId)
+  if (slot.raw === raw) return
+  slot.raw = raw
   const board = shape.toState(raw)
   if (!shape.isNewer(board, slot.board as State | undefined)) return
   slot.board = board
@@ -107,6 +111,8 @@ export const useLiveBoard = <View, State>(
 
       return () => {
         slot.listeners.delete(listener)
+        // A game left drops its board, the next visit starts from its render
+        if (!slot.listeners.size && slots.get(sessionId) === slot) slots.delete(sessionId)
       }
     },
     [sessionId]

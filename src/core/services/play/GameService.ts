@@ -13,7 +13,7 @@ import { areBotsAwake } from '@/declarations/play/bots'
 import type { EngineStep } from '@/core/engines/play'
 import { driveBots } from '@/core/engines/play/players/BotDriver'
 import { logger } from '@/core/lib/logger'
-import { noteAction } from '@/core/services/play/PlayIdleService'
+import { forgetIdle, noteAction } from '@/core/services/play/PlayIdleService'
 import { tellFollowers } from '@/core/services/play/PlayFollowService'
 import { finishSession } from '@/core/services/play/RewardService'
 import { tournamentStandings } from '@/core/services/play/TournamentService'
@@ -47,6 +47,7 @@ const applyStep = async (
 ): Promise<void> => {
   if (step.finished) {
     clearSessionTimers(sessionId)
+    forgetIdle(sessionId)
     await finishSession(sessionId)
   } else if (step.deadline) {
     scheduleDeadline(sessionId, step.deadline, () => settleSession(sessionId))
@@ -54,8 +55,8 @@ const applyStep = async (
 
   // A running table draws from its board alone, the page moves at the end
   if (step.changed || step.finished) await signalPlay(sessionId, step.finished, !step.finished)
-  // Bots answer the new board
-  if (step.changed && !step.finished) {
+  // Bots answer the new board, a typed draft aside
+  if (step.changed && !step.finished && !step.isCosmetic) {
     void driveBots(sessionId, game, playMove).catch((error: unknown) =>
       logger.warn('[play] bots stalled', error)
     )

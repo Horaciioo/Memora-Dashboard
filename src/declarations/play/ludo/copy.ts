@@ -115,7 +115,7 @@ export const LUDO_RULE_COPY = {
   },
   safeSquares: {
     label: 'Cases protégées',
-    hint: 'Personne ne se fait manger sur une étoile ni sur une case de départ, les pions s’y partagent la case.',
+    hint: 'Personne ne se fait manger sur une étoile ni sur une case de départ, et une case protégée déjà occupée est fermée aux autres pions.',
   },
 } as const
 

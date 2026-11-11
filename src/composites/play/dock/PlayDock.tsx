@@ -92,21 +92,28 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
     },
   }
 
-  // Bubble centred on its key, kept inside the screen
+  // Bubble centred on its key, kept inside the screen, placed again when the screen turns
   useLayoutEffect(() => {
-    const key = open && bar.current?.querySelector(`[data-dock="${open}"]`)
-    if (!key || !bar.current || !bubble.current) return
-    const keyBox = key.getBoundingClientRect()
-    const centre = keyBox.left + keyBox.width / 2
-    const half = bubble.current.offsetWidth / 2
-    const placed = Math.min(
-      Math.max(centre, SCREEN_EDGE + half),
-      window.innerWidth - SCREEN_EDGE - half
-    )
-    setSpot({
-      left: placed - bar.current.getBoundingClientRect().left,
-      caret: centre - placed + half,
-    })
+    if (!open) return
+    const place = () => {
+      const key = bar.current?.querySelector(`[data-dock="${open}"]`)
+      if (!key || !bar.current || !bubble.current) return
+      const keyBox = key.getBoundingClientRect()
+      const centre = keyBox.left + keyBox.width / 2
+      const half = bubble.current.offsetWidth / 2
+      const placed = Math.min(
+        Math.max(centre, SCREEN_EDGE + half),
+        window.innerWidth - SCREEN_EDGE - half
+      )
+      setSpot({
+        left: placed - bar.current.getBoundingClientRect().left,
+        caret: centre - placed + half,
+      })
+    }
+    place()
+    window.addEventListener('resize', place)
+
+    return () => window.removeEventListener('resize', place)
   }, [open])
 
   useOutsideDismiss(open !== null, bar, close)

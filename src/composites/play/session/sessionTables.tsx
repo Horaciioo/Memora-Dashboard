@@ -145,6 +145,8 @@ export const PLAY_SESSION_TABLES: Partial<
     return {
       board: (
         <LudoBoard
+          // A new game of a tournament starts from a clean screen
+          key={sessionId}
           sessionId={sessionId}
           board={ludo}
           faces={seats.map(({ id, name, avatarUrl, isHost }) => ({

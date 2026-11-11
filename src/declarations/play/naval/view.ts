@@ -41,6 +41,13 @@ export const NAVAL_VIEW = {
   swipePx: readInteger(view.swipePx, { path: 'play/naval.view.swipePx', fallback: 24, min: 4 }),
   // Sea size from which the mini map shows
   mapFrom: readInteger(view.mapFrom, { path: 'play/naval.view.mapFrom', fallback: 13, min: 1 }),
+  // Paint rate of a calm sea, strikes run at full speed
+  idleFps: readInteger(view.idleFps, {
+    path: 'play/naval.view.idleFps',
+    fallback: 30,
+    min: 1,
+    max: 120,
+  }),
 }
 
 /**

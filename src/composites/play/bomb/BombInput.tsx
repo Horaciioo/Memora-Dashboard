@@ -36,11 +36,11 @@ export const BombInput = ({
   // Focus as the bomb lands
   useEffect(() => field.current?.focus(), [])
 
-  // Refused word wiped as it lands
+  // Refused word wiped each time it lands, the same word twice included
   const [wiped, setWiped] = useState<string | null>(null)
-  if (refused && refused !== wiped) {
+  if (refused !== wiped) {
     setWiped(refused)
-    setText('')
+    if (refused) setText('')
   }
 
   // Ready to retype
@@ -68,7 +68,11 @@ export const BombInput = ({
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    if (text.trim()) void act({ type: 'submit', word: text })
+    if (!text.trim() || isSaving) return
+    // A late keystroke would wipe the refusal on screen
+    if (pending.current) window.clearTimeout(pending.current)
+    pending.current = null
+    void act({ type: 'submit', word: text })
   }
 
   return (

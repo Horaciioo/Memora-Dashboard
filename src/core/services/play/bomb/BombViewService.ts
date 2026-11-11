@@ -7,13 +7,12 @@ import type { BombMissReason } from '@/declarations/play'
 import type { EngineSession } from '@/types/play'
 
 /**
- * Board of a Bomb Party game, the fuse kept secret
+ * Boards of a Bomb Party game read once, the fuse kept secret
  * @param {EngineSession} session - Game
- * @param {string} viewerId - Reader
- * @return {Promise<object>} - Board
+ * @return {Promise<(viewerId: string) => object>} - Board of each reader
  */
 
-export const bombView = async (session: EngineSession, viewerId: string) => {
+export const bombBoards = async (session: EngineSession) => {
   const where = { sessionId: session.id }
   const [table, seats, moves, words, lasts] = await Promise.all([
     prisma.bombGame.findUnique({ where }),
@@ -34,15 +33,13 @@ export const bombView = async (session: EngineSession, viewerId: string) => {
   const present = new Set(session.players)
   const alive = seats.filter((seat) => seat.lives > 0 && present.has(seat.accountId))
   const now = new Date()
-
-  return {
+  const base = {
     settings: bombSettingsOf(session.settings),
     isCountdown: table ? now < table.startsAt : false,
     isOver: isTableOver(alive.length, seats.length),
     startsAt: table?.startsAt ?? now,
     prompt: table?.prompt ?? '',
     turnId: table?.turnId ?? null,
-    isMyTurn: table?.turnId === viewerId,
     draft: table?.draft ?? '',
     miss: table?.missWord
       ? { word: table.missWord, reason: table.missReason as BombMissReason }
@@ -67,4 +64,16 @@ export const bombView = async (session: EngineSession, viewerId: string) => {
     })),
     serverTime: now,
   }
+
+  return (viewerId: string) => ({ ...base, isMyTurn: table?.turnId === viewerId })
 }
+
+/**
+ * Board of a Bomb Party game for one reader
+ * @param {EngineSession} session - Game
+ * @param {string} viewerId - Reader
+ * @return {Promise<object>} - Board
+ */
+
+export const bombView = async (session: EngineSession, viewerId: string) =>
+  (await bombBoards(session))(viewerId)

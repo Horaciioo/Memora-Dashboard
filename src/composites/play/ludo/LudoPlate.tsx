@@ -66,27 +66,29 @@ export const LudoPlate = ({ face, colour, isRight, turn, isMine, die }: LudoPlat
       </span>
       <div className={cn(LUDO_PLATE.row, isRight && LUDO_PLATE.rowRight)}>
         <LudoPawn colour={colour} className={LUDO_PLATE.chip} />
-        <span
-          className={cn(LUDO_PLATE.ring, turn?.isAlert && LUDO_PLATE.ringAlert)}
-          style={{ '--left': turn?.clock ?? 0 } as CSSProperties}
-        >
-          <Avatar name={name} src={avatarUrl} size="lg" className={LUDO_PLATE.face} />
-        </span>
-        {die}
+        <div className={LUDO_PLATE.core}>
+          <span
+            className={cn(LUDO_PLATE.ring, turn?.isAlert && LUDO_PLATE.ringAlert)}
+            style={{ '--left': turn?.clock ?? 0 } as CSSProperties}
+          >
+            <Avatar name={name} src={avatarUrl} size="lg" className={LUDO_PLATE.face} />
+          </span>
+          <div className={LUDO_PLATE.nameRow}>
+            {isHost && <CrownIcon className={LUDO_PLATE.crown} aria-label={LUDO_BOARD_COPY.host} />}
+            <span
+              className={cn(LUDO_PLATE.dot, hasLeft ? LUDO_PLATE.away : LUDO_PLATE.online)}
+              title={hasLeft ? LUDO_BOARD_COPY.left : undefined}
+            />
+            <span className={LUDO_PLATE.name}>{name}</span>
+          </div>
+          {place ? (
+            <span className={LUDO_PLATE.place}>{ludoPlaceLabel(place)}</span>
+          ) : (
+            <span className={LUDO_PLATE.note}>{fillPlayMessage(LUDO_BOARD_COPY.home, home)}</span>
+          )}
+        </div>
+        {die && <span className={LUDO_PLATE.dieSlot}>{die}</span>}
       </div>
-      <div className={cn(LUDO_PLATE.nameRow, isRight && LUDO_PLATE.nameRowRight)}>
-        {isHost && <CrownIcon className={LUDO_PLATE.crown} aria-label={LUDO_BOARD_COPY.host} />}
-        <span
-          className={cn(LUDO_PLATE.dot, hasLeft ? LUDO_PLATE.away : LUDO_PLATE.online)}
-          title={hasLeft ? LUDO_BOARD_COPY.left : undefined}
-        />
-        <span className={LUDO_PLATE.name}>{name}</span>
-      </div>
-      {place ? (
-        <span className={LUDO_PLATE.place}>{ludoPlaceLabel(place)}</span>
-      ) : (
-        <span className={LUDO_PLATE.note}>{fillPlayMessage(LUDO_BOARD_COPY.home, home)}</span>
-      )}
     </div>
   )
 }

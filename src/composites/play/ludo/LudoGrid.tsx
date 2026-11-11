@@ -11,13 +11,11 @@ const MIDDLE = LUDO_LAYOUT.size / 2
 const LINE = 0.025
 // Rounded tile: gap round it and corner radius, cell units
 const TILE = { gap: 0.05, radius: 0.24 }
-// Centre medallion radii, cell units
-const MEDAL = { outer: 0.95, inner: 0.55 }
 // Yard inset and hole size, cell units
 const YARD_INSET = 0.55
 const HOLE = 0.48
 // Star radii, cell units
-const STAR = { outer: 0.32, inner: 0.14 }
+const STAR = { outer: 0.34, inner: 0.17 }
 
 // Gold sheen of a held star, light to deep
 const GOLD_STOPS = [
@@ -143,17 +141,6 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
           <CornerArt key={corner} corner={corner} />
         ))}
 
-        {/* Medallion over the meeting point of the four lanes */}
-        <circle cx={MIDDLE} cy={MIDDLE} r={MEDAL.outer} fill="var(--play-ludo-board)" />
-        <circle
-          cx={MIDDLE}
-          cy={MIDDLE}
-          r={MEDAL.inner}
-          fill="none"
-          stroke={`url(#${gold})`}
-          strokeWidth="0.12"
-        />
-
         {/* Arrows into each lane */}
         {LUDO_CORNERS.map((colour, corner) => (
           <path
@@ -186,12 +173,12 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
               fill={`url(#${gold})`}
               className={cn(LUDO_BOARD.starCell, isLit && LUDO_BOARD.starLit)}
             />
-            {/* Outline when free; gilded and swollen when held, its points left showing around the pawn */}
+            {/* Soft rounded star: pale when free, gilded and swollen when held, its points left showing around the pawn */}
             <polygon
               points={starPoints(x, y)}
-              fill={isLit ? `url(#${gold})` : 'none'}
+              fill={isLit ? `url(#${gold})` : 'var(--play-ludo-star)'}
               stroke={isLit ? 'var(--play-ludo-star-lit-line)' : 'var(--play-ludo-star)'}
-              strokeWidth={isLit ? 0.06 : 0.045}
+              strokeWidth={isLit ? 0.05 : 0.1}
               strokeLinejoin="round"
               className={cn(LUDO_BOARD.starShape, isLit && LUDO_BOARD.starShapeLit)}
             />

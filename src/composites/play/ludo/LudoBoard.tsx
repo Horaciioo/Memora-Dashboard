@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
@@ -87,15 +87,22 @@ const strikeOf = (strike: LudoMotion['strike'], seats: LudoSeatFace[]): string |
  * Colours with their faces
  * @param {LudoBoardState} board - Board
  * @param {LudoFace[]} faces - Faces
+ * @param {Record<string, number[]>} pawns - Steps on screen
  * @return {LudoSeatFace[]} - Seats
  */
 
-const seatsOf = (board: LudoBoardState, faces: LudoFace[]): LudoSeatFace[] =>
+const seatsOf = (
+  board: LudoBoardState,
+  faces: LudoFace[],
+  pawns: Record<string, number[]>
+): LudoSeatFace[] =>
   board.players.map((player) => {
     const face = faces.find((entry) => entry.accountId === player.accountId)
 
     return {
       ...player,
+      // Pawns as the screen shows them, so the home count follows the walk
+      pawns: pawns[player.accountId] ?? player.pawns,
       name: face?.name ?? '',
       avatarUrl: face?.avatarUrl ?? null,
       isHost: face?.isHost ?? false,
@@ -123,7 +130,11 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
   }
   useLudoCues({ board, motion, now })
 
-  const seats = seatsOf(board, faces)
+  const seats = useMemo(
+    () => seatsOf(board, faces, motion.pawns),
+    [board, faces, motion.pawns]
+  )
+  const present = useMemo(() => seats.filter((seat) => !seat.hasLeft), [seats])
   if (board.isOver && !motion.isBusy) return <LudoResult players={seats} />
 
   // The viewer's colour turned to the bottom right
@@ -143,10 +154,13 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
     viewerId,
     // The die stays with its thrower while the move plays
     turnId: countdown > 0 ? null : motion.isBusy ? motion.rollerId : board.turnId,
-    clock: {
-      clock: Math.min(1, msLeft / (board.settings.turnSeconds * SECOND_MS)),
-      isAlert: msLeft <= LUDO_SETTINGS.alertSeconds * SECOND_MS,
-    },
+    // The thrower's clock rests full while the move plays, the next clock starts after it
+    clock: motion.isBusy
+      ? { clock: 1, isAlert: false }
+      : {
+          clock: Math.min(1, msLeft / (board.settings.turnSeconds * SECOND_MS)),
+          isAlert: msLeft <= LUDO_SETTINGS.alertSeconds * SECOND_MS,
+        },
     die: (
       <LudoDie
         face={motion.dice}
@@ -157,7 +171,6 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
     ),
   }
   const holder = seats.find((seat) => seat.accountId === board.turnId)
-  const present = seats.filter((seat) => !seat.hasLeft)
 
   return (
     <div className={LUDO_BOARD.board}>

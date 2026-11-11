@@ -249,7 +249,7 @@ export const joinSession = async (sessionId: string, accountId: string): Promise
     await tx.playSeat.upsert({
       where: { sessionId_accountId: { sessionId, accountId } },
       create: { sessionId, accountId, color },
-      update: { leftAt: null, color, joinedAt: new Date() },
+      update: { leftAt: null, readyAt: null, color, joinedAt: new Date() },
     })
     await touch(tx, sessionId)
 
@@ -299,6 +299,9 @@ const afterDeparture = async (
   session: LoadedSession,
   accountId: string
 ): Promise<void> => {
+  // A game over keeps its result, whoever walks out
+  if (!PLAY_OPEN_STATUSES.includes(session.status)) return
+
   // Bots alone never keep a table
   const remaining = session.seats.filter(
     (seat) => isPresent(seat) && seat.accountId !== accountId && !seat.account.botKind
@@ -420,6 +423,9 @@ export const kickPlayer = async (
   })
   await announceInChat(sessionId, accountId, PlayMessageKinds.Kicked)
   await signalPlay(sessionId, true)
+  // A kicked player on turn hands it on now
+  const { settleSession } = await import('@/core/services/play/GameService')
+  await settleSession(sessionId).catch(() => undefined)
   await journalPlay({
     eventType: 'PlayKicked',
     subjectId: accountId,

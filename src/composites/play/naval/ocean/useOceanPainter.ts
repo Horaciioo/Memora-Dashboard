@@ -16,8 +16,9 @@ import type { OceanCell } from '@/composites/play/naval/ocean/useOceanGestures'
 import type { NavalCamera } from '@/core/lib/play/naval/camera'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
 import type { NavalSkin } from '@/declarations/play/naval/skins'
-import { NAVAL_SHAKE } from '@/declarations/play/naval/view'
+import { NAVAL_SHAKE, NAVAL_VIEW } from '@/declarations/play/naval/view'
 import { NAVAL_WEAPONS } from '@/declarations/play/naval/weapons'
+import { SECOND_MS } from '@/utils/constants/time'
 import { prefersReducedMotion } from '@/utils/motion'
 
 /**
@@ -72,8 +73,11 @@ export const useOceanPainter = (
   scene: OceanScene
 ): void => {
   const latest = useRef(scene)
+  // A new scene paints on the next frame, whatever the pace
+  const isDirty = useRef(true)
   useEffect(() => {
     latest.current = scene
+    isDirty.current = true
   })
 
   useEffect(() => {
@@ -82,17 +86,38 @@ export const useOceanPainter = (
     if (!element || !ctx) return
     const sinking = new Map<string, number>()
     const isCalm = prefersReducedMotion()
+    const idleGap = SECOND_MS / NAVAL_VIEW.idleFps
     let frameId = 0
     let isFirst = true
+    let paintedAt = -Infinity
+    // Width read once per resize, never per frame
+    let width = element.clientWidth
+    let isSeen = true
+    const sizer = new ResizeObserver(() => {
+      width = element.clientWidth
+      isDirty.current = true
+    })
+    sizer.observe(element)
+    // A sea scrolled away stops painting
+    const sight = new IntersectionObserver(([entry]) => {
+      isSeen = entry?.isIntersecting ?? true
+      isDirty.current = true
+    })
+    sight.observe(element)
 
     const draw = (now: number) => {
+      frameId = requestAnimationFrame(draw)
+      const { playing } = latest.current
+      const isDue = playing || isDirty.current || now - paintedAt >= idleGap
+      if (!isSeen || !isDue) return
+      paintedAt = now
+      isDirty.current = false
       const ratio = window.devicePixelRatio || 1
-      const width = element.clientWidth
       if (element.width !== Math.round(width * ratio)) {
         element.width = Math.round(width * ratio)
         element.height = Math.round(width * ratio)
       }
-      const { size, camera, marks, ships, skin, hover, zone, playing } = latest.current
+      const { size, camera, marks, ships, skin, hover, zone } = latest.current
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
       const frame = frameOf({ ctx, width, size, now, skin }, camera)
       paintWater(frame)
@@ -107,10 +132,13 @@ export const useOceanPainter = (
         ? `${(Math.random() - 0.5) * amount}px ${(Math.random() - 0.5) * amount}px`
         : ''
       isFirst = false
-      frameId = requestAnimationFrame(draw)
     }
     frameId = requestAnimationFrame(draw)
 
-    return () => cancelAnimationFrame(frameId)
+    return () => {
+      cancelAnimationFrame(frameId)
+      sizer.disconnect()
+      sight.disconnect()
+    }
   }, [canvas])
 }

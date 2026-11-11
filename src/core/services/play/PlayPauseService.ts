@@ -4,7 +4,9 @@ import { prisma } from '@/core/lib/db'
 import { conflict } from '@/core/lib/errors'
 import { signalPlay } from '@/core/lib/play/signal'
 import { clearSessionTimers } from '@/core/lib/play/timers'
+import { forgetBots } from '@/core/engines/play/players/BotDriver'
 import { settleSession, wakeBots } from '@/core/services/play/GameService'
+import { forgetIdle } from '@/core/services/play/PlayIdleService'
 import { lockSession } from '@/core/services/play/PlaySessionService'
 import { PLAY_ERRORS } from '@/declarations/play'
 import { PlayStatuses } from '@/utils/constants/play'
@@ -86,8 +88,10 @@ export const pauseSession = async (
     })
   })
 
-  // Deadlines and bots stop with the clock
+  // Deadlines and bots stop with the clock, plans and idle clock drawn again on resume
   clearSessionTimers(sessionId)
+  forgetBots(sessionId)
+  forgetIdle(sessionId)
   await signalPlay(sessionId, true)
 }
 

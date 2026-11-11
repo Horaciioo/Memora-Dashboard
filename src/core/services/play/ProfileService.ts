@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { cache } from 'react'
+
 import { openSeatOf } from '@/core/lib/play/session'
 import { prisma } from '@/core/lib/db'
 import { levelOf } from '@/core/lib/play'
@@ -37,12 +39,12 @@ const winRate = ({ wins, played }: { wins: number; played: number }): number =>
   played ? wins / played : 0
 
 /**
- * Play tab of a member
+ * Play tab of a member, read once per request for the layout and its page
  * @param {string} accountId - Member
  * @return {Promise<object>} - Global and per game stats
  */
 
-export const readPlayProfile = async (accountId: string) => {
+export const readPlayProfile = cache(async (accountId: string) => {
   const [stats, profile] = await Promise.all([
     prisma.playGameStat.findMany({ where: { accountId } }),
     prisma.playProfile.findUnique({ where: { accountId } }),
@@ -91,7 +93,7 @@ export const readPlayProfile = async (accountId: string) => {
     }),
     maxLevel: PLAY_SETTINGS.levels.max,
   }
-}
+})
 
 /**
  * Best players over every game by one measure, counters summed

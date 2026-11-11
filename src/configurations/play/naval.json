@@ -103,7 +103,8 @@
     "zoomStep": 1.15,
     "tapSlopPx": 10,
     "swipePx": 24,
-    "mapFrom": 13
+    "mapFrom": 13,
+    "idleFps": 30
   },
   "shake": {
     "cannon": 3,

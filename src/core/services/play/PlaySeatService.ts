@@ -44,7 +44,7 @@ export const setSeatRole = async (
       requireSeat(session, accountId)
       await tx.playSeat.update({
         where: { sessionId_accountId: { sessionId, accountId } },
-        data: { leftAt: new Date() },
+        data: { leftAt: new Date(), readyAt: null },
       })
     } else {
       const seat = session.seats.find((entry) => entry.accountId === accountId)
@@ -57,7 +57,12 @@ export const setSeatRole = async (
       await ensureAllowed(tx, accountId)
       await tx.playSeat.update({
         where: { sessionId_accountId: { sessionId, accountId } },
-        data: { leftAt: null, color: pickSeatColor(present.map((entry) => entry.color)) },
+        // Back at the table, ready asked again
+        data: {
+          leftAt: null,
+          readyAt: null,
+          color: pickSeatColor(present.map((entry) => entry.color)),
+        },
       })
       seated = session.game
     }

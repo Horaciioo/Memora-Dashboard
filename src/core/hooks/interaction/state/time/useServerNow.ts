@@ -1,25 +1,34 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // Clock tick
 const TICK_MS = 200
 
 /**
- * Current time on the server clock, ticking
- * @param {Date | string} serverTime - Server time when the page was read
+ * Current time on the server clock, ticking, set again by each newer server reading
+ * @param {Date | string} serverTime - Server time of the latest read
  * @return {number} - Now, in server milliseconds
  */
 
 export const useServerNow = (serverTime: Date | string): number => {
-  const [offset] = useState(() => new Date(serverTime).getTime() - Date.now())
-  const [now, setNow] = useState(() => Date.now() + offset)
+  const read = new Date(serverTime).getTime()
+  const [now, setNow] = useState(read)
+  // Quickest reading kept: an old page from the router cache is put right by a fresh push
+  const offset = useRef<number | null>(null)
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now() + offset), TICK_MS)
+    const next = read - Date.now()
+    offset.current = offset.current === null ? next : Math.max(offset.current, next)
+  }, [read])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (offset.current !== null) setNow(Date.now() + offset.current)
+    }, TICK_MS)
 
     return () => window.clearInterval(timer)
-  }, [offset])
+  }, [])
 
   return now
 }
