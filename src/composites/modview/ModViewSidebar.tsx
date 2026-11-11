@@ -15,7 +15,7 @@ import type { TeamTools } from '@/composites/modview/memberMenu'
 import type { MentionSeats } from '@/core/lib/lives/teamChat'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { MODVIEW_COPY, MODVIEW_UNBAN_COPY } from '@/declarations/modview/copy'
-import { TEAM_CHAT_COPY } from '@/declarations/lives/teamChat'
+import { TEAM_CHAT_COPY, TEAM_CHAT_ENABLED } from '@/declarations/lives/teamChat'
 import { TEAM_ROLES } from '@/declarations/modview/roles'
 import type { TeamRole } from '@/declarations/modview/roles'
 import { MODVIEW_TEAM_COPY } from '@/declarations/modview/watch'
@@ -191,7 +191,7 @@ export const ModViewSidebar = ({
           </PanelButton>
         )}
 
-        {team && (
+        {TEAM_CHAT_ENABLED && team && (
           <TeamChatEntry
             liveId={team.liveId}
             viewerId={team.chat.viewerId}
@@ -202,7 +202,7 @@ export const ModViewSidebar = ({
           />
         )}
 
-        {!team && !leaveLiveId && (
+        {TEAM_CHAT_ENABLED && !team && !leaveLiveId && (
           <PanelButton
             icon="teamChat"
             label={TEAM_CHAT_COPY.title}

@@ -10,7 +10,7 @@ import { TeamPanel } from '@/composites/modview/TeamPanel'
 import { useTeamChatAlerts } from '@/core/hooks/data/lives/useTeamChatAlerts'
 import { canSeeScope } from '@/core/lib/lives/teamChat'
 import type { MentionSeats } from '@/core/lib/lives/teamChat'
-import { TEAM_CHAT_COPY, TEAM_CHAT_SCOPES } from '@/declarations/lives/teamChat'
+import { TEAM_CHAT_COPY, TEAM_CHAT_ENABLED, TEAM_CHAT_SCOPES } from '@/declarations/lives/teamChat'
 import { MODVIEW_TEAM_COPY as TEAM_COPY } from '@/declarations/modview/watch'
 import { MODVIEW_MOBILE, MODVIEW_TEAM_CHAT } from '@/declarations/ui/variants'
 import type { LiveFocusView } from '@/types/lives'
@@ -94,6 +94,42 @@ export const MobileTeamPage = ({
 
 export const MobileTeamOffline = () => (
   <div className={MODVIEW_TEAM_CHAT.box}>
-    <p className={MODVIEW_TEAM_CHAT.empty}>{TEAM_CHAT_COPY.offline}</p>
+    <p className={MODVIEW_TEAM_CHAT.empty}>
+      {TEAM_CHAT_ENABLED ? TEAM_CHAT_COPY.offline : TEAM_CHAT_COPY.rosterOffline}
+    </p>
   </div>
 )
+
+/**
+ * Team page while the internal chat is hidden: the roster alone
+ * @param {MobileTeamPageProps} props - Page props
+ * @return {JSX.Element}
+ */
+
+export const MobileRosterPage = ({
+  liveId,
+  tools,
+  focuses,
+  coordinatorIds,
+  canReinforce,
+}: MobileTeamPageProps) => {
+  const [isReinforcing, setReinforcing] = useState(false)
+
+  return (
+    <div className={MODVIEW_MOBILE.pageBody}>
+      <TeamPanel
+        liveId={liveId}
+        tools={tools}
+        focuses={focuses}
+        coordinatorIds={coordinatorIds}
+        canReinforce={canReinforce}
+        onReinforce={() => setReinforcing(true)}
+      />
+      <LiveReinforcementEditor
+        liveId={liveId}
+        open={isReinforcing}
+        onClose={() => setReinforcing(false)}
+      />
+    </div>
+  )
+}

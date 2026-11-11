@@ -1,3 +1,4 @@
+import { TEAM_CHAT_ENABLED } from '@/declarations/lives/teamChat'
 import type { MobilePageKey } from '@/types/modview'
 
 /**
@@ -25,7 +26,7 @@ export const MODVIEW_TICKER = {
 
 export const MODVIEW_MOBILE_COPY = {
   pageSettings: 'Paramètres',
-  pageTeam: 'Chat d’équipe',
+  pageTeam: TEAM_CHAT_ENABLED ? 'Chat d’équipe' : 'Équipe',
   pageLive: 'Live',
   pageFeed: 'Fil d’action',
   unbanPage: 'Débannissements',

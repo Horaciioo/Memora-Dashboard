@@ -159,11 +159,13 @@ export const TeamPanel = ({
     )
   }
 
-  // Admins above Responsables inside a section
+  // Connected first, then Admins above Responsables inside a section
   const coordinating = new Set(coordinatorIds)
   const rankOf = (member: LivePerson) =>
     TEAM_ORDER.indexOf(roleOf(member.rank, coordinating.has(member.id)) ?? 'moderator')
-  const ordered = [...tools.members].sort((a, b) => rankOf(a) - rankOf(b))
+  const ordered = [...tools.members].sort(
+    (a, b) => Number(online.has(b.id)) - Number(online.has(a.id)) || rankOf(a) - rankOf(b)
+  )
 
   return (
     <>

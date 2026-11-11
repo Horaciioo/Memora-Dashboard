@@ -8,6 +8,8 @@ import {
   MODVIEW_ACTION_LIMITS,
   MODVIEW_DEFAULT_ACTIONS,
 } from '@/declarations/modview/actions'
+import { MODVIEW_ACTION_COPY } from '@/declarations/modview/actionCopy'
+import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
 import type { ModActionConfig, ModActionKind } from '@/types/modview'
 
 // Fresh action of a kind
@@ -29,6 +31,7 @@ const newAction = (kind: ModActionKind): ModActionConfig => ({
 
 export const useActionsDraft = () => {
   const { preferences, preview } = useModPreferences()
+  const { notify } = useNotifications()
   const [draft, setDraft] = useState(preferences.actions)
 
   const change = (next: ModActionConfig[]) => {
@@ -54,11 +57,21 @@ export const useActionsDraft = () => {
     add: (kind: ModActionKind): ModActionConfig => {
       const fresh = newAction(kind)
       change([...draft, fresh])
+      notify({ tone: 'success', title: MODVIEW_ACTION_COPY.noticeAdded })
 
       return fresh
     },
-    remove: (id: string) => change(draft.filter((entry) => entry.id !== id)),
-    restore: () => change([...MODVIEW_DEFAULT_ACTIONS]),
-    clear: () => change([]),
+    remove: (id: string) => {
+      change(draft.filter((entry) => entry.id !== id))
+      notify({ tone: 'success', title: MODVIEW_ACTION_COPY.noticeRemoved })
+    },
+    restore: () => {
+      change([...MODVIEW_DEFAULT_ACTIONS])
+      notify({ tone: 'success', title: MODVIEW_ACTION_COPY.noticeRestored })
+    },
+    clear: () => {
+      change([])
+      notify({ tone: 'success', title: MODVIEW_ACTION_COPY.noticeCleared })
+    },
   }
 }

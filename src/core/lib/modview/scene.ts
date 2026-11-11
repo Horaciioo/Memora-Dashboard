@@ -337,6 +337,22 @@ const replyFrom = (view: ModViewState, parentId?: string): { reply?: ChatReply }
 }
 
 /**
+ * Sentence of a chat mode change
+ * @param {string} mode - Mode
+ * @param {boolean} enabled - Turned on
+ * @param {number} [seconds] - Delay or age
+ * @return {string} - Sentence
+ */
+
+const modeSentence = (mode: string, enabled: boolean, seconds?: number): string => {
+  const base = mode === 'emotes' ? 'emoteonly' : mode
+  const label = TWITCH_EVENT_COPY.modeActions[enabled ? base : `${base}off`] ?? mode
+  const delay = !enabled || !seconds ? '' : mode === 'slow' ? ` (${seconds} s)` : ''
+
+  return `${label}${delay}`
+}
+
+/**
  * Play a gesture inside a scene
  * @param {SceneState} state - Played state
  * @param {ModViewIntent} intent - Gesture
@@ -449,7 +465,11 @@ export const applySceneIntent = (
 
       return applySceneEvent(applySceneEvent(state, { kind: 'modes', modes }), {
         kind: 'act',
-        act: act({ kind: 'mode', target: null, quote: intent.mode }),
+        act: act({
+          kind: 'mode',
+          target: null,
+          quote: modeSentence(intent.mode, intent.enabled, intent.seconds),
+        }),
       })
     }
     case 'term': {

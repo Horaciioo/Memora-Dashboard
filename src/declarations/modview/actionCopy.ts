@@ -51,4 +51,8 @@ export const MODVIEW_ACTION_COPY = {
   warnLead: 'Avertir {name}',
   noTarget: 'Aucune cible',
   unnamed: 'Action',
+  noticeAdded: 'Action ajoutée',
+  noticeRemoved: 'Action retirée',
+  noticeCleared: 'Toutes les actions retirées',
+  noticeRestored: 'Actions rétablies par défaut',
 } as const

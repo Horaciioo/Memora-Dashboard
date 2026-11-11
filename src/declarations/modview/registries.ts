@@ -128,6 +128,13 @@ const ACT_MAP: Record<ModActKind, ModActOption> = {
     verb: 'traitée',
     tone: 'info',
   },
+  role: { label: 'Modérateur ou VIP', icon: 'sword', verb: 'modifié', tone: 'info' },
+  warnAck: {
+    label: 'Avertissement lu',
+    icon: 'modWarn',
+    verb: 'pris en compte',
+    tone: 'success',
+  },
 }
 
 export const MOD_ACTS = createRegistry(ACT_MAP)

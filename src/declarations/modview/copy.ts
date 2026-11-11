@@ -149,6 +149,8 @@ export const MODVIEW_ACT_COPY = {
   termRemove: 'Terme bloqué retiré par',
   mode: 'Mode changé par',
   unbanRequest: 'Demande traitée par',
+  role: 'Rôle modifié par',
+  warnAck: 'Avertissement pris en compte par',
 } as const
 
 /**

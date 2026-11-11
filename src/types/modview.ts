@@ -98,7 +98,7 @@ export interface ChatMessage {
 
 /**
  * Kind of moderation act
- * @typedef {'delete' | 'warn' | 'timeout' | 'ban' | 'unban' | 'automodApprove' | 'automodDeny' | 'termAdd' | 'termRemove' | 'mode' | 'unbanRequest'} ModActKind
+ * @typedef {'delete' | 'warn' | 'timeout' | 'ban' | 'unban' | 'automodApprove' | 'automodDeny' | 'termAdd' | 'termRemove' | 'mode' | 'unbanRequest' | 'role' | 'warnAck'} ModActKind
  */
 
 export type ModActKind =
@@ -113,6 +113,8 @@ export type ModActKind =
   | 'termRemove'
   | 'mode'
   | 'unbanRequest'
+  | 'role'
+  | 'warnAck'
 
 /**
  * One line of the moderator actions window

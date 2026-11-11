@@ -20,6 +20,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_MOBILE_COPY as COPY } from '@/declarations/modview/mobile'
 import { LIVE_HUB_STYLES, MODVIEW_MOBILE, MODVIEW_SETTINGS } from '@/declarations/ui/variants'
+import { useFeatures } from '@/managers/front-end/FeaturesManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ModViewState } from '@/types/modview'
 import { roughDuration } from '@/utils/format/time/hours'
@@ -64,6 +65,7 @@ export const MobileSettingsPage = ({
   const { preferences, preview, commit, discard } = useModPreferences()
   const { session } = useAuthContext()
   const figures = useOwnLiveFigures()
+  const { isOpen } = useFeatures()
   const [section, setSection] = useState<SettingsSection | null>(null)
   const BackIcon = ICONS.back
   const NextIcon = ICONS.next
@@ -111,23 +113,25 @@ export const MobileSettingsPage = ({
         )}
         {section === null ? (
           <ul className={cn(MODVIEW_SETTINGS.list, 'my-auto')}>
-            {SECTIONS.map(({ key, label, icon }) => {
-              const Icon = ICONS[icon]
+            {SECTIONS.filter(({ key }) => key !== 'unban' || isOpen('lives.modview.unban')).map(
+              ({ key, label, icon }) => {
+                const Icon = ICONS[icon]
 
-              return (
-                <li key={key}>
-                  <button
-                    type="button"
-                    className={MODVIEW_MOBILE.settingsEntry}
-                    onClick={() => setSection(key)}
-                  >
-                    <Icon className="size-4 shrink-0" aria-hidden="true" />
-                    <span className="flex-1">{label}</span>
-                    <NextIcon className="size-4 shrink-0" aria-hidden="true" />
-                  </button>
-                </li>
-              )
-            })}
+                return (
+                  <li key={key}>
+                    <button
+                      type="button"
+                      className={MODVIEW_MOBILE.settingsEntry}
+                      onClick={() => setSection(key)}
+                    >
+                      <Icon className="size-4 shrink-0" aria-hidden="true" />
+                      <span className="flex-1">{label}</span>
+                      <NextIcon className="size-4 shrink-0" aria-hidden="true" />
+                    </button>
+                  </li>
+                )
+              }
+            )}
           </ul>
         ) : (
           <>
