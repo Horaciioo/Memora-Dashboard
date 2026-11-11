@@ -160,3 +160,14 @@ export const MODVIEW_DEFAULT_ACTIONS: readonly ModActionConfig[] = [
   action('timeout-1d', 'timeout', 86_400, 'actHammer'),
   action('ban', 'ban', null, 'actBan'),
 ]
+
+/**
+ * Base measures of a viewer file, fixed
+ * @type {readonly ModActionConfig[]}
+ */
+
+export const MODVIEW_BASE_MEASURES: readonly ModActionConfig[] = [
+  action('base-warn', 'warn', null, 'actWarn'),
+  action('base-ban', 'ban', null, 'actBan'),
+  action('base-unban', 'unban', null, 'actUnban'),
+]

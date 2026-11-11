@@ -260,6 +260,8 @@ export interface LiveEmotes {
  * @property {'hover' | 'alt'} pauseMode - What stands the chat still
  * @property {'left' | 'hover' | 'right' | 'card'} toolsPosition - Where the gestures of a line show
  * @property {boolean} keepResolved - Handled held messages stay in the queue
+ * @property {string[]} repeatWords - Words whose repeated lines are counted
+ * @property {ModBadword[]} badwords - Personal words caught in the queue
  * @property {ModActionConfig[]} actions - Sanction buttons, in order
  * @property {boolean} confirmHarsh - Ban and long timeouts ask first
  * @property {boolean} hideBots - Lines of bots left out
@@ -276,11 +278,27 @@ export interface ModPreferences {
   pauseMode: 'hover' | 'alt'
   toolsPosition: 'left' | 'hover' | 'right' | 'card'
   keepResolved: boolean
+  repeatWords: string[]
+  badwords: ModBadword[]
   actions: ModActionConfig[]
   confirmHarsh: boolean
   hideBots: boolean
   textSize: 'small' | 'normal' | 'large'
   density: 'compact' | 'normal' | 'airy'
+}
+
+/**
+ * One personal word caught in the queue
+ * @typedef {Object} ModBadword
+ * @property {string} term - Word or phrase
+ * @property {string | null} colour - Hexadecimal, null for the danger tone
+ * @property {boolean} isSuggested - Also proposes a sanction
+ */
+
+export interface ModBadword {
+  term: string
+  colour: string | null
+  isSuggested: boolean
 }
 
 /**

@@ -26,11 +26,14 @@ export const SplitHandle = ({ orientation, label, onMove }: SplitHandleProps) =>
   const isColumn = orientation === 'vertical'
 
   const drag = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return
     const target = event.currentTarget
     target.setPointerCapture(event.pointerId)
     let last = isColumn ? event.clientX : event.clientY
 
     const move = (next: globalThis.PointerEvent) => {
+      // A release missed outside the window ends the drag
+      if (next.buttons === 0) return stop()
       const point = isColumn ? next.clientX : next.clientY
       onMove(point - last)
       last = point
@@ -39,11 +42,14 @@ export const SplitHandle = ({ orientation, label, onMove }: SplitHandleProps) =>
       target.removeEventListener('pointermove', move)
       target.removeEventListener('pointerup', stop)
       target.removeEventListener('pointercancel', stop)
+      target.removeEventListener('lostpointercapture', stop)
+      if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId)
     }
 
     target.addEventListener('pointermove', move)
     target.addEventListener('pointerup', stop)
     target.addEventListener('pointercancel', stop)
+    target.addEventListener('lostpointercapture', stop)
   }
 
   const press = (event: KeyboardEvent<HTMLDivElement>) => {

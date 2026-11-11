@@ -117,7 +117,12 @@ export const managerTasks = async (
         href: ROUTES.home,
         description: DEPARTURE_COPY.description,
       }),
-      announcement: { id: departure.id, body: departure.body },
+      announcement: {
+        id: departure.id,
+        name: departure.name,
+        body: departure.body,
+        mergeable: departure.mergeable,
+      },
     })
   }
 

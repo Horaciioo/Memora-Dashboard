@@ -33,7 +33,7 @@ export const MODVIEW_WATCH = {
   name: 'cursor-pointer font-bold hover:underline',
   silent: 'px-3 py-2 text-xs text-[var(--color-ink-subtle)] italic',
   tools: 'ml-2 inline-flex items-center gap-0.5 align-middle',
-  tool: 'inline-flex h-6 w-6 items-center justify-center rounded-[var(--radius-md)] hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-35',
+  tool: 'inline-flex h-6 w-6 items-center justify-center opacity-80 hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-35',
   toolIcon: 'h-4 w-4',
 } as const
 
@@ -254,18 +254,43 @@ export const MODVIEW_UNBAN = {
  */
 
 export const MODVIEW_TEAM_CHAT = {
-  box: 'relative flex flex-col',
-  list: 'flex max-h-[64dvh] min-h-[50dvh] flex-col overflow-y-auto px-1 py-1.5',
-  row: 'mt-3 flex gap-2 rounded-lg px-2 pt-1.5 pb-0 first:mt-0hover:bg-[var(--color-hover)]',
+  box: 'relative flex h-[calc(55dvh-5rem)] min-h-72 flex-col',
+  list: 'flex min-h-0 flex-1 flex-col overflow-y-auto px-1 pt-4 pb-1.5',
+  line: 'group/line relative flex flex-col',
+  // Bar floating over the top right corner of a hovered message
+  reactBar:
+    'glass-panel absolute -top-3 right-2 z-10 flex items-center gap-0.5 rounded-xl border border-[var(--color-border-strong)] p-0.5 opacity-0 shadow-[var(--shadow-lg)] group-hover/line:opacity-100 focus-within:opacity-100',
+  reactBarOn: 'opacity-100',
+  reactDivider: 'mx-0.5 h-5 w-px bg-[var(--color-border-strong)]',
+  row: 'mt-3 flex gap-2 rounded-lg px-2 pt-1.5 pb-0 first:mt-0 hover:bg-[var(--color-hover)]',
   follow:
     'rounded-lg py-px pr-2 pl-10 text-[0.8125rem] leading-snug break-words whitespace-pre-wrap hover:bg-[var(--color-hover)]',
   rowMentioned: 'bg-[color-mix(in_srgb,var(--color-gold-400)_14%,transparent)]',
   body: 'flex min-w-0 flex-1 flex-col text-[0.8125rem] leading-snug break-words whitespace-pre-wrap',
-  meta: 'flex items-baseline gap-1.5',
+  meta: 'mb-1 flex items-center gap-1.5',
   author: 'truncate text-[0.8125rem] font-bold',
-  time: 'text-[0.65rem] font-medium text-[var(--color-ink-subtle)] tabular-nums',
+  time: 'ml-auto shrink-0 text-[0.65rem] font-medium text-[var(--color-ink-subtle)] tabular-nums',
   mention:
     'rounded bg-[color-mix(in_srgb,var(--color-ink)_14%,transparent)] px-1 font-semibold text-[var(--color-ink)]',
+  // Dashed frame centred in the list
+  emptyBox: 'my-auto mx-1 !border-2 !border-dashed !bg-transparent !shadow-none',
+  // Filled box holding the room glyphs
+  tabs: 'm-1.5 flex gap-1 rounded-xl bg-[color-mix(in_srgb,var(--color-ink)_12%,transparent)] p-1',
+  tab: 'grid flex-1 cursor-pointer place-items-center rounded-lg py-1.5 text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]',
+  tabOn: 'bg-[var(--color-surface-raised)] text-[var(--color-ink)] shadow-sm',
+  tabUnread:
+    'relative after:absolute after:top-1 after:right-2 after:size-1.5 after:rounded-full after:bg-[var(--color-danger)]',
+  typing:
+    'flex h-5 items-center gap-1.5 px-3 text-[0.7rem] font-medium text-[var(--color-ink-subtle)]',
+  typingDots:
+    'inline-flex items-center gap-0.5 [&>span]:size-1 [&>span]:rounded-full [&>span]:bg-current',
+  reactions: 'mt-1 mb-0.5 flex flex-wrap items-center gap-1 pl-10',
+  chip: 'inline-flex cursor-pointer items-center gap-1 rounded-full bg-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] px-2 py-px text-xs font-semibold hover:bg-[var(--color-hover)]',
+  chipMine: 'bg-[color-mix(in_srgb,var(--color-apple-green)_24%,transparent)]',
+  picker:
+    'popover-enter glass-panel absolute top-full right-0 z-20 mt-1 flex gap-0.5 rounded-xl border border-[var(--color-border-strong)] p-1 shadow-[var(--shadow-lg)]',
+  pickerItem:
+    'grid size-7 cursor-pointer place-items-center rounded-lg text-base hover:bg-[var(--color-hover)]',
   older: 'self-center text-xs font-semibold text-[var(--color-ink-accent)] hover:underline',
   empty: 'px-3 py-4 text-center text-xs text-[var(--color-ink-subtle)]',
   composer: 'flex flex-col border-t border-[var(--color-border-strong)]',
@@ -275,7 +300,7 @@ export const MODVIEW_TEAM_CHAT = {
     'cursor-pointer rounded-md bg-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] px-2 py-0.5 text-[0.7rem] font-semibold whitespace-nowrap text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]',
   inputBar: 'flex items-center gap-2 px-3 py-2',
   field:
-    'block max-h-28 min-h-9 min-w-0 flex-1 resize-none rounded-full bg-[color-mix(in_srgb,var(--color-ink)_12%,transparent)] px-4 py-2 text-[0.8125rem] placeholder:text-[var(--color-ink-subtle)] focus:bg-[color-mix(in_srgb,var(--color-ink)_16%,transparent)] focus:outline-none',
+    'block max-h-28 min-h-9 min-w-0 flex-1 resize-none rounded-full bg-[color-mix(in_srgb,var(--room)_16%,transparent)] px-4 py-2 text-[0.8125rem] placeholder:text-[var(--color-ink-subtle)] focus:bg-[color-mix(in_srgb,var(--room)_22%,transparent)] focus:outline-none focus-visible:!rounded-full focus-visible:!border-transparent focus-visible:!shadow-none',
   suggest:
     'popover-enter glass-panel absolute right-2 bottom-full left-2 z-10 mb-1 flex flex-col overflow-hidden rounded-xl border border-[var(--color-border-strong)] p-1 shadow-[var(--shadow-lg)]',
   suggestItem:
@@ -302,9 +327,7 @@ export const MODVIEW_TEAM_CHAT = {
 export const MODVIEW_ACTION = {
   bar: 'inline-flex shrink-0 items-center gap-0.5 align-middle',
   button:
-    'inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-[var(--radius-sm)] px-0.5 text-xs font-bold whitespace-nowrap opacity-80 hover:bg-[var(--color-hover)] hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-25',
-  // Chosen colour stays on hover
-  buttonFilled: 'px-1.5 opacity-100 hover:bg-transparent hover:brightness-110',
+    'inline-flex h-5 min-w-5 items-center justify-center gap-1 px-0.5 text-xs font-bold whitespace-nowrap opacity-80 hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-25',
   icon: 'h-4 w-4 shrink-0',
 } as const
 

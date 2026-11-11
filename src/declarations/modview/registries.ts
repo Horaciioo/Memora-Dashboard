@@ -143,6 +143,7 @@ export const PERMISSION_OWNERS: Partial<Record<PermissionName, string>> = {
   [Permissions.LiveTerms]: 'Jérémy, aux Responsables et au Coordinateur',
   [Permissions.LivePin]: 'Jérémy, aux Responsables et au Coordinateur',
   [Permissions.LivePoll]: 'l’équipe de modération, hors Juniors',
+  [Permissions.LiveSharedWords]: 'l’équipe de modération, hors Juniors',
   [Permissions.LiveCrisisChat]: 'Jérémy',
 }
 

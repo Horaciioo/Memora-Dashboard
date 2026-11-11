@@ -1,5 +1,6 @@
 import { commandMeasure, nextRung, writeRungCommand } from '@/core/lib/modview/commands'
 import type { PanelMemory } from '@/core/lib/modview/commands'
+import { repeatOffense } from '@/core/lib/modview/duplicates'
 import { offenseByKeywords, offenseByText } from '@/core/lib/modview/detection'
 import type { Chatter, ModAct } from '@/types/modview'
 import type {
@@ -22,6 +23,7 @@ import type { SanctionGravityName } from '@/utils/constants/moderation'
  * @property {string} categoryKey - Platform key of the category
  * @property {string} category - Category said
  * @property {string} at - Moment
+ * @property {boolean} [isRepeat] - A line said again
  */
 
 export interface SuggestionSource {
@@ -33,6 +35,7 @@ export interface SuggestionSource {
   categoryKey: string
   category: string
   at: string
+  isRepeat?: boolean
 }
 
 /**
@@ -154,7 +157,9 @@ export const suggestFor = (
   memory: PanelMemory,
   acts: ModAct[] = []
 ): Suggestion => {
-  const offense = offenseByKeywords(panel, source) ?? offenseByText(panel, source)
+  const offense = source.isRepeat
+    ? repeatOffense(panel)
+    : (offenseByKeywords(panel, source) ?? offenseByText(panel, source))
   if (!offense)
     return {
       source,

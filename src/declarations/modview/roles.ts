@@ -19,8 +19,7 @@ export type TeamRole = MemoraRank | 'coordinator'
 // Bright tone of each seat, read by the shimmer and the glyph glow
 const SHINE = {
   moderator: '[--shine:var(--color-apple-green)]',
-  junior:
-    '[--shine:color-mix(in_srgb,var(--color-apple-green)_65%,var(--color-surface))]',
+  junior: '[--shine:color-mix(in_srgb,var(--color-apple-green)_65%,var(--color-surface))]',
   coordinator: '[--shine:var(--color-gold-400)]',
   responsable: '[--shine:var(--color-apple-orange)]',
   admin: '[--shine:var(--color-apple-red)]',

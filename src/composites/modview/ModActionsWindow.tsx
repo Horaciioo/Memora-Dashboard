@@ -1,7 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
-
 import { DotMark } from '@/components/elements/display/Dotted'
 import { ActSentence } from '@/composites/modview/ActSentence'
 import { FlaggedText } from '@/composites/modview/FlaggedText'
@@ -9,8 +7,6 @@ import { memberMenu, memberNamed } from '@/composites/modview/memberMenu'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
 import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
-import { repeatRanks } from '@/core/lib/modview/repeats'
-import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { useMenu } from '@/managers/front-end'
 import { MODVIEW_ACT_COPY, MODVIEW_COPY, MODVIEW_INSPECT_COPY } from '@/declarations/modview/copy'
 import { MOD_ACTS } from '@/declarations/modview/registries'
@@ -54,7 +50,6 @@ export const ModActionsWindow = ({
 }: ModActionsWindowProps) => {
   const { contextMenu } = useMenu()
   const { preferences } = useModPreferences()
-  const ranks = useMemo(() => repeatRanks(acts, LIVE_SETTINGS.repeatWindowMinutes), [acts])
 
   return (
     <ModWindow title={MODVIEW_COPY.modActions} isLit={isLit} grow>
@@ -116,9 +111,6 @@ export const ModActionsWindow = ({
                       : ''}
                     <DotMark />
                     {act.pending ? MODVIEW_COPY.pending : formatSince(act.at)}
-                    {(ranks.get(act.id) ?? 0) > 1 && (
-                      <span className={MODVIEW_FEED.repeat}>{`x${ranks.get(act.id)}`}</span>
-                    )}
                   </p>
                   {act.reason && <p className={MODVIEW_FEED.line}>{act.reason}</p>}
                   {act.quote && (

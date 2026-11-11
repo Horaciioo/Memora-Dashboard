@@ -8,10 +8,6 @@ import {
 import type { ModActionConfig, ModActionKind, ModViewIntent } from '@/types/modview'
 import { normaliseHex } from '@/utils/format/colour'
 
-// Ink painted on a coloured button
-const DARK_INK = '#111111'
-const LIGHT_INK = '#ffffff'
-
 // Safe key of an action
 const ID_PATTERN = /^[\w-]+$/
 
@@ -151,23 +147,3 @@ export const needsReason = (action: ModActionConfig): boolean =>
 export const isHarsh = (action: ModActionConfig): boolean =>
   MODVIEW_ACTION_KINDS[action.kind].isHarsh ||
   (action.seconds ?? 0) > MODVIEW_ACTION_LIMITS.confirmAboveSeconds
-
-/**
- * Readable ink over a colour
- * @param {string} hex - Background
- * @return {string} - Dark or light ink, whichever contrasts more
- */
-
-export const inkOn = (hex: string): string => {
-  const digits = normaliseHex(hex)
-  if (!digits) return DARK_INK
-  const [red, green, blue] = [1, 3, 5].map((start) => {
-    const channel = parseInt(digits.slice(start, start + 2), 16) / 255
-
-    return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
-  }) as [number, number, number]
-  const luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
-
-  // Dark ink wins above the crossover luminance
-  return luminance > 0.179 ? DARK_INK : LIGHT_INK
-}

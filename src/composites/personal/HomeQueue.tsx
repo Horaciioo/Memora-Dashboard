@@ -14,6 +14,8 @@ import { HomeTaskGroups } from '@/composites/personal/HomeTaskGroups'
 import { HomeTaskStepper } from '@/composites/personal/HomeTaskStepper'
 import { useCoordinationReply } from '@/core/hooks/data/lives/useCoordinationReply'
 import type { CoordinationWindow } from '@/core/hooks/data/lives/useCoordinationReply'
+import { DerankPicker } from '@/composites/members/admin/DerankPicker'
+import { useDerank } from '@/core/hooks/data/people/useDerank'
 import { useAbsences } from '@/core/hooks/data/people/useAbsences'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { useCopy } from '@/core/hooks/interaction/state/useCopy'
@@ -22,6 +24,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import type { PendingRollCall } from '@/core/services/calendar/attendance'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { ABSENCE_COPY } from '@/declarations/absences/copy'
+import { DERANK_COPY } from '@/declarations/academy/derank'
 import { DEPARTURE_COPY } from '@/declarations/academy/parkour'
 import { LIVE_COORDINATION_COPY } from '@/declarations/lives/copy'
 import { PERSONAL_COPY, PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
@@ -101,6 +104,18 @@ export const HomeQueue = ({
 
     router.refresh()
   }
+  // Dismissals that can be joined, and those ticked when the dialog opens
+  const mergeables = useMemo(
+    () =>
+      tasks.flatMap((task) =>
+        task.announcement?.mergeable
+          ? [{ id: task.announcement.id, name: task.announcement.name }]
+          : []
+      ),
+    [tasks]
+  )
+  const [merging, setMerging] = useState<string[] | null>(null)
+  const { isSaving: isMerging, merge } = useDerank()
   // Live roll-call whose hours are being asked
   const [askingCall, setAskingCall] = useState<PendingRollCall | null>(null)
   const [step, setStep] = useState<{ group: string; index: number } | null>(null)
@@ -233,6 +248,17 @@ export const HomeQueue = ({
               variant: 'primary',
               onSelect: () => void publish(task.announcement?.id ?? ''),
             },
+            // Several dismissals can share one message
+            ...(task.announcement.mergeable && mergeables.length > 1
+              ? [
+                  {
+                    id: 'derank',
+                    label: DERANK_COPY.action,
+                    variant: 'secondary' as const,
+                    onSelect: () => setMerging([task.announcement?.id ?? '']),
+                  },
+                ]
+              : []),
           ]
         : [
             {
@@ -286,7 +312,7 @@ export const HomeQueue = ({
 
     return [...coords, ...asked, ...calls, ...todo]
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requests, rollCalls, tasks, coordination, windows])
+  }, [requests, rollCalls, tasks, coordination, windows, mergeables])
 
   // A task treated here stays on the list, struck through, until the page is left
   const [seen, setSeen] = useState<HomeEntry[]>(entries)
@@ -320,7 +346,24 @@ export const HomeQueue = ({
           index={step.index}
           onIndex={(index) => setStep({ group: step.group, index })}
           onClose={() => setStep(null)}
-          hidden={reviewing !== null || askingCall !== null}
+          hidden={reviewing !== null || askingCall !== null || merging !== null}
+        />
+      )}
+
+      {merging && (
+        <DerankPicker
+          open
+          title={DERANK_COPY.mergeTitle}
+          description={DERANK_COPY.mergeLead}
+          confirmLabel={DERANK_COPY.merge}
+          minimum={2}
+          initial={merging}
+          pending={isMerging}
+          options={mergeables}
+          onClose={() => setMerging(null)}
+          onConfirm={async (ids) => {
+            if (await merge(ids)) setMerging(null)
+          }}
         />
       )}
 

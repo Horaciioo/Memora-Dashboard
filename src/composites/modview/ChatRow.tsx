@@ -14,6 +14,7 @@ import type { MenuItem } from '@/managers/front-end'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { TIER_BADGE_ICONS } from '@/declarations/modview/registries'
 import type { ChatOptionName } from '@/declarations/modview/registries'
+import { MODVIEW_PERSONAL_COPY } from '@/declarations/modview/personal'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
@@ -54,6 +55,8 @@ export interface ChatRowProps {
   toolsPosition: ModPreferences['toolsPosition']
   actions: ModActionConfig[]
   confirmHarsh: boolean
+  // Times the line was said, when said again
+  repeat?: number
   roster?: Record<string, MemoraRank>
   emblems?: Record<string, SeatEmblem>
   gate: GateCheck
@@ -75,6 +78,7 @@ const ChatLineBody = ({
   toolsPosition,
   actions,
   confirmHarsh,
+  repeat,
   roster,
   emblems,
   gate,
@@ -224,6 +228,14 @@ const ChatLineBody = ({
       >
         {message.author.name}
       </button>
+      {repeat && (
+        <span
+          className={MODVIEW_CHAT.repeat}
+          title={MODVIEW_PERSONAL_COPY.repeatTitle.replace('{count}', String(repeat))}
+        >
+          {MODVIEW_PERSONAL_COPY.repeatBadge.replace('{count}', String(repeat))}
+        </span>
+      )}
       {': '}
       {isDeleted && !options.deleted ? (
         <span className={MODVIEW_CHAT.deleted}>{deletedSentence}</span>

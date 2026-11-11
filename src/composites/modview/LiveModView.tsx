@@ -1,15 +1,18 @@
 'use client'
 
-import { useReread } from '@/composites/lives/LiveGate'
 import { ModView } from '@/composites/modview/ModView'
+import { useReread } from '@/composites/lives/LiveGate'
 import type { ModViewLiveTools } from '@/composites/modview/ModView'
 import { AvatarProvider } from '@/core/hooks/data/lives/useAvatars'
+import { SharedWordsProvider } from '@/core/hooks/data/lives/useSharedWords'
 import { useLivePanel } from '@/core/hooks/data/lives/useLivePanel'
 import { useLiveModView } from '@/core/hooks/data/lives/useLiveModView'
 import { useModViewPresence } from '@/core/hooks/interaction/scenes/useModViewPresence'
 import type { IconName } from '@/declarations/ui/icons'
-import type { LiveView } from '@/types/lives'
+import type { LiveView, ModViewCreator } from '@/types/lives'
 import type { SanctionPanelView } from '@/types/sanctions'
+import { LiveStatuses } from '@/utils/constants/lives'
+import { Permissions } from '@/utils/constants/permissions'
 
 export interface LiveModViewProps {
   live: LiveView
@@ -17,6 +20,7 @@ export interface LiveModViewProps {
   tools: ModViewLiveTools
   // Creator level
   fallbackLevel: { name: string; icon: IconName | null } | null
+  creators: ModViewCreator[]
 }
 
 /**
@@ -33,23 +37,31 @@ export const LiveModView = ({
   panel: initialPanel,
   tools,
   fallbackLevel,
+  creators,
 }: LiveModViewProps) => {
   const panel = useLivePanel(initialPanel)
   const driver = useLiveModView(live)
-  useModViewPresence(live.id)
   const reread = useReread()
+  useModViewPresence(live.id)
 
   return (
     <AvatarProvider liveId={live.id}>
-      <ModView
-        driver={driver}
-        permissions={live.permissions}
-        panel={panel}
-        levelName={live.liveconLevel?.name ?? fallbackLevel?.name ?? null}
-        levelIcon={live.liveconLevel?.icon ?? fallbackLevel?.icon ?? null}
-        live={tools}
-        onReread={reread}
-      />
+      <SharedWordsProvider
+        liveId={live.id}
+        canEdit={live.permissions.includes(Permissions.LiveSharedWords)}
+      >
+        <ModView
+          driver={driver}
+          watchOnly={live.status !== LiveStatuses.Live}
+          permissions={live.permissions}
+          panel={panel}
+          levelName={live.liveconLevel?.name ?? fallbackLevel?.name ?? null}
+          levelIcon={live.liveconLevel?.icon ?? fallbackLevel?.icon ?? null}
+          live={tools}
+          creators={creators}
+          onReread={reread}
+        />
+      </SharedWordsProvider>
     </AvatarProvider>
   )
 }

@@ -1,4 +1,5 @@
 import { sanitizeActions } from '@/core/lib/modview/actions'
+import { sanitizeBadwords, sanitizeWords } from '@/core/lib/modview/personal'
 import { MODVIEW_PREFERENCES } from '@/declarations/modview/preferences'
 import type { PreferenceDefinition } from '@/declarations/modview/preferences'
 import type { ModPreferences } from '@/types/modview'
@@ -16,6 +17,8 @@ export const MODVIEW_DEFAULTS = Object.fromEntries(
 const readValue = (rule: PreferenceDefinition, value: unknown): unknown => {
   if (rule.kind === 'toggle') return typeof value === 'boolean' ? value : undefined
   if (rule.kind === 'actions') return sanitizeActions(value) ?? undefined
+  if (rule.kind === 'words') return sanitizeWords(value, rule.max) ?? undefined
+  if (rule.kind === 'badwords') return sanitizeBadwords(value, rule.max) ?? undefined
 
   return typeof value === 'string' && rule.options.includes(value) ? value : undefined
 }
