@@ -12,20 +12,21 @@ import { DAY_MS } from '@/utils/constants/time'
 const INFRACTION_KINDS = ['DELETE', 'TIMEOUT', 'BAN', 'WARN'] as const
 
 /**
- * Figures of the member on one creator, over a period
- * @param {string} accountId - Member
+ * Figures on one creator over a period, the whole team's when no member is given
+ * @param {string | null} accountId - Member, null for the team
  * @param {string} youtuberId - Creator
  * @param {Date} from - Period start
  * @param {Date} to - Period end
- * @return {Promise<number[]>} - Infractions, seconds, messages, lives
+ * @return {Promise<number[]>} - Infractions, seconds, messages, lives, moderators
  */
 
-const figuresOver = async (accountId: string, youtuberId: string, from: Date, to: Date) => {
+const figuresOver = async (accountId: string | null, youtuberId: string, from: Date, to: Date) => {
   const live = { youtuberId }
-  const [infractions, messages, presence, lives] = await Promise.all([
+  const who = accountId ? { actorAccountId: accountId } : {}
+  const [infractions, messages, presence, lives, moderators] = await Promise.all([
     prisma.moderationAction.count({
       where: {
-        actorAccountId: accountId,
+        ...who,
         live,
         kind: { in: [...INFRACTION_KINDS] },
         status: 'SUCCEEDED',
@@ -34,23 +35,27 @@ const figuresOver = async (accountId: string, youtuberId: string, from: Date, to
     }),
     prisma.moderationAction.count({
       where: {
-        actorAccountId: accountId,
+        ...who,
         live,
         kind: 'MESSAGE_SEND',
         occurredAt: { gte: from, lt: to },
       },
     }),
     prisma.modViewPresence.aggregate({
-      where: { accountId, live, openedAt: { gte: from, lt: to } },
+      where: { ...(accountId ? { accountId } : {}), live, openedAt: { gte: from, lt: to } },
       _sum: { activeSeconds: true },
     }),
     prisma.modViewPresence.groupBy({
       by: ['liveId'],
-      where: { accountId, live, openedAt: { gte: from, lt: to } },
+      where: { ...(accountId ? { accountId } : {}), live, openedAt: { gte: from, lt: to } },
+    }),
+    prisma.modViewPresence.groupBy({
+      by: ['accountId'],
+      where: { live, openedAt: { gte: from, lt: to } },
     }),
   ])
 
-  return [infractions, presence._sum.activeSeconds ?? 0, messages, lives.length]
+  return [infractions, presence._sum.activeSeconds ?? 0, messages, lives.length, moderators.length]
 }
 
 /**
@@ -70,6 +75,7 @@ export const readLiveHub = async (
       id: true,
       name: true,
       avatarUrl: true,
+      accent: true,
       bannerUrl: true,
       fadeBannerUrl: true,
       lives: {
@@ -96,11 +102,14 @@ export const readLiveHub = async (
 
   return Promise.all(
     creators.map(async (creator) => {
-      const [latest, before] = await Promise.all([
+      const [latest, before, teamLatest, teamBefore] = await Promise.all([
         figuresOver(accountId, creator.id, split, new Date(now + DAY_MS)),
         figuresOver(accountId, creator.id, start, split),
+        figuresOver(null, creator.id, split, new Date(now + DAY_MS)),
+        figuresOver(null, creator.id, start, split),
       ])
       const keys: LiveHubFigure['key'][] = ['infractions', 'time', 'messages', 'lives']
+      const teamKeys: LiveHubFigure['key'][] = [...keys, 'moderators']
       // On air first, else the soonest
       const next = creator.lives.find((row) => row.status === LiveStatuses.Live) ?? creator.lives[0]
 
@@ -108,11 +117,17 @@ export const readLiveHub = async (
         id: creator.id,
         name: creator.name,
         avatarUrl: creator.avatarUrl,
+        accent: creator.accent,
         banner: creator.fadeBannerUrl ?? creator.bannerUrl,
         figures: keys.map((key, index) => ({
           key,
           value: latest[index],
           previous: before[index],
+        })),
+        team: teamKeys.map((key, index) => ({
+          key,
+          value: teamLatest[index],
+          previous: teamBefore[index],
         })),
         recent: (history?.lives ?? [])
           .filter((live) => live.creator === creator.name)

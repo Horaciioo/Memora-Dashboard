@@ -23,6 +23,12 @@ const COLUMNS: AttendanceStatusName[] = [
   AttendanceStatuses.Absent,
 ]
 
+const COLUMN_LABELS: Record<AttendanceStatusName, string> = {
+  [AttendanceStatuses.Present]: LIVE_ROSTER_COPY.present,
+  [AttendanceStatuses.Pending]: LIVE_ROSTER_COPY.pending,
+  [AttendanceStatuses.Absent]: LIVE_ROSTER_COPY.absent,
+}
+
 export interface LiveRosterBoardProps {
   liveId: string
 }
@@ -65,7 +71,7 @@ export const LiveRosterBoard = ({ liveId }: LiveRosterBoardProps) => {
               >
                 <p className={cn(LIVE_ROSTER.columnHead, TONES[option.tone].text)}>
                   <Glyph className={LIVE_ROSTER.columnGlyph} aria-hidden="true" />
-                  {option.label}
+                  {COLUMN_LABELS[status]}
                 </p>
                 {people.length === 0 && (
                   <p className={LIVE_ROSTER.columnEmpty}>{LIVE_ROSTER_COPY.empty}</p>
@@ -122,16 +128,24 @@ const RosterPerson = ({ person, canManage, isDragged, dragProps, onMove }: Roste
     <div
       className={cn(
         LIVE_ROSTER.person,
+        !canManage && LIVE_ROSTER.personPrivate,
         canManage && LIVE_ROSTER.personMovable,
         isDragged && LIVE_ROSTER.personDragged
       )}
       {...dragProps}
       {...(canManage ? { onContextMenu: menu.onContextMenu } : {})}
     >
-      <Avatar name={person.name} src={person.avatar} size="xs" />
-      <span className={LIVE_ROSTER.name}>{person.name}</span>
-      {person.isReinforcement && <ReinforcementTag />}
-      {person.isJunior && <span className={LIVE_ROSTER.junior}>{LIVE_ROSTER_COPY.junior}</span>}
+      <Avatar
+        name={person.name}
+        src={person.avatar}
+        size={canManage ? 'xs' : 'sm'}
+        className={LIVE_ROSTER.personAvatar}
+      />
+      {canManage && <span className={LIVE_ROSTER.name}>{person.name}</span>}
+      {canManage && person.isReinforcement && <ReinforcementTag />}
+      {canManage && person.isJunior && (
+        <span className={LIVE_ROSTER.junior}>{LIVE_ROSTER_COPY.junior}</span>
+      )}
     </div>
   )
 }

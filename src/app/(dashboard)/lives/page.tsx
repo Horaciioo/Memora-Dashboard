@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { LiveHub } from '@/composites/lives/hub/LiveHub'
-import { LivesBoard } from '@/composites/lives/LivesBoard'
 import { readLiveHub } from '@/core/services/lives/LiveHubService'
 import { listOpenLives, listPastLives, listRecentLives } from '@/core/services/lives/LiveService'
-import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
+import { LIVE_HUB } from '@/declarations/lives/hub'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { TWITCH_MOCK_ORIGIN } from '@/declarations/platforms/twitch'
@@ -28,28 +27,22 @@ export default async function LivesPage() {
     listOpenLives(perimeter, session.id, session.permissions),
     listRecentLives(perimeter, session.id, session.permissions),
     // Past lives shown on demand: all for the Bilan readers, the ones coordinated for the others
-    listPastLives(
-      perimeter,
-      session.id,
-      session.permissions,
-      LIVE_SETTINGS.pastLives,
-      !canReadLogs
-    ),
+    listPastLives(perimeter, session.id, session.permissions, LIVE_HUB.recentCount, !canReadLogs),
   ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <LiveHub creators={hub} initialId={perimeter.activeYoutuberId} />
-      <LivesBoard
-        isEmbedded
-        initialLives={lives}
-        initialRecent={recent}
+      <LiveHub
+        creators={hub}
+        lives={lives}
+        recent={recent}
         canAnnounce={canAnnounce}
+        showFakeLive={TWITCH_MOCK_ORIGIN !== null && access.isAdmin}
+        initialId={perimeter.activeYoutuberId}
         past={past}
         canReport={canReadLogs}
         canDelete={access.isResponsable}
         canCreatorReport={access.can(Permissions.LiveCreatorReport)}
-        showFakeLive={TWITCH_MOCK_ORIGIN !== null && access.isAdmin}
       />
     </div>
   )

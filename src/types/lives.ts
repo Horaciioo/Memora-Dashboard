@@ -1,6 +1,6 @@
 import type { LiveAccess } from '@/core/lib/lives/access'
 import type { ModerationKind, ModerationOrigin, ModerationStatus } from '@prisma/client'
-import type { TeamMentionKind } from '@/declarations/lives/teamChat'
+import type { TeamChatScope, TeamMentionKind } from '@/declarations/lives/teamChat'
 import type { IconName } from '@/declarations/ui/icons'
 import type { MemoraRank, SeatEmblem } from '@/types/modview'
 import type {
@@ -359,6 +359,20 @@ export interface ViewerComment {
 }
 
 /**
+ * Watch word the team shares on a channel
+ * @typedef {Object} SharedWord
+ * @property {string} id - Word identifier
+ * @property {string} term - Word or phrase
+ * @property {string | null} authorName - Member who added it
+ */
+
+export interface SharedWord {
+  id: string
+  term: string
+  authorName: string | null
+}
+
+/**
  * One stored chat message
  * @typedef {Object} ChatHistoryMessage
  * @property {string} id - Identifier
@@ -456,6 +470,8 @@ export interface LiveNote {
  * @property {string} authorId - Author
  * @property {string} body - Text
  * @property {TeamMentionKind[]} mentions - Who it calls
+ * @property {TeamChatScope} scope - Room it was written in
+ * @property {LiveTeamReaction[]} reactions - Emoji left on it
  * @property {string} createdAt - Sent moment
  */
 
@@ -464,7 +480,21 @@ export interface LiveTeamMessage {
   authorId: string
   body: string
   mentions: TeamMentionKind[]
+  scope: TeamChatScope
+  reactions: LiveTeamReaction[]
   createdAt: string
+}
+
+/**
+ * One emoji and who left it
+ * @typedef {Object} LiveTeamReaction
+ * @property {string} emoji - Emoji
+ * @property {string[]} accountIds - Members who left it
+ */
+
+export interface LiveTeamReaction {
+  emoji: string
+  accountIds: string[]
 }
 
 /**
@@ -482,13 +512,13 @@ export interface LiveTeamPage {
 /**
  * One figure of the Live hub, the last 30 days against the 30 before
  * @typedef {Object} LiveHubFigure
- * @property {'infractions' | 'time' | 'messages' | 'lives'} key - What it counts
+ * @property {'infractions' | 'time' | 'messages' | 'lives' | 'moderators'} key - What it counts
  * @property {number} value - Last 30 days
  * @property {number} previous - The 30 days before
  */
 
 export interface LiveHubFigure {
-  key: 'infractions' | 'time' | 'messages' | 'lives'
+  key: 'infractions' | 'time' | 'messages' | 'lives' | 'moderators'
   value: number
   previous: number
 }
@@ -521,6 +551,7 @@ export interface LiveHubLive {
  * @property {string | null} avatarUrl - Portrait
  * @property {string | null} banner - Banner picture
  * @property {LiveHubFigure[]} figures - Four figures of the member
+ * @property {LiveHubFigure[]} team - Figures of the whole team
  * @property {MemberLiveSummary[]} recent - Latest lives the member moderated
  * @property {LiveHubLive | null} live - Live on air, else the next planned one
  */
@@ -530,7 +561,27 @@ export interface LiveHubCreator {
   name: string
   avatarUrl: string | null
   banner: string | null
+  accent: string | null
   figures: LiveHubFigure[]
+  team: LiveHubFigure[]
   recent: MemberLiveSummary[]
   live: LiveHubLive | null
+}
+
+/**
+ * Creator in Mod View
+ * @typedef {Object} ModViewCreator
+ * @property {string} id - Creator identifier
+ * @property {string} name - Creator name
+ * @property {string | null} avatar - Creator portrait
+ * @property {string | null} liveId - Open or announced live
+ * @property {boolean} isActive - Live is on air
+ */
+
+export interface ModViewCreator {
+  id: string
+  name: string
+  avatar: string | null
+  liveId: string | null
+  isActive: boolean
 }

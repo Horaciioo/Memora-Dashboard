@@ -40,7 +40,6 @@
   "focusPollSeconds": 10,
   "moderatorCacheSeconds": 60,
   "emoteCacheSeconds": 600,
-  "repeatWindowMinutes": 60,
   "avatarCacheSeconds": 86400,
   "avatarBatchMax": 100,
   "ownedEmoteCacheSeconds": 300,

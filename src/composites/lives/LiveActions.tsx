@@ -65,7 +65,7 @@ export const LiveActions = ({
   return (
     <>
       <div className={cn(LIVE_BOARD.actions, className)}>
-        {!hideOpen && live.access === 'open' && (
+        {!hideOpen && (
           <Link
             href={ROUTES.live(live.id)}
             className={cn(BUTTON_STYLES.base, BUTTON_STYLES.primary)}

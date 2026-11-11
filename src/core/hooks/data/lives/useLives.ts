@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { isOpenLive } from '@/core/lib/lives/permissions'
 import { apiPatch, apiPost } from '@/core/lib/api/client'
@@ -42,6 +43,7 @@ export interface LiveCollection {
  */
 
 export const useLives = (initialLives: LiveView[], initialRecent: LiveView[]): LiveCollection => {
+  const router = useRouter()
   const [lives, setLives] = useState(initialLives)
   const [recent, setRecent] = useState(initialRecent)
   const [endedId, setEndedId] = useState<string | null>(null)
@@ -66,9 +68,10 @@ export const useLives = (initialLives: LiveView[], initialRecent: LiveView[]): L
         setEndedId(live.id)
       }
 
+      router.refresh()
       return true
     },
-    [run]
+    [run, router]
   )
 
   // A live put back runs again
@@ -87,9 +90,10 @@ export const useLives = (initialLives: LiveView[], initialRecent: LiveView[]): L
         )
       )
 
+      router.refresh()
       return true
     },
-    [run]
+    [run, router]
   )
 
   const dismissEnded = useCallback(() => setEndedId(null), [])

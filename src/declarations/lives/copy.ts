@@ -4,9 +4,9 @@
  */
 
 export const LIVE_COPY = {
-  title: 'Live en cours',
-  modViewTab: '{name} - Mod View',
-  navLabel: 'Live en cours',
+  title: 'Lives',
+  modViewTab: '{name} - Mod. View',
+  navLabel: 'Lives',
   announce: 'Annoncer un live',
   slotTaken: 'Un live est déjà prévu à ces horaires pour ce créateur.',
   start: 'Lancer le live',
@@ -74,9 +74,12 @@ export const LIVE_FIELD_COPY = {
  */
 
 export const LIVE_ROSTER_COPY = {
-  title: 'Appel',
+  title: 'Appel de présence',
   open: 'Voir l’appel',
   empty: 'Personne ici',
+  present: 'Présence',
+  absent: 'Absences',
+  pending: 'Non répondu',
   moveTo: 'Passer en « {status} »',
   junior: 'Junior',
   loading: 'Chargement de l’appel',
@@ -104,8 +107,11 @@ export const LIVE_PAGE_COPY = {
   backToLives: 'Retour aux lives',
   presenceTitle: 'Ta présence sur ce live',
   presencePresent: 'Je suis présent',
+  presenceAbsent: 'Je ne suis pas disponible',
   presencePassing: 'Je ne fais que passer, je ne suis pas disponible',
   presenceAnswered: 'Tu as répondu être présent de {from} à {to}.',
+  presenceAnsweredAbsent: 'Tu as répondu ne pas être disponible.',
+  presenceChange: 'Modifier ma réponse',
   presenceEarly: 'Tu es déjà là ? Tu n’as que répondu présent de {from} à {to}.',
   presenceEdit: 'Modifier mes horaires',
   presenceNow: 'Je modère dès à présent',
@@ -131,6 +137,11 @@ export const LIVE_PAGE_COPY = {
   open: 'J’ai lu, ouvrir la Mod View',
   reread: 'Relire les consignes',
   startedBubble: 'Le live a démarré ! On y va ?',
+  steps: ['Consignes', 'Équipe prévue', 'Présence'],
+  next: 'Passer à l’étape suivante',
+  enter: 'Y entrer',
+  team: 'Équipe prévue',
+  members: 'Équipe de modération',
 } as const
 
 /**

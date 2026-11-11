@@ -86,9 +86,27 @@ const HoursSentence = ({
 export const LivePresenceChoice = ({ live, decision, onDecide }: LivePresenceChoiceProps) => {
   const [dialog, setDialog] = useState<'until' | 'hours' | null>(null)
   const [state] = useState(() => gateState(live, new Date()))
-  const CheckIcon = ICONS.picked
+  const [isChanging, setChanging] = useState(false)
   const FigureIcon = ICONS.members
   const hours = live.myHours
+
+  // Saved refusal stands until the member changes it
+  if (live.myAttendance === AttendanceStatuses.Absent && !decision && !isChanging) {
+    const CrossIcon = ICONS.cross
+
+    return (
+      <div className={LIVE_GATE.answeredBlock}>
+        <span className={LIVE_GATE.answeredFigure} aria-hidden="true">
+          <FigureIcon className={LIVE_GATE.answeredGlyph} />
+          <CrossIcon className={LIVE_GATE.answeredBadge} />
+        </span>
+        <p className={LIVE_GATE.answered}>{LIVE_PAGE_COPY.presenceAnsweredAbsent}</p>
+        <Button variant="secondary" onClick={() => setChanging(true)}>
+          {LIVE_PAGE_COPY.presenceChange}
+        </Button>
+      </div>
+    )
+  }
 
   if (state === 'answered' && hours) {
     // Hours edited here replace the ones given before
@@ -101,7 +119,7 @@ export const LivePresenceChoice = ({ live, decision, onDecide }: LivePresenceCho
       <div className={LIVE_GATE.answeredBlock}>
         <span className={LIVE_GATE.answeredFigure} aria-hidden="true">
           <FigureIcon className={LIVE_GATE.answeredGlyph} />
-          <CheckIcon className={LIVE_GATE.answeredBadge} />
+          <ICONS.check className={LIVE_GATE.answeredBadge} />
         </span>
         <p className={LIVE_GATE.answered}>
           <HoursSentence template={LIVE_PAGE_COPY.presenceAnswered} hours={shown} />
