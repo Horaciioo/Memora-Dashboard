@@ -335,6 +335,33 @@ const afterDeparture = async (
 }
 
 /**
+ * What follows a departure: a running game reacts at once, a forfeit counts now, then the journal
+ * @param {string} sessionId - Game
+ * @param {string} accountId - Player
+ * @param {PlayGameName} game - Game kind
+ * @param {boolean} quiet - Skip the journal line
+ * @return {Promise<void>} - Settled
+ */
+
+const settleDeparture = async (
+  sessionId: string,
+  accountId: string,
+  game: PlayGameName,
+  quiet: boolean
+): Promise<void> => {
+  const { settleSession } = await import('@/core/services/play/GameService')
+  await settleSession(sessionId).catch(() => undefined)
+  if (quiet) return
+  await journalPlay({
+    eventType: 'PlayLeft',
+    subjectId: accountId,
+    game,
+    template: PLAY_JOURNAL.left,
+    sessionId,
+  }).catch(() => undefined)
+}
+
+/**
  * Leave a game on purpose
  * @param {string} sessionId - Game
  * @param {string} accountId - Player
@@ -359,20 +386,12 @@ export const leaveSession = async (
 
     return session.game
   })
-  await announceInChat(sessionId, accountId, PlayMessageKinds.Left)
-  await signalPlay(sessionId, true)
-  // A running game reacts at once, a forfeit counts now
-  const { settleSession } = await import('@/core/services/play/GameService')
-  await settleSession(sessionId).catch(() => undefined)
-  if (!quiet) {
-    await journalPlay({
-      eventType: 'PlayLeft',
-      subjectId: accountId,
-      game,
-      template: PLAY_JOURNAL.left,
-      sessionId,
-    })
-  }
+  await Promise.all([
+    announceInChat(sessionId, accountId, PlayMessageKinds.Left),
+    signalPlay(sessionId, true),
+  ])
+  // The player is out already, the forfeit and the journal follow without holding the answer back
+  void settleDeparture(sessionId, accountId, game, quiet)
 }
 
 /**
