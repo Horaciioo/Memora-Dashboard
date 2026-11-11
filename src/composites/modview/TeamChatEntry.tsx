@@ -53,9 +53,7 @@ export const TeamChatEntry = ({
       isWide
       hasUnread={hasUnread}
       hint={
-        mention
-          ? COPY.mentionedTip.replace('{author}', caller?.name ?? COPY.unknown)
-          : undefined
+        mention ? COPY.mentionedTip.replace('{author}', caller?.name ?? COPY.unknown) : undefined
       }
       floating={
         bubble && (

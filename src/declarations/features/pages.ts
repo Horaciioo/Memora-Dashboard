@@ -69,7 +69,8 @@ export const PAGE_FEATURES: FeatureDefinition[] = [
   {
     key: 'management',
     label: 'Gestions',
-    description: 'Les absences, les réseaux, les notes, les anniversaires, les arrivées et les fonctions de toute l’équipe.',
+    description:
+      'Les absences, les réseaux, les notes, les anniversaires, les arrivées et les fonctions de toute l’équipe.',
     kind: 'page',
     section: 'team',
     routes: ['/management', '/management/*'],

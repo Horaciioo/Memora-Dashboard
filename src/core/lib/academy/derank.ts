@@ -1,10 +1,7 @@
 import { fillDeparture } from '@/core/lib/academy/parkour'
 import { DERANK_FUNCTIONS, DERANK_PERIODS, DERANK_WORDS } from '@/declarations/academy/derank'
 import type { DerankPeriodName } from '@/declarations/academy/derank'
-import {
-  DEPARTURE_TEMPLATES,
-  DEPARTURE_VERBS,
-} from '@/declarations/academy/parkour'
+import { DEPARTURE_TEMPLATES, DEPARTURE_VERBS } from '@/declarations/academy/parkour'
 import { AcademyStages, DepartureKinds } from '@/utils/constants/hierarchy'
 import type { AcademyStageName, DepartureKindName } from '@/utils/constants/hierarchy'
 

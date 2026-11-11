@@ -9,10 +9,7 @@ import { graduateAccount, releaseAccount } from '@/core/services/academy/Admissi
 import { clearVolunteeredDetails } from '@/core/services/members/MemberService'
 import { notify } from '@/core/services/system/NotificationService'
 import { isRootIdentity } from '@/declarations/access/identity'
-import {
-  DEPARTURE_EMOJIS,
-  GRADUATE_DIVISION_RANK,
-} from '@/declarations/academy/parkour'
+import { DEPARTURE_EMOJIS, GRADUATE_DIVISION_RANK } from '@/declarations/academy/parkour'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { tradeOfFunction } from '@/declarations/reference/fixed'
 import {

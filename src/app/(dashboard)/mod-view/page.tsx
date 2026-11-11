@@ -21,7 +21,8 @@ export default async function ModViewPage() {
   const { session, scope } = await requirePermission(Permissions.LiveRead)
   const perimeter = await scope()
   const lives = await listOpenLives(perimeter, session.id, session.permissions)
-  const priority = lives.find((live) => live.status === LiveStatuses.Live) ??
+  const priority =
+    lives.find((live) => live.status === LiveStatuses.Live) ??
     lives.find((live) => live.access === 'open')
 
   if (priority) redirect(ROUTES.live(priority.id))

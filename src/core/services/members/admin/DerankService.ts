@@ -10,10 +10,7 @@ import type { AdminActor } from '@/core/services/members/admin/guards'
 import { DEPARTURE_EMOJIS } from '@/declarations/academy/parkour'
 import type { DerankPeriodName } from '@/declarations/academy/derank'
 import type { MemberDeparture } from '@/types/members'
-import {
-  DepartureKinds,
-  GONE_MEMBER_STATUSES,
-} from '@/utils/constants/hierarchy'
+import { DepartureKinds, GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 
 // Several trades read as "Lives et Discord"
 const TRADE_JOINER = ' et '
@@ -25,10 +22,7 @@ const TRADE_JOINER = ' et '
  * @return {Promise<MemberDeparture>} - Announcement now holding everyone
  */
 
-export const mergeDepartures = async (
-  ids: string[],
-  actorId: string
-): Promise<MemberDeparture> => {
+export const mergeDepartures = async (ids: string[], actorId: string): Promise<MemberDeparture> => {
   const notices = await prisma.departureNotice.findMany({
     where: {
       id: { in: ids },
@@ -74,10 +68,7 @@ export const mergeDepartures = async (
  * @return {Promise<MemberDeparture>} - Announcement to paste
  */
 
-export const derankMembers = async (
-  ids: string[],
-  actor: AdminActor
-): Promise<MemberDeparture> => {
+export const derankMembers = async (ids: string[], actor: AdminActor): Promise<MemberDeparture> => {
   const unique = [...new Set(ids)]
   if (unique.length === 0) throw conflict()
 
