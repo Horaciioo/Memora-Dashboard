@@ -4,7 +4,7 @@ import { PlayNoticeKind } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { seatBoundsOf } from '@/core/lib/play/seats'
-import { conflict, notFound } from '@/core/lib/errors'
+import { conflict, notFound, toAppError } from '@/core/lib/errors'
 import { mayEnter, mayOversee } from '@/core/lib/play/access'
 import { signalPlay } from '@/core/lib/play/signal'
 import { clearSessionTimers, scheduleDeadline } from '@/core/lib/play/timers'
@@ -27,6 +27,8 @@ import {
 import { isPresent, toEngineSession } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { toSessionView } from '@/core/lib/play/views'
+import { recordError } from '@/core/services/system/ErrorEventService'
+import { ErrorCodes } from '@/utils/constants/errors'
 import { PlayStatuses } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -186,7 +188,22 @@ export const actInSession = async (
   raw: Record<string, unknown>
 ): Promise<void> => {
   noteAction(sessionId)
-  await playMove(sessionId, accountId, raw)
+  try {
+    await playMove(sessionId, accountId, raw)
+  } catch (error) {
+    // Expected refusals stay out of the console
+    if (toAppError(error).code === ErrorCodes.SystemFailure) {
+      void recordError({
+        severity: 'ERROR',
+        source: 'PLAY',
+        error,
+        route: 'play.act',
+        accountId,
+        context: { sessionId },
+      })
+    }
+    throw error
+  }
 }
 
 /**

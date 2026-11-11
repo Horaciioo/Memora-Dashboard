@@ -1,7 +1,10 @@
 import 'server-only'
 
 import { notFound, toAppError } from '@/core/lib/errors'
+import { runWithRequestId } from '@/core/lib/http/requestOrigin'
 import { logger } from '@/core/lib/logger'
+import { OBSERVABILITY } from '@/core/lib/nexus/observe/registry'
+import { recordError } from '@/core/services/system/ErrorEventService'
 import type {
   RealtimeConnection,
   RealtimeRequest,
@@ -95,18 +98,33 @@ const answer = async (
   const request = registry.requests[frame.op ?? '']
   const startedAt = performance.now()
 
+  let failed = false
   try {
     if (!request) throw notFound()
-    reply({ d: (await request(live.session, frame.d, live)) ?? null })
+    // Each message carries its own identifier
+    const data = await runWithRequestId(`WS ${frame.op}`, () =>
+      request(live.session, frame.d, live)
+    )
+    reply({ d: data ?? null })
   } catch (error) {
+    failed = true
     const failure = toAppError(error)
-    if (failure.code === ErrorCodes.SystemFailure)
+    if (failure.code === ErrorCodes.SystemFailure) {
       logger.error(`[realtime] ${frame.op} failed`, error)
+      void recordError({
+        severity: 'ERROR',
+        source: 'WEBSOCKET',
+        error,
+        route: `WS ${frame.op}`,
+        accountId: live.session?.id ?? null,
+      })
+    }
     reply({ err: { message: failure.message, code: failure.code, issues: failure.issues } })
   }
 
   // Slow answers named, never their content
   const elapsed = Math.round(performance.now() - startedAt)
+  OBSERVABILITY.websocket.add(frame.op ?? 'unknown', elapsed, failed)
   if (elapsed > REALTIME_SETTINGS.slowRequestMs)
     logger.warn(`[realtime] ${frame.op} took ${elapsed}ms`)
 }

@@ -3,6 +3,7 @@ import 'server-only'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
 
+import { nexusQueryExtension } from '@/core/lib/nexus/observe/queryExtension'
 import { botFilterExtension } from '@/core/lib/play/botFilter'
 import { changeSignalExtension } from '@/core/lib/system/changeSignal'
 
@@ -32,6 +33,7 @@ const createClient = (): PrismaClient =>
   new PrismaClient({
     adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL, max: poolSize() }),
   })
+    .$extends(nexusQueryExtension)
     .$extends(changeSignalExtension)
     .$extends(botFilterExtension) as unknown as PrismaClient
 

@@ -487,4 +487,11 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'id',
     search: [],
   },
+  errorEvent: {
+    model: 'ErrorEvent',
+    exposure: 'excluded',
+    reason: 'Lu par les commandes d’erreurs seulement',
+    display: 'id',
+    search: [],
+  },
 }

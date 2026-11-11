@@ -2329,6 +2329,8 @@ model ActivityLog {
   ip         String?
   userAgent  String?
   route      String?
+  // Request that raised it, for the console trace
+  requestId  String?
   createdAt  DateTime @default(now())
 
   actor   Account? @relation("LogActor", fields: [actorId], references: [id], onDelete: SetNull)
@@ -2340,6 +2342,7 @@ model ActivityLog {
   @@index([createdAt])
   @@index([actorId, createdAt])
   @@index([level, createdAt])
+  @@index([requestId])
   @@map("activity_logs")
 }
 
@@ -3952,4 +3955,54 @@ model NexusAudit {
   @@index([commandId])
   @@index([createdAt])
   @@map("nexus_audits")
+}
+
+enum ErrorSeverity {
+  FATAL
+  ERROR
+  WARNING
+}
+
+enum ErrorSource {
+  SERVER
+  CLIENT
+  API
+  PRISMA
+  WEBSOCKET
+  JOB
+  PLAY
+  FEATURE
+}
+
+// Errors grouped by fingerprint, read by the console only
+model ErrorEvent {
+  id          String        @id @default(cuid())
+  // Route, normalised message and first frame
+  fingerprint String        @unique
+  occurrences Int           @default(1)
+  firstAt     DateTime      @default(now())
+  lastAt      DateTime      @default(now())
+  severity    ErrorSeverity
+  service     String
+  environment String
+  source      ErrorSource
+  route       String?
+  accountId   String?
+  sessionId   String?
+  requestId   String?
+  traceId     String?
+  message     String
+  stack       String?
+  // Cause chain and database code
+  rootCause   String?
+  // Masked and bounded
+  context     Json?
+  resolvedAt  DateTime?
+
+  @@index([lastAt])
+  @@index([source, lastAt])
+  @@index([severity, lastAt])
+  @@index([requestId])
+  @@index([accountId, lastAt])
+  @@map("error_events")
 }

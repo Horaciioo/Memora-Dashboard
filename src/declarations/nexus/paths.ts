@@ -14,4 +14,6 @@ export const NEXUS_PATHS = {
   password: '/api/nexus/auth/password',
   reauth: '/api/nexus/auth/reauth',
   discord: '/api/nexus/auth/discord',
+  clientErrors: '/api/nexus/client-errors',
+  logsStream: '/api/nexus/logs/stream',
 } as const

@@ -86,6 +86,7 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
       ip: origin.ip,
       userAgent: origin.userAgent,
       route: origin.route,
+      requestId: origin.requestId,
       actorId: input.actorId ?? null,
       subjectId: input.subjectId ?? null,
       targetType: input.targetType,

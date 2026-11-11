@@ -62,6 +62,7 @@ const RATE_LIMIT_MAP = {
   moderation: policy('moderation', 'Mod View gesture', RATE_LIMIT_SCOPES.Account, 60, 240),
   nexus: policy('nexus', 'Console command', RATE_LIMIT_SCOPES.Account, 60, 60),
   nexusWrite: policy('nexusWrite', 'Console change', RATE_LIMIT_SCOPES.Account, 60, 10),
+  clientErrors: policy('clientErrors', 'Browser errors', RATE_LIMIT_SCOPES.Account, 60, 20),
   // Autosave fires on every pause in typing
 } satisfies Record<string, RateLimitPolicy>
 

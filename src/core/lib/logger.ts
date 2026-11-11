@@ -24,6 +24,21 @@ const consoleFacade: LoggerFacade = {
 
 let bound: LoggerFacade = consoleFacade
 
+// Where recent lines are kept for the console
+let sink: ((level: string, args: unknown[]) => void) | null = null
+
+const keep = (level: string, args: unknown[]): void => sink?.(level, args)
+
+/**
+ * Hand recent lines to the console buffer
+ * @param {(level: string, args: unknown[]) => void} receiver - Buffer writer
+ * @return {void}
+ */
+
+export const bindLogSink = (receiver: (level: string, args: unknown[]) => void): void => {
+  sink = receiver
+}
+
 /**
  * Bind logger facade
  * @param {LoggerFacade} facade - Facade
@@ -50,7 +65,16 @@ export const unbindLogger = (): void => {
 
 export const logger: LoggerFacade = {
   debug: (...args) => bound.debug(...args),
-  info: (...args) => bound.info(...args),
-  warn: (...args) => bound.warn(...args),
-  error: (...args) => bound.error(...args),
+  info: (...args) => {
+    keep('info', args)
+    bound.info(...args)
+  },
+  warn: (...args) => {
+    keep('warn', args)
+    bound.warn(...args)
+  },
+  error: (...args) => {
+    keep('error', args)
+    bound.error(...args)
+  },
 }

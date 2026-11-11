@@ -69,5 +69,44 @@
     "blocksKept": 100,
     "pollSeconds": 60,
     "edgeMargin": 8
+  },
+  "observability": {
+    "errorRetentionDays": 30,
+    "maxErrorRows": 5000,
+    "minIntervalSeconds": 5,
+    "perMinuteCap": 120,
+    "slowQueryMs": 300,
+    "clientPerMinute": 20,
+    "clientMaxBytes": 8192,
+    "contextMaxBytes": 4000,
+    "logBuffer": 5000,
+    "infoSampleRate": 0.1,
+    "infoPerMinute": 200,
+    "windowsMinutes": [
+      1,
+      5,
+      60
+    ],
+    "routeKeysMax": 300
+  },
+  "db": {
+    "searchMinLength": 2,
+    "dependentDepth": 3,
+    "checkRows": 200
+  },
+  "system": {
+    "queueRows": 50,
+    "maintenanceNoticeSeconds": 30,
+    "restartTimeoutMs": 15000
+  },
+  "game": {
+    "eventRows": 50,
+    "turnRows": 50,
+    "pauseMaxMinutes": 240
+  },
+  "realtime": {
+    "eventsPerAccount": 200,
+    "eventsKeepMinutes": 15,
+    "reconnectPerMinute": 5
   }
 }

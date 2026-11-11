@@ -19,6 +19,7 @@ import { consume, readIdentity } from '@/core/lib/http/rateLimit'
 import { fail, succeed } from '@/core/lib/http/response'
 import { logger } from '@/core/lib/logger'
 import { runWithOrigin } from '@/core/lib/http/requestOrigin'
+import { recordError } from '@/core/services/system/ErrorEventService'
 import { reportFailure, reportRefusal } from '@/core/services/system/FailureReport'
 import { isFeatureOpen } from '@/core/services/features'
 import { featureOfApi } from '@/declarations/features'
@@ -300,7 +301,17 @@ const assertWritable = (request: NextRequest, session: SessionUser): void => {
 
 const assertFeatureOpen = async (request: NextRequest, isAdmin: boolean): Promise<void> => {
   const key = featureOfApi(request.nextUrl.pathname)
-  if (key && !(await isFeatureOpen(key, isAdmin))) throw forbidden(FEATURE_COPY.apiClosed)
+  if (!key || (await isFeatureOpen(key, isAdmin))) return
+
+  // A cut feature that still gets called is worth a line
+  void recordError({
+    severity: 'WARNING',
+    source: 'FEATURE',
+    message: `Feature ${key} closed`,
+    route: `${request.method} ${request.nextUrl.pathname}`,
+    context: { feature: key },
+  })
+  throw forbidden(FEATURE_COPY.apiClosed)
 }
 
 /**

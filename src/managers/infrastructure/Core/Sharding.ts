@@ -1,6 +1,7 @@
 import 'server-only'
 
-import { bindLogger, unbindLogger } from '@/core/lib/logger'
+import { bindLogger, bindLogSink, unbindLogger } from '@/core/lib/logger'
+import { sinkLog } from '@/core/lib/nexus/observe/logSink'
 import ConfigManager from '@/managers/infrastructure/Core/ConfigManager'
 import LoggerManager from '@/managers/infrastructure/Core/LoggerManager'
 import DatabaseManager from '@/managers/infrastructure/Database/DatabaseManager'
@@ -152,6 +153,9 @@ export default class Sharding {
 
     // Load logger next
     await this.logger.load()
+
+    // Console buffer
+    bindLogSink(sinkLog)
 
     // Bind logger facade
     bindLogger({
