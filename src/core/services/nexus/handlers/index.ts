@@ -1,4 +1,5 @@
 import { ACCESS_HANDLERS } from '@/core/services/nexus/handlers/access'
+import { DB_HANDLERS } from '@/core/services/nexus/handlers/db'
 import { ERROR_HANDLERS } from '@/core/services/nexus/handlers/errors'
 import { HEALTH_HANDLERS } from '@/core/services/nexus/handlers/health'
 import { MEMORA_HANDLERS } from '@/core/services/nexus/handlers/memora'
@@ -14,4 +15,5 @@ export const NEXUS_HANDLERS: Record<string, NexusHandler> = {
   ...MEMORA_HANDLERS,
   ...ERROR_HANDLERS,
   ...HEALTH_HANDLERS,
+  ...DB_HANDLERS,
 }
