@@ -105,7 +105,7 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: NAVAL_SEA.ground,
     minPlayers: NAVAL_SETTINGS.minPlayers,
     maxPlayers: NAVAL_SETTINGS.maxPlayers,
-    playable: APP_ENVIRONMENT === 'dev',
+    playable: APP_ENVIRONMENT === 'dev' || APP_ENVIRONMENT === 'staging',
   },
 })
 

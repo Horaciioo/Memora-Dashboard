@@ -4,7 +4,6 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { LudoPawn } from '@/composites/play/ludo/LudoPawn'
 import type { LudoCornerName } from '@/declarations/play/ludo/board'
 import { LUDO_BOARD_COPY, ludoPlaceLabel } from '@/declarations/play/ludo/copy'
-import { fillPlayMessage } from '@/declarations/play/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { LUDO_PLATE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -20,7 +19,6 @@ export interface LudoPlateFace {
   isHost: boolean
   hasLeft: boolean
   place: number | null
-  home: { count: number; total: number }
 }
 
 export interface LudoPlateProps {
@@ -43,7 +41,7 @@ export interface LudoPlateProps {
  */
 
 export const LudoPlate = ({ face, colour, isRight, turn, isMine, die }: LudoPlateProps) => {
-  const { name, avatarUrl, isHost, hasLeft, place, home } = face
+  const { name, avatarUrl, isHost, hasLeft, place } = face
   const CrownIcon = ICONS.playCrown
 
   return (
@@ -81,11 +79,7 @@ export const LudoPlate = ({ face, colour, isRight, turn, isMine, die }: LudoPlat
             />
             <span className={LUDO_PLATE.name}>{name}</span>
           </div>
-          {place ? (
-            <span className={LUDO_PLATE.place}>{ludoPlaceLabel(place)}</span>
-          ) : (
-            <span className={LUDO_PLATE.note}>{fillPlayMessage(LUDO_BOARD_COPY.home, home)}</span>
-          )}
+          {place && <span className={LUDO_PLATE.place}>{ludoPlaceLabel(place)}</span>}
         </div>
         {die && <span className={LUDO_PLATE.dieSlot}>{die}</span>}
       </div>

@@ -60,24 +60,23 @@ export const LUDO_PLATE = {
   tag: 'ludo-turn-tag',
   plateRight: 'ludo-plate-right items-end',
   // Die beside the avatar, level with it
-  dieSlot: 'mt-0.5 shrink-0 scale-[0.72] origin-top sm:mt-1 sm:scale-100',
+  dieSlot: 'mt-0 shrink-0 scale-[0.6] origin-top sm:mt-1 sm:scale-100',
   off: 'opacity-45 grayscale',
   row: 'flex items-start gap-1.5 sm:gap-3',
   // Avatar, name and home count share one centred column
   core: 'flex min-w-0 flex-col items-center gap-1',
   rowRight: 'flex-row-reverse',
   // Avatar inside the turn clock
-  ring: 'ludo-ring grid size-12 shrink-0 place-items-center rounded-full p-[0.18rem] sm:size-[4.6rem] sm:p-[0.25rem]',
+  ring: 'ludo-ring grid size-10 shrink-0 place-items-center rounded-full p-[0.14rem] sm:size-[4.6rem] sm:p-[0.25rem]',
   ringAlert: 'ludo-ring-alert',
-  face: 'size-full rounded-full text-sm ring-[0.15rem] ring-[var(--play-ludo-felt)] sm:text-xl sm:ring-[0.2rem]',
-  chip: 'mt-1 w-6 shrink-0 sm:mt-2 sm:w-11',
+  face: '!size-full rounded-full text-xs ring-[0.15rem] ring-[var(--play-ludo-felt)] sm:text-xl sm:ring-[0.2rem]',
+  chip: 'mt-0.5 w-5 shrink-0 sm:mt-2 sm:w-11',
   nameRow: 'flex items-center justify-center gap-1 px-1 sm:gap-1.5',
   name: NAME,
   crown: 'size-3 shrink-0 sm:size-4 text-[var(--play-ludo-crown)]',
   dot: 'size-2 shrink-0 sm:size-2.5 rounded-full',
   online: 'bg-[var(--play-ludo-online)]',
   away: 'bg-[var(--play-ludo-away)]',
-  note: 'text-center text-[0.7rem] font-bold sm:text-xs text-[var(--play-ink-soft)] tabular-nums',
   place:
     'rounded-full bg-[var(--play-ludo-crown)] px-2 py-0.5 text-xs font-black text-[var(--play-ludo-felt)]',
 } as const

@@ -17,6 +17,7 @@ export const LUDO_BOARD_COPY = {
   eating: '{name} a mangé un pion de {victim}',
   theirRoll: '{name} lance le dé',
   theirMove: '{name} choisit un pion',
+  home: '{count} / {total} à la maison',
   starting: 'La partie commence',
   sixAgain: 'Six, tu rejoues',
   bonus: 'Tour bonus',
@@ -28,7 +29,6 @@ export const LUDO_BOARD_COPY = {
   place: '{place}e',
   firstPlace: '1er',
   pawn: 'Pion {number}',
-  home: '{count} / {total} à la maison',
   seconds: '{seconds} s',
   winner: 'Victoire',
 } as const

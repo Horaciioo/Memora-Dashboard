@@ -148,9 +148,6 @@ export const PlayInvitePicker = ({
                   onSend={send}
                 />
               ))}
-              {sections.every(({ people }) => people.length === 0) && (
-                <p className={PLAY_INVITE.empty}>{PLAY_HUB_COPY.inviteHint}</p>
-              )}
             </>
           )}
         </div>

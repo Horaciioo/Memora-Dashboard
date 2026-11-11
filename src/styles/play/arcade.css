@@ -1028,9 +1028,10 @@
   }
 }
 
-/* Shell glowing hot */
+/* Shell glowing hot, orange turning red */
 .play-bomb-heat {
-  opacity: calc(var(--heat, 0) * 0.6);
+  fill: color-mix(in srgb, var(--play-bomb-red) calc(var(--heat, 0) * 100%), var(--play-bomb));
+  opacity: calc(var(--heat, 0) * 0.85);
 }
 
 /* Spark swelling with the heat */

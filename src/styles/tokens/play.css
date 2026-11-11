@@ -198,6 +198,7 @@
   --play-golf-card-done: #6f9d5a;
   --play-bomb: #e0743a;
   --play-bomb-deep: #7a2a12;
+  --play-bomb-red: #e5251f;
   --play-bomb-glow: #ffd08a;
   /* The drawn bomb: iron shell, brass cap, cord, spark */
   --play-bomb-shell: #2a2236;
@@ -305,7 +306,7 @@
   --play-haze: #3a1d7a;
   --play-on-art: #ffffff;
   --play-panel: rgb(30 34 44 / 0.72);
-  --play-panel-strong: rgb(44 49 62 / 0.82);
+  --play-panel-strong: rgb(44 49 62);
   /* Frosted glass of the dock */
   --play-glass: rgb(26 30 40 / 0.78);
   --play-glass-solid: var(--play-night);
