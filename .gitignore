@@ -36,8 +36,8 @@ vitest.config.mts
 .DS_Store
 *.log
 
-# loose notes at the root
-/*.md
+# notes and agent instructions
+*.md
 !/README.md
 
 # editor
@@ -45,6 +45,7 @@ vitest.config.mts
 
 # internal tooling notes, never public
 /.claude/
+/.agents/
 
 # reference captures (Discord Putt Party, Ludo), never shipped
 /public/examples-putt-party
