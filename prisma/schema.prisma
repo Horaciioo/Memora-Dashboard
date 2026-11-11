@@ -3914,3 +3914,42 @@ model NexusLockout {
 
   @@map("nexus_lockouts")
 }
+
+// How a console command ended
+enum NexusAuditStatus {
+  OK
+  REFUSED
+  FAILED
+  PREVIEWED
+}
+
+// One line per console command, answered or refused
+model NexusAudit {
+  id             String           @id @default(cuid())
+  // Kept after the session closes
+  nexusSessionId String?
+  accountId      String
+  commandId      String?
+  // Typed text with secret arguments masked
+  input          String
+  level          String?
+  status         NexusAuditStatus
+  // Pipeline step that refused
+  refusal        String?
+  // Entity and identifier aimed at
+  target         String?
+  before         Json?
+  after          Json?
+  reversible     Boolean          @default(false)
+  revertedById   String?
+  requestId      String
+  durationMs     Int              @default(0)
+  address        String?
+  createdAt      DateTime         @default(now())
+
+  @@index([accountId, createdAt])
+  @@index([target, createdAt])
+  @@index([commandId])
+  @@index([createdAt])
+  @@map("nexus_audits")
+}
