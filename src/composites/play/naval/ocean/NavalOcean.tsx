@@ -9,8 +9,9 @@ import type { OceanZone } from '@/composites/play/naval/ocean/paint/zone'
 import { useOceanGestures } from '@/composites/play/naval/ocean/useOceanGestures'
 import type { OceanCell, OceanHandlers } from '@/composites/play/naval/ocean/useOceanGestures'
 import { useOceanPainter } from '@/composites/play/naval/ocean/useOceanPainter'
-import { firstCamera } from '@/core/lib/play/naval/camera'
+import { useOceanWorld } from '@/composites/play/naval/ocean/useOceanWorld'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
+import { navalStageOf } from '@/declarations/play/naval/maps'
 import { NAVAL_SKIN } from '@/declarations/play/naval/skins'
 import { NAVAL_VIEW } from '@/declarations/play/naval/view'
 import { NAVAL_OCEAN } from '@/declarations/ui/variants/games/naval'
@@ -18,6 +19,8 @@ import { cn } from '@/utils/classnames'
 
 export interface NavalOceanProps extends OceanHandlers {
   size: number
+  // Map drawn around the sea
+  map?: string
   marks: SeaMark[]
   ships?: OceanShip[]
   hover?: OceanCell | null
@@ -30,13 +33,14 @@ export interface NavalOceanProps extends OceanHandlers {
 }
 
 /**
- * A sea painted on a canvas, whole in view
+ * A sea painted on a canvas, whole in view with the decor of its map around it
  * @param {NavalOceanProps} props - Sea
  * @return {JSX.Element}
  */
 
 export const NavalOcean = ({
   size,
+  map,
   marks,
   ships = [],
   hover = null,
@@ -51,9 +55,10 @@ export const NavalOcean = ({
   const ownBox = useRef<HTMLDivElement>(null)
   const box = boxRef ?? ownBox
   const canvas = useRef<HTMLCanvasElement>(null)
-  const camera = useMemo(() => firstCamera(size, size), [size])
+  const { camera, mapId } = useMemo(() => navalStageOf(map, size), [map, size])
+  const world = useOceanWorld(mapId)
   const tilt = isFlat ? 0 : NAVAL_VIEW.tilt
-  useOceanPainter(canvas, { size, camera, marks, ships, skin: NAVAL_SKIN, hover, zone, playing })
+  useOceanPainter(canvas, { size, camera, marks, ships, skin: NAVAL_SKIN, hover, zone, playing, world })
   const gestures = useOceanGestures({ box, size, camera, tilt, ...handlers })
   const view = {
     '--tilt': `${tilt}deg`,

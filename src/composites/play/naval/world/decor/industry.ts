@@ -123,4 +123,5 @@ export const paintRig: DecorPainter = (scene) => {
   pen.stroke()
   paintGlow(pen, { x: flare.x, y: flare.y, radius: 2.4, colour: land.flare })
   paintLamp(pen, { x: flare.x, y: flare.y, radius: 0.5, colour: land.lamp })
+  scene.light?.({ x: flare.x, y: flare.y, radius: 1.6, colour: land.flare, beat: 'flicker' })
 }

@@ -15,6 +15,7 @@ import { cn } from '@/utils/classnames'
 
 export interface NavalTargetSeaProps {
   size: number
+  map: string
   target: NavalCaptainView
   isMine?: boolean
   marks: SeaMark[]
@@ -32,6 +33,7 @@ export interface NavalTargetSeaProps {
 
 export const NavalTargetSea = ({
   size,
+  map,
   target,
   isMine,
   marks,
@@ -46,6 +48,7 @@ export const NavalTargetSea = ({
     <div className={NAVAL_BOARD.target}>
       <NavalOcean
         size={size}
+        map={map}
         marks={marks}
         ships={ships}
         playing={playing}

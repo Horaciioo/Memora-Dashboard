@@ -92,7 +92,9 @@ const paintCrane = (scene: DecorScene, { x, y, base }: { x: number; y: number; b
   pen.moveTo(x + base[0] + lx, y + base[1] + ly + 0.8)
   pen.lineTo(x + base[0] + lx, y + base[1] + ly - reach)
   pen.stroke()
-  paintLamp(pen, { x: x + base[0] + lx, y: y + base[1] + ly - reach, radius: 0.5, colour: land.lamp })
+  const lamp = { x: x + base[0] + lx, y: y + base[1] + ly - reach }
+  paintLamp(pen, { ...lamp, radius: 0.5, colour: land.lamp })
+  scene.light?.({ ...lamp, radius: 0.7, colour: land.beacon, beat: 'blink' })
 }
 
 /**

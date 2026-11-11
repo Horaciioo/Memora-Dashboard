@@ -149,6 +149,7 @@ export const readLook = (node: Record<string, unknown>, path: string): NavalMapL
       span: readNumber(preview.span, { path: `${path}.preview.span`, fallback: 40, min: 8, max: 140 }),
       focus: readNumber(preview.focus, { path: `${path}.preview.focus`, fallback: 0, min: 0, max: 1 }),
     },
+    stage: readNumber(node.stage, { path: `${path}.stage`, fallback: 0, min: 0, max: 8 }),
     life: Object.fromEntries(
       Object.entries(life).filter((entry): entry is [string, number] => typeof entry[1] === 'number')
     ),

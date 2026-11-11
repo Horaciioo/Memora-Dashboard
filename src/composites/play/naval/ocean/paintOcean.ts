@@ -11,6 +11,7 @@ import { paintStillWater, paintSwell } from '@/composites/play/naval/ocean/paint
 import { paintNearGrid, paintZone } from '@/composites/play/naval/ocean/paint/zone'
 import type { OceanZone } from '@/composites/play/naval/ocean/paint/zone'
 import type { OceanCell } from '@/composites/play/naval/ocean/useOceanGestures'
+import type { StageWorld } from '@/composites/play/naval/world/stage'
 import type { NavalCamera } from '@/core/lib/play/naval/camera'
 import type { NavalTier } from '@/core/lib/play/naval/quality'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
@@ -30,6 +31,8 @@ export interface OceanScene {
   hover: OceanCell | null
   zone: OceanZone | null
   playing: OceanStrike | null
+  // Map drawn around the sea, plain water until it is fetched
+  world: StageWorld | null
 }
 
 /**
@@ -93,9 +96,9 @@ const marksVersionOf = (pen: OceanPen, marks: SeaMark[]): number => {
  * @return {() => void} - Paints the misses layer, after the ships
  */
 
-const paintLayers = (pen: OceanPen, frame: OceanFrame, { camera, marks }: OceanScene) => {
-  const key = `${pen.width}|${pen.ratio}|${camera.x},${camera.y},${camera.span}|${frame.size}|${frame.life ? 1 : 0}`
-  const water = freshLayer(pen.still, key, pen, (ctx) => paintStillWater({ ...frame, ctx, now: 0 }))
+const paintLayers = (pen: OceanPen, frame: OceanFrame, { camera, marks, world }: OceanScene) => {
+  const key = `${pen.width}|${pen.ratio}|${camera.x},${camera.y},${camera.span}|${frame.size}|${frame.life ? 1 : 0}|${world?.key ?? ''}`
+  const water = freshLayer(pen.still, key, pen, (ctx) => paintStillWater({ ...frame, ctx, now: 0 }, world))
   pen.ctx.drawImage(water, 0, 0, pen.width, pen.width)
 
   return () => {
@@ -122,6 +125,7 @@ export const paintOcean = (pen: OceanPen, scene: OceanScene, now: number, tier: 
   const base = { ctx, width, size: scene.size, now, skin: scene.skin, ratio, life: tier.life }
   const frame = frameOf(base, scene.camera)
   const paintMisses = paintLayers(pen, frame, scene)
+  if (frame.life && scene.world) scene.world.paintLife(frame)
   if (frame.life) paintSwell(frame)
   if (scene.hover) paintNearGrid(frame, scene.hover)
   paintShips(frame, withSinking(pen, scene.ships, now))

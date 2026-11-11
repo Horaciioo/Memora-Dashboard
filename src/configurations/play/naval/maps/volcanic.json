@@ -57,7 +57,7 @@
       "kind": "volcano",
       "side": "northwest",
       "at": 0.5,
-      "depth": 0.55,
+      "depth": 0.4,
       "scale": 1
     },
     {
@@ -88,6 +88,7 @@
     "mist": 0.12,
     "embers": 14
   },
+  "stage": 6,
   "preview": {
     "span": 21,
     "focus": 0.55

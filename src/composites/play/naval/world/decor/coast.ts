@@ -57,6 +57,7 @@ export const paintLighthouse: DecorPainter = (scene) => {
   pen.fill()
   pen.restore()
   paintLamp(pen, { x: top.x, y: top.y, radius: 0.9, colour: land.lamp })
+  scene.light?.({ x: top.x, y: top.y, radius: 1.4, colour: land.lamp, beat: 'blink' })
 }
 
 /**

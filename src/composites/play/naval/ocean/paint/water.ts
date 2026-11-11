@@ -1,5 +1,6 @@
 import { sightOf } from '@/composites/play/naval/ocean/paint/frame'
 import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
+import type { StageWorld } from '@/composites/play/naval/world/stage'
 import { NAVAL_WATER } from '@/declarations/play/naval/skins'
 import { SECOND_MS } from '@/utils/constants/time'
 
@@ -28,14 +29,16 @@ const paintBed = ({ ctx, width }: OceanFrame): void => {
 }
 
 /**
- * Swell: soft sine strokes drifting across, the second layer only at full life
+ * Swell: soft sine strokes drifting across the sea, the second layer only at full life
  * @param {OceanFrame} frame - Frame
  * @return {void}
  */
 
 export const paintSwell = (frame: OceanFrame): void => {
-  const { ctx, cell, left, top, now, width } = frame
+  const { ctx, cell, left, top, now, width, size } = frame
   const { y0, y1 } = sightOf(frame)
+  const from = Math.max(0, left)
+  const to = Math.min(width, left + size * cell)
   const seconds = now / SECOND_MS
   const gap = 1 / LINES_PER_SQUARE
   ctx.lineWidth = Math.max(1, cell * 0.05)
@@ -46,11 +49,12 @@ export const paintSwell = (frame: OceanFrame): void => {
     ctx.beginPath()
     for (let row = Math.floor(y0 / gap) * gap + layer * gap; row <= y1 + 1; row += gap) {
       const base = top + row * cell
-      for (let px = 0; px <= width; px += Math.max(4, cell / 3)) {
+      for (let px = from; px <= to; px = Math.min(to, px + Math.max(4, cell / 3))) {
         const phase = (px - left) / cell + seconds * DRIFT * (layer ? -1 : 1) * 4
         const lift = Math.sin(phase * 1.3 + row) * cell * 0.08
-        if (px === 0) ctx.moveTo(px, base + lift)
+        if (px === from) ctx.moveTo(px, base + lift)
         else ctx.lineTo(px, base + lift)
+        if (px === to) break
       }
     }
     ctx.stroke()
@@ -98,11 +102,13 @@ const paintGrid = (frame: OceanFrame): void => {
 /**
  * Water that holds still, painted once into its layer, swell frozen in when life is off
  * @param {OceanFrame} frame - Frame
+ * @param {StageWorld | null} world - Map around the sea, plain water without it
  * @return {void}
  */
 
-export const paintStillWater = (frame: OceanFrame): void => {
-  paintBed(frame)
+export const paintStillWater = (frame: OceanFrame, world: StageWorld | null): void => {
+  if (world) world.paintStill(frame)
+  else paintBed(frame)
   if (!frame.life) paintSwell(frame)
   paintGrid(frame)
   paintEdge(frame)

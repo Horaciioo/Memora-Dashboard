@@ -36,6 +36,24 @@ export const firstCamera = (size: number, startSpan: number): NavalCamera => ({
 })
 
 /**
+ * Camera over a sea and its decor: a few squares more, leaning towards the deeper bands
+ * @param {number} size - Sea size
+ * @param {Record<'north' | 'east' | 'south' | 'west', number>} band - Decor squares on each side
+ * @param {number} margin - Squares added to the view
+ * @return {NavalCamera} - Camera, the whole sea always in view
+ */
+
+export const stageCamera = (
+  size: number,
+  band: Record<'north' | 'east' | 'south' | 'west', number>,
+  margin: number
+): NavalCamera => {
+  const lean = (far: number, near: number) => (far + near ? (((far - near) / (far + near)) * margin) / 2 : 0)
+
+  return { x: size / 2 + lean(band.east, band.west), y: size / 2 + lean(band.south, band.north), span: size + margin }
+}
+
+/**
  * Square under a point of the view
  * @param {NavalCamera} camera - Camera
  * @param {NavalPoint} point - Point, in pixels from the top left

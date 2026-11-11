@@ -2,6 +2,8 @@ import cliffs from '@/configurations/play/naval/maps/cliffs.json'
 import strait from '@/configurations/play/naval/maps/strait.json'
 import tropical from '@/configurations/play/naval/maps/tropical.json'
 import volcanic from '@/configurations/play/naval/maps/volcanic.json'
+import { firstCamera, stageCamera } from '@/core/lib/play/naval/camera'
+import type { NavalCamera } from '@/core/lib/play/naval/camera'
 import { createRegistry } from '@/core/lib/registry'
 import { readLook, readTheatre } from '@/declarations/play/naval/maps/read'
 import type { NavalMapMeta } from '@/declarations/play/naval/maps/types'
@@ -76,4 +78,21 @@ export const navalMapSize = (id: string): string => {
   const { size } = (NAVAL_MAPS.has(id) ? NAVAL_MAPS.get(id) : NAVAL_MAPS.list[0]).theatre
 
   return `${size}x${size}`
+}
+
+/**
+ * What a sea of a game shows: its camera, and the map drawn around it when it fits the sea
+ * @param {string | undefined} id - Map key
+ * @param {number} size - Sea size
+ * @return {{ camera: NavalCamera; mapId: string | null }} - Stage, no map for a sea of another size
+ */
+
+export const navalStageOf = (
+  id: string | undefined,
+  size: number
+): { camera: NavalCamera; mapId: string | null } => {
+  const map = id && NAVAL_MAPS.has(id) ? NAVAL_MAPS.get(id) : null
+  if (!map || map.theatre.size !== size) return { camera: firstCamera(size, size), mapId: null }
+
+  return { camera: stageCamera(size, map.look.band, map.look.stage), mapId: id ?? null }
 }

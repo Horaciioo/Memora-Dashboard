@@ -129,6 +129,7 @@ export const NavalBattle = ({
           {target >= 0 && (
             <NavalTargetSea
               size={board.sea.size}
+              map={board.settings.map}
               target={captains[isOwnShown ? viewer : target]}
               isMine={isOwnShown}
               marks={isOwnShown ? mineMarks : marksOf(target)}

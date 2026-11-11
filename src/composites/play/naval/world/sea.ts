@@ -23,9 +23,10 @@ const channels = (hex: string): number[] => {
 }
 
 /**
- * Water bed, pixel by pixel: depth swells, lighter towards the coasts, light ripples
+ * Water bed, pixel by pixel: depth swells, lighter towards the coasts, light ripples,
+ * worked out every few pixels on a large picture and stretched back
  * @param {Pen} pen - Pen, no transform
- * @param {Object} view - Board and its fit
+ * @param {Object} view - Board, its fit and the pixel step
  * @return {void}
  */
 
@@ -36,21 +37,30 @@ export const paintBed = (
     look,
     fit,
     seed,
-  }: { board: WorldBoard; look: NavalMapLook; fit: { scale: number; x: number; y: number }; seed: number }
+    step = 1,
+  }: {
+    board: WorldBoard
+    look: NavalMapLook
+    fit: { scale: number; x: number; y: number }
+    seed: number
+    step?: number
+  }
 ): void => {
-  const { width, height } = pen.canvas
+  const { width: fullWidth, height: fullHeight } = pen.canvas
+  const width = Math.ceil(fullWidth / step)
+  const height = Math.ceil(fullHeight / step)
   const image = pen.createImageData(width, height)
   const [deep, mid, shallow] = ['deep', 'mid', 'shallow'].map((key) => channels(look.water[key]))
   const middle = { x: board.left + board.size / 2, y: board.top + board.size / 2 }
   const reach = Math.max(board.width, board.height) / 2
   for (let py = 0; py < height; py += 1) {
     for (let px = 0; px < width; px += 1) {
-      const bx = (px - fit.x) / fit.scale
-      const by = (py - fit.y) / fit.scale
+      const bx = (px * step - fit.x) / fit.scale
+      const by = (py * step - fit.y) / fit.scale
       const coast = Math.min(1, Math.hypot(bx - middle.x, by - middle.y) / reach)
       const swell = fbm(bx / DEPTH_SCALE, by / DEPTH_SCALE, seed)
       const depth = Math.min(1, Math.max(0, swell * 0.7 + coast * coast * 0.55 - 0.12))
-      const ridge = 1 - Math.abs(valueNoise(px / RIPPLE_PX, py / RIPPLE_PX, seed + 3) * 2 - 1)
+      const ridge = 1 - Math.abs(valueNoise((px * step) / RIPPLE_PX, (py * step) / RIPPLE_PX, seed + 3) * 2 - 1)
       const glint = ridge ** 12 * 9 * (0.3 + depth)
       const [from, to, share] = depth < 0.6 ? [deep, mid, depth / 0.6] : [mid, shallow, (depth - 0.6) / 0.4]
       const at = (py * width + px) * 4
@@ -60,7 +70,13 @@ export const paintBed = (
       image.data[at + 3] = 255
     }
   }
-  pen.putImageData(image, 0, 0)
+  if (step === 1) return pen.putImageData(image, 0, 0)
+  const small = document.createElement('canvas')
+  small.width = width
+  small.height = height
+  small.getContext('2d')?.putImageData(image, 0, 0)
+  pen.drawImage(small, 0, 0, width * step, height * step)
+  small.width = 0
 }
 
 /**

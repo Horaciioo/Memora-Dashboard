@@ -86,6 +86,7 @@
     "birds": 2,
     "mist": 0.18
   },
+  "stage": 6,
   "preview": {
     "span": 20,
     "focus": 0.45

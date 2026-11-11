@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
+import { loadWorldPainters } from '@/composites/play/naval/world/load'
 import { navalMapSize } from '@/declarations/play/naval/maps'
 import { NAVAL_MAP_CARD } from '@/declarations/ui/variants/games/naval'
 
@@ -24,11 +25,14 @@ const pictureOf = (id: string): Promise<string> => {
   if (known) return Promise.resolve(known)
   const drawn = queue.then(async () => {
     await new Promise((resolve) => window.setTimeout(resolve, 0))
-    const { paintMapScene } = await import('@/composites/play/naval/world/scene')
+    const [{ paintMapScene }, painters] = await Promise.all([
+      import('@/composites/play/naval/world/scene'),
+      loadWorldPainters(id),
+    ])
     const canvas = document.createElement('canvas')
     canvas.width = PICTURE_PX
     canvas.height = PICTURE_PX
-    paintMapScene(canvas, id)
+    paintMapScene(canvas, id, painters)
     PICTURES.set(id, canvas.toDataURL('image/webp', 0.9))
   })
   queue = drawn

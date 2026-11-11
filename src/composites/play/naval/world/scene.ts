@@ -1,4 +1,4 @@
-import { DECOR_PAINTERS } from '@/composites/play/naval/world/decor'
+import type { DecorLight, DecorPainters } from '@/composites/play/naval/world/decor'
 import { boardOf, frameOf, placeOf } from '@/composites/play/naval/world/geometry'
 import type { WorldBoard } from '@/composites/play/naval/world/geometry'
 import { pieceRng } from '@/composites/play/naval/world/noise'
@@ -99,35 +99,101 @@ const paintAir = (pen: Pen, look: NavalMapLook): void => {
 }
 
 /**
- * Whole map drawn into a canvas, the board covering it: water, decor, grid, light
- * @param {HTMLCanvasElement | OffscreenCanvas} canvas - Target, sized already
- * @param {string} id - Map key
+ * Pixels per square and offset of the board on a pen without transform
+ * @typedef {Object} WorldFit
+ */
+
+export interface WorldFit {
+  scale: number
+  x: number
+  y: number
+}
+
+/**
+ * How a map is painted
+ * @typedef {Object} WorldPaint
+ * @property {DecorPainters} painters - Painters of its pieces, a missing one is left out
+ * @property {boolean} [isGame] - Inside a game: the grid is the game's and no piece covers it
+ * @property {number} [step] - Pixels per worked out pixel of the bed
+ * @property {(light: DecorLight) => void} [light] - Keeps the living lights
+ */
+
+export interface WorldPaint {
+  id: string
+  fit: WorldFit
+  painters: DecorPainters
+  isGame?: boolean
+  step?: number
+  light?: (light: DecorLight) => void
+}
+
+/**
+ * Pieces of the decor, the farthest first, kept off the sea in a game
+ * @param {Pen} pen - Pen in squares
+ * @param {Object} view - Board, map and how it is painted
  * @return {void}
  */
 
-export const paintMapScene = (canvas: HTMLCanvasElement, id: string): void => {
-  const pen = canvas.getContext('2d')
-  const map = NAVAL_MAPS.has(id) ? NAVAL_MAPS.get(id) : NAVAL_MAPS.list[0]
-  if (!pen) return
-  const { look } = map
-  const board = boardOf(look, map.theatre.size)
-  const fit = frameOf(board, look, canvas.width)
-  const seed = seedOf(id)
-  paintBed(pen, { board, look, fit, seed })
-  pen.setTransform(fit.scale, 0, 0, fit.scale, fit.x, fit.y)
-  paintCloudShadows(pen, { board, look, seed })
-  paintCrests(pen, { board, look, seed })
-  paintGrid(pen, board, look)
-  // Far pieces first, the nearest on top
+const paintPieces = (
+  pen: Pen,
+  { board, look, seed, paint }: { board: WorldBoard; look: NavalMapLook; seed: number; paint: WorldPaint }
+): void => {
+  pen.save()
+  if (paint.isGame) {
+    pen.beginPath()
+    pen.rect(-board.width, -board.height, board.width * 3, board.height * 3)
+    pen.rect(board.left, board.top, board.size, board.size)
+    pen.clip('evenodd')
+  }
   const pieces = look.decor
     .map((piece, index) => ({ piece, index, place: placeOf(board, look, piece) }))
     .toSorted((a, b) => a.place.y - b.place.y)
   for (const { piece, index, place } of pieces) {
+    const painter = paint.painters[piece.kind]
+    if (!painter) continue
     pen.save()
-    DECOR_PAINTERS[piece.kind]({ pen, board, look, piece, place, seed: seed + index * 101 })
+    painter({ pen, board, look, piece, place, seed: seed + index * 101, light: paint.light })
     pen.restore()
   }
+  pen.restore()
+}
+
+/**
+ * Whole map drawn on a pen without transform: water, decor, grid, light
+ * @param {Pen} pen - Pen, sized already
+ * @param {WorldPaint} paint - Map and how
+ * @return {void}
+ */
+
+export const paintWorld = (pen: Pen, paint: WorldPaint): void => {
+  const map = NAVAL_MAPS.has(paint.id) ? NAVAL_MAPS.get(paint.id) : NAVAL_MAPS.list[0]
+  const { look } = map
+  const { fit } = paint
+  const board = boardOf(look, map.theatre.size)
+  const seed = seedOf(paint.id)
+  paintBed(pen, { board, look, fit, seed, step: paint.step })
+  pen.setTransform(fit.scale, 0, 0, fit.scale, fit.x, fit.y)
+  paintCloudShadows(pen, { board, look, seed })
+  paintCrests(pen, { board, look, seed })
+  if (!paint.isGame) paintGrid(pen, board, look)
+  paintPieces(pen, { board, look, seed, paint })
   paintMist(pen, board, look, seed)
   pen.setTransform(1, 0, 0, 1, 0, 0)
   paintAir(pen, look)
+}
+
+/**
+ * Picture of a map, the board covering it
+ * @param {HTMLCanvasElement} canvas - Target, sized already
+ * @param {string} id - Map key
+ * @param {DecorPainters} painters - Painters of its pieces
+ * @return {void}
+ */
+
+export const paintMapScene = (canvas: HTMLCanvasElement, id: string, painters: DecorPainters): void => {
+  const pen = canvas.getContext('2d')
+  const map = NAVAL_MAPS.has(id) ? NAVAL_MAPS.get(id) : NAVAL_MAPS.list[0]
+  if (!pen) return
+  const fit = frameOf(boardOf(map.look, map.theatre.size), map.look, canvas.width)
+  paintWorld(pen, { id, fit, painters })
 }

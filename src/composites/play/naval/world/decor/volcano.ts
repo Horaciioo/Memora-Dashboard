@@ -82,7 +82,7 @@ const paintLava = (
  */
 
 const paintCrater = (
-  { pen, look, seed }: DecorScene,
+  { pen, look, seed, light }: DecorScene,
   { top, radius }: { top: [number, number]; radius: number }
 ): void => {
   const { land } = look
@@ -100,6 +100,7 @@ const paintCrater = (
   pen.ellipse(x, y + radius * 0.06, radius * 0.72, radius * 0.5, 0, 0, Math.PI * 2)
   pen.fill()
   paintGlow(pen, { x, y, radius: radius * 4, colour: look.water.glow, strength: 0.9 })
+  light?.({ x, y, radius: radius * 5, colour: look.water.glow, beat: 'pulse' })
   const rng = pieceRng(seed + 13)
   pen.fillStyle = land.lavaCore
   for (let ember = 0; ember < (look.life.embers ?? 0); ember += 1) {

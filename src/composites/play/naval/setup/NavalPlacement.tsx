@@ -72,6 +72,7 @@ export const NavalPlacement = ({
             <NavalOcean
               boxRef={box}
               size={sea.size}
+              map={board.settings.map}
               marks={marksOf(sea.size, [])}
               ships={ships.map((ship) => ({ ship }))}
               zone={isPlacing ? placement.zone : null}
@@ -92,6 +93,7 @@ export const NavalPlacement = ({
                   heldId={placement.heldId}
                   box={box}
                   size={sea.size}
+                  map={board.settings.map}
                   onGrab={placement.grabFromDock}
                   onDrag={placement.onDrag}
                   onDrop={placement.onDrop}

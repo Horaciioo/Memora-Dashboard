@@ -99,6 +99,8 @@ export interface NavalMapLook {
   land: Record<string, string>
   decor: NavalDecor[]
   life: Record<string, number>
+  // Decor squares added around the sea in a game
+  stage: number
   // Thumbnail framing: squares shown, pull towards the first piece
   preview: { span: number; focus: number }
 }

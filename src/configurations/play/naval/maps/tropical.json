@@ -87,6 +87,7 @@
     "clouds": 4,
     "birds": 3
   },
+  "stage": 4,
   "preview": {
     "span": 21,
     "focus": 0.2

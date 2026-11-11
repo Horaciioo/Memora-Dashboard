@@ -6,8 +6,8 @@ import type { RefObject } from 'react'
 import { NavalShipSprite } from '@/composites/play/naval/NavalShipSprite'
 import { locate } from '@/composites/play/naval/ocean/useOceanGestures'
 import type { OceanCell } from '@/composites/play/naval/ocean/useOceanGestures'
-import { firstCamera } from '@/core/lib/play/naval/camera'
 import { NAVAL_SHIP_NAMES } from '@/declarations/play/naval/copy'
+import { navalStageOf } from '@/declarations/play/naval/maps'
 import { NAVAL_VIEW } from '@/declarations/play/naval/view'
 import { NAVAL_PLACE } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
@@ -18,6 +18,7 @@ export interface NavalDockProps {
   heldId: number | null
   box: RefObject<HTMLDivElement | null>
   size: number
+  map: string
   onGrab: (id: number) => void
   onDrag: (cell: OceanCell | null) => void
   onDrop: (cell: OceanCell | null) => void
@@ -35,14 +36,15 @@ export const NavalDock = ({
   heldId,
   box,
   size,
+  map,
   onGrab,
   onDrag,
   onDrop,
 }: NavalDockProps) => {
   const isDragging = useRef(false)
-  const latest = useRef({ size, onDrag, onDrop })
+  const latest = useRef({ size, map, onDrag, onDrop })
   useEffect(() => {
-    latest.current = { size, onDrag, onDrop }
+    latest.current = { size, map, onDrag, onDrop }
   })
 
   // The finger leaves the dock, the sea follows it
@@ -53,7 +55,7 @@ export const NavalDock = ({
             box.current,
             { x: event.clientX, y: event.clientY },
             {
-              camera: firstCamera(latest.current.size, latest.current.size),
+              camera: navalStageOf(latest.current.map, latest.current.size).camera,
               size: latest.current.size,
               tilt: NAVAL_VIEW.tilt,
             }
