@@ -112,6 +112,7 @@ export const MEMBER_COPY = {
   railPinned: 'Note épinglée',
   noFunction: 'Aucune fonction',
   unofficial: 'Non officiel',
+  formerToggle: 'Afficher les destitués et démissionnaires',
   administration: 'Administration',
   moderators: 'Modérateurs',
   acceptedCandidates: 'Candidat accepté',

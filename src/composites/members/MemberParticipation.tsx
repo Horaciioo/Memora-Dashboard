@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 
-import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { Avatar } from '@/components/elements/display/Avatar'
 import Link from '@/components/elements/navigation/AppLink'
+import { Tabs } from '@/components/elements/navigation/Tabs'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { Section } from '@/components/structures/page/Section'
 import { useSeatActions } from '@/core/hooks/data/people/useSeatActions'
@@ -220,9 +220,11 @@ export const MemberParticipation = ({
   const { isSaving, act } = useSeatActions()
   const [forgetting, setForgetting] = useState<Participation | null>(null)
 
-  // One tab per function held
-  const tabs = PARTICIPATION_TABS.filter((tab) =>
-    tab.functions.some((name) => functions.includes(name))
+  // One tab per function held, or per kind of session already joined
+  const tabs = PARTICIPATION_TABS.filter(
+    (tab) =>
+      tab.functions.some((name) => functions.includes(name)) ||
+      participations.some((entry) => entry.kind === tab.value)
   )
   const [picked, setPicked] = useState<string>('')
   const current = tabs.find((tab) => tab.value === picked) ?? tabs[0]
@@ -250,8 +252,8 @@ export const MemberParticipation = ({
     >
       {tabs.length > 1 && (
         <div className={PARTICIPATION_BOX.tabs}>
-          <SegmentedControl
-            options={tabs.map(({ value, label }) => ({ value, label }))}
+          <Tabs
+            items={tabs.map(({ value, label }) => ({ value, label }))}
             value={current.value}
             onChange={setPicked}
             label={MEMBER_COPY.participationTabs}
