@@ -1,4 +1,4 @@
-import { clamp01 } from '@/composites/play/naval/ocean/paint/frame'
+import { clamp01, sightOf } from '@/composites/play/naval/ocean/paint/frame'
 import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
 import { paintHull } from '@/composites/play/naval/ocean/paint/hull'
 import type { NavalShip } from '@/core/lib/play/naval/fleet'
@@ -41,6 +41,20 @@ const poseOf = ({ cell, left, top, now }: OceanFrame, ship: NavalShip) => {
 }
 
 /**
+ * Ship overlapping the squares in sight
+ * @param {ReturnType<typeof sightOf>} sight - Squares in sight
+ * @param {NavalShip} ship - Ship
+ * @return {boolean} - Seen
+ */
+
+const isInSight = (sight: ReturnType<typeof sightOf>, ship: NavalShip): boolean => {
+  const x1 = ship.x + (ship.isHorizontal ? ship.length - 1 : 0)
+  const y1 = ship.y + (ship.isHorizontal ? 0 : ship.length - 1)
+
+  return x1 >= sight.x0 && ship.x <= sight.x1 && y1 >= sight.y0 && ship.y <= sight.y1
+}
+
+/**
  * A wreck: hull broken in two, halves leaning apart and going under
  * @param {OceanFrame} frame - Frame
  * @param {OceanShip} entry - Ship
@@ -78,7 +92,9 @@ const paintWreck = (frame: OceanFrame, { ship, sinkFrom }: OceanShip): void => {
 
 export const paintShips = (frame: OceanFrame, ships: OceanShip[]): void => {
   const { ctx, cell } = frame
+  const sight = sightOf(frame)
   for (const entry of ships) {
+    if (!isInSight(sight, entry.ship)) continue
     const pose = poseOf(frame, entry.ship)
     ctx.save()
     ctx.translate(pose.x, pose.y + (entry.isWreck ? 0 : pose.bob * cell * 0.03))

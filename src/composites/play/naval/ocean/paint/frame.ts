@@ -12,6 +12,8 @@ import type { NavalSkin } from '@/declarations/play/naval/skins'
  * @property {number} size - Squares per side
  * @property {number} now - Clock in milliseconds
  * @property {NavalSkin} skin - Ships and shells
+ * @property {number} ratio - Pixel density
+ * @property {number} life - Share of the living sea, zero is still
  */
 
 export interface OceanFrame {
@@ -23,6 +25,8 @@ export interface OceanFrame {
   size: number
   now: number
   skin: NavalSkin
+  ratio: number
+  life: number
 }
 
 /**

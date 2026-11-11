@@ -247,6 +247,22 @@ export const NavalWeapons = {
 export type NavalWeaponName = (typeof NavalWeapons)[keyof typeof NavalWeapons]
 
 /**
+ * Effect tiers of a sea, auto picks one
+ * @type {Object}
+ */
+
+export const NavalQualities = {
+  Auto: 'auto',
+  Full: 'full',
+  Reduced: 'reduced',
+  Minimal: 'minimal',
+} as const
+
+export type NavalQualityName = (typeof NavalQualities)[keyof typeof NavalQualities]
+
+export type NavalTierName = Exclude<NavalQualityName, typeof NavalQualities.Auto>
+
+/**
  * Footprint of a weapon on the sea
  * @type {Record<string, string>}
  */

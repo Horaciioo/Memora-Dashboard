@@ -39,7 +39,7 @@ export const NavalShipSprite = ({
     element.height = Math.round(height * ratio)
     ctx.setTransform(ratio, 0, 0, ratio, 0, height / 2)
     paintHull(
-      { ctx, width, cell, left: 0, top: 0, size: length, now: 0, skin: NAVAL_SKIN },
+      { ctx, width, cell, left: 0, top: 0, size: length, now: 0, skin: NAVAL_SKIN, ratio, life: 0 },
       { id, length, x: 0, y: 0, isHorizontal: true }
     )
   }, [id, length, cell, width, height])

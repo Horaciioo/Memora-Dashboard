@@ -6,6 +6,11 @@ import { SECOND_MS } from '@/utils/constants/time'
 // Swell lines per square, and their drift speed in squares per second
 const LINES_PER_SQUARE = 0.5
 const DRIFT = 0.18
+// Swell layers: row offset in gaps, opacity
+const SWELL_LAYERS = [
+  [0, 1],
+  [0.5, 0.6],
+] as const
 
 /**
  * Deep water, lighter towards the viewer
@@ -23,21 +28,19 @@ const paintBed = ({ ctx, width }: OceanFrame): void => {
 }
 
 /**
- * Swell: soft sine strokes drifting across, two layers
+ * Swell: soft sine strokes drifting across, the second layer only at full life
  * @param {OceanFrame} frame - Frame
  * @return {void}
  */
 
-const paintSwell = (frame: OceanFrame): void => {
+export const paintSwell = (frame: OceanFrame): void => {
   const { ctx, cell, left, top, now, width } = frame
   const { y0, y1 } = sightOf(frame)
   const seconds = now / SECOND_MS
   const gap = 1 / LINES_PER_SQUARE
   ctx.lineWidth = Math.max(1, cell * 0.05)
-  for (const [layer, alpha] of [
-    [0, 1],
-    [0.5, 0.6],
-  ] as const) {
+  const layers = frame.life >= 1 ? SWELL_LAYERS : SWELL_LAYERS.slice(0, 1)
+  for (const [layer, alpha] of layers) {
     ctx.strokeStyle = NAVAL_WATER.sheen
     ctx.globalAlpha = alpha
     ctx.beginPath()
@@ -93,14 +96,14 @@ const paintGrid = (frame: OceanFrame): void => {
 }
 
 /**
- * Animated water of a sea
+ * Water that holds still, painted once into its layer, swell frozen in when life is off
  * @param {OceanFrame} frame - Frame
  * @return {void}
  */
 
-export const paintWater = (frame: OceanFrame): void => {
+export const paintStillWater = (frame: OceanFrame): void => {
   paintBed(frame)
-  paintSwell(frame)
+  if (!frame.life) paintSwell(frame)
   paintGrid(frame)
   paintEdge(frame)
 }

@@ -3,66 +3,117 @@
 import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 
-import { frameOf } from '@/composites/play/naval/ocean/paint/frame'
-import { paintMarks } from '@/composites/play/naval/ocean/paint/marks'
-import { paintShips } from '@/composites/play/naval/ocean/paint/ships'
-import type { OceanShip } from '@/composites/play/naval/ocean/paint/ships'
-import { paintStrike } from '@/composites/play/naval/ocean/paint/strike'
-import type { OceanStrike } from '@/composites/play/naval/ocean/paint/strike'
-import { paintWater } from '@/composites/play/naval/ocean/paint/water'
-import { paintNearGrid, paintZone } from '@/composites/play/naval/ocean/paint/zone'
-import type { OceanZone } from '@/composites/play/naval/ocean/paint/zone'
-import type { OceanCell } from '@/composites/play/naval/ocean/useOceanGestures'
-import type { NavalCamera } from '@/core/lib/play/naval/camera'
-import type { SeaMark } from '@/core/lib/play/naval/sea'
-import type { NavalSkin } from '@/declarations/play/naval/skins'
+import { blankLayer, freeLayer } from '@/composites/play/naval/ocean/layers'
+import { oceanLoop } from '@/composites/play/naval/ocean/loop'
+import { recordPaint } from '@/composites/play/naval/ocean/monitor'
+import { paintOcean } from '@/composites/play/naval/ocean/paintOcean'
+import type { OceanPen, OceanScene } from '@/composites/play/naval/ocean/paintOcean'
+import { currentTier, reportFrame } from '@/composites/play/naval/ocean/tier'
+import { NAVAL_QUALITY } from '@/declarations/play/naval/quality'
 import { NAVAL_SHAKE, NAVAL_VIEW } from '@/declarations/play/naval/view'
 import { NAVAL_WEAPONS } from '@/declarations/play/naval/weapons'
+import { NavalQualities } from '@/utils/constants/play'
 import { SECOND_MS } from '@/utils/constants/time'
 import { prefersReducedMotion } from '@/utils/motion'
 
+export type { OceanScene } from '@/composites/play/naval/ocean/paintOcean'
+
 /**
- * Everything a sea paints
- * @typedef {Object} OceanScene
+ * Latest scene and whether it still has to be painted
+ * @typedef {Object} OceanFeed
  */
 
-export interface OceanScene {
-  size: number
-  camera: NavalCamera
-  marks: SeaMark[]
-  ships: OceanShip[]
-  skin: NavalSkin
-  hover: OceanCell | null
-  zone: OceanZone | null
-  playing: OceanStrike | null
+interface OceanFeed {
+  scene: RefObject<OceanScene>
+  isDirty: RefObject<boolean>
 }
 
 /**
- * Wrecks seen go down once, those already down lie still
- * @param {Map<string, number>} seen - Ship key to the clock it sank
- * @param {OceanShip[]} ships - Ships
- * @param {number} now - Clock
- * @param {boolean} isFirst - First frame, nothing sinks
- * @return {OceanShip[]} - Ships with their sinking clock
+ * Canvas sized to its box at the tier density
+ * @param {HTMLCanvasElement} element - Canvas
+ * @param {OceanPen} pen - Pen
+ * @param {number} ceiling - Tier pixel ceiling
+ * @return {void}
  */
 
-const withSinking = (
-  seen: Map<string, number>,
-  ships: OceanShip[],
-  now: number,
-  isFirst: boolean
-) =>
-  ships.map((entry) => {
-    if (!entry.isWreck) return entry
-    const key = `${entry.ship.id}:${entry.ship.x}:${entry.ship.y}`
-    if (!seen.has(key)) seen.set(key, isFirst ? -Infinity : now)
-    const from = seen.get(key) ?? -Infinity
-
-    return Number.isFinite(from) ? { ...entry, sinkFrom: from } : entry
-  })
+const fitCanvas = (element: HTMLCanvasElement, pen: OceanPen, ceiling: number): void => {
+  pen.ratio = Math.min(window.devicePixelRatio || 1, ceiling)
+  const pixels = Math.round(pen.width * pen.ratio)
+  if (element.width === pixels) return
+  element.width = pixels
+  element.height = pixels
+}
 
 /**
- * Paint loop of a sea on a canvas, one frame per screen refresh
+ * Screen shake of the strike under way, scaled by the tier
+ * @param {OceanScene} scene - Scene
+ * @param {number} share - Strike shake share
+ * @param {number} tierShake - Tier shake share, zero under reduced motion
+ * @return {string} - Translate value
+ */
+
+const shakeOf = ({ playing }: OceanScene, share: number, tierShake: number): string => {
+  const weapon = playing ? NAVAL_WEAPONS[playing.strike.weapon]?.name : undefined
+  const amount = weapon ? share * NAVAL_SHAKE[weapon] * tierShake : 0
+
+  return amount ? `${(Math.random() - 0.5) * amount}px ${(Math.random() - 0.5) * amount}px` : ''
+}
+
+/**
+ * Paint loop of a canvas: full pace during a strike, idle pace otherwise, none out of sight
+ * @param {HTMLCanvasElement} element - Canvas
+ * @param {CanvasRenderingContext2D} ctx - Pen
+ * @param {OceanFeed} feed - Scene feed
+ * @return {() => void} - Stops and frees the layers
+ */
+
+const startOcean = (element: HTMLCanvasElement, ctx: CanvasRenderingContext2D, feed: OceanFeed) => {
+  const pen: OceanPen = {
+    ctx,
+    width: element.clientWidth,
+    ratio: 1,
+    still: blankLayer(),
+    marked: blankLayer(),
+    sinking: new Map(),
+    isFirst: true,
+    marks: new Uint8Array(),
+    marksVersion: 0,
+  }
+  const isCalm = prefersReducedMotion()
+  let paintedAt = -Infinity
+  let busyAt: number | null = null
+  const tick = (now: number) => {
+    const { name, tier } = currentTier()
+    const scene = feed.scene.current
+    const fps = name === NavalQualities.Minimal ? NAVAL_QUALITY.ecoFps : NAVAL_VIEW.idleFps
+    const isBusy = Boolean(scene.playing)
+    if (!isBusy && !feed.isDirty.current && now - paintedAt < SECOND_MS / fps) return
+    if (isBusy && busyAt !== null) reportFrame(now - busyAt, now)
+    busyAt = isBusy ? now : null
+    paintedAt = now
+    feed.isDirty.current = false
+    fitCanvas(element, pen, tier.pixelRatio)
+    const started = performance.now()
+    const share = paintOcean(pen, scene, now, tier)
+    recordPaint(performance.now() - started, name)
+    element.style.translate = shakeOf(scene, share, isCalm ? 0 : tier.shake)
+  }
+  const wake = () => {
+    pen.width = element.clientWidth
+    busyAt = null
+    feed.isDirty.current = true
+  }
+  const stop = oceanLoop(element, { tick, wake, rest: () => (element.style.translate = '') })
+
+  return () => {
+    stop()
+    freeLayer(pen.still)
+    freeLayer(pen.marked)
+  }
+}
+
+/**
+ * Paint loop of a sea on a canvas
  * @param {RefObject<HTMLCanvasElement | null>} canvas - Canvas
  * @param {OceanScene} scene - Scene, read on every frame
  * @return {void}
@@ -84,61 +135,7 @@ export const useOceanPainter = (
     const element = canvas.current
     const ctx = element?.getContext('2d')
     if (!element || !ctx) return
-    const sinking = new Map<string, number>()
-    const isCalm = prefersReducedMotion()
-    const idleGap = SECOND_MS / NAVAL_VIEW.idleFps
-    let frameId = 0
-    let isFirst = true
-    let paintedAt = -Infinity
-    // Width read once per resize, never per frame
-    let width = element.clientWidth
-    let isSeen = true
-    const sizer = new ResizeObserver(() => {
-      width = element.clientWidth
-      isDirty.current = true
-    })
-    sizer.observe(element)
-    // A sea scrolled away stops painting
-    const sight = new IntersectionObserver(([entry]) => {
-      isSeen = entry?.isIntersecting ?? true
-      isDirty.current = true
-    })
-    sight.observe(element)
 
-    const draw = (now: number) => {
-      frameId = requestAnimationFrame(draw)
-      const { playing } = latest.current
-      const isDue = playing || isDirty.current || now - paintedAt >= idleGap
-      if (!isSeen || !isDue) return
-      paintedAt = now
-      isDirty.current = false
-      const ratio = window.devicePixelRatio || 1
-      if (element.width !== Math.round(width * ratio)) {
-        element.width = Math.round(width * ratio)
-        element.height = Math.round(width * ratio)
-      }
-      const { size, camera, marks, ships, skin, hover, zone } = latest.current
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
-      const frame = frameOf({ ctx, width, size, now, skin }, camera)
-      paintWater(frame)
-      if (hover) paintNearGrid(frame, hover)
-      paintShips(frame, withSinking(sinking, ships, now, isFirst))
-      paintMarks(frame, marks)
-      if (zone) paintZone(frame, zone)
-      const shake = playing ? paintStrike(frame, playing) : 0
-      const weapon = playing ? NAVAL_WEAPONS[playing.strike.weapon]?.name : undefined
-      const amount = isCalm || !weapon ? 0 : shake * NAVAL_SHAKE[weapon]
-      element.style.translate = amount
-        ? `${(Math.random() - 0.5) * amount}px ${(Math.random() - 0.5) * amount}px`
-        : ''
-      isFirst = false
-    }
-    frameId = requestAnimationFrame(draw)
-
-    return () => {
-      cancelAnimationFrame(frameId)
-      sizer.disconnect()
-      sight.disconnect()
-    }
+    return startOcean(element, ctx, { scene: latest, isDirty })
   }, [canvas])
 }
