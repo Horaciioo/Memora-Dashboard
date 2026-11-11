@@ -74,7 +74,15 @@ const paintWall = ({ pen, look, seed }: DecorScene, foot: Outline, lift: Lift): 
     cave.addColorStop(1, shade(land.rockDark, -0.1))
     pen.fillStyle = cave
     pen.beginPath()
-    pen.ellipse(x + lift[0] * 0.12, y + lift[1] * 0.12, size * 0.55, size, Math.atan2(lift[1], lift[0]), 0, Math.PI * 2)
+    pen.ellipse(
+      x + lift[0] * 0.12,
+      y + lift[1] * 0.12,
+      size * 0.55,
+      size,
+      Math.atan2(lift[1], lift[0]),
+      0,
+      Math.PI * 2
+    )
     pen.fill()
   }
 }
@@ -96,7 +104,10 @@ const paintPlateau = ({ pen, look, seed, place }: DecorScene, top: Outline): voi
     const x = place.x + (rng() - 0.5) * place.room * 2.6
     const y = rng() * 120 - 10
     const radius = 0.4 + rng() * 1.3
-    pen.fillStyle = shade([land.grassDark, land.grass, land.grassDark, land.scree][index % 4], (rng() - 0.5) * 0.12)
+    pen.fillStyle = shade(
+      [land.grassDark, land.grass, land.grassDark, land.scree][index % 4],
+      (rng() - 0.5) * 0.12
+    )
     pen.globalAlpha = 0.45
     pen.beginPath()
     pen.ellipse(x, y, radius, radius * 0.7, rng() * Math.PI, 0, Math.PI * 2)
@@ -138,13 +149,25 @@ export const paintCliff: DecorPainter = (scene) => {
   for (let index = 0; index < foot.length; index += 4) {
     const [x, y] = foot[index]
     const out = (isWest ? 1 : -1) * (0.2 + rng() * 0.5)
-    paintStone(scene, { outline: stoneOutline(x + out, y, 0.18 + rng() * 0.22, rng), x: x + out, y, height: 0.3 })
+    paintStone(scene, {
+      outline: stoneOutline(x + out, y, 0.18 + rng() * 0.22, rng),
+      x: x + out,
+      y,
+      height: 0.3,
+    })
   }
   extrude(pen, {
     outline: massif,
     lift,
     side: shade(land.rock, -0.08),
-    top: sunlit(pen, { x: place.x + lift[0], y: place.y, radius: place.room, sun, colour: land.grass, strength: 0.15 }),
+    top: sunlit(pen, {
+      x: place.x + lift[0],
+      y: place.y,
+      radius: place.room,
+      sun,
+      colour: land.grass,
+      strength: 0.15,
+    }),
   })
   paintWall(scene, foot, lift)
   const top = massif.map(([x, y]): [number, number] => [x + lift[0], y + lift[1]])
@@ -152,6 +175,8 @@ export const paintCliff: DecorPainter = (scene) => {
   pen.strokeStyle = shade(land.rockLight, 0.25)
   pen.lineWidth = 0.08
   pen.beginPath()
-  foot.forEach(([x, y], index) => (index ? pen.lineTo(x + lift[0], y + lift[1]) : pen.moveTo(x + lift[0], y + lift[1])))
+  foot.forEach(([x, y], index) =>
+    index ? pen.lineTo(x + lift[0], y + lift[1]) : pen.moveTo(x + lift[0], y + lift[1])
+  )
   pen.stroke()
 }

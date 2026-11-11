@@ -13,7 +13,8 @@ import type { NavalMapLook } from '@/declarations/play/naval/maps'
  * @return {number} - Seed
  */
 
-const seedOf = (id: string): number => [...id].reduce((sum, char) => sum * 31 + char.charCodeAt(0), 7) | 0
+const seedOf = (id: string): number =>
+  [...id].reduce((sum, char) => sum * 31 + char.charCodeAt(0), 7) | 0
 
 /**
  * Grid lines over the playable water and its frame
@@ -58,7 +59,11 @@ const paintMist = (pen: Pen, board: WorldBoard, look: NavalMapLook, seed: number
   const span = Math.max(board.width, board.height)
   for (let wisp = 0; wisp < 12; wisp += 1) {
     const isEdge = wisp % 3 !== 0
-    const x = isEdge ? (rng() < 0.5 ? rng() * board.left : board.width - rng() * (board.width - board.left - board.size)) : rng() * board.width
+    const x = isEdge
+      ? rng() < 0.5
+        ? rng() * board.left
+        : board.width - rng() * (board.width - board.left - board.size)
+      : rng() * board.width
     const y = rng() * board.height
     const radius = span * (0.08 + rng() * 0.12)
     const fog = pen.createRadialGradient(x, y, 0, x, y, radius)
@@ -91,7 +96,14 @@ const paintAir = (pen: Pen, look: NavalMapLook): void => {
   light.addColorStop(1, 'rgba(0,0,0,0)')
   pen.fillStyle = light
   pen.fillRect(0, 0, width, height)
-  const vignette = pen.createRadialGradient(width / 2, height / 2, width * 0.35, width / 2, height / 2, width * 0.75)
+  const vignette = pen.createRadialGradient(
+    width / 2,
+    height / 2,
+    width * 0.35,
+    width / 2,
+    height / 2,
+    width * 0.75
+  )
   vignette.addColorStop(0, 'rgba(0,0,0,0)')
   vignette.addColorStop(1, look.light.shade)
   pen.fillStyle = vignette
@@ -136,7 +148,12 @@ export interface WorldPaint {
 
 const paintPieces = (
   pen: Pen,
-  { board, look, seed, paint }: { board: WorldBoard; look: NavalMapLook; seed: number; paint: WorldPaint }
+  {
+    board,
+    look,
+    seed,
+    paint,
+  }: { board: WorldBoard; look: NavalMapLook; seed: number; paint: WorldPaint }
 ): void => {
   pen.save()
   if (paint.isGame) {
@@ -190,7 +207,11 @@ export const paintWorld = (pen: Pen, paint: WorldPaint): void => {
  * @return {void}
  */
 
-export const paintMapScene = (canvas: HTMLCanvasElement, id: string, painters: DecorPainters): void => {
+export const paintMapScene = (
+  canvas: HTMLCanvasElement,
+  id: string,
+  painters: DecorPainters
+): void => {
   const pen = canvas.getContext('2d')
   const map = NAVAL_MAPS.has(id) ? NAVAL_MAPS.get(id) : NAVAL_MAPS.list[0]
   if (!pen) return

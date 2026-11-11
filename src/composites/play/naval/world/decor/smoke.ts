@@ -42,7 +42,14 @@ export const paintSmoke = (
     const radius = size * (1 + share * 2.6) * (0.85 + rng() * 0.3)
     const px = x + wind[0] * index + (rng() - 0.5) * radius * 0.6
     const py = y + wind[1] * index + (rng() - 0.5) * radius * 0.4
-    const puff = pen.createRadialGradient(px - radius * 0.3, py - radius * 0.3, radius * 0.1, px, py, radius)
+    const puff = pen.createRadialGradient(
+      px - radius * 0.3,
+      py - radius * 0.3,
+      radius * 0.1,
+      px,
+      py,
+      radius
+    )
     puff.addColorStop(0, colour)
     puff.addColorStop(0.7, colour)
     puff.addColorStop(1, 'rgba(0,0,0,0)')
@@ -53,7 +60,14 @@ export const paintSmoke = (
     pen.fill()
     if (!glow || share > 0.35) continue
     // Underside lit by the fire
-    const lit = pen.createRadialGradient(px, py + radius * 0.5, 0, px, py + radius * 0.5, radius * 0.9)
+    const lit = pen.createRadialGradient(
+      px,
+      py + radius * 0.5,
+      0,
+      px,
+      py + radius * 0.5,
+      radius * 0.9
+    )
     lit.addColorStop(0, glow)
     lit.addColorStop(1, 'rgba(0,0,0,0)')
     pen.globalAlpha = 0.55 * (1 - share * 2)
@@ -74,7 +88,13 @@ export const paintSmoke = (
 
 export const paintGlow = (
   pen: Pen,
-  { x, y, radius, colour, strength = 1 }: { x: number; y: number; radius: number; colour: string; strength?: number }
+  {
+    x,
+    y,
+    radius,
+    colour,
+    strength = 1,
+  }: { x: number; y: number; radius: number; colour: string; strength?: number }
 ): void => {
   const glow = pen.createRadialGradient(x, y, 0, x, y, radius)
   glow.addColorStop(0, colour)

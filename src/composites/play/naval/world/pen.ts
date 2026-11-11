@@ -204,7 +204,14 @@ export const sunlit = (
     sun,
     colour,
     strength = 0.22,
-  }: { x: number; y: number; radius: number; sun: [number, number]; colour: string; strength?: number }
+  }: {
+    x: number
+    y: number
+    radius: number
+    sun: [number, number]
+    colour: string
+    strength?: number
+  }
 ): CanvasGradient => {
   const fill = pen.createLinearGradient(
     x + sun[0] * radius,

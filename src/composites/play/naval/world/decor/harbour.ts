@@ -19,12 +19,25 @@ const layoutOf = ({ board, place }: DecorScene) => {
   const right = board.left + board.size * 0.92
   // One pier every few squares of quay
   const count = Math.max(2, Math.floor((right - left) / 7))
-  const piers = Array.from({ length: count }, (_, index) => left + 7 + index * ((right - left - 10) / (count - 1)))
+  const piers = Array.from(
+    { length: count },
+    (_, index) => left + 7 + index * ((right - left - 10) / (count - 1))
+  )
   const land: Outline = [[left, quay]]
   for (const pier of piers) {
-    land.push([pier - 0.5, quay], [pier - 0.5, quay - place.room * 0.24], [pier + 0.5, quay - place.room * 0.24], [pier + 0.5, quay])
+    land.push(
+      [pier - 0.5, quay],
+      [pier - 0.5, quay - place.room * 0.24],
+      [pier + 0.5, quay - place.room * 0.24],
+      [pier + 0.5, quay]
+    )
   }
-  land.push([right, quay], [right + 2, quay + 2], [right + 2, board.height + 30], [left, board.height + 30])
+  land.push(
+    [right, quay],
+    [right + 2, quay + 2],
+    [right + 2, board.height + 30],
+    [left, board.height + 30]
+  )
 
   return { land, quay, piers, left, right }
 }
@@ -36,7 +49,10 @@ const layoutOf = ({ board, place }: DecorScene) => {
  * @return {void}
  */
 
-const paintContainers = (scene: DecorScene, { x, y, base }: { x: number; y: number; base: Lift }): void => {
+const paintContainers = (
+  scene: DecorScene,
+  { x, y, base }: { x: number; y: number; base: Lift }
+): void => {
   const { pen, board, look, seed } = scene
   const { land, sun } = look
   const rng = pieceRng(seed + 4)
@@ -66,7 +82,10 @@ const paintContainers = (scene: DecorScene, { x, y, base }: { x: number; y: numb
  * @return {void}
  */
 
-const paintCrane = (scene: DecorScene, { x, y, base }: { x: number; y: number; base: Lift }): void => {
+const paintCrane = (
+  scene: DecorScene,
+  { x, y, base }: { x: number; y: number; base: Lift }
+): void => {
   const { pen, board, look } = scene
   const { land, sun } = look
   const [lx, ly] = liftOf(board, x, y, 2.6)
@@ -115,7 +134,12 @@ const paintMoored = (scene: DecorScene, { x, y }: { x: number; y: number }): voi
   extrude(pen, { outline: hull, lift: deck, side: land.steel, top: land.concreteLight })
   const bridge = rect(x - 0.13, y - 0.1, 0.26, 0.45)
   const top = liftOf(board, x, y, 0.8)
-  extrude(pen, { outline: bridge.map(([px, py]): [number, number] => [px + deck[0], py + deck[1]]), lift: [top[0] - deck[0], top[1] - deck[1]], side: land.steel, top: land.concrete })
+  extrude(pen, {
+    outline: bridge.map(([px, py]): [number, number] => [px + deck[0], py + deck[1]]),
+    lift: [top[0] - deck[0], top[1] - deck[1]],
+    side: land.steel,
+    top: land.concrete,
+  })
 }
 
 /**
@@ -137,7 +161,14 @@ export const paintHarbour: DecorPainter = (scene) => {
     outline: ground,
     lift: base,
     side: land.concreteDark,
-    top: sunlit(pen, { x: place.x, y: quay + 3, radius: 8, sun, colour: land.concrete, strength: 0.08 }),
+    top: sunlit(pen, {
+      x: place.x,
+      y: quay + 3,
+      radius: 8,
+      sun,
+      colour: land.concrete,
+      strength: 0.08,
+    }),
   })
   // Quay edge marking
   pen.strokeStyle = land.crane
@@ -166,11 +197,27 @@ export const paintHarbour: DecorPainter = (scene) => {
       shadow: look.light.shade,
       sun,
     })
-    paintRoof(pen, { x, y, width: 3.6, height: 2, lift: roof, colour: index % 2 ? land.roof : land.roofWarm })
+    paintRoof(pen, {
+      x,
+      y,
+      width: 3.6,
+      height: 2,
+      lift: roof,
+      colour: index % 2 ? land.roof : land.roofWarm,
+    })
   }
-  piers.slice(0, -1).forEach((pier, index) => paintMoored(scene, { x: pier + 1.9, y: quay - 1.4 - (index % 2) * 0.3 }))
+  piers
+    .slice(0, -1)
+    .forEach((pier, index) =>
+      paintMoored(scene, { x: pier + 1.9, y: quay - 1.4 - (index % 2) * 0.3 })
+    )
   for (const pier of piers) paintCrane(scene, { x: pier, y: quay - 0.4, base })
   for (let index = 0; index < 5; index += 1) {
-    paintLamp(pen, { x: left + 6 + index * ((right - left - 8) / 4) + base[0], y: quay + base[1] + 0.5, radius: 0.7, colour: land.lamp })
+    paintLamp(pen, {
+      x: left + 6 + index * ((right - left - 8) / 4) + base[0],
+      y: quay + base[1] + 0.5,
+      radius: 0.7,
+      colour: land.lamp,
+    })
   }
 }

@@ -30,7 +30,9 @@ export const paintFactory: DecorPainter = (scene) => {
   pen.strokeStyle = land.steel
   pen.lineWidth = 0.14
   pen.beginPath()
-  tanks.forEach(({ x, y }, index) => (index ? pen.lineTo(x + base[0], y + base[1]) : pen.moveTo(x + base[0], y + base[1])))
+  tanks.forEach(({ x, y }, index) =>
+    index ? pen.lineTo(x + base[0], y + base[1]) : pen.moveTo(x + base[0], y + base[1])
+  )
   pen.stroke()
   for (const tank of tanks) {
     const top = paintBox(pen, {
@@ -85,7 +87,12 @@ export const paintRig: DecorPainter = (scene) => {
   pen.fillStyle = look.light.shade
   trace(pen, rect(x - half, y - half, half * 2, half * 2), -sun[0] * 1.6, -sun[1] * 1.6)
   pen.fill()
-  for (const [dx, dy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+  for (const [dx, dy] of [
+    [-1, -1],
+    [1, -1],
+    [1, 1],
+    [-1, 1],
+  ]) {
     const foot = { x: x + dx * half * 0.8, y: y + dy * half * 0.8 }
     paintFoam(pen, circle(foot.x, foot.y, 0.16), water.foam, 0.04)
     pen.strokeStyle = land.steel
@@ -108,7 +115,12 @@ export const paintRig: DecorPainter = (scene) => {
   const derrick = liftOf(board, x, y, 2.6)
   pen.strokeStyle = land.crane
   pen.lineWidth = 0.07
-  for (const [dx, dy] of [[-0.4, -0.4], [0.4, -0.4], [0.4, 0.4], [-0.4, 0.4]]) {
+  for (const [dx, dy] of [
+    [-0.4, -0.4],
+    [0.4, -0.4],
+    [0.4, 0.4],
+    [-0.4, 0.4],
+  ]) {
     pen.beginPath()
     pen.moveTo(x + dx + top[0], y + dy + top[1])
     pen.lineTo(x + top[0] + derrick[0], y + top[1] + derrick[1])

@@ -65,7 +65,11 @@ export const boardOf = ({ band }: NavalMapLook, size: number): WorldBoard => ({
  * @return {WorldPlace} - Place
  */
 
-export const placeOf = (board: WorldBoard, { band }: NavalMapLook, piece: NavalDecor): WorldPlace => {
+export const placeOf = (
+  board: WorldBoard,
+  { band }: NavalMapLook,
+  piece: NavalDecor
+): WorldPlace => {
   const { left, top, size } = board
   const corners: Record<string, [number, number]> = {
     northwest: [band.west, band.north],

@@ -83,7 +83,14 @@ export const paintBox = (
 
 export const paintRoof = (
   pen: Pen,
-  { x, y, width, height, lift, colour }: { x: number; y: number; width: number; height: number; lift: Lift; colour: string }
+  {
+    x,
+    y,
+    width,
+    height,
+    lift,
+    colour,
+  }: { x: number; y: number; width: number; height: number; lift: Lift; colour: string }
 ): void => {
   const [dx, dy] = lift
   pen.fillStyle = shade(colour, 0.18)

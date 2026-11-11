@@ -60,9 +60,11 @@ export const paintBed = (
       const coast = Math.min(1, Math.hypot(bx - middle.x, by - middle.y) / reach)
       const swell = fbm(bx / DEPTH_SCALE, by / DEPTH_SCALE, seed)
       const depth = Math.min(1, Math.max(0, swell * 0.7 + coast * coast * 0.55 - 0.12))
-      const ridge = 1 - Math.abs(valueNoise((px * step) / RIPPLE_PX, (py * step) / RIPPLE_PX, seed + 3) * 2 - 1)
+      const ridge =
+        1 - Math.abs(valueNoise((px * step) / RIPPLE_PX, (py * step) / RIPPLE_PX, seed + 3) * 2 - 1)
       const glint = ridge ** 12 * 9 * (0.3 + depth)
-      const [from, to, share] = depth < 0.6 ? [deep, mid, depth / 0.6] : [mid, shallow, (depth - 0.6) / 0.4]
+      const [from, to, share] =
+        depth < 0.6 ? [deep, mid, depth / 0.6] : [mid, shallow, (depth - 0.6) / 0.4]
       const at = (py * width + px) * 4
       for (let channel = 0; channel < 3; channel += 1) {
         image.data[at + channel] = from[channel] + (to[channel] - from[channel]) * share + glint

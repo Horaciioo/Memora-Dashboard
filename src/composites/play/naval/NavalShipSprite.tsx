@@ -42,12 +42,21 @@ export const NavalShipSprite = ({
     element.height = Math.round(height * ratio)
     ctx.setTransform(ratio, 0, 0, ratio, 0, height / 2)
     paintHull(
-      { ctx, width, cell, left: 0, top: 0, size: length, now: 0, skin: navalSkinOf(map), ratio, life: 0 },
+      {
+        ctx,
+        width,
+        cell,
+        left: 0,
+        top: 0,
+        size: length,
+        now: 0,
+        skin: navalSkinOf(map),
+        ratio,
+        life: 0,
+      },
       { id, length, x: 0, y: 0, isHorizontal: true }
     )
   }, [id, length, cell, width, height, map])
 
-  return (
-    <canvas ref={canvas} style={{ width, height }} className="block" aria-hidden="true" />
-  )
+  return <canvas ref={canvas} style={{ width, height }} className="block" aria-hidden="true" />
 }

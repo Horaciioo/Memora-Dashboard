@@ -73,7 +73,14 @@ export const paintStone = (
     outline,
     lift,
     side: land.rockDark,
-    top: sunlit(pen, { x: x + lift[0], y: y + lift[1], radius, sun, colour: land.rock, strength: 0.3 }),
+    top: sunlit(pen, {
+      x: x + lift[0],
+      y: y + lift[1],
+      radius,
+      sun,
+      colour: land.rock,
+      strength: 0.3,
+    }),
   })
 
   // Ridge from the sunny corner to the crown
@@ -131,6 +138,11 @@ export const paintIslet: DecorPainter = (scene) => {
     const angle = rng() * Math.PI * 2
     const x = place.x + Math.cos(angle) * radius * 1.35
     const y = place.y + Math.sin(angle) * radius
-    paintStone(scene, { outline: stoneOutline(x, y, radius * 0.16, rng), x, y, height: radius * 0.25 })
+    paintStone(scene, {
+      outline: stoneOutline(x, y, radius * 0.16, rng),
+      x,
+      y,
+      height: radius * 0.25,
+    })
   }
 }
