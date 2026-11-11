@@ -330,6 +330,7 @@ model Account {
   functions AccountFunction[]
 
   sessions              Session[]
+  nexusSessions         NexusSession[]
   pushSubscriptions     PushSubscription[]
   modViewPreferences    ModViewPreference[]
   sharedWordsAdded      ModSharedWord[]
@@ -509,6 +510,7 @@ model Session {
 
   account           Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
   pushSubscriptions PushSubscription[]
+  nexusSessions     NexusSession[]
 
   @@index([accountId])
   @@index([expiresAt])
@@ -3843,4 +3845,72 @@ model FeatureSwitch {
   updatedAt   DateTime @updatedAt
 
   @@map("feature_switches")
+}
+
+// Stage of an owner console session
+enum NexusStage {
+  PASSWORD
+  UNLOCKED
+}
+
+// Factor an owner console attempt tried
+enum NexusAttemptKind {
+  PASSWORD
+  DISCORD
+  REAUTH
+}
+
+// Owner console session, bound to the sign-in session that opened it
+model NexusSession {
+  id            String     @id @default(cuid())
+  // SHA-256 of the cookie token
+  tokenHash     String     @unique
+  sessionId     String
+  accountId     String
+  stage         NexusStage
+  passwordAt    DateTime
+  discordAt     DateTime?
+  reauthAt      DateTime
+  lastUsedAt    DateTime   @default(now())
+  expiresAt     DateTime
+  // Armed modes lapse on their own
+  writeUntil    DateTime?
+  dangerUntil   DateTime?
+  revokedAt     DateTime?
+  revokedReason String?
+  address       String?
+  userAgent     String?
+  createdAt     DateTime   @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([sessionId])
+  @@index([expiresAt])
+  @@map("nexus_sessions")
+}
+
+// One try at a factor, success or not
+model NexusAttempt {
+  id        String           @id @default(cuid())
+  accountId String
+  address   String
+  kind      NexusAttemptKind
+  succeeded Boolean
+  createdAt DateTime         @default(now())
+
+  @@index([accountId, createdAt])
+  @@index([address, createdAt])
+  @@map("nexus_attempts")
+}
+
+// Pause after too many failures, one row per account and address
+model NexusLockout {
+  key       String   @id
+  until     DateTime
+  strikes   Int      @default(1)
+  updatedAt DateTime @updatedAt
+
+  @@map("nexus_lockouts")
 }
