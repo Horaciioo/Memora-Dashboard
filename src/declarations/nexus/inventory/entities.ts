@@ -459,4 +459,25 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     search: [],
   },
   featureSwitch: { model: 'FeatureSwitch', exposure: 'full', display: 'key', search: [] },
+  nexusSession: {
+    model: 'NexusSession',
+    exposure: 'excluded',
+    reason: 'Jetons de la console',
+    display: 'id',
+    search: [],
+  },
+  nexusAttempt: {
+    model: 'NexusAttempt',
+    exposure: 'excluded',
+    reason: 'Compteurs de verrouillage',
+    display: 'id',
+    search: [],
+  },
+  nexusLockout: {
+    model: 'NexusLockout',
+    exposure: 'excluded',
+    reason: 'Compteurs de verrouillage',
+    display: 'key',
+    search: [],
+  },
 }

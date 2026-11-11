@@ -62,24 +62,41 @@ const requireCredentials = (): { clientId: string; clientSecret: string; redirec
 }
 
 /**
+ * Variation of the flow
+ * @typedef {Object} FlowOptions
+ * @property {string} [redirectUri] - Callback other than the sign-in one
+ * @property {string} [prompt] - Consent behaviour
+ */
+
+export interface FlowOptions {
+  redirectUri?: string
+  prompt?: string
+}
+
+/**
  * Build the screen a member is sent to
  * @param {string} state - Anti-forgery token
  * @param {string} codeVerifier - Proof key secret
+ * @param {FlowOptions} [options] - Flow variation
  * @return {string} - Authorization URL
  */
 
-export const buildAuthorizationUrl = (state: string, codeVerifier: string): string => {
+export const buildAuthorizationUrl = (
+  state: string,
+  codeVerifier: string,
+  options: FlowOptions = {}
+): string => {
   const { clientId, redirectUri } = requireCredentials()
 
   const parameters = new URLSearchParams({
     client_id: clientId,
-    redirect_uri: redirectUri,
+    redirect_uri: options.redirectUri ?? redirectUri,
     response_type: 'code',
     scope: DISCORD_SCOPES.join(' '),
     state,
     code_challenge: deriveChallenge(codeVerifier),
     code_challenge_method: DISCORD_PKCE.method,
-    prompt: 'none',
+    prompt: options.prompt ?? 'none',
   })
 
   return `${DISCORD_ENDPOINTS.authorize}?${parameters.toString()}`
@@ -129,10 +146,15 @@ const readGrant = async (response: Response): Promise<DiscordGrant> => {
  * Trade an authorization code for a grant
  * @param {string} code - Authorization code
  * @param {string} codeVerifier - Proof key secret
+ * @param {string} [callback] - Callback used to ask
  * @return {Promise<DiscordGrant>} - Grant
  */
 
-export const exchangeCode = async (code: string, codeVerifier: string): Promise<DiscordGrant> => {
+export const exchangeCode = async (
+  code: string,
+  codeVerifier: string,
+  callback?: string
+): Promise<DiscordGrant> => {
   const { clientId, clientSecret, redirectUri } = requireCredentials()
 
   const response = await fetch(DISCORD_ENDPOINTS.token, {
@@ -144,7 +166,7 @@ export const exchangeCode = async (code: string, codeVerifier: string): Promise<
       client_secret: clientSecret,
       grant_type: 'authorization_code',
       code,
-      redirect_uri: redirectUri,
+      redirect_uri: callback ?? redirectUri,
       code_verifier: codeVerifier,
     }),
   })

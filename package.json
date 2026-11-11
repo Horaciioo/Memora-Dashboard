@@ -15,6 +15,7 @@
     "status:dev": "STATUS_DATA_FILE=.next/status-state.json STATUS_APP_URL=http://127.0.0.1:3000/api/health STATUS_DATABASE_ADDRESS=127.0.0.1:5432 STATUS_CACHE_ADDRESS=127.0.0.1:6379 node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON status/server.ts",
     "lint": "eslint .",
     "type-check": "yarn openapi:generate && tsc --noEmit && tsc --noEmit -p src/worker/tsconfig.json",
+    "nexus:hash": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/scripts/nexus/hash.ts",
     "comments:trim": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/scripts/comments/trim.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

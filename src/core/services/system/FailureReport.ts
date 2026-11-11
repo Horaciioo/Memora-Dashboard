@@ -7,6 +7,7 @@ import { recordEvent } from '@/core/services/system/ActivityService'
 import type { ActivityError } from '@/core/services/system/ActivityService'
 import { ACTIVITY_COPY } from '@/declarations/activity/copy'
 import { FAILURE_SETTINGS } from '@/declarations/configurations/settings'
+import { NEXUS_PATHS } from '@/declarations/nexus/paths'
 import { ErrorCodes } from '@/utils/constants/errors'
 import { Prisma } from '@prisma/client'
 import { SECOND_MS } from '@/utils/constants/time'
@@ -74,6 +75,10 @@ const traceOf = (error: unknown): string | undefined => {
     .slice(0, FAILURE_SETTINGS.traceMaxLength)
 }
 
+// Routes the journal never names
+const isHiddenRoute = (request: NextRequest): boolean =>
+  request.nextUrl.pathname.startsWith(NEXUS_PATHS.api)
+
 /**
  * Keep an unexpected failure in the journal
  * @param {NextRequest} request - Failed request
@@ -88,6 +93,7 @@ export const reportFailure = async (
   error: unknown
 ): Promise<void> => {
   if (!actorId || toAppError(error).code !== ErrorCodes.SystemFailure) return
+  if (isHiddenRoute(request)) return
 
   const route = `${request.method} ${request.nextUrl.pathname}`
   const message = messageOf(error)
@@ -125,7 +131,7 @@ export const reportRefusal = async (
   error: unknown
 ): Promise<void> => {
   const code = toAppError(error).code
-  if (!(code in REFUSALS)) return
+  if (!(code in REFUSALS) || isHiddenRoute(request)) return
 
   const route = `${request.method} ${request.nextUrl.pathname}`
   if (isRecent(`${code} ${actorId ?? ''} ${route}`)) return

@@ -7,6 +7,7 @@ import {
   STATIC_SECURITY_HEADERS,
   WORKER_HEADERS,
 } from './src/declarations/system/security/securityHeaders'
+import { NEXUS_PATHS } from './src/declarations/nexus/paths'
 import { WORKER_FILE } from './src/declarations/pwa/worker'
 import { LEGACY_REDIRECTS } from './src/declarations/system/redirects'
 import { displayVersion } from './src/utils/format/version'
@@ -37,6 +38,8 @@ const nextConfig: NextConfig = {
   // The content security policy carries a per-request nonce
   headers: async () => [
     { source: '/:path*', headers: STATIC_SECURITY_HEADERS },
+    // The console is never cached
+    { source: `${NEXUS_PATHS.api}/:path*`, headers: [{ key: 'Cache-Control', value: 'no-store' }] },
     // A stale worker would pin an old version
     { source: WORKER_FILE.script, headers: WORKER_HEADERS },
   ],
