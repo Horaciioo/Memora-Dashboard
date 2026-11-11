@@ -1,0 +1,42 @@
+{
+  "password": {
+    "memoryKib": 65536,
+    "iterations": 3,
+    "parallelism": 1,
+    "minLength": 16,
+    "maxLength": 256
+  },
+  "session": {
+    "pendingSeconds": 180,
+    "dangerReauthSeconds": 300
+  },
+  "attempts": {
+    "windowMinutes": 15,
+    "maxFailures": 5,
+    "backoffSeconds": [1, 2, 4, 8],
+    "lockoutMinutes": 30,
+    "dayFailures": 20,
+    "dayLockoutHours": 24
+  },
+  "modes": {
+    "writeMinutes": 15,
+    "writeMaxMinutes": 15,
+    "dangerMinutes": 5
+  },
+  "commands": {
+    "maxLength": 2000,
+    "maxArguments": 30,
+    "timeoutMs": 10000,
+    "maxRows": 200,
+    "pageSize": 50,
+    "confirmSeconds": 120,
+    "auditPageSize": 50
+  },
+  "redaction": {
+    "patterns": ["token", "secret", "password", "hash", "key", "cookie", "vapid"]
+  },
+  "retention": {
+    "auditDays": 365,
+    "attemptDays": 30
+  }
+}
