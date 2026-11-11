@@ -2,7 +2,7 @@ import 'server-only'
 
 import { logger } from '@/core/lib/logger'
 import { createHub } from '@/core/lib/realtime/server/hub'
-import type { RealtimeHub } from '@/core/lib/realtime/server/hub'
+import type { HubSnapshot, RealtimeHub } from '@/core/lib/realtime/server/hub'
 import { DOC_REALTIME_REQUESTS, flushDocs } from '@/core/lib/realtime/server/docs'
 import { PRESENCE_REALTIME_REQUESTS } from '@/core/lib/realtime/server/presence'
 import {
@@ -62,3 +62,20 @@ export const wireRealtime = (): void => {
  */
 
 export const realtimeSocketCount = (): number => globalForHub.memoraRealtime?.count() ?? 0
+
+/**
+ * Sockets and topics of this process
+ * @return {HubSnapshot} - Read only picture
+ */
+
+export const readHubSnapshot = (): HubSnapshot =>
+  globalForHub.memoraRealtime?.snapshot() ?? { sockets: [], topics: {} }
+
+/**
+ * Close one socket from the console
+ * @param {string} socketId - Socket
+ * @return {boolean} - Socket found
+ */
+
+export const disconnectSocket = (socketId: string): boolean =>
+  globalForHub.memoraRealtime?.disconnect(socketId) ?? false

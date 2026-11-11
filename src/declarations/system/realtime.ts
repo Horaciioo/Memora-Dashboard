@@ -145,6 +145,8 @@ export const REALTIME_CLOSE = {
   expired: 4000,
   slow: 4008,
   flooded: 4029,
+  // Closed from the console, the client reconnects
+  owner: 4002,
 } as const
 
 /**

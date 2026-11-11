@@ -64,3 +64,15 @@ export const GAME_COPY = {
   tournamentMissing: 'Tournoi introuvable',
   groupMissing: 'Groupe introuvable',
 } as const
+
+/**
+ * Realtime and client wording
+ * @type {Record<string, string>}
+ */
+
+export const REALTIME_COPY = {
+  userMissing: 'Membre introuvable',
+  topicMissing: 'Sujet sans abonné',
+  socketMissing: 'Socket introuvable',
+  perProcess: 'Instantané de ce processus seulement',
+} as const
