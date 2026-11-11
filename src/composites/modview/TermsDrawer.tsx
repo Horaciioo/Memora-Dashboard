@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Input } from '@/components/elements/forms/inputs/Input'
+import { TermBox } from '@/composites/modview/TermBox'
 import { Drawer } from '@/components/structures/overlays/Drawer'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
@@ -68,15 +69,11 @@ export const TermsDrawer = ({ list, state, gate, onAct, onClose }: TermsDrawerPr
           ) : (
             <ul className={MODVIEW_TERMS.list}>
               {terms.map((entry) => (
-                <li key={entry}>
-                  <Button
-                    variant="ghost"
-                    title={MODVIEW_COPY.termRemove.replace('{term}', entry)}
-                    onClick={() => onAct({ kind: 'term', list, term: entry, remove: true })}
-                  >
-                    {entry}
-                  </Button>
-                </li>
+                <TermBox
+                  key={entry}
+                  term={entry}
+                  onRemove={() => onAct({ kind: 'term', list, term: entry, remove: true })}
+                />
               ))}
             </ul>
           )}
