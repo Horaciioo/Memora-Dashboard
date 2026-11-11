@@ -7,9 +7,14 @@ import { loadState, saveState } from './store.ts'
 
 const state = loadState()
 
+// Deploy window, checks ignored until then
+let pausedUntil = 0
+
 // One round of checks
 const runRound = async (): Promise<void> => {
   const at = new Date()
+  if (at.getTime() < pausedUntil) return
+
   const outcomes = await Promise.all(COMPONENTS.map((item) => probe(item)))
 
   // Record in order
@@ -35,6 +40,16 @@ const server = createServer((request, response) => {
         meta: COMPONENTS.map(({ id, label, lead }) => ({ id, label, lead })),
       })
     )
+    return
+  }
+
+  // Internal only, Caddy never routes here
+  if (request.method === 'POST' && request.url?.startsWith('/api/pause')) {
+    const minutes = Number(new URL(request.url, 'http://x').searchParams.get('minutes') ?? 0)
+    const bounded = Math.min(Math.max(minutes, 0), SETTINGS.maxPauseMinutes)
+
+    pausedUntil = Date.now() + bounded * 60_000
+    response.writeHead(204).end()
     return
   }
 

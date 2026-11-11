@@ -8,6 +8,15 @@ export const HEALTH_LEVELS = ['up', 'degraded', 'down'] as const
 export type Health = (typeof HEALTH_LEVELS)[number]
 
 /**
+ * Day levels, mildest first
+ * @type {readonly ['up', 'minor', 'degraded', 'down', 'outage']}
+ */
+
+export const DAY_LEVELS = ['up', 'minor', 'degraded', 'down', 'outage'] as const
+
+export type DayLevel = (typeof DAY_LEVELS)[number]
+
+/**
  * Probe kinds
  * @typedef {Object} ProbeTarget
  * @property {string} id - Component key
@@ -87,12 +96,14 @@ export const SETTINGS = {
   dataFile: read('STATUS_DATA_FILE', '/data/state.json'),
   intervalMs: 60_000,
   timeoutMs: 5_000,
-  slowMs: 2_000,
+  slowMs: 4_000,
   // Checks in a row before an incident opens or closes
   confirmations: 2,
   historyDays: 90,
+  // Longest pause a deploy can ask
+  maxPauseMinutes: 30,
   incidentsShown: 20,
-  // Down checks that colour a whole day red
-  redDayChecks: 3,
+  // Failed or slow checks per day before each colour, isolated blips stay green
+  dayChecks: { yellow: 3, orange: 15, red: 30, black: 720 },
   timeZone: 'Europe/Paris',
 } as const

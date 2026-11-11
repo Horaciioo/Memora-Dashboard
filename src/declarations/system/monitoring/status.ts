@@ -39,7 +39,9 @@ export const STATUS_COPY = {
   noData: 'Pas de mesure ce jour-là.',
   dayLevel: {
     up: 'Aucune panne enregistrée ce jour-là.',
+    minor: 'Quelques ralentissements ce jour-là.',
     degraded: 'Fonctionnement dégradé ce jour-là.',
     down: 'Panne enregistrée ce jour-là.',
+    outage: 'Panne majeure ce jour-là.',
   },
 } as const

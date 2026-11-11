@@ -111,13 +111,15 @@ export const STATUS_HISTORY_STYLES = {
 
 /**
  * Colour of a day bar per health
- * @type {Record<'up' | 'degraded' | 'down' | 'none', string>}
+ * @type {Record<'up' | 'minor' | 'degraded' | 'down' | 'outage' | 'none', string>}
  */
 
 export const STATUS_BAR_COLOURS = {
   up: 'bg-[var(--color-success)]',
-  degraded: 'bg-[var(--color-warning)]',
-  down: 'bg-[var(--color-danger)]',
+  minor: 'bg-[var(--color-status-minor)]',
+  degraded: 'bg-[var(--color-status-degraded)]',
+  down: 'bg-[var(--color-status-down)]',
+  outage: 'bg-[var(--color-status-outage)]',
   none: 'bg-[var(--color-border-strong)]',
 } as const
 
@@ -170,5 +172,5 @@ export const PUBLIC_STATUS_BANNERS = {
   up: 'bg-[var(--color-success)]',
   degraded:
     'border-[var(--color-warning)] bg-[color-mix(in_srgb,var(--color-warning)_14%,transparent)]',
-  down: 'bg-[var(--color-danger)]',
+  down: 'bg-[var(--color-status-down)]',
 } as const

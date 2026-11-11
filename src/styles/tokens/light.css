@@ -71,6 +71,10 @@
   --color-caution: #8a5a00;
   --color-warning: #964f08;
   --color-danger: #b83a3a;
+  --color-status-minor: #ecd47e;
+  --color-status-degraded: #eaa56c;
+  --color-status-down: #de7d78;
+  --color-status-outage: #4b4b54;
   --color-info: #2f6496;
   --color-neutral: #636368;
   --color-success-soft: #e8f3ec;

@@ -3,7 +3,7 @@ import 'server-only'
 import { dayHealth, uptimePercent } from '../../../../status/history.ts'
 import type { StatusState } from '../../../../status/history.ts'
 import { HEALTH_LEVELS, SETTINGS } from '../../../../status/declarations.ts'
-import type { Health } from '../../../../status/declarations.ts'
+import type { DayLevel, Health } from '../../../../status/declarations.ts'
 import { STATUS_LINK } from '@/declarations/system/monitoring/status'
 import { DAY_MS } from '@/utils/constants/time'
 
@@ -11,12 +11,12 @@ import { DAY_MS } from '@/utils/constants/time'
  * One day of history
  * @typedef {Object} StatusDay
  * @property {string} day - Day key
- * @property {Health | null} health - Day level
+ * @property {DayLevel | null} health - Day level
  */
 
 export interface StatusDay {
   day: string
-  health: Health | null
+  health: DayLevel | null
 }
 
 /**
