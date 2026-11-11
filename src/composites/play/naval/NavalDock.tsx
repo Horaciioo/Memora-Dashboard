@@ -98,7 +98,7 @@ export const NavalDock = ({
           }}
         >
           <span className={NAVAL_PLACE.sprite}>
-            <NavalShipSprite length={length} id={id} cell={NAVAL_PLACE.spriteCell} />
+            <NavalShipSprite length={length} id={id} cell={NAVAL_PLACE.spriteCell} map={map} />
           </span>
         </button>
       ))}

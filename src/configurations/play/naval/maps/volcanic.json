@@ -1,13 +1,8 @@
 {
+  "fleet": "heavy",
   "theatre": {
     "size": 18,
-    "fleet": [
-      5,
-      4,
-      3,
-      3,
-      2
-    ],
+    "fleet": [5, 4, 3, 3, 2],
     "reachScale": 1.5,
     "ramp": {
       "everyTurns": 1,
@@ -24,10 +19,7 @@
     }
   },
   "light": {
-    "sun": [
-      -0.7,
-      -0.7
-    ],
+    "sun": [-0.7, -0.7],
     "tint": "rgba(255,120,60,0.12)",
     "shade": "rgba(10,4,4,0.45)"
   },

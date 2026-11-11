@@ -55,6 +55,7 @@ export const NavalTargetSea = ({
         hover={aim.isOpen ? aim.hover : null}
         zone={aim.zone}
         isDim={!aim.isOpen && !playing}
+        isFoe={!isMine}
         label={
           isMine
             ? NAVAL_BOARD_COPY.mine

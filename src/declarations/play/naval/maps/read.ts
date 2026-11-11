@@ -1,4 +1,4 @@
-import { readChoice, readInteger, readNode, readNumber } from '@/declarations/configurations/readers'
+import { readChoice, readInteger, readNode, readNumber, readString } from '@/declarations/configurations/readers'
 import { NavalDecorKinds, NavalSides } from '@/declarations/play/naval/maps/types'
 import type {
   NavalBand,
@@ -150,6 +150,7 @@ export const readLook = (node: Record<string, unknown>, path: string): NavalMapL
       focus: readNumber(preview.focus, { path: `${path}.preview.focus`, fallback: 0, min: 0, max: 1 }),
     },
     stage: readNumber(node.stage, { path: `${path}.stage`, fallback: 0, min: 0, max: 8 }),
+    fleet: readString(node.fleet, { path: `${path}.fleet`, fallback: '' }),
     life: Object.fromEntries(
       Object.entries(life).filter((entry): entry is [string, number] => typeof entry[1] === 'number')
     ),

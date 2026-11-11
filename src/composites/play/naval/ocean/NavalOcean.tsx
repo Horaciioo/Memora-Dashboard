@@ -11,8 +11,8 @@ import type { OceanCell, OceanHandlers } from '@/composites/play/naval/ocean/use
 import { useOceanPainter } from '@/composites/play/naval/ocean/useOceanPainter'
 import { useOceanWorld } from '@/composites/play/naval/ocean/useOceanWorld'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
+import { NavalFleetSides, navalSkinOf } from '@/declarations/play/naval/fleets'
 import { navalStageOf } from '@/declarations/play/naval/maps'
-import { NAVAL_SKIN } from '@/declarations/play/naval/skins'
 import { NAVAL_VIEW } from '@/declarations/play/naval/view'
 import { NAVAL_OCEAN } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
@@ -28,6 +28,8 @@ export interface NavalOceanProps extends OceanHandlers {
   playing?: OceanStrike | null
   isFlat?: boolean
   isDim?: boolean
+  // Ships of the other side
+  isFoe?: boolean
   label: string
   boxRef?: RefObject<HTMLDivElement | null>
 }
@@ -48,6 +50,7 @@ export const NavalOcean = ({
   playing = null,
   isFlat,
   isDim,
+  isFoe,
   label,
   boxRef,
   ...handlers
@@ -57,8 +60,12 @@ export const NavalOcean = ({
   const canvas = useRef<HTMLCanvasElement>(null)
   const { camera, mapId } = useMemo(() => navalStageOf(map, size), [map, size])
   const world = useOceanWorld(mapId)
+  const skin = useMemo(
+    () => navalSkinOf(mapId, isFoe ? NavalFleetSides.Foe : NavalFleetSides.Mine),
+    [mapId, isFoe]
+  )
   const tilt = isFlat ? 0 : NAVAL_VIEW.tilt
-  useOceanPainter(canvas, { size, camera, marks, ships, skin: NAVAL_SKIN, hover, zone, playing, world })
+  useOceanPainter(canvas, { size, camera, marks, ships, skin, hover, zone, playing, world })
   const gestures = useOceanGestures({ box, size, camera, tilt, ...handlers })
   const view = {
     '--tilt': `${tilt}deg`,

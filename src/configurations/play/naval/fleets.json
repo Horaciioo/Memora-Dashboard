@@ -1,0 +1,346 @@
+{
+  "default": "patrol",
+  "sides": {
+    "mine": "#47c1ff",
+    "foe": "#ff4b3e"
+  },
+  "fleets": {
+    "patrol": {
+      "colours": {
+        "rim": "#f4f6f7",
+        "rimDark": "#aab3bb",
+        "deck": "#dfe4e8",
+        "deckDark": "#bcc4cb",
+        "seam": "rgba(60,72,84,0.18)",
+        "metal": "#cdd4da",
+        "top": "#ffffff",
+        "dark": "#4b5662",
+        "stripe": "#ff7a1f",
+        "shell": "#2b2f36",
+        "trail": "rgba(255,255,255,0.55)"
+      },
+      "classes": {
+        "5": [
+          {
+            "outline": "bow",
+            "beam": 0.8,
+            "deck": "plain",
+            "sway": 0.7,
+            "bands": [0.9],
+            "pieces": [
+              { "kind": "pad", "at": 0.12, "size": 0.62 },
+              { "kind": "bridge", "at": 0.45, "size": 1.15 },
+              { "kind": "mast", "at": 0.42, "size": 0.32 },
+              { "kind": "vls", "at": 0.68, "size": 0.42 },
+              { "kind": "turret", "at": 0.83, "size": 0.36, "barrels": 1 }
+            ]
+          }
+        ],
+        "4": [
+          {
+            "outline": "bow",
+            "beam": 0.74,
+            "deck": "plain",
+            "sway": 0.85,
+            "bands": [0.88],
+            "pieces": [
+              { "kind": "pad", "at": 0.14, "size": 0.56 },
+              { "kind": "bridge", "at": 0.5, "size": 0.9 },
+              { "kind": "mast", "at": 0.48, "size": 0.28 },
+              { "kind": "turret", "at": 0.84, "size": 0.32, "barrels": 1 }
+            ]
+          }
+        ],
+        "3": [
+          {
+            "outline": "bow",
+            "beam": 0.7,
+            "deck": "seams",
+            "sway": 1,
+            "bands": [0.82],
+            "pieces": [
+              { "kind": "bridge", "at": 0.42, "size": 0.72 },
+              { "kind": "mast", "at": 0.4, "size": 0.26 },
+              { "kind": "turret", "at": 0.8, "size": 0.28, "barrels": 1 }
+            ]
+          },
+          {
+            "outline": "submarine",
+            "beam": 0.5,
+            "deck": "plain",
+            "sway": 0.6,
+            "isSubmerged": true,
+            "bands": [],
+            "pieces": [{ "kind": "sail", "at": 0.6, "size": 0.5 }]
+          }
+        ],
+        "2": [
+          {
+            "outline": "bow",
+            "beam": 0.62,
+            "deck": "seams",
+            "sway": 1.6,
+            "bands": [0.78],
+            "pieces": [
+              { "kind": "bridge", "at": 0.42, "size": 0.55 },
+              { "kind": "mast", "at": 0.4, "size": 0.22 }
+            ]
+          }
+        ]
+      }
+    },
+    "stealth": {
+      "colours": {
+        "rim": "#575e66",
+        "rimDark": "#2b2f34",
+        "deck": "#454b52",
+        "deckDark": "#30353a",
+        "seam": "rgba(255,255,255,0.08)",
+        "metal": "#626a73",
+        "top": "#79828b",
+        "dark": "#191c20",
+        "stripe": "#9aa4ae",
+        "shell": "#2b2f36",
+        "trail": "rgba(255,255,255,0.45)"
+      },
+      "classes": {
+        "5": [
+          {
+            "outline": "facet",
+            "beam": 0.8,
+            "deck": "facets",
+            "sway": 0.7,
+            "bands": [],
+            "pieces": [
+              { "kind": "pad", "at": 0.1, "size": 0.6 },
+              { "kind": "vls", "at": 0.27, "size": 0.4 },
+              { "kind": "bridge", "at": 0.5, "size": 1.2 },
+              { "kind": "vls", "at": 0.72, "size": 0.44 },
+              { "kind": "turret", "at": 0.86, "size": 0.34, "barrels": 1 }
+            ]
+          }
+        ],
+        "4": [
+          {
+            "outline": "facet",
+            "beam": 0.76,
+            "deck": "facets",
+            "sway": 0.85,
+            "bands": [],
+            "pieces": [
+              { "kind": "vls", "at": 0.28, "size": 0.38 },
+              { "kind": "bridge", "at": 0.52, "size": 0.9 },
+              { "kind": "turret", "at": 0.84, "size": 0.32, "barrels": 1 }
+            ]
+          }
+        ],
+        "3": [
+          {
+            "outline": "facet",
+            "beam": 0.72,
+            "deck": "facets",
+            "sway": 1,
+            "bands": [],
+            "pieces": [
+              { "kind": "bridge", "at": 0.46, "size": 0.75 },
+              { "kind": "vls", "at": 0.8, "size": 0.34 }
+            ]
+          },
+          {
+            "outline": "submarine",
+            "beam": 0.52,
+            "deck": "plain",
+            "sway": 0.6,
+            "isSubmerged": true,
+            "bands": [],
+            "pieces": [{ "kind": "sail", "at": 0.64, "size": 0.5 }]
+          }
+        ],
+        "2": [
+          {
+            "outline": "facet",
+            "beam": 0.6,
+            "deck": "facets",
+            "sway": 1.6,
+            "bands": [],
+            "pieces": [{ "kind": "bridge", "at": 0.52, "size": 0.5 }]
+          }
+        ]
+      }
+    },
+    "heavy": {
+      "colours": {
+        "rim": "#5a5e64",
+        "rimDark": "#2d2f33",
+        "deck": "#6a2a26",
+        "deckDark": "#431915",
+        "seam": "rgba(0,0,0,0.32)",
+        "metal": "#70757c",
+        "top": "#8d939a",
+        "dark": "#1b1c1f",
+        "stripe": "#a3241c",
+        "shell": "#2b2f36",
+        "trail": "rgba(255,230,210,0.5)"
+      },
+      "classes": {
+        "5": [
+          {
+            "outline": "carrier",
+            "beam": 0.9,
+            "deck": "flight",
+            "sway": 0.7,
+            "bands": [],
+            "pieces": [
+              { "kind": "pad", "at": 0.22, "size": 0.62 },
+              { "kind": "heli", "at": 0.22, "size": 0.5 },
+              { "kind": "pad", "at": 0.5, "size": 0.62 },
+              { "kind": "pad", "at": 0.78, "size": 0.62 },
+              { "kind": "heli", "at": 0.78, "size": 0.5 },
+              { "kind": "tower", "at": 0.5, "size": 0.9, "across": 0.62 }
+            ]
+          }
+        ],
+        "4": [
+          {
+            "outline": "armour",
+            "beam": 0.82,
+            "deck": "plates",
+            "sway": 0.85,
+            "bands": [],
+            "pieces": [
+              { "kind": "turret", "at": 0.18, "size": 0.42, "barrels": 2 },
+              { "kind": "bridge", "at": 0.48, "size": 1 },
+              { "kind": "funnel", "at": 0.62, "size": 0.32 },
+              { "kind": "turret", "at": 0.82, "size": 0.44, "barrels": 2 }
+            ]
+          }
+        ],
+        "3": [
+          {
+            "outline": "armour",
+            "beam": 0.76,
+            "deck": "plates",
+            "sway": 1,
+            "bands": [],
+            "pieces": [
+              { "kind": "funnel", "at": 0.22, "size": 0.28 },
+              { "kind": "bridge", "at": 0.46, "size": 0.8 },
+              { "kind": "turret", "at": 0.8, "size": 0.38, "barrels": 2 }
+            ]
+          },
+          {
+            "outline": "submarine",
+            "beam": 0.58,
+            "deck": "plain",
+            "sway": 0.6,
+            "isSubmerged": true,
+            "bands": [],
+            "pieces": [
+              { "kind": "vls", "at": 0.34, "size": 0.36 },
+              { "kind": "sail", "at": 0.66, "size": 0.55 }
+            ]
+          }
+        ],
+        "2": [
+          {
+            "outline": "armour",
+            "beam": 0.64,
+            "deck": "plates",
+            "sway": 1.5,
+            "bands": [],
+            "pieces": [
+              { "kind": "bridge", "at": 0.36, "size": 0.52 },
+              { "kind": "turret", "at": 0.78, "size": 0.3, "barrels": 1 }
+            ]
+          }
+        ]
+      }
+    },
+    "strategic": {
+      "colours": {
+        "rim": "#8a96a2",
+        "rimDark": "#4f5a65",
+        "deck": "#66727d",
+        "deckDark": "#4c5660",
+        "seam": "rgba(0,0,0,0.18)",
+        "metal": "#9aa6b1",
+        "top": "#c9d2da",
+        "dark": "#252c33",
+        "stripe": "#f2c94c",
+        "shell": "#2b2f36",
+        "trail": "rgba(255,255,255,0.55)"
+      },
+      "classes": {
+        "5": [
+          {
+            "outline": "carrier",
+            "beam": 0.9,
+            "deck": "flight",
+            "sway": 0.7,
+            "bands": [],
+            "pieces": [
+              { "kind": "plane", "at": 0.24, "size": 0.5 },
+              { "kind": "plane", "at": 0.42, "size": 0.5 },
+              { "kind": "plane", "at": 0.78, "size": 0.5 },
+              { "kind": "tower", "at": 0.58, "size": 0.85, "across": 0.62 }
+            ]
+          }
+        ],
+        "4": [
+          {
+            "outline": "bow",
+            "beam": 0.8,
+            "deck": "plain",
+            "sway": 0.85,
+            "bands": [],
+            "pieces": [
+              { "kind": "pad", "at": 0.09, "size": 0.56 },
+              { "kind": "vls", "at": 0.26, "size": 0.38 },
+              { "kind": "bridge", "at": 0.48, "size": 1 },
+              { "kind": "mast", "at": 0.46, "size": 0.3 },
+              { "kind": "vls", "at": 0.72, "size": 0.38 },
+              { "kind": "turret", "at": 0.86, "size": 0.36, "barrels": 1 }
+            ]
+          }
+        ],
+        "3": [
+          {
+            "outline": "bow",
+            "beam": 0.74,
+            "deck": "plain",
+            "sway": 1,
+            "bands": [],
+            "pieces": [
+              { "kind": "pad", "at": 0.12, "size": 0.5 },
+              { "kind": "bridge", "at": 0.5, "size": 0.8 },
+              { "kind": "mast", "at": 0.48, "size": 0.26 },
+              { "kind": "turret", "at": 0.84, "size": 0.3, "barrels": 1 }
+            ]
+          },
+          {
+            "outline": "submarine",
+            "beam": 0.58,
+            "deck": "plain",
+            "sway": 0.6,
+            "isSubmerged": true,
+            "bands": [],
+            "pieces": [
+              { "kind": "vls", "at": 0.4, "size": 0.4 },
+              { "kind": "sail", "at": 0.7, "size": 0.55 }
+            ]
+          }
+        ],
+        "2": [
+          {
+            "outline": "bow",
+            "beam": 0.6,
+            "deck": "seams",
+            "sway": 1.6,
+            "bands": [0.8],
+            "pieces": [{ "kind": "bridge", "at": 0.4, "size": 0.5 }]
+          }
+        ]
+      }
+    }
+  }
+}

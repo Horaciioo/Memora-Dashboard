@@ -1,14 +1,9 @@
 {
+  "fleet": "patrol",
   "legacyFormat": "compact",
   "theatre": {
     "size": 14,
-    "fleet": [
-      5,
-      4,
-      3,
-      3,
-      2
-    ],
+    "fleet": [5, 4, 3, 3, 2],
     "reachScale": 1,
     "ramp": {
       "everyTurns": 1,
@@ -25,10 +20,7 @@
     }
   },
   "light": {
-    "sun": [
-      -0.55,
-      -0.8
-    ],
+    "sun": [-0.55, -0.8],
     "tint": "rgba(255,236,170,0.10)",
     "shade": "rgba(8,40,60,0.28)"
   },

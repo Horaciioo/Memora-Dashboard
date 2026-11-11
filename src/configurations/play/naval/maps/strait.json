@@ -1,13 +1,8 @@
 {
+  "fleet": "strategic",
   "theatre": {
     "size": 20,
-    "fleet": [
-      5,
-      4,
-      3,
-      3,
-      2
-    ],
+    "fleet": [5, 4, 3, 3, 2],
     "reachScale": 1.5,
     "ramp": {
       "everyTurns": 1,
@@ -24,10 +19,7 @@
     }
   },
   "light": {
-    "sun": [
-      0.35,
-      -0.95
-    ],
+    "sun": [0.35, -0.95],
     "tint": "rgba(200,212,224,0.10)",
     "shade": "rgba(12,20,28,0.38)"
   },

@@ -1,39 +1,21 @@
+import type { NavalFleet, NavalFleetColours, NavalHull } from '@/declarations/play/naval/fleets/types'
+
 /**
- * The one look of ships and shells, read by the painters
+ * Look of the ships of one sea, built by navalSkinOf
  * @typedef {Object} NavalSkin
  */
 
-export interface NavalSkin {
-  rim: string
-  rimDark: string
-  wood: string
-  woodDark: string
-  plank: string
-  metal: string
-  top: string
-  dark: string
+export interface NavalSkin extends NavalFleetColours {
+  // Mine or foe band
   accent: string
-  shell: string
-  trail: string
-}
-
-/**
- * Top-down warships, a metal rim around a wooden deck
- * @type {NavalSkin}
- */
-
-export const NAVAL_SKIN: NavalSkin = {
-  rim: '#d4dbe1',
-  rimDark: '#7e8995',
-  wood: '#9b6b3c',
-  woodDark: '#6f4724',
-  plank: 'rgba(40,22,8,0.35)',
-  metal: '#aeb8c2',
-  top: '#eef2f5',
-  dark: '#3f4954',
-  accent: '#e0452f',
-  shell: '#2b2f36',
-  trail: 'rgba(255,255,255,0.55)',
+  // Cache key of its paths
+  key: string
+  // Theatre fleet, length by ship id
+  lengths: readonly number[]
+  // Class by ship id
+  hulls: readonly NavalHull[]
+  // Classes for any other ship
+  classes: NavalFleet
 }
 
 /**

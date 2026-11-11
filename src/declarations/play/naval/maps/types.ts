@@ -103,6 +103,8 @@ export interface NavalMapLook {
   stage: number
   // Thumbnail framing: squares shown, pull towards the first piece
   preview: { span: number; focus: number }
+  // Fleet skin key
+  fleet: string
 }
 
 /**

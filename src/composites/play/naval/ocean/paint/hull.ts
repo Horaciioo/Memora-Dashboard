@@ -1,190 +1,89 @@
 import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
+import { paintDeckTexture } from '@/composites/play/naval/ocean/paint/hull/decks'
+import { hullPathsOf } from '@/composites/play/naval/ocean/paint/hull/outlines'
+import { paintPiece } from '@/composites/play/naval/ocean/paint/hull/pieces'
 import type { NavalShip } from '@/core/lib/play/naval/fleet'
+import { hullOf, NavalPieces } from '@/declarations/play/naval/fleets'
+import type { NavalHull } from '@/declarations/play/naval/fleets'
 import type { NavalSkin } from '@/declarations/play/naval/skins'
 
-// Beam of a ship in squares, and the wooden deck inside the rim
-const BEAM = 0.8
-const DECK_BEAM = 0.62
-
-// Longest ship that carries aircraft, and the one that carries guns
-const CARRIER = 5
-const BATTLESHIP = 4
-const CRUISER = 3
+// Gap left at each end, in squares
+const END_GAP = 0.06
+// Outline width in squares
+const LINE = 0.035
+// Squares of a livery or side band
+const BAND = 0.12
+// Side band from the stern
+const SIDE_BAND_AT = 0.1
+// Hull share seen above water on a submarine
+const SUBMERGED_ALPHA = 0.5
 
 type Pen = CanvasRenderingContext2D
 
 /**
- * Hull outline along the x axis, stern rounded, bow pointed
+ * Rim and deck shaded across the beam
  * @param {Pen} ctx - Pen
- * @param {number} length - Pixels
- * @param {number} beam - Pixels across
+ * @param {Path2D} path - Shape
+ * @param {string[]} colours - Lit then shaded
+ * @param {number} half - Half beam
  * @return {void}
  */
 
-const hullPath = (ctx: Pen, length: number, beam: number): void => {
-  const half = beam / 2
-  const bow = beam * 1.05
-  ctx.beginPath()
-  ctx.moveTo(half * 0.6, -half)
-  ctx.lineTo(length - bow, -half)
-  ctx.quadraticCurveTo(length - bow * 0.3, -half * 0.92, length, 0)
-  ctx.quadraticCurveTo(length - bow * 0.3, half * 0.92, length - bow, half)
-  ctx.lineTo(half * 0.6, half)
-  ctx.quadraticCurveTo(0, half, 0, 0)
-  ctx.quadraticCurveTo(0, -half, half * 0.6, -half)
-  ctx.closePath()
+const shade = (ctx: Pen, path: Path2D, [lit, shaded]: string[], half: number): void => {
+  const gradient = ctx.createLinearGradient(0, -half, 0, half)
+  gradient.addColorStop(0, lit)
+  gradient.addColorStop(1, shaded)
+  ctx.fillStyle = gradient
+  ctx.fill(path)
 }
 
 /**
- * Rounded block on the deck
- * @param {Pen} ctx - Pen
- * @param {number[]} box - Left, top, width, height
- * @param {string} fill - Colour
- * @param {string} edge - Outline colour
- * @param {number} line - Outline width
- * @return {void}
- */
-
-const block = (
-  ctx: Pen,
-  [x, y, width, height]: number[],
-  fill: string,
-  edge: string,
-  line: number
-): void => {
-  ctx.beginPath()
-  ctx.roundRect(x, y, width, height, Math.min(width, height) * 0.22)
-  ctx.fillStyle = fill
-  ctx.fill()
-  ctx.strokeStyle = edge
-  ctx.lineWidth = line
-  ctx.stroke()
-}
-
-/**
- * Gun turret with its barrels pointing to the bow
+ * Livery stripes and the side band
  * @param {Pen} ctx - Pen
  * @param {NavalSkin} skin - Skin
- * @param {number[]} at - Centre column, row, size in pixels
- * @param {number} barrels - Barrels
+ * @param {NavalHull} hull - Class
+ * @param {number} length - Squares
  * @return {void}
  */
 
-const turret = (ctx: Pen, skin: NavalSkin, [x, y, size]: number[], barrels: number): void => {
-  ctx.fillStyle = skin.dark
-  for (let index = 0; index < barrels; index += 1) {
-    const offset = barrels === 1 ? 0 : (index - (barrels - 1) / 2) * size * 0.5
-    ctx.fillRect(x, y + offset - size * 0.05, size * 1.1, size * 0.1)
-  }
-  ctx.beginPath()
-  ctx.arc(x, y, size * 0.5, 0, Math.PI * 2)
-  ctx.fillStyle = skin.metal
-  ctx.fill()
-  ctx.strokeStyle = skin.dark
-  ctx.lineWidth = size * 0.08
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.arc(x - size * 0.06, y, size * 0.22, 0, Math.PI * 2)
-  ctx.fillStyle = skin.top
-  ctx.fill()
-}
-
-/**
- * Small aircraft parked on a flight deck
- * @param {Pen} ctx - Pen
- * @param {NavalSkin} skin - Skin
- * @param {number[]} at - Centre column, row, size in pixels
- * @return {void}
- */
-
-const plane = (ctx: Pen, skin: NavalSkin, [x, y, size]: number[]): void => {
-  ctx.fillStyle = skin.top
-  ctx.strokeStyle = skin.dark
-  ctx.lineWidth = size * 0.06
-  ctx.beginPath()
-  ctx.roundRect(x - size * 0.45, y - size * 0.07, size * 0.9, size * 0.14, size * 0.07)
-  ctx.fill()
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.roundRect(x - size * 0.12, y - size * 0.42, size * 0.2, size * 0.84, size * 0.05)
-  ctx.fill()
-  ctx.stroke()
+const paintBands = (ctx: Pen, skin: NavalSkin, hull: NavalHull, length: number): void => {
+  const half = hull.beam / 2
+  ctx.fillStyle = skin.stripe
+  for (const band of hull.bands) ctx.fillRect(band * length - BAND / 2, -half, BAND, hull.beam)
   ctx.fillStyle = skin.accent
-  ctx.fillRect(x + size * 0.28, y - size * 0.05, size * 0.1, size * 0.1)
+  ctx.fillRect(SIDE_BAND_AT, -half, BAND, hull.beam)
 }
 
 /**
- * Pieces standing on the deck, by ship size
+ * Hull body: rim, bands, deck
  * @param {Pen} ctx - Pen
  * @param {NavalSkin} skin - Skin
- * @param {NavalShip} ship - Ship
- * @param {number} cell - Pixels per square
+ * @param {NavalHull} hull - Class
+ * @param {number[]} size - Length and outline width
  * @return {void}
  */
 
-const paintDeck = (ctx: Pen, skin: NavalSkin, ship: NavalShip, cell: number): void => {
-  const line = Math.max(1, cell * 0.04)
-  const at = (squares: number) => squares * cell
+const paintBody = (ctx: Pen, skin: NavalSkin, hull: NavalHull, [length, line]: number[]): void => {
+  const half = hull.beam / 2
+  const { rim, deck } = hullPathsOf(hull, length)
 
-  if (ship.length >= CARRIER) {
-    // Runway, four aircraft and the tower aside
-    ctx.setLineDash([cell * 0.22, cell * 0.2])
-    ctx.strokeStyle = 'rgba(255,255,255,0.55)'
-    ctx.lineWidth = line * 1.5
-    ctx.beginPath()
-    ctx.moveTo(at(0.5), 0)
-    ctx.lineTo(at(ship.length - 0.9), 0)
-    ctx.stroke()
-    ctx.setLineDash([])
-    for (let index = 0; index < ship.length - 1; index += 1)
-      plane(ctx, skin, [at(1.05 + index * 0.95), cell * 0.02, cell * 0.5])
-    block(ctx, [at(0.25), cell * 0.12, cell * 0.7, cell * 0.2], skin.metal, skin.dark, line)
-    block(ctx, [at(0.38), cell * 0.17, cell * 0.3, cell * 0.1], skin.top, skin.dark, line)
-  } else if (ship.length === BATTLESHIP) {
-    turret(ctx, skin, [at(0.75), 0, cell * 0.46], 2)
-    turret(ctx, skin, [at(ship.length - 1.1), 0, cell * 0.46], 2)
-    block(ctx, [at(1.4), -cell * 0.2, cell * 1.2, cell * 0.4], skin.metal, skin.dark, line)
-    block(ctx, [at(1.65), -cell * 0.13, cell * 0.5, cell * 0.26], skin.top, skin.dark, line)
-    ctx.fillStyle = skin.accent
-    ctx.fillRect(at(2.7), -cell * 0.04, cell * 0.14, cell * 0.08)
-  } else if (ship.length === CRUISER && ship.id % 2 === 0) {
-    turret(ctx, skin, [at(ship.length - 0.85), 0, cell * 0.42], 2)
-    block(ctx, [at(0.95), -cell * 0.19, cell * 0.95, cell * 0.38], skin.metal, skin.dark, line)
-    block(ctx, [at(1.15), -cell * 0.12, cell * 0.4, cell * 0.24], skin.top, skin.dark, line)
-    turret(ctx, skin, [at(0.5), 0, cell * 0.3], 1)
-  } else if (ship.length === CRUISER) {
-    // Two cargo hatches and a lifebuoy
-    for (const column of [0.45, 1.55])
-      block(ctx, [at(column), -cell * 0.22, cell * 0.85, cell * 0.44], skin.top, skin.dark, line)
-    ctx.fillStyle = skin.accent
-    ctx.beginPath()
-    ctx.arc(at(ship.length - 0.45), cell * 0.18, cell * 0.06, 0, Math.PI * 2)
-    ctx.fill()
-  } else {
-    block(ctx, [at(0.25), -cell * 0.2, cell * 0.65, cell * 0.4], skin.metal, skin.dark, line)
-    block(ctx, [at(0.38), -cell * 0.12, cell * 0.3, cell * 0.24], skin.top, skin.dark, line)
-    turret(ctx, skin, [at(ship.length - 0.55), 0, cell * 0.3], 1)
-  }
-}
+  // Rim and its bands
+  shade(ctx, rim, [skin.rim, skin.rimDark], half)
+  ctx.save()
+  ctx.clip(rim)
+  paintBands(ctx, skin, hull, length)
+  ctx.restore()
+  ctx.strokeStyle = skin.dark
+  ctx.lineWidth = line
+  ctx.stroke(rim)
 
-/**
- * Wooden planks along the deck
- * @param {Pen} ctx - Pen
- * @param {NavalSkin} skin - Skin
- * @param {number} length - Pixels
- * @param {number} beam - Pixels across
- * @return {void}
- */
-
-const paintPlanks = (ctx: Pen, skin: NavalSkin, length: number, beam: number): void => {
-  ctx.strokeStyle = skin.plank
-  ctx.lineWidth = Math.max(1, beam * 0.025)
-  ctx.beginPath()
-  for (const row of [-0.33, -0.11, 0.11, 0.33]) {
-    ctx.moveTo(0, beam * row)
-    ctx.lineTo(length, beam * row)
-  }
-  ctx.stroke()
+  // Deck and its texture
+  shade(ctx, deck, [skin.deck, skin.deckDark], half)
+  ctx.save()
+  ctx.clip(deck)
+  ctx.lineWidth = line * 0.7
+  paintDeckTexture(ctx, skin, hull.deck, [length, half])
+  ctx.restore()
 }
 
 /**
@@ -194,41 +93,30 @@ const paintPlanks = (ctx: Pen, skin: NavalSkin, length: number, beam: number): v
  * @return {void}
  */
 
-export const paintHull = (frame: OceanFrame, ship: NavalShip): void => {
-  const { ctx, cell, skin } = frame
-  const length = ship.length * cell - cell * 0.12
-  const beam = cell * BEAM
+export const paintHull = ({ ctx, cell, skin }: OceanFrame, ship: NavalShip): void => {
+  const hull = hullOf(skin, ship)
+  const length = ship.length - END_GAP * 2
+  const line = Math.max(1 / cell, LINE)
+  const alpha = ctx.globalAlpha
   ctx.save()
-  ctx.translate(cell * 0.06, 0)
+  ctx.scale(cell, cell)
+  ctx.translate(END_GAP, 0)
 
-  // Metal rim
-  hullPath(ctx, length, beam)
-  const rim = ctx.createLinearGradient(0, -beam / 2, 0, beam / 2)
-  rim.addColorStop(0, skin.rim)
-  rim.addColorStop(1, skin.rimDark)
-  ctx.fillStyle = rim
-  ctx.fill()
-  ctx.strokeStyle = skin.dark
-  ctx.lineWidth = Math.max(1, cell * 0.04)
-  ctx.stroke()
+  // Body, faded under water
+  if (hull.isSubmerged) ctx.globalAlpha = alpha * SUBMERGED_ALPHA
+  paintBody(ctx, skin, hull, [length, line])
+  const place = (at: number, across: number) => ({
+    x: at * length,
+    y: across * (hull.beam / 2),
+    half: hull.beam / 2,
+    line,
+  })
+  for (const piece of hull.pieces)
+    if (piece.kind !== NavalPieces.Sail) paintPiece(ctx, skin, piece, place(piece.at, piece.across))
 
-  // Wooden deck inside it
-  const inner = length - cell * 0.3
-  const deckBeam = cell * DECK_BEAM
-  ctx.save()
-  ctx.translate(cell * 0.12, 0)
-  hullPath(ctx, inner, deckBeam)
-  const wood = ctx.createLinearGradient(0, -deckBeam / 2, 0, deckBeam / 2)
-  wood.addColorStop(0, skin.wood)
-  wood.addColorStop(1, skin.woodDark)
-  ctx.fillStyle = wood
-  ctx.fill()
-  ctx.clip()
-  paintPlanks(ctx, skin, inner, deckBeam)
-  ctx.restore()
-  ctx.save()
-  ctx.translate(cell * 0.12, 0)
-  paintDeck(ctx, skin, ship, cell)
-  ctx.restore()
+  // Sail above the surface
+  ctx.globalAlpha = alpha
+  for (const piece of hull.pieces)
+    if (piece.kind === NavalPieces.Sail) paintPiece(ctx, skin, piece, place(piece.at, piece.across))
   ctx.restore()
 }

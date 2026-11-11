@@ -2,6 +2,7 @@ import { clamp01, sightOf } from '@/composites/play/naval/ocean/paint/frame'
 import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
 import { paintHull } from '@/composites/play/naval/ocean/paint/hull'
 import type { NavalShip } from '@/core/lib/play/naval/fleet'
+import { hullOf } from '@/declarations/play/naval/fleets'
 import { NAVAL_WATER } from '@/declarations/play/naval/skins'
 
 /**
@@ -27,7 +28,7 @@ export const SINK_MS = 1800
  * @return {{ x: number; y: number; angle: number; bob: number }} - Pose
  */
 
-const poseOf = ({ cell, left, top, now }: OceanFrame, ship: NavalShip) => {
+const poseOf = ({ cell, left, top, now, skin }: OceanFrame, ship: NavalShip) => {
   const phase = ship.id * 1.7 + ship.x * 0.3
   const across = ship.isHorizontal ? ship.length : 1
   const down = ship.isHorizontal ? 1 : ship.length
@@ -36,7 +37,7 @@ const poseOf = ({ cell, left, top, now }: OceanFrame, ship: NavalShip) => {
     x: left + (ship.x + across / 2) * cell,
     y: top + (ship.y + down / 2) * cell,
     angle: ship.isHorizontal ? 0 : Math.PI / 2,
-    bob: Math.sin(now / 1300 + phase),
+    bob: Math.sin((now * hullOf(skin, ship).sway) / 1300 + phase),
   }
 }
 
