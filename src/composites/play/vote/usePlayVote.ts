@@ -17,7 +17,7 @@ const VOTE_SOUNDS = [
   GOLF_SOUNDS.voteSwitch,
 ]
 
-export interface GolfVoteInput {
+export interface PlayVoteInput {
   vote: PlayVoteState
   // Leading card of some picks
   winner: (picks: Record<string, string>) => string
@@ -29,11 +29,11 @@ export interface GolfVoteInput {
 
 /**
  * Vote of the lobby: own pick shown at once, card most picked, gestures with their sounds
- * @param {GolfVoteInput} input - Vote and sender
+ * @param {PlayVoteInput} input - Vote and sender
  * @return {Object} - Picks, leading card and gestures
  */
 
-export const useGolfVote = ({ vote, winner, viewerId, isHost, onSend }: GolfVoteInput) => {
+export const usePlayVote = ({ vote, winner, viewerId, isHost, onSend }: PlayVoteInput) => {
   // Own pick, shown before the server answers
   const [mine, setMine] = useState<{ step: string; key: string } | null>(null)
   const timers = useRef<number[]>([])

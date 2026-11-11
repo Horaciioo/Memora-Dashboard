@@ -1,4 +1,4 @@
-import type { GolfVoteCard } from '@/composites/play/golf/vote/GolfVoteDeck'
+import type { PlayVoteCard } from '@/composites/play/vote/PlayVoteDeck'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_SETUP_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_COURSES, GOLF_RANDOM_COURSE } from '@/declarations/play/golf/courses'
@@ -25,10 +25,10 @@ export const MODE_HINTS: Record<GolfModeName, string> = {
 
 /**
  * Cards of the formats
- * @return {GolfVoteCard[]} - Cards
+ * @return {PlayVoteCard[]} - Cards
  */
 
-export const modeCards = (): GolfVoteCard[] =>
+export const modeCards = (): PlayVoteCard[] =>
   Object.values(GolfModes).map((mode) => {
     const Icon = ICONS[GOLF_MODE_ICONS[mode]]
 
@@ -41,10 +41,10 @@ export const modeCards = (): GolfVoteCard[] =>
 
 /**
  * Cards of the tournament lengths
- * @return {GolfVoteCard[]} - Cards
+ * @return {PlayVoteCard[]} - Cards
  */
 
-export const roundCards = (): GolfVoteCard[] =>
+export const roundCards = (): PlayVoteCard[] =>
   GOLF_SETTINGS.tournament.maps.map((count) => ({
     key: String(count),
     label: fillPlayMessage(GOLF_SETUP_COPY.mapsCount, { count }),
@@ -54,10 +54,10 @@ export const roundCards = (): GolfVoteCard[] =>
 /**
  * Cards of the courses, the random draw last
  * @param {Map<string, string>} shots - Thumbnails drawn so far
- * @return {GolfVoteCard[]} - Cards
+ * @return {PlayVoteCard[]} - Cards
  */
 
-export const courseCards = (shots: Map<string, string>): GolfVoteCard[] => {
+export const courseCards = (shots: Map<string, string>): PlayVoteCard[] => {
   const RandomIcon = ICONS.help
 
   return [...GOLF_COURSES.keys, GOLF_RANDOM_COURSE].map((key) => {

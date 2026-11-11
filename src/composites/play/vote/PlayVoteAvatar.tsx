@@ -7,7 +7,7 @@ import type { VoteLook } from '@/declarations/ui/variants/games/golf'
 // Hops above which a jump stops climbing higher
 const MAX_LIFT = 4
 
-export interface GolfVoter {
+export interface PlayVoter {
   id: string
   name: string
   avatarUrl: string | null
@@ -18,18 +18,18 @@ export interface GolfVoter {
 /**
  * Avatar of a voter, arcing from its old card to the new one
  * @param {Object} props - Voter and distance
- * @param {GolfVoter} props.voter - Who voted
+ * @param {PlayVoter} props.voter - Who voted
  * @param {number} props.hops - Cards crossed, signed
  * @param {VoteLook} [props.look] - Screen classes
  * @return {JSX.Element}
  */
 
-export const GolfVoteAvatar = ({
+export const PlayVoteAvatar = ({
   voter,
   hops,
   look = GOLF_VOTE,
 }: {
-  voter: GolfVoter
+  voter: PlayVoter
   hops: number
   look?: VoteLook
 }) => (

@@ -14,6 +14,7 @@ import { LudoRulesDrawer } from '@/composites/play/ludo/LudoRulesDrawer'
 import { LudoSetupDrawer } from '@/composites/play/ludo/LudoSetupDrawer'
 import { NavalRulesDrawer } from '@/composites/play/naval/setup/NavalRulesDrawer'
 import { NavalSetupDrawer } from '@/composites/play/naval/setup/NavalSetupDrawer'
+import { navalVoteFace } from '@/composites/play/naval/world/navalVoteFace'
 import { declaredVote } from '@/composites/play/vote/PlayStartVote'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
@@ -97,6 +98,7 @@ export const PLAY_START_VOTES: Partial<Record<PlayGameName, ComponentType<PlayVo
   [PlayGames.Baccalaureat]: declaredVote(PlayGames.Baccalaureat),
   [PlayGames.Bomb]: declaredVote(PlayGames.Bomb),
   [PlayGames.Ludo]: declaredVote(PlayGames.Ludo),
+  [PlayGames.Naval]: declaredVote(PlayGames.Naval, navalVoteFace),
 }
 
 /**

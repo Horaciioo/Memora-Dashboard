@@ -2,6 +2,7 @@ import { BACCALAUREAT_CATEGORIES } from '@/declarations/play/baccalaureat/catego
 import { BACCALAUREAT_PACKS } from '@/declarations/play/baccalaureat/packs'
 import type { IconName } from '@/declarations/ui/icons'
 import { LudoEndings } from '@/declarations/play/ludo/settings'
+import { NAVAL_MAPS, NAVAL_RANDOM_MAP, navalMapSize } from '@/declarations/play/naval/maps'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -102,6 +103,26 @@ export const PLAY_VOTE_STEPS: Partial<Record<PlayGameName, PlayVoteStepSpec[]>> 
       })),
     },
   ],
+  [PlayGames.Naval]: [
+    {
+      key: 'map',
+      title: 'Carte',
+      lead: 'Sur quelle mer on se bat ?',
+      choices: [
+        ...NAVAL_MAPS.keys.map((key) => ({
+          key,
+          label: NAVAL_MAPS.label(key),
+          hint: `${navalMapSize(key)}. ${NAVAL_MAPS.get(key).tagline}`,
+        })),
+        {
+          key: NAVAL_RANDOM_MAP,
+          label: 'Au hasard',
+          hint: 'Une des quatre cartes, tirée au lancement.',
+          icon: 'help',
+        },
+      ],
+    },
+  ],
   [PlayGames.Ludo]: [
     {
       key: 'ending',
@@ -152,5 +173,6 @@ export const PLAY_VOTE_SETTINGS: Partial<
     difficulty: chosen.difficulty,
     startLives: Number(chosen.lives),
   }),
+  [PlayGames.Naval]: (chosen) => ({ map: chosen.map }),
   [PlayGames.Ludo]: (chosen) => ({ ending: chosen.ending, pawns: Number(chosen.pawns) }),
 }

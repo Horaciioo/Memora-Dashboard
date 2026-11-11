@@ -15,7 +15,7 @@ const RETRY_MS = 1000
 // Screen refresh of the number
 const TICK_MS = 250
 
-export interface GolfVoteTimerProps {
+export interface PlayVoteTimerProps {
   // Server ms the step closes
   endsAt: number
   // Server ms at the page render
@@ -28,16 +28,16 @@ export interface GolfVoteTimerProps {
 
 /**
  * Seconds left to vote, read against the server clock, closing the step at zero
- * @param {GolfVoteTimerProps} props - Deadline
+ * @param {PlayVoteTimerProps} props - Deadline
  * @return {JSX.Element}
  */
 
-export const GolfVoteTimer = ({
+export const PlayVoteTimer = ({
   endsAt,
   serverTime,
   onExpire,
   look = GOLF_VOTE,
-}: GolfVoteTimerProps) => {
+}: PlayVoteTimerProps) => {
   const [left, setLeft] = useState(endsAt - serverTime)
   const expire = useEffectEvent(onExpire)
 

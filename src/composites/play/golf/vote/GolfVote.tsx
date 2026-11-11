@@ -6,15 +6,15 @@ import { createPortal } from 'react-dom'
 
 import { GolfPanorama } from '@/composites/play/golf/panorama/GolfPanorama'
 import { GolfTournamentDeck } from '@/composites/play/golf/vote/GolfTournamentDeck'
-import { GolfVoteDeck } from '@/composites/play/golf/vote/GolfVoteDeck'
-import { GolfVoteTimer } from '@/composites/play/golf/vote/GolfVoteTimer'
+import { PlayVoteDeck } from '@/composites/play/vote/PlayVoteDeck'
+import { PlayVoteTimer } from '@/composites/play/vote/PlayVoteTimer'
 import {
   courseCards,
   MODE_HINTS,
   modeCards,
   roundCards,
 } from '@/composites/play/golf/vote/voteCards'
-import { useGolfVote } from '@/composites/play/golf/vote/useGolfVote'
+import { usePlayVote } from '@/composites/play/vote/usePlayVote'
 import { winningCard } from '@/core/lib/play/golf'
 import type { GolfGameSettings, GolfVoteState } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -69,7 +69,7 @@ export const GolfVote = ({
   onSend,
 }: GolfVoteProps) => {
   const isHost = viewerId === hostId
-  const { picks, leader, pick, close, validate, back } = useGolfVote({
+  const { picks, leader, pick, close, validate, back } = usePlayVote({
     vote,
     winner: (picked) => winningCard(vote.step, picked, hostId, settings),
     viewerId,
@@ -150,7 +150,7 @@ export const GolfVote = ({
             <h2 className={GOLF_VOTE.title}>{screen.title}</h2>
             <p className={GOLF_VOTE.lead}>{screen.lead}</p>
           </div>
-          <GolfVoteDeck
+          <PlayVoteDeck
             key={step}
             cards={screen.cards}
             value={leader}
@@ -167,7 +167,7 @@ export const GolfVote = ({
                 {GOLF_VOTE_COPY.back}
               </button>
             )}
-            <GolfVoteTimer
+            <PlayVoteTimer
               key={step}
               endsAt={vote.endsAt}
               serverTime={serverTime}

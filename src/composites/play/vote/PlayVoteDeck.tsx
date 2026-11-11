@@ -3,28 +3,28 @@
 import { useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 
-import { GolfVoteAvatar } from '@/composites/play/golf/vote/GolfVoteAvatar'
-import type { GolfVoter } from '@/composites/play/golf/vote/GolfVoteAvatar'
+import { PlayVoteAvatar } from '@/composites/play/vote/PlayVoteAvatar'
+import type { PlayVoter } from '@/composites/play/vote/PlayVoteAvatar'
 import { GOLF_VOTE } from '@/declarations/ui/variants'
 import type { VoteLook } from '@/declarations/ui/variants/games/golf'
 import { cn } from '@/utils/classnames'
 
 /**
  * One card to vote for
- * @typedef {Object} GolfVoteCard
+ * @typedef {Object} PlayVoteCard
  */
 
-export interface GolfVoteCard {
+export interface PlayVoteCard {
   key: string
   label: string
   // Picture of the card
   face: ReactNode
 }
 
-export interface GolfVoteDeckProps {
-  cards: GolfVoteCard[]
+export interface PlayVoteDeckProps {
+  cards: PlayVoteCard[]
   value: string
-  voters: GolfVoter[]
+  voters: PlayVoter[]
   // White frame on the picture, name on a green strip
   isCourse?: boolean
   // Classes of the screen, Golf's by default
@@ -34,18 +34,18 @@ export interface GolfVoteDeckProps {
 
 /**
  * Row of cards on a dark band, each voter's avatar hopping onto the card picked, the leading card framed
- * @param {GolfVoteDeckProps} props - Cards and picks
+ * @param {PlayVoteDeckProps} props - Cards and picks
  * @return {JSX.Element}
  */
 
-export const GolfVoteDeck = ({
+export const PlayVoteDeck = ({
   cards,
   value,
   voters,
   isCourse = false,
   look = GOLF_VOTE,
   onPick,
-}: GolfVoteDeckProps) => {
+}: PlayVoteDeckProps) => {
   const positions = Object.fromEntries(
     voters.map((voter) => [voter.id, cards.findIndex((card) => card.key === voter.key)])
   )
@@ -89,7 +89,7 @@ export const GolfVoteDeck = ({
               {here.length > 0 && (
                 <span className={look.avatarBox}>
                   {here.map((voter) => (
-                    <GolfVoteAvatar
+                    <PlayVoteAvatar
                       key={voter.id}
                       voter={voter}
                       hops={hops[voter.id] ?? 0}
