@@ -127,6 +127,155 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.12.0',
+    date: '2026-11-11',
+    title: 'Un max. d’améliorations',
+    intro:
+      'Les Lives, la Mod. View et le chat interne gagnent en confort, et l’encadrement dispose enfin d’un espace « Gestions » pour suivre toute l’équipe au même endroit.',
+    description:
+      'Suivre l’équipe obligeait à ouvrir plusieurs pages, et le Live comme la Mod. View manquaient de repères pour arriver, discuter et surveiller le chat. Cette version rassemble le suivi de l’équipe dans « Gestions », refait l’arrivée sur un Live en trois étapes, ajoute des salons et des réactions au chat interne, des mots de surveillance personnels ou partagés, et permet de dérank plusieurs modérateurs d’un coup.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.management,
+        permission: Permissions.MemberRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Gestions » : un menu du rail qui se déplie sur les Absences, les Réseaux, les Notes, les Anniversaires, les Arrivées et les Fonctions de toute l’équipe.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.management,
+        permission: Permissions.AbsenceReview,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une page « Absences » dans « Gestions » : les demandes de l’équipe rangées en À traiter, En cours et à venir, Terminées, Refusées et annulées, avec une recherche par membre ou motif et un filtre par statut.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.management,
+        permission: Permissions.MemberRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une page « Réseaux » dans « Gestions » : tous les profils déclarés par les membres, filtrables par réseau, avec un bouton pour ouvrir chaque profil.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.management,
+        permission: Permissions.MemberNoteRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une page « Notes » dans « Gestions » : les remarques posées sur les fiches des membres, avec les épinglées en premier et un filtre par auteur.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.management,
+        permission: Permissions.MemberRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une page « Anniversaires » dans « Gestions » : les dates à souhaiter ce mois-ci, le mois prochain et plus tard dans l’année, avec le nombre de jours restants.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.management,
+        permission: Permissions.MemberRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une page « Arrivées » dans « Gestions » : qui est arrivé et depuis quand, avec les nouveaux, les moins d’un an et les plus d’un an, filtrables par rôle et par statut.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.management,
+        permission: Permissions.MemberRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une page « Fonctions » dans « Gestions » : qui porte quelle fonction dans l’équipe.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        permission: Permissions.MemberUpdate,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de dérank plusieurs modérateurs d’un coup avec « Dérank » : leur accès est coupé, ce qu’ils avaient renseigné est effacé, et l’annonce de départ est préparée avec la période d’intégration non validée.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        permission: Permissions.AcademyManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de réunir plusieurs annonces de départ en un seul message avec « Réunir ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveSharedWords,
+        text: 'Ajout des « Mots partagés » dans la Mod. View : un mot de surveillance ajouté pour un créateur est vu par toute l’équipe sur le live, sans rien sanctionner.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de mots de surveillance personnels dans les réglages de la Mod. View : des mots de répétition et des mots interdits qui s’allument dans ton chat, avec une couleur propre à chacun.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de trois salons dans le chat interne du live, « Tous », « Référents » et « Responsables » : les deux derniers ne sont vus que par ceux à qui ils sont réservés.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de réactions en emoji sur les messages du chat interne, d’une mention « @Admin » et d’une ligne « est en train d’écrire » qui montre qui rédige.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’un parcours en trois étapes pour entrer sur un live, « Consignes », « Équipe prévue » puis « Présence », avec un choix « Je ne suis pas disponible » et la possibilité de modifier ta réponse.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’un « Historique des Lives » sur la page « Lives », avec « Tes chiffres » et « Toute l’équipe » : sanctions effectuées, messages envoyés, temps de modération et modérateurs actifs.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.modView,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une page « Mod. View » : elle ouvre le live en cours, ou montre l’outil en lecture seule quand aucun live n’est ouvert, et un bouton flottant « Ouvrir la Mod. View » la rejoint depuis les Lives.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la page « Live en cours », renommée « Lives » : elle montre le prochain live, l’historique et un message plus clair quand rien n’est annoncé.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de l’appel de présence : l’écran sépare Présence, Absences et Non répondu, et les boutons de bilan deviennent « Bilan Mod. » et « Bilan Créa. ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration du menu : « Pages privées » devient une entrée du rail avec un lien « Retour au menu », à la place du choix Privées ou Normales, et « Play » rejoint les accès rapides.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des onglets de page : quand tu reviens sur une page, elle rouvre l’onglet que tu avais quitté, et le fil d’Ariane affiche son nom.',
+      },
+    ],
+    comments: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.management,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Toute l’équipe se suit désormais dans « Gestions », sans passer d’une page à l’autre.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        text: 'Le chat interne et l’arrivée sur un live ont été pensés pour que chacun sache qui est là et à qui il parle.',
+      },
+    ],
+  },
+  {
     version: '0.11.1',
     date: '2026-11-09',
     title: 'Memora Play sur son 31',
