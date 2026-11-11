@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { apiPost } from '@/core/lib/api/client'
@@ -36,8 +36,15 @@ export const useFavoritePage = (path: string, label: string): FavoriteState => {
 
   const held = session?.favorites ?? []
 
+  const isHeld = held.some((entry) => entry.path === path)
+
   // Optimistic until the refresh lands
-  const isFavorite = pending ?? held.some((entry) => entry.path === path)
+  const isFavorite = pending ?? isHeld
+
+  // Server caught up
+  useEffect(() => {
+    if (pending !== null && pending === isHeld) setPending(null)
+  }, [pending, isHeld])
   const isFull = !isFavorite && held.length >= FAVORITE_LIMIT
 
   const toggle = () => {
@@ -46,8 +53,7 @@ export const useFavoritePage = (path: string, label: string): FavoriteState => {
     setPending(!isFavorite)
     void apiPost(API_ROUTES.favoritePage, { path, label })
       .then(() => router.refresh())
-      .catch(() => undefined)
-      .finally(() => setPending(null))
+      .catch(() => setPending(null))
   }
 
   return { isFavorite, isFull, toggle }
