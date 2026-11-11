@@ -1,16 +1,14 @@
 import type { Metadata } from 'next'
-import Link from '@/components/elements/navigation/AppLink'
 import { LoginForm } from '@/composites/auth/LoginForm'
 import { DiscordSignInButton } from '@/composites/auth/DiscordSignInButton'
 import { OfflineWipe } from '@/composites/pages/offline/OfflineWipe'
-import { AuthShell } from '@/layouts/AuthShell'
+import { LoginShell } from '@/layouts/LoginShell'
 import { isDiscordConfigured } from '@/declarations/access/discord'
 import {
   SIGN_IN_ERROR_PARAM,
   isIdentifierSignInAllowed,
   readSignInError,
 } from '@/declarations/access/signIn'
-import { ROUTES } from '@/declarations/navigation'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 import { SIGN_IN_STYLES } from '@/declarations/ui/variants'
 
@@ -20,7 +18,7 @@ export const metadata: Metadata = { title: AUTH_COPY.title }
  * Sign-in screen
  * @param {Object} props - Route props
  * @param {Promise<Record<string, string | string[] | undefined>>} props.searchParams - URL query
- * @return {Promise<JSX.Element>} - Auth shell
+ * @return {Promise<JSX.Element>} - Showcase shell
  */
 
 export default async function LoginPage({
@@ -35,7 +33,7 @@ export default async function LoginPage({
   const withFallback = isIdentifierSignInAllowed()
 
   return (
-    <AuthShell title={AUTH_COPY.title} subtitle={AUTH_COPY.subtitle}>
+    <LoginShell>
       <div className={SIGN_IN_STYLES.stack}>
         <OfflineWipe />
         {failure && (
@@ -55,12 +53,7 @@ export default async function LoginPage({
             <LoginForm />
           </>
         )}
-        <p className={SIGN_IN_STYLES.footer}>
-          <Link href={ROUTES.privacy} className={SIGN_IN_STYLES.link}>
-            {AUTH_COPY.privacyLink}
-          </Link>
-        </p>
       </div>
-    </AuthShell>
+    </LoginShell>
   )
 }

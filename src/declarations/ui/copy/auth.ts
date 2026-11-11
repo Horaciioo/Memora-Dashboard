@@ -27,3 +27,12 @@ export const AUTH_COPY = {
   broken: 'La connexion a échoué. Réessaie dans un instant.',
   privacyLink: 'Comment tes données sont traitées',
 } as const
+
+/**
+ * Sign-in showcase photo
+ * @type {Object}
+ */
+
+export const LOGIN_SHOWCASE = {
+  image: '/login/hero.jpg',
+} as const

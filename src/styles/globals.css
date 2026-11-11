@@ -24,6 +24,7 @@
 @import './shell/surfaces.css';
 @import './shell/switch.css';
 @import './shell/welcome.css';
+@import './shell/showcase.css';
 @import './motion/feedback.css';
 @import './motion/overlays.css';
 @import './motion/focus.css';
