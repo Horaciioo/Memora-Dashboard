@@ -3560,10 +3560,8 @@ model NavalPlayer {
   place        Int?
   // Turns lost to the clock in a row
   strikes      Int       @default(0)
-  // Ammo for special weapons
-  ammo         Int       @default(0)
-  // Weapons drawn for the current turn
-  offer        String[]  @default([])
+  // Weapon drawn for the current turn
+  weapon       String    @default("cannon")
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
