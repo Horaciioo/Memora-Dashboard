@@ -17,6 +17,7 @@
     "type-check": "yarn openapi:generate && tsc --noEmit && tsc --noEmit -p src/worker/tsconfig.json",
     "nexus:hash": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/scripts/nexus/hash.ts",
     "comments:trim": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/scripts/comments/trim.ts",
+    "clean": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/scripts/clean.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "validate": "yarn type-check && yarn lint && yarn test && yarn build",
