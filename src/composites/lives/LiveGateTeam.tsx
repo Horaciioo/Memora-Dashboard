@@ -65,25 +65,32 @@ const TeamGroup = ({ label, people, juniors = [] }: TeamGroupProps) => (
  * @return {JSX.Element}
  */
 
-export const LiveGateTeam = ({ live }: { live: LiveView }) => (
-  <section className={LIVE_GATE.side}>
-    <h3 className={LIVE_GATE.heading}>{LIVE_PAGE_COPY.team}</h3>
-    <div className={LIVE_GATE.boxes}>
-      <div className={LIVE_GATE.pair}>
+export const LiveGateTeam = ({ live }: { live: LiveView }) => {
+  const chosen = new Set(
+    [...live.responsables, ...live.coordinators.map((seat) => seat.person)].map(({ id }) => id)
+  )
+  const others = live.members.filter((person) => !chosen.has(person.id))
+
+  return (
+    <section className={LIVE_GATE.side}>
+      <h3 className={LIVE_GATE.heading}>{LIVE_PAGE_COPY.team}</h3>
+      <div className={LIVE_GATE.boxes}>
+        <div className={LIVE_GATE.pair}>
+          <TeamGroup
+            label={LIVE_PAGE_COPY.recapResponsables}
+            people={live.responsables.map((person) => ({ person }))}
+          />
+          <TeamGroup
+            label={LIVE_PAGE_COPY.recapCoordinators}
+            people={live.coordinators.map((seat) => ({ person: seat.person, seat }))}
+          />
+        </div>
         <TeamGroup
-          label={LIVE_PAGE_COPY.recapResponsables}
-          people={live.responsables.map((person) => ({ person }))}
-        />
-        <TeamGroup
-          label={LIVE_PAGE_COPY.recapCoordinators}
-          people={live.coordinators.map((seat) => ({ person: seat.person, seat }))}
+          label={LIVE_PAGE_COPY.members}
+          people={others.filter((person) => person.rank).map((person) => ({ person }))}
+          juniors={others.filter((person) => !person.rank).map((person) => ({ person }))}
         />
       </div>
-      <TeamGroup
-        label={LIVE_PAGE_COPY.members}
-        people={live.members.filter((person) => person.rank).map((person) => ({ person }))}
-        juniors={live.members.filter((person) => !person.rank).map((person) => ({ person }))}
-      />
-    </div>
-  </section>
-)
+    </section>
+  )
+}

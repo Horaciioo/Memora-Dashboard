@@ -51,7 +51,6 @@ export const LivesBoard = ({
     initialRecent
   )
   const router = useRouter()
-  const upcoming = lives.filter((live) => live.status === LiveStatuses.Announced)
   const onAir = lives.filter((live) => live.status === LiveStatuses.Live)
 
   // A live is planned on the calendar
@@ -84,13 +83,6 @@ export const LivesBoard = ({
               key: 'onAir',
               title: LIVE_COPY.liveSection,
               rows: onAir,
-              Card: LiveTile,
-              list: LIVE_BOARD.tiles,
-            },
-            {
-              key: 'upcoming',
-              title: LIVE_COPY.upcomingSection,
-              rows: upcoming,
               Card: LiveTile,
               list: LIVE_BOARD.tiles,
             },
