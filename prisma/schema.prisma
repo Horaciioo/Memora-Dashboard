@@ -411,6 +411,7 @@ model Account {
   bombPlayers           BombPlayer[]
   bombMoves             BombMove[]
   jumbleRounds          JumbleRound[]
+  echoFinds             EchoFind[]
   golfPlayers           GolfPlayer[]
   golfMoves             GolfMove[]
   ludoPlayers           LudoPlayer[]
@@ -2218,8 +2219,8 @@ model LiveTeamMessage {
   scope     String   @default("all")
   createdAt DateTime @default(now())
 
-  live      Live                 @relation(fields: [liveId], references: [id], onDelete: Cascade)
-  author    Account              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  live      Live               @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  author    Account            @relation(fields: [authorId], references: [id], onDelete: Cascade)
   reactions LiveTeamReaction[]
 
   @@index([liveId, createdAt])
@@ -2979,6 +2980,7 @@ enum PlayGame {
   LUDO
   NAVAL
   JUMBLE
+  ECHO
 }
 
 // Play bot level
@@ -3062,6 +3064,8 @@ model PlaySession {
   bombMoves    BombMove[]
   jumbleGame   JumbleGame?
   jumbleRounds JumbleRound[]
+  echoGame     EchoGame?
+  echoFinds    EchoFind[]
   golfGame     GolfGame?
   golfPlayers  GolfPlayer[]
   golfMoves    GolfMove[]
@@ -4049,13 +4053,13 @@ model ConfigOverride {
 
 // Switch the owner flips from the console, kept apart from feature switches
 model SystemFlag {
-  key         String   @id
-  enabled     Boolean  @default(false)
+  key         String    @id
+  enabled     Boolean   @default(false)
   // Words members read
   message     String?
   until       DateTime?
   updatedById String?
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime  @updatedAt
 
   @@map("system_flags")
 }
@@ -4107,4 +4111,47 @@ model JumbleRound {
 
   @@unique([sessionId, round])
   @@map("play_jumble_rounds")
+}
+
+// Echo table: the deal of the round and its clock
+model EchoGame {
+  sessionId   String    @id
+  // Round in play, from one
+  round       Int
+  // Center card, a card per player and the layout seed
+  deal        Json
+  // Moment each player may try again after a miss
+  locks       Json      @default("{}")
+  startsAt    DateTime
+  endsAt      DateTime
+  // Reveal over, the next round opens
+  revealUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_echo_games")
+}
+
+// Symbol found by a player on a round
+model EchoFind {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  accountId String
+  // Place among the finders, from one
+  rank      Int
+  points    Int      @default(0)
+  // Time the player took
+  ms        Int      @default(0)
+  // Symbol id found
+  symbol    Int
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round, accountId])
+  @@index([sessionId, round])
+  @@map("play_echo_finds")
 }

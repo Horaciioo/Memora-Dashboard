@@ -1,6 +1,8 @@
 import { createRegistry } from '@/core/lib/registry'
 import { BOMB_EMBERS } from '@/declarations/play/bomb/copy'
 import { BOMB_SETTINGS } from '@/declarations/play/bomb/settings'
+import { ECHO_HUB } from '@/declarations/play/echo/copy'
+import { ECHO_SETTINGS } from '@/declarations/play/echo/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
@@ -83,6 +85,18 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: BOMB_EMBERS.ground,
     minPlayers: BOMB_SETTINGS.minPlayers,
     maxPlayers: BOMB_SETTINGS.maxPlayers,
+    playable: true,
+  },
+  [PlayGames.Echo]: {
+    label: 'Écho',
+    slug: 'echo',
+    tagline: 'Deux cartes, un symbole en commun : trouve-le avant tout le monde.',
+    tone: '--play-echo',
+    logo: 'playEcho',
+    backdrop: 'cards',
+    ground: ECHO_HUB.ground,
+    minPlayers: ECHO_SETTINGS.minPlayers,
+    maxPlayers: ECHO_SETTINGS.maxPlayers,
     playable: true,
   },
   [PlayGames.Jumble]: {

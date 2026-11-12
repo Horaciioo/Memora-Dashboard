@@ -39,4 +39,5 @@ export {
   BAC_RULES,
 } from '@/declarations/ui/variants/games/play/boards'
 export type { PlaySetupStyles } from '@/declarations/ui/variants/games/play/boards'
+export { ECHO_BOARD, ECHO_SETUP } from '@/declarations/ui/variants/games/play/echo'
 export { JUMBLE_BOARD, JUMBLE_SETUP } from '@/declarations/ui/variants/games/play/jumble'

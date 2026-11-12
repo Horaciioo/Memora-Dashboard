@@ -158,6 +158,8 @@ export const PLAY_HUB = {
   // Syllables rising like embers
   embers: 'pointer-events-none fixed inset-0 z-0 overflow-hidden',
   ember: 'play-ember',
+  // Symbols rising like bubbles
+  echoFloat: 'play-echo-float',
   // Letters rising like bubbles
   jumbleFloat: 'play-jumble-float',
   // Big bomb behind the hub

@@ -152,6 +152,17 @@ const MARKS: Record<string, ReactNode> = {
       />
     </>
   ),
+  playEcho: (
+    <>
+      <circle cx="24" cy="32" r="19" {...tint('--play-echo-glow')} />
+      <circle cx="42" cy="32" r="19" {...tint('--play-echo')} opacity="0.9" />
+      <path
+        d="M33 19.5l2.7 6.2 6.7.6-5.100 4.400 1.6 6.600-5.900-3.600-5.900 3.600 1.600-6.600-5.100-4.400 6.700-.6z"
+        transform="translate(0 4)"
+        {...tint('--play-gold')}
+      />
+    </>
+  ),
   playLudo: (
     <>
       <defs>
@@ -239,6 +250,7 @@ const MARKS: Record<string, ReactNode> = {
 const BARE = new Set([
   'playBaccalaureat',
   'playBomb',
+  'playEcho',
   'playGolf',
   'playJumble',
   'playLudo',

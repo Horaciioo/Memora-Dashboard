@@ -47,6 +47,10 @@ export const GAME_INVENTORY: Record<PlayGameName, GameEntry> = {
   [PlayGames.Golf]: { moves: ['GolfMove'], capabilities: ['pause', 'resume', 'kick', 'setScore'] },
   [PlayGames.Bomb]: { moves: ['BombMove'], capabilities: ['pause', 'resume', 'kick', 'setScore'] },
   [PlayGames.Ludo]: { moves: ['LudoMove'], capabilities: ['pause', 'resume', 'kick', 'setScore'] },
+  [PlayGames.Echo]: {
+    moves: ['EchoFind'],
+    capabilities: ['pause', 'resume', 'kick', 'setScore'],
+  },
   [PlayGames.Jumble]: {
     moves: ['JumbleRound'],
     capabilities: ['pause', 'resume', 'kick', 'setScore'],

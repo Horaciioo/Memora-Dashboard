@@ -34,6 +34,17 @@
       "max": 1600
     }
   },
+  "echo": {
+    "thinkMs": {
+      "min": 2500,
+      "max": 11000
+    },
+    "failRate": {
+      "EASY": 0.4,
+      "MEDIUM": 0.2,
+      "HARD": 0.05
+    }
+  },
   "jumble": {
     "thinkMs": {
       "min": 4000,

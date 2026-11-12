@@ -41,6 +41,10 @@ export const PLAY_HISTORY_FACTS: Record<PlayGameName, Array<{ key: string; label
     { key: 'words', label: 'Mots posés' },
     { key: 'blasts', label: 'Explosions' },
   ],
+  [PlayGames.Echo]: [
+    { key: 'found', label: 'Symboles trouvés' },
+    { key: 'firsts', label: 'Premières places' },
+  ],
   [PlayGames.Jumble]: [
     { key: 'solved', label: 'Mots trouvés' },
     { key: 'bestStreak', label: 'Meilleure série' },

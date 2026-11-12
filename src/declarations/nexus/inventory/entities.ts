@@ -407,6 +407,14 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'id',
     search: [],
   },
+  echoGame: { model: 'EchoGame', exposure: 'full', display: 'sessionId', search: [] },
+  echoFind: {
+    model: 'EchoFind',
+    exposure: 'readOnly',
+    reason: 'Historique de symboles trouvés',
+    display: 'id',
+    search: [],
+  },
   jumbleGame: { model: 'JumbleGame', exposure: 'full', display: 'sessionId', search: [] },
   jumbleRound: {
     model: 'JumbleRound',

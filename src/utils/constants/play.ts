@@ -10,6 +10,7 @@ export const PlayGames = {
   Ludo: 'LUDO',
   Naval: 'NAVAL',
   Jumble: 'JUMBLE',
+  Echo: 'ECHO',
 } as const
 
 export type PlayGameName = (typeof PlayGames)[keyof typeof PlayGames]

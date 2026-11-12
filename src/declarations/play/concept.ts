@@ -45,6 +45,20 @@ export const PLAY_CONCEPT: Record<PlayGameName, PlayConceptStep[]> = {
       text: 'Mot validé, la bombe passe au suivant. Si elle t’explose dans les mains, tu perds une vie.',
     },
   ],
+  [PlayGames.Echo]: [
+    {
+      title: 'Deux cartes, un seul point commun',
+      text: 'Chaque joueur reçoit une carte, une autre trône au centre. Elles partagent toujours exactement un symbole.',
+    },
+    {
+      title: 'Clique dessus le premier',
+      text: 'Repère le symbole en commun sur ta carte, même s’il est tout petit ou penché. Une erreur verrouille ta carte un instant.',
+    },
+    {
+      title: 'Plus vite, plus de points',
+      text: 'Chaque symbole trouvé rapporte des points, le premier à le trouver a un bonus.',
+    },
+  ],
   [PlayGames.Jumble]: [
     {
       title: 'Des lettres en vrac',

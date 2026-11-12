@@ -207,6 +207,26 @@
   --play-bomb-cap: #6d6578;
   --play-bomb-cap-deep: #34303d;
   --play-bomb-cord: #d8b77a;
+  --play-echo: #11a6b5;
+  --play-echo-deep: #0a5560;
+  --play-echo-glow: #c9f3f7;
+  --play-echo-night: #051f26;
+  --play-echo-dusk: #0b4350;
+  /* Echo card: cream face, soft edge */
+  --echo-card: #fffaf0;
+  --echo-card-edge: #cfe3e6;
+  /* Echo symbol paints */
+  --echo-ink: #2b2140;
+  --echo-white: #ffffff;
+  --echo-grey: #b9b4c6;
+  --echo-wood: #b9783f;
+  --echo-red: #ef4b4b;
+  --echo-orange: #ff9a3d;
+  --echo-yellow: #ffd23f;
+  --echo-pink: #ff7eb6;
+  --echo-purple: #8a5cf6;
+  --echo-blue: #3b7bf0;
+  --echo-sky: #5ec8f2;
   --play-jumble: #8a5cf6;
   --play-jumble-deep: #3d1a9c;
   --play-jumble-glow: #e2d6ff;

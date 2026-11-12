@@ -53,7 +53,7 @@ export const CONFIGURATION_FILES: Record<ConfigurationFolder, string[]> = {
     'two-factor',
     'versioning',
   ],
-  play: ['baccalaureat', 'bomb', 'bots', 'golf', 'jumble', 'ludo', 'naval', 'play'],
+  play: ['baccalaureat', 'bomb', 'bots', 'echo', 'golf', 'jumble', 'ludo', 'naval', 'play'],
   reference: [
     'eventTemplates',
     'networks',

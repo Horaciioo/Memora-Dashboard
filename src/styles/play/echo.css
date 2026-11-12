@@ -1,0 +1,179 @@
+/* Echo ground: deep teal night, symbols rising like bubbles */
+.play-room:has(.play-echo) {
+  background:
+    radial-gradient(
+      70rem 34rem at 50% 115%,
+      color-mix(in srgb, var(--play-echo) 50%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      40rem 24rem at 12% -8%,
+      color-mix(in srgb, var(--play-echo-glow) 16%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-echo-night) 0%, var(--play-echo-dusk) 100%);
+}
+
+.play-room:has(.play-echo) .play-floor {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--play-echo) 28%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--play-echo) 28%, transparent) 1px,
+      transparent 1px
+    );
+}
+
+/* A hub symbol rises, spins a little, fades out */
+.play-echo-float {
+  position: absolute;
+  bottom: -5rem;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  opacity: 0;
+  animation: play-echo-float var(--rise) linear var(--delay) infinite;
+}
+
+@keyframes play-echo-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--tilt));
+  }
+  12% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
+  }
+}
+
+/* Countdown in the teal glow */
+.play-figure-echo {
+  color: var(--play-echo-glow);
+  --play-key: var(--play-echo);
+}
+
+/* Round card: cream disc with a soft edge */
+.play-echo-card {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--echo-card) 60%);
+  box-shadow:
+    0 0 0 0.35rem var(--echo-card-edge),
+    0 1rem 2rem rgb(0 0 0 / 0.4);
+  animation: play-echo-deal 460ms var(--motion-ease-out) backwards;
+}
+
+.play-echo-card-small {
+  box-shadow:
+    0 0 0 0.2rem var(--echo-card-edge),
+    0 0.5rem 1rem rgb(0 0 0 / 0.35);
+}
+
+@keyframes play-echo-deal {
+  0% {
+    opacity: 0;
+    transform: translateY(-2rem) rotate(-8deg) scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.play-echo-symbol {
+  display: block;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+/* Answer ringed once the round is over */
+.play-echo-answer {
+  box-shadow: 0 0 0 0.25rem var(--play-gold);
+  animation: play-echo-pulse 700ms ease-in-out infinite alternate;
+}
+
+@keyframes play-echo-pulse {
+  to {
+    scale: 1.12;
+  }
+}
+
+/* Time bar drains and reddens */
+.play-echo-clock {
+  background: var(--play-echo);
+  transform-origin: left;
+  animation:
+    play-echo-drain var(--left) linear var(--wait) forwards,
+    play-echo-redden var(--left) linear var(--wait) forwards;
+  scale: var(--from) 1;
+}
+
+@keyframes play-echo-drain {
+  to {
+    scale: 0 1;
+  }
+}
+
+@keyframes play-echo-redden {
+  70% {
+    background: var(--play-echo);
+  }
+  to {
+    background: var(--play-heart);
+  }
+}
+
+.play-echo-gain {
+  animation: play-echo-gain 700ms var(--motion-ease-out) backwards;
+}
+
+@keyframes play-echo-gain {
+  0% {
+    opacity: 0;
+    translate: 0 1rem;
+    scale: 0.6;
+  }
+  100% {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+.play-echo-scored {
+  animation: play-echo-scored 900ms ease-out;
+}
+
+@keyframes play-echo-scored {
+  0% {
+    background: color-mix(in srgb, var(--play-echo) 45%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+/* Invite and arcade keys of the game */
+.play-key-teal {
+  background: var(--play-echo);
+  color: var(--play-on-art);
+  box-shadow:
+    0 0.3rem 0 var(--play-echo-deep),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-echo-float,
+  .play-echo-card,
+  .play-echo-answer,
+  .play-echo-clock,
+  .play-echo-gain,
+  .play-echo-scored {
+    animation: none;
+  }
+}

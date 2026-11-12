@@ -282,6 +282,44 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
       ))}
     </>
   ),
+  cards: (tone) => (
+    <>
+      <circle cx="180" cy="300" r="150" {...tint(`${tone}-glow`, 0.2)} />
+      {[
+        { x: 40, y: 120, r: -12, size: 150, fill: '--echo-card' },
+        { x: 170, y: 190, r: 9, size: 160, fill: '--echo-card' },
+      ].map((card) => (
+        <g key={card.x} transform={`translate(${card.x} ${card.y}) rotate(${card.r})`}>
+          <circle
+            cx={card.size / 2}
+            cy={card.size / 2 + 8}
+            r={card.size / 2}
+            fill="black"
+            opacity="0.28"
+          />
+          <circle cx={card.size / 2} cy={card.size / 2} r={card.size / 2} {...tint(card.fill)} />
+          <circle
+            cx={card.size * 0.3}
+            cy={card.size * 0.35}
+            r={card.size * 0.13}
+            {...tint('--play-gold')}
+          />
+          <circle
+            cx={card.size * 0.66}
+            cy={card.size * 0.6}
+            r={card.size * 0.2}
+            {...tint('--play-echo')}
+          />
+          <circle
+            cx={card.size * 0.38}
+            cy={card.size * 0.72}
+            r={card.size * 0.09}
+            {...tint('--echo-pink')}
+          />
+        </g>
+      ))}
+    </>
+  ),
   board: (tone) => (
     <LudoBoardArt
       tone={tone}
