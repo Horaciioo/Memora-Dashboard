@@ -8,7 +8,20 @@ import type { Prisma } from '@prisma/client'
 
 // What the public pages may learn about a link
 const PUBLIC_INCLUDE = {
-  youtuber: { select: { name: true, avatarUrl: true, bannerUrl: true } },
+  youtuber: { select: { id: true, name: true, accent: true, avatarUrl: true, bannerUrl: true } },
+  // Never the notes, the assignee or the author of a decision
+  request: {
+    select: {
+      reference: true,
+      status: true,
+      discordId: true,
+      submittedAt: true,
+      statusChangedAt: true,
+      decidedAt: true,
+      reviewNote: true,
+      answers: true,
+    },
+  },
 } as const
 
 export type PublicLinkRow = Prisma.UnbanLinkGetPayload<{ include: typeof PUBLIC_INCLUDE }>

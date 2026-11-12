@@ -10,6 +10,7 @@ export const CookieKeys = {
   integrationClaim: 'integration_claim',
   identityCheck: 'identity_check',
   exerciseClaim: 'exercise_claim',
+  unbanTicket: 'unban_ticket',
   navigationView: 'navigation_view',
   activeYoutuber: 'active_youtuber',
   activeYoutuberAuto: 'active_youtuber_auto',

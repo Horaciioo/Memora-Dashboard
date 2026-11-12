@@ -69,3 +69,23 @@ export const UNBAN_TOKEN = {
 
 // Longest note a moderator attaches to a link
 export const UNBAN_LABEL_MAX_LENGTH = 80
+
+/**
+ * Names of the fields the public form carries besides the questions
+ * @type {Record<string, string>}
+ */
+
+export const UNBAN_FORM_FIELDS = {
+  fillToken: 'fillToken',
+  // A bait only a robot fills
+  trap: 'website',
+  discordId: 'discordId',
+  discordName: 'discordName',
+} as const
+
+/**
+ * How the public form is cut into steps
+ * @type {{ maxShort: number }}
+ */
+
+export const UNBAN_STEP = { maxShort: 3 } as const

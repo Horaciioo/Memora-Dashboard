@@ -21,7 +21,7 @@ const shortAnswerMaxLength = readInteger(unban.shortAnswerMaxLength, {
 
 /**
  * Unban requests, links and form bounds
- * @type {{ expiryChoicesDays: number[], defaultExpiryDays: number, requireDiscordIdentity: boolean, minFillSeconds: number, maxQuestions: number, maxOptions: number, answerMaxLength: number, shortAnswerMaxLength: number, reviewNoteMaxLength: number, listedLinks: number }}
+ * @type {{ expiryChoicesDays: number[], defaultExpiryDays: number, requireDiscordIdentity: boolean, minFillSeconds: number, maxQuestions: number, maxOptions: number, answerMaxLength: number, shortAnswerMaxLength: number, reviewNoteMaxLength: number, listedLinks: number, ticketMinutes: number }}
  */
 
 export const UNBAN_SETTINGS = {
@@ -65,5 +65,11 @@ export const UNBAN_SETTINGS = {
     path: 'system/unban.listedLinks',
     fallback: 50,
     min: 1,
+  }),
+  // How long a verified identity and a served form stay valid
+  ticketMinutes: readInteger(unban.ticketMinutes, {
+    path: 'system/unban.ticketMinutes',
+    fallback: 120,
+    min: 5,
   }),
 } as const

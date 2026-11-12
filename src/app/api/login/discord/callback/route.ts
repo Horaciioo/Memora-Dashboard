@@ -19,6 +19,9 @@ import { claimCheckLink } from '@/core/services/identity'
 import { checkIdentity, holdCheck } from '@/core/services/identity/signIn'
 import { exerciseFailure } from '@/core/services/recruitment/exerciseRedirects'
 import { claimExerciseLink } from '@/core/services/recruitment/ExerciseLinkService'
+import { completeUnbanSignIn, readOpenUnban } from '@/core/services/unban/signIn'
+import { unbanFailure } from '@/core/services/unban/UnbanIdentityService'
+import { UNBAN_TICKET_COOKIE } from '@/core/lib/auth/unbanTicket'
 import { claimIdentity } from '@/core/services/onboarding/IntegrationService'
 import { SIGN_IN_ERRORS, signInFailure } from '@/declarations/access/signIn'
 import { integrationFailure } from '@/core/services/onboarding/redirects'
@@ -49,6 +52,9 @@ export const GET = createRedirectRoute({
     const exercise = readOpenExercise(cookieStore.get(EXERCISE_TICKET_COOKIE)?.value)
 
     if (exercise) return exerciseFailure(error, params)
+    if (readOpenUnban(cookieStore.get(UNBAN_TICKET_COOKIE)?.value)) {
+      return unbanFailure(error, params)
+    }
 
     // A link a responsable handed out answers on its own screen
     const linkToken = readWelcomeLink(cookieStore.get(IDENTITY_CHECK_COOKIE)?.value)
@@ -61,6 +67,7 @@ export const GET = createRedirectRoute({
     const handshake = unpackHandshake(cookieStore.get(OAUTH_STATE_COOKIE)?.value)
     const ticket = unpackTicket(cookieStore.get(INTEGRATION_TICKET_COOKIE)?.value)
     const exercise = readOpenExercise(cookieStore.get(EXERCISE_TICKET_COOKIE)?.value)
+    const unban = readOpenUnban(cookieStore.get(UNBAN_TICKET_COOKIE)?.value)
 
     // The handshake is single use whatever happens next
     cookieStore.delete(OAUTH_STATE_COOKIE)
@@ -107,6 +114,9 @@ export const GET = createRedirectRoute({
 
       return ROUTES.integration(ticket.token)
     }
+
+    // A banned person proves the account, then Discord is forgotten
+    if (unban) return completeUnbanSignIn(unban, identity)
 
     // A link a responsable handed out only accepts the identifier it was made for
     const welcomeLink = readWelcomeLink(cookieStore.get(IDENTITY_CHECK_COOKIE)?.value)

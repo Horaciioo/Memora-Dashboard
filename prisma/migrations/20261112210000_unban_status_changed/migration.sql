@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "unban_requests" ADD COLUMN "statusChangedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

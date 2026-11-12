@@ -8,5 +8,6 @@
   "answerMaxLength": 4000,
   "shortAnswerMaxLength": 200,
   "reviewNoteMaxLength": 2000,
-  "listedLinks": 50
+  "listedLinks": 50,
+  "ticketMinutes": 120
 }

@@ -2902,6 +2902,8 @@ model UnbanRequest {
   // Bumped on every reopening, keys the system tasks
   cycle             Int         @default(0)
   submittedAt       DateTime    @default(now())
+  // Moves with the status or the decision only, what the requester sees as the last update
+  statusChangedAt   DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
   link        UnbanLink        @relation(fields: [linkId], references: [id], onDelete: Restrict)
