@@ -27,6 +27,7 @@ export const CONFIGURATION_FILES: Record<ConfigurationFolder, string[]> = {
     'emojis',
     'exercises',
     'failures',
+    'features',
     'files',
     'forms',
     'gestures',
