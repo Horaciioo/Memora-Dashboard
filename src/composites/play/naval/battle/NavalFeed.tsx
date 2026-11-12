@@ -5,35 +5,37 @@ import { useState } from 'react'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlaySessionFeed } from '@/composites/play/session/PlaySessionFeed'
 import type { PlayFeedLine } from '@/composites/play/session/PlaySessionFeed'
+import { useNavalBoard } from '@/core/hooks/data/play/useNavalBoard'
 import { NavalCodes, strikesOf } from '@/core/lib/play/naval/state'
-import type { NavalBoardState, NavalShotView } from '@/core/lib/play/naval/state'
+import type { NavalBoardView } from '@/core/lib/play/naval/state'
+import { useNavalPlayedStore } from '@/core/store/play/navalPlayed'
 import { NAVAL_FEED_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 
 /**
  * Naval feed, a line per strike once it has landed
  * @param {Object} props - Feed
- * @param {NavalBoardState} props.board - Board
- * @param {NavalShotView[]} props.shown - Shots fully played
- * @param {number} props.match - Match on screen
+ * @param {string} props.sessionId - Game
+ * @param {NavalBoardView} props.board - Board of the page render
  * @param {PlayFace[]} props.players - Faces by account
  * @return {JSX.Element}
  */
 
 export const NavalFeed = ({
-  board,
-  shown,
-  match,
+  sessionId,
+  board: initial,
   players,
 }: {
-  board: NavalBoardState
-  shown: NavalShotView[]
-  match: number
+  sessionId: string
+  board: NavalBoardView
   players: PlayFace[]
 }) => {
+  const board = useNavalBoard(sessionId, initial)
+  // Played by the battle screen
+  const played = useNavalPlayedStore((state) => state.played[sessionId])
   // Moment each strike was first told
   const [told, setTold] = useState<Record<string, Date>>({})
-  const strikes = strikesOf(shown.filter((shot) => shot.match === match))
+  const strikes = strikesOf((played?.shots ?? []).filter((shot) => shot.match === played?.match))
   // Strikes told since the last render are stamped now
   const missing = strikes.filter(({ match: m, rev }) => !told[`${m}:${rev}`])
   if (missing.length) {

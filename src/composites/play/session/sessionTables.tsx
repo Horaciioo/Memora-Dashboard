@@ -19,6 +19,7 @@ import { GolfFeed } from '@/composites/play/golf/GolfFeed'
 import { LudoBoard } from '@/composites/play/ludo/LudoBoard'
 import { LudoFeed } from '@/composites/play/ludo/LudoFeed'
 import { NavalBoard } from '@/composites/play/naval/battle/NavalBoard'
+import { NavalFeed } from '@/composites/play/naval/battle/NavalFeed'
 import type { LudoBoardView } from '@/core/lib/play/ludo/state'
 import type { NavalBoardView } from '@/core/lib/play/naval/state'
 import type { GolfBoardView } from '@/core/lib/play/golf'
@@ -294,7 +295,7 @@ export const PLAY_SESSION_TABLES: Partial<
       feed: <LudoFeed sessionId={sessionId} board={ludo} players={[...seats, ...spectators]} />,
     }
   },
-  [PlayGames.Naval]: ({ sessionId, board, seats, viewerId }) => ({
+  [PlayGames.Naval]: ({ sessionId, board, seats, spectators, viewerId }) => ({
     board: (
       <NavalBoard
         sessionId={sessionId}
@@ -308,6 +309,12 @@ export const PLAY_SESSION_TABLES: Partial<
         viewerId={viewerId}
       />
     ),
-    feed: null,
+    feed: (
+      <NavalFeed
+        sessionId={sessionId}
+        board={board as NavalBoardView}
+        players={[...seats, ...spectators]}
+      />
+    ),
   }),
 }
