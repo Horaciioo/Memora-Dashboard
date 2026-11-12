@@ -53,6 +53,8 @@ const DECOR_LOADERS: Record<NavalDecorKind, () => Promise<DecorPainter>> = {
     import('@/composites/play/naval/world/decor/reef').then((m) => m.paintReef),
   [NavalDecorKinds.Sandbar]: () =>
     import('@/composites/play/naval/world/decor/sandbar').then((m) => m.paintSandbar),
+  [NavalDecorKinds.Seabed]: () =>
+    import('@/composites/play/naval/world/decor/seabed').then((m) => m.paintSeabed),
 }
 
 /**

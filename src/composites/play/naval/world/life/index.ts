@@ -56,6 +56,14 @@ const paintActor = (pen: CanvasRenderingContext2D, actor: DecorActor, seconds: n
   (ACTOR_PAINTERS[actor.kind] as ActorPainter<DecorActorKind>)(pen, actor, seconds)
 
 /**
+ * Lives under the water, may swim under the grid
+ * @param {DecorActor} actor - Thing
+ * @return {boolean} - Underwater
+ */
+
+export const isUnderwater = (actor: DecorActor): boolean => ACTOR_LAYERS[actor.kind] === 0
+
+/**
  * Moving things in drawing order
  * @param {DecorActor[]} actors - Things
  * @return {DecorActor[]} - Sorted

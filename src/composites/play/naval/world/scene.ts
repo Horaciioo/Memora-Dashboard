@@ -5,7 +5,7 @@ import type { DecorActor } from '@/composites/play/naval/world/life'
 import { pieceRng } from '@/composites/play/naval/world/noise'
 import type { Pen } from '@/composites/play/naval/world/pen'
 import { paintBed, paintCloudShadows, paintCrests } from '@/composites/play/naval/world/sea'
-import { NAVAL_MAPS } from '@/declarations/play/naval/maps'
+import { NAVAL_MAPS, NavalDecorKinds } from '@/declarations/play/naval/maps'
 import type { NavalMapLook } from '@/declarations/play/naval/maps'
 
 /**
@@ -158,19 +158,12 @@ const paintPieces = (
     paint,
   }: { board: WorldBoard; look: NavalMapLook; seed: number; paint: WorldPaint }
 ): void => {
-  pen.save()
-  if (paint.isGame) {
-    pen.beginPath()
-    pen.rect(-board.width, -board.height, board.width * 3, board.height * 3)
-    pen.rect(board.left, board.top, board.size, board.size)
-    pen.clip('evenodd')
-  }
   const pieces = look.decor
     .map((piece, index) => ({ piece, index, place: placeOf(board, look, piece) }))
     .toSorted((a, b) => a.place.y - b.place.y)
-  for (const { piece, index, place } of pieces) {
+  const paintOne = ({ piece, index, place }: (typeof pieces)[number]) => {
     const painter = paint.painters[piece.kind]
-    if (!painter) continue
+    if (!painter) return
     pen.save()
     painter({
       pen,
@@ -184,6 +177,16 @@ const paintPieces = (
     })
     pen.restore()
   }
+  // The sea floor lies under the grid too
+  pieces.filter(({ piece }) => piece.kind === NavalDecorKinds.Seabed).forEach(paintOne)
+  pen.save()
+  if (paint.isGame) {
+    pen.beginPath()
+    pen.rect(-board.width, -board.height, board.width * 3, board.height * 3)
+    pen.rect(board.left, board.top, board.size, board.size)
+    pen.clip('evenodd')
+  }
+  pieces.filter(({ piece }) => piece.kind !== NavalDecorKinds.Seabed).forEach(paintOne)
   pen.restore()
 }
 

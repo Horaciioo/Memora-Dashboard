@@ -47,7 +47,9 @@
     "mark": "#ffffff",
     "rock": "#b9b3a6",
     "rockDark": "#7b766c",
-    "rockLight": "#e2ddd1"
+    "rockLight": "#e2ddd1",
+    "coralTeal": "#36c4a8",
+    "coralRed": "#e5484d"
   },
   "decor": [
     {
@@ -91,6 +93,13 @@
       "at": 0.5,
       "depth": 0.6,
       "scale": 0.8
+    },
+    {
+      "kind": "seabed",
+      "side": "north",
+      "at": 0.5,
+      "depth": 0.5,
+      "scale": 0.5
     }
   ],
   "life": {

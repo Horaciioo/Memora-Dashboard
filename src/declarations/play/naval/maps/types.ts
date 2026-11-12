@@ -22,6 +22,7 @@ export const NavalDecorKinds = {
   Flotsam: 'flotsam',
   Reef: 'reef',
   Sandbar: 'sandbar',
+  Seabed: 'seabed',
 } as const
 
 export type NavalDecorKind = (typeof NavalDecorKinds)[keyof typeof NavalDecorKinds]

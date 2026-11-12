@@ -2,7 +2,7 @@ import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
 import type { DecorLight, DecorPainters } from '@/composites/play/naval/world/decor'
 import { boardOf, placeOf } from '@/composites/play/naval/world/geometry'
 import type { WorldBoard } from '@/composites/play/naval/world/geometry'
-import { orderActors, paintActors } from '@/composites/play/naval/world/life'
+import { isUnderwater, orderActors, paintActors } from '@/composites/play/naval/world/life'
 import type { DecorActor } from '@/composites/play/naval/world/life'
 import { paintWorld } from '@/composites/play/naval/world/scene'
 import { NAVAL_MAPS } from '@/declarations/play/naval/maps'
@@ -183,7 +183,9 @@ export const stageWorld = (id: string, painters: DecorPainters): StageWorld => {
   const map = NAVAL_MAPS.has(id) ? NAVAL_MAPS.get(id) : NAVAL_MAPS.list[0]
   const board = boardOf(map.look, map.theatre.size)
   const lights: DecorLight[] = []
-  let actors: DecorActor[] = []
+  // Under the water, then on it
+  let deep: DecorActor[] = []
+  let surface: DecorActor[] = []
 
   const paintStill = (frame: OceanFrame): void => {
     const { ctx } = frame
@@ -202,7 +204,9 @@ export const stageWorld = (id: string, painters: DecorPainters): StageWorld => {
       // A still sea keeps them in the picture
       live: frame.life ? (actor) => moving.push(actor) : undefined,
     })
-    actors = orderActors(moving)
+    const ordered = orderActors(moving)
+    deep = ordered.filter(isUnderwater)
+    surface = ordered.filter((actor) => !isUnderwater(actor))
     ctx.restore()
   }
 
@@ -211,11 +215,13 @@ export const stageWorld = (id: string, painters: DecorPainters): StageWorld => {
     const seconds = now / SECOND_MS
     ctx.save()
     ctx.transform(cell, 0, 0, cell, left - board.left * cell, top - board.top * cell)
+    // Fish swim under the grid, under ships and marks
+    paintActors(ctx, { actors: deep, seconds, life })
     ctx.beginPath()
     ctx.rect(-board.width, -board.height, board.width * 3, board.height * 3)
     ctx.rect(board.left, board.top, board.size, board.size)
     ctx.clip('evenodd')
-    paintActors(ctx, { actors, seconds, life })
+    paintActors(ctx, { actors: surface, seconds, life })
     paintBirds(ctx, { board, map, seconds, count: Math.round((map.look.life.birds ?? 0) * life) })
     ctx.globalCompositeOperation = 'lighter'
     lights.forEach((light, index) => {
