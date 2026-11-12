@@ -127,6 +127,197 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.13.0',
+    date: '2026-11-12',
+    title: 'Memora Play s’agrandit',
+    intro:
+      'Quatre nouveaux jeux arrivent dans Memora Play, la Bataille navale prend la mer, et la Mod. View tient désormais dans une poche.',
+    description:
+      'Memora Play manquait de jeux et la Mod. View ne se pensait que sur grand écran. Cette version ajoute Jumble, Écho, Glitch et Croquis, refait l’accueil de Play autour de la Bataille navale, apporte une Mod. View pour téléphone avec les demandes de débannissement, et complète les historiques de l’Academy et des Recrutements.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Jumble » dans « Memora Play » : des lettres en vrac à remettre dans l’ordre avant les autres joueurs.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Écho » dans « Memora Play » : deux cartes, un symbole en commun à trouver avant tout le monde.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Glitch » dans « Memora Play » : deux images presque identiques dont il faut repérer les différences avant les autres.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Croquis » dans « Memora Play » : un mot à dessiner pendant que les autres joueurs le devinent avant la fin du temps.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un écran de chargement dans « Memora Play » : le logo Memora et une barre de progression s’affichent pour tous les joueurs dès que l’hôte clique sur « Lancer la partie », puis à l’ouverture d’une partie.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de sept cartes à la « Bataille navale », de l’archipel tropical au port méditerranéen antique en passant par la baie pirate, chacune avec son décor autour de la mer et son propre bateau.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un vote de la carte avant une partie de « Bataille navale », avec des aperçus dessinés de chaque carte.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’armes dessinées, de tirs animés, de dégâts visibles et de naufrages mis en scène dans la « Bataille navale », avec des statistiques affichées à la fin de la partie.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un réglage « Zoom automatique » dans la « Bataille navale » : la caméra se rapproche de la zone touchée puis recule, ou reste fixe quand il est coupé.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.modView,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une Mod. View pour téléphone : le flux, les actions, l’équipe et les réglages se parcourent en pages, le stream reste en haut de l’écran et un glissement vers le haut fige le chat.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.modView,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une page « Débannissements » dans la Mod. View sur téléphone : les demandes se parcourent une à une avec la raison, le chat de la personne et les boutons « Demande précédente » et « Demande suivante ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveLogRead,
+        text: 'Ajout de nouveaux événements Twitch dans le journal du live : modérateur ou VIP ajouté ou retiré, mode bouclier activé ou coupé, et avertissement pris en compte.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveAnnounce,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de programmer et de supprimer un live depuis l’assistant, étape par étape.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’un onglet « Historique » dans « Academy » : les sessions passées avec leurs juniors, une recherche par junior et des filtres par statut de session, parcours et référent.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        permission: Permissions.MemberRead,
+        text: 'Ajout de la possibilité d’afficher les destitués et démissionnaires dans « Membres » avec un interrupteur.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la possibilité de passer d’une page à l’autre du menu du bas en glissant sur téléphone.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de l’accueil de « Memora Play » : une bannière « À la une » met la « Bataille navale » en avant, les jeux défilent en une rangée, et un volet profil donne accès à « Mes stats » et aux « Réglages ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de « Ludo » sur téléphone : un premier appui sur un pion montre où il ira, un second appui valide le déplacement, et le dé s’affiche à côté du nom du joueur.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de la sortie d’une partie : le retour à l’accueil de « Memora Play » est plus rapide.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration de l’historique des « Recrutements » : les sessions apparaissent avec leurs candidats, la recherche accepte un nom, un identifiant ou une session, de nouveaux filtres portent sur le statut, le résultat et le recruteur, et les blacklistés sans candidature conservée se retrouvent à part.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la page « Lives » : la section des lives récents est retirée au profit de l’historique.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        permission: Permissions.MemberRead,
+        text: 'Amélioration des bannières de créateurs : elles reprennent la bannière Twitch de la chaîne.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des historiques d’activité : chaque entrée précise ce dont elle parle, avec le logo du réseau quand il y en a un.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.status,
+        text: 'Amélioration de « Memora Status » : la couleur d’un jour dépend du nombre de ralentissements ou de pannes constatés, et un incident isolé ne colore plus la journée.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle de la page de connexion, qui s’ouvre sur une photo.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle de la page hors ligne, avec des engrenages animés.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle des notifications : de simples cartes remplacent les cartes en verre.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de parties de « Memora Play » qui pouvaient rester figées quand un joueur automatique ne jouait plus.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui laissait des cadres vides à la place d’images ou d’avatars introuvables.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un clignotement de l’étoile quand une page est ajoutée aux favoris ou retirée.',
+      },
+    ],
+    comments: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        text: 'Quatre jeux de plus et une Bataille navale refaite : Memora Play a de quoi remplir une soirée.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.modView,
+        text: 'Modérer depuis un téléphone devient possible, avec les mêmes outils que sur l’ordinateur.',
+      },
+    ],
+  },
+  {
     version: '0.12.0',
     date: '2026-11-11',
     title: 'Un max. d’améliorations',
@@ -239,12 +430,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.modView,
         permission: Permissions.LiveRead,
         text: 'Ajout d’une page « Mod. View » : elle ouvre le live en cours, ou montre l’outil en lecture seule quand aucun live n’est ouvert, et un bouton flottant « Ouvrir la Mod. View » la rejoint depuis les Lives.',
-      },
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.play,
-        permission: Permissions.PlayAccess,
-        text: 'Ajout d’un écran de chargement dans « Memora Play » : le logo Memora et une barre de progression s’affichent pour tous les joueurs dès que l’hôte clique sur « Lancer la partie », puis à l’ouverture d’une partie.',
       },
       {
         tag: ChangelogTags.Improved,
