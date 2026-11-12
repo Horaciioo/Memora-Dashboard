@@ -99,6 +99,22 @@ export const readVersion = async (id: string): Promise<UnbanFormVersionView> => 
 }
 
 /**
+ * Published versions, newest first, for the read-only history
+ * @param {PermissionHelpers} access - Caller rights
+ * @return {Promise<UnbanFormVersionView[]>} - Published versions
+ */
+
+export const listVersions = async (access: PermissionHelpers): Promise<UnbanFormVersionView[]> => {
+  assertManager(access)
+  const rows = await prisma.unbanFormVersion.findMany({
+    where: { publishedAt: { not: null } },
+    orderBy: { number: 'desc' },
+  })
+
+  return rows.map(toView)
+}
+
+/**
  * Unpublished version being edited
  * @param {PermissionHelpers} access - Caller rights
  * @return {Promise<UnbanFormVersionView | null>} - Draft

@@ -1,6 +1,6 @@
 import { UNBAN_SETTINGS } from '@/declarations/configurations/settings'
 import { UNBAN_COPY } from '@/declarations/unban/copy'
-import { UnbanStatuses } from '@/utils/constants/unban'
+import { UnbanStatuses, UNBAN_LABEL_MAX_LENGTH } from '@/utils/constants/unban'
 import { UNBAN_STATUS_REGISTRY } from '@/declarations/unban/registries'
 import type { FieldDefinition } from '@/types/forms'
 
@@ -62,4 +62,36 @@ export const UNBAN_REOPEN_FIELDS: FieldDefinition[] = [
 export const UNBAN_ASSIGN_FIELDS: FieldDefinition[] = [
   UNBAN_VERSION_FIELD,
   { name: 'assigneeId', kind: 'text', label: UNBAN_COPY.fieldAssignee },
+]
+
+/**
+ * Fields of a new link
+ * @type {FieldDefinition[]}
+ */
+
+export const UNBAN_LINK_FIELDS: FieldDefinition[] = [
+  {
+    name: 'youtuberId',
+    kind: 'select',
+    label: UNBAN_COPY.fieldCreator,
+    required: true,
+  },
+  {
+    name: 'expiryDays',
+    kind: 'select',
+    label: UNBAN_COPY.expiry,
+    required: true,
+    options: UNBAN_SETTINGS.expiryChoicesDays.map((days) => ({
+      value: String(days),
+      label: UNBAN_COPY.expiryDays.replace('{days}', String(days)),
+    })),
+    initial: String(UNBAN_SETTINGS.defaultExpiryDays),
+  },
+  {
+    name: 'expectedDiscordId',
+    kind: 'discord',
+    label: UNBAN_COPY.expectedDiscordId,
+    hint: UNBAN_COPY.expectedDiscordIdHint,
+  },
+  { name: 'label', kind: 'text', label: UNBAN_COPY.fieldLabel, maxLength: UNBAN_LABEL_MAX_LENGTH },
 ]
