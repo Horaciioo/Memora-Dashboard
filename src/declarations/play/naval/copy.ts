@@ -102,7 +102,6 @@ export const NAVAL_BOARD_COPY = {
   bye: 'Qualifié d’office',
   seconds: '{seconds} s',
   turnHint: 'Touche pour tourner',
-  aimFirst: 'Vise une case',
   map: 'Carte de la mer',
   turnWeapon: 'Tourner l’arme',
   dragHelp: 'Glisse tes navires sur la mer, touche-les pour les tourner.',
@@ -110,6 +109,20 @@ export const NAVAL_BOARD_COPY = {
   captainOut: '{name} est éliminé',
   standings: 'Classement',
   shotLine: '{shooter} {line}',
+  previousSea: 'Mer précédente',
+  nextSea: 'Mer suivante',
+  seaCount: '{index} sur {total}',
+} as const
+
+/**
+ * Feed lines of a naval battle
+ * @type {Record<string, string>}
+ */
+
+export const NAVAL_FEED_COPY = {
+  HIT: 'a *touché* {victim}',
+  MISS: 'a *raté* son tir sur {victim}',
+  SUNK: 'a *coulé* un navire de {victim}',
 } as const
 
 /**

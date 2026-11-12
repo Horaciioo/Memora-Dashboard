@@ -117,7 +117,12 @@ export const NavalResult = ({
           ))}
         </div>
       )}
-      <NavalFinalSea board={board} match={match} seat={isPlayer ? viewer : (winner?.index ?? 0)} />
+      <NavalFinalSea
+        board={board}
+        match={match}
+        captains={captains}
+        seat={isPlayer ? viewer : (winner?.index ?? 0)}
+      />
       <div className={NAVAL_RESULT.list}>
         {ranked.map((captain) => (
           <div

@@ -27,6 +27,7 @@
     "min": 10,
     "max": 60
   },
+  "feedSize": 40,
   "graceSeconds": 1,
   "map": "tropical",
   "rules": {

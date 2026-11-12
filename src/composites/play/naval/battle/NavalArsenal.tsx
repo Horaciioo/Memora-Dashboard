@@ -53,7 +53,7 @@ export interface NavalArsenalProps {
 }
 
 /**
- * The weapon drawn for the turn and the one action key, shown only on the viewer's turn
+ * The weapon drawn and the one action key, same size whoever's turn it is
  * @param {NavalArsenalProps} props - Arsenal
  * @return {JSX.Element}
  */
@@ -71,23 +71,14 @@ export const NavalArsenal = ({
   const turns = turnsOf(weaponOf(weapon))
   const copy = NAVAL_WEAPON_COPY[weapon]
 
-  if (!isMyTurn)
-    return (
-      <div className={cn(NAVAL_ARSENAL.root, NAVAL_ARSENAL.idle)}>
-        <p className={NAVAL_ARSENAL.wait} aria-live="polite">
-          {waitCall}
-        </p>
-      </div>
-    )
-
   return (
-    <div className={NAVAL_ARSENAL.root}>
+    <div className={cn(NAVAL_ARSENAL.root, !isMyTurn && NAVAL_ARSENAL.idle)}>
       <button
         key={`${weapon}:${drawKey}`}
         type="button"
-        className={cn(NAVAL_ARSENAL.card, turns < 2 && NAVAL_ARSENAL.cardFixed)}
+        className={cn(NAVAL_ARSENAL.card, (!isMyTurn || turns < 2) && NAVAL_ARSENAL.cardFixed)}
         aria-label={turns > 1 ? NAVAL_BOARD_COPY.turnWeapon : copy.label}
-        disabled={turns < 2}
+        disabled={!isMyTurn || turns < 2}
         aria-keyshortcuts="R"
         onClick={() => onTurn((orientation + 1) % turns)}
       >
@@ -102,9 +93,15 @@ export const NavalArsenal = ({
         </span>
       </button>
       <div className={NAVAL_ARSENAL.divider} role="separator" />
-      <button type="button" className={NAVAL_ARSENAL.fire} disabled={!canFire} onClick={onFire}>
-        {canFire ? NAVAL_BOARD_COPY.fire : NAVAL_BOARD_COPY.aimFirst}
-      </button>
+      {isMyTurn ? (
+        <button type="button" className={NAVAL_ARSENAL.fire} disabled={!canFire} onClick={onFire}>
+          {NAVAL_BOARD_COPY.fire}
+        </button>
+      ) : (
+        <p className={NAVAL_ARSENAL.wait} aria-live="polite">
+          {waitCall}
+        </p>
+      )}
     </div>
   )
 }
