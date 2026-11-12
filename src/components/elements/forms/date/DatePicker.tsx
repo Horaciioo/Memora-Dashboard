@@ -50,7 +50,7 @@ export interface DatePickerProps {
 const DEFAULT_TIME = '09:00'
 
 /**
- * Drawn calendar, or iOS wheels on mobile, replacing the native date input
+ * Drawn calendar
  * @param {DatePickerProps} props - Value, handler and flags
  * @return {JSX.Element}
  */
@@ -87,6 +87,8 @@ export const DatePicker = ({
 
   // The hour shows once forced, once the value has one, or once asked for
   const [wantTime, setWantTime] = useState(Boolean(startsTimed))
+  // Typed hour kept while below the bound
+  const [draft, setDraft] = useState<string | null>(null)
   const hasValue = range ? startDay !== '' : day !== ''
   const timed =
     !hoursLocked &&
@@ -277,13 +279,22 @@ export const DatePicker = ({
               {timed && !range && (
                 <input
                   type="time"
-                  value={time}
+                  value={draft ?? time}
                   min={minDay && day === minDay ? min?.slice(11, 16) : undefined}
                   aria-label={PICKER_COPY.time}
                   className={DATE_PICKER_STYLES.time}
-                  onChange={(event) =>
-                    onChange(clamp(`${day || toDayKey(new Date())}T${event.target.value}`))
-                  }
+                  onChange={(event) => {
+                    const moment = `${day || toDayKey(new Date())}T${event.target.value}`
+
+                    if (min && moment < min) return setDraft(event.target.value)
+                    setDraft(null)
+                    onChange(moment)
+                  }}
+                  onBlur={() => {
+                    if (draft === null) return
+                    setDraft(null)
+                    onChange(clamp(`${day || toDayKey(new Date())}T${draft}`))
+                  }}
                 />
               )}
               {!withTime && !dayOnly && !hoursLocked && (
