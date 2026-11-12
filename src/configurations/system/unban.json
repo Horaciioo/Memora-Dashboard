@@ -9,5 +9,7 @@
   "shortAnswerMaxLength": 200,
   "reviewNoteMaxLength": 2000,
   "listedLinks": 50,
-  "ticketMinutes": 120
+  "ticketMinutes": 120,
+  "statsRecentDays": 7,
+  "statsMonthDays": 30
 }

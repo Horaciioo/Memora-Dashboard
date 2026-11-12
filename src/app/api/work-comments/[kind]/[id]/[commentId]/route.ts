@@ -4,11 +4,12 @@ import { workViewer } from '@/core/services/work/visibility'
 
 export const DELETE = createProtectedRoute({
   descriptor: { summary: 'Drop a remark left on a work record', tags: ['work'] },
-  handler: async ({ params, session, access }) =>
+  handler: async ({ params, session, access, scope }) =>
     removeWorkComment(
       commentKind(params.kind, access),
       params.id,
       params.commentId,
-      workViewer(session, access)
+      workViewer(session, access),
+      scope
     ),
 })

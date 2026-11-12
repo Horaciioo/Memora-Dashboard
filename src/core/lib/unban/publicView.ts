@@ -38,7 +38,8 @@ export const toPublicView = (
   submittedAt: request.submittedAt.toISOString(),
   updatedAt: request.statusChangedAt.toISOString(),
   decidedAt: request.decidedAt?.toISOString() ?? null,
-  reviewNote: decryptField(request.reviewNote),
+  // A reopened request no longer shows the answer it had
+  reviewNote: request.decidedAt ? decryptField(request.reviewNote) : null,
   answers: readAnswers(request.answers).map((answer) => ({
     label: answer.label,
     text: answerText(answer),

@@ -21,7 +21,7 @@ const shortAnswerMaxLength = readInteger(unban.shortAnswerMaxLength, {
 
 /**
  * Unban requests, links and form bounds
- * @type {{ expiryChoicesDays: number[], defaultExpiryDays: number, requireDiscordIdentity: boolean, minFillSeconds: number, maxQuestions: number, maxOptions: number, answerMaxLength: number, shortAnswerMaxLength: number, reviewNoteMaxLength: number, listedLinks: number, ticketMinutes: number }}
+ * @type {{ expiryChoicesDays: number[], defaultExpiryDays: number, requireDiscordIdentity: boolean, minFillSeconds: number, maxQuestions: number, maxOptions: number, answerMaxLength: number, shortAnswerMaxLength: number, reviewNoteMaxLength: number, listedLinks: number, ticketMinutes: number, statsRecentDays: number, statsMonthDays: number }}
  */
 
 export const UNBAN_SETTINGS = {
@@ -71,5 +71,16 @@ export const UNBAN_SETTINGS = {
     path: 'system/unban.ticketMinutes',
     fallback: 120,
     min: 5,
+  }),
+  // Windows the overview counts over
+  statsRecentDays: readInteger(unban.statsRecentDays, {
+    path: 'system/unban.statsRecentDays',
+    fallback: 7,
+    min: 1,
+  }),
+  statsMonthDays: readInteger(unban.statsMonthDays, {
+    path: 'system/unban.statsMonthDays',
+    fallback: 30,
+    min: 1,
   }),
 } as const

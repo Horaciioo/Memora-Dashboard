@@ -17,6 +17,9 @@ export const UNBAN_COPY = {
   refuseAction: 'Refuser',
   reopenAction: 'Rouvrir',
   assigneeNone: 'Aucun',
+  fieldVersion: 'Version',
+  fieldOutcome: 'Décision',
+  fieldAssignee: 'Attributaire',
   answerToRequester: 'Réponse au demandeur',
   reopenReason: 'Motif de la réouverture',
   internalNotes: 'Visible par l’équipe seulement',
@@ -39,6 +42,7 @@ export const UNBAN_COPY = {
   formPublish: 'Publier le formulaire',
   formDiscard: 'Abandonner le brouillon',
   conflict: 'Ce dossier vient d’être modifié par {name}.',
+  conflictUnknown: 'Ce dossier vient d’être modifié.',
   alreadyTaken: 'Déjà pris en charge par {name}.',
 } as const
 
@@ -139,4 +143,9 @@ export const UNBAN_ERRORS = {
   linkUsed: 'Ce lien a déjà servi, son dossier garde son lien.',
   linkRevoked: 'Ce lien est révoqué, génère-en un nouveau.',
   badPage: 'Cette page n’existe pas.',
+  notAllowed: 'Tu ne peux pas faire cela sur ce dossier.',
+  badOutcome: 'Une décision est une acceptation ou un refus.',
+  noteTooLong: 'Cette réponse est trop longue.',
+  reasonRequired: 'Indique le motif de la réouverture.',
+  badAssignee: 'Ce membre ne peut pas traiter les demandes de ce YouTubeur.',
 } as const

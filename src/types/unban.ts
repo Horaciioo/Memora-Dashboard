@@ -1,6 +1,7 @@
 import type { IntegrationCreator } from '@/types/onboarding'
 import type { UnbanLinkStateName, UnbanStatusName } from '@/utils/constants/unban'
-import type { UnbanFormSnapshot } from '@/declarations/unban/form'
+import type { UnbanActionName } from '@/core/lib/unban/actions'
+import type { UnbanAnswer, UnbanFormSnapshot } from '@/declarations/unban/form'
 
 /**
  * Version of the Deban. form
@@ -142,4 +143,110 @@ export interface UnbanIdentityView {
   discordId: string
   name: string
   avatarUrl: string | null
+}
+
+/**
+ * Member shown beside a request
+ * @typedef {Object} UnbanPerson
+ * @property {string} id - Account identifier
+ * @property {string} name - Display name
+ * @property {string | null} avatarUrl - Avatar
+ */
+
+export interface UnbanPerson {
+  id: string
+  name: string
+  avatarUrl: string | null
+}
+
+/**
+ * Request as a list row
+ * @typedef {Object} UnbanRequestItem
+ * @property {string} id - Request identifier
+ * @property {string} reference - Short code
+ * @property {UnbanStatusName} status - Where it stands
+ * @property {string} youtuberId - Creator it belongs to
+ * @property {string} youtuberName - Name of that creator
+ * @property {string} discordId - Discord account of the requester
+ * @property {string} discordName - Discord name of the requester
+ * @property {string | null} discordAvatar - Discord avatar of the requester
+ * @property {UnbanPerson | null} assignee - Member in charge
+ * @property {string} submittedAt - ISO submission
+ * @property {string} statusChangedAt - ISO last change of status
+ */
+
+export interface UnbanRequestItem {
+  id: string
+  reference: string
+  status: UnbanStatusName
+  youtuberId: string
+  youtuberName: string
+  discordId: string
+  discordName: string
+  discordAvatar: string | null
+  assignee: UnbanPerson | null
+  submittedAt: string
+  statusChangedAt: string
+}
+
+/**
+ * One page of requests
+ * @typedef {Object} UnbanRequestPage
+ * @property {UnbanRequestItem[]} items - Requests, newest first
+ * @property {string | null} nextCursor - Cursor of the next page, null at the end
+ */
+
+export interface UnbanRequestPage {
+  items: UnbanRequestItem[]
+  nextCursor: string | null
+}
+
+/**
+ * Request with everything the team reads
+ * @typedef {Object} UnbanRequestDetail
+ * @property {number} version - Counter the next write must quote
+ * @property {UnbanAnswer[]} answers - Answers as given
+ * @property {{ id: string, number: number }} formVersion - Version the requester filled
+ * @property {number} activeFormNumber - Version served now
+ * @property {string | null} reviewNote - Answer shown to the requester
+ * @property {string | null} decidedAt - ISO decision
+ * @property {UnbanPerson | null} decidedBy - Member who decided
+ * @property {string | null} discordLiftedAt - ISO confirmation of the lift on Discord
+ * @property {UnbanPerson | null} discordLiftedBy - Member who confirmed it
+ * @property {{ id: string, state: UnbanLinkStateName, expiresAt: string }} link - Link it came from
+ * @property {UnbanActionName[]} actions - What the caller may do to it
+ */
+
+export interface UnbanRequestDetail extends UnbanRequestItem {
+  version: number
+  answers: UnbanAnswer[]
+  formVersion: { id: string; number: number }
+  activeFormNumber: number
+  reviewNote: string | null
+  decidedAt: string | null
+  decidedBy: UnbanPerson | null
+  discordLiftedAt: string | null
+  discordLiftedBy: UnbanPerson | null
+  link: { id: string; state: UnbanLinkStateName; expiresAt: string }
+  actions: UnbanActionName[]
+}
+
+/**
+ * Figures of the overview
+ * @typedef {Object} UnbanOverview
+ * @property {number} pending - Waiting requests
+ * @property {number} inReview - Requests being handled
+ * @property {number} receivedRecent - Received over the short window
+ * @property {number} receivedMonth - Received over the long window
+ * @property {number} decidedMonth - Decided over the long window
+ * @property {number | null} medianDecisionMs - Median time to a decision over the long window
+ */
+
+export interface UnbanOverview {
+  pending: number
+  inReview: number
+  receivedRecent: number
+  receivedMonth: number
+  decidedMonth: number
+  medianDecisionMs: number | null
 }

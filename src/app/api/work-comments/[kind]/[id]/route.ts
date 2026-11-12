@@ -11,17 +11,23 @@ import { workViewer } from '@/core/services/work/visibility'
 
 export const GET = createProtectedRoute({
   descriptor: { summary: 'Read the remarks left on a work record', tags: ['work'] },
-  handler: async ({ params, session, access }) =>
-    listWorkComments(commentKind(params.kind, access), params.id, workViewer(session, access)),
+  handler: async ({ params, session, access, scope }) =>
+    listWorkComments(
+      commentKind(params.kind, access),
+      params.id,
+      workViewer(session, access),
+      scope
+    ),
 })
 
 export const POST = createProtectedRoute({
   status: 201,
   fields: commentFields(),
   descriptor: { summary: 'Leave a remark on a work record', tags: ['work'] },
-  handler: async ({ params, body, session, access }) => {
+  handler: async ({ params, body, session, access, scope }) => {
     const kind = commentKind(params.kind, access)
-    const comments = await addWorkComment(kind, params.id, workViewer(session, access), body)
+    const viewer = workViewer(session, access)
+    const comments = await addWorkComment(kind, params.id, viewer, body, scope)
 
     // Members named in the remark hear of it
     const mention = await commentMention(kind, params.id)
