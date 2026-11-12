@@ -5,12 +5,11 @@ import { conflict, notFound } from '@/core/lib/errors'
 import { cleanLinkInput } from '@/core/lib/unban/linkInput'
 import { createToken, hashToken } from '@/core/lib/unban/token'
 import { assertInScope } from '@/core/services/auth/ScopeService'
-import { isFeatureOn } from '@/core/services/features/FeatureService'
+import { isLinkMakingOpen } from '@/core/services/unban/intake'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { ROUTES } from '@/declarations/navigation'
 import { UNBAN_SETTINGS } from '@/declarations/configurations/settings'
 import { UNBAN_ERRORS } from '@/declarations/unban/copy'
-import { UNBAN_INTAKE_FEATURE } from '@/utils/constants/unban'
 import { revokeLink } from './manage'
 import { assertCanLink, expiryAfter, LINK_INCLUDE, loadLink, toLinkView } from './shared'
 import type { NewLinkInput } from '@/core/lib/unban/linkInput'
@@ -28,7 +27,7 @@ const insertLink = async (input: NewLinkInput, caller: UnbanCaller): Promise<Cre
   const clean = cleanLinkInput(input)
   assertInScope(caller.scope, clean.youtuberId)
 
-  if (!(await isFeatureOn(UNBAN_INTAKE_FEATURE))) throw conflict(UNBAN_ERRORS.intakeClosed)
+  if (!(await isLinkMakingOpen(caller.access.isSystem))) throw conflict(UNBAN_ERRORS.intakeClosed)
 
   const youtuber = await prisma.youtuber.findUnique({ where: { id: clean.youtuberId } })
   if (!youtuber) throw notFound()

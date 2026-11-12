@@ -276,7 +276,8 @@ export const PAGE_FEATURES: FeatureDefinition[] = [
   {
     key: 'unban.intake',
     label: 'Demandes publiques',
-    description: 'Le formulaire et le suivi ouverts aux personnes bannies.',
+    description:
+      'Le formulaire et le suivi ouverts aux personnes bannies. Couper ferme le formulaire et le suivi publics. Les dossiers restent consultables et traitables.',
     kind: 'subpage',
     parent: 'unban',
     routes: ['/unban/*'],
