@@ -315,6 +315,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Fixed,
         text: 'Correction d’un clignotement de l’étoile quand une page est ajoutée aux favoris ou retirée.',
       },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction du sélecteur de date : l’heure peut de nouveau se taper en entier, même quand elle est avant l’heure minimale.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction de la mise en page du téléphone, où le contenu ne remplissait pas toute la hauteur de l’écran.',
+      },
     ],
     comments: [
       {
