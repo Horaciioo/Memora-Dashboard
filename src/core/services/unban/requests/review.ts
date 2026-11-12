@@ -3,6 +3,8 @@ import 'server-only'
 import { encryptField } from '@/core/lib/crypto'
 import { forbidden, invalidInput } from '@/core/lib/errors'
 import { UnbanActions } from '@/core/lib/unban/actions'
+import { unbanTaskFragment } from '@/core/lib/unban/taskKey'
+import { closeSystemTasks } from '@/core/services/personal/SystemTaskService'
 import { notify } from '@/core/services/system/NotificationService'
 import { UNBAN_SETTINGS } from '@/declarations/configurations/settings'
 import { UNBAN_ERRORS } from '@/declarations/unban/copy'
@@ -68,16 +70,13 @@ export const takeRequest = async (
 ): Promise<UnbanRequestDetail> => {
   const row = await loadRequest(target, caller, true)
   assertCanAct(UnbanActions.Take, row, caller)
+  const assigneeId = row.assigneeId ?? caller.actorId
 
-  return writeVersioned(
+  const detail = await writeVersioned(
     {
       ...target,
       takeRace: true,
-      data: {
-        status: InReview,
-        assigneeId: row.assigneeId ?? caller.actorId,
-        statusChangedAt: new Date(),
-      },
+      data: { status: InReview, assigneeId, statusChangedAt: new Date() },
       event: {
         eventType: 'UnbanTaken',
         summary: row.reference,
@@ -86,6 +85,9 @@ export const takeRequest = async (
     },
     caller
   )
+  await closeSystemTasks(unbanTaskFragment(row.id), assigneeId)
+
+  return detail
 }
 
 /**
@@ -105,7 +107,12 @@ export const releaseRequest = async (
   return writeVersioned(
     {
       ...target,
-      data: { status: Pending, assigneeId: null, statusChangedAt: new Date() },
+      data: {
+        status: Pending,
+        assigneeId: null,
+        cycle: { increment: 1 },
+        statusChangedAt: new Date(),
+      },
       event: {
         eventType: 'UnbanReleased',
         summary: row.reference,
@@ -173,7 +180,8 @@ export const assignRequest = async (
   const detail = await writeVersioned(
     {
       ...target,
-      data: { assigneeId },
+      // A new cycle, so the ones who lost it find it again if it comes back
+      data: { assigneeId, cycle: { increment: 1 } },
       event: {
         eventType: 'UnbanAssigned',
         summary: row.reference,
@@ -183,6 +191,7 @@ export const assignRequest = async (
     caller
   )
 
+  if (assigneeId) await closeSystemTasks(unbanTaskFragment(row.id), assigneeId)
   await notify({
     kind: 'UnbanAssigned',
     recipients: [assigneeId],
@@ -218,7 +227,7 @@ export const decideRequest = async (
   const note = boundedText(decision.reviewNote, 'reviewNote')
   const now = new Date()
 
-  return writeVersioned(
+  const detail = await writeVersioned(
     {
       ...target,
       data: {
@@ -237,6 +246,9 @@ export const decideRequest = async (
     },
     caller
   )
+  await closeSystemTasks(unbanTaskFragment(row.id))
+
+  return detail
 }
 
 /**

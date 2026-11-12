@@ -14,6 +14,7 @@ import {
   mentionTasks,
   playTasks,
 } from '@/core/services/personal/TaskInboxService/activity'
+import { unbanTasks } from '@/core/services/personal/TaskInboxService/unban'
 
 /**
  * Everything waiting on the signed-in member: what the parkour asks of their seat
@@ -26,17 +27,19 @@ export const myTasks = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<HomeTask[]> => {
-  const [preparation, reviews, trainings, interviews, mentions, reports, play] = await Promise.all([
-    access.can(Permissions.AcademyManage) ? managerTasks(viewer, access) : Promise.resolve([]),
-    reviewTasks(viewer.id),
-    trainingTasks(viewer.id),
-    candidateReviewTasks(viewer.id),
-    mentionTasks(viewer.id),
-    reportTasks(viewer, access),
-    playTasks(viewer.id, access),
-  ])
+  const [preparation, reviews, trainings, interviews, requests, mentions, reports, play] =
+    await Promise.all([
+      access.can(Permissions.AcademyManage) ? managerTasks(viewer, access) : Promise.resolve([]),
+      reviewTasks(viewer.id),
+      trainingTasks(viewer.id),
+      candidateReviewTasks(viewer.id),
+      unbanTasks(viewer, access),
+      mentionTasks(viewer.id),
+      reportTasks(viewer, access),
+      playTasks(viewer.id, access),
+    ])
 
-  const timeline = [...preparation, ...reviews, ...trainings, ...interviews]
+  const timeline = [...preparation, ...reviews, ...trainings, ...interviews, ...requests]
   if (!access.can(Permissions.TaskRead)) return [...mentions, ...reports, ...timeline, ...play]
 
   // The timeline opens its tasks on the board, ticking one there takes it off the home

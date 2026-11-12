@@ -104,3 +104,35 @@ export const syncSystemTasks = async (
 
   return done
 }
+
+/**
+ * Close at once the open tasks carrying a fragment in their key, the owner kept aside stays open
+ * @param {string} fragment - Part of the system key shared by the tasks
+ * @param {string | null} [keepAccountId] - Owner whose task stays open
+ * @return {Promise<void>} - Closed
+ */
+
+export const closeSystemTasks = async (
+  fragment: string,
+  keepAccountId: string | null = null
+): Promise<void> => {
+  try {
+    const doneState = await prisma.workflowState.findFirst({
+      where: { scope: WorkflowScopes.Task, phase: WorkflowPhases.Done },
+      orderBy: { position: 'asc' },
+    })
+    if (!doneState) return
+
+    await prisma.task.updateMany({
+      where: {
+        systemKey: { contains: fragment },
+        ...(keepAccountId ? { NOT: { systemKey: { startsWith: `${keepAccountId}:` } } } : {}),
+        OR: [{ stateId: null }, { state: { phase: { not: WorkflowPhases.Done } } }],
+      },
+      data: { stateId: doneState.id },
+    })
+  } catch (error) {
+    // The next read of the home closes it anyway
+    logger.error('[system-tasks]', error)
+  }
+}

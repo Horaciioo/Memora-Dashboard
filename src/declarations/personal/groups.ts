@@ -133,6 +133,12 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     title: 'Bilans de live',
     icon: 'modActions',
   },
+  unbanRequest: {
+    one: 'Tu as {n} demande de déban à traiter',
+    other: 'Tu as {n} demandes de déban à traiter',
+    title: 'Demandes de déban',
+    icon: 'unlock',
+  },
   task: {
     one: 'Tu as {n} tâche à faire',
     other: 'Tu as {n} tâches à faire',
@@ -160,6 +166,7 @@ export const SYSTEM_TASK_KINDS: readonly HomeTaskKind[] = [
   'pimReview',
   'training',
   'candidateReview',
+  'unbanRequest',
 ]
 
 /**

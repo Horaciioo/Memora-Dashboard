@@ -73,6 +73,9 @@ export const PERSONAL_TASK_COPY = {
   liveReportTitle: 'Voir le bilan du live « {title} »',
   liveReportDescription:
     'Tu n’étais pas là pour ce live. Ouvre son bilan pour voir comment il s’est passé.',
+  unbanTitle: 'Demande de déban de {name}',
+  unbanDescription:
+    'Une personne bannie attend une réponse. Ouvre sa fiche, prends-la en charge puis tranche.',
   mentionDescription: 'Un commentaire du recrutement te cite. Va jeter un œil.',
   assignReferent: 'Attribuer un Référent',
   assignReferentDescription:
