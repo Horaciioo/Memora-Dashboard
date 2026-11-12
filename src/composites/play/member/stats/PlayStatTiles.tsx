@@ -30,6 +30,9 @@ export const playTime = (seconds: number): string => {
 export const recordOf = ({ wins, draws, losses }: PlayTileTotals): string =>
   [wins, draws, losses].join(' - ')
 
+// Figure keys
+export type PlayFigureId = 'played' | 'winRate' | 'record' | 'streak' | 'tournaments' | 'time'
+
 /**
  * Six figures of a player, label and value
  * @param {PlayTileTotals} totals - Totals
@@ -38,14 +41,22 @@ export const recordOf = ({ wins, draws, losses }: PlayTileTotals): string =>
 
 export const figuresOf = (
   totals: PlayTileTotals
-): { label: string; value: string | number; icon: keyof typeof ICONS; tone: string }[] => [
+): {
+  id: PlayFigureId
+  label: string
+  value: string | number
+  icon: keyof typeof ICONS
+  tone: string
+}[] => [
   {
+    id: 'played',
     label: PLAY_HUB_COPY.statPlayed,
     value: totals.played,
     icon: 'play',
     tone: '--play-baccalaureat',
   },
   {
+    id: 'winRate',
     label: PLAY_HUB_COPY.statWinRate,
     value: fillPlayMessage(PLAY_HUB_COPY.percent, {
       value: Math.round((totals.winRate ?? 0) * 100),
@@ -54,24 +65,28 @@ export const figuresOf = (
     tone: '--play-gold-deep',
   },
   {
+    id: 'record',
     label: PLAY_HUB_COPY.statRecord,
     value: recordOf(totals),
     icon: 'playStats',
     tone: '--play-golf',
   },
   {
+    id: 'streak',
     label: PLAY_HUB_COPY.statStreak,
     value: totals.bestStreak,
     icon: 'playFlame',
     tone: '--play-bomb',
   },
   {
+    id: 'tournaments',
     label: PLAY_HUB_COPY.statTournaments,
     value: totals.tournamentsWon,
     icon: 'playTrophy',
     tone: '--play-ludo',
   },
   {
+    id: 'time',
     label: PLAY_HUB_COPY.statTime,
     value: playTime(totals.playSeconds),
     icon: 'playClock',

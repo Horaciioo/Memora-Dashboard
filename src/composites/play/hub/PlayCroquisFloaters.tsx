@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 
 import { CROQUIS_COLORS, CROQUIS_HUB } from '@/declarations/play'
+import { PlayHubScenery } from '@/composites/play/hub/scenery/PlayHubScenery'
 import { PLAY_HUB } from '@/declarations/ui/variants'
 
 // Spread of the scribbles across the width, a prime step
@@ -15,6 +16,7 @@ const SIZES = [3.2, 4.6, 2.8, 4, 3.4]
 
 export const PlayCroquisFloaters = () => (
   <div className={PLAY_HUB.embers} aria-hidden="true">
+    <PlayHubScenery set="croquis" />
     {CROQUIS_HUB.floaters.map((color, index) => (
       <svg
         // Colours repeat, the slot is the identity

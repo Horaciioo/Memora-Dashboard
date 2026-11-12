@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 
 import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
+import { PlayHubScenery } from '@/composites/play/hub/scenery/PlayHubScenery'
 import { PLAY_HUB } from '@/declarations/ui/variants'
 
 // Spread of the letters across the width, a prime step
@@ -15,6 +16,7 @@ const SIZES = [2.2, 3.2, 1.8, 2.8, 2.4]
 
 export const PlayJumbleLetters = () => (
   <div className={PLAY_HUB.embers} aria-hidden="true">
+    <PlayHubScenery set="jumble" />
     {JUMBLE_HUB.letters.map((letter, index) => (
       <span
         // Letters repeat, the slot is the identity

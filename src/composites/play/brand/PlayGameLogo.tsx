@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { NEW_MARKS } from '@/composites/play/brand/logo/marks'
 import { PLAY_GAMES } from '@/declarations/play/games'
 import { PLAY_BRAND } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -95,104 +96,7 @@ const MARKS: Record<string, ReactNode> = {
       />
     </>
   ),
-  playJumble: (
-    <>
-      <rect
-        x="4"
-        y="22"
-        width="26"
-        height="26"
-        rx="6"
-        transform="rotate(-12 17 35)"
-        {...tint('--play-jumble-tile')}
-      />
-      <rect
-        x="34"
-        y="14"
-        width="26"
-        height="26"
-        rx="6"
-        transform="rotate(10 47 27)"
-        {...tint('--play-gold')}
-      />
-      <rect
-        x="22"
-        y="38"
-        width="26"
-        height="22"
-        rx="6"
-        transform="rotate(-4 35 49)"
-        {...tint('--play-jumble-glow')}
-      />
-      <path
-        d="M12 38l5-12 5 12M14 34h6"
-        stroke="var(--play-jumble-tile-ink)"
-        strokeWidth="3"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        transform="rotate(-12 17 35)"
-      />
-      <path
-        d="M43 20v14h8"
-        stroke="var(--play-jumble-tile-ink)"
-        strokeWidth="3.4"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        transform="rotate(10 47 27)"
-      />
-      <path
-        d="M28 45h14M35 45v10"
-        stroke="var(--play-jumble-tile-ink)"
-        strokeWidth="3.4"
-        fill="none"
-        strokeLinecap="round"
-        transform="rotate(-4 35 49)"
-      />
-    </>
-  ),
-  playGlitch: (
-    <>
-      <rect x="4" y="14" width="26" height="34" rx="6" {...tint('--glitch-paper')} />
-      <rect x="34" y="14" width="26" height="34" rx="6" {...tint('--glitch-paper')} />
-      <circle cx="17" cy="26" r="5" {...tint('--glitch-c3')} />
-      <path d="M11 41l6-8 6 8z" {...tint('--glitch-c1')} />
-      <circle cx="47" cy="26" r="5" {...tint('--glitch-c0')} />
-      <path d="M41 41l6-8 6 8z" {...tint('--glitch-c1')} />
-      <circle cx="47" cy="26" r="9.5" fill="none" stroke="var(--play-gold)" strokeWidth="2.6" />
-    </>
-  ),
-  playCroquis: (
-    <>
-      <circle cx="30" cy="34" r="22" {...tint('--play-croquis-glow')} />
-      <path
-        d="M14 46c6-18 12-18 18-4s12 6 18-14"
-        stroke="var(--play-croquis-deep)"
-        strokeWidth="4"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <g transform="rotate(38 46 20)">
-        <rect x="41" y="2" width="10" height="30" rx="2" {...tint('--play-croquis')} />
-        <path d="M41 32h10l-5 10z" {...tint('--croquis-paper')} />
-        <path d="M44 38h4l-2 4z" {...tint('--croquis-black')} />
-        <rect x="41" y="2" width="10" height="6" rx="2" {...tint('--play-gold')} />
-      </g>
-    </>
-  ),
-  playEcho: (
-    <>
-      <circle cx="24" cy="32" r="19" {...tint('--play-echo-glow')} />
-      <circle cx="42" cy="32" r="19" {...tint('--play-echo')} opacity="0.9" />
-      <path
-        d="M33 19.5l2.7 6.2 6.7.6-5.100 4.400 1.6 6.600-5.900-3.600-5.900 3.600 1.600-6.600-5.100-4.400 6.700-.6z"
-        transform="translate(0 4)"
-        {...tint('--play-gold')}
-      />
-    </>
-  ),
+  ...NEW_MARKS,
   playLudo: (
     <>
       <defs>

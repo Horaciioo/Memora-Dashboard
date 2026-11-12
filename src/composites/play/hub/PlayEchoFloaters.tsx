@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 
 import { ECHO_ART } from '@/composites/play/echo/EchoSymbols'
 import { ECHO_HUB } from '@/declarations/play/echo/copy'
+import { PlayHubScenery } from '@/composites/play/hub/scenery/PlayHubScenery'
 import { PLAY_HUB } from '@/declarations/ui/variants'
 
 // Spread of the symbols across the width, a prime step
@@ -16,6 +17,7 @@ const SIZES = [3, 4.2, 2.6, 3.6, 3.2]
 
 export const PlayEchoFloaters = () => (
   <div className={PLAY_HUB.embers} aria-hidden="true">
+    <PlayHubScenery set="echo" />
     {ECHO_HUB.floaters.map((key, index) => (
       <svg
         key={key}

@@ -199,6 +199,11 @@ export const PLAY_SETTINGS = {
     fallback: 20,
     min: 1,
   }),
+  sidebarGames: readInteger(play.sidebarGames, {
+    path: 'play/play.sidebarGames',
+    fallback: 1,
+    min: 1,
+  }),
   historySize: readInteger(play.historySize, {
     path: 'play/play.historySize',
     fallback: 30,

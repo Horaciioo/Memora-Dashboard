@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { GlitchMarkArt } from '@/composites/play/glitch/GlitchShapes'
 import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
 import { GLITCH_SHAPES } from '@/declarations/play/glitch/symbols'
+import { PlayHubScenery } from '@/composites/play/hub/scenery/PlayHubScenery'
 import { PLAY_HUB } from '@/declarations/ui/variants'
 
 // Spread of the floaters across the width, a prime step
@@ -19,6 +20,7 @@ const COLORS = [0, 3, 1, 4, 2, 5]
 
 export const PlayGlitchFloaters = () => (
   <div className={PLAY_HUB.embers} aria-hidden="true">
+    <PlayHubScenery set="glitch" />
     {GLITCH_HUB.floaters.map((key, index) => (
       <svg
         key={key}

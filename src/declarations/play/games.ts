@@ -166,6 +166,13 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
 })
 
 /**
+ * Featured games, the banner on top of the hub
+ * @type {PlayGameName[]}
+ */
+
+export const PLAY_FEATURED_GAMES: PlayGameName[] = [PlayGames.Naval]
+
+/**
  * Game behind a URL segment
  * @param {string} slug - URL segment
  * @return {PlayGameName | null} - Game or nothing

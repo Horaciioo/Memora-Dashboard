@@ -5,14 +5,8 @@ import { usePathname } from 'next/navigation'
 import { PlayNote } from '@/composites/play/hub/notices/PlayNote'
 import { usePlayNote } from '@/core/hooks/interaction/state/play/usePlayNote'
 import AppLink from '@/components/elements/navigation/AppLink'
-import { PlayMeMenu } from '@/composites/play/mobile/PlayMeMenu'
 import { PlayTabGlyph } from '@/composites/play/mobile/PlayTabGlyphs'
-import {
-  PLAY_ME_AFTER,
-  PLAY_TAB_LABELS,
-  PLAY_TAB_ORDER,
-  playTabIndexOf,
-} from '@/composites/play/mobile/tabs'
+import { PLAY_TAB_LABELS, PLAY_TAB_ORDER, playTabIndexOf } from '@/composites/play/mobile/tabs'
 import type { PlayTab } from '@/composites/play/mobile/tabs'
 import { PLAY_HUB_COPY, PLAY_MOBILE_COPY } from '@/declarations/play'
 import { PLAY_TABS } from '@/declarations/ui/variants'
@@ -25,8 +19,6 @@ import { cn } from '@/utils/classnames'
 const SESSION_PREFIX = ROUTES.playSession('')
 
 export interface PlayTabBarProps {
-  player: { name: string; avatarUrl: string | null }
-  level: number
   invites: PlayNoticeView[]
   presence: PlayPresence | null
   groupCalls: number
@@ -38,7 +30,7 @@ export interface PlayTabBarProps {
  * @return {JSX.Element | null}
  */
 
-export const PlayTabBar = ({ player, level, invites, presence, groupCalls }: PlayTabBarProps) => {
+export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) => {
   const path = usePathname()
   const { note, show } = usePlayNote()
   if (path.startsWith(SESSION_PREFIX)) return null
@@ -104,11 +96,7 @@ export const PlayTabBar = ({ player, level, invites, presence, groupCalls }: Pla
   return (
     <>
       <nav aria-label={PLAY_MOBILE_COPY.tabs} className={PLAY_TABS.bar}>
-        {PLAY_TAB_ORDER.flatMap((tab, index) =>
-          tab.key === PLAY_ME_AFTER
-            ? [link(tab, index), <PlayMeMenu key="me" player={player} level={level} />]
-            : [link(tab, index)]
-        )}
+        {PLAY_TAB_ORDER.map(link)}
       </nav>
       <AppLink
         href={ROUTES.dashboard}

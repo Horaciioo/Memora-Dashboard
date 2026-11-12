@@ -41,17 +41,58 @@ export const PLAY_NOTICE = {
 } as const
 
 /**
+ * Featured game banner over the row
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_FEATURE = {
+  root: 'relative w-full max-md:hidden',
+  slide:
+    'play-feature-in relative flex h-72 items-center overflow-hidden rounded-[2rem] ring-[0.4rem] ring-[var(--game)] lg:h-80',
+  backdrop: 'scale-125 blur-md',
+  shade:
+    'absolute inset-0 bg-linear-to-r from-[var(--play-night)] from-10% via-[var(--play-night)]/70 via-45% to-transparent',
+  body: 'relative flex max-w-sm flex-col items-start gap-2 pl-10 text-[var(--play-on-art)]',
+  badge:
+    'rounded-full bg-[var(--play-gold)] px-3 py-1 text-xs font-extrabold tracking-wide text-[var(--play-night)] uppercase',
+  name: 'text-5xl font-extrabold tracking-tight uppercase',
+  tagline: 'text-sm text-[var(--play-on-art)]/85',
+  seats: 'text-xs font-extrabold tabular-nums text-[var(--game)]',
+  play: 'mt-2 rounded-2xl bg-[var(--game)] px-6 py-2.5 text-sm font-extrabold text-[var(--play-night)] shadow-[0_0.3rem_0_rgb(0_0_0/0.35)] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
+  poster:
+    'play-feature-poster absolute top-1/2 right-12 aspect-[3/4] w-52 -translate-y-1/2 rotate-3 overflow-hidden rounded-3xl ring-[0.3rem] ring-white/70 shadow-[0_1.5rem_3rem_rgb(0_0_0/0.45)] lg:w-60',
+  dots: 'mt-3 flex justify-center gap-2',
+  dot: 'h-2 w-2 rounded-full bg-[var(--play-ink-faint)] transition-[width,background-color] duration-300 aria-[current=true]:w-6 aria-[current=true]:bg-[var(--play-ink)]',
+} as const
+
+/**
  * Game choice laid as a row of tall posters
  * @type {Record<string, string>}
  */
 
 export const PLAY_CROSS = {
-  stage: 'mx-auto flex w-full max-w-6xl flex-col gap-8 pb-28',
+  stage: 'mx-auto flex w-full max-w-4xl flex-col gap-6 pb-28',
   games: 'flex min-w-0 flex-col items-center gap-6',
   heading: `${HEADING} text-center max-md:sr-only sm:text-3xl`,
   // Three by three on desktop, one column on a phone
-  cross: 'grid w-full gap-4 md:grid-cols-3 md:gap-6',
-  card: 'min-h-0! md:aspect-[4/3]!',
+  cross: 'grid w-full gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-3',
+  card: 'min-h-0! w-[var(--card)] shrink-0',
+  // Phone keeps the plain list
+  list: 'flex flex-col gap-4 md:hidden',
+  // One row of cards, the middle one larger
+  row: 'flex w-full flex-col gap-4 max-md:hidden',
+  rowTitle: 'text-center text-lg font-extrabold tracking-wide text-[var(--play-ink)] uppercase',
+  track: 'relative overflow-hidden py-6 [--card:10.5rem] [--gap:1.5rem] focus-visible:outline-none',
+  strip:
+    'ml-[50%] flex w-max gap-[var(--gap)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] translate-x-[calc(var(--card)/-2-var(--at)*(var(--card)+var(--gap)))]',
+  slot: 'relative scale-90 opacity-70 transition-[scale,opacity] duration-500 data-[active=true]:z-10 data-[active=true]:scale-110 data-[active=true]:opacity-100',
+  // Side card: a click brings it to the middle
+  slotPick: 'absolute inset-0 z-20 cursor-pointer rounded-3xl',
+  arrow:
+    'play-glass absolute top-1/2 z-30 grid size-10 -translate-y-1/2 place-items-center rounded-full text-[var(--play-ink)] transition-opacity hover:bg-[var(--play-chip)] disabled:opacity-0',
+  arrowPrev: 'left-2',
+  arrowNext: 'right-2',
+  arrowIcon: 'size-5',
   live: 'min-h-0 shrink',
   online: 'min-h-0 shrink-0',
 } as const
