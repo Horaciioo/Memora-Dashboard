@@ -1,6 +1,7 @@
 import type { DecorLight, DecorPainters } from '@/composites/play/naval/world/decor'
 import { boardOf, frameOf, placeOf } from '@/composites/play/naval/world/geometry'
 import type { WorldBoard } from '@/composites/play/naval/world/geometry'
+import type { DecorActor } from '@/composites/play/naval/world/life'
 import { pieceRng } from '@/composites/play/naval/world/noise'
 import type { Pen } from '@/composites/play/naval/world/pen'
 import { paintBed, paintCloudShadows, paintCrests } from '@/composites/play/naval/world/sea'
@@ -128,6 +129,7 @@ export interface WorldFit {
  * @property {boolean} [isGame] - Inside a game: the grid is the game's and no piece covers it
  * @property {number} [step] - Pixels per worked out pixel of the bed
  * @property {(light: DecorLight) => void} [light] - Keeps the living lights
+ * @property {(actor: DecorActor) => void} [live] - Keeps the moving things
  */
 
 export interface WorldPaint {
@@ -137,6 +139,7 @@ export interface WorldPaint {
   isGame?: boolean
   step?: number
   light?: (light: DecorLight) => void
+  live?: (actor: DecorActor) => void
 }
 
 /**
@@ -169,7 +172,16 @@ const paintPieces = (
     const painter = paint.painters[piece.kind]
     if (!painter) continue
     pen.save()
-    painter({ pen, board, look, piece, place, seed: seed + index * 101, light: paint.light })
+    painter({
+      pen,
+      board,
+      look,
+      piece,
+      place,
+      seed: seed + index * 101,
+      light: paint.light,
+      live: paint.live,
+    })
     pen.restore()
   }
   pen.restore()

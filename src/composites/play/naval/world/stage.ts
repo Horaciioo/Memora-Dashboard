@@ -2,6 +2,8 @@ import type { OceanFrame } from '@/composites/play/naval/ocean/paint/frame'
 import type { DecorLight, DecorPainters } from '@/composites/play/naval/world/decor'
 import { boardOf, placeOf } from '@/composites/play/naval/world/geometry'
 import type { WorldBoard } from '@/composites/play/naval/world/geometry'
+import { orderActors, paintActors } from '@/composites/play/naval/world/life'
+import type { DecorActor } from '@/composites/play/naval/world/life'
 import { paintWorld } from '@/composites/play/naval/world/scene'
 import { NAVAL_MAPS } from '@/declarations/play/naval/maps'
 import type { NavalMapMeta } from '@/declarations/play/naval/maps'
@@ -25,7 +27,7 @@ const EMBER_S = 3.2
  * @typedef {Object} StageWorld
  * @property {string} key - Changes when the picture does
  * @property {(frame: OceanFrame) => void} paintStill - Water and decor, into the still layer
- * @property {(frame: OceanFrame) => void} paintLife - Lights and birds, every frame
+ * @property {(frame: OceanFrame) => void} paintLife - Moving things, lights and birds, every frame
  */
 
 export interface StageWorld {
@@ -135,6 +137,7 @@ const paintBirds = (
   if (!look.decor.length) return
   pen.lineWidth = 0.06
   pen.lineCap = 'round'
+  const plumage = look.land.bird ?? look.water.foam
   for (let bird = 0; bird < count; bird += 1) {
     const place = placeOf(board, look, look.decor[bird % look.decor.length])
     const ring = Math.max(0.8, place.room * 0.35) * (0.7 + (bird % 3) * 0.15)
@@ -144,7 +147,7 @@ const paintBirds = (
     const wing = 0.22 * (0.6 + 0.4 * Math.sin(seconds * FLAPS * Math.PI * 2 + bird))
     for (const [colour, dx, dy] of [
       [look.light.shade, 0.5, 0.6],
-      [look.water.foam, 0, 0],
+      [plumage, 0, 0],
     ] as const) {
       pen.strokeStyle = colour
       pen.beginPath()
@@ -180,10 +183,12 @@ export const stageWorld = (id: string, painters: DecorPainters): StageWorld => {
   const map = NAVAL_MAPS.has(id) ? NAVAL_MAPS.get(id) : NAVAL_MAPS.list[0]
   const board = boardOf(map.look, map.theatre.size)
   const lights: DecorLight[] = []
+  let actors: DecorActor[] = []
 
   const paintStill = (frame: OceanFrame): void => {
     const { ctx } = frame
     lights.length = 0
+    const moving: DecorActor[] = []
     ctx.save()
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     const step = Math.max(1, Math.ceil(ctx.canvas.width / BED_PX))
@@ -194,7 +199,10 @@ export const stageWorld = (id: string, painters: DecorPainters): StageWorld => {
       isGame: true,
       step,
       light: (light) => lights.push(light),
+      // A still sea keeps them in the picture
+      live: frame.life ? (actor) => moving.push(actor) : undefined,
     })
+    actors = orderActors(moving)
     ctx.restore()
   }
 
@@ -207,6 +215,7 @@ export const stageWorld = (id: string, painters: DecorPainters): StageWorld => {
     ctx.rect(-board.width, -board.height, board.width * 3, board.height * 3)
     ctx.rect(board.left, board.top, board.size, board.size)
     ctx.clip('evenodd')
+    paintActors(ctx, { actors, seconds, life })
     paintBirds(ctx, { board, map, seconds, count: Math.round((map.look.life.birds ?? 0) * life) })
     ctx.globalCompositeOperation = 'lighter'
     lights.forEach((light, index) => {

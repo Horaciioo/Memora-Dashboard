@@ -117,7 +117,7 @@ export const PLAY_VOTE_STEPS: Partial<Record<PlayGameName, PlayVoteStepSpec[]>> 
         {
           key: NAVAL_RANDOM_MAP,
           label: 'Au hasard',
-          hint: 'Une des quatre cartes, tirée au lancement.',
+          hint: 'Une carte tirée au sort au lancement.',
           icon: 'help',
         },
       ],

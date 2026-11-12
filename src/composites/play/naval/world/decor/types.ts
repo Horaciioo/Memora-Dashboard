@@ -1,4 +1,5 @@
 import type { WorldBoard, WorldPlace } from '@/composites/play/naval/world/geometry'
+import type { DecorActor } from '@/composites/play/naval/world/life/types'
 import type { Pen } from '@/composites/play/naval/world/pen'
 import type { NavalDecor, NavalMapLook } from '@/declarations/play/naval/maps'
 
@@ -27,6 +28,7 @@ export interface DecorLight {
  * @property {Pen} pen - Pen, one unit per square
  * @property {number} seed - Seed of the piece
  * @property {(light: DecorLight) => void} [light] - Keeps a light for the living layer
+ * @property {(actor: DecorActor) => void} [live] - Keeps a moving thing
  */
 
 export interface DecorScene {
@@ -37,6 +39,7 @@ export interface DecorScene {
   place: WorldPlace
   seed: number
   light?: (light: DecorLight) => void
+  live?: (actor: DecorActor) => void
 }
 
 // Painter of one decor kind

@@ -37,6 +37,22 @@ const DECOR_LOADERS: Record<NavalDecorKind, () => Promise<DecorPainter>> = {
     import('@/composites/play/naval/world/decor/coast').then((m) => m.paintLighthouse),
   [NavalDecorKinds.Wreck]: () =>
     import('@/composites/play/naval/world/decor/coast').then((m) => m.paintWreck),
+  [NavalDecorKinds.Village]: () =>
+    import('@/composites/play/naval/world/decor/village').then((m) => m.paintVillage),
+  [NavalDecorKinds.Quay]: () =>
+    import('@/composites/play/naval/world/decor/quay').then((m) => m.paintQuay),
+  [NavalDecorKinds.Beacon]: () =>
+    import('@/composites/play/naval/world/decor/beacon').then((m) => m.paintBeacon),
+  [NavalDecorKinds.Cove]: () =>
+    import('@/composites/play/naval/world/decor/cove').then((m) => m.paintCove),
+  [NavalDecorKinds.Galleon]: () =>
+    import('@/composites/play/naval/world/decor/galleon').then((m) => m.paintGalleon),
+  [NavalDecorKinds.Flotsam]: () =>
+    import('@/composites/play/naval/world/decor/flotsam').then((m) => m.paintFlotsam),
+  [NavalDecorKinds.Reef]: () =>
+    import('@/composites/play/naval/world/decor/reef').then((m) => m.paintReef),
+  [NavalDecorKinds.Sandbar]: () =>
+    import('@/composites/play/naval/world/decor/sandbar').then((m) => m.paintSandbar),
 }
 
 /**

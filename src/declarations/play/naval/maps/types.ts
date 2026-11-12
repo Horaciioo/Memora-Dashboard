@@ -14,6 +14,14 @@ export const NavalDecorKinds = {
   Rig: 'rig',
   Lighthouse: 'lighthouse',
   Wreck: 'wreck',
+  Village: 'village',
+  Quay: 'quay',
+  Beacon: 'beacon',
+  Cove: 'cove',
+  Galleon: 'galleon',
+  Flotsam: 'flotsam',
+  Reef: 'reef',
+  Sandbar: 'sandbar',
 } as const
 
 export type NavalDecorKind = (typeof NavalDecorKinds)[keyof typeof NavalDecorKinds]

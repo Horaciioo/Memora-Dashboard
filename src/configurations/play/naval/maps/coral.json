@@ -1,0 +1,105 @@
+{
+  "fleet": "patrol",
+  "theatre": {
+    "size": 14,
+    "fleet": [5, 4, 3, 3, 2],
+    "reachScale": 1,
+    "ramp": {
+      "everyTurns": 1,
+      "step": 0.25,
+      "max": 6
+    }
+  },
+  "frame": {
+    "band": {
+      "north": 4,
+      "east": 4,
+      "south": 4,
+      "west": 4
+    }
+  },
+  "light": {
+    "sun": [-0.5, -0.85],
+    "tint": "rgba(255,248,210,0.1)",
+    "shade": "rgba(6,48,72,0.24)"
+  },
+  "water": {
+    "deep": "#0a64a3",
+    "mid": "#12a0c6",
+    "shallow": "#3ed5d0",
+    "lagoon": "#a4f4e2",
+    "foam": "#f6fffd",
+    "sheen": "rgba(225,255,252,0.24)",
+    "grid": "rgba(255,255,255,0.28)"
+  },
+  "land": {
+    "sand": "#fbf1d6",
+    "sandDark": "#e0c992",
+    "floor": "#c9f1dc",
+    "shell": "#f6d9d0",
+    "coralPink": "#f2668f",
+    "coralViolet": "#9b62d6",
+    "coralOrange": "#ff8a3d",
+    "coralYellow": "#ffd23f",
+    "fishYellow": "#ffe14a",
+    "fishBlue": "#2f6fe0",
+    "fishOrange": "#ff7a2e",
+    "mark": "#ffffff",
+    "rock": "#b9b3a6",
+    "rockDark": "#7b766c",
+    "rockLight": "#e2ddd1"
+  },
+  "decor": [
+    {
+      "kind": "reef",
+      "side": "north",
+      "at": 0.32,
+      "depth": 0.45,
+      "scale": 1
+    },
+    {
+      "kind": "reef",
+      "side": "east",
+      "at": 0.62,
+      "depth": 0.45,
+      "scale": 0.9
+    },
+    {
+      "kind": "reef",
+      "side": "south",
+      "at": 0.7,
+      "depth": 0.45,
+      "scale": 0.75
+    },
+    {
+      "kind": "reef",
+      "side": "west",
+      "at": 0.28,
+      "depth": 0.45,
+      "scale": 0.7
+    },
+    {
+      "kind": "sandbar",
+      "side": "northeast",
+      "at": 0.5,
+      "depth": 0.6,
+      "scale": 0.9
+    },
+    {
+      "kind": "sandbar",
+      "side": "southwest",
+      "at": 0.5,
+      "depth": 0.6,
+      "scale": 0.8
+    }
+  ],
+  "life": {
+    "clouds": 2,
+    "birds": 2
+  },
+  "stage": 4,
+  "preview": {
+    "span": 20,
+    "focus": 0.15
+  }
+}

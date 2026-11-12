@@ -1,3 +1,6 @@
+import coral from '@/configurations/play/naval/maps/coral.json'
+import pirate from '@/configurations/play/naval/maps/pirate.json'
+import mediterranean from '@/configurations/play/naval/maps/mediterranean.json'
 import cliffs from '@/configurations/play/naval/maps/cliffs.json'
 import strait from '@/configurations/play/naval/maps/strait.json'
 import tropical from '@/configurations/play/naval/maps/tropical.json'
@@ -42,9 +45,17 @@ export const NAVAL_MAPS = createRegistry<string, NavalMapMeta>({
     label: 'Archipel tropical',
     tagline: 'Mer ouverte en plein soleil avec rien pour se cacher.',
   }),
+  coral: mapOf('coral', coral, {
+    label: 'Lagon et récifs coralliens',
+    tagline: 'Une eau claire sur des coraux de toutes les couleurs.',
+  }),
   cliffs: mapOf('cliffs', cliffs, {
     label: 'Les falaises',
     tagline: 'Un large couloir entre deux murs de roche.',
+  }),
+  pirate: mapOf('pirate', pirate, {
+    label: 'Baie pirate',
+    tagline: 'Une crique des Caraïbes, son épave et le campement des pirates.',
   }),
   volcanic: mapOf('volcanic', volcanic, {
     label: 'L’archipel volcanique',
@@ -53,6 +64,10 @@ export const NAVAL_MAPS = createRegistry<string, NavalMapMeta>({
   strait: mapOf('strait', strait, {
     label: 'Le détroit militaire',
     tagline: 'Devant le port militaire, sous les grues et le phare.',
+  }),
+  mediterranean: mapOf('mediterranean', mediterranean, {
+    label: 'Port méditerranéen antique',
+    tagline: 'Un vieux port de pierre sous le soleil, au pied du village blanc.',
   }),
 })
 
