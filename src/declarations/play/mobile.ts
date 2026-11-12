@@ -89,4 +89,8 @@ export const PLAY_ME_COPY = {
   open: 'Voir mon profil',
   allStats: 'Mes stats',
   settings: 'Réglages',
+  // Record columns: wins, draws, losses
+  recordWins: 'Vict.',
+  recordDraws: 'Ega.',
+  recordLosses: 'Déf.',
 } as const

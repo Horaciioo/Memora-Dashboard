@@ -40,7 +40,6 @@ export const LIVE_COPY = {
   reinforceNow: 'Tu as été demandé en renfort pour modérer sur {platform} !',
   liveJoin: 'Rejoindre le live',
   liveSection: 'En direct',
-  upcomingSection: 'À venir',
   recentSection: 'Lives passés',
   recentEndedAt: 'Clos à {time}',
   reopen: 'Rétablir le live',

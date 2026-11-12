@@ -1,5 +1,5 @@
 import ludo from '@/configurations/play/ludo.json'
-import { readInteger, readNode } from '@/declarations/configurations/readers'
+import { readInteger, readNode, readNumber } from '@/declarations/configurations/readers'
 
 /**
  * Chaos bonuses
@@ -15,6 +15,9 @@ export const LUDO_BONUSES = ['ghost', 'double', 'boost', 'chameleon'] as const
 
 export const LUDO_MALUSES = ['duel', 'faulty', 'stall', 'blind'] as const
 
+// Tag of the dice lines thrown in a storm of dice
+export const LUDO_STORM_TAG = 'frenzy'
+
 export type LudoBonusName = (typeof LUDO_BONUSES)[number]
 export type LudoMalusName = (typeof LUDO_MALUSES)[number]
 export type LudoEffectName = LudoBonusName | LudoMalusName
@@ -24,6 +27,7 @@ const chaos = readNode(ludo.chaos, 'play/ludo.chaos')
 const node = (key: string) => readNode(chaos[key], `play/ludo.chaos.${key}`)
 const ghost = node('ghost')
 const faulty = node('faulty')
+const frenzy = node('frenzy')
 
 /**
  * Squares of a quarter, read as offsets
@@ -79,6 +83,13 @@ export const LUDO_CHAOS = {
     path: 'play/ludo.chaos.blind.turns',
     fallback: 3,
     min: 1,
+  }),
+  // Chance, at the start of a turn, of a storm of dice thrown by everyone together
+  frenzyChance: readNumber(frenzy.chance, {
+    path: 'play/ludo.chaos.frenzy.chance',
+    fallback: 0.12,
+    min: 0,
+    max: 1,
   }),
   // Beats of the screen, in milliseconds
   duelMs: readInteger(chaos.duelMs, { path: 'play/ludo.chaos.duelMs', fallback: 900, min: 100 }),

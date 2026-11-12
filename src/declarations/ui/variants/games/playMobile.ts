@@ -236,21 +236,36 @@ export const PLAY_FOLD = {
 export const PLAY_ME = {
   // Over the page, off its scrollbar, which keeps the screen's right edge
   aside: 'absolute top-8 right-8 z-10 hidden w-80 flex-col gap-3 md:flex xl:right-12 xl:w-[22rem]',
-  card: `${PANEL} ${LIFT} flex flex-col overflow-hidden`,
-  head: 'group flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-[var(--play-chip)]',
-  name: 'min-w-0 flex-1 truncate text-lg font-extrabold tracking-tight',
-  caret:
-    'size-5 shrink-0 text-[var(--play-ink-soft)] transition-transform group-aria-expanded:rotate-180',
-  // Level, stuck under the head and split from it by a divider
-  level: 'play-rise flex flex-col gap-2 border-t border-[var(--play-line)] p-4',
-  levelHead: 'flex items-baseline justify-between gap-3',
-  levelNumber: 'text-xl font-extrabold tabular-nums',
+  // Card and invitation side by side, the invitation hanging on the card's left
+  row: 'relative',
+  invite: 'absolute top-0 right-full mr-3 w-72',
+  // Rank card in the tier colour, as on the stats page
+  card: `${LIFT} relative isolate flex flex-col overflow-hidden rounded-[1.75rem] bg-[color-mix(in_oklab,var(--tier)_22%,var(--play-night))] text-white [--ring-gap:color-mix(in_oklab,var(--tier)_22%,var(--play-night))] [--ring-track:rgb(255_255_255/0.18)]`,
+  head: 'group flex w-full items-center gap-4 p-4 pb-5 text-left transition-colors hover:bg-white/6',
+  headText: 'flex min-w-0 flex-1 flex-col gap-0.5',
+  name: 'min-w-0 truncate text-xl font-extrabold tracking-tight',
+  caret: 'size-5 shrink-0 text-white/70 transition-transform group-aria-expanded:rotate-180',
+  // Level, under the head
+  level: 'play-rise flex flex-col gap-2.5 px-4 pt-1 pb-5',
+  levelBar: 'h-2.5 w-full overflow-hidden rounded-full bg-white/15',
+  levelFill: 'block h-full rounded-full bg-[var(--tier)] transition-[width] duration-700',
+  levelNext: 'text-sm text-white/75',
   body: 'flex flex-col gap-4',
-  // Figures as one board, the record spanning the foot
-  figures: `${LIFT} grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-[var(--play-line)] ring-1 ring-[var(--play-line)]`,
-  figure: 'flex flex-col gap-0.5 bg-[var(--play-panel-strong)] px-4 py-3',
-  figureWide: 'col-span-2 items-center py-4 text-center',
+  // Figures as separate tiles, the record spanning the foot
+  figures: 'grid grid-cols-2 gap-2',
+  figure: `${PANEL} ${LIFT} flex flex-col gap-1 px-4 py-3.5`,
   figureValue: 'truncate text-2xl leading-none font-extrabold tracking-tight tabular-nums',
   figureLabel: 'truncate text-xs font-bold text-[var(--play-ink-faint)]',
+  // Record and best game, side by side and compact
+  pair: 'grid grid-cols-2 gap-2',
+  tile: `${PANEL} ${LIFT} flex min-w-0 items-stretch px-1 py-3 text-center`,
+  // Columns split by a vertical divider
+  recordColumn:
+    'flex min-w-0 flex-1 flex-col items-center gap-0 border-l border-[var(--play-line)] first:border-l-0',
+  best: `${PANEL} ${LIFT} flex min-w-0 items-center gap-2.5 px-3 py-3`,
+  bestLogo: 'size-9 shrink-0',
+  bestText: 'flex min-w-0 flex-col',
+  bestName: 'truncate text-sm leading-tight font-extrabold',
+  record: 'flex items-baseline justify-center text-xl leading-none font-extrabold tabular-nums',
   links: 'flex flex-wrap items-center justify-between gap-x-4 gap-y-1',
 } as const

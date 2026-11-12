@@ -67,12 +67,13 @@ export const PlayGameCarousel = ({ title, games, onLocked }: PlayGameCarouselPro
                   <div className={PLAY_CROSS.info} aria-hidden={index !== at}>
                     <div className={PLAY_CROSS.infoBox}>
                       <p className={PLAY_CROSS.infoText}>{PLAY_GAMES.get(entry.game).tagline}</p>
+                      <div aria-hidden="true" className={PLAY_CROSS.infoDivider} />
                       <AppLink
                         href={ROUTES.playGame(PLAY_GAMES.get(entry.game).slug)}
                         tabIndex={index === at ? 0 : -1}
                         className={PLAY_CROSS.infoPlay}
                       >
-                        {PLAY_HUB_COPY.featurePlay}
+                        {PLAY_HUB_COPY.carouselPlay}
                       </AppLink>
                     </div>
                   </div>

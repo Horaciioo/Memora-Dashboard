@@ -29,6 +29,8 @@ export const PLAY_INVITE_CALL = {
 export const HOME_PLAY_INVITE = {
   // The rail notice takes over from tablets
   box: 'play-invite flex md:hidden items-center gap-4 rounded-[var(--radius-lg)] px-4 py-3',
+  // Under the profile card of the hub, at every width
+  aside: 'play-invite flex items-center gap-3 rounded-[1.75rem] px-4 py-3.5',
   logo: 'play-invite-logo size-10 shrink-0',
   body: 'flex min-w-0 flex-1 flex-col',
   eyebrow: 'text-micro font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',

@@ -96,9 +96,9 @@ export const LUDO_SETTINGS = {
   minPlayers,
   maxPlayers: readInteger(ludo.maxPlayers, {
     path: 'play/ludo.maxPlayers',
-    fallback: 4,
+    fallback: 6,
     min: minPlayers,
-    max: 4,
+    max: 6,
   }),
   countdownSeconds: readInteger(ludo.countdownSeconds, {
     path: 'play/ludo.countdownSeconds',

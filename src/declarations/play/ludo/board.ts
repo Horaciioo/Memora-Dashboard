@@ -49,11 +49,40 @@ export const LUDO_LAYOUT = {
 } as const
 
 /**
+ * Star board of the Chaos mode: six arms around a hexagon, units are cells
+ * @type {Object}
+ */
+
+export const LUDO_STAR = {
+  // Cells per side of the drawing
+  size: 25,
+  // Squares along one arm, odd so the middle one sits on the axis
+  side: 9,
+  // Coloured lane squares to the centre
+  lane: 3,
+  // Yard side, and its gap to the track
+  yard: 3.8,
+  yardGap: 0.15,
+  // Pawn spots of the yard from its middle
+  yardSpot: 0.65,
+  // Centre triangle: where its base lies, half its width, and the foot of the pile at home
+  wedge: { base: 3.3, half: 1.5 },
+  goalReach: 1.4,
+  // Detour of each arm: it stands for the squares from the first to the last offset of the quarter,
+  // the start square included, sits this far inside the track (its end tiles touching it, at the edge distance), and carries action squares at these tile numbers
+  branch: { first: 0, last: 5, inset: 2, edge: 1, special: [2, 3] },
+  // Soft plate under the track, its margin round the tiles
+  plate: 0.6,
+  // Rounded square of a track tile
+  tile: { gap: 0.1, radius: 0.3 },
+} as const
+
+/**
  * Colour of each corner, clockwise from the top left
  * @type {readonly string[]}
  */
 
-export const LUDO_CORNERS = ['blue', 'red', 'green', 'yellow'] as const
+export const LUDO_CORNERS = ['blue', 'red', 'green', 'yellow', 'purple', 'teal'] as const
 
 export type LudoCornerName = (typeof LUDO_CORNERS)[number]
 
@@ -69,8 +98,25 @@ export const LUDO_SEATING: Record<number, readonly number[]> = {
   4: [0, 1, 2, 3],
 }
 
+/**
+ * Arms dealt on the star for each table size, facing ones first
+ * @type {Record<number, readonly number[]>}
+ */
+
+export const LUDO_STAR_SEATING: Record<number, readonly number[]> = {
+  1: [0],
+  2: [0, 3],
+  3: [0, 2, 4],
+  4: [0, 1, 3, 4],
+  5: [0, 1, 2, 3, 4],
+  6: [0, 1, 2, 3, 4, 5],
+}
+
 // Corner the viewer is turned to, bottom right
 export const LUDO_VIEWER_CORNER = 2
+
+// Arm the viewer is turned to on the star, bottom right as well
+export const LUDO_STAR_VIEWER_CORNER = 3
 
 /**
  * Pips of each die face, cells of a 3 by 3 grid

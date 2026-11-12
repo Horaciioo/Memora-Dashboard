@@ -7,14 +7,13 @@ import { LudoImpact } from '@/composites/play/ludo/LudoImpact'
 import { LudoPath } from '@/composites/play/ludo/LudoPath'
 import { LudoPawn } from '@/composites/play/ludo/LudoPawn'
 import type { LudoMotion } from '@/composites/play/ludo/useLudoMotion'
-import { GOAL_STEP, HIDDEN_STEP, pawnPoint, turnPoint, YARD_STEP } from '@/core/lib/play/ludo'
-import type { LudoGhostView } from '@/core/lib/play/ludo'
+import { HIDDEN_STEP, isHomeStep, pawnPoint, turnPoint, YARD_STEP } from '@/core/lib/play/ludo'
+import type { LudoGhostView, LudoMap } from '@/core/lib/play/ludo'
 import {
   LUDO_CORNERS,
   LUDO_CROWD_SCALE,
   LUDO_CROWDS,
   LUDO_GOAL_SCALE,
-  LUDO_LAYOUT,
   LUDO_PILE_RISE,
 } from '@/declarations/play/ludo/board'
 import type { LudoCell } from '@/declarations/play/ludo/board'
@@ -28,8 +27,8 @@ import { cn } from '@/utils/classnames'
 const DEPTH = 2
 // Spot key precision
 const SPOT_DIGITS = 2
-// Pile on this side of the middle puts its numbers outward
-const PILE_SIDE_EDGE = LUDO_LAYOUT.size / 2 - 0.25
+// Pile on this side of the middle puts its numbers outward, as a gap to the middle in cells
+const PILE_SIDE_GAP = 0.25
 // Largest crowd drawn apart
 const MAX_CROWD = Math.max(...Object.keys(LUDO_CROWDS).map(Number))
 
@@ -55,6 +54,7 @@ interface LudoSpot {
 /**
  * Every pawn on screen, those sharing a square drawn smaller side by side
  * @param {Object} input - Board
+ * @param {LudoMap} input.map - Board drawn
  * @param {{ accountId: string, corner: number }[]} input.players - Colours in play
  * @param {Record<string, number[]>} input.pawns - Steps on screen
  * @param {number} input.turns - View turn
@@ -62,10 +62,12 @@ interface LudoSpot {
  */
 
 const spotsOf = ({
+  map,
   players,
   pawns,
   turns,
 }: {
+  map: LudoMap
   players: { accountId: string; corner: number }[]
   pawns: Record<string, number[]>
   turns: number
@@ -81,7 +83,7 @@ const spotsOf = ({
               corner,
               pawn,
               step,
-              point: turnPoint(pawnPoint(corner, step, pawn), turns),
+              point: turnPoint(map, pawnPoint(map, corner, step, pawn), turns),
             },
           ]
     )
@@ -89,17 +91,17 @@ const spotsOf = ({
   const keyOf = ({ point }: { point: LudoCell }) =>
     point.map((value) => value.toFixed(SPOT_DIGITS)).join(':')
   const crowds = Map.groupBy(
-    laid.filter((entry) => entry.step < GOAL_STEP),
+    laid.filter((entry) => !isHomeStep(map, entry.step)),
     keyOf
   )
   // Pawns at home pile up in order of arrival
   const piles = Map.groupBy(
-    laid.filter((entry) => entry.step >= GOAL_STEP),
+    laid.filter((entry) => isHomeStep(map, entry.step)),
     (entry) => entry.accountId
   )
 
   return laid.map((entry) => {
-    if (entry.step >= GOAL_STEP) {
+    if (isHomeStep(map, entry.step)) {
       const pile = (piles.get(entry.accountId) ?? [entry]).toSorted(
         (left, right) => left.step - right.step || left.pawn - right.pawn
       )
@@ -110,7 +112,7 @@ const spotsOf = ({
         offset: [-rank * LUDO_PILE_RISE, 0] as LudoCell,
         scale: LUDO_GOAL_SCALE,
         rank: rank + 1,
-        isLeft: entry.point[1] < PILE_SIDE_EDGE,
+        isLeft: entry.point[1] < map.size / 2 - PILE_SIDE_GAP,
       }
     }
     const crowd = crowds.get(keyOf(entry)) ?? [entry]
@@ -129,6 +131,7 @@ const spotsOf = ({
 
 /**
  * Place of the mark standing for a landing the player cannot see
+ * @param {LudoMap} map - Board drawn
  * @param {number} corner - Pawn colour
  * @param {number} step - Pawn step
  * @param {number} pawn - Pawn index
@@ -136,13 +139,20 @@ const spotsOf = ({
  * @return {CSSProperties} - Style
  */
 
-const blindSpot = (corner: number, step: number, pawn: number, turns: number): CSSProperties => {
-  const [y, x] = turnPoint(pawnPoint(corner, step, pawn), turns)
+const blindSpot = (
+  map: LudoMap,
+  corner: number,
+  step: number,
+  pawn: number,
+  turns: number
+): CSSProperties => {
+  const [y, x] = turnPoint(map, pawnPoint(map, corner, step, pawn), turns)
 
   return { '--x': x, '--y': y } as CSSProperties
 }
 
 export interface LudoPawnsProps {
+  map: LudoMap
   players: { accountId: string; corner: number }[]
   pawns: Record<string, number[]>
   turns: number
@@ -151,7 +161,8 @@ export interface LudoPawnsProps {
   movable: { pawn: number; to: number }[]
   hop: { accountId: string; pawn: number; key: number } | null
   strike: LudoMotion['strike']
-  onPick: (pawn: number) => void
+  // The pawn and where it lands, when it has a detour to choose
+  onPick: (pawn: number, to?: number) => void
   // Chaos: colour drawn per player, phantom pairs, pawns vanishing or pushed back
   looks: Record<string, number>
   ghosts: Record<string, LudoGhostView>
@@ -170,6 +181,7 @@ export interface LudoPawnsProps {
  */
 
 export const LudoPawns = ({
+  map,
   players,
   pawns,
   turns,
@@ -192,25 +204,32 @@ export const LudoPawns = ({
   const aimed = aim?.scope === scope ? aim.pawn : null
   const setAimed = (pawn: number | null) => setAim(pawn === null ? null : { pawn, scope })
   const mine = players.find((player) => player.accountId === viewerId)
-  const target = movable.find((entry) => entry.pawn === aimed)
+  const targets = movable.filter((entry) => entry.pawn === aimed)
+  const target = targets[0]
   const glide = { '--glide': `${LUDO_SETTINGS.stepMs}ms` } as CSSProperties
 
   return (
     <>
-      {mine && target && !isBlind && (
-        <LudoPath
-          corner={mine.corner}
-          pawn={target.pawn}
-          from={pawns[viewerId]?.[target.pawn] ?? YARD_STEP}
-          to={target.to}
-          turns={turns}
-        />
-      )}
+      {mine &&
+        !isBlind &&
+        targets.map((entry) => (
+          <LudoPath
+            key={entry.to}
+            map={map}
+            corner={mine.corner}
+            pawn={entry.pawn}
+            from={pawns[viewerId]?.[entry.pawn] ?? YARD_STEP}
+            to={entry.to}
+            turns={turns}
+            onPick={targets.length > 1 ? () => onPick(entry.pawn, entry.to) : undefined}
+          />
+        ))}
 
       {isBlind && mine && target && (
         <span
           className={LUDO_CHAOS_PIECES.blindMark}
           style={blindSpot(
+            map,
             mine.corner,
             pawns[viewerId]?.[target.pawn] ?? YARD_STEP,
             target.pawn,
@@ -221,9 +240,11 @@ export const LudoPawns = ({
         </span>
       )}
 
-      {strike && <LudoImpact key={strike.key} strike={strike} players={players} turns={turns} />}
+      {strike && (
+        <LudoImpact key={strike.key} map={map} strike={strike} players={players} turns={turns} />
+      )}
 
-      {spotsOf({ players, pawns, turns }).map((spot) => {
+      {spotsOf({ map, players, pawns, turns }).map((spot) => {
         const colour = LUDO_CORNERS[looks[spot.accountId] ?? spot.corner]
         const ghost = ghosts[spot.accountId]
         const isGhost = Boolean(ghost?.pair.includes(spot.pawn))
@@ -234,7 +255,7 @@ export const LudoPawns = ({
           isDisguised &&
           spot.accountId === viewerId &&
           spot.step > YARD_STEP &&
-          spot.step < GOAL_STEP
+          !isHomeStep(map, spot.step)
         const canPick =
           spot.accountId === viewerId && movable.some((entry) => entry.pawn === spot.pawn)
         const isHopping = hop?.accountId === spot.accountId && hop.pawn === spot.pawn

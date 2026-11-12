@@ -5,8 +5,9 @@ import { LudoFxDie } from '@/composites/play/ludo/LudoFxDie'
 import { LudoPawn } from '@/composites/play/ludo/LudoPawn'
 import type { LudoCue } from '@/composites/play/ludo/chaosMotion'
 import { pawnPoint, turnPoint } from '@/core/lib/play/ludo'
+import type { LudoMap } from '@/core/lib/play/ludo'
 import { fillPlayMessage } from '@/declarations/play/copy'
-import { LUDO_CORNERS, LUDO_LAYOUT } from '@/declarations/play/ludo/board'
+import { LUDO_CORNERS } from '@/declarations/play/ludo/board'
 import type { LudoCornerName } from '@/declarations/play/ludo/board'
 import { LUDO_CHAOS } from '@/declarations/play/ludo/chaos'
 import type { LudoEffectName } from '@/declarations/play/ludo/chaos'
@@ -45,6 +46,7 @@ const EFFECT_TURNS: Partial<Record<LudoEffectName, number>> = {
 }
 
 export interface LudoChaosFxProps {
+  map: LudoMap
   cue: LudoCue
   // Colour of the player who triggered it, and name
   corner: number
@@ -205,11 +207,11 @@ const JokerScene = ({ effect }: { effect: LudoEffectName }) => (
  * @return {JSX.Element}
  */
 
-export const LudoChaosFx = ({ cue, corner, name, turns }: LudoChaosFxProps) => {
+export const LudoChaosFx = ({ map, cue, corner, name, turns }: LudoChaosFxProps) => {
   const [y, x] =
     cue.pawn !== null && cue.to !== null
-      ? turnPoint(pawnPoint(corner, cue.to, cue.pawn), turns)
-      : [LUDO_LAYOUT.size / 2, LUDO_LAYOUT.size / 2]
+      ? turnPoint(map, pawnPoint(map, corner, cue.to, cue.pawn), turns)
+      : [map.size / 2, map.size / 2]
   const copy = LUDO_CHAOS_COPY[cue.effect]
   const isJoker = cue.kind === 'joker'
   const isEnd = cue.kind === 'end'
@@ -233,7 +235,7 @@ export const LudoChaosFx = ({ cue, corner, name, turns }: LudoChaosFxProps) => {
       style={vars({
         '--x': x,
         '--y': y,
-        '--cells': LUDO_LAYOUT.size,
+        '--cells': map.size,
         '--fx-ms': `${LUDO_CHAOS.effectMs}ms`,
         '--pawn-tone': `var(--play-ludo-${LUDO_CORNERS[corner]})`,
       })}

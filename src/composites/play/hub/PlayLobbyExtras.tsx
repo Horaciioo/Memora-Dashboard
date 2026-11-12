@@ -11,7 +11,6 @@ import {
 import { PLAY_INVITE } from '@/declarations/ui/variants'
 import { PlayBotKinds } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
-import { cn } from '@/utils/classnames'
 
 /**
  * Host seats bots from the seat picker, greyed while bots sleep
@@ -29,12 +28,12 @@ export const PlayLobbyExtras = ({ sessionId, game }: { sessionId: string; game: 
   const isDisabled = isAsleep || moves.isSaving
 
   return (
-    <div className={PLAY_INVITE.footGroup}>
-      <h3 className={PLAY_INVITE.sectionTitle}>{PLAY_HUB_COPY.botsTitle}</h3>
-      {isAsleep && <p className={PLAY_INVITE.pausedNote}>{PLAY_HUB_COPY.botsPaused}</p>}
-      <div className={cn('flex flex-col', isAsleep && PLAY_INVITE.footPaused)}>
-        <div className={PLAY_INVITE.choice} role="group" aria-label={PLAY_BOT_COPY.add}>
-          <span className={PLAY_INVITE.choiceText}>{PLAY_HUB_COPY.botsAdd}</span>
+    <div className={PLAY_INVITE.botsRow} role="group" aria-label={PLAY_BOT_COPY.add}>
+      <h3 className={PLAY_INVITE.botsLabel}>{PLAY_HUB_COPY.botsTitle}</h3>
+      {isAsleep ? (
+        <p className={PLAY_INVITE.pausedNote}>{PLAY_HUB_COPY.botsPaused}</p>
+      ) : (
+        <>
           {levels.map((level) => (
             <button
               key={level}
@@ -46,16 +45,16 @@ export const PlayLobbyExtras = ({ sessionId, game }: { sessionId: string; game: 
               {levels.length > 1 ? PLAY_BOT_LEVEL_LABELS[level] : PLAY_BOT_COPY.badge}
             </button>
           ))}
-        </div>
-        <button
-          type="button"
-          className={PLAY_INVITE.choice}
-          disabled={isDisabled}
-          onClick={() => void moves.bots(sessionId, fillLevel, true)}
-        >
-          {PLAY_HUB_COPY.botsFill}
-        </button>
-      </div>
+          <button
+            type="button"
+            className={PLAY_INVITE.level}
+            disabled={isDisabled}
+            onClick={() => void moves.bots(sessionId, fillLevel, true)}
+          >
+            {PLAY_HUB_COPY.botsFill}
+          </button>
+        </>
+      )}
     </div>
   )
 }

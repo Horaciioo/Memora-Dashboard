@@ -1,7 +1,7 @@
 import { playLudoSound, playLudoTake } from '@/composites/play/ludo/sound'
 import { ghostsOf, HIDDEN_STEP, readGhostTag } from '@/core/lib/play/ludo'
 import type { LudoBoardState, LudoGhostView, LudoLineView } from '@/core/lib/play/ludo'
-import { LUDO_CHAOS, LUDO_BONUSES } from '@/declarations/play/ludo/chaos'
+import { LUDO_BONUSES, LUDO_CHAOS, LUDO_STORM_TAG } from '@/declarations/play/ludo/chaos'
 import type { LudoEffectName } from '@/declarations/play/ludo/chaos'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { LUDO_MIX } from '@/declarations/play/ludo/sounds'
@@ -31,6 +31,8 @@ export interface LudoDuelState {
   rolls: { accountId: string; dice: number }[]
   winnerId: string | null
   isDraw: boolean
+  // A storm of dice: nobody wins, everyone just throws
+  isStorm: boolean
 }
 
 /**
@@ -197,11 +199,25 @@ const BEATS: Record<string, (play: ChaosPlay) => Promise<void>> = {
 
       return {
         ...current,
-        duel: { key: current.duel?.key ?? line.rev, rolls, winnerId: null, isDraw: false },
+        duel: {
+          key: current.duel?.key ?? line.rev,
+          rolls,
+          winnerId: null,
+          isDraw: false,
+          isStorm: line.effect === LUDO_STORM_TAG,
+        },
       }
     })
     playLudoTake('roll', LUDO_MIX.roll)
     await wait(LUDO_CHAOS.duelMs)
+    // A storm crowns nobody, it clears once the last die has shown
+    if (line.effect === LUDO_STORM_TAG) {
+      if (line.value === 1) {
+        await wait(LUDO_CHAOS.duelMs)
+        set((current) => ({ ...current, duel: null }))
+      }
+      return
+    }
     // Throws come one by one: only the last one crowns (older lines carry no flag)
     if (line.value === 0 || (line.value === undefined && next?.kind === 'DUEL')) return
 

@@ -1,4 +1,6 @@
 import type { ChaosSeat, LudoGhost, LudoLine } from '@/core/lib/play/ludo/effects'
+import type { LudoMap } from '@/core/lib/play/ludo/maps'
+import { rollDie } from '@/core/lib/play/ludo/rules'
 import type { LudoPlan } from '@/core/lib/play/ludo/rules'
 import { isOnTrack, squareOf } from '@/core/lib/play/ludo/track'
 import { LUDO_CHAOS } from '@/declarations/play/ludo/chaos'
@@ -47,6 +49,7 @@ export const fadeLine = (accountId: string, ghost: LudoGhost, count: number): Lu
 /**
  * Pair born where a pawn stands, one of the two jumps ahead
  * @param {Object} input - Pawn
+ * @param {LudoMap} input.map - Board
  * @param {ChaosSeat[]} input.seats - Board
  * @param {string} input.moverId - Owner
  * @param {number} input.pawn - Pawn index
@@ -55,11 +58,13 @@ export const fadeLine = (accountId: string, ghost: LudoGhost, count: number): Lu
  */
 
 export const spawnGhost = ({
+  map,
   seats,
   moverId,
   pawn,
   random,
 }: {
+  map: LudoMap
   seats: ChaosSeat[]
   moverId: string
   pawn: number
@@ -70,7 +75,7 @@ export const spawnGhost = ({
   const step = mover.pawns[pawn]
   const swap = (random() < 0.5 ? 0 : 1) as 0 | 1
   const gaps = Array.from({ length: LUDO_CHAOS.ghostGap }, (_, index) => index + 1).filter((gap) =>
-    isOnTrack(step + gap)
+    isOnTrack(map, step + gap)
   )
 
   // The real pawn only jumps onto a free square
@@ -81,7 +86,8 @@ export const spawnGhost = ({
         seat.accountId !== moverId &&
         seat.pawns.some(
           (other) =>
-            isOnTrack(other) && squareOf(seat.corner, other) === squareOf(mover.corner, landing)
+            isOnTrack(map, other) &&
+            squareOf(map, seat.corner, other) === squareOf(map, mover.corner, landing)
         )
     )
   const free = gaps.filter((gap) => !taken(step + gap))
@@ -107,31 +113,36 @@ export const spawnGhost = ({
 }
 
 /**
- * Decoy walking beside the real pawn
+ * Decoy walking its own random way, whatever the real die says
  * @param {Object} input - Move
+ * @param {LudoMap} input.map - Board
  * @param {LudoGhost} input.ghost - Phantom
  * @param {LudoPlan} input.plan - Real move
- * @param {number} input.dice - Die face
  * @param {string} input.accountId - Owner
  * @param {number} input.count - Pawns per colour
+ * @param {() => number} input.random - Random source
  * @return {Object} - Lines around the real move, phantom left
  */
 
 export const followGhost = ({
+  map,
   ghost,
   plan,
-  dice,
   accountId,
   count,
+  random,
 }: {
+  map: LudoMap
   ghost: LudoGhost
   plan: LudoPlan
-  dice: number
   accountId: string
   count: number
+  random: () => number
 }) => {
+  // Its own throw, the decoy never mirrors the real pawn
+  const dice = rollDie(random)
   const decoyTo = ghost.step + dice
-  const isGone = !isOnTrack(plan.to) || !isOnTrack(decoyTo)
+  const isGone = !isOnTrack(map, plan.to) || !isOnTrack(map, decoyTo)
   const walk: LudoLine = {
     kind: 'MOVE',
     accountId,
@@ -156,26 +167,29 @@ export const followGhost = ({
 /**
  * Phantoms touched by a move: followed, eaten or dispelled
  * @param {Object} input - Move
+ * @param {LudoMap} input.map - Board
  * @param {T[]} input.seats - Board after the move
  * @param {string} input.moverId - Player moving
  * @param {LudoPlan} input.plan - Move
- * @param {number} input.dice - Die face
  * @param {number} input.count - Pawns per colour
+ * @param {() => number} [input.random] - Random source
  * @return {Object} - Board, tags and lines around the move
  */
 
 export const ghostsAfter = <T extends ChaosSeat>({
+  map,
   seats,
   moverId,
   plan,
-  dice,
   count,
+  random = Math.random,
 }: {
+  map: LudoMap
   seats: T[]
   moverId: string
   plan: LudoPlan
-  dice: number
   count: number
+  random?: () => number
 }) => {
   const fades: LudoLine[] = []
   const eaten = new Map<string, string>()
@@ -193,7 +207,7 @@ export const ghostsAfter = <T extends ChaosSeat>({
   // The decoy walks beside its pawn
   const own = seats.find((seat) => seat.accountId === moverId)?.effects.ghost
   if (own && own.pawn === plan.pawn) {
-    const follow = followGhost({ ghost: own, plan, dice, accountId: moverId, count })
+    const follow = followGhost({ map, ghost: own, plan, accountId: moverId, count, random })
     moveTag = ghostTag('real', own)
     walk = follow.lines[0] ?? null
     isFirst = follow.isFirst
@@ -221,8 +235,8 @@ export const ghostsAfter = <T extends ChaosSeat>({
     const isHit =
       ghost &&
       seat.accountId !== moverId &&
-      isOnTrack(plan.to) &&
-      squareOf(seat.corner, ghost.step) === squareOf(mover.corner, plan.to)
+      isOnTrack(map, plan.to) &&
+      squareOf(map, seat.corner, ghost.step) === squareOf(map, mover.corner, plan.to)
     if (!isHit) continue
     fades.push(fadeLine(seat.accountId, ghost, count))
     next = clear(next, seat.accountId)

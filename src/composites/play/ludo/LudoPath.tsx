@@ -1,17 +1,21 @@
 import type { CSSProperties } from 'react'
 
 import { LudoPawn } from '@/composites/play/ludo/LudoPawn'
-import { pawnPoint, turnPoint, YARD_STEP } from '@/core/lib/play/ludo'
+import { pawnPoint, turnPoint, walkSteps } from '@/core/lib/play/ludo'
+import type { LudoMap } from '@/core/lib/play/ludo'
 import { LUDO_CORNERS } from '@/declarations/play/ludo/board'
 import { LUDO_PIECES } from '@/declarations/ui/variants'
 
 export interface LudoPathProps {
+  map: LudoMap
   corner: number
   pawn: number
   from: number
   to: number
   // View turn
   turns: number
+  // The landing can be chosen
+  onPick?: () => void
 }
 
 /**
@@ -20,15 +24,14 @@ export interface LudoPathProps {
  * @return {JSX.Element}
  */
 
-export const LudoPath = ({ corner, pawn, from, to, turns }: LudoPathProps) => {
-  const first = from <= YARD_STEP ? to : from + 1
-  const steps = Array.from({ length: to - first + 1 }, (_, index) => first + index)
+export const LudoPath = ({ map, corner, pawn, from, to, turns, onPick }: LudoPathProps) => {
+  const steps = walkSteps(map, corner, from, to)
   const colour = LUDO_CORNERS[corner]
 
   return (
     <>
       {steps.map((step, index) => {
-        const [y, x] = turnPoint(pawnPoint(corner, step, pawn), turns)
+        const [y, x] = turnPoint(map, pawnPoint(map, corner, step, pawn), turns)
         const isLast = step === to
         const place = {
           '--x': x,
@@ -39,7 +42,13 @@ export const LudoPath = ({ corner, pawn, from, to, turns }: LudoPathProps) => {
 
         return isLast ? (
           <span key={step} className={LUDO_PIECES.ghost} style={place}>
-            <LudoPawn colour={colour} />
+            {onPick ? (
+              <button type="button" className={LUDO_PIECES.ghostButton} onClick={onPick}>
+                <LudoPawn colour={colour} />
+              </button>
+            ) : (
+              <LudoPawn colour={colour} />
+            )}
           </span>
         ) : (
           <span key={step} className={LUDO_PIECES.trail} style={place} />

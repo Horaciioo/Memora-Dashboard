@@ -7,6 +7,7 @@ import { invalidInput } from '@/core/lib/errors'
 import { FEATURE_MAP, FeatureModes, FEATURES, subtreeOf } from '@/declarations/features'
 import type { FeatureModeName, FeatureState } from '@/declarations/features'
 import { FEATURE_COPY } from '@/declarations/features/copy'
+import { DISABLED_FEATURES } from '@/declarations/configurations/settings/features'
 import { areBotsAwake } from '@/declarations/play/bots'
 import { PlayGames } from '@/utils/constants/play'
 import type { ClosedFeatures, FeatureRow } from '@/types/features'
@@ -20,9 +21,20 @@ const NOTE_MAX = 200
 
 type Overrides = Map<string, FeatureState>
 
+// Cut in the configuration file, locked ones never close
+const isConfigDisabled = (key: string): boolean =>
+  DISABLED_FEATURES.has(key) && FEATURE_MAP.get(key)?.locked !== true
+
+// Unknown or locked keys in the file do nothing
+for (const key of DISABLED_FEATURES) {
+  if (!FEATURE_MAP.has(key) || FEATURE_MAP.get(key)?.locked) {
+    console.warn(`[config] system/features.${key} is unknown or locked, ignored`)
+  }
+}
+
 // Asleep whatever its switch says
 const isPausedFeature = (key: string): boolean =>
-  key === 'play.bots.golf' && !areBotsAwake(PlayGames.Golf)
+  isConfigDisabled(key) || (key === 'play.bots.golf' && !areBotsAwake(PlayGames.Golf))
 
 let cache: { at: number; rows: Overrides } | null = null
 
@@ -43,6 +55,11 @@ export const readOverrides = async (): Promise<Overrides> => {
       .filter((row) => FEATURE_MAP.has(row.key))
       .map((row) => [row.key, { mode: row.mode as FeatureModeName, note: row.note }])
   )
+
+  // The file beats the database, admins included
+  for (const key of DISABLED_FEATURES) {
+    if (isConfigDisabled(key)) overrides.set(key, { mode: FeatureModes.Off, note: null })
+  }
   cache = { at: Date.now(), rows: overrides }
 
   return overrides

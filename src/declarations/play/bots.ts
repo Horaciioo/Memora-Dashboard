@@ -9,8 +9,8 @@ import type { Bounds } from '@/declarations/configurations/readers'
 import { PlayBotKinds, PlayGames } from '@/utils/constants/play'
 import type { PlayBotKindName, PlayGameName } from '@/utils/constants/play'
 
-// Games whose bots sleep
-const ASLEEP_GAMES: readonly PlayGameName[] = [PlayGames.Golf]
+// Games whose bots sleep, all for now
+const ASLEEP_GAMES: readonly PlayGameName[] = Object.values(PlayGames)
 
 /**
  * Bots of a game are awake

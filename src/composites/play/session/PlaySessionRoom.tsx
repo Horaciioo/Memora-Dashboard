@@ -91,8 +91,10 @@ export const PlaySessionRoom = ({
   // Golf keeps its own keys in the course HUD
   const hasKeys = game !== PlayGames.Golf
   const { ground } = PLAY_GAMES.get(game)
-  // Ludo on a phone: the board takes the whole screen, no panel around it
-  const isBare = isMobile && game === PlayGames.Ludo
+  // Full screen with the chat open: the keys leave the table for the column
+  const isDocked = isFullscreen && isChatOpen && !isMobile
+  // Ludo: the board takes the whole screen, no panel around it
+  const isBare = game === PlayGames.Ludo
 
   return (
     <div
@@ -154,7 +156,7 @@ export const PlaySessionRoom = ({
           </p>
         )}
         {!me.isSeated && <PlaySpectatorBar players={faces} />}
-        {hasKeys && isFullscreen && (
+        {hasKeys && isFullscreen && !isDocked && (
           <PlayStageKeys
             game={game}
             sessionId={chat.sessionId}
@@ -225,6 +227,17 @@ export const PlaySessionRoom = ({
         >
           {isColumn ? (
             <>
+              {hasKeys && isDocked && (
+                <PlayStageKeys
+                  game={game}
+                  sessionId={chat.sessionId}
+                  gameSlug={gameSlug}
+                  isSeated={me.isSeated}
+                  isHost={me.isHost}
+                  isOver={replay !== null}
+                  isDocked
+                />
+              )}
               <PlayChat
                 {...chat}
                 isSide

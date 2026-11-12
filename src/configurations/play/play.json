@@ -41,6 +41,7 @@
   "seatColors": 15,
   "leaderboardSize": 20,
   "sidebarGames": 1,
+  "everyoneCooldownMinutes": 10,
   "historySize": 30,
   "historyPage": 15,
   "profileRecent": 5,

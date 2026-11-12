@@ -12,6 +12,7 @@ import {
   pendingOf,
   progressOf,
   readGhostTag,
+  mapOf,
 } from '@/core/lib/play/ludo'
 import type { LudoEffects } from '@/core/lib/play/ludo'
 import { HIDDEN_STEP, YARD_STEP } from '@/core/lib/play/ludo/track'
@@ -152,6 +153,7 @@ export const ludoBoards = async (session: EngineSession) => {
     }),
   ])
   const settings = ludoSettingsOf(session.settings)
+  const map = mapOf(settings.rules.chaos)
   const present = new Set(session.players)
   const read = seats.map((seat) => ({ ...seat, effects: effectsOf(seat.effects) }))
   const board = read
@@ -187,7 +189,7 @@ export const ludoBoards = async (session: EngineSession) => {
           corner: seat.corner,
           pawns: pawnsView(seat.pawns, seat.effects, isOwner),
           place: seat.place,
-          progress: progressOf(seat.pawns),
+          progress: progressOf(map, seat.pawns),
           hasLeft: !present.has(seat.accountId),
           joker: seat.joker,
           effects: effectsView(seat.effects, isOwner, seat.pawns.length),
@@ -204,7 +206,7 @@ export const ludoBoards = async (session: EngineSession) => {
       ),
       // Choice the turn waits on, its content told to the player only
       pending: pending
-        ? pending.type === 'duel'
+        ? pending.type === 'duel' || pending.type === 'frenzy'
           ? { type: pending.type, dice: null, malus: null, waiting: pending.waiting }
           : isMyTurn
             ? pending

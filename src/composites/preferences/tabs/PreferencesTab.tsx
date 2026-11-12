@@ -7,6 +7,7 @@ import { DockPreferences } from '@/composites/preferences/DockPreferences'
 import { InstallSection } from '@/composites/preferences/InstallSection'
 import { SettingRow } from '@/composites/preferences/SettingRow'
 import { SettingsGroup } from '@/composites/preferences/SettingsGroup'
+import { NavalAutoZoomToggle } from '@/composites/play/naval/NavalAutoZoomToggle'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
 import { replayGuides } from '@/app/(dashboard)/preferences/actions'
 import { useComfortStore } from '@/core/store/appearance/comfort'
@@ -64,6 +65,7 @@ export const PreferencesTab = ({ dock }: PreferencesTabProps) => {
         >
           <PlayVolume />
         </SettingRow>
+        <NavalAutoZoomToggle />
       </SettingsGroup>
       <InstallSection />
       <DockPreferences candidates={dock.candidates} saved={dock.saved} />

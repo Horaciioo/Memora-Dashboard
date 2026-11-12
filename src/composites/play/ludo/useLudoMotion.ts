@@ -7,13 +7,14 @@ import type { LudoChaosMotion } from '@/composites/play/ludo/chaosMotion'
 import { playLudoSound, playLudoTake, preloadLudoSounds } from '@/composites/play/ludo/sound'
 import {
   arrivalStep,
-  GOAL_STEP,
   HIDDEN_STEP,
+  isHomeStep,
   isOnTrack,
   linesSince,
+  mapOf,
   pawnsOf,
-  SAFE_SQUARES,
   squareOf,
+  walkSteps,
   YARD_STEP,
 } from '@/core/lib/play/ludo'
 import type { LudoBoardState, LudoLineView } from '@/core/lib/play/ludo'
@@ -259,6 +260,7 @@ const playLine = async ({
 }): Promise<void> => {
   const { stepMs, rollMs } = LUDO_SETTINGS
   const corner = board.players.find((player) => player.accountId === line.accountId)?.corner ?? 0
+  const map = mapOf(board.settings.rules.chaos)
 
   // Chaos lines have their own beats
   const isChaos = await playChaosLine({
@@ -303,30 +305,34 @@ const playLine = async ({
       playLudoSound('exit')
       await wait(stepMs * BEATS.exit)
     } else {
-      for (let step = from + 1; step <= to; step += 1) {
+      const walk = walkSteps(map, corner, from, to)
+      for (const [index, step] of walk.entries()) {
         place(line.accountId, pawn, step)
         setMotion((current) => ({
           ...current,
           hop: { accountId: line.accountId, pawn, key: step },
-          walking: step < to ? { accountId: line.accountId, pawn } : null,
+          walking: index < walk.length - 1 ? { accountId: line.accountId, pawn } : null,
         }))
         playLudoTake('step', LUDO_MIX.step)
         await wait(stepMs)
       }
     }
-    if (to >= GOAL_STEP) {
+    if (isHomeStep(map, to)) {
       // The pile numbers pawns by arrival
       setMotion((current) => {
         const pawns = [...(current.pawns[line.accountId] ?? [])]
-        pawns[pawn] = arrivalStep(pawns.filter((_, index) => index !== pawn))
+        pawns[pawn] = arrivalStep(
+          map,
+          pawns.filter((_, index) => index !== pawn)
+        )
 
         return { ...current, pawns: { ...current.pawns, [line.accountId]: pawns } }
       })
       playLudoSound('home')
     } else if (
       board.settings.rules.safeSquares &&
-      isOnTrack(to) &&
-      SAFE_SQUARES.has(squareOf(corner, to))
+      isOnTrack(map, to) &&
+      map.safe.has(squareOf(map, corner, to))
     )
       playLudoSound('star')
     return

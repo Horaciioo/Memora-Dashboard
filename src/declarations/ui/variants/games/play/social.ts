@@ -94,7 +94,7 @@ export const PLAY_CROSS = {
   rowTitle: 'text-center text-lg font-extrabold tracking-wide text-[var(--play-ink)] uppercase',
   frame: 'flex items-center gap-3',
   track:
-    'relative min-w-0 flex-1 overflow-hidden py-6 [--card:10.5rem] [--gap:1.5rem] [--info:15rem] [mask-image:linear-gradient(to_right,transparent,#000_14%,#000_86%,transparent)] focus-visible:outline-none',
+    'relative min-w-0 flex-1 overflow-hidden py-6 [--card:10.5rem] [--gap:1.5rem] [--info:20rem] [mask-image:linear-gradient(to_right,transparent,#000_14%,#000_86%,transparent)] focus-visible:outline-none',
   strip:
     'ml-[50%] flex w-max gap-[var(--gap)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] translate-x-[calc(var(--card)/-2-var(--info)/2-var(--at)*(var(--card)+var(--gap)))]',
   slot: 'group/slot relative flex scale-90 items-stretch opacity-70 transition-[scale,opacity] duration-500 data-[active=true]:z-10 data-[active=true]:scale-100 data-[active=true]:opacity-100',
@@ -102,10 +102,11 @@ export const PLAY_CROSS = {
   info: 'flex w-0 items-center overflow-hidden py-2 text-[var(--play-on-art)] opacity-0 transition-[width,opacity,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[active=true]/slot:w-[var(--info)] group-data-[active=true]/slot:-ml-5 group-data-[active=true]/slot:opacity-100',
   // Tucked under the card like the title boxes, same border and hard shadow
   infoBox:
-    'flex w-[var(--info)] shrink-0 flex-col items-start gap-3 rounded-r-3xl border-[0.2rem] border-l-0 border-[var(--game)] bg-[color-mix(in_srgb,var(--play-panel-strong)_93%,var(--game))] py-4 pr-4 pl-9 shadow-[inset_0_-0.35rem_0_color-mix(in_srgb,var(--game)_14%,transparent),0_0.3rem_0_var(--game)]',
+    'flex w-[var(--info)] shrink-0 flex-col items-stretch gap-3 rounded-r-3xl border-[0.2rem] border-l-0 border-[var(--game)] bg-[color-mix(in_srgb,var(--play-panel-strong)_93%,var(--game))] py-4 pr-4 pl-9 shadow-[inset_0_-0.35rem_0_color-mix(in_srgb,var(--game)_14%,transparent),0_0.3rem_0_var(--game)]',
   infoText: 'text-sm leading-snug font-semibold text-[var(--play-on-art)]/90',
+  infoDivider: 'h-px w-full bg-[var(--game)]/40',
   infoPlay:
-    'w-fit rounded-xl bg-[var(--game)] px-4 py-1.5 text-sm font-extrabold text-[var(--play-night)] shadow-[0_0.3rem_0_rgb(0_0_0/0.35)] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-ink)]',
+    'w-full rounded-xl bg-[var(--game)] px-4 py-1.5 text-center text-sm font-extrabold text-[var(--play-night)] shadow-[0_0.3rem_0_rgb(0_0_0/0.35)] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-ink)]',
   // Side card: a click brings it to the middle
   slotPick: 'absolute inset-0 z-20 cursor-pointer rounded-3xl',
   arrow:
@@ -150,9 +151,10 @@ export const PLAY_DOCK = {
   rows: 'flex max-h-96 flex-col divide-y divide-[var(--play-line)] overflow-y-auto',
   row: 'flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0',
   // Own game, a row of the sessions list
-  resume: 'flex items-center gap-3 py-3 first:pt-0 last:pb-0',
-  resumeLogo: 'size-12 shrink-0',
-  resumeText: 'min-w-0 flex-1 text-sm font-extrabold text-[var(--play-ink)]',
+  resume: 'flex items-center gap-4 py-5 first:pt-1 last:pb-1',
+  resumeActions: 'flex shrink-0 items-center gap-2',
+  resumeLogo: 'size-16 shrink-0',
+  resumeText: 'min-w-0 flex-1 text-base font-extrabold text-[var(--play-ink)]',
   rowHead: 'flex items-center justify-between gap-2 text-sm font-extrabold',
   rowName: 'flex min-w-0 items-center gap-2 truncate',
   rowLogo: 'size-7',
@@ -299,7 +301,7 @@ export const PLAY_CHAT_UI = {
 
 export const PLAY_INVITE = {
   anchor: 'relative',
-  panel: `${SOLID} absolute top-full left-0 z-30 mt-3 flex w-96 flex-col gap-3 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-[80] max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
+  panel: `${SOLID} absolute top-full left-0 z-30 mt-3 flex w-96 flex-col gap-2 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-[80] max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
   // Phone: a centred modal, so side anchors do nothing
   panelEnd: 'right-0 left-auto',
   panelCentered: 'left-1/2 right-auto -translate-x-1/2',
@@ -310,7 +312,7 @@ export const PLAY_INVITE = {
   // Opens in the seats grid, never clipped
   anchorInline: 'contents',
   // Full screen sheet on a phone
-  panelInline: `${SOLID} relative col-span-full mx-auto mt-2 flex w-full max-w-md flex-col gap-3 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-[80] max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
+  panelInline: `${SOLID} relative col-span-full mx-auto mt-2 flex w-full max-w-md flex-col gap-2 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-[80] max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
   // Tip aimed at the trigger above
   arrow:
     'absolute -top-1.5 left-[var(--arrow-x,50%)] size-3 max-md:hidden -translate-x-1/2 rotate-45 bg-[var(--play-panel-strong)] ring-1 ring-[var(--play-line)] [clip-path:polygon(0_0,100%_0,0_100%)]',
@@ -321,10 +323,17 @@ export const PLAY_INVITE = {
   choiceText: 'mr-auto whitespace-nowrap',
   level:
     'rounded-lg bg-[var(--play-chip)] px-2.5 py-1 text-xs font-extrabold text-[var(--play-ink)] hover:bg-[var(--play-line)] disabled:opacity-50',
-  foot: 'flex flex-col gap-1',
+  foot: 'flex flex-col gap-2 border-t border-[var(--play-line)] pt-3',
+  // Everyone and spectator, side by side
+  options: 'grid grid-cols-2 gap-2',
+  option:
+    'flex min-w-0 items-center justify-center gap-2 rounded-xl bg-[var(--play-chip)] px-3 py-2 text-xs font-extrabold text-[var(--play-ink-soft)] hover:text-[var(--play-ink)] disabled:opacity-50 aria-pressed:bg-[var(--play-key)] aria-pressed:text-[var(--play-key-ink)] md:text-sm',
+  // Bots on one line, label then levels
+  botsRow: 'flex flex-wrap items-center gap-2 px-1',
+  botsLabel:
+    'mr-auto text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
   footGroup: 'flex flex-col border-t border-[var(--play-line)] pt-1',
-  footPaused: 'pointer-events-none opacity-50',
-  pausedNote: 'px-3 pb-1 text-xs font-bold text-[var(--play-ink-faint)]',
+  pausedNote: 'text-xs font-bold text-[var(--play-ink-faint)]',
   search:
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-3 py-2 text-sm font-semibold md:py-2.5 placeholder:text-[var(--play-ink-faint)] focus:outline-none',
   head: 'flex items-center gap-2',
@@ -336,9 +345,11 @@ export const PLAY_INVITE = {
   section: 'flex flex-col',
   sectionTitle:
     'px-2 pt-2 pb-1 text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
-  people: 'flex max-h-60 flex-col overflow-y-auto max-md:max-h-none max-md:flex-1',
+  people: 'flex flex-col max-md:flex-1',
+  // Search results can run long, only they scroll
+  peopleSearch: 'max-h-48 overflow-y-auto max-md:max-h-none',
   // Faces side by side, name under each
-  faces: 'grid grid-cols-5 gap-x-1.5 gap-y-2 px-1 pb-1.5 md:gap-x-2 md:gap-y-3 md:pb-2',
+  faces: 'grid grid-cols-5 gap-x-1.5 gap-y-1 px-1 pb-1',
   face: 'flex min-w-0 flex-col items-center gap-1 rounded-xl p-1.5 transition-colors hover:bg-[var(--play-chip)]',
   faceSent: 'cursor-default opacity-70 hover:bg-transparent',
   faceAvatar: 'relative',
@@ -388,4 +399,7 @@ export const PLAY_FEED_VERBS: Record<string, string> = {
   SKIP: 'text-[var(--play-blue-ink)]',
   PENALTY: 'text-[var(--play-heart)]',
   FINISH: 'text-[var(--play-gold-ink)]',
+  HIT: 'text-[var(--play-naval-fire)]',
+  MISS: 'text-[var(--play-blue-ink)]',
+  SUNK: 'text-[var(--play-heart)]',
 }

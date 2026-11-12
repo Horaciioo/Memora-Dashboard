@@ -55,7 +55,7 @@ const shipOf = (drag: NavalDrag, size: number): NavalShip | null => {
  */
 
 export const useNavalPlacement = (sea: NavalLayoutSea, start: NavalShip[]) => {
-  const [ships, setShips] = useState<NavalShip[]>(start)
+  const [ships, setShips] = useState<NavalShip[]>(() => (start.length ? start : randomFleet(sea)))
   const [drag, setDrag] = useState<NavalDrag | null>(null)
   const others = (id: number) => ships.filter((ship) => ship.id !== id)
   const held = drag ? shipOf(drag, sea.size) : null

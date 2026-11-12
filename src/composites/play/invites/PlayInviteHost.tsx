@@ -22,6 +22,8 @@ export const PlayInviteHost = ({ isPlay }: { isPlay?: boolean }) => {
   const pathname = usePathname()
 
   if (!invite) return null
+  // The hub shows it under the profile card
+  if (isPlay && pathname === ROUTES.play) return null
   if (isPlay) return <PlayInviteBubble key={invite.id} invite={invite} beacon={PLAY_FEED_BEACON} />
   // Home shows its own box, the rail its notice
   if (pathname === ROUTES.dashboard) return null

@@ -1,8 +1,10 @@
 import { LudoChaosFx } from '@/composites/play/ludo/LudoChaosFx'
 import { LudoDuel } from '@/composites/play/ludo/LudoDuel'
 import type { LudoMotion } from '@/composites/play/ludo/useLudoMotion'
+import type { LudoMap } from '@/core/lib/play/ludo'
 
 export interface LudoChaosLayerProps {
+  map: LudoMap
   motion: LudoMotion
   players: { accountId: string; corner: number }[]
   names: Record<string, string>
@@ -16,7 +18,7 @@ export interface LudoChaosLayerProps {
  * @return {JSX.Element}
  */
 
-export const LudoChaosLayer = ({ motion, players, names, turns }: LudoChaosLayerProps) => {
+export const LudoChaosLayer = ({ map, motion, players, names, turns }: LudoChaosLayerProps) => {
   const { cue, duel } = motion
   const owner = players.find((player) => player.accountId === cue?.accountId)
 
@@ -24,6 +26,7 @@ export const LudoChaosLayer = ({ motion, players, names, turns }: LudoChaosLayer
     <>
       {cue && owner && (
         <LudoChaosFx
+          map={map}
           key={`${cue.kind}:${cue.key}`}
           cue={cue}
           corner={owner.corner}
@@ -31,7 +34,7 @@ export const LudoChaosLayer = ({ motion, players, names, turns }: LudoChaosLayer
           turns={turns}
         />
       )}
-      {duel && <LudoDuel duel={duel} players={players} names={names} turns={turns} />}
+      {duel && <LudoDuel map={map} duel={duel} players={players} names={names} turns={turns} />}
     </>
   )
 }

@@ -2,12 +2,13 @@ import { useId } from 'react'
 
 import { LudoBoardDrawing } from '@/composites/play/ludo/LudoGrid'
 import { LudoPawnShape } from '@/composites/play/ludo/LudoPawn'
-import { squareOf, TRACK, turnPoint } from '@/core/lib/play/ludo'
-import { LUDO_CORNERS, LUDO_LAYOUT } from '@/declarations/play/ludo/board'
+import { LUDO_MAPS, squareOf, turnPoint } from '@/core/lib/play/ludo'
+import { LUDO_LAYOUT } from '@/declarations/play/ludo/board'
 import type { LudoCell, LudoCornerName } from '@/declarations/play/ludo/board'
 
 // Each corner in its own colour
-const IDLE_PALETTE = LUDO_CORNERS.map((_, corner) => corner)
+const CROSS = LUDO_MAPS.cross
+const IDLE_PALETTE = Array.from({ length: CROSS.corners }, (_, corner) => corner)
 
 // Board corner radius, cell units
 const RADIUS = 1.1
@@ -24,23 +25,15 @@ const PIPS = [
   [0.73, 0.73],
 ]
 
-/**
- * Centre of a cell
- * @param {LudoCell} cell - Grid cell
- * @return {LudoCell} - Point
- */
-
-const centreOf = ([row, column]: LudoCell): LudoCell => [row + 0.5, column + 0.5]
-
 // Pawns of the scene: one on a star, one on the way, one still home
 const STAR_CORNER = 1
 const SCENE_PAWNS: { colour: LudoCornerName; point: LudoCell }[] = [
   {
     colour: 'red',
-    point: centreOf(TRACK[squareOf(STAR_CORNER, LUDO_LAYOUT.starOffset)]),
+    point: CROSS.track[squareOf(CROSS, STAR_CORNER, LUDO_LAYOUT.starOffset)],
   },
-  { colour: 'blue', point: centreOf(TRACK[squareOf(0, 9)]) },
-  { colour: 'yellow', point: turnPoint(LUDO_LAYOUT.yardSpots[0], 3) },
+  { colour: 'blue', point: CROSS.track[squareOf(CROSS, 0, 9)] },
+  { colour: 'yellow', point: turnPoint(CROSS, LUDO_LAYOUT.yardSpots[0], 3) },
 ]
 
 /**
@@ -94,7 +87,13 @@ export const LudoBoardArt = ({
         />
         <g clipPath={`url(#${clip})`}>
           <g transform={`translate(${-half} ${-half})`}>
-            <LudoBoardDrawing turns={0} lit={0} palette={IDLE_PALETTE} isChaos={false} />
+            <LudoBoardDrawing
+              map={CROSS}
+              turns={0}
+              lit={0}
+              palette={IDLE_PALETTE}
+              isChaos={false}
+            />
           </g>
         </g>
         {SCENE_PAWNS.map(({ colour, point: [y, x] }) => (

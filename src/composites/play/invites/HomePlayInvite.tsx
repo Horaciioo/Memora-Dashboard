@@ -17,17 +17,18 @@ import type { PlayNoticeView } from '@/types/play'
  * The box itself, for one invitation
  * @param {Object} props - Box
  * @param {PlayNoticeView} props.invite - Invitation
+ * @param {boolean} [props.isAside] - Hub sidebar dress, shown at every width
  * @return {JSX.Element}
  */
 
-const InviteBox = ({ invite }: { invite: PlayNoticeView }) => {
+const InviteBox = ({ invite, isAside }: { invite: PlayNoticeView; isAside?: boolean }) => {
   const { isSaving, accept, decline } = usePlayNoticeAnswer(invite)
   const labels = noticeLabels(invite)
   const JoinIcon = ICONS.next
 
   return (
     <aside
-      className={HOME_PLAY_INVITE.box}
+      className={isAside ? HOME_PLAY_INVITE.aside : HOME_PLAY_INVITE.box}
       style={playKeysOf(invite.game) as CSSProperties}
       aria-label={PLAY_INVITE_COPY.label}
     >
@@ -61,11 +62,13 @@ const InviteBox = ({ invite }: { invite: PlayNoticeView }) => {
 
 /**
  * Home page box: « name t'invite à jouer au jeu », an arrow to join
+ * @param {Object} props - Box
+ * @param {boolean} [props.isAside] - Hub sidebar dress
  * @return {JSX.Element | null}
  */
 
-export const HomePlayInvite = () => {
+export const HomePlayInvite = ({ isAside }: { isAside?: boolean }) => {
   const invite = usePendingNotice()
 
-  return invite ? <InviteBox key={invite.id} invite={invite} /> : null
+  return invite ? <InviteBox key={invite.id} invite={invite} isAside={isAside} /> : null
 }

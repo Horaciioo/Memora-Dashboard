@@ -98,6 +98,7 @@ export const NAVAL_SETTINGS = {
     min: 10,
     max: 60,
   }),
+  feedSize: readInteger(naval.feedSize, { path: 'play/naval.feedSize', fallback: 40, min: 1 }),
   graceSeconds: readInteger(naval.graceSeconds, {
     path: 'play/naval.graceSeconds',
     fallback: 1,

@@ -17,6 +17,8 @@ import {
   landOnSquare,
   legalMoves,
   ludoSettingsOf,
+  mapOf,
+  stepsOf,
   nextTurn,
   pendingOf,
   rollDie,
@@ -25,7 +27,7 @@ import {
   tickEffects,
   YARD_STEP,
 } from '@/core/lib/play/ludo'
-import type { LudoLine, LudoPending, LudoPlan } from '@/core/lib/play/ludo'
+import type { LudoFrenzyWait, LudoLine, LudoPending, LudoPlan } from '@/core/lib/play/ludo'
 import { readBodyInteger } from '@/core/lib/play/parse'
 import { IDLE_STEP } from '@/core/engines/play/steps'
 import {
@@ -38,8 +40,7 @@ import {
   writeLines,
 } from '@/core/services/play/ludo/LudoTable'
 import type { LudoRow, LudoTable } from '@/core/services/play/ludo/LudoTable'
-import { LUDO_SEATING } from '@/declarations/play/ludo/board'
-import { LUDO_CHAOS } from '@/declarations/play/ludo/chaos'
+import { LUDO_CHAOS, LUDO_STORM_TAG } from '@/declarations/play/ludo/chaos'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
 import type { EngineSession, EngineStep } from '@/types/play'
@@ -53,13 +54,25 @@ type JokerOffer = Extract<LudoPending, { type: 'joker' }>
  */
 
 export const openBoard = async (session: EngineSession): Promise<EngineStep> => {
-  const settings = ludoSettingsOf(session.settings)
+  const stored = ludoSettingsOf(session.settings)
   const order = session.players.toSorted(() => Math.random() - 0.5)
-  const corners = LUDO_SEATING[order.length] ?? LUDO_SEATING[LUDO_SETTINGS.maxPlayers]
+  // More than four colours only fit the star board, so Chaos is switched on
+  const isCrowd = order.length > mapOf(false).corners
+  const settings = isCrowd ? { ...stored, rules: { ...stored.rules, chaos: true } } : stored
+  const map = mapOf(settings.rules.chaos)
+  const corners = map.seating[order.length] ?? map.seating[map.corners]
   const startsAt = countdownEnd(new Date(), LUDO_SETTINGS.countdownSeconds)
   const turnEndsAt = after(startsAt, settings.turnSeconds)
 
   await prisma.$transaction([
+    ...(isCrowd
+      ? [
+          prisma.playSession.update({
+            where: { id: session.id },
+            data: { settings: settings as unknown as Prisma.InputJsonObject },
+          }),
+        ]
+      : []),
     prisma.ludoPlayer.createMany({
       data: order.map((accountId, index) => ({
         sessionId: session.id,
@@ -101,7 +114,7 @@ const closeBoard = async (table: LudoTable, seats: LudoRow[]) => {
       where: {
         sessionId_accountId: { sessionId: table.session.id, accountId: seat.accountId },
       },
-      data: { score: standingScore(seat, LUDO_SETTINGS.maxPlayers) },
+      data: { score: standingScore(table.map, seat, LUDO_SETTINGS.maxPlayers) },
     })
   }
 
@@ -167,6 +180,7 @@ const upcomingOf = ({
  * @param {number} input.sixes - Sixes in a row kept
  * @param {number} [input.steps] - Squares walked
  * @param {number} [input.extraMs] - Beats of effects
+ * @param {boolean} [input.isStormAllowed] - A storm of dice may open the turn
  * @return {Promise<EngineStep>} - Step
  */
 
@@ -178,6 +192,7 @@ const passTurn = async ({
   sixes,
   steps = 0,
   extraMs = 0,
+  isStormAllowed = true,
 }: {
   table: LudoTable
   seats: LudoRow[]
@@ -186,6 +201,7 @@ const passTurn = async ({
   sixes: number
   steps?: number
   extraMs?: number
+  isStormAllowed?: boolean
 }): Promise<EngineStep> => {
   if (isOver(table, seats)) return closeBoard(table, seats)
 
@@ -218,6 +234,19 @@ const passTurn = async ({
   await saveSeats(table, working)
   const stalls = lines.filter((line) => line.kind === 'STALL').length
   const turnEndsAt = clockAfter(table, steps, extraMs + stalls * LUDO_CHAOS.effectMs)
+
+  // Now and then every colour throws its die together before the turn begins
+  const isStorm =
+    !keeps &&
+    isStormAllowed &&
+    table.settings.rules.chaos &&
+    active.length > 1 &&
+    Math.random() < LUDO_CHAOS.frenzyChance
+  const storm: LudoFrenzyWait = {
+    type: 'frenzy',
+    waiting: active.map((seat) => seat.accountId),
+    rolls: {},
+  }
   await table.tx.ludoGame.update({
     where: { sessionId: table.session.id },
     data: {
@@ -226,7 +255,7 @@ const passTurn = async ({
       sixes: keeps ? sixes : 0,
       rev: last,
       turnEndsAt,
-      pending: Prisma.DbNull,
+      pending: isStorm ? storedPending(storm) : Prisma.DbNull,
     },
   })
 
@@ -235,8 +264,8 @@ const passTurn = async ({
 
 /**
  * Lines of a move, in the order the screen plays them
- * @param {LudoTable} table - Locked board
  * @param {Object} move - Move
+ * @param {string} move.accountId - Player moving
  * @param {LudoPlan} move.plan - Plan
  * @param {number} move.dice - Die face
  * @param {number | null} move.place - Place just won
@@ -244,16 +273,19 @@ const passTurn = async ({
  * @return {LudoLine[]} - Lines
  */
 
-const linesOf = (
-  { table }: LudoTable,
-  {
-    plan,
-    dice,
-    place,
-    ghosts,
-  }: { plan: LudoPlan; dice: number; place: number | null; ghosts: ReturnType<typeof ghostsAfter> }
-): LudoLine[] => {
-  const accountId = table.turnId
+const linesOf = ({
+  accountId,
+  plan,
+  dice,
+  place,
+  ghosts,
+}: {
+  accountId: string
+  plan: LudoPlan
+  dice: number
+  place: number | null
+  ghosts: ReturnType<typeof ghostsAfter>
+}): LudoLine[] => {
   const { pawn, from, to } = plan
   const move: LudoLine = { kind: 'MOVE', accountId, dice, pawn, from, to, effect: ghosts.moveTag }
   const { walk } = ghosts
@@ -380,6 +412,7 @@ const throwDuel = async (
   // Everyone threw: the best pushes the trigger back
   const present = table.seats.filter((seat) => table.session.players.includes(seat.accountId))
   const outcome = duelRecoil({
+    map: table.map,
     seats: present,
     moverId,
     pawn: duel.pawn,
@@ -397,6 +430,185 @@ const throwDuel = async (
     steps: duel.steps,
     extraMs: chaosMs(all),
   })
+}
+
+/**
+ * One move worked out: pawns taken, phantoms followed, the action square under the pawn
+ * @param {Object} input - Move
+ * @param {LudoTable} input.table - Locked board
+ * @param {LudoRow[]} input.seats - Seats before the move
+ * @param {string} input.moverId - Player moving
+ * @param {LudoPlan} input.plan - Move
+ * @param {number} input.dice - Die face
+ * @return {Object} - Seats afterwards, the lines and what the landing gives
+ */
+
+const applyMove = ({
+  table,
+  seats,
+  moverId,
+  plan,
+  dice,
+}: {
+  table: LudoTable
+  seats: LudoRow[]
+  moverId: string
+  plan: LudoPlan
+  dice: number
+}) => {
+  const { map } = table
+  const moved = seatsAfter(seats, { map, moverId, plan, now: table.now })
+  const wasDone = Boolean(seats.find((seat) => seat.accountId === moverId)?.finishedAt)
+  const place = wasDone ? null : (moved.find((seat) => seat.accountId === moverId)?.place ?? null)
+
+  // Phantoms followed, eaten or dispelled
+  const ghosts = ghostsAfter({
+    map,
+    seats: moved,
+    moverId,
+    plan,
+    count: table.settings.pawns,
+  })
+
+  // Action square under the pawn
+  const present = ghosts.seats.filter((seat) => table.session.players.includes(seat.accountId))
+  const landing = table.settings.rules.chaos
+    ? landOnSquare({ map, seats: present, moverId, plan })
+    : { seats: present, lines: [] as LudoLine[], malus: null, isDuel: false }
+
+  return {
+    seats: merged(ghosts.seats, landing.seats),
+    lines: [...linesOf({ accountId: moverId, plan, dice, place, ghosts }), ...landing.lines],
+    landing,
+  }
+}
+
+/**
+ * Colours racing in turn order, the one on turn first
+ * @param {LudoTable} table - Locked board
+ * @param {LudoRow[]} seats - Seats now
+ * @return {LudoRow[]} - Order of play
+ */
+
+const stormOrder = (table: LudoTable, seats: LudoRow[]): LudoRow[] => {
+  const active = racing(table, seats).toSorted((left, right) => left.corner - right.corner)
+  const start = Math.max(
+    0,
+    active.findIndex((seat) => seat.accountId === table.table.turnId)
+  )
+
+  return [...active.slice(start), ...active.slice(0, start)]
+}
+
+/**
+ * Every die thrown: each colour plays its best move at once, in turn order, then the turn goes on
+ * @param {LudoTable} table - Locked board
+ * @param {Record<string, number>} rolls - Face of each colour
+ * @param {LudoLine[]} throws - Lines of the dice thrown
+ * @return {Promise<EngineStep>} - Step
+ */
+
+const playStorm = async (
+  table: LudoTable,
+  rolls: Record<string, number>,
+  throws: LudoLine[]
+): Promise<EngineStep> => {
+  let seats = table.seats
+  const lines: LudoLine[] = [...throws]
+  let steps = 0
+
+  for (const { accountId } of stormOrder(table, seats)) {
+    const dice = rolls[accountId]
+    if (!dice) continue
+    const plans = legalMoves(boardOf({ ...table, seats }), accountId, dice, table.settings)
+    const plan = autoMove(plans, table.map)
+    if (!plan) continue
+    const moved = applyMove({ table, seats, moverId: accountId, plan, dice })
+    seats = moved.seats
+    lines.push(...moved.lines)
+    steps += stepsOf(plan)
+
+    // A joker is played against the malus at once, a duel has no one to wait for
+    if (moved.landing.malus) {
+      seats = seats.map((seat) =>
+        seat.accountId === accountId ? { ...seat, joker: Math.max(0, seat.joker - 1) } : seat
+      )
+      lines.push({
+        kind: 'JOKER',
+        accountId,
+        effect: moved.landing.malus,
+        pawn: plan.pawn,
+        to: plan.to,
+      })
+    }
+  }
+  const rev = await writeLines(table, lines)
+
+  // Someone may have gone home: the game ends, or the die passes on
+  const extraMs = chaosMs(lines)
+  const isHolderOut = !racing(table, seats).some((seat) => seat.accountId === table.table.turnId)
+  if (isOver(table, seats) || isHolderOut)
+    return passTurn({
+      table,
+      seats,
+      rev,
+      isBonus: false,
+      sixes: 0,
+      steps,
+      extraMs,
+      isStormAllowed: false,
+    })
+  const turnEndsAt = clockAfter(table, steps, extraMs)
+  await saveSeats(table, seats)
+  await table.tx.ludoGame.update({
+    where: { sessionId: table.session.id },
+    data: { dice: null, rev, turnEndsAt, pending: Prisma.DbNull },
+  })
+
+  return { changed: true, finished: false, deadline: turnEndsAt }
+}
+
+/**
+ * Dice thrown in a storm, the last one setting every colour moving
+ * @param {LudoTable} table - Locked board
+ * @param {LudoFrenzyWait} storm - Storm waiting
+ * @param {string[]} throwers - Players throwing now
+ * @return {Promise<EngineStep>} - Step
+ */
+
+const throwStorm = async (
+  table: LudoTable,
+  storm: LudoFrenzyWait,
+  throwers: string[]
+): Promise<EngineStep> => {
+  const rolls = { ...storm.rolls }
+  const waiting = storm.waiting.filter((accountId) => !throwers.includes(accountId))
+  const lines: LudoLine[] = throwers.map((accountId, index) => {
+    const seat = table.seats.find((entry) => entry.accountId === accountId)
+    const dice = faceOf(seat?.effects ?? {})
+    rolls[accountId] = dice
+
+    return {
+      kind: 'DUEL',
+      accountId,
+      dice,
+      effect: LUDO_STORM_TAG,
+      value: !waiting.length && index === throwers.length - 1 ? 1 : 0,
+    }
+  })
+
+  // Still some to throw: the faces wait on the board
+  if (waiting.length) {
+    const rev = await writeLines(table, lines)
+    await table.tx.ludoGame.update({
+      where: { sessionId: table.session.id },
+      data: { rev, pending: storedPending({ ...storm, waiting, rolls }) },
+    })
+
+    return { changed: true, finished: false, deadline: table.table.turnEndsAt }
+  }
+
+  return playStorm(table, rolls, lines)
 }
 
 /**
@@ -421,36 +633,14 @@ const playPlan = async ({
   before?: LudoLine[]
 }): Promise<EngineStep> => {
   const moverId = table.table.turnId
-  const moved = seatsAfter(table.seats, { moverId, plan, now: table.now })
-  const wasDone = Boolean(table.seats.find((seat) => seat.accountId === moverId)?.finishedAt)
-  const place = wasDone ? null : (moved.find((seat) => seat.accountId === moverId)?.place ?? null)
-
-  // Phantoms followed, eaten or dispelled
-  const ghosts = ghostsAfter({
-    seats: moved,
-    moverId,
-    plan,
-    dice,
-    count: table.settings.pawns,
-  })
-  const { sixReplay, captureReplay, homeReplay, chaos } = table.settings.rules
+  const { sixReplay, captureReplay, homeReplay } = table.settings.rules
   const isBonus =
     (dice === 6 && sixReplay) ||
     (plan.captures.length > 0 && captureReplay) ||
     (plan.isHome && homeReplay)
-  const steps = plan.isExit ? 1 : plan.to - plan.from
-
-  // Action square under the pawn
-  const present = ghosts.seats.filter((seat) => table.session.players.includes(seat.accountId))
-  const landing = chaos
-    ? landOnSquare({ seats: present, moverId, plan })
-    : { seats: present, lines: [] as LudoLine[], malus: null }
-  const seats = merged(ghosts.seats, landing.seats)
-  const rev = await writeLines(table, [
-    ...before,
-    ...linesOf(table, { plan, dice, place, ghosts }),
-    ...landing.lines,
-  ])
+  const steps = stepsOf(plan)
+  const { seats, lines, landing } = applyMove({ table, seats: table.seats, moverId, plan, dice })
+  const rev = await writeLines(table, [...before, ...lines])
   const extraMs = chaosMs(landing.lines)
 
   // Others throw their own die
@@ -524,6 +714,7 @@ const resolveOffer = async (
   } else {
     const present = seats.filter((seat) => table.session.players.includes(seat.accountId))
     const hit = applyMalus(offer.malus, {
+      map: table.map,
       seats: present,
       moverId,
       pawn: offer.pawn,
@@ -585,7 +776,7 @@ const settleRoll = async (
     })
   }
   if (isAuto || isOnlyChoice(plans))
-    return playPlan({ table: rolled, plan: autoMove(plans)!, dice, before })
+    return playPlan({ table: rolled, plan: autoMove(plans, table.map)!, dice, before })
 
   // Several pawns can go, the player picks
   const rev = await writeLines(table, before)
@@ -718,9 +909,12 @@ export const movePawn = (
     if (dice === null) throw conflict(PLAY_ERRORS.rollFirst)
 
     const pawn = readBodyInteger(raw, 'pawn')
-    const plan = legalMoves(boardOf(table), accountId, dice, table.settings).find(
+    // A pawn with a detour to take names where it lands, the track by default
+    const asked = typeof raw.to === 'number' ? raw.to : null
+    const options = legalMoves(boardOf(table), accountId, dice, table.settings).filter(
       (entry) => entry.pawn === pawn
     )
+    const plan = options.find((entry) => entry.to === asked) ?? options[0]
     if (!plan) throw conflict(PLAY_ERRORS.badPawn)
 
     return playPlan({ table, plan, dice })
@@ -785,6 +979,22 @@ export const rollDuel = (session: EngineSession, accountId: string): Promise<Eng
   })
 
 /**
+ * Throw the die of a storm, for any colour that has not thrown yet
+ * @param {EngineSession} session - Game
+ * @param {string} accountId - Player
+ * @return {Promise<EngineStep>} - Step
+ */
+
+export const rollStorm = (session: EngineSession, accountId: string): Promise<EngineStep> =>
+  withTable(session, (table) => {
+    const pending = pendingOf(table.table.pending)
+    if (pending?.type !== 'frenzy' || !pending.waiting.includes(accountId))
+      throw conflict(PLAY_ERRORS.noChoice)
+
+    return throwStorm(table, pending, [accountId])
+  })
+
+/**
  * Turn handed on without a move, no line written
  * @param {LudoTable} table - Locked board
  * @return {Promise<EngineStep>} - Step
@@ -813,6 +1023,7 @@ export const settleBoard = (session: EngineSession): Promise<EngineStep> =>
     const pending = pendingOf(table.table.pending)
     if (pending?.type === 'joker') return resolveOffer(table, pending, false)
     if (pending?.type === 'duel') return throwDuel(table, pending, pending.waiting)
+    if (pending?.type === 'frenzy') return throwStorm(table, pending, pending.waiting)
     if (pending?.type === 'pick') {
       const skip: LudoLine = { kind: 'SKIP', accountId: turnId }
 
@@ -821,7 +1032,7 @@ export const settleBoard = (session: EngineSession): Promise<EngineStep> =>
 
     // Clock ran out, the best move is played
     if (dice === null) return rollFor(table, { isAuto: true })
-    const plan = autoMove(legalMoves(boardOf(table), turnId, dice, table.settings))
+    const plan = autoMove(legalMoves(boardOf(table), turnId, dice, table.settings), table.map)
     if (!plan) return skipTurn(table)
 
     return playPlan({ table, plan, dice, before: [{ kind: 'SKIP', accountId: turnId }] })

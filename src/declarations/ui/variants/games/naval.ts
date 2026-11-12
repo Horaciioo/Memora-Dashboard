@@ -125,6 +125,12 @@ export const NAVAL_RESULT = {
   glowWin: 'naval-result-win',
   glowLose: 'naval-result-lose',
   sea: 'relative mx-auto w-full max-w-[30rem]',
+  seaNav: 'mx-auto flex w-full max-w-[30rem] items-center justify-between gap-3',
+  seaArrow:
+    'flex size-10 items-center justify-center rounded-full bg-white/12 text-[var(--play-naval-ink)] transition-colors hover:bg-white/20 disabled:opacity-30',
+  seaTitle: 'flex min-w-0 flex-1 flex-col items-center text-center',
+  seaName: 'max-w-full truncate text-base font-black text-[var(--play-naval-ink)]',
+  seaCount: 'text-xs font-bold text-[var(--play-naval-ink-soft)]',
   stats: `${PANEL} grid grid-cols-2 gap-3 sm:grid-cols-4`,
   stat: 'flex flex-col items-center gap-0.5 text-center',
   statValue: 'text-xl font-black tabular-nums text-[var(--play-naval-ink)]',
@@ -191,7 +197,7 @@ export const NAVAL_OCEAN = {
 export const NAVAL_ARSENAL = {
   root: 'flex flex-col items-stretch gap-2 rounded-2xl border border-white/10 bg-[var(--play-naval-panel)] p-2 backdrop-blur-sm',
   divider: 'h-px shrink-0 bg-white/10',
-  idle: 'opacity-80',
+  idle: 'opacity-70',
   card: 'naval-draw flex min-w-0 items-center gap-3 rounded-xl bg-white/10 px-2.5 py-1.5 text-left text-[var(--play-naval-ink)] transition-transform active:scale-[0.98]',
   cardFixed: 'cursor-default active:scale-100 disabled:opacity-100',
   glyphBox:
@@ -201,7 +207,7 @@ export const NAVAL_ARSENAL = {
   name: 'truncate text-lg leading-6 font-black',
   note: 'truncate text-xs font-semibold text-[var(--play-naval-ink-soft)]',
   fire: 'min-h-14 w-full rounded-xl bg-[var(--play-naval-hit)] px-5 text-lg font-black text-white transition-transform active:scale-[0.97] disabled:bg-white/10 disabled:text-[var(--play-naval-ink-soft)]',
-  wait: 'grid min-h-14 w-full place-items-center text-center text-base font-black text-[var(--play-naval-ink-soft)]',
+  wait: 'grid min-h-14 w-full place-items-center rounded-xl bg-white/5 px-5 text-center text-base font-black text-[var(--play-naval-ink-soft)]',
 } as const
 
 /**

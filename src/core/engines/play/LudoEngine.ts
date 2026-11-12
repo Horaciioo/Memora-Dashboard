@@ -10,6 +10,7 @@ import {
   pickDie,
   rollDice,
   rollDuel,
+  rollStorm,
   settleBoard,
 } from '@/core/services/play/ludo/LudoTurnService'
 import { ludoBoards, ludoView } from '@/core/services/play/ludo/LudoViewService'
@@ -26,6 +27,7 @@ const ACTIONS: Record<
   pick: pickDie,
   joker: answerJoker,
   duelRoll: (session, accountId) => rollDuel(session, accountId),
+  stormRoll: (session, accountId) => rollStorm(session, accountId),
 }
 
 /**

@@ -12,6 +12,7 @@ import { callOf } from '@/composites/play/naval/battle/battleCall'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import { NavalArsenal } from '@/composites/play/naval/battle/NavalArsenal'
 import { NavalBracket } from '@/composites/play/naval/NavalBracket'
+import { NavalFeed } from '@/composites/play/naval/battle/NavalFeed'
 import { NavalFoes } from '@/composites/play/naval/battle/NavalFoes'
 import { NavalHud } from '@/composites/play/naval/NavalHud'
 import { NavalResult } from '@/composites/play/naval/NavalResult'
@@ -53,6 +54,12 @@ export const NavalBattle = ({
   const matchIndex = watchedMatch(board, pickedMatch)
   const match = board.matches[matchIndex]
   const { shown, playing, callout } = playback
+  const faces = captains.map(({ accountId, name, avatarUrl }) => ({
+    id: accountId,
+    name,
+    avatarUrl,
+  }))
+  const feed = <NavalFeed board={board} shown={shown} match={matchIndex} players={faces} />
   const fighters = match?.fighters ?? []
   const isFighter = viewer >= 0 && fighters.includes(viewer) && !captains[viewer].isOut
   const foes = fighters.filter((seat) => seat !== viewer)
@@ -77,7 +84,7 @@ export const NavalBattle = ({
     reachScale: board.sea.reachScale,
     resetKey: `${target}:${matchIndex}:${board.rev}`,
   })
-  useNavalCues({ isMyTurn: Boolean(isMyTurn) && !playback.isBusy, callout })
+  useNavalCues({ isMyTurn: Boolean(isMyTurn) && !playback.isBusy, callout, viewer })
 
   // Placement may leave the page scrolled
   const root = useRef<HTMLDivElement>(null)
@@ -90,13 +97,16 @@ export const NavalBattle = ({
       board.shots.filter((shot) => shot[2] === seat && shot[6] === NavalCodes.Sunk).length
 
     return (
-      <NavalResult
-        board={board}
-        captains={captains}
-        viewer={viewer}
-        match={matchIndex}
-        sunkBy={sunkBy}
-      />
+      <>
+        <NavalResult
+          board={board}
+          captains={captains}
+          viewer={viewer}
+          match={matchIndex}
+          sunkBy={sunkBy}
+        />
+        {feed}
+      </>
     )
   }
 
@@ -136,6 +146,7 @@ export const NavalBattle = ({
 
   return (
     <div ref={root} className={NAVAL_BOARD.root}>
+      {feed}
       {match && (
         <NavalStartCountdown
           startsAt={match.startsAt}

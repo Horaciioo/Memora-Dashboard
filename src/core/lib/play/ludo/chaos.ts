@@ -1,11 +1,17 @@
 import { fadeLine, spawnGhost } from '@/core/lib/play/ludo/ghost'
 import type { ChaosSeat, LudoEffects, LudoLine } from '@/core/lib/play/ludo/effects'
+import type { LudoMap } from '@/core/lib/play/ludo/maps'
 import { rollDie } from '@/core/lib/play/ludo/rules'
 import type { LudoPlan } from '@/core/lib/play/ludo/rules'
-import { chaosKindOf, isOnTrack, squareOf } from '@/core/lib/play/ludo/track'
+import {
+  baseStep,
+  chaosKindOf,
+  isBranchStep,
+  isOnTrack,
+  squareOf,
+} from '@/core/lib/play/ludo/track'
 import { LUDO_BONUSES, LUDO_CHAOS, LUDO_MALUSES } from '@/declarations/play/ludo/chaos'
 import type { LudoEffectName } from '@/declarations/play/ludo/chaos'
-import { LUDO_CORNERS } from '@/declarations/play/ludo/board'
 
 /**
  * What a landing on an action square gives
@@ -22,6 +28,7 @@ export interface ChaosOutcome<T extends ChaosSeat> {
 }
 
 interface ChaosContext<T extends ChaosSeat> {
+  map: LudoMap
   seats: T[]
   moverId: string
   pawn: number
@@ -81,6 +88,7 @@ export const otherFaceOf = (
 /**
  * Duel of dice settled: a lone best thrower among the others pushes the trigger back
  * @param {Object} input - Duel
+ * @param {LudoMap} input.map - Board
  * @param {T[]} input.seats - Board
  * @param {string} input.moverId - Player who triggered it
  * @param {number} input.pawn - Pawn on the square
@@ -89,11 +97,13 @@ export const otherFaceOf = (
  */
 
 export const duelRecoil = <T extends ChaosSeat>({
+  map,
   seats,
   moverId,
   pawn,
   rolls,
 }: {
+  map: LudoMap
   seats: T[]
   moverId: string
   pawn: number
@@ -102,7 +112,7 @@ export const duelRecoil = <T extends ChaosSeat>({
   const best = Math.max(0, ...rolls.map((roll) => roll.dice))
   const winners = rolls.filter((roll) => roll.dice === best)
   const mover = seats.find((seat) => seat.accountId === moverId)!
-  const from = mover.pawns[pawn]
+  const from = baseStep(mover.pawns[pawn])
 
   // A lone winner pushes back
   if (winners.length !== 1 || from < 1) return { seats, lines: [] as LudoLine[] }
@@ -111,8 +121,8 @@ export const duelRecoil = <T extends ChaosSeat>({
       seat.pawns.some(
         (other, index) =>
           !(seat.accountId === moverId && index === pawn) &&
-          isOnTrack(other) &&
-          squareOf(seat.corner, other) === squareOf(mover.corner, step)
+          isOnTrack(map, other) &&
+          squareOf(map, seat.corner, other) === squareOf(map, mover.corner, step)
       )
     )
   const first = Math.max(0, from - best)
@@ -171,15 +181,23 @@ export const applyMalus = <T extends ChaosSeat>(
 }
 
 /**
- * Colour a chameleon takes, among the three others
+ * Colour a chameleon takes, among the others of the board
+ * @param {LudoMap} map - Board
  * @param {ChaosSeat[]} seats - Board
  * @param {ChaosSeat} mover - Chameleon
  * @param {() => number} random - Random source
  * @return {number} - Corner
  */
 
-const colourFor = (seats: ChaosSeat[], mover: ChaosSeat, random: () => number): number => {
-  const others = LUDO_CORNERS.map((_, corner) => corner).filter((corner) => corner !== mover.corner)
+const colourFor = (
+  map: LudoMap,
+  seats: ChaosSeat[],
+  mover: ChaosSeat,
+  random: () => number
+): number => {
+  const others = Array.from({ length: map.corners }, (_, corner) => corner).filter(
+    (corner) => corner !== mover.corner
+  )
   const free = others.filter(
     (corner) => !seats.some((seat) => seat.corner === corner && seat.effects.chameleon)
   )
@@ -199,7 +217,7 @@ export const applyBonus = <T extends ChaosSeat>(
   bonus: LudoEffectName,
   context: ChaosContext<T>
 ) => {
-  const { seats, moverId, pawn, random } = context
+  const { map, seats, moverId, pawn, random } = context
   const mover = seats.find((seat) => seat.accountId === moverId)!
   const set = (change: Partial<LudoEffects>, pawns = mover.pawns) =>
     patch(seats, moverId, (seat) => ({ ...seat, pawns, effects: { ...seat.effects, ...change } }))
@@ -207,7 +225,7 @@ export const applyBonus = <T extends ChaosSeat>(
   if (bonus === 'double') return { seats: set({ double: true }), lines: [] as LudoLine[] }
   if (bonus === 'boost') return { seats: set({ boost: true }), lines: [] as LudoLine[] }
   if (bonus === 'chameleon') {
-    const colour = colourFor(seats, mover, random)
+    const colour = colourFor(map, seats, mover, random)
 
     return {
       seats: set({ chameleon: { turns: LUDO_CHAOS.chameleonTurns, colour } }),
@@ -218,7 +236,7 @@ export const applyBonus = <T extends ChaosSeat>(
 
   // Ghost, a second pair never starts over the first
   if (mover.effects.ghost) return { seats, lines: [] as LudoLine[] }
-  const born = spawnGhost({ seats, moverId, pawn, random })
+  const born = spawnGhost({ map, seats, moverId, pawn, random })
 
   return {
     seats: set(
@@ -232,6 +250,7 @@ export const applyBonus = <T extends ChaosSeat>(
 /**
  * Landing on an action square
  * @param {Object} input - Landing
+ * @param {LudoMap} input.map - Board
  * @param {T[]} input.seats - Board after the move
  * @param {string} input.moverId - Player moving
  * @param {LudoPlan} input.plan - Move played
@@ -241,12 +260,14 @@ export const applyBonus = <T extends ChaosSeat>(
  */
 
 export const landOnSquare = <T extends ChaosSeat>({
+  map,
   seats,
   moverId,
   plan,
   random = Math.random,
   force,
 }: {
+  map: LudoMap
   seats: T[]
   moverId: string
   plan: LudoPlan
@@ -255,8 +276,9 @@ export const landOnSquare = <T extends ChaosSeat>({
 }): ChaosOutcome<T> => {
   const mover = seats.find((seat) => seat.accountId === moverId)
   const none = { seats, lines: [], malus: null }
-  if (!mover || plan.isHome || !isOnTrack(plan.to)) return none
-  const kind = chaosKindOf(squareOf(mover.corner, plan.to))
+  const isBranch = isBranchStep(plan.to)
+  if (!mover || plan.isHome || !(isBranch || isOnTrack(map, plan.to))) return none
+  const kind = chaosKindOf(map, squareOf(map, mover.corner, plan.to), isBranch)
   if (!kind) return none
 
   // Effect drawn from its family
@@ -269,7 +291,7 @@ export const landOnSquare = <T extends ChaosSeat>({
     to: plan.to,
     effect,
   }
-  const context = { seats, moverId, pawn: plan.pawn, random }
+  const context = { map, seats, moverId, pawn: plan.pawn, random }
   if (kind === 'bonus') {
     const bonus = applyBonus(effect, context)
 

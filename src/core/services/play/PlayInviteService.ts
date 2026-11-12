@@ -19,7 +19,7 @@ import {
   PlayStatuses,
 } from '@/utils/constants/play'
 import type { PlayInviteRoleName, PlayNoticeKindName } from '@/utils/constants/play'
-import { DAY_MS } from '@/utils/constants/time'
+import { DAY_MS, MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Seat offered by a body
@@ -32,6 +32,25 @@ const roleOf = (raw: Record<string, unknown>): PlayInviteRoleName => {
   if (!role) throw invalidInput([{ field: 'role', message: PLAY_ERRORS.inviteRole }])
 
   return role
+}
+
+/**
+ * Block a second call to all too soon
+ * @param {string} inviterId - Caller
+ * @return {Promise<void>} - Rested
+ */
+
+const requireEveryoneRest = async (inviterId: string): Promise<void> => {
+  const window = PLAY_SETTINGS.everyoneCooldownMinutes * MINUTE_MS
+  const last = await prisma.playInvite.findFirst({
+    where: { inviterId, inviteeId: null, createdAt: { gt: new Date(Date.now() - window) } },
+    orderBy: { createdAt: 'desc' },
+    select: { createdAt: true },
+  })
+  if (!last) return
+
+  const minutes = Math.ceil((last.createdAt.getTime() + window - Date.now()) / MINUTE_MS)
+  throw conflict(PLAY_ERRORS.everyoneCooldown.replace('{minutes}', String(minutes)))
 }
 
 /**
@@ -60,6 +79,7 @@ export const inviteToSession = async (
       ? null
       : (readBodyList(raw, 'accountIds') ?? []).filter((id) => id && id !== inviterId)
   if (!ids) {
+    await requireEveryoneRest(inviterId)
     await prisma.playInvite.create({ data: { sessionId, inviterId, role } })
   } else {
     await prisma.$transaction(

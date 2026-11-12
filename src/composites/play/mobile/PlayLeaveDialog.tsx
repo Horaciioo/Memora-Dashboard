@@ -13,6 +13,10 @@ export interface PlayLeaveDialogProps {
   text: string
   confirm: string
   pending: boolean
+  // Cancel key label, "Rester" by default
+  cancel?: string
+  // Confirm is a plain key, not a red one
+  isCalm?: boolean
   onCancel: () => void
   onConfirm: () => void
 }
@@ -28,6 +32,8 @@ export const PlayLeaveDialog = ({
   text,
   confirm,
   pending,
+  cancel = PLAY_MOBILE_COPY.gameLeaveKeep,
+  isCalm = false,
   onCancel,
   onConfirm,
 }: PlayLeaveDialogProps) => {
@@ -54,10 +60,10 @@ export const PlayLeaveDialog = ({
             onClick={onCancel}
             disabled={pending}
           >
-            {PLAY_MOBILE_COPY.gameLeaveKeep}
+            {cancel}
           </Button>
           <Button
-            variant="arcadeDanger"
+            variant={isCalm ? 'arcade' : 'arcadeDanger'}
             className={PLAY_LEAVE_UI.key}
             isLoading={pending}
             onClick={onConfirm}

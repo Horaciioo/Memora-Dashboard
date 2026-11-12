@@ -358,6 +358,8 @@ export const BAC_SESSION = {
   // Inside the table's top corner, left of the open chat
   keysShifted:
     'right-[calc(min(var(--play-side-open),100vw)+2rem)] sm:right-[calc(min(var(--play-side-open),100vw)+2.5rem)]',
+  // Full screen, chat open: the keys top the chat column
+  keysDocked: 'shrink-0 justify-center px-4 pt-1 pb-3',
   keysIcon: 'size-5',
   exitKey: 'play-key play-key-ghost inline-flex items-center gap-2 px-3 py-2 text-sm font-bold',
   keyButton: 'px-3! py-2!',

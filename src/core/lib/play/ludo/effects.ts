@@ -90,8 +90,22 @@ export interface LudoDuelWait {
   rolls: Record<string, number>
 }
 
+/**
+ * Storm of dice: every colour still racing throws its own die before the turn starts
+ * @typedef {Object} LudoFrenzyWait
+ */
+
+export interface LudoFrenzyWait {
+  type: 'frenzy'
+  waiting: string[]
+  rolls: Record<string, number>
+}
+
 export type LudoPending =
-  ({ type: 'joker' } & LudoOffer) | { type: 'pick'; dice: [number, number] } | LudoDuelWait
+  | ({ type: 'joker' } & LudoOffer)
+  | { type: 'pick'; dice: [number, number] }
+  | LudoDuelWait
+  | LudoFrenzyWait
 
 /**
  * Effects as stored

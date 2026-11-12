@@ -2,13 +2,18 @@ import type { ReactNode } from 'react'
 
 import { LudoPlate } from '@/composites/play/ludo/LudoPlate'
 import type { LudoRanked } from '@/composites/play/ludo/LudoResult'
-import { GOAL_STEP } from '@/core/lib/play/ludo/track'
+import type { LudoMap } from '@/core/lib/play/ludo/maps'
+import { isHomeStep } from '@/core/lib/play/ludo/track'
 import { LUDO_CORNERS } from '@/declarations/play/ludo/board'
 import type { LudoEffectName } from '@/declarations/play/ludo/chaos'
-import { LUDO_SLOTS } from '@/declarations/ui/variants'
+import { LUDO_SLOTS, LUDO_STAR_SLOTS } from '@/declarations/ui/variants'
 
-// Screen corners on the right edge
-const RIGHT_SLOTS = new Set([1, 2])
+// Screen places on the right edge, per board
+const RIGHT_SLOTS: Record<string, Set<number>> = {
+  cross: new Set([1, 2]),
+  star: new Set([1, 2, 3]),
+}
+const SLOTS: Record<string, readonly string[]> = { cross: LUDO_SLOTS, star: LUDO_STAR_SLOTS }
 
 /**
  * Colour with its face and crown
@@ -34,6 +39,7 @@ const effectsOf = (seat: LudoSeatFace, isMine: boolean): LudoEffectName[] =>
   ).filter((effect): effect is LudoEffectName => Boolean(effect))
 
 export interface LudoPlatesProps {
+  map: LudoMap
   seats: LudoSeatFace[]
   // View turn
   turns: number
@@ -56,6 +62,7 @@ export interface LudoPlatesProps {
  */
 
 export const LudoPlates = ({
+  map,
   seats,
   turns,
   turnId,
@@ -67,8 +74,8 @@ export const LudoPlates = ({
   stalledId,
 }: LudoPlatesProps) => (
   <>
-    {LUDO_SLOTS.map((place, slot) => {
-      const seat = seats.find((entry) => (entry.corner + turns) % LUDO_CORNERS.length === slot)
+    {SLOTS[map.name].map((place, slot) => {
+      const seat = seats.find((entry) => (entry.corner + turns) % map.corners === slot)
       if (!seat) return null
       const isTurn = seat.accountId === turnId
 
@@ -76,12 +83,12 @@ export const LudoPlates = ({
         <div key={slot} className={place}>
           <LudoPlate
             colour={LUDO_CORNERS[looks[seat.accountId] ?? seat.corner]}
-            isRight={RIGHT_SLOTS.has(slot)}
+            isRight={RIGHT_SLOTS[map.name].has(slot)}
             face={seat}
             turn={isTurn ? clock : null}
             isMine={seat.accountId === viewerId}
             die={isTurn && die}
-            home={seat.pawns.filter((step) => step >= GOAL_STEP).length}
+            home={seat.pawns.filter((step) => isHomeStep(map, step)).length}
             joker={isChaos ? seat.joker : null}
             effects={isChaos ? effectsOf(seat, seat.accountId === viewerId) : []}
             isStalled={seat.accountId === stalledId}

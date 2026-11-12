@@ -10,15 +10,18 @@ import type { NavalCallout } from '@/composites/play/naval/fx/useNavalDirector'
  * @param {Object} input - Table
  * @param {boolean} input.isMyTurn - The viewer may fire
  * @param {NavalCallout | null} input.callout - Last strike shown
+ * @param {number} input.viewer - Seat of the viewer
  * @return {void}
  */
 
 export const useNavalCues = ({
   isMyTurn,
   callout,
+  viewer,
 }: {
   isMyTurn: boolean
   callout: NavalCallout | null
+  viewer: number
 }): void => {
   const wasMine = useRef(false)
 
@@ -31,8 +34,8 @@ export const useNavalCues = ({
     wasMine.current = isMyTurn
   }, [isMyTurn])
 
-  // Bell for a captain out
-  const eliminatedId = callout?.isEliminated ? callout.id : 0
+  // Bell for the viewer out
+  const eliminatedId = callout?.isEliminated && callout.strike.target === viewer ? callout.id : 0
   useEffect(() => {
     if (eliminatedId) playNaval('bell')
   }, [eliminatedId])
