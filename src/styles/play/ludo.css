@@ -36,6 +36,12 @@
   position: relative;
   aspect-ratio: 1;
   container-type: inline-size;
+  /* Pieces grow with the star, whose cells are smaller */
+  --grow: 1;
+}
+
+.ludo-board[data-map='star'] {
+  --grow: 1.35;
 }
 
 /* Pawn: placed in cell units, glides square to square */
@@ -43,7 +49,7 @@
   position: absolute;
   left: calc((var(--x) + var(--dx, 0)) / var(--cells) * 100%);
   top: calc((var(--y) + var(--dy, 0)) / var(--cells) * 100%);
-  width: calc(100cqi / var(--cells) * 0.66 * var(--scale, 1));
+  width: calc(100cqi / var(--cells) * 0.66 * var(--scale, 1) * var(--grow, 1));
   translate: -50% -58%;
   z-index: calc(10 + var(--z, 0));
   transition:
@@ -146,7 +152,7 @@
 
 .ludo-burst-ring {
   position: absolute;
-  width: calc(100cqi / var(--cells) * 1.5);
+  width: calc(100cqi / var(--cells) * 1.5 * var(--grow, 1));
   aspect-ratio: 1;
   translate: -50% -50%;
   border-radius: 9999px;
@@ -310,7 +316,7 @@
 }
 
 .ludo-trail {
-  width: calc(100% / var(--cells) * 0.3);
+  width: calc(100% / var(--cells) * 0.3 * var(--grow, 1));
   aspect-ratio: 1;
   border-radius: 9999px;
   background: var(--pawn-tone);
@@ -319,8 +325,18 @@
     0 0.12rem 0.25rem var(--play-ludo-shadow);
 }
 
+.ludo-ghost-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
 .ludo-ghost {
-  width: calc(100% / var(--cells) * 0.66);
+  width: calc(100% / var(--cells) * 0.66 * var(--grow, 1));
   translate: -50% -58%;
   opacity: 0.6;
 }

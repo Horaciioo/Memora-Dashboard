@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { latest, pauseAfter } from '@/core/bots/play/random'
-import { autoMove, legalMoves } from '@/core/lib/play/ludo'
+import { autoMove, legalMoves, mapOf } from '@/core/lib/play/ludo'
 import type { ludoView } from '@/core/services/play/ludo/LudoViewService'
 import { PLAY_BOT_SETTINGS } from '@/declarations/play/bots'
 import type { PlayBotStrategy } from '@/types/play'
@@ -24,6 +24,12 @@ export const LUDO_BOT: PlayBotStrategy = {
       const isWaiting = 'waiting' in board.pending && board.pending.waiting.includes(botId)
 
       return isWaiting ? { key: `duel:${board.rev}`, raw: { type: 'duelRoll' }, at } : null
+    }
+    // A storm of dice: every colour throws its own die
+    if (board.pending?.type === 'frenzy') {
+      const isWaiting = 'waiting' in board.pending && board.pending.waiting.includes(botId)
+
+      return isWaiting ? { key: `storm:${board.rev}`, raw: { type: 'stormRoll' }, at } : null
     }
     if (board.turnId !== botId) return null
 
@@ -48,9 +54,12 @@ export const LUDO_BOT: PlayBotStrategy = {
           ? { ...player, pawns: player.pawns.slice(0, board.settings.pawns) }
           : player
       )
-    const plan = autoMove(legalMoves(seats, botId, board.dice, board.settings))
+    const plan = autoMove(
+      legalMoves(seats, botId, board.dice, board.settings),
+      mapOf(board.settings.rules.chaos)
+    )
     if (!plan) return null
 
-    return { key: `move:${board.rev}`, raw: { type: 'move', pawn: plan.pawn }, at }
+    return { key: `move:${board.rev}`, raw: { type: 'move', pawn: plan.pawn, to: plan.to }, at }
   },
 }

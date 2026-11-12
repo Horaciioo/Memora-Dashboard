@@ -5,8 +5,14 @@ import type { LudoGame, LudoPlayer } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
-import { effectsOf, ludoSettingsOf } from '@/core/lib/play/ludo'
-import type { ChaosSeat, LudoEffects, LudoGameSettings, LudoLine } from '@/core/lib/play/ludo'
+import { effectsOf, ludoSettingsOf, mapOf } from '@/core/lib/play/ludo'
+import type {
+  ChaosSeat,
+  LudoEffects,
+  LudoGameSettings,
+  LudoLine,
+  LudoMap,
+} from '@/core/lib/play/ludo'
 import { holdSession } from '@/core/services/play/PlaySessionService'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
@@ -29,6 +35,8 @@ export interface LudoTable {
   tx: Prisma.TransactionClient
   session: EngineSession
   settings: LudoGameSettings
+  // Board the game is played on
+  map: LudoMap
   table: LudoGame
   // Rows as stored
   rows: LudoRow[]
@@ -84,10 +92,13 @@ export const withTable = (
     if (!table) throw notFound(PLAY_ERRORS.roundMissing)
     const read = rows.map((row) => ({ ...row, effects: effectsOf(row.effects) }))
 
+    const settings = ludoSettingsOf(session.settings)
+
     return work({
       tx,
       session,
-      settings: ludoSettingsOf(session.settings),
+      settings,
+      map: mapOf(settings.rules.chaos),
       table,
       rows: read,
       seats: read,

@@ -1,6 +1,6 @@
 {
   "minPlayers": 1,
-  "maxPlayers": 4,
+  "maxPlayers": 6,
   "countdownSeconds": 5,
   "pawns": {
     "default": 4,
@@ -56,6 +56,9 @@
     },
     "blind": {
       "turns": 3
+    },
+    "frenzy": {
+      "chance": 0.12
     },
     "duelMs": 900,
     "effectMs": 1600

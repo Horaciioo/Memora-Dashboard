@@ -4,8 +4,8 @@ import { useEffect } from 'react'
 
 import { PlayPodium } from '@/composites/play/results/PlayPodium'
 import { playLudoSound } from '@/composites/play/ludo/sound'
-import { GOAL_STEP } from '@/core/lib/play/ludo'
 import type { LudoPlayerView } from '@/core/lib/play/ludo'
+import { BRANCH_STEP } from '@/core/lib/play/ludo'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { LUDO_BOARD_COPY, ludoPlaceLabel } from '@/declarations/play/ludo/copy'
 import { BOMB_BOARD } from '@/declarations/ui/variants'
@@ -38,10 +38,11 @@ const rankPlayers = (players: LudoRanked[]): LudoRanked[] =>
  * Podium of the race under confetti, a fanfare as it opens
  * @param {Object} props - Result
  * @param {LudoRanked[]} props.players - Colours
+ * @param {number} props.goal - Step of a pawn at home
  * @return {JSX.Element}
  */
 
-export const LudoResult = ({ players }: { players: LudoRanked[] }) => {
+export const LudoResult = ({ players, goal }: { players: LudoRanked[]; goal: number }) => {
   const ranked = rankPlayers(players)
 
   // Fanfare once
@@ -56,7 +57,7 @@ export const LudoResult = ({ players }: { players: LudoRanked[] }) => {
           note: player.place
             ? ludoPlaceLabel(player.place)
             : fillPlayMessage(LUDO_BOARD_COPY.home, {
-                count: player.pawns.filter((step) => step >= GOAL_STEP).length,
+                count: player.pawns.filter((step) => step >= goal && step < BRANCH_STEP).length,
                 total: player.pawns.length,
               }),
         }))}

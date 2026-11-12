@@ -12,18 +12,24 @@ const NAME =
 export const LUDO_BOARD = {
   // Phones: plates over and under the board; wide screens: plates in the four corners around it
   board:
-    'relative mx-auto grid w-full grid-cols-2 gap-x-3 gap-y-2 px-2 pb-6 select-none sm:gap-x-6 sm:gap-y-3 sm:px-0 sm:pb-16 in-[.play-boxfull]:pt-10 in-[.play-boxfull]:pb-0 [grid-template-areas:"tl_tr"_"board_board"_"status_status"_"bl_br"] lg:w-fit lg:grid-cols-[minmax(11rem,1fr)_auto_minmax(11rem,1fr)] lg:grid-rows-[1fr_1fr_auto] lg:[grid-template-areas:"tl_board_tr"_"bl_board_br"_"._status_."]',
+    'relative mx-auto grid w-full grid-cols-2 gap-x-3 gap-y-2 px-2 pb-6 select-none sm:gap-x-6 sm:gap-y-3 sm:px-0 sm:pb-16 in-[.play-boxfull]:pt-20 in-[.play-boxfull]:pb-0 [grid-template-areas:"tl_tr"_"board_board"_"status_status"_"bl_br"] lg:w-fit lg:grid-cols-[minmax(11rem,1fr)_auto_minmax(11rem,1fr)] lg:grid-rows-[1fr_1fr_auto] lg:[grid-template-areas:"tl_board_tr"_"bl_board_br"_"._status_."]',
+  // Star board: six plates, the side ones in a row beside the board
+  boardStar:
+    'relative mx-auto grid w-full grid-cols-2 gap-x-3 gap-y-2 px-2 pb-6 select-none sm:gap-x-6 sm:gap-y-3 sm:px-0 sm:pb-16 in-[.play-boxfull]:pt-20 in-[.play-boxfull]:pb-0 [grid-template-areas:"tl_tr"_"l_r"_"board_board"_"status_status"_"bl_br"] lg:w-fit lg:grid-cols-[minmax(11rem,1fr)_auto_minmax(11rem,1fr)] lg:grid-rows-[1fr_1fr_1fr_auto] lg:[grid-template-areas:"tl_board_tr"_"l_board_r"_"bl_board_br"_"._status_."]',
   figure: 'play-figure text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
   // Same size on every turn, so the table never moves
   status:
     'my-2 min-h-7 max-w-full self-center justify-self-center truncate text-center text-lg leading-7 font-extrabold text-[var(--play-ink)] [grid-area:status]',
   // Full screen: the board takes the height left, less the chat when open
-  frameFull: 'lg:w-[min(64rem,calc(100dvh-9rem),calc(100vw-30rem))]!',
-  frameFullChat: 'lg:w-[min(64rem,calc(100dvh-9rem),calc(100vw-58rem))]!',
+  frameFull: 'lg:w-[min(64rem,calc(100dvh-12rem),calc(100vw-30rem))]!',
+  frameFullChat: 'lg:w-[min(64rem,calc(100dvh-12rem),calc(100vw-58rem))]!',
   // The viewer's turn: blue text, no box
   statusCall: 'text-[var(--play-ludo-call)]',
   frame:
     'ludo-frame [grid-area:board] max-lg:-mx-2 max-lg:w-auto lg:w-[min(36rem,calc(100dvh-13rem))]',
+  // The star is larger, so its frame is too
+  frameStar:
+    'ludo-frame [grid-area:board] max-lg:-mx-2 max-lg:w-auto lg:w-[min(46rem,calc(100dvh-13rem))]',
   // The viewer's turn: the frame lights in their colour
   frameMine: 'ludo-frame-mine',
   // Call over the board as the turn comes
@@ -47,6 +53,20 @@ export const LUDO_SLOTS = [
   'self-start justify-self-end translate-x-2 sm:translate-x-4 [grid-area:tr]',
   'self-end justify-self-end translate-x-2 sm:translate-x-4 [grid-area:br]',
   'self-end -translate-x-2 sm:-translate-x-4 [grid-area:bl]',
+] as const
+
+/**
+ * Grid place of each arm of the star on screen, clockwise from the top left
+ * @type {readonly string[]}
+ */
+
+export const LUDO_STAR_SLOTS = [
+  LUDO_SLOTS[0],
+  LUDO_SLOTS[1],
+  'self-center justify-self-end translate-x-2 sm:translate-x-4 [grid-area:r]',
+  LUDO_SLOTS[2],
+  LUDO_SLOTS[3],
+  'self-center -translate-x-2 sm:-translate-x-4 [grid-area:l]',
 ] as const
 
 /**
@@ -111,6 +131,7 @@ export const LUDO_PIECES = {
   rankLeft: 'ludo-rank-left',
   trail: 'ludo-trail',
   ghost: 'ludo-ghost',
+  ghostButton: 'ludo-ghost-button',
   pawnButton:
     'block w-full rounded-full focus-visible:outline-2 focus-visible:outline-[var(--play-ludo-board)]',
 } as const

@@ -21,9 +21,9 @@ import { useLudoBoard } from '@/core/hooks/data/play/useLudoBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { usePlayStageStore } from '@/core/store/play/playStage'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
-import { heldStars } from '@/core/lib/play/ludo'
+import { heldStars, mapOf } from '@/core/lib/play/ludo'
 import type { LudoBoardState, LudoBoardView } from '@/core/lib/play/ludo'
-import { LUDO_CORNERS, LUDO_LAYOUT, LUDO_VIEWER_CORNER } from '@/declarations/play/ludo/board'
+import { LUDO_CORNERS } from '@/declarations/play/ludo/board'
 import { LUDO_BOARD_COPY, LUDO_CHAOS_UI } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -31,8 +31,6 @@ import { LUDO_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { SECOND_MS } from '@/utils/constants/time'
 import { PlayGames } from '@/utils/constants/play'
-
-const CORNER_COUNT = LUDO_CORNERS.length
 
 // Longest wait for the board pushed after a move, in milliseconds
 const PUSH_WAIT_MS = 3000
@@ -64,6 +62,13 @@ export interface LudoBoardProps {
  */
 
 const statusOf = (board: LudoBoardState, name: string, viewerId: string): string => {
+  // A storm of dice waits on everyone's own die
+  if (board.pending?.type === 'frenzy') {
+    const waiting = 'waiting' in board.pending ? board.pending.waiting : []
+
+    return waiting.includes(viewerId) ? LUDO_CHAOS_UI.stormRoll : LUDO_CHAOS_UI.stormWait
+  }
+
   // A duel waits on the others' own dice
   if (board.pending?.type === 'duel') {
     const waiting = 'waiting' in board.pending ? board.pending.waiting : []
@@ -154,28 +159,32 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
 
   const seats = useMemo(() => seatsOf(board, faces, motion.pawns), [board, faces, motion.pawns])
   const present = useMemo(() => seats.filter((seat) => !seat.hasLeft), [seats])
-  if (board.isOver && !motion.isBusy) return <LudoResult players={seats} />
+  if (board.isOver && !motion.isBusy)
+    return <LudoResult players={seats} goal={mapOf(board.settings.rules.chaos).goal} />
 
   // The viewer's colour turned to the bottom right
+  const isChaos = board.settings.rules.chaos
+  const map = mapOf(isChaos)
   const me = seats.find((seat) => seat.accountId === viewerId)
-  const turns = me ? (LUDO_VIEWER_CORNER - me.corner + CORNER_COUNT) % CORNER_COUNT : 0
+  const turns = me ? (map.viewerCorner - me.corner + map.corners) % map.corners : 0
   const countdown = secondsTo(new Date(board.startsAt), now)
   const isStill = !motion.isBusy && !isSaving && sentRev !== board.rev && countdown === 0
   const msLeft = Math.max(0, board.turnEndsAt - now)
   const isRoll = board.dice === null && !board.pending
   const isMyRoll = isStill && board.isMyTurn && isRoll
-  const isChaos = board.settings.rules.chaos
   const names = Object.fromEntries(seats.map((seat) => [seat.accountId, seat.name]))
   const pending = board.pending
   // The call over the board comes each time the roll turns to the viewer
   if (call.was !== isMyRoll) setCall({ was: isMyRoll, count: call.count + Number(isMyRoll) })
   // Colour drawn at each corner, a chameleon takes another's
-  const palette = LUDO_CORNERS.map(
+  const palette = Array.from(
+    { length: map.corners },
     (_, corner) =>
       motion.looks[seats.find((seat) => seat.corner === corner)?.accountId ?? ''] ?? corner
   ).join()
   const tone = { '--pawn-tone': `var(--play-ludo-${LUDO_CORNERS[me?.corner ?? 0]})` }
   const row = {
+    map,
     seats,
     turns,
     viewerId,
@@ -208,7 +217,7 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
   const holder = seats.find((seat) => seat.accountId === board.turnId)
 
   return (
-    <div className={LUDO_BOARD.board}>
+    <div className={map.name === 'star' ? LUDO_BOARD.boardStar : LUDO_BOARD.board}>
       {countdown > 0 && (
         <PlayCountdown
           game={PlayGames.Ludo}
@@ -221,7 +230,7 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
 
       <div
         className={cn(
-          LUDO_BOARD.frame,
+          map.name === 'star' ? LUDO_BOARD.frameStar : LUDO_BOARD.frame,
           board.isMyTurn && countdown === 0 && LUDO_BOARD.frameMine,
           isFullscreen && (isChatOpen ? LUDO_BOARD.frameFullChat : LUDO_BOARD.frameFull)
         )}
@@ -229,16 +238,19 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
       >
         <div
           className={LUDO_BOARD.surface}
-          style={{ '--cells': LUDO_LAYOUT.size } as CSSProperties}
+          style={{ '--cells': map.size } as CSSProperties}
+          data-map={map.name}
           aria-label={LUDO_BOARD_COPY.board}
         >
           <LudoGrid
+            board={map.name}
             turns={turns}
-            lit={heldStars(present, motion.pawns, motion.walking)}
+            lit={heldStars(map, present, motion.pawns, motion.walking)}
             palette={palette}
             isChaos={isChaos}
           />
           <LudoPawns
+            map={map}
             players={present}
             pawns={motion.pawns}
             turns={turns}
@@ -246,7 +258,7 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
             movable={isStill ? board.movable : []}
             hop={motion.hop}
             strike={motion.strike}
-            onPick={(pawn) => void send({ type: 'move', pawn })}
+            onPick={(pawn, to) => void send({ type: 'move', pawn, to })}
             looks={motion.looks}
             ghosts={motion.ghosts}
             fading={motion.fading}
@@ -254,7 +266,7 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
             isBlind={(me?.effects.blind ?? 0) > 0}
             isDisguised={me !== undefined && (motion.looks[viewerId] ?? me.corner) !== me.corner}
           />
-          <LudoChaosLayer motion={motion} players={present} names={names} turns={turns} />
+          <LudoChaosLayer map={map} motion={motion} players={present} names={names} turns={turns} />
           {isMyRoll && call.count > 0 && (
             <div key={call.count} className={LUDO_BOARD.banner} aria-hidden="true">
               <span className={LUDO_BOARD.bannerText}>{LUDO_BOARD_COPY.yourTurn}</span>
@@ -266,6 +278,15 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
         'waiting' in pending &&
         pending.waiting.includes(viewerId) &&
         isStill && <LudoDuelRoll onRoll={() => void send({ type: 'duelRoll' })} />}
+      {pending?.type === 'frenzy' &&
+        'waiting' in pending &&
+        pending.waiting.includes(viewerId) &&
+        isStill && (
+          <LudoDuelRoll
+            label={LUDO_CHAOS_UI.stormRoll}
+            onRoll={() => void send({ type: 'stormRoll' })}
+          />
+        )}
       {pending?.type === 'joker' && pending.malus && board.isMyTurn && isStill && (
         <LudoJokerOffer
           malus={pending.malus}

@@ -45,6 +45,8 @@ export const LUDO_CORNER_COPY: Record<LudoCornerName, string> = {
   red: 'Rouge',
   green: 'Vert',
   yellow: 'Jaune',
+  purple: 'Violet',
+  teal: 'Turquoise',
 }
 
 /**
@@ -122,7 +124,7 @@ export const LUDO_RULE_COPY = {
   },
   chaos: {
     label: 'Chaos Jubilatoire',
-    hint: 'Des cases action cachent des bonus et des malus. Chaque joueur garde un Joker pour éviter un malus.',
+    hint: 'Une grande carte en étoile jusqu’à 6 joueurs, des cases action cachent des bonus et des malus, et parfois tout le monde lance son dé en même temps. Chaque joueur garde un Joker pour éviter un malus.',
   },
 } as const
 
@@ -238,6 +240,9 @@ export const LUDO_CHAOS_UI = {
   duelOthers: 'Les autres lancent leur dé',
   duelTheirs: 'Le duel attend les dés',
   duelDraw: 'Égalité, personne ne recule',
+  stormTitle: 'Tempête de dés !',
+  stormRoll: 'Tempête de dés, lance ton dé',
+  stormWait: 'Tempête de dés, les autres lancent',
   recoil: '{name} recule de {steps}',
   bonus: 'Bonus',
   malus: 'Malus',

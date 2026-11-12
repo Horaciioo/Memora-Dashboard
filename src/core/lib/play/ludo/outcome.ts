@@ -1,6 +1,7 @@
 import { isAllHome, progressOf } from '@/core/lib/play/ludo/rules'
 import type { LudoPlan } from '@/core/lib/play/ludo/rules'
-import { GOAL_STEP, YARD_STEP } from '@/core/lib/play/ludo/track'
+import type { LudoMap } from '@/core/lib/play/ludo/maps'
+import { isHomeStep, YARD_STEP } from '@/core/lib/play/ludo/track'
 import { LudoEndings } from '@/declarations/play/ludo/settings'
 import type { LudoEndingName } from '@/declarations/play/ludo/settings'
 
@@ -21,17 +22,19 @@ export interface LudoStanding {
 
 /**
  * Step kept for a pawn reaching the goal: the goal plus the pawns already there, the arrival order
+ * @param {LudoMap} map - Board
  * @param {number[]} pawns - Steps before the move
  * @return {number} - Step
  */
 
-export const arrivalStep = (pawns: number[]): number =>
-  GOAL_STEP + pawns.filter((step) => step >= GOAL_STEP).length
+export const arrivalStep = (map: LudoMap, pawns: number[]): number =>
+  map.goal + pawns.filter((step) => isHomeStep(map, step)).length
 
 /**
  * Seats after a move, the taken pawns back in their yard
  * @param {T[]} seats - Seats before
  * @param {Object} move - Move
+ * @param {LudoMap} move.map - Board
  * @param {string} move.moverId - Player moving
  * @param {LudoPlan} move.plan - Plan
  * @param {Date} move.now - Moment
@@ -40,21 +43,21 @@ export const arrivalStep = (pawns: number[]): number =>
 
 export const seatsAfter = <T extends LudoStanding>(
   seats: T[],
-  { moverId, plan, now }: { moverId: string; plan: LudoPlan; now: Date }
+  { map, moverId, plan, now }: { map: LudoMap; moverId: string; plan: LudoPlan; now: Date }
 ): T[] => {
   const placed = seats.filter((seat) => seat.place).length
 
   return seats.map((seat) => {
     const pawns = seat.pawns.map((step, pawn) => {
       if (seat.accountId === moverId && pawn === plan.pawn)
-        return plan.isHome ? arrivalStep(seat.pawns) : plan.to
+        return plan.isHome ? arrivalStep(map, seat.pawns) : plan.to
       const isTaken = plan.captures.some(
         (taken) => taken.accountId === seat.accountId && taken.pawn === pawn
       )
 
       return isTaken ? YARD_STEP : step
     })
-    const isDone = seat.accountId === moverId && !seat.finishedAt && isAllHome(pawns)
+    const isDone = seat.accountId === moverId && !seat.finishedAt && isAllHome(map, pawns)
 
     return isDone ? { ...seat, pawns, finishedAt: now, place: placed + 1 } : { ...seat, pawns }
   })
@@ -86,10 +89,11 @@ export const isBoardOver = ({
 
 /**
  * Final score, places first then distance
+ * @param {LudoMap} map - Board
  * @param {LudoStanding} seat - Colour
  * @param {number} seatCount - Places possible
  * @return {number} - Score
  */
 
-export const standingScore = (seat: LudoStanding, seatCount: number): number =>
-  (seat.place ? (seatCount + 1 - seat.place) * PLACE_WEIGHT : 0) + progressOf(seat.pawns)
+export const standingScore = (map: LudoMap, seat: LudoStanding, seatCount: number): number =>
+  (seat.place ? (seatCount + 1 - seat.place) * PLACE_WEIGHT : 0) + progressOf(map, seat.pawns)
