@@ -148,7 +148,7 @@ export const NavalBattle = ({
           <NavalHud call={call} tone={tone} clock={clock} />
           {sea && (
             <NavalTargetSea
-              key={foes.length > 1 ? (isOwnShown ? viewer : target) : 0}
+              key={foes.length > 1 ? target : 0}
               isFading={foes.length > 1}
               size={board.sea.size}
               map={board.settings.map}

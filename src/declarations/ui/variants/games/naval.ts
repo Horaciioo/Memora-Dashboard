@@ -190,16 +190,17 @@ export const NAVAL_OCEAN = {
  */
 
 export const NAVAL_ARSENAL = {
-  root: 'flex items-stretch gap-2 rounded-2xl border border-white/10 bg-[var(--play-naval-panel)] p-2 backdrop-blur-sm',
+  root: 'flex flex-col items-stretch gap-2 rounded-2xl border border-white/10 bg-[var(--play-naval-panel)] p-2 backdrop-blur-sm',
+  divider: 'h-px shrink-0 bg-white/10',
   idle: 'opacity-80',
-  card: 'naval-draw flex min-w-0 flex-1 items-center gap-3 rounded-xl bg-white/10 px-2.5 py-1.5 text-left text-[var(--play-naval-ink)] transition-transform active:scale-[0.98]',
+  card: 'naval-draw flex min-w-0 items-center gap-3 rounded-xl bg-white/10 px-2.5 py-1.5 text-left text-[var(--play-naval-ink)] transition-transform active:scale-[0.98]',
   cardFixed: 'cursor-default active:scale-100 disabled:opacity-100',
   glyphBox: 'grid size-12 shrink-0 place-items-center rounded-lg bg-black/25 text-[var(--play-naval-reticle)]',
   glyph: 'size-9 fill-current',
   text: 'flex min-w-0 flex-col',
   name: 'truncate text-lg leading-6 font-black',
   note: 'truncate text-xs font-semibold text-[var(--play-naval-ink-soft)]',
-  fire: 'min-h-14 min-w-28 rounded-xl bg-[var(--play-naval-hit)] px-5 text-lg font-black text-white transition-transform active:scale-[0.97] disabled:bg-white/10 disabled:text-[var(--play-naval-ink-soft)]',
+  fire: 'min-h-14 w-full rounded-xl bg-[var(--play-naval-hit)] px-5 text-lg font-black text-white transition-transform active:scale-[0.97] disabled:bg-white/10 disabled:text-[var(--play-naval-ink-soft)]',
   wait: 'grid min-h-14 w-full place-items-center text-center text-base font-black text-[var(--play-naval-ink-soft)]',
 } as const
 

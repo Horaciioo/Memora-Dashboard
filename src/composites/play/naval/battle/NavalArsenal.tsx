@@ -101,6 +101,7 @@ export const NavalArsenal = ({
           </span>
         </span>
       </button>
+      <div className={NAVAL_ARSENAL.divider} role="separator" />
       <button type="button" className={NAVAL_ARSENAL.fire} disabled={!canFire} onClick={onFire}>
         {canFire ? NAVAL_BOARD_COPY.fire : NAVAL_BOARD_COPY.aimFirst}
       </button>
