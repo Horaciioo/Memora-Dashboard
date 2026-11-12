@@ -456,6 +456,12 @@ model Account {
   pageMedia             PageMedia[]              @relation("PageMediaUploader")
   pageRevisions         PageRevision[]           @relation("PageRevisionAuthor")
   pageComments          PageComment[]            @relation("PageCommentAuthor")
+  unbanFormsPublished   UnbanFormVersion[]       @relation("UnbanFormPublisher")
+  unbanLinksCreated     UnbanLink[]              @relation("UnbanLinkCreator")
+  unbanLinksRevoked     UnbanLink[]              @relation("UnbanLinkRevoker")
+  unbanAssigned         UnbanRequest[]           @relation("UnbanAssignee")
+  unbanDecided          UnbanRequest[]           @relation("UnbanDecider")
+  unbanLifted           UnbanRequest[]           @relation("UnbanLifter")
 
   @@index([role])
   @@index([status])
@@ -738,6 +744,8 @@ model Youtuber {
   viewerComments      ViewerComment[]
   sharedWords         ModSharedWord[]
   unbanRule           ModUnbanRule?
+  unbanLinks          UnbanLink[]
+  unbanRequests       UnbanRequest[]
   chatMessages        LiveChatMessage[]
   chatStats           ViewerChatStat[]
   sanctionOffenses    SanctionOffense[]
@@ -2793,6 +2801,7 @@ model WorkComment {
   taskId          String?
   communicationId String?
   meetingId       String?
+  unbanRequestId  String?
   authorId        String?
   body            String
   createdAt       DateTime @default(now())
@@ -2801,13 +2810,114 @@ model WorkComment {
   task          Task?          @relation(fields: [taskId], references: [id], onDelete: Cascade)
   communication Communication? @relation(fields: [communicationId], references: [id], onDelete: Cascade)
   meeting       Meeting?       @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  unbanRequest  UnbanRequest?  @relation(fields: [unbanRequestId], references: [id], onDelete: Cascade)
   author        Account?       @relation("WorkCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
   @@index([projectId, createdAt])
   @@index([taskId, createdAt])
   @@index([communicationId, createdAt])
   @@index([meetingId, createdAt])
+  @@index([unbanRequestId, createdAt])
   @@map("work_comments")
+}
+
+// Where a Deban. request stands
+enum UnbanStatus {
+  PENDING
+  IN_REVIEW
+  ACCEPTED
+  REFUSED
+}
+
+// Version of the Deban. form, frozen once published
+model UnbanFormVersion {
+  id            String    @id @default(cuid())
+  number        Int       @unique
+  // Whole snapshot of the questions, readable without any other table
+  fields        Json
+  // Null while it is the draft
+  publishedAt   DateTime?
+  publishedById String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  publishedBy Account?       @relation("UnbanFormPublisher", fields: [publishedById], references: [id], onDelete: SetNull)
+  requests    UnbanRequest[]
+
+  // One draft at most, a partial unique index written by hand in the migration: ON publishedAt IS NULL
+  @@map("unban_form_versions")
+}
+
+// Link a banned person opens to file a request, only its hash is stored
+model UnbanLink {
+  id                String    @id @default(cuid())
+  tokenHash         String    @unique
+  youtuberId        String
+  // Only this Discord account may open it
+  expectedDiscordId String?
+  label             String?
+  expiresAt         DateTime
+  usedAt            DateTime?
+  revokedAt         DateTime?
+  revokedById       String?
+  createdById       String?
+  // Set once by the nightly sweep so an expiry is journaled a single time
+  expiredLoggedAt   DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  youtuber  Youtuber      @relation(fields: [youtuberId], references: [id], onDelete: Restrict)
+  createdBy Account?      @relation("UnbanLinkCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  revokedBy Account?      @relation("UnbanLinkRevoker", fields: [revokedById], references: [id], onDelete: SetNull)
+  request   UnbanRequest?
+
+  @@index([youtuberId, createdAt])
+  @@index([expiresAt])
+  @@map("unban_links")
+}
+
+// Unban request of one person on one server
+model UnbanRequest {
+  id                String      @id @default(cuid())
+  // Short readable code, never derived from the id
+  reference         String      @unique
+  linkId            String      @unique
+  youtuberId        String
+  formVersionId     String
+  discordId         String
+  discordName       String
+  discordAvatar     String?
+  // JSON of the answers, written through the cipher
+  answers           String
+  status            UnbanStatus @default(PENDING)
+  assigneeId        String?
+  // Answer shown to the requester, written through the cipher
+  reviewNote        String?
+  decidedAt         DateTime?
+  decidedById       String?
+  discordLiftedAt   DateTime?
+  discordLiftedById String?
+  // Optimistic concurrency
+  version           Int         @default(0)
+  // Bumped on every reopening, keys the system tasks
+  cycle             Int         @default(0)
+  submittedAt       DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  link        UnbanLink        @relation(fields: [linkId], references: [id], onDelete: Restrict)
+  youtuber    Youtuber         @relation(fields: [youtuberId], references: [id], onDelete: Restrict)
+  formVersion UnbanFormVersion @relation(fields: [formVersionId], references: [id], onDelete: Restrict)
+  assignee    Account?         @relation("UnbanAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  decidedBy   Account?         @relation("UnbanDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  liftedBy    Account?         @relation("UnbanLifter", fields: [discordLiftedById], references: [id], onDelete: SetNull)
+  comments    WorkComment[]
+
+  // One open request per person and server, a partial unique index written by hand in the migration: (youtuberId, discordId) WHERE status IN (PENDING, IN_REVIEW)
+  @@index([youtuberId, status, submittedAt])
+  @@index([discordId])
+  @@index([assigneeId, status])
+  @@index([status, decidedAt])
+  @@map("unban_requests")
 }
 
 // Remark left on a candidate while their application is being weighed

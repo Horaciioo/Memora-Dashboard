@@ -3,7 +3,14 @@
  * @type {string[]}
  */
 
-export const ENCRYPTED_FIELDS = ['body', 'reason', 'reviewNote', 'accessToken', 'refreshToken']
+export const ENCRYPTED_FIELDS = [
+  'body',
+  'reason',
+  'reviewNote',
+  'answers',
+  'accessToken',
+  'refreshToken',
+]
 
 /**
  * Whether one column name carries ciphertext
