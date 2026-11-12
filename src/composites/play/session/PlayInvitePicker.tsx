@@ -3,17 +3,38 @@
 import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
+import { PlayLeaveDialog } from '@/composites/play/mobile/PlayLeaveDialog'
 import { PlayInviteSection } from '@/composites/play/session/PlayInviteSection'
 import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { usePlayInvites } from '@/core/hooks/data/play/usePlayInvites'
 import { groupCandidates, PlayInviteGroups } from '@/core/lib/play/inviteGroups'
-import { PLAY_HUB_COPY } from '@/declarations/play'
+import { PLAY_HUB_COPY, PLAY_SETTINGS } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_INVITE } from '@/declarations/ui/variants'
 import type { PlayInviteCandidate } from '@/types/play'
 import { cn } from '@/utils/classnames'
 import { PLAY_INVITE_SHOWN, PlayInviteRoles } from '@/utils/constants/play'
 import { foldText } from '@/utils/format/strings'
+import { MINUTE_MS } from '@/utils/constants/time'
+
+// Last call to all, remembered per browser
+const EVERYONE_KEY = 'play-everyone-at'
+
+/**
+ * Minutes left before another call to all
+ * @return {number} - Zero when free
+ */
+
+const waitMinutes = (): number => {
+  try {
+    const at = Number(localStorage.getItem(EVERYONE_KEY) ?? 0)
+    const left = at + PLAY_SETTINGS.everyoneCooldownMinutes * MINUTE_MS - Date.now()
+
+    return left > 0 ? Math.ceil(left / MINUTE_MS) : 0
+  } catch {
+    return 0
+  }
+}
 
 export interface PlayInvitePickerProps {
   sessionId: string
@@ -54,6 +75,8 @@ export const PlayInvitePicker = ({
   const [isSpectator, setSpectator] = useState(!canSeat)
   const [query, setQuery] = useState('')
   const [sent, setSent] = useState<string[]>([])
+  const [isAsking, setAsking] = useState(false)
+  const [wait, setWait] = useState(waitMinutes)
 
   const groups = useMemo(
     () => groupCandidates(candidates, new Set(online.map((member) => member.accountId))),
@@ -80,7 +103,6 @@ export const PlayInvitePicker = ({
   const role = isSpectator ? PlayInviteRoles.Spectator : PlayInviteRoles.Player
   const EveryoneIcon = ICONS.playCall
   const CloseIcon = ICONS.playClose
-  const TickIcon = ICONS.playTick
   const SpectatorIcon = ICONS.playSpectators
 
   const send = async (id: string) => {
@@ -88,7 +110,16 @@ export const PlayInvitePicker = ({
     if (await invite(sessionId, role, { accountIds: [id] })) setSent((current) => [...current, id])
   }
   const everyone = async () => {
-    if (await invite(sessionId, role, { everyone: true })) onDone()
+    if (await invite(sessionId, role, { everyone: true })) {
+      try {
+        localStorage.setItem(EVERYONE_KEY, String(Date.now()))
+      } catch {
+        // Server keeps the cooldown anyway
+      }
+      onDone()
+    }
+    setAsking(false)
+    setWait(waitMinutes())
   }
 
   return (
@@ -159,33 +190,48 @@ export const PlayInvitePicker = ({
         </div>
 
         <div className={PLAY_INVITE.foot}>
-          <div className={PLAY_INVITE.footGroup}>
-            <h3 className={PLAY_INVITE.sectionTitle}>{PLAY_HUB_COPY.inviteOptionsTitle}</h3>
+          <div className={PLAY_INVITE.options}>
             <button
               type="button"
-              className={PLAY_INVITE.choice}
-              disabled={isSaving}
-              onClick={everyone}
+              className={PLAY_INVITE.option}
+              disabled={isSaving || wait > 0}
+              onClick={() => setAsking(true)}
             >
               <EveryoneIcon className={PLAY_INVITE.choiceIcon} />
-              {PLAY_HUB_COPY.inviteEveryoneOption}
+              {wait > 0
+                ? PLAY_HUB_COPY.inviteEveryoneWait.replace('{minutes}', String(wait))
+                : PLAY_HUB_COPY.inviteEveryoneOption}
             </button>
             {canSeat && (
               <button
                 type="button"
                 aria-pressed={isSpectator}
-                className={PLAY_INVITE.choice}
+                className={PLAY_INVITE.option}
                 onClick={() => setSpectator((current) => !current)}
               >
                 <SpectatorIcon className={PLAY_INVITE.choiceIcon} />
                 {PLAY_HUB_COPY.inviteSpectatorOption}
-                {isSpectator && <TickIcon className={PLAY_INVITE.check} />}
               </button>
             )}
           </div>
           {extras}
         </div>
       </div>
+      {isAsking && (
+        <PlayLeaveDialog
+          isCalm
+          title={PLAY_HUB_COPY.inviteEveryoneTitle}
+          text={PLAY_HUB_COPY.inviteEveryoneText.replace(
+            '{minutes}',
+            String(PLAY_SETTINGS.everyoneCooldownMinutes)
+          )}
+          confirm={PLAY_HUB_COPY.inviteEveryoneConfirm}
+          cancel={PLAY_HUB_COPY.inviteEveryoneCancel}
+          pending={isSaving}
+          onCancel={() => setAsking(false)}
+          onConfirm={everyone}
+        />
+      )}
     </>
   )
 }

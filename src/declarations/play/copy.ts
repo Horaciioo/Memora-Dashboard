@@ -35,6 +35,7 @@ export const PLAY_ERRORS = {
   emptyMessage: 'Écris un message.',
   longMessage: 'Ton message dépasse {max} caractères.',
   inviteRole: 'Choisis joueur ou spectateur.',
+  everyoneCooldown: 'Tu as déjà appelé tout Memora. Réessaie dans {minutes} min.',
   inviteMissing: 'Cette invitation n’existe plus.',
   botLevel: 'Choisis un niveau de bot.',
   botsOff: 'Les bots de ce jeu sont en pause pour l’instant.',

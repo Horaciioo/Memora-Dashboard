@@ -204,6 +204,11 @@ export const PLAY_SETTINGS = {
     fallback: 1,
     min: 1,
   }),
+  everyoneCooldownMinutes: readInteger(play.everyoneCooldownMinutes, {
+    path: 'play/play.everyoneCooldownMinutes',
+    fallback: 10,
+    min: 1,
+  }),
   historySize: readInteger(play.historySize, {
     path: 'play/play.historySize',
     fallback: 30,

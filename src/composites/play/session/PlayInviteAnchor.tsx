@@ -34,7 +34,7 @@ export const PlayInviteAnchor = ({
   const [isOpen, setOpen] = useState(isOpenAtStart)
   const box = useRef<HTMLDivElement>(null)
   const close = useCallback(() => setOpen(false), [])
-  useOutsideDismiss(isOpen, box, close)
+  useOutsideDismiss(isOpen, box, close, '[role="alertdialog"]')
 
   return (
     <div

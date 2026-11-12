@@ -36,6 +36,7 @@ export const BUTTON_STYLES = {
   arcadeGhost: 'play-key play-key-ghost px-5 py-3 text-base! font-bold!',
   // Compact keys of the dock bubbles
   arcadeSmall: 'play-key px-3.5 py-1.5 text-sm! font-bold!',
+  arcadeDangerSmall: 'play-key play-key-danger px-3.5 py-1.5 text-sm! font-bold!',
   arcadeGhostSmall: 'play-key play-key-ghost px-3.5 py-1.5 text-sm! font-bold!',
   // No fill, no depth: text on the room
   arcadeText:

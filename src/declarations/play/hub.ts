@@ -16,6 +16,7 @@ export const PLAY_HUB_COPY = {
   featureTitle: 'À la une',
   featureBadge: 'Vedette',
   featurePlay: 'Jouer',
+  carouselPlay: 'Jouer à ce jeu',
   carouselPrev: 'Jeu précédent',
   carouselNext: 'Jeu suivant',
   loungeTitle: 'Salon',
@@ -191,6 +192,12 @@ export const PLAY_HUB_COPY = {
   trophiesTitle: 'Tes trophées',
   // Invite panel
   inviteEveryoneOption: 'Tout Memora',
+  inviteEveryoneWait: 'Dans {minutes} min',
+  inviteEveryoneTitle: 'Mentionner tout Memora ?',
+  inviteEveryoneText:
+    'Tous les membres de Memora recevront une notification pour rejoindre ta partie. Utilise-le avec parcimonie : tu ne pourras pas le refaire avant {minutes} min.',
+  inviteEveryoneConfirm: 'Mentionner tout le monde',
+  inviteEveryoneCancel: 'Annuler',
   inviteOptionsTitle: 'Inviter',
   botsTitle: 'Bots',
   botsAdd: 'Ajouter',

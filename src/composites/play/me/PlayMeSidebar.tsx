@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayLevelRing } from '@/composites/play/brand/PlayLevelRing'
+import { HomePlayInvite } from '@/composites/play/invites/HomePlayInvite'
 import { PlayMeDetails } from '@/composites/play/me/PlayMeDetails'
 import { PlayMeLevel } from '@/composites/play/me/PlayMeLevel'
 import { PLAY_ME_COPY, tierOf } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
-import { PLAY_ME } from '@/declarations/ui/variants'
+import { PLAY_CAREER, PLAY_ME } from '@/declarations/ui/variants'
 import type { PlayProfileView } from '@/types/play'
 
 export interface PlayMeSidebarProps {
@@ -30,19 +31,27 @@ export const PlayMeSidebar = ({ player, profile }: PlayMeSidebarProps) => {
 
   return (
     <aside className={PLAY_ME.aside}>
-      <div className={PLAY_ME.card} style={{ '--tier': `var(${tier.tone})` } as CSSProperties}>
-        <button
-          type="button"
-          aria-label={PLAY_ME_COPY.open}
-          aria-expanded={isOpen}
-          className={PLAY_ME.head}
-          onClick={() => setIsOpen((open) => !open)}
-        >
-          <Avatar name={player.name} src={player.avatarUrl} size="md" />
-          <span className={PLAY_ME.name}>{player.name}</span>
-          <CaretIcon className={PLAY_ME.caret} aria-hidden="true" />
-        </button>
-        {isOpen && <PlayMeLevel level={level} tier={tier} />}
+      <div className={PLAY_ME.row}>
+        <div className={PLAY_ME.invite}>
+          <HomePlayInvite isAside />
+        </div>
+        <div className={PLAY_ME.card} style={{ '--tier': `var(${tier.tone})` } as CSSProperties}>
+          <button
+            type="button"
+            aria-label={PLAY_ME_COPY.open}
+            aria-expanded={isOpen}
+            className={PLAY_ME.head}
+            onClick={() => setIsOpen((open) => !open)}
+          >
+            <PlayLevelRing player={player} level={level} size="md" tone={tier.tone} />
+            <span className={PLAY_ME.headText}>
+              <span className={PLAY_CAREER.heroKicker}>{tier.label}</span>
+              <span className={PLAY_ME.name}>{player.name}</span>
+            </span>
+            <CaretIcon className={PLAY_ME.caret} aria-hidden="true" />
+          </button>
+          {isOpen && <PlayMeLevel level={level} />}
+        </div>
       </div>
       {isOpen && <PlayMeDetails profile={profile} />}
     </aside>
