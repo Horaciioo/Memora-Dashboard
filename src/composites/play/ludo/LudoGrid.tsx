@@ -1,8 +1,8 @@
 import { memo, useId } from 'react'
 
-import { squareOf, TRACK, turnPoint } from '@/core/lib/play/ludo'
+import { chaosKindOf, squareOf, TRACK, turnPoint } from '@/core/lib/play/ludo'
 import { LUDO_CORNERS, LUDO_LAYOUT } from '@/declarations/play/ludo/board'
-import { LUDO_BOARD } from '@/declarations/ui/variants'
+import { LUDO_BOARD, LUDO_CHAOS_PIECES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 // Middle of the board, cell units
@@ -23,6 +23,10 @@ const GOLD_STOPS = [
   ['0.45', '--play-ludo-gold'],
   ['1', '--play-ludo-gold-deep'],
 ] as const
+
+// Marks of the action squares, drawn around their centre
+const SPARKLE = 'M0 -0.3L0.08 -0.08L0.3 0L0.08 0.08L0 0.3L-0.08 0.08L-0.3 0L-0.08 -0.08Z'
+const BOLT = 'M0.08 -0.3L-0.18 0.05H-0.02L-0.08 0.3L0.18 -0.07H0.02Z'
 
 // Arrow into the lane, drawn in its cell
 const ARROW = 'M0.16 0.4H0.52V0.22L0.85 0.5L0.52 0.78V0.6H0.16Z'
@@ -55,28 +59,42 @@ const tone = (colour: string, shade = ''): string => `var(--play-ludo-${colour}$
  * One corner as the top left one draws it, turned into place
  * @param {Object} props - Corner
  * @param {number} props.corner - Corner index
+ * @param {number} props.shown - Colour drawn there
  * @return {JSX.Element}
  */
 
-const CornerArt = ({ corner }: { corner: number }) => {
-  const colour = LUDO_CORNERS[corner]
+const CornerArt = ({ corner, shown }: { corner: number; shown: number }) => {
+  const colour = LUDO_CORNERS[shown]
   const size = LUDO_LAYOUT.yard
   const [startRow, startColumn] = LUDO_LAYOUT.quarter[0]
 
   return (
     <g transform={`rotate(${corner * 90} ${MIDDLE} ${MIDDLE})`}>
       {/* Yard and its holes */}
-      <rect width={size} height={size} fill={tone(colour)} />
+      <rect
+        width={size}
+        height={size}
+        className={LUDO_CHAOS_PIECES.recolor}
+        style={{ fill: tone(colour) }}
+      />
       <rect
         x={YARD_INSET}
         y={YARD_INSET}
         width={size - YARD_INSET * 2}
         height={size - YARD_INSET * 2}
         rx="0.22"
-        fill={tone(colour, '-deep')}
+        className={LUDO_CHAOS_PIECES.recolor}
+        style={{ fill: tone(colour, '-deep') }}
       />
       {LUDO_LAYOUT.yardSpots.map(([y, x]) => (
-        <circle key={`${y}:${x}`} cx={x} cy={y} r={HOLE} fill={tone(colour, '-hole')} />
+        <circle
+          key={`${y}:${x}`}
+          cx={x}
+          cy={y}
+          r={HOLE}
+          className={LUDO_CHAOS_PIECES.recolor}
+          style={{ fill: tone(colour, '-hole') }}
+        />
       ))}
 
       {/* Start square and coloured lane */}
@@ -88,14 +106,16 @@ const CornerArt = ({ corner }: { corner: number }) => {
           width={1 - TILE.gap * 2}
           height={1 - TILE.gap * 2}
           rx={TILE.radius}
-          fill={tone(colour)}
+          className={LUDO_CHAOS_PIECES.recolor}
+          style={{ fill: tone(colour) }}
         />
       ))}
 
       {/* Centre triangle */}
       <polygon
         points={`${size},${size} ${size},${LUDO_LAYOUT.size - size} ${MIDDLE},${MIDDLE}`}
-        fill={tone(colour)}
+        className={LUDO_CHAOS_PIECES.recolor}
+        style={{ fill: tone(colour) }}
       />
     </g>
   )
@@ -106,10 +126,22 @@ const CornerArt = ({ corner }: { corner: number }) => {
  * @param {Object} props - Board
  * @param {number} props.turns - Quarter turns toward the viewer
  * @param {number} props.lit - Stars with a pawn, one bit per corner
+ * @param {number[]} props.palette - Colour drawn at each corner
+ * @param {boolean} props.isChaos - Action squares shown
  * @return {JSX.Element}
  */
 
-export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number }) => {
+export const LudoBoardDrawing = ({
+  turns,
+  lit,
+  palette,
+  isChaos,
+}: {
+  turns: number
+  lit: number
+  palette: readonly number[]
+  isChaos: boolean
+}) => {
   const [entryRow, entryColumn] = LUDO_LAYOUT.entry
   const gold = useId()
 
@@ -138,7 +170,7 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
           />
         ))}
         {LUDO_CORNERS.map((_, corner) => (
-          <CornerArt key={corner} corner={corner} />
+          <CornerArt key={corner} corner={corner} shown={palette[corner]} />
         ))}
 
         {/* Arrows into each lane */}
@@ -148,7 +180,8 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
             d={ARROW}
             transform={`rotate(${corner * 90} ${MIDDLE} ${MIDDLE}) translate(${entryColumn} ${entryRow})`}
             fill="var(--play-ludo-board)"
-            stroke={tone(colour)}
+            className={LUDO_CHAOS_PIECES.recolor}
+            style={{ stroke: tone(LUDO_CORNERS[palette[corner]]) }}
             strokeWidth="0.05"
             strokeLinejoin="round"
           />
@@ -185,6 +218,40 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
           </g>
         )
       })}
+
+      {/* Action squares stay upright whatever the turn */}
+      {isChaos &&
+        TRACK.map(([row, column], square) => {
+          const kind = chaosKindOf(square)
+          if (!kind) return null
+          const [y, x] = turnPoint([row + 0.5, column + 0.5], turns)
+
+          return (
+            <g
+              key={square}
+              transform={`translate(${x} ${y})`}
+              className={cn(
+                LUDO_CHAOS_PIECES.mark,
+                kind === 'bonus' ? 'ludo-mark-bonus' : 'ludo-mark-malus'
+              )}
+            >
+              {/* Bonus is a round violet disc, malus a red diamond: shape and tone both differ */}
+              {kind === 'bonus' ? (
+                <circle r="0.43" />
+              ) : (
+                <rect
+                  x="-0.31"
+                  y="-0.31"
+                  width="0.62"
+                  height="0.62"
+                  rx="0.12"
+                  transform="rotate(45)"
+                />
+              )}
+              <path d={kind === 'bonus' ? SPARKLE : BOLT} />
+            </g>
+          )
+        })}
     </>
   )
 }
@@ -194,16 +261,33 @@ export const LudoBoardDrawing = ({ turns, lit }: { turns: number; lit: number })
  * @param {Object} props - Board
  * @param {number} props.turns - Quarter turns toward the viewer
  * @param {number} props.lit - Stars with a pawn, one bit per corner
+ * @param {string} props.palette - Colours per corner, joined
+ * @param {boolean} props.isChaos - Action squares shown
  * @return {JSX.Element}
  */
 
-const Grid = ({ turns, lit }: { turns: number; lit: number }) => (
+const Grid = ({
+  turns,
+  lit,
+  palette,
+  isChaos,
+}: {
+  turns: number
+  lit: number
+  palette: string
+  isChaos: boolean
+}) => (
   <svg
     viewBox={`0 0 ${LUDO_LAYOUT.size} ${LUDO_LAYOUT.size}`}
     className={LUDO_BOARD.grid}
     aria-hidden="true"
   >
-    <LudoBoardDrawing turns={turns} lit={lit} />
+    <LudoBoardDrawing
+      turns={turns}
+      lit={lit}
+      palette={palette.split(',').map(Number)}
+      isChaos={isChaos}
+    />
   </svg>
 )
 

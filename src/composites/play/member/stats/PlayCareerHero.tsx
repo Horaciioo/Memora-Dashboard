@@ -1,40 +1,26 @@
 import type { CSSProperties } from 'react'
 
+import { PlayCareerFacts } from '@/composites/play/member/stats/PlayCareerFacts'
 import { PlayLevelRing } from '@/composites/play/brand/PlayLevelRing'
 import type { PlayLevelRingProps } from '@/composites/play/brand/PlayLevelRing'
-import { fillPlayMessage, PLAY_HUB_COPY, PLAY_TIERS, tierOf } from '@/declarations/play'
+import { fillPlayMessage, PLAY_HUB_COPY, tierOf } from '@/declarations/play'
 import { PLAY_CAREER } from '@/declarations/ui/variants'
-import type { PlayTotalsView } from '@/types/play'
-import { cn } from '@/utils/classnames'
-
-/**
- * Share of a rung filled at this level
- * @param {number} index - Rung in the ladder
- * @param {number} level - Player level
- * @return {number} - Percent
- */
-
-const rungShare = (index: number, level: number): number => {
-  const { from } = PLAY_TIERS[index]
-  const next = PLAY_TIERS[index + 1]
-  if (level < from) return 0
-  if (!next || level >= next.from) return 100
-
-  return ((level - from) / (next.from - from)) * 100
-}
+import type { PlayProfileView, PlayTotalsView } from '@/types/play'
 
 export interface PlayCareerHeroProps {
   totals: PlayTotalsView
   player: PlayLevelRingProps['player']
+  // Per-game figures, global view only
+  games?: PlayProfileView['games']
 }
 
 /**
- * Rank card: the level ring, the XP left and the tier ladder
+ * Rank card: the level ring, the XP left
  * @param {PlayCareerHeroProps} props - Totals and player
  * @return {JSX.Element}
  */
 
-export const PlayCareerHero = ({ totals, player }: PlayCareerHeroProps) => {
+export const PlayCareerHero = ({ totals, player, games }: PlayCareerHeroProps) => {
   const { level } = totals
   const { tier } = tierOf(level.level)
 
@@ -60,30 +46,8 @@ export const PlayCareerHero = ({ totals, player }: PlayCareerHeroProps) => {
               : PLAY_HUB_COPY.maxed}
           </p>
         </div>
+        {games && <PlayCareerFacts games={games} />}
       </div>
-
-      <ol className={PLAY_CAREER.ladder} aria-label={PLAY_HUB_COPY.ranks}>
-        {PLAY_TIERS.map((rung, index) => (
-          <li
-            key={rung.label}
-            className={PLAY_CAREER.rung}
-            style={{ '--rung': `var(${rung.tone})` } as CSSProperties}
-            aria-current={rung.label === tier.label ? 'step' : undefined}
-          >
-            <span className={PLAY_CAREER.rungTrack}>
-              <span
-                className={PLAY_CAREER.rungFill}
-                style={{ width: `${rungShare(index, level.level)}%` }}
-              />
-            </span>
-            <span
-              className={cn(PLAY_CAREER.rungName, rung.label === tier.label && PLAY_CAREER.rungNow)}
-            >
-              {rung.label}
-            </span>
-          </li>
-        ))}
-      </ol>
     </section>
   )
 }

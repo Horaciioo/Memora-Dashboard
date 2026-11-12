@@ -81,6 +81,7 @@ export const LUDO_PLATE = {
   dot: 'size-2 shrink-0 sm:size-2.5 rounded-full',
   online: 'bg-[var(--play-ludo-online)]',
   away: 'bg-[var(--play-ludo-away)]',
+  chaosRow: 'flex w-max max-w-[6.5rem] flex-wrap items-center justify-center gap-1',
   place:
     'w-max rounded-full bg-[var(--play-ludo-crown)] px-2 py-0.5 text-xs font-black text-[var(--play-ludo-felt)]',
 } as const
@@ -143,5 +144,22 @@ export const LUDO_HUB = {
   surprise: 'ludo-surprise',
   shadow: 'ludo-walker-shadow',
   hopper: 'ludo-hopper block',
+  pawn: 'w-full',
+} as const
+
+/**
+ * Faces of the launch vote: pawns hopping from square to square
+ * @type {Record<string, string>}
+ */
+
+export const LUDO_VOTE = {
+  face: 'flex size-full flex-col items-center justify-center gap-[8%] px-[6%]',
+  dice: 'flex gap-[6%]',
+  die: 'grid size-[calc(var(--vote-card)*0.28)] place-items-center rounded-[24%] bg-white text-[calc(var(--vote-card)*0.18)] leading-none font-black text-[var(--play-night)] shadow-[0_0.2rem_0_rgb(0_0_0/0.25)]',
+  track: 'relative grid w-full',
+  cell: 'aspect-square rounded-[24%] bg-white/15 ring-1 ring-white/30',
+  // Rides over the squares, one square wide
+  traveller: 'ludo-vote-travel absolute inset-y-0 left-0 p-[3%]',
+  jumper: 'ludo-vote-jump p-[6%]',
   pawn: 'w-full',
 } as const

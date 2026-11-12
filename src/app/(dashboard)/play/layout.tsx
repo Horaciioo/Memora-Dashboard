@@ -1,7 +1,14 @@
 import type { ReactNode } from 'react'
 
 import { PlayShell } from '@/composites/play/hub/PlayShell'
-import { listNotices, readPlayGroup, readPlayPresence, readPlayProfile } from '@/core/services/play'
+import {
+  claimTrophies,
+  listNotices,
+  readPlayGroup,
+  readPlayPresence,
+  readPlayProfile,
+  readTrophyNotice,
+} from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -14,15 +21,19 @@ import { Permissions } from '@/utils/constants/permissions'
 
 export default async function PlayLayout({ children }: { children: ReactNode }) {
   const { session } = await requirePermission(Permissions.PlayAccess)
-  const [profile, invites, presence, group] = await Promise.all([
+  // Trophies won before they paid, once
+  await claimTrophies(session.id)
+  const [profile, invites, presence, group, trophyNotice] = await Promise.all([
     readPlayProfile(session.id),
     listNotices(session.id),
     readPlayPresence(session.id),
     readPlayGroup(session.id),
+    readTrophyNotice(session.id),
   ])
 
   return (
     <PlayShell
+      trophyNotice={trophyNotice}
       dock={{
         profile,
         invites,

@@ -74,7 +74,7 @@ const VoteScreen = ({
   const options = spec?.choices.map((choice) => choice.key) ?? []
   const { picks, leader, pick, close, validate, back } = usePlayVote({
     vote,
-    winner: (picked) => mostPicked(options, picked, hostId),
+    winner: (picked) => mostPicked(options, picked, hostId, spec?.initial),
     viewerId,
     isHost,
     onSend: (payload) => void moves.vote(sessionId, payload),

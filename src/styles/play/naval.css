@@ -159,3 +159,60 @@
     animation: none;
   }
 }
+
+/* Vote cards: a shot lands, then a second one follows or the turn leaves */
+.naval-vote-first {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: naval-vote-shot 2.4s ease-in infinite;
+}
+
+.naval-vote-again {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: naval-vote-shot 2.4s ease-in 1s infinite;
+}
+
+.naval-vote-pass {
+  animation: naval-vote-slide 2.4s ease-in-out 1s infinite;
+}
+
+.naval-vote-pulse {
+  animation: naval-vote-slide 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes naval-vote-shot {
+  0% {
+    scale: 2.4;
+    opacity: 0;
+  }
+  18%,
+  70% {
+    scale: 1;
+    opacity: 1;
+  }
+  100% {
+    scale: 1;
+    opacity: 0;
+  }
+}
+
+@keyframes naval-vote-slide {
+  0% {
+    opacity: 0.4;
+    translate: -3px 0;
+  }
+  100% {
+    opacity: 1;
+    translate: 3px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .naval-vote-first,
+  .naval-vote-again,
+  .naval-vote-pass,
+  .naval-vote-pulse {
+    animation: none;
+  }
+}

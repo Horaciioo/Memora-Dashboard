@@ -65,6 +65,8 @@ export const CONFIGURATION_FILES: Record<ConfigurationFolder, string[]> = {
     'ludo',
     'naval',
     'play',
+    'suspens',
+    'votes',
   ],
   reference: [
     'eventTemplates',

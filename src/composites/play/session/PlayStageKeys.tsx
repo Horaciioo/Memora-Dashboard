@@ -2,22 +2,26 @@
 
 import { Button } from '@/components/elements/actions/Button'
 import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
+import { PlayMenuKey } from '@/composites/play/session/PlayMenuKey'
 import { PlayVolumeKey } from '@/composites/play/session/PlayVolumeKey'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlayStageStore } from '@/core/store/play/playStage'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
 
 /**
- * Sound key, full screen key, and the chat key once the table fills the screen
+ * Menu key, sound key, full screen key, and the chat key once the table fills the screen
  * @param {Object} props - Game
  * @param {PlayGameName} props.game - Game played
  * @param {string} props.sessionId - Session id
  * @param {string} props.gameSlug - Hub of the game
  * @param {boolean} props.isSeated - Viewer plays
+ * @param {boolean} props.isHost - Viewer hosts
+ * @param {boolean} props.isOver - Game finished
  * @return {JSX.Element}
  */
 
@@ -26,11 +30,15 @@ export const PlayStageKeys = ({
   sessionId,
   gameSlug,
   isSeated,
+  isHost = false,
+  isOver = false,
 }: {
   game: PlayGameName
   sessionId: string
   gameSlug: string
   isSeated: boolean
+  isHost?: boolean
+  isOver?: boolean
 }) => {
   const { isFullscreen, isChatOpen, toggleFullscreen, toggleChat } = usePlayStageStore()
   const isMobile = useIsMobileShell()
@@ -46,13 +54,25 @@ export const PlayStageKeys = ({
         isFullscreen && [BAC_SESSION.keysFull, isChatOpen && BAC_SESSION.keysShifted]
       )}
     >
-      {isFullscreen && (
-        <PlayGameActions
+      {game === PlayGames.Golf ? (
+        // Golf keeps its own inline exits
+        isFullscreen && (
+          <PlayGameActions
+            sessionId={sessionId}
+            gameSlug={gameSlug}
+            isSeated={isSeated}
+            hasSettings={false}
+            itemClass={BAC_SESSION.exitKey}
+            iconClass={BAC_SESSION.exitIcon}
+          />
+        )
+      ) : (
+        <PlayMenuKey
           sessionId={sessionId}
           gameSlug={gameSlug}
           isSeated={isSeated}
-          itemClass={BAC_SESSION.exitKey}
-          iconClass={BAC_SESSION.exitIcon}
+          isHost={isHost}
+          isOver={isOver}
         />
       )}
       <PlayVolumeKey game={game} />

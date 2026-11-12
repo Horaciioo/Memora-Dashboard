@@ -1,0 +1,248 @@
+/* Suspens ground: warm wooden night, chalk letters rising like bubbles */
+.play-room:has(.play-suspens) {
+  background:
+    radial-gradient(
+      70rem 34rem at 50% 115%,
+      color-mix(in srgb, var(--play-suspens) 48%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      40rem 24rem at 12% -8%,
+      color-mix(in srgb, var(--play-suspens-glow) 14%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-suspens-night) 0%, var(--play-suspens-dusk) 100%);
+}
+
+.play-room:has(.play-suspens) .play-floor {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--play-suspens) 26%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--play-suspens) 26%, transparent) 1px,
+      transparent 1px
+    );
+}
+
+/* A hub letter rises, spins a little, fades out */
+.play-suspens-float {
+  position: absolute;
+  bottom: -4rem;
+  left: var(--x);
+  display: grid;
+  width: var(--size);
+  height: var(--size);
+  place-items: center;
+  color: var(--suspens-chalk);
+  font-size: calc(var(--size) * 0.8);
+  font-weight: 900;
+  text-shadow: 0 0.15rem 0 var(--play-suspens-deep);
+  opacity: 0;
+  animation: play-suspens-float var(--rise) linear var(--delay) infinite;
+}
+
+@keyframes play-suspens-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--tilt));
+  }
+  12% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
+  }
+}
+
+/* Countdown in the wood glow */
+.play-figure-suspens {
+  color: var(--play-suspens-glow);
+  --play-key: var(--play-suspens);
+}
+
+/* Gallows: every part is a stroke that draws itself when it appears */
+.play-suspens-gallows {
+  overflow: visible;
+}
+
+.play-suspens-gallows path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.play-suspens-wood {
+  stroke: var(--suspens-wood);
+  stroke-width: 9;
+}
+
+.play-suspens-rope {
+  stroke: var(--suspens-rope);
+  stroke-width: 5;
+}
+
+.play-suspens-body {
+  stroke: var(--suspens-chalk);
+  stroke-width: 6;
+}
+
+.play-suspens-part-in {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: play-suspens-draw 520ms var(--motion-ease-out) backwards;
+}
+
+@keyframes play-suspens-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+.play-suspens-eyes {
+  stroke: var(--suspens-miss);
+  stroke-width: 3;
+  animation: play-suspens-draw 300ms ease-out 520ms backwards;
+}
+
+/* The hanged figure sways under the beam */
+.play-suspens-swing {
+  transform-origin: 150px 20px;
+  animation: play-suspens-sway 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes play-suspens-sway {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+/* Cell of the word: a line under the letter */
+.play-suspens-cell {
+  height: 2.6rem;
+  border-bottom: 0.2rem solid var(--suspens-chalk);
+  color: var(--suspens-chalk);
+}
+
+.play-suspens-cell-found {
+  animation: play-suspens-pop 460ms var(--motion-ease-out);
+}
+
+/* Letters only the setter reads, faded */
+.play-suspens-cell-secret {
+  color: var(--play-suspens-glow);
+  opacity: 0.75;
+}
+
+@keyframes play-suspens-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(0.8rem) scale(0.6);
+  }
+  60% {
+    transform: translateY(-0.2rem) scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Keys of the alphabet */
+.play-suspens-key {
+  box-shadow: 0 0.2rem 0 var(--play-suspens-deep);
+}
+
+.play-suspens-key-idle {
+  background: var(--suspens-key);
+  color: var(--suspens-key-ink);
+}
+
+.play-suspens-key-idle:disabled {
+  opacity: 0.55;
+}
+
+.play-suspens-key-hit {
+  background: var(--suspens-hit);
+  color: white;
+  box-shadow: none;
+}
+
+.play-suspens-key-miss {
+  background: var(--suspens-miss);
+  color: white;
+  box-shadow: none;
+  opacity: 0.55;
+}
+
+.play-suspens-wrong {
+  background: var(--suspens-miss);
+  animation: play-suspens-pop 460ms var(--motion-ease-out);
+}
+
+/* Time bar drains and reddens */
+.play-suspens-clock {
+  position: relative;
+  transform-origin: left center;
+  animation: play-suspens-drain var(--left) linear var(--wait, 0ms) both;
+  background: linear-gradient(90deg, var(--play-suspens-glow), var(--play-suspens));
+}
+
+@keyframes play-suspens-drain {
+  from {
+    transform: scaleX(var(--from));
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.play-suspens-clock::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--play-bomb), var(--play-bomb-red));
+  opacity: 0;
+  animation: play-suspens-redden var(--left) linear var(--wait, 0ms) both;
+}
+
+@keyframes play-suspens-redden {
+  0%,
+  65% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Revealed word and banner pop in */
+.play-suspens-secret,
+.play-suspens-gain {
+  animation: play-suspens-pop 520ms var(--motion-ease-out);
+}
+
+/* Row lights up when its player is on turn */
+.play-suspens-on {
+  background: color-mix(in srgb, var(--play-suspens) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-suspens-float,
+  .play-suspens-part-in,
+  .play-suspens-eyes,
+  .play-suspens-swing,
+  .play-suspens-cell-found,
+  .play-suspens-wrong,
+  .play-suspens-clock::after,
+  .play-suspens-secret,
+  .play-suspens-gain {
+    animation: none;
+  }
+}

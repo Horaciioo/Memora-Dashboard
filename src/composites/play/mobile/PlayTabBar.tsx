@@ -32,7 +32,7 @@ export interface PlayTabBarProps {
 
 export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) => {
   const path = usePathname()
-  const { note, show } = usePlayNote()
+  const { note } = usePlayNote()
   if (path.startsWith(SESSION_PREFIX)) return null
 
   const current = playTabIndexOf(path)
@@ -62,20 +62,6 @@ export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) =
 
   const link = (tab: PlayTab, index: number) => {
     const isOn = index === current
-
-    if (tab.key === 'stats') {
-      return (
-        <button
-          key={tab.key}
-          type="button"
-          aria-label={PLAY_MOBILE_COPY.tabStatsFull}
-          className={cn(PLAY_TABS.tab, isOn && PLAY_TABS.tabOn)}
-          onClick={() => show(PLAY_HUB_COPY.statsConstruction)}
-        >
-          {body(tab, isOn)}
-        </button>
-      )
-    }
 
     return (
       <AppLink

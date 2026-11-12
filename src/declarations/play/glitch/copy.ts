@@ -43,12 +43,7 @@ export const GLITCH_FEED_COPY = {
 export const GLITCH_SETUP_COPY = {
   title: 'Nouvelle partie de Glitch',
   tabs: 'Réglages de la partie',
-  tabRounds: 'Manches',
   tabSpeed: 'Rythme',
-  rounds: 'Nombre de manches',
-  roundsHint: 'Une paire d’images par manche, avec un décor différent.',
-  differences: 'Différences par image',
-  differencesHint: 'Plus il y en a, plus il faut chercher.',
   roundSeconds: 'Temps par manche',
   roundSecondsHint: 'Le temps de tout repérer, la rapidité rapporte des points.',
   seconds: '{seconds} s',

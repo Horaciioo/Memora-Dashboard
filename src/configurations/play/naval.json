@@ -15,7 +15,7 @@
       "max": 8
     }
   },
-  "mode": "duel",
+  "mode": "bracket",
   "countdownSeconds": 4,
   "placementSeconds": {
     "default": 75,

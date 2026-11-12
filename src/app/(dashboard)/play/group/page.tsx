@@ -24,8 +24,7 @@ export default async function PlayGroupPage() {
   return (
     <div className={PLAY_HUB.main}>
       <PlaySignal topic={PLAY_TOPICS.groups} />
-      <PlayPageTitle>{PLAY_GROUP_COPY.title}</PlayPageTitle>
-      <PlayGroupPanel state={state} />
+      <PlayPageTitle body={<PlayGroupPanel state={state} />}>{PLAY_GROUP_COPY.title}</PlayPageTitle>
     </div>
   )
 }

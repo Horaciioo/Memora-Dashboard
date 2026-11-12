@@ -11,6 +11,8 @@ export {
   PLAY_PROFILE,
   PLAY_GROUP,
   PLAY_NOTE,
+  PLAY_LEAVE_UI,
+  PLAY_TROPHY_UI,
 } from '@/declarations/ui/variants/games/play/hub'
 export { PLAY_PANEL } from '@/declarations/ui/variants/games/play/shared'
 export {
@@ -42,5 +44,6 @@ export {
 export type { PlaySetupStyles } from '@/declarations/ui/variants/games/play/boards'
 export { CROQUIS_BOARD, CROQUIS_SETUP } from '@/declarations/ui/variants/games/play/croquis'
 export { ECHO_BOARD, ECHO_SETUP } from '@/declarations/ui/variants/games/play/echo'
+export { SUSPENS_BOARD, SUSPENS_SETUP } from '@/declarations/ui/variants/games/play/suspens'
 export { GLITCH_BOARD, GLITCH_SETUP } from '@/declarations/ui/variants/games/play/glitch'
 export { JUMBLE_BOARD, JUMBLE_SETUP } from '@/declarations/ui/variants/games/play/jumble'

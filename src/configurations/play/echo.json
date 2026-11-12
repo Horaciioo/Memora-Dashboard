@@ -3,7 +3,7 @@
   "maxPlayers": 12,
   "countdownSeconds": 3,
   "order": 5,
-  "rounds": { "default": 12, "min": 3, "max": 30 },
+  "rounds": { "default": 5, "min": 3, "max": 30 },
   "roundSeconds": { "default": 15, "min": 8, "max": 40 },
   "revealSeconds": 3,
   "lockMs": 1500,

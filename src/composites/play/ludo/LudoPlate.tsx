@@ -1,11 +1,15 @@
 import type { CSSProperties, ReactNode } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
+import { LudoChaosGlyph } from '@/composites/play/ludo/LudoChaosGlyph'
+import { LudoHomeCount } from '@/composites/play/ludo/LudoHomeCount'
+import { LudoJokerChip } from '@/composites/play/ludo/LudoJokerChip'
 import { LudoPawn } from '@/composites/play/ludo/LudoPawn'
 import type { LudoCornerName } from '@/declarations/play/ludo/board'
-import { LUDO_BOARD_COPY, ludoPlaceLabel } from '@/declarations/play/ludo/copy'
+import type { LudoEffectName } from '@/declarations/play/ludo/chaos'
+import { LUDO_BOARD_COPY, LUDO_CHAOS_COPY, ludoPlaceLabel } from '@/declarations/play/ludo/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { LUDO_PLATE } from '@/declarations/ui/variants'
+import { LUDO_CHAOS_PIECES, LUDO_PLATE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 /**
@@ -32,6 +36,14 @@ export interface LudoPlateProps {
   isMine: boolean
   // Die beside the player on turn
   die: ReactNode
+  // Pawns home
+  home: number
+  // Jokers left, null outside Chaos mode
+  joker: number | null
+  // Chaos effects at work
+  effects: LudoEffectName[]
+  // Turn being lost to a stall
+  isStalled: boolean
 }
 
 /**
@@ -40,7 +52,18 @@ export interface LudoPlateProps {
  * @return {JSX.Element}
  */
 
-export const LudoPlate = ({ face, colour, isRight, turn, isMine, die }: LudoPlateProps) => {
+export const LudoPlate = ({
+  face,
+  colour,
+  isRight,
+  turn,
+  isMine,
+  die,
+  home,
+  joker,
+  effects,
+  isStalled,
+}: LudoPlateProps) => {
   const { name, avatarUrl, isHost, hasLeft, place } = face
   const CrownIcon = ICONS.playCrown
 
@@ -50,7 +73,8 @@ export const LudoPlate = ({ face, colour, isRight, turn, isMine, die }: LudoPlat
         LUDO_PLATE.plate,
         isRight && LUDO_PLATE.plateRight,
         hasLeft && LUDO_PLATE.off,
-        turn && LUDO_PLATE.plateTurn
+        turn && LUDO_PLATE.plateTurn,
+        isStalled && LUDO_CHAOS_PIECES.plateStalled
       )}
       style={{ '--pawn-tone': `var(--play-ludo-${colour})` } as CSSProperties}
     >
@@ -79,6 +103,19 @@ export const LudoPlate = ({ face, colour, isRight, turn, isMine, die }: LudoPlat
             />
             <span className={LUDO_PLATE.name}>{name}</span>
           </div>
+          <span className={LUDO_PLATE.chaosRow}>
+            <LudoHomeCount colour={colour} count={home} />
+            {joker !== null && <LudoJokerChip count={joker} />}
+            {effects.map((effect) => (
+              <span
+                key={effect}
+                className={LUDO_CHAOS_PIECES.effectChip}
+                title={LUDO_CHAOS_COPY[effect].name}
+              >
+                <LudoChaosGlyph name={effect} />
+              </span>
+            ))}
+          </span>
           {die && (
             <span className={isRight ? LUDO_PLATE.dieSlotRight : LUDO_PLATE.dieSlot}>{die}</span>
           )}

@@ -56,6 +56,17 @@
       "HARD": 0.05
     }
   },
+  "suspens": {
+    "thinkMs": {
+      "min": 2500,
+      "max": 7000
+    },
+    "failRate": {
+      "EASY": 0.45,
+      "MEDIUM": 0.2,
+      "HARD": 0.04
+    }
+  },
   "glitch": {
     "thinkMs": {
       "min": 3500,

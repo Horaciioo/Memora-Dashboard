@@ -35,7 +35,7 @@ export const GLITCH_SETTINGS = {
     fallback: 3,
     min: 0,
   }),
-  rounds: readRange(glitch.rounds, 'play/glitch.rounds', { initial: 6, min: 3, max: 20 }),
+  rounds: readRange(glitch.rounds, 'play/glitch.rounds', { initial: 3, min: 3, max: 20 }),
   roundSeconds: readRange(glitch.roundSeconds, 'play/glitch.roundSeconds', {
     initial: 60,
     min: 20,
@@ -43,7 +43,7 @@ export const GLITCH_SETTINGS = {
   }),
   differences: readRange(glitch.differences, 'play/glitch.differences', {
     initial: 5,
-    min: 3,
+    min: 1,
     max: 10,
   }),
   revealSeconds: readInteger(glitch.revealSeconds, {

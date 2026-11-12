@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client'
 
 import { clampToRange, readBodyInteger } from '@/core/lib/play'
 import { JUMBLE_SETTINGS } from '@/declarations/play'
+import type { JumbleLevel } from '@/declarations/play/jumble/settings'
 
 /**
  * Host choices of a Jumble game
@@ -12,7 +13,12 @@ export interface JumbleGameSettings {
   rounds: number
   roundSeconds: number
   hasHint: boolean
+  // Word length band
+  difficulty: JumbleLevel
 }
+
+// Levels a host may pick
+const LEVELS = Object.keys(JUMBLE_SETTINGS.difficulties) as JumbleLevel[]
 
 /**
  * Default Jumble choices
@@ -23,6 +29,7 @@ export const jumbleDefaults = (): JumbleGameSettings => ({
   rounds: JUMBLE_SETTINGS.rounds.initial,
   roundSeconds: JUMBLE_SETTINGS.roundSeconds.initial,
   hasHint: true,
+  difficulty: JUMBLE_SETTINGS.difficulty,
 })
 
 /**
@@ -56,6 +63,7 @@ export const readJumbleSettings = (
       JUMBLE_SETTINGS.roundSeconds
     ),
     hasHint: typeof raw.hasHint === 'boolean' ? raw.hasHint : current.hasHint,
+    difficulty: LEVELS.find((level) => level === raw.difficulty) ?? current.difficulty,
   }
 
   return settings as unknown as Prisma.InputJsonObject

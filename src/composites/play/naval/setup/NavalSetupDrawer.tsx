@@ -10,22 +10,17 @@ import { SetupSection, SetupStepper } from '@/composites/play/setup/PlaySetupFie
 import { navalSettingsOf } from '@/core/lib/play/naval/settings'
 import type { NavalGameSettings } from '@/core/lib/play/naval/settings'
 import { fillPlayMessage } from '@/declarations/play/copy'
-import { NAVAL_MODE_COPY, NAVAL_RULE_COPY, NAVAL_SETUP_COPY } from '@/declarations/play/naval/copy'
+import { NAVAL_RULE_COPY, NAVAL_SETUP_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import type { NavalRuleName } from '@/declarations/play/naval/settings'
 import { FIELD_STYLES } from '@/declarations/ui/variants'
 import { NAVAL_SETUP } from '@/declarations/ui/variants/games/naval'
-import { cn } from '@/utils/classnames'
-import { NavalModes } from '@/utils/constants/play'
 
 // Tabs of the drawer
-const TABS = [
-  { value: 'game', label: NAVAL_SETUP_COPY.tabGame, icon: 'playPawn' as const },
-  { value: 'rules', label: NAVAL_SETUP_COPY.tabRules, icon: 'playRules' as const },
-]
+const TABS = [{ value: 'game', label: NAVAL_SETUP_COPY.tabGame, icon: 'playPawn' as const }]
 
-// House rules, in reading order
-const RULES = Object.keys(NAVAL_RULE_COPY) as NavalRuleName[]
+// Mode, map and hit replay are voted at launch, spaced ships stay here
+const RULE: NavalRuleName = 'spacedShips'
 
 /**
  * Choices made before a naval battle opens
@@ -62,77 +57,54 @@ export const NavalSetupDrawer = ({
       onClose={onClose}
       onSubmit={() => onSubmit({ settings })}
     >
-      {(tab) => (
+      {() => (
         <div className={NAVAL_SETUP.body}>
-          {tab === 'game' && (
-            <>
-              <SetupSection styles={NAVAL_SETUP} title={NAVAL_SETUP_COPY.mode}>
-                <div className={NAVAL_SETUP.cards}>
-                  {Object.values(NavalModes).map((mode) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      aria-pressed={settings.mode === mode}
-                      className={cn(NAVAL_SETUP.card, settings.mode === mode && NAVAL_SETUP.cardOn)}
-                      onClick={() => set('mode')(mode)}
-                    >
-                      <span className={NAVAL_SETUP.cardTitle}>{NAVAL_MODE_COPY[mode].title}</span>
-                      <span className={NAVAL_SETUP.cardNote}>{NAVAL_MODE_COPY[mode].note}</span>
-                    </button>
-                  ))}
-                </div>
-              </SetupSection>
-              <SetupSection
-                styles={NAVAL_SETUP}
-                title={NAVAL_SETUP_COPY.turn}
-                hint={NAVAL_SETUP_COPY.turnHint}
-              >
-                <SetupStepper
-                  styles={NAVAL_SETUP}
-                  value={settings.turnSeconds}
-                  range={NAVAL_SETTINGS.turnSeconds}
-                  step={5}
-                  display={fillPlayMessage(NAVAL_SETUP_COPY.seconds, {
-                    seconds: settings.turnSeconds,
-                  })}
-                  onChange={set('turnSeconds')}
-                  labels={steps}
-                />
-              </SetupSection>
-              <SetupSection
-                styles={NAVAL_SETUP}
-                title={NAVAL_SETUP_COPY.placement}
-                hint={NAVAL_SETUP_COPY.placementHint}
-              >
-                <SetupStepper
-                  styles={NAVAL_SETUP}
-                  value={settings.placementSeconds}
-                  range={NAVAL_SETTINGS.placementSeconds}
-                  step={15}
-                  display={fillPlayMessage(NAVAL_SETUP_COPY.seconds, {
-                    seconds: settings.placementSeconds,
-                  })}
-                  onChange={set('placementSeconds')}
-                  labels={steps}
-                />
-              </SetupSection>
-            </>
-          )}
-          {tab === 'rules' &&
-            RULES.map((name) => (
-              <div key={name} className={NAVAL_SETUP.switchRow}>
-                <span className={FIELD_STYLES.labelRow}>
-                  <span className={NAVAL_SETUP.switchLabel}>{NAVAL_RULE_COPY[name].label}</span>
-                  <InfoHint text={NAVAL_RULE_COPY[name].hint} align="start" />
-                </span>
-                <Toggle
-                  bare
-                  checked={settings.rules[name]}
-                  onChange={setRule(name)}
-                  label={NAVAL_RULE_COPY[name].label}
-                />
-              </div>
-            ))}
+          <SetupSection
+            styles={NAVAL_SETUP}
+            title={NAVAL_SETUP_COPY.turn}
+            hint={NAVAL_SETUP_COPY.turnHint}
+          >
+            <SetupStepper
+              styles={NAVAL_SETUP}
+              value={settings.turnSeconds}
+              range={NAVAL_SETTINGS.turnSeconds}
+              step={5}
+              display={fillPlayMessage(NAVAL_SETUP_COPY.seconds, {
+                seconds: settings.turnSeconds,
+              })}
+              onChange={set('turnSeconds')}
+              labels={steps}
+            />
+          </SetupSection>
+          <SetupSection
+            styles={NAVAL_SETUP}
+            title={NAVAL_SETUP_COPY.placement}
+            hint={NAVAL_SETUP_COPY.placementHint}
+          >
+            <SetupStepper
+              styles={NAVAL_SETUP}
+              value={settings.placementSeconds}
+              range={NAVAL_SETTINGS.placementSeconds}
+              step={15}
+              display={fillPlayMessage(NAVAL_SETUP_COPY.seconds, {
+                seconds: settings.placementSeconds,
+              })}
+              onChange={set('placementSeconds')}
+              labels={steps}
+            />
+          </SetupSection>
+          <div className={NAVAL_SETUP.switchRow}>
+            <span className={FIELD_STYLES.labelRow}>
+              <span className={NAVAL_SETUP.switchLabel}>{NAVAL_RULE_COPY[RULE].label}</span>
+              <InfoHint text={NAVAL_RULE_COPY[RULE].hint} align="start" />
+            </span>
+            <Toggle
+              bare
+              checked={settings.rules[RULE]}
+              onChange={setRule(RULE)}
+              label={NAVAL_RULE_COPY[RULE].label}
+            />
+          </div>
         </div>
       )}
     </PlaySetupDrawer>

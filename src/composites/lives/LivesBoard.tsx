@@ -7,7 +7,6 @@ import { FloatingAdd } from '@/composites/search/assistant/FloatingAdd'
 import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { FakeLivePanel } from '@/composites/lives/FakeLivePanel'
 import { LiveEndedDialog } from '@/composites/lives/notices/LiveEndedDialog'
 import { LiveTile } from '@/composites/lives/LiveTile'
 import { useLives } from '@/core/hooks/data/lives/useLives'
@@ -26,7 +25,6 @@ export interface LivesBoardProps {
   canAnnounce: boolean
   canReport: boolean
   // Dev only: simulated live controls
-  showFakeLive?: boolean
   // Sits under the personal Live hub
   isEmbedded?: boolean
 }
@@ -37,7 +35,6 @@ export interface LivesBoardProps {
  * @param {LiveView[]} initialRecent - Lives closed within the day
  * @param {boolean} canAnnounce - Viewer may announce
  * @param {boolean} canReport - Viewer reads the Bilan
- * @param {boolean} [showFakeLive] - Dev controls of the fake live
  * @param {boolean} [isEmbedded] - Drops the empty state
  * @return {JSX.Element}
  */
@@ -47,7 +44,6 @@ export const LivesBoard = ({
   initialRecent,
   canAnnounce,
   canReport,
-  showFakeLive = false,
   isEmbedded = false,
 }: LivesBoardProps) => {
   const { lives, recent, isSaving, endedId, dismissEnded, move } = useLives(
@@ -129,7 +125,6 @@ export const LivesBoard = ({
         />
       )}
 
-      {showFakeLive && <FakeLivePanel />}
 
       <LiveEndedDialog liveId={canReport ? endedId : null} onClose={dismissEnded} />
     </div>

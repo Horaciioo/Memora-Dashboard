@@ -1,0 +1,23 @@
+{
+  "echo": {
+    "rounds": [3, 5, 8, 12]
+  },
+  "glitch": {
+    "rounds": [3, 5, 8],
+    "differences": [1, 3, 5, 8]
+  },
+  "croquis": {
+    "laps": [1, 2, 3]
+  },
+  "suspens": {
+    "laps": [1, 2, 3],
+    "errors": [6, 8, 10]
+  },
+  "jumble": {
+    "rounds": [5, 10, 15, 20]
+  },
+  "bomb": {
+    "lives": [1, 2, 3],
+    "minTurnSeconds": [2, 5, 10]
+  }
+}

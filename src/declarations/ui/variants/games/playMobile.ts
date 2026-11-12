@@ -95,13 +95,6 @@ export const PLAY_BOARD = {
   rows: 'flex flex-col gap-2',
   row: 'flex min-h-14 items-center gap-3 rounded-xl border-2 border-black/25 bg-[var(--play-panel-strong)] px-3 shadow-[0_0.2rem_0_rgb(0_0_0/0.25)]',
   rowMe: 'ring-2 ring-[var(--play-gold)]',
-  // Medal boxes by place
-  place1:
-    'bg-[linear-gradient(180deg,var(--play-medal-gold))] text-[var(--play-night)] shadow-[inset_0_3px_0_rgb(255_255_255/0.5),0_0.2rem_0_rgb(0_0_0/0.35)]',
-  place2:
-    'bg-[linear-gradient(180deg,var(--play-medal-silver))] text-[var(--play-night)] shadow-[inset_0_3px_0_rgb(255_255_255/0.5),0_0.2rem_0_rgb(0_0_0/0.35)]',
-  place3:
-    'bg-[linear-gradient(180deg,var(--play-medal-bronze))] text-[var(--play-night)] shadow-[inset_0_3px_0_rgb(255_255_255/0.5),0_0.2rem_0_rgb(0_0_0/0.35)]',
   rank: 'w-7 text-center text-lg font-extrabold tabular-nums',
   name: 'min-w-0 flex-1 truncate text-sm font-extrabold',
   value: 'shrink-0 text-xs font-bold tabular-nums opacity-80',

@@ -5,7 +5,6 @@ import { listOpenLives, listPastLives, listRecentLives } from '@/core/services/l
 import { LIVE_HUB } from '@/declarations/lives/hub'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { LIVE_COPY } from '@/declarations/lives/copy'
-import { TWITCH_MOCK_ORIGIN } from '@/declarations/platforms/twitch'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -42,7 +41,6 @@ export default async function LivesPage({
         lives={lives}
         recent={recent}
         canAnnounce={canAnnounce}
-        showFakeLive={TWITCH_MOCK_ORIGIN !== null && access.isAdmin}
         initialId={creator ?? perimeter.activeYoutuberId}
         past={past}
         canReport={canReadLogs}

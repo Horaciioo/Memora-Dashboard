@@ -154,7 +154,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
         <div className={PLAY_ROOM.main}>
           <header className={PLAY_ROOM.head}>
             <PlayGameLogo game={game.game} className={PLAY_ROOM.logo} />
-            <h1 className={PLAY_HUB.srOnly}>{title}</h1>
+            {!isLobby && <h1 className={PLAY_HUB.srOnly}>{title}</h1>}
             <AppLink href={ROUTES.playGame(meta.slug)} className={cn(PLAY_ROOM.back, 'lg:hidden')}>
               <BackIcon className={PLAY_HUB.backIcon} aria-hidden="true" />
               {PLAY_HUB_COPY.backToHub}

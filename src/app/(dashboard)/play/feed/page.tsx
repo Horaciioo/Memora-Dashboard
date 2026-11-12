@@ -29,8 +29,11 @@ export default async function PlayFeedPage() {
     <div className={PLAY_HUB.main}>
       <PlaySignal topic={PLAY_TOPICS.notices} />
       <div className={PLAY_BOX.stack}>
-        <PlayPageTitle>{PLAY_MOBILE_COPY.tabFeed}</PlayPageTitle>
-        <PlayFeedBox presence={presence} invites={invites} history={entries} />
+        <PlayPageTitle
+          body={<PlayFeedBox presence={presence} invites={invites} history={entries} />}
+        >
+          {PLAY_MOBILE_COPY.tabFeed}
+        </PlayPageTitle>
       </div>
     </div>
   )

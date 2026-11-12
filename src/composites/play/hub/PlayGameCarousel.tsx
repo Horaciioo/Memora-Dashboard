@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import type { CSSProperties, KeyboardEvent } from 'react'
 
+import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayGameCard } from '@/composites/play/hub/PlayGameCard'
+import { ROUTES } from '@/declarations/navigation'
 import { PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_CROSS } from '@/declarations/ui/variants'
@@ -35,42 +37,63 @@ export const PlayGameCarousel = ({ title, games, onLocked }: PlayGameCarouselPro
   return (
     <section className={PLAY_CROSS.row} aria-label={title}>
       <h2 className={PLAY_CROSS.rowTitle}>{title}</h2>
-      <div
-        className={PLAY_CROSS.track}
-        role="group"
-        aria-roledescription="carousel"
-        tabIndex={0}
-        onKeyDown={onKey}
-      >
-        <div className={PLAY_CROSS.strip} style={{ '--at': at } as CSSProperties}>
-          {games.map((entry, index) => (
-            <div key={entry.game} data-active={index === at} className={PLAY_CROSS.slot}>
-              <PlayGameCard {...entry} onLocked={onLocked} className={PLAY_CROSS.card} />
-              {index !== at && (
-                <button
-                  type="button"
-                  aria-label={PLAY_GAMES.label(entry.game)}
-                  className={PLAY_CROSS.slotPick}
-                  onClick={() => go(index)}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+      <div className={PLAY_CROSS.frame}>
         <button
           type="button"
           aria-label={PLAY_HUB_COPY.carouselPrev}
           disabled={at === 0}
-          className={cn(PLAY_CROSS.arrow, PLAY_CROSS.arrowPrev)}
+          className={PLAY_CROSS.arrow}
           onClick={() => go(at - 1)}
         >
           <ChevronIcon className={cn(PLAY_CROSS.arrowIcon, 'rotate-90')} aria-hidden="true" />
         </button>
+        <div
+          className={PLAY_CROSS.track}
+          role="group"
+          aria-roledescription="carousel"
+          tabIndex={0}
+          onKeyDown={onKey}
+        >
+          <div className={PLAY_CROSS.strip} style={{ '--at': at } as CSSProperties}>
+            {games.map((entry, index) => (
+              <div
+                key={entry.game}
+                data-active={index === at}
+                style={{ '--game': `var(${PLAY_GAMES.get(entry.game).tone})` } as CSSProperties}
+                className={PLAY_CROSS.slot}
+              >
+                <PlayGameCard {...entry} onLocked={onLocked} className={PLAY_CROSS.card} />
+                {entry.playable && (
+                  <div className={PLAY_CROSS.info} aria-hidden={index !== at}>
+                    <div className={PLAY_CROSS.infoBox}>
+                      <p className={PLAY_CROSS.infoText}>{PLAY_GAMES.get(entry.game).tagline}</p>
+                      <AppLink
+                        href={ROUTES.playGame(PLAY_GAMES.get(entry.game).slug)}
+                        tabIndex={index === at ? 0 : -1}
+                        className={PLAY_CROSS.infoPlay}
+                      >
+                        {PLAY_HUB_COPY.featurePlay}
+                      </AppLink>
+                    </div>
+                  </div>
+                )}
+                {index !== at && (
+                  <button
+                    type="button"
+                    aria-label={PLAY_GAMES.label(entry.game)}
+                    className={PLAY_CROSS.slotPick}
+                    onClick={() => go(index)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
         <button
           type="button"
           aria-label={PLAY_HUB_COPY.carouselNext}
           disabled={at === games.length - 1}
-          className={cn(PLAY_CROSS.arrow, PLAY_CROSS.arrowNext)}
+          className={PLAY_CROSS.arrow}
           onClick={() => go(at + 1)}
         >
           <ChevronIcon className={cn(PLAY_CROSS.arrowIcon, '-rotate-90')} aria-hidden="true" />

@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { chaosIdle, playChaosLine } from '@/composites/play/ludo/chaosMotion'
+import type { LudoChaosMotion } from '@/composites/play/ludo/chaosMotion'
 import { playLudoSound, playLudoTake, preloadLudoSounds } from '@/composites/play/ludo/sound'
 import {
   arrivalStep,
   GOAL_STEP,
+  HIDDEN_STEP,
   isOnTrack,
   linesSince,
   pawnsOf,
@@ -53,7 +56,7 @@ export interface LudoStrike {
  * @typedef {Object} LudoMotion
  */
 
-export interface LudoMotion {
+export interface LudoMotion extends LudoChaosMotion {
   pawns: Record<string, number[]>
   dice: number | null
   // Player who threw it
@@ -74,13 +77,23 @@ export interface LudoMotion {
 /**
  * Last roll on the table
  * @param {LudoLineView[]} lines - Lines, newest first
- * @return {Object} - Face and thrower
+ * @return {Object} - Faces and thrower
  */
 
 const lastRoll = (lines: LudoLineView[]) => {
   const roll = lines.find((line) => line.kind === 'ROLL')
+  if (!roll) return { dice: null, rollerId: null, dice2: null, kept: null }
 
-  return { dice: roll?.dice ?? null, rollerId: roll?.accountId ?? null }
+  // A double throw adds a second die and a kept one
+  const newer = lines.filter((line) => line.rev > roll.rev && line.accountId === roll.accountId)
+  const pick = newer.find((line) => line.kind === 'PICK')
+
+  return {
+    dice: roll.dice,
+    rollerId: roll.accountId,
+    dice2: newer.find((line) => line.kind === 'DOUBLE')?.dice ?? null,
+    kept: pick ? ((pick.value === 1 ? 1 : 0) as 0 | 1) : null,
+  }
 }
 
 /**
@@ -106,13 +119,14 @@ export const useLudoMotion = (
 ): LudoMotion => {
   const [motion, setMotion] = useState<LudoMotion>(() => ({
     pawns: pawnsOf(board.players),
-    ...lastRoll(board.lines),
     isRolling: false,
     isBusy: false,
     hop: null,
     walking: null,
     strike: null,
     settledRev: board.rev,
+    ...chaosIdle(board),
+    ...lastRoll(board.lines),
   }))
   const latest = useRef(board)
   const shown = useRef(board.rev)
@@ -174,6 +188,8 @@ export const useLudoMotion = (
       walking: null,
       strike: null,
       settledRev: latest.current.rev,
+      ...chaosIdle(latest.current),
+      ...lastRoll(latest.current.lines),
     }))
   }, [place, viewerId, sessionId, setPlayed])
 
@@ -188,8 +204,9 @@ export const useLudoMotion = (
       setMotion((current) => ({
         ...current,
         pawns: pawnsOf(board.players),
-        ...lastRoll(board.lines),
         settledRev: board.rev,
+        ...chaosIdle(board),
+        ...lastRoll(board.lines),
       }))
       return
     }
@@ -203,6 +220,8 @@ export const useLudoMotion = (
         ...current,
         pawns: pawnsOf(board.players),
         settledRev: board.rev,
+        ...chaosIdle(board),
+        ...lastRoll(board.lines),
       }))
     }
   }, [board, run, sessionId, setPlayed])
@@ -241,6 +260,16 @@ const playLine = async ({
   const { stepMs, rollMs } = LUDO_SETTINGS
   const corner = board.players.find((player) => player.accountId === line.accountId)?.corner ?? 0
 
+  // Chaos lines have their own beats
+  const isChaos = await playChaosLine({
+    line,
+    next,
+    board,
+    place,
+    set: (update) => setMotion((current) => ({ ...current, ...update(current) })),
+  })
+  if (isChaos) return
+
   // Die tumbles, lands, maybe nothing to move
   if (line.kind === 'ROLL' && line.dice) {
     setMotion((current) => ({
@@ -248,12 +277,16 @@ const playLine = async ({
       dice: line.dice,
       rollerId: line.accountId,
       isRolling: true,
+      dice2: null,
+      kept: null,
     }))
     playLudoTake('roll', LUDO_MIX.roll)
     await wait(rollMs)
     setMotion((current) => ({ ...current, isRolling: false }))
     if (line.dice === 6) playLudoSound('six')
-    const isStuck = next ? !['MOVE', 'PENALTY'].includes(next.kind) : board.dice === null
+    const isStuck = next
+      ? !['MOVE', 'PENALTY', 'DOUBLE', 'PICK'].includes(next.kind)
+      : board.dice === null && !board.pending
     if (isStuck) playLudoSound('blocked')
     return
   }
@@ -311,7 +344,12 @@ const playLine = async ({
     setMotion((current) => ({ ...current, strike: { ...strike, phase: 'hit' } }))
     playLudoSound(line.victimId === viewerId ? 'eaten' : 'eat')
     await wait(stepMs * BEATS.hit)
-    place(line.victimId, line.pawn, YARD_STEP)
+    // A phantom's real pawn leaves the others' screens too
+    place(
+      line.victimId,
+      line.pawn,
+      line.effect && line.victimId !== viewerId ? HIDDEN_STEP : YARD_STEP
+    )
     setMotion((current) => ({ ...current, strike: { ...strike, phase: 'fly' } }))
     await wait(stepMs * BEATS.fly)
     setMotion((current) => ({ ...current, strike: null }))

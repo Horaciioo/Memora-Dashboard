@@ -555,16 +555,3 @@ export const LIVE_STARTED_BUBBLE = {
   tail: 'pointer-events-none absolute top-1/2 -left-[0.5625rem] h-[1.125rem] w-3 -translate-y-1/2 text-[var(--color-surface-raised)]',
 } as const
 
-/**
- * Dev panel driving the fake live
- * @type {Record<string, string>}
- */
-
-export const FAKE_LIVE = {
-  root: 'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-dashed border-[var(--color-border-strong)] p-5',
-  head: 'flex flex-col gap-1',
-  title: 'text-sm font-bold tracking-wide uppercase',
-  lead: 'text-sm text-[var(--color-ink-subtle)]',
-  row: 'flex flex-wrap items-center gap-2',
-  label: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
-} as const

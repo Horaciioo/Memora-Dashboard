@@ -188,6 +188,7 @@ const BARE = new Set([
   'playEcho',
   'playGlitch',
   'playGolf',
+  'playSuspens',
   'playJumble',
   'playLudo',
   'playNaval',

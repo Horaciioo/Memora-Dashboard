@@ -1,3 +1,5 @@
+import type { JumbleLevel } from '@/declarations/play/jumble/settings'
+
 /**
  * Copy of the Jumble table
  * @type {Record<string, string>}
@@ -43,14 +45,9 @@ export const JUMBLE_FEED_COPY = {
 export const JUMBLE_SETUP_COPY = {
   title: 'Nouvelle partie de Jumble',
   tabs: 'Réglages de la partie',
-  tabRounds: 'Manches',
   tabSpeed: 'Rythme',
-  rounds: 'Nombre de manches',
-  roundsHint: 'Un mot par manche, de plus en plus long.',
   roundSeconds: 'Temps par manche',
   roundSecondsHint: 'Plus la réponse est rapide, plus elle rapporte.',
-  hint: 'Indice',
-  hintHint: 'La première lettre se dévoile à mi-chemin.',
   hintOn: 'Avec indice',
   hintOff: 'Sans indice',
   seconds: '{seconds} s',
@@ -62,6 +59,18 @@ export const JUMBLE_SETUP_COPY = {
 } as const
 
 /**
+ * Name of each word length level
+ * @type {Record<JumbleLevel, string>}
+ */
+
+export const JUMBLE_LEVEL_COPY: Record<JumbleLevel, string> = {
+  easy: 'Facile',
+  medium: 'Moyen',
+  hard: 'Difficile',
+  extreme: 'Extrême',
+}
+
+/**
  * Rules drawer of a Jumble game
  * @type {Record<string, string>}
  */
@@ -69,6 +78,7 @@ export const JUMBLE_SETUP_COPY = {
 export const JUMBLE_RULES_COPY = {
   title: 'Règles de la partie',
   rounds: 'Manches',
+  difficulty: 'Difficulté',
   roundSeconds: 'Temps par manche',
   hint: 'Indice',
   scoring: 'Points',

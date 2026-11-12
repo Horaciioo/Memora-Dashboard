@@ -38,7 +38,8 @@ export interface PlayVoteState {
  */
 
 export interface PlayVoteRules {
-  steps: (chosen: Record<string, string>) => string[]
+  // Steps still to ask, a game may skip some for the table size
+  steps: (chosen: Record<string, string>, seated: number) => string[]
   options: (step: string) => string[]
   // Card most picked, the host breaking ties
   winner: (
@@ -48,26 +49,32 @@ export interface PlayVoteRules {
     stored: Prisma.JsonValue
   ) => string
   // Raw settings for the game's reader
-  settings: (chosen: Record<string, string>, stored: Prisma.JsonValue) => Record<string, unknown>
+  settings: (
+    chosen: Record<string, string>,
+    stored: Prisma.JsonValue,
+    seated: number
+  ) => Record<string, unknown>
   // Draw shown before the start, settings fixed and its length
   deal?: (settled: Prisma.JsonValue) => { settings: Prisma.InputJsonObject; ms: number } | null
 }
 
 /**
- * Card most picked, the host's on a tie, the first card when nobody voted
+ * Card most picked, the host's on a tie, the fallback when nobody voted
  * @param {string[]} options - Cards in order
  * @param {Record<string, string>} picks - Card of each voter
  * @param {string} hostId - Host
+ * @param {string} [fallback] - Card kept without votes, the first by default
  * @return {string} - Card key
  */
 
 export const mostPicked = (
   options: string[],
   picks: Record<string, string>,
-  hostId: string
+  hostId: string,
+  fallback?: string
 ): string => {
   const votes = Object.values(picks).filter((key) => options.includes(key))
-  if (!votes.length) return options[0]
+  if (!votes.length) return fallback ?? options[0]
   const count = (key: string) => votes.filter((vote) => vote === key).length
   const top = Math.max(...options.map(count))
   const tied = options.filter((key) => count(key) === top)
@@ -85,14 +92,16 @@ const declaredRules = (game: PlayGameName): PlayVoteRules | null => {
   const steps = PLAY_VOTE_STEPS[game]
   const toSettings = PLAY_VOTE_SETTINGS[game]
   if (!steps || !toSettings) return null
-  const optionsOf = (step: string) =>
-    steps.find((entry) => entry.key === step)?.choices.map((choice) => choice.key) ?? []
+  const specOf = (step: string) => steps.find((entry) => entry.key === step)
+  const optionsOf = (step: string) => specOf(step)?.choices.map((choice) => choice.key) ?? []
 
   return {
-    steps: () => steps.map((entry) => entry.key),
+    steps: (_, seated) =>
+      steps.filter((entry) => entry.isAsked?.(seated) ?? true).map((entry) => entry.key),
     options: optionsOf,
-    winner: (step, picks, hostId) => mostPicked(optionsOf(step), picks, hostId),
-    settings: (chosen) => toSettings(chosen),
+    winner: (step, picks, hostId) =>
+      mostPicked(optionsOf(step), picks, hostId, specOf(step)?.initial),
+    settings: (chosen, _, seated) => toSettings(chosen, seated),
   }
 }
 

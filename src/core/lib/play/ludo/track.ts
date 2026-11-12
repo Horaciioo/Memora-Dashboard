@@ -1,5 +1,6 @@
 import { LUDO_LAYOUT } from '@/declarations/play/ludo/board'
 import type { LudoCell } from '@/declarations/play/ludo/board'
+import { LUDO_CHAOS } from '@/declarations/play/ludo/chaos'
 
 // Corners on the board
 const CORNERS = 4
@@ -112,7 +113,8 @@ const centreOf = ([row, column]: LudoCell): LudoCell => [row + 0.5, column + 0.5
  */
 
 export const pawnPoint = (corner: number, step: number, pawn: number): LudoCell => {
-  if (step <= YARD_STEP) return turnPoint(LUDO_LAYOUT.yardSpots[pawn], corner)
+  if (step <= YARD_STEP)
+    return turnPoint(LUDO_LAYOUT.yardSpots[pawn % LUDO_LAYOUT.yardSpots.length], corner)
   if (step >= GOAL_STEP) return turnPoint(LUDO_LAYOUT.goalSpot, corner)
   if (isOnTrack(step)) return centreOf(TRACK[squareOf(corner, step)])
 
@@ -143,3 +145,23 @@ export const heldStars = (
       }, mask),
     0
   )
+
+/**
+ * Step of a pawn hidden from a screen
+ * @type {number}
+ */
+
+export const HIDDEN_STEP = -9
+
+/**
+ * Action kind of a track square
+ * @param {number} square - Track square
+ * @return {'bonus' | 'malus' | null} - Kind
+ */
+
+export const chaosKindOf = (square: number): 'bonus' | 'malus' | null => {
+  const offset = square % QUARTER
+  if (LUDO_CHAOS.bonusSquares.includes(offset)) return 'bonus'
+
+  return LUDO_CHAOS.malusSquares.includes(offset) ? 'malus' : null
+}

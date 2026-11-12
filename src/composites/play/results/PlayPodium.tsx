@@ -1,5 +1,6 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { PlayConfetti } from '@/composites/play/baccalaureat/PlayConfetti'
+import { PlayMedal } from '@/composites/play/shared/PlayMedal'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_BOARD, BAC_PODIUM_BLOCKS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -57,7 +58,9 @@ export const PlayPodium = ({
               </div>
               <span className={BAC_BOARD.podiumName}>{entry.name}</span>
               <span className={BAC_BOARD.podiumPoints}>{entry.note}</span>
-              <div className={cn(BAC_BOARD.podiumBlock, BAC_PODIUM_BLOCKS[place])}>{place}</div>
+              <div className={cn(BAC_BOARD.podiumBlock, BAC_PODIUM_BLOCKS[place])}>
+                <PlayMedal place={place as 1 | 2 | 3} size="lg" />
+              </div>
             </div>
           )
         })}

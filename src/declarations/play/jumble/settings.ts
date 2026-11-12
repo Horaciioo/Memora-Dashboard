@@ -1,6 +1,7 @@
 import jumble from '@/configurations/play/jumble.json'
 import {
   readBounds,
+  readChoice,
   readInteger,
   readNode,
   readNumber,
@@ -9,6 +10,30 @@ import { readRange } from '@/declarations/play/settings'
 
 // Raw nodes
 const scoring = readNode(jumble.scoring, 'play/jumble.scoring')
+
+// Word length band of each level, shorter words are easier
+const LEVEL_FALLBACKS = {
+  easy: { min: 3, max: 6 },
+  medium: { min: 4, max: 7 },
+  hard: { min: 5, max: 10 },
+  extreme: { min: 7, max: 12 },
+} as const
+
+const difficulties = readNode(jumble.difficulties, 'play/jumble.difficulties')
+
+/**
+ * Word lengths of each level
+ * @type {Record<JumbleLevel, Bounds>}
+ */
+
+const LEVEL_LENGTHS = Object.fromEntries(
+  Object.entries(LEVEL_FALLBACKS).map(([level, fallback]) => [
+    level,
+    readBounds(difficulties[level], { path: `play/jumble.difficulties.${level}`, fallback }),
+  ])
+) as Record<keyof typeof LEVEL_FALLBACKS, { min: number; max: number }>
+
+export type JumbleLevel = keyof typeof LEVEL_LENGTHS
 
 // Seat bounds
 const minPlayers = readInteger(jumble.minPlayers, {
@@ -51,9 +76,21 @@ export const JUMBLE_SETTINGS = {
     min: 0.1,
     max: 0.9,
   }),
+  // Word length a bot reads at its base pace
+  paceLength: readInteger(jumble.paceLength, {
+    path: 'play/jumble.paceLength',
+    fallback: 5,
+    min: 1,
+  }),
+  difficulties: LEVEL_LENGTHS,
+  difficulty: readChoice<JumbleLevel>(jumble.difficulty, {
+    path: 'play/jumble.difficulty',
+    fallback: 'easy',
+    allowed: Object.keys(LEVEL_LENGTHS) as JumbleLevel[],
+  }),
   lengths: readBounds(jumble.lengths, {
     path: 'play/jumble.lengths',
-    fallback: { min: 5, max: 12 },
+    fallback: { min: 3, max: 12 },
   }),
   scoring: {
     base: readInteger(scoring.base, { path: 'play/jumble.scoring.base', fallback: 10, min: 1 }),

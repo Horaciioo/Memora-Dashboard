@@ -38,7 +38,7 @@ export const PlayFeedBox = ({ presence, invites, history }: PlayFeedBoxProps) =>
   return (
     <>
       {isOpen ? (
-        <section className={PLAY_BOX.root}>
+        <section className={PLAY_BOX.flat}>
           <SegmentedControl
             isPlay
             label={PLAY_MOBILE_COPY.feedTabs}

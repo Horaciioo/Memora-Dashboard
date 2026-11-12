@@ -3,6 +3,7 @@
 import { PlayRulesDrawer } from '@/composites/play/rules/PlayRulesDrawer'
 import type { JumbleGameSettings } from '@/core/lib/play/jumble/settings'
 import {
+  JUMBLE_LEVEL_COPY,
   JUMBLE_RULES_COPY,
   JUMBLE_SETTINGS,
   JUMBLE_SETUP_COPY,
@@ -28,6 +29,7 @@ export const JumbleRulesDrawer = ({ open, onClose, settings }: JumbleRulesDrawer
       label: JUMBLE_RULES_COPY.rounds,
       value: fillPlayMessage(JUMBLE_SETUP_COPY.count, { count: settings.rounds }),
     },
+    { label: JUMBLE_RULES_COPY.difficulty, value: JUMBLE_LEVEL_COPY[settings.difficulty] },
     {
       label: JUMBLE_RULES_COPY.roundSeconds,
       value: fillPlayMessage(JUMBLE_SETUP_COPY.seconds, { seconds: settings.roundSeconds }),

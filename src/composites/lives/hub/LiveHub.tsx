@@ -23,7 +23,6 @@ export interface LiveHubProps {
   lives: LiveView[]
   recent: LiveView[]
   canAnnounce: boolean
-  showFakeLive: boolean
   canReport: boolean
   canCreatorReport: boolean
   canDelete: boolean
@@ -42,7 +41,6 @@ export const LiveHub = ({
   lives,
   recent,
   canAnnounce,
-  showFakeLive,
   canReport,
   canCreatorReport,
   canDelete,
@@ -107,7 +105,6 @@ export const LiveHub = ({
           initialRecent={recent.filter((live) => live.youtuber.id === creator.id)}
           canAnnounce={canAnnounce}
           canReport={canReport}
-          showFakeLive={showFakeLive}
         />
         <LiveHubStats figures={creator.figures} team={creator.team} />
         <LiveHistory

@@ -82,6 +82,7 @@ const RULES = {
     path: 'play/ludo.rules.safeSquares',
     fallback: true,
   }),
+  chaos: readBoolean(rules.chaos, { path: 'play/ludo.rules.chaos', fallback: false }),
 }
 
 export type LudoRuleName = keyof typeof RULES

@@ -40,10 +40,7 @@ export const ECHO_FEED_COPY = {
 export const ECHO_SETUP_COPY = {
   title: 'Nouvelle partie d’Écho',
   tabs: 'Réglages de la partie',
-  tabRounds: 'Manches',
   tabSpeed: 'Rythme',
-  rounds: 'Nombre de manches',
-  roundsHint: 'Une nouvelle donne à chaque manche.',
   roundSeconds: 'Temps par manche',
   roundSecondsHint: 'Plus le symbole est trouvé vite, plus il rapporte.',
   seconds: '{seconds} s',

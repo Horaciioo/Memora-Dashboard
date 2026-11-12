@@ -99,6 +99,51 @@ const Spot = ({ x, y, r, odd }: { x: number; y: number; r: number; odd: string }
 )
 
 /**
+ * Gallows with its rope, the figure left out
+ * @param {object} props - Place, angle and scale
+ * @return {JSX.Element}
+ */
+
+const Gallows = ({
+  x,
+  y,
+  r = 0,
+  scale = 1,
+}: {
+  x: number
+  y: number
+  r?: number
+  scale?: number
+}) => (
+  <g transform={`translate(${x} ${y}) rotate(${r}) scale(${scale})`}>
+    <g
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="16"
+      style={{ stroke: 'var(--suspens-wood)' }}
+    >
+      <path d="M-60 0H220M0 0V-340M0 -340H200M0 -280L60 -340" />
+    </g>
+    <path
+      d="M200 -340V-290"
+      fill="none"
+      strokeWidth="9"
+      strokeLinecap="round"
+      style={{ stroke: 'var(--suspens-rope)' }}
+    />
+    <circle
+      cx="200"
+      cy="-266"
+      r="26"
+      fill="none"
+      strokeWidth="9"
+      style={{ stroke: 'var(--suspens-rope)' }}
+    />
+  </g>
+)
+
+/**
  * Drawing sheet with one doodle
  * @param {object} props - Place, angle, size and doodle colour
  * @return {JSX.Element}
@@ -249,6 +294,29 @@ export const SCENERY_SETS: Record<string, ScenerySet> = {
             fill="none"
             opacity="0.4"
           />
+        </g>
+      </>
+    ),
+  },
+  suspens: {
+    far: [220, 620, 1000, 1380].map((x, index) => (
+      <Gallows key={x} x={x} y={820 - (index % 2) * 40} r={(index % 2 ? 1 : -1) * 3} scale={0.5} />
+    )),
+    near: (
+      <>
+        <Gallows x={150} y={880} r={-3} scale={1.15} />
+        <g className="play-scenery-bob">
+          {['A', 'B', 'C'].map((letter, index) => (
+            <Tile
+              key={letter}
+              x={1330 + index * 90}
+              y={830 - index * 8}
+              r={index * 7 - 7}
+              size={84}
+              letter={letter}
+              fill="--suspens-key"
+            />
+          ))}
         </g>
       </>
     ),

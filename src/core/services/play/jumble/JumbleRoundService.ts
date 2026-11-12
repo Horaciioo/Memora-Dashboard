@@ -100,7 +100,7 @@ const playedWords = async (
 
 export const openTable = async (session: EngineSession): Promise<EngineStep> => {
   const settings = jumbleSettingsOf(session.settings)
-  const { answer, display } = drawWord(1, settings.rounds, new Set())
+  const { answer, display } = drawWord(1, settings.rounds, new Set(), settings.difficulty)
   const clock = clockOf(settings, countdownEnd(new Date(), JUMBLE_SETTINGS.countdownSeconds))
   const game = await prisma.jumbleGame.create({
     data: {
@@ -173,7 +173,12 @@ const endRound = async (
 const nextRound = async (table: JumbleTable): Promise<EngineStep> => {
   const { tx, session, settings, game, now } = table
   const round = game.round + 1
-  const { answer, display } = drawWord(round, settings.rounds, await playedWords(tx, session.id))
+  const { answer, display } = drawWord(
+    round,
+    settings.rounds,
+    await playedWords(tx, session.id),
+    settings.difficulty
+  )
   const next = await tx.jumbleGame.update({
     where: { sessionId: session.id },
     data: {

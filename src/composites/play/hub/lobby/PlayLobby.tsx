@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import type { CSSProperties } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Avatar } from '@/components/elements/display/Avatar'
 import {
   PLAY_RULES_DRAWERS,
   PLAY_SETUP_DRAWERS,
@@ -12,17 +12,17 @@ import {
 import type { PlayRulesValue } from '@/composites/play/registry'
 import { PlayLobbyExtras } from '@/composites/play/hub/PlayLobbyExtras'
 import { PlayLobbyLink } from '@/composites/play/hub/lobby/PlayLobbyLink'
+import { PlaySeatCard } from '@/composites/play/hub/lobby/PlaySeatCard'
 import { PlayLoadingScreen } from '@/composites/play/loading/PlayLoadingScreen'
 import { PlayInviteSlot } from '@/composites/play/session/PlayInviteSlot'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { usePlayStarting } from '@/core/hooks/data/play/usePlayStarting'
 import { usePlayPeopleMenu } from '@/core/hooks/interaction/state/play/usePlayPeopleMenu'
-import { botSeatNote, fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
-import { ICONS } from '@/declarations/ui/icons'
-import { PLAY_HUB, PLAY_ROOM } from '@/declarations/ui/variants'
+import { fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
+import { PLAY_ROOM } from '@/declarations/ui/variants'
 import type { PlayInviteCandidate } from '@/types/play'
-import { PlayStatuses, PlayVisibilities } from '@/utils/constants/play'
+import { PLAY_OPEN_STATUSES, PlayStatuses, PlayVisibilities } from '@/utils/constants/play'
 import type {
   PlayBotKindName,
   PlayGameName,
@@ -106,8 +106,17 @@ export const PlayLobby = ({
   const present = seats.filter((seat) => !seat.hasLeft)
   const isLobby = status === PlayStatuses.Lobby
   const waiting = present.filter((seat) => !seat.isReady).length
-  const mySeat = seats.find((seat) => seat.accountId === viewerId)
-  const TickIcon = ICONS.playTick
+  const canStart = present.length >= minPlayers && waiting === 0
+  const freeSeats = Math.max(0, Math.min(maxPlayers, EMPTY_SEATS_MAX) - present.length)
+  const columns = Math.min(4, Math.max(2, seats.length + (me.isSeated ? freeSeats : 0)))
+  const subtitle =
+    present.length < minPlayers
+      ? fillPlayMessage(PLAY_HUB_COPY.needPlayers, { min: minPlayers })
+      : waiting > 0
+        ? me.isHost
+          ? fillPlayMessage(PLAY_HUB_COPY.waitingFor, { count: waiting })
+          : PLAY_HUB_COPY.lobbyNeedReady
+        : PLAY_HUB_COPY.lobbyAllReady
   const Rules = PLAY_RULES_DRAWERS[game]
   const Setup = PLAY_SETUP_DRAWERS[game]
   const Vote = PLAY_START_VOTES[game]
@@ -125,8 +134,17 @@ export const PlayLobby = ({
   return (
     <div className={PLAY_ROOM.middle} data-play-box>
       {(isLaunching || isStarting) && isLobby && <PlayLoadingScreen isCover />}
+      {isLobby && (
+        <header className={PLAY_ROOM.lobbyHead}>
+          <p className={PLAY_ROOM.eyebrow}>{PLAY_HUB_COPY.lobbyEyebrow}</p>
+          <h1 className={PLAY_ROOM.lobbyTitle}>{PLAY_HUB_COPY.lobbyWaiting}</h1>
+          <p className={PLAY_ROOM.lobbySub} role="status">
+            {subtitle}
+          </p>
+        </header>
+      )}
+      {isLobby && isPrivate && me.isSeated && <PlayLobbyLink sessionId={id} joinCode={joinCode} />}
       <section className={PLAY_ROOM.box}>
-        <h2 className={PLAY_ROOM.playersTitle}>{PLAY_HUB_COPY.playersTitle}</h2>
         <div className={PLAY_ROOM.summary}>
           <button
             type="button"
@@ -137,10 +155,7 @@ export const PlayLobby = ({
           >
             {isPrivate ? PLAY_HUB_COPY.privateOption : PLAY_HUB_COPY.publicOption}
           </button>
-          <span className={PLAY_ROOM.summaryCount}>
-            {fillPlayMessage(PLAY_HUB_COPY.playerCount, { count: present.length, max: maxPlayers })}
-          </span>
-          {isLobby && (me.isSeated || me.isSpectator) && (Rules || canEdit) ? (
+          {isLobby && (me.isSeated || me.isSpectator) && (Rules || canEdit) && (
             <button
               type="button"
               className={cn(PLAY_ROOM.summaryLink, PLAY_ROOM.summaryEnd)}
@@ -148,16 +163,28 @@ export const PlayLobby = ({
             >
               {PLAY_HUB_COPY.rulesLine}
             </button>
-          ) : (
-            <span />
           )}
         </div>
 
-        <div className={PLAY_ROOM.table}>
-          {seats.map((seat) => (
-            <div
+        <div className={PLAY_ROOM.table} style={{ '--cols': columns } as CSSProperties}>
+          {seats.map((seat, index) => (
+            <PlaySeatCard
               key={seat.accountId}
-              className={cn(PLAY_ROOM.tile, seat.hasLeft && PLAY_ROOM.tileOff)}
+              seat={seat}
+              index={index}
+              isLobby={isLobby}
+              isMine={seat.accountId === viewerId}
+              isMobile={isMobile}
+              canKick={
+                isLobby && me.isHost && !seat.isHost && !seat.hasLeft && seat.accountId !== viewerId
+              }
+              isSaving={moves.isSaving}
+              onKick={() => void moves.kick(id, seat.accountId)}
+              onToggleReady={
+                isLobby && me.isSeated && !me.isHost && seat.accountId === viewerId
+                  ? () => void moves.ready(id, !seat.isReady)
+                  : null
+              }
               onContextMenu={menuOf(
                 {
                   accountId: seat.accountId,
@@ -168,65 +195,33 @@ export const PlayLobby = ({
                 },
                 seat.name
               )}
-            >
-              <Avatar name={seat.name} src={seat.avatarUrl} size={isMobile ? 'md' : 'lg'} />
-              <p className={PLAY_ROOM.tileName} style={{ color: `var(--play-${seat.color})` }}>
-                {seat.name}
-              </p>
-              {isLobby && !seat.hasLeft && seat.isReady && !seat.isHost && !seat.botKind ? (
-                <p className={PLAY_ROOM.tileReady}>
-                  <TickIcon className={PLAY_HUB.seatReadyIcon} aria-hidden="true" />
-                  {PLAY_HUB_COPY.ready}
-                </p>
-              ) : (
-                <p className={PLAY_ROOM.tileNote}>
-                  {seat.hasLeft
-                    ? PLAY_HUB_COPY.left
-                    : seat.botKind
-                      ? botSeatNote(seat.botKind)
-                      : seat.isHost
-                        ? PLAY_HUB_COPY.host
-                        : isLobby
-                          ? PLAY_HUB_COPY.seatWaiting
-                          : PLAY_HUB_COPY.player}
-                </p>
-              )}
-            </div>
+            />
           ))}
           {isLobby &&
             me.isSeated &&
-            Array.from(
-              { length: Math.min(maxPlayers, EMPTY_SEATS_MAX) - present.length },
-              (_, index) => (
-                <PlayInviteSlot
-                  key={`free-${index}`}
-                  sessionId={id}
-                  candidates={candidates}
-                  extras={me.isHost ? <PlayLobbyExtras sessionId={id} game={game} /> : undefined}
-                />
-              )
-            )}
+            Array.from({ length: freeSeats }, (_, index) => (
+              <PlayInviteSlot
+                key={`free-${index}`}
+                sessionId={id}
+                candidates={candidates}
+                extras={me.isHost ? <PlayLobbyExtras sessionId={id} game={game} /> : undefined}
+              />
+            ))}
         </div>
 
-        {isLobby && me.isSeated && <PlayLobbyLink sessionId={id} joinCode={joinCode} />}
+        {isLobby && !isPrivate && me.isSeated && (
+          <PlayLobbyLink sessionId={id} joinCode={joinCode} />
+        )}
 
         <div className={PLAY_ROOM.actions}>
           {isLobby && me.isHost && (
             <Button
               variant="arcadeHero"
-              disabled={present.length < minPlayers}
+              disabled={!canStart}
               isLoading={moves.isSaving}
               onClick={() => void (Vote ? moves.openVote(id) : launch())}
             >
-              {waiting > 0 ? PLAY_HUB_COPY.startAnyway : PLAY_HUB_COPY.start}
-            </Button>
-          )}
-          {isLobby && me.isSeated && !me.isHost && mySeat && (
-            <Button
-              variant={mySeat.isReady ? 'arcadeGhost' : 'arcadeHero'}
-              onClick={() => void moves.ready(id, !mySeat.isReady)}
-            >
-              {mySeat.isReady ? PLAY_HUB_COPY.notReadyAgain : PLAY_HUB_COPY.imReady}
+              {PLAY_HUB_COPY.start}
             </Button>
           )}
           {isLobby && me.isSpectator && (
@@ -248,7 +243,7 @@ export const PlayLobby = ({
               {PLAY_HUB_COPY.cancel}
             </button>
           )}
-          {me.isSeated && !(isLobby && me.isHost) && (
+          {me.isSeated && PLAY_OPEN_STATUSES.includes(status) && !(isLobby && me.isHost) && (
             <button
               type="button"
               className={PLAY_ROOM.exit}
@@ -260,16 +255,6 @@ export const PlayLobby = ({
           )}
         </div>
 
-        {isLobby && me.isHost && waiting > 0 && present.length >= minPlayers && (
-          <p className={PLAY_ROOM.note}>
-            {fillPlayMessage(PLAY_HUB_COPY.waitingFor, { count: waiting })}
-          </p>
-        )}
-        {isLobby && present.length < minPlayers && (
-          <p className={PLAY_ROOM.note}>
-            {fillPlayMessage(PLAY_HUB_COPY.needPlayers, { min: minPlayers })}
-          </p>
-        )}
         {!isLobby && me.isSpectator && <p className={PLAY_ROOM.note}>{PLAY_HUB_COPY.spectating}</p>}
       </section>
 

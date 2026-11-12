@@ -624,6 +624,29 @@
   }
 }
 
+/* Seat cards rise in when someone joins, the tick pops when someone is ready */
+.play-seat {
+  animation: play-seat-in 360ms var(--motion-ease-out) backwards;
+}
+
+.play-badge-pop {
+  animation: play-badge-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@keyframes play-seat-in {
+  from {
+    opacity: 0;
+    translate: 0 0.5rem;
+    scale: 0.94;
+  }
+}
+
+@keyframes play-badge-pop {
+  from {
+    scale: 0;
+  }
+}
+
 /* Side chat slides in from the right edge, and back out when folded */
 .play-side-in {
   animation: play-side-in 300ms var(--motion-ease-out) backwards;
@@ -671,6 +694,8 @@
   .play-score-bar,
   .play-side-in,
   .play-side-out,
+  .play-seat,
+  .play-badge-pop,
   .play-pop {
     animation: none;
   }
@@ -1580,8 +1605,10 @@
   animation: play-feature-in 600ms var(--motion-ease-out) both;
 }
 
-.play-feature-in .play-feature-poster {
-  animation: play-feature-poster 800ms var(--motion-ease-out) both;
+.play-feature-poster {
+  animation:
+    play-feature-poster 800ms var(--motion-ease-out) both,
+    play-feature-spin 10s ease-in-out 4s infinite;
 }
 
 @keyframes play-feature-in {
@@ -1599,9 +1626,32 @@
   }
 }
 
+.play-feature-flip {
+  transition: transform 500ms var(--motion-ease-out);
+}
+
+.play-feature-flip[data-flipped='true'] {
+  transform: rotateY(180deg);
+}
+
+/* Rare quick full turn, flat on the box */
+@keyframes play-feature-spin {
+  0% {
+    transform: perspective(1000px) rotateY(0);
+  }
+  5%,
+  100% {
+    transform: perspective(1000px) rotateY(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .play-feature-in,
-  .play-feature-in .play-feature-poster {
+  .play-feature-poster {
     animation: none;
+  }
+
+  .play-feature-flip {
+    transition: none;
   }
 }

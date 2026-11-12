@@ -365,6 +365,11 @@ export const BAC_SESSION = {
   keyHolder: 'relative',
   volumeCard:
     'absolute top-full right-0 z-10 mt-2 flex w-64 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--play-panel,var(--color-surface))] p-3 shadow-lg ring-1 ring-[var(--play-line,var(--color-border))]',
+  // Game menu card hanging under the menu key, one row per way out
+  menuCard:
+    'absolute top-full right-0 z-10 mt-2 flex w-64 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--play-panel,var(--color-surface))] p-2 shadow-lg ring-1 ring-[var(--play-line,var(--color-border))]',
+  menuRow:
+    'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-left text-sm font-bold text-[var(--play-ink)] transition-colors hover:bg-black/5',
   box: `${PANEL} ${LIFT} flex flex-col gap-5 p-5 sm:p-6`,
   // Column flush against the right edge, under the shell bar
   side: 'mt-4 flex min-w-0 flex-col gap-3 lg:fixed lg:top-[var(--play-bar-h)] lg:right-0 lg:bottom-0 lg:z-40 lg:mt-0 lg:pb-28',

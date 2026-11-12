@@ -10,6 +10,7 @@ export { voteInLobby } from '@/core/services/play/PlayVoteService'
 export {
   cancelSession,
   createSession,
+  endSession,
   joinByCode,
   joinSession,
   kickPlayer,
@@ -19,6 +20,12 @@ export {
   setVisibility,
   updateSettings,
 } from '@/core/services/play/LobbyService'
+export {
+  claimTrophies,
+  dismissTrophyNotice,
+  readTrophyNotice,
+} from '@/core/services/play/TrophyService'
+export type { TrophyNotice } from '@/core/services/play/TrophyService'
 export { readPlaySheet } from '@/core/services/play/SheetService'
 export {
   readLeaderboards,

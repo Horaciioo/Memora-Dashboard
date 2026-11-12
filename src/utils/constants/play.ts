@@ -13,6 +13,7 @@ export const PlayGames = {
   Echo: 'ECHO',
   Glitch: 'GLITCH',
   Croquis: 'CROQUIS',
+  Suspens: 'SUSPENS',
 } as const
 
 export type PlayGameName = (typeof PlayGames)[keyof typeof PlayGames]
@@ -312,3 +313,27 @@ export const NavalShapes = {
 } as const
 
 export type NavalShapeName = (typeof NavalShapes)[keyof typeof NavalShapes]
+
+/**
+ * Phases of a Suspens round
+ * @type {Record<string, string>}
+ */
+
+export const SuspensPhases = {
+  Pick: 'PICK',
+  Play: 'PLAY',
+  Reveal: 'REVEAL',
+} as const
+
+export type SuspensPhaseName = (typeof SuspensPhases)[keyof typeof SuspensPhases]
+
+/**
+ * Moves of a Suspens guesser
+ * @type {Record<string, string>}
+ */
+
+export const SuspensMoves = {
+  Letter: 'LETTER',
+  Word: 'WORD',
+  Timeout: 'TIMEOUT',
+} as const
