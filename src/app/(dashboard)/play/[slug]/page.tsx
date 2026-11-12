@@ -14,6 +14,7 @@ import { PlayLeaderboard } from '@/composites/play/hub/leaderboard/PlayLeaderboa
 import { PlayLiveTables } from '@/composites/play/hub/lobby/PlayLiveTables'
 import { PlayEmbers } from '@/composites/play/hub/PlayEmbers'
 import { PlayEchoFloaters } from '@/composites/play/hub/PlayEchoFloaters'
+import { PlayGlitchFloaters } from '@/composites/play/hub/PlayGlitchFloaters'
 import { PlayJumbleLetters } from '@/composites/play/hub/PlayJumbleLetters'
 import { NavalHubPhoto } from '@/composites/play/naval/NavalHubPhoto'
 import { LudoHopField } from '@/composites/play/ludo/LudoHopField'
@@ -36,6 +37,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { PLAY_CONCEPT_COPY } from '@/declarations/play/concept'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { ECHO_HUB } from '@/declarations/play/echo/copy'
+import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
 import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
 import { LUDO_FELT } from '@/declarations/play/ludo/copy'
 import { NAVAL_SEA } from '@/declarations/play/naval/copy'
@@ -59,6 +61,7 @@ const GROUND_LAYERS: Record<string, ComponentType> = {
   [BOMB_EMBERS.ground]: PlayEmbers,
   [JUMBLE_HUB.ground]: PlayJumbleLetters,
   [ECHO_HUB.ground]: PlayEchoFloaters,
+  [GLITCH_HUB.ground]: PlayGlitchFloaters,
   [GOLF_TURF.ground]: GolfPanorama,
   [LUDO_FELT.ground]: LudoHopField,
   [NAVAL_SEA.ground]: NavalHubPhoto,

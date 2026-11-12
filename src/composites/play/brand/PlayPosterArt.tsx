@@ -320,6 +320,25 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
       ))}
     </>
   ),
+  twins: (tone) => (
+    <>
+      <circle cx="180" cy="300" r="150" {...tint(`${tone}-glow`, 0.2)} />
+      {[
+        { x: 28, y: 90, r: -6 },
+        { x: 28, y: 270, r: 5 },
+      ].map((card, index) => (
+        <g key={card.y} transform={`translate(${card.x} ${card.y}) rotate(${card.r})`}>
+          <rect y="8" width="304" height="150" rx="22" fill="black" opacity="0.28" />
+          <rect width="304" height="150" rx="22" {...tint('--glitch-paper')} />
+          {/* The copy differs from the model by the colour of the disc */}
+          <circle cx="70" cy="62" r="26" {...tint(index ? '--glitch-c0' : '--glitch-c3')} />
+          <path d="M130 108l36-62 36 62z" {...tint('--glitch-c1')} />
+          <rect x="226" y="38" width="48" height="48" rx="10" {...tint('--glitch-c4')} />
+        </g>
+      ))}
+      <circle cx="98" cy="332" r="38" fill="none" stroke="var(--play-gold)" strokeWidth="7" />
+    </>
+  ),
   board: (tone) => (
     <LudoBoardArt
       tone={tone}

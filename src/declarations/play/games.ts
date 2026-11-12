@@ -5,6 +5,8 @@ import { ECHO_HUB } from '@/declarations/play/echo/copy'
 import { ECHO_SETTINGS } from '@/declarations/play/echo/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
+import { GLITCH_SETTINGS } from '@/declarations/play/glitch/settings'
 import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
 import { JUMBLE_SETTINGS } from '@/declarations/play/jumble/settings'
 import { LUDO_FELT } from '@/declarations/play/ludo/copy'
@@ -97,6 +99,18 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: ECHO_HUB.ground,
     minPlayers: ECHO_SETTINGS.minPlayers,
     maxPlayers: ECHO_SETTINGS.maxPlayers,
+    playable: true,
+  },
+  [PlayGames.Glitch]: {
+    label: 'Glitch',
+    slug: 'glitch',
+    tagline: 'Deux images presque identiques, repère toutes les différences avant les autres.',
+    tone: '--play-glitch',
+    logo: 'playGlitch',
+    backdrop: 'twins',
+    ground: GLITCH_HUB.ground,
+    minPlayers: GLITCH_SETTINGS.minPlayers,
+    maxPlayers: GLITCH_SETTINGS.maxPlayers,
     playable: true,
   },
   [PlayGames.Jumble]: {

@@ -415,6 +415,14 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'id',
     search: [],
   },
+  glitchGame: { model: 'GlitchGame', exposure: 'full', display: 'sessionId', search: [] },
+  glitchProgress: {
+    model: 'GlitchProgress',
+    exposure: 'readOnly',
+    reason: 'Historique de manches',
+    display: 'id',
+    search: [],
+  },
   jumbleGame: { model: 'JumbleGame', exposure: 'full', display: 'sessionId', search: [] },
   jumbleRound: {
     model: 'JumbleRound',

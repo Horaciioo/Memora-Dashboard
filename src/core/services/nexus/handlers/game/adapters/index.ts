@@ -1,6 +1,7 @@
 import { baccalaureatAdapter } from '@/core/services/nexus/handlers/game/adapters/baccalaureat'
 import { bombAdapter } from '@/core/services/nexus/handlers/game/adapters/bomb'
 import { echoAdapter } from '@/core/services/nexus/handlers/game/adapters/echo'
+import { glitchAdapter } from '@/core/services/nexus/handlers/game/adapters/glitch'
 import { golfAdapter } from '@/core/services/nexus/handlers/game/adapters/golf'
 import { jumbleAdapter } from '@/core/services/nexus/handlers/game/adapters/jumble'
 import { ludoAdapter } from '@/core/services/nexus/handlers/game/adapters/ludo'
@@ -21,5 +22,6 @@ export const GAME_ADAPTERS: Record<PlayGameName, GameAdapter> = {
   [PlayGames.Ludo]: ludoAdapter,
   [PlayGames.Naval]: navalAdapter,
   [PlayGames.Jumble]: jumbleAdapter,
+  [PlayGames.Glitch]: glitchAdapter,
   [PlayGames.Echo]: echoAdapter,
 }

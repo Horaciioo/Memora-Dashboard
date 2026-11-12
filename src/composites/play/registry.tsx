@@ -9,6 +9,8 @@ import { BombRulesDrawer } from '@/composites/play/bomb/BombRulesDrawer'
 import { BombSetupDrawer } from '@/composites/play/bomb/BombSetupDrawer'
 import { EchoRulesDrawer } from '@/composites/play/echo/EchoRulesDrawer'
 import { EchoSetupDrawer } from '@/composites/play/echo/EchoSetupDrawer'
+import { GlitchRulesDrawer } from '@/composites/play/glitch/GlitchRulesDrawer'
+import { GlitchSetupDrawer } from '@/composites/play/glitch/GlitchSetupDrawer'
 import { GolfRulesDrawer } from '@/composites/play/golf/setup/GolfRulesDrawer'
 import { GolfSetupDrawer } from '@/composites/play/golf/setup/GolfSetupDrawer'
 import { GolfStartVote } from '@/composites/play/golf/vote/GolfStartVote'
@@ -23,6 +25,7 @@ import { declaredVote } from '@/composites/play/vote/PlayStartVote'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
 import { echoSettingsOf } from '@/core/lib/play/echo/settings'
+import { glitchSettingsOf } from '@/core/lib/play/glitch/settings'
 import { golfSettingsOf } from '@/core/lib/play/golf/settings'
 import { jumbleSettingsOf } from '@/core/lib/play/jumble/settings'
 import { ludoSettingsOf } from '@/core/lib/play/ludo/settings'
@@ -94,6 +97,7 @@ export const PLAY_SETUP_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   [PlayGames.Naval]: NavalSetupDrawer,
   [PlayGames.Jumble]: JumbleSetupDrawer,
   [PlayGames.Echo]: EchoSetupDrawer,
+  [PlayGames.Glitch]: GlitchSetupDrawer,
 }
 
 /**
@@ -108,6 +112,7 @@ export const PLAY_START_VOTES: Partial<Record<PlayGameName, ComponentType<PlayVo
   [PlayGames.Ludo]: declaredVote(PlayGames.Ludo),
   [PlayGames.Naval]: declaredVote(PlayGames.Naval, navalVoteFace),
   [PlayGames.Echo]: declaredVote(PlayGames.Echo),
+  [PlayGames.Glitch]: declaredVote(PlayGames.Glitch),
 }
 
 /**
@@ -127,6 +132,9 @@ export const PLAY_RULES_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   ),
   [PlayGames.Ludo]: ({ open, onClose, settings }) => (
     <LudoRulesDrawer open={open} onClose={onClose} settings={ludoSettingsOf(settings)} />
+  ),
+  [PlayGames.Glitch]: ({ open, onClose, settings }) => (
+    <GlitchRulesDrawer open={open} onClose={onClose} settings={glitchSettingsOf(settings)} />
   ),
   [PlayGames.Echo]: ({ open, onClose, settings }) => (
     <EchoRulesDrawer open={open} onClose={onClose} settings={echoSettingsOf(settings)} />

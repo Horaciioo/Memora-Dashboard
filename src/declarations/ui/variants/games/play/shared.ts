@@ -28,6 +28,9 @@ export const SETUP_BLUE =
 export const SETUP_TEAL =
   'border-[var(--play-echo)] bg-[var(--play-echo)] text-white hover:border-[var(--play-echo)]'
 
+export const SETUP_PINK =
+  'border-[var(--play-glitch)] bg-[var(--play-glitch)] text-white hover:border-[var(--play-glitch)]'
+
 export const SETUP_VIOLET =
   'border-[var(--play-jumble)] bg-[var(--play-jumble)] text-white hover:border-[var(--play-jumble)]'
 

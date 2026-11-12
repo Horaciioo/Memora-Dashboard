@@ -47,6 +47,12 @@ const SHIFTERS: Record<
         "endsAt" = "endsAt" + (${s}::float8 * interval '1 second'),
         "revealUntil" = "revealUntil" + (${s}::float8 * interval '1 second')
     WHERE "sessionId" = ${id}`,
+  GLITCH: (tx, id, s) => tx.$executeRaw`
+    UPDATE play_glitch_games
+    SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),
+        "endsAt" = "endsAt" + (${s}::float8 * interval '1 second'),
+        "revealUntil" = "revealUntil" + (${s}::float8 * interval '1 second')
+    WHERE "sessionId" = ${id}`,
   JUMBLE: (tx, id, s) => tx.$executeRaw`
     UPDATE play_jumble_games
     SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),

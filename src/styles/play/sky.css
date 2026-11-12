@@ -1,17 +1,17 @@
 /* Neutral Play backdrop */
-.play-room:not(:has(.play-game-hub, .play-paper, .play-fuse, .play-jumble, .play-turf, .play-ludo, .play-sea)) {
+.play-room:not(:has(.play-game-hub, .play-paper, .play-fuse, .play-jumble, .play-glitch, .play-turf, .play-ludo, .play-sea)) {
   background: var(--play-core);
 }
 
 .play-room:not(
-    :has(.play-game-hub, .play-paper, .play-fuse, .play-jumble, .play-turf, .play-ludo, .play-sea)
+    :has(.play-game-hub, .play-paper, .play-fuse, .play-jumble, .play-glitch, .play-turf, .play-ludo, .play-sea)
   )::before,
-.play-room:not(:has(.play-game-hub, .play-paper, .play-fuse, .play-jumble, .play-turf, .play-ludo, .play-sea))
+.play-room:not(:has(.play-game-hub, .play-paper, .play-fuse, .play-jumble, .play-glitch, .play-turf, .play-ludo, .play-sea))
   .play-floor {
   display: none;
 }
 
-.play-room:has(.play-game-hub, .play-paper, .play-fuse, .play-jumble, .play-turf, .play-ludo, .play-sea)
+.play-room:has(.play-game-hub, .play-paper, .play-fuse, .play-jumble, .play-glitch, .play-turf, .play-ludo, .play-sea)
   .play-scene-banner {
   display: none;
 }

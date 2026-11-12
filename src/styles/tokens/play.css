@@ -236,6 +236,23 @@
   --play-jumble-tile: #fff4d6;
   --play-jumble-tile-deep: #d9b45a;
   --play-jumble-tile-ink: #2a1466;
+  --play-glitch: #e0369b;
+  --play-glitch-deep: #7d1457;
+  --play-glitch-glow: #ffd3ec;
+  --play-glitch-night: #200614;
+  --play-glitch-dusk: #4d0f35;
+  /* Picture of a round: warm paper, soft edge */
+  --glitch-paper: #fff8f1;
+  --glitch-edge: #f3c4de;
+  --glitch-ink: #2b1432;
+  /* Palette of the shapes and figures */
+  --glitch-c0: #e5484d;
+  --glitch-c1: #ff8a2b;
+  --glitch-c2: #f5c518;
+  --glitch-c3: #3b7bf0;
+  --glitch-c4: #8a5cf6;
+  --glitch-c5: #11a6b5;
+  --glitch-c6: #475069;
   --play-heart: #ff4d5e;
   --play-heart-gold: #ffc53d;
   /* Bomb difficulty buttons, easiest to hardest */

@@ -9,6 +9,7 @@
 @import './tokens/play.css';
 @import './play/arcade.css';
 @import './play/echo.css';
+@import './play/glitch.css';
 @import './play/jumble.css';
 @import './play/ludo.css';
 @import './play/naval.css';

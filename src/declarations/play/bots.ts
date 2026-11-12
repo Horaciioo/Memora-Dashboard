@@ -24,6 +24,7 @@ export const areBotsAwake = (game: PlayGameName): boolean => !ASLEEP_GAMES.inclu
 const ludo = readNode(bots.ludo, 'play/bots.ludo')
 const bomb = readNode(bots.bomb, 'play/bots.bomb')
 const echo = readNode(bots.echo, 'play/bots.echo')
+const glitch = readNode(bots.glitch, 'play/bots.glitch')
 const jumble = readNode(bots.jumble, 'play/bots.jumble')
 const baccalaureat = readNode(bots.baccalaureat, 'play/bots.baccalaureat')
 const golf = readNode(bots.golf, 'play/bots.golf')
@@ -81,6 +82,10 @@ export const PLAY_BOT_SETTINGS = {
   naval: {
     thinkMs: delay(naval.thinkMs, 'play/bots.naval.thinkMs'),
     mistakeRate: perLevel(naval.mistakeRate, 'play/bots.naval.mistakeRate', 0.2),
+  },
+  glitch: {
+    thinkMs: delay(glitch.thinkMs, 'play/bots.glitch.thinkMs'),
+    failRate: perLevel(glitch.failRate, 'play/bots.glitch.failRate', 0.1),
   },
   echo: {
     thinkMs: delay(echo.thinkMs, 'play/bots.echo.thinkMs'),

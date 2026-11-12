@@ -1,0 +1,270 @@
+/* Glitch ground: deep magenta night, shapes and figures rising like bubbles */
+.play-room:has(.play-glitch) {
+  background:
+    radial-gradient(
+      70rem 34rem at 50% 115%,
+      color-mix(in srgb, var(--play-glitch) 50%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      40rem 24rem at 12% -8%,
+      color-mix(in srgb, var(--play-glitch-glow) 16%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-glitch-night) 0%, var(--play-glitch-dusk) 100%);
+}
+
+.play-room:has(.play-glitch) .play-floor {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--play-glitch) 28%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--play-glitch) 28%, transparent) 1px,
+      transparent 1px
+    );
+}
+
+/* A hub shape rises, spins a little, fades out */
+.play-glitch-float {
+  position: absolute;
+  bottom: -5rem;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  opacity: 0;
+  animation: play-glitch-float var(--rise) linear var(--delay) infinite;
+}
+
+@keyframes play-glitch-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--tilt));
+  }
+  12% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
+  }
+}
+
+/* Countdown in the magenta glow */
+.play-figure-glitch {
+  color: var(--play-glitch-glow);
+  --play-key: var(--play-glitch);
+}
+
+/* Picture: warm paper with a soft edge, dealt in */
+.play-glitch-picture {
+  aspect-ratio: 4 / 3;
+  border-radius: 1rem;
+  background: var(--glitch-paper);
+  box-shadow:
+    0 0 0 0.3rem var(--glitch-edge),
+    0 1rem 2rem rgb(0 0 0 / 0.4);
+  animation: play-glitch-deal 460ms var(--motion-ease-out) backwards;
+}
+
+@keyframes play-glitch-deal {
+  0% {
+    opacity: 0;
+    transform: translateY(-1.5rem) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A wrong click freezes the picture for a moment */
+.play-glitch-locked {
+  cursor: not-allowed;
+  filter: saturate(0.35) brightness(0.92);
+  transition: filter 160ms ease-out;
+}
+
+.play-glitch-lockedtext {
+  animation: play-glitch-shake 320ms ease-in-out;
+}
+
+@keyframes play-glitch-shake {
+  20% {
+    translate: -0.35rem 0;
+  }
+  60% {
+    translate: 0.35rem 0;
+  }
+}
+
+/* Elements pop in one after the other */
+.play-glitch-item {
+  animation: play-glitch-pop 380ms var(--motion-ease-out) backwards;
+  animation-delay: calc(var(--i) * 16ms);
+}
+
+@keyframes play-glitch-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Difference found: a gold ring draws in */
+.play-glitch-ring,
+.play-glitch-ring-missed {
+  fill: none;
+  stroke-width: 0.9;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.play-glitch-ring {
+  stroke: var(--play-gold);
+  animation: play-glitch-ring 420ms var(--motion-ease-out) backwards;
+}
+
+@keyframes play-glitch-ring {
+  0% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Difference nobody found: dashed magenta, breathing */
+.play-glitch-ring-missed {
+  stroke: var(--play-glitch);
+  stroke-dasharray: 2.4 1.6;
+  animation: play-glitch-breathe 800ms ease-in-out infinite alternate;
+}
+
+@keyframes play-glitch-breathe {
+  to {
+    transform: scale(1.12);
+  }
+}
+
+/* Ripple where the picture was clicked */
+.play-glitch-burst {
+  fill: none;
+  stroke: var(--glitch-ink);
+  stroke-width: 0.6;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: play-glitch-burst 600ms ease-out forwards;
+}
+
+@keyframes play-glitch-burst {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* Time bar drains and reddens */
+.play-glitch-clock {
+  background: var(--play-glitch);
+  transform-origin: left;
+  animation:
+    play-glitch-drain var(--left) linear var(--wait) forwards,
+    play-glitch-redden var(--left) linear var(--wait) forwards;
+  scale: var(--from) 1;
+}
+
+@keyframes play-glitch-drain {
+  to {
+    scale: 0 1;
+  }
+}
+
+@keyframes play-glitch-redden {
+  70% {
+    background: var(--play-glitch);
+  }
+  to {
+    background: var(--play-heart);
+  }
+}
+
+/* Pip lights up when a difference is found */
+.play-glitch-pip {
+  animation: play-glitch-pip 360ms var(--motion-ease-out);
+}
+
+@keyframes play-glitch-pip {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.6);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.play-glitch-gain {
+  animation: play-glitch-gain 700ms var(--motion-ease-out) backwards;
+}
+
+@keyframes play-glitch-gain {
+  0% {
+    opacity: 0;
+    translate: 0 1rem;
+    scale: 0.6;
+  }
+  100% {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+.play-glitch-scored {
+  animation: play-glitch-scored 900ms ease-out;
+}
+
+@keyframes play-glitch-scored {
+  0% {
+    background: color-mix(in srgb, var(--play-glitch) 45%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-glitch-float,
+  .play-glitch-picture,
+  .play-glitch-item,
+  .play-glitch-ring,
+  .play-glitch-ring-missed,
+  .play-glitch-burst,
+  .play-glitch-clock,
+  .play-glitch-pip,
+  .play-glitch-gain,
+  .play-glitch-scored,
+  .play-glitch-lockedtext {
+    animation: none;
+  }
+}

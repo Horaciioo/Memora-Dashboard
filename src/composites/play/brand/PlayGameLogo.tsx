@@ -152,6 +152,17 @@ const MARKS: Record<string, ReactNode> = {
       />
     </>
   ),
+  playGlitch: (
+    <>
+      <rect x="4" y="14" width="26" height="34" rx="6" {...tint('--glitch-paper')} />
+      <rect x="34" y="14" width="26" height="34" rx="6" {...tint('--glitch-paper')} />
+      <circle cx="17" cy="26" r="5" {...tint('--glitch-c3')} />
+      <path d="M11 41l6-8 6 8z" {...tint('--glitch-c1')} />
+      <circle cx="47" cy="26" r="5" {...tint('--glitch-c0')} />
+      <path d="M41 41l6-8 6 8z" {...tint('--glitch-c1')} />
+      <circle cx="47" cy="26" r="9.5" fill="none" stroke="var(--play-gold)" strokeWidth="2.6" />
+    </>
+  ),
   playEcho: (
     <>
       <circle cx="24" cy="32" r="19" {...tint('--play-echo-glow')} />
@@ -251,6 +262,7 @@ const BARE = new Set([
   'playBaccalaureat',
   'playBomb',
   'playEcho',
+  'playGlitch',
   'playGolf',
   'playJumble',
   'playLudo',

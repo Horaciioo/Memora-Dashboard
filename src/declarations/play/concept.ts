@@ -59,6 +59,20 @@ export const PLAY_CONCEPT: Record<PlayGameName, PlayConceptStep[]> = {
       text: 'Chaque symbole trouvé rapporte des points, le premier à le trouver a un bonus.',
     },
   ],
+  [PlayGames.Glitch]: [
+    {
+      title: 'Deux images jumelles',
+      text: 'Des chiffres, des lettres, des formes : la copie diffère du modèle en quelques détails.',
+    },
+    {
+      title: 'Clique sur chaque écart',
+      text: 'Couleur, taille, forme, un élément en trop ou en moins. Un faux clic fige ton image un instant.',
+    },
+    {
+      title: 'Boucle l’image la première',
+      text: 'Chaque différence rapporte, le premier à tout trouver empoche le plus gros bonus.',
+    },
+  ],
   [PlayGames.Jumble]: [
     {
       title: 'Des lettres en vrac',

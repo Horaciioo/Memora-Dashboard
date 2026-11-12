@@ -412,6 +412,7 @@ model Account {
   bombMoves             BombMove[]
   jumbleRounds          JumbleRound[]
   echoFinds             EchoFind[]
+  glitchProgress        GlitchProgress[]
   golfPlayers           GolfPlayer[]
   golfMoves             GolfMove[]
   ludoPlayers           LudoPlayer[]
@@ -2981,6 +2982,7 @@ enum PlayGame {
   NAVAL
   JUMBLE
   ECHO
+  GLITCH
 }
 
 // Play bot level
@@ -3066,6 +3068,8 @@ model PlaySession {
   jumbleRounds JumbleRound[]
   echoGame     EchoGame?
   echoFinds    EchoFind[]
+  glitchGame   GlitchGame?
+  glitchProgress GlitchProgress[]
   golfGame     GolfGame?
   golfPlayers  GolfPlayer[]
   golfMoves    GolfMove[]
@@ -4154,4 +4158,49 @@ model EchoFind {
   @@unique([sessionId, round, accountId])
   @@index([sessionId, round])
   @@map("play_echo_finds")
+}
+
+// Glitch table: the seed of the two pictures and the clock of the round
+model GlitchGame {
+  sessionId   String    @id
+  // Round in play, from one
+  round       Int
+  // Draws both pictures and their differences, never sent as is
+  seed        Int
+  startsAt    DateTime
+  endsAt      DateTime
+  // Reveal over, the next round opens
+  revealUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_glitch_games")
+}
+
+// What a player found on a round
+model GlitchProgress {
+  id        String    @id @default(cuid())
+  sessionId String
+  round     Int
+  accountId String
+  // Differences found, by index in the round
+  found     Int[]
+  misses    Int       @default(0)
+  // Wrong click, the picture stays shut until then
+  lockUntil DateTime?
+  // Place among those who found everything, from one
+  rank      Int?
+  points    Int       @default(0)
+  // Time of the last find
+  ms        Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round, accountId])
+  @@index([sessionId, round])
+  @@map("play_glitch_progress")
 }

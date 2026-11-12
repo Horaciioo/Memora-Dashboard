@@ -1,0 +1,28 @@
+{
+  "minPlayers": 1,
+  "maxPlayers": 12,
+  "countdownSeconds": 3,
+  "rounds": { "default": 6, "min": 3, "max": 20 },
+  "roundSeconds": { "default": 60, "min": 20, "max": 180 },
+  "differences": { "default": 5, "min": 3, "max": 10 },
+  "revealSeconds": 5,
+  "lockMs": 1500,
+  "tolerance": 2.5,
+  "spread": 19,
+  "scene": {
+    "width": 100,
+    "height": 75,
+    "cols": 7,
+    "rows": 5,
+    "items": { "min": 16, "max": 24 },
+    "size": { "min": 4.2, "max": 5.8 }
+  },
+  "scoring": {
+    "perFind": 2,
+    "finishBonus": 12,
+    "finishStep": 3,
+    "finishFloor": 2,
+    "speedBonus": 10
+  },
+  "feedSize": 40
+}

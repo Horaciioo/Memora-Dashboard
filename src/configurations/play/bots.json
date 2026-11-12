@@ -45,6 +45,17 @@
       "HARD": 0.05
     }
   },
+  "glitch": {
+    "thinkMs": {
+      "min": 3500,
+      "max": 9000
+    },
+    "failRate": {
+      "EASY": 0.18,
+      "MEDIUM": 0.08,
+      "HARD": 0.02
+    }
+  },
   "jumble": {
     "thinkMs": {
       "min": 4000,
