@@ -7,6 +7,7 @@ import { apiPost, ApiClientError } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useAssistantScenario } from '@/core/hooks/data/system/useAssistantScenario'
 import type { ScenarioId, ScenarioRunner } from '@/core/hooks/data/system/useAssistantScenario'
+import { useNexusHandoff } from '@/managers/front-end/NexusManager'
 import { useAssistantStore } from '@/core/store/assistant'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { IDEMPOTENCY_HEADER } from '@/declarations/system/security/idempotency'
@@ -81,6 +82,7 @@ const failureOf = (error: unknown): string =>
 export const useAssistantChat = (onNavigate: (href: string) => void): AssistantChat => {
   const router = useRouter()
   const pathname = usePathname()
+  const handoff = useNexusHandoff()
   const { memory, remember } = useAssistantStore()
   const [turns, setTurns] = useState<AssistantTurn[]>([])
   const [pending, setPending] = useState({ text: '', filled: {} as Record<string, string> })
@@ -143,7 +145,7 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
   }
 
   const start = (text: string, known?: AssistantProposal | null) => {
-    if (inFlight.current || !text.trim()) return
+    if (inFlight.current || !text.trim() || handoff(text)) return
     setPending({ text, filled: {} })
     say('me', text)
     if (known) receive(known)
@@ -162,6 +164,7 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
 
   // Typed line answers or asks again
   const send = (text: string) => {
+    if (handoff(text)) return
     if (scenario.isActive) {
       scenario.reply(text)
       return

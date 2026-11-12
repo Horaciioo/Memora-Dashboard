@@ -52,6 +52,16 @@ export const abandonRunning = async (sessionId: string): Promise<void> => {
 }
 
 /**
+ * Forget a game's idle clock, the next action arms it again
+ * @param {string} sessionId - Game
+ * @return {void}
+ */
+
+export const forgetIdle = (sessionId: string): void => {
+  lastActions.delete(sessionId)
+}
+
+/**
  * Wake once at the idle limit, or later after a recent action
  * @param {string} sessionId - Game
  * @param {number} at - Due time

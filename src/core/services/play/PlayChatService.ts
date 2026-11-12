@@ -3,9 +3,9 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
-import { conflict, forbidden, invalidInput } from '@/core/lib/errors'
+import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { readBodyText } from '@/core/lib/play'
-import { mayEnter } from '@/core/lib/play/access'
+import { mayEnter, mayOversee } from '@/core/lib/play/access'
 import { signalChat } from '@/core/lib/play/signal'
 import { loadSession } from '@/core/services/play/PlaySessionService'
 import { fillPlayMessage, PLAY_ERRORS } from '@/declarations/play'
@@ -50,6 +50,27 @@ export const listMessages = async (sessionId: string) => {
   })
 
   return rows.reverse().map(toMessageView)
+}
+
+/**
+ * Chat of a game the reader may open
+ * @param {string} sessionId - Game
+ * @param {string} viewerId - Reader
+ * @param {boolean} canManage - Play management right
+ * @return {Promise<PlayMessageView[]>} - Lines
+ */
+
+export const readMessages = async (
+  sessionId: string,
+  viewerId: string,
+  canManage: boolean
+): Promise<PlayMessageView[]> => {
+  const session = await loadSession(sessionId)
+  // Private chats stay shut to the uninvited
+  const isAllowed = mayOversee(session, canManage) || (await mayEnter(prisma, session, viewerId))
+  if (!isAllowed) throw notFound(PLAY_ERRORS.sessionMissing)
+
+  return listMessages(sessionId)
 }
 
 /**

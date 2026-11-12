@@ -17,6 +17,7 @@ export const LUDO_BOARD_COPY = {
   eating: '{name} a mangé un pion de {victim}',
   theirRoll: '{name} lance le dé',
   theirMove: '{name} choisit un pion',
+  home: '{count} / {total} à la maison',
   starting: 'La partie commence',
   sixAgain: 'Six, tu rejoues',
   bonus: 'Tour bonus',
@@ -28,7 +29,6 @@ export const LUDO_BOARD_COPY = {
   place: '{place}e',
   firstPlace: '1er',
   pawn: 'Pion {number}',
-  home: '{count} / {total} à la maison',
   seconds: '{seconds} s',
   winner: 'Victoire',
 } as const
@@ -115,7 +115,7 @@ export const LUDO_RULE_COPY = {
   },
   safeSquares: {
     label: 'Cases protégées',
-    hint: 'Personne ne se fait manger sur une étoile ni sur une case de départ, les pions s’y partagent la case.',
+    hint: 'Personne ne se fait manger sur une étoile ni sur une case de départ, et une case protégée déjà occupée est fermée aux autres pions.',
   },
 } as const
 

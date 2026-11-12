@@ -12,44 +12,106 @@ import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FilterBar, type FilterDefinition } from '@/components/structures/data/FilterBar'
 import { RowList, type RowListGroup } from '@/components/structures/data/RowList'
 import { BanDrawer, type BanTarget } from '@/composites/recruitment/history/BanDrawer'
-import { useRecruitmentHistory } from '@/core/hooks/data/recruitment/useRecruitmentHistory'
+import {
+  useRecruitmentHistory,
+  type HistoryFilters,
+} from '@/core/hooks/data/recruitment/useRecruitmentHistory'
+import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { HISTORY_COPY } from '@/declarations/recruitment/historyCopy'
 import type { MenuItem } from '@/managers/front-end'
-import type { HistoryEntry, HistoryPassage } from '@/types/recruitment'
+import type { HistoryCandidate } from '@/types/recruitment'
 import { formatDay } from '@/utils/format/time/dates'
 
-// Value of the only filter
+// No search, no filter
+const NO_FILTERS: HistoryFilters = {
+  search: '',
+  bannedOnly: false,
+  outcomeId: '',
+  recruiterId: '',
+  status: '',
+}
+
+// Value of the blacklist filter
 const BANNED = 'banned'
 
-const FILTERS: FilterDefinition[] = [
-  {
-    name: 'blacklist',
-    label: HISTORY_COPY.banned,
-    allLabel: HISTORY_COPY.allIdentities,
-    options: [{ value: BANNED, label: HISTORY_COPY.bannedOnly }],
-  },
-]
+// Phases a session of the history can be in
+const STATUS_OPTIONS = RECRUITMENT_STATUS_REGISTRY.keys.map((value) => ({
+  value,
+  label: RECRUITMENT_STATUS_REGISTRY.label(value),
+}))
 
 /**
- * Candidates of every session, found again by their Discord identity
+ * Sessions with their candidates, found again by name or Discord identity
  * @return {JSX.Element}
  */
 
 export const HistoryPanel = () => {
   const router = useRouter()
-  const [search, setSearch] = useState('')
-  const [bannedOnly, setBannedOnly] = useState(false)
+  const [filters, setFilters] = useState<HistoryFilters>(NO_FILTERS)
   const [target, setTarget] = useState<BanTarget | null>(null)
-  const history = useRecruitmentHistory(search, bannedOnly)
+  const history = useRecruitmentHistory(filters)
 
-  const isFiltered = search !== '' || bannedOnly
-  const targetBanned = history.entries.some(
-    (entry) => entry.discordId === target?.discordId && entry.ban !== null
-  )
+  const isFiltered =
+    filters.search !== '' ||
+    filters.bannedOnly ||
+    filters.outcomeId !== '' ||
+    filters.recruiterId !== '' ||
+    filters.status !== ''
+  const targetBanned =
+    history.orphans.some((orphan) => orphan.discordId === target?.discordId) ||
+    history.sessions.some((session) =>
+      session.candidates.some((entry) => entry.discordId === target?.discordId && entry.ban)
+    )
+
+  const definitions: FilterDefinition[] = [
+    {
+      name: 'status',
+      label: HISTORY_COPY.status,
+      allLabel: HISTORY_COPY.allStatuses,
+      options: STATUS_OPTIONS,
+    },
+    {
+      name: 'outcome',
+      label: HISTORY_COPY.outcome,
+      allLabel: HISTORY_COPY.allOutcomes,
+      options: history.options.outcomes.map((item) => ({ value: item.id, label: item.name })),
+    },
+    {
+      name: 'recruiter',
+      label: HISTORY_COPY.recruiter,
+      allLabel: HISTORY_COPY.allRecruiters,
+      options: history.options.recruiters.map((item) => ({ value: item.id, label: item.label })),
+    },
+    {
+      name: 'blacklist',
+      label: HISTORY_COPY.banned,
+      allLabel: HISTORY_COPY.allIdentities,
+      options: [{ value: BANNED, label: HISTORY_COPY.bannedOnly }],
+    },
+  ]
+
+  const values: Record<string, string> = {
+    status: filters.status,
+    outcome: filters.outcomeId,
+    recruiter: filters.recruiterId,
+    blacklist: filters.bannedOnly ? BANNED : '',
+  }
+
+  const applyFilter = (name: string, value: string) =>
+    setFilters((current) => ({
+      ...current,
+      ...(name === 'status' ? { status: value } : {}),
+      ...(name === 'outcome' ? { outcomeId: value } : {}),
+      ...(name === 'recruiter' ? { recruiterId: value } : {}),
+      ...(name === 'blacklist' ? { bannedOnly: value === BANNED } : {}),
+    }))
 
   // Barring and freeing share one menu entry
-  const banMenu = (entry: HistoryEntry, passage?: HistoryPassage): MenuItem[] => [
+  const banMenu = (
+    entry: Pick<HistoryCandidate, 'discordId' | 'ban'>,
+    passage?: { sessionId: string; candidateId: string }
+  ): MenuItem[] => [
     ...(passage
       ? [
           {
@@ -75,66 +137,62 @@ export const HistoryPanel = () => {
     },
   ]
 
-  const groups: RowListGroup[] = history.entries.map((entry) => {
-    const lead = <Avatar name={entry.name} src={entry.avatarUrl} size="md" />
-    const banned = entry.ban && <Status label={HISTORY_COPY.banned} tone="danger" />
-
-    return {
-      id: entry.discordId,
-      label: `${entry.name} · ${entry.discordId}`,
-      items:
-        entry.passages.length > 0
-          ? entry.passages.map((passage) => ({
-              id: passage.candidateId,
-              title: passage.sessionName,
-              meta:
-                passage.recruiters.map((member) => member.label).join(', ') ||
-                HISTORY_COPY.noRecruiter,
-              metaEmpty: passage.recruiters.length === 0,
-              lead,
-              trail: (
-                <span className="flex items-center gap-3">
-                  {banned}
-                  <span className={PASTEL_TAG} style={accentVars(passage.outcome?.accent)}>
-                    {passage.outcome?.label ?? HISTORY_COPY.noOutcome}
-                  </span>
-                  <span>{formatDay(passage.at)}</span>
-                </span>
-              ),
-              menu: banMenu(entry, passage),
-              onOpen: () => router.push(ROUTES.candidate(passage.sessionId, passage.candidateId)),
-            }))
-          : [
-              {
-                id: entry.discordId,
-                title: entry.name,
-                meta: entry.ban?.reason ?? undefined,
-                lead,
-                trail: banned,
-                menu: banMenu(entry),
-                onOpen: () => setTarget({ discordId: entry.discordId, sessionId: null }),
-              },
-            ],
-    }
-  })
+  const groups: RowListGroup[] = [
+    ...history.sessions.map((session) => ({
+      id: session.id,
+      label: `${session.name} · ${session.youtuber} · ${RECRUITMENT_STATUS_REGISTRY.label(session.status)}`,
+      items: session.candidates.map((entry) => ({
+        id: entry.candidateId,
+        title: entry.name,
+        meta: entry.recruiters.map((member) => member.label).join(', ') || HISTORY_COPY.noRecruiter,
+        metaEmpty: entry.recruiters.length === 0,
+        lead: <Avatar name={entry.name} src={entry.avatarUrl} size="md" />,
+        trail: (
+          <span className="flex items-center gap-3">
+            {entry.ban && <Status label={HISTORY_COPY.banned} tone="danger" />}
+            <span className={PASTEL_TAG} style={accentVars(entry.outcome?.accent)}>
+              {entry.outcome?.label ?? HISTORY_COPY.noOutcome}
+            </span>
+            <span>{formatDay(entry.at)}</span>
+          </span>
+        ),
+        menu: banMenu(entry, { sessionId: session.id, candidateId: entry.candidateId }),
+        onOpen: () => router.push(ROUTES.candidate(session.id, entry.candidateId)),
+      })),
+    })),
+    ...(history.orphans.length > 0
+      ? [
+          {
+            id: 'orphans',
+            label: HISTORY_COPY.orphans,
+            items: history.orphans.map((orphan) => ({
+              id: orphan.discordId,
+              title: orphan.name,
+              meta: orphan.ban.reason ?? undefined,
+              lead: <Avatar name={orphan.name} src={orphan.avatarUrl} size="md" />,
+              trail: <Status label={HISTORY_COPY.banned} tone="danger" />,
+              menu: banMenu(orphan),
+              onOpen: () => setTarget({ discordId: orphan.discordId, sessionId: null }),
+            })),
+          },
+        ]
+      : []),
+  ]
 
   return (
     <div className="flex flex-col gap-6">
       <FilterBar
         searchLabel={HISTORY_COPY.search}
-        search={search}
-        onSearch={setSearch}
-        filters={FILTERS}
-        values={{ blacklist: bannedOnly ? BANNED : '' }}
-        onFilter={(_, value) => setBannedOnly(value === BANNED)}
-        onReset={() => {
-          setSearch('')
-          setBannedOnly(false)
-        }}
+        search={filters.search}
+        onSearch={(search) => setFilters((current) => ({ ...current, search }))}
+        filters={definitions}
+        values={values}
+        onFilter={applyFilter}
+        onReset={() => setFilters(NO_FILTERS)}
         isFiltered={isFiltered}
       />
 
-      {history.entries.length === 0 && !history.isLoading ? (
+      {groups.length === 0 && !history.isLoading ? (
         <EmptyState
           variant={isFiltered ? 'filter' : 'start'}
           figure="members"

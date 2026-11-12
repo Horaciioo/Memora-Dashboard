@@ -21,6 +21,8 @@ export const MODERATION_KINDS: Record<ModerationKind, { label: string; icon: Ico
   UNBAN_REQUEST_APPROVE: { label: 'Demande de déban acceptée', icon: 'unbanRequest' },
   UNBAN_REQUEST_DENY: { label: 'Demande de déban refusée', icon: 'unbanRequest' },
   MESSAGE_SEND: { label: 'Message dans le chat', icon: 'chat' },
+  ROLE_CHANGE: { label: 'Modérateur ou VIP', icon: 'sword' },
+  WARN_ACK: { label: 'Avertissement pris en compte', icon: 'modWarn' },
 }
 
 /**

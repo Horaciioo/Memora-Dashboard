@@ -8,7 +8,7 @@ const view = readNode(naval.view, 'play/naval.view')
 const shake = readNode(naval.shake, 'play/naval.shake')
 
 /**
- * Camera and gestures of a sea
+ * Look and gestures of a sea
  * @type {Object}
  */
 
@@ -20,18 +20,6 @@ export const NAVAL_VIEW = {
     fallback: 1600,
     min: 400,
   }),
-  // Squares across on arrival, and at the closest zoom
-  startCells: readInteger(view.startCells, {
-    path: 'play/naval.view.startCells',
-    fallback: 14,
-    min: 4,
-  }),
-  minCells: readInteger(view.minCells, { path: 'play/naval.view.minCells', fallback: 6, min: 2 }),
-  zoomStep: readNumber(view.zoomStep, {
-    path: 'play/naval.view.zoomStep',
-    fallback: 1.15,
-    min: 1.01,
-  }),
   // Finger travel that still counts as a tap, and as a swipe
   tapSlopPx: readInteger(view.tapSlopPx, {
     path: 'play/naval.view.tapSlopPx',
@@ -39,8 +27,13 @@ export const NAVAL_VIEW = {
     min: 1,
   }),
   swipePx: readInteger(view.swipePx, { path: 'play/naval.view.swipePx', fallback: 24, min: 4 }),
-  // Sea size from which the mini map shows
-  mapFrom: readInteger(view.mapFrom, { path: 'play/naval.view.mapFrom', fallback: 13, min: 1 }),
+  // Paint rate of a calm sea, strikes run at full speed
+  idleFps: readInteger(view.idleFps, {
+    path: 'play/naval.view.idleFps',
+    fallback: 30,
+    min: 1,
+    max: 120,
+  }),
 }
 
 /**

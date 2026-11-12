@@ -156,7 +156,7 @@ export const MEMBER_FILE = {
 
 export const PARTICIPATION_BOX = {
   list: 'flex flex-col gap-3',
-  box: 'flex w-full flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-4 py-3 text-left transition-colors',
+  box: 'flex w-full flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-4 py-2 text-left transition-colors',
   link: 'cursor-pointer hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   // Access taken back, the glass turns red
   revoked: 'card-danger',
@@ -306,7 +306,10 @@ export const CREATOR_FILE = {
 export const CREATOR_GROUP = {
   root: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] shadow-[var(--shadow-md)]',
   banner:
-    'relative isolate flex min-h-24 w-full cursor-pointer items-center gap-4 overflow-hidden bg-[var(--color-media-shade)] px-4 py-3 text-left text-[var(--color-on-media)] sm:px-6',
+    'relative isolate flex min-h-20 w-full cursor-pointer items-center gap-4 overflow-hidden bg-[var(--color-media-shade)] px-4 py-3 text-left text-[var(--color-on-media)] sm:px-6',
+  // Banner shown sharp, only the name side is shaded
+  backdrop: 'absolute inset-0 -z-20 h-full w-full object-cover',
+  wash: 'absolute inset-0 -z-10 bg-gradient-to-r from-[color-mix(in_srgb,var(--color-media-shade)_65%,transparent)] via-transparent to-transparent',
   portrait: 'shrink-0 shadow-[var(--shadow-lg)] ring-2 ring-[var(--color-on-media)]',
   name: 'min-w-0 flex-1 truncate text-xl font-bold tracking-tight sm:text-2xl',
   chevron:

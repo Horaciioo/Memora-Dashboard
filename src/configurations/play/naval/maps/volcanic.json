@@ -1,0 +1,88 @@
+{
+  "fleet": "heavy",
+  "theatre": {
+    "size": 18,
+    "fleet": [5, 4, 3, 3, 2],
+    "reachScale": 1.5,
+    "ramp": {
+      "everyTurns": 1,
+      "step": 0.25,
+      "max": 6
+    }
+  },
+  "frame": {
+    "band": {
+      "north": 8,
+      "east": 3,
+      "south": 3,
+      "west": 8
+    }
+  },
+  "light": {
+    "sun": [-0.7, -0.7],
+    "tint": "rgba(255,120,60,0.12)",
+    "shade": "rgba(10,4,4,0.45)"
+  },
+  "water": {
+    "deep": "#08141d",
+    "mid": "#132d3d",
+    "shallow": "#2b4650",
+    "lagoon": "#4a5450",
+    "foam": "#d9d4cc",
+    "sheen": "rgba(255,170,110,0.12)",
+    "grid": "rgba(255,220,200,0.18)",
+    "glow": "rgba(255,110,40,0.5)"
+  },
+  "land": {
+    "rock": "#2c2725",
+    "rockDark": "#141110",
+    "rockLight": "#5a504a",
+    "ash": "#6b625c",
+    "lava": "#ff8a2b",
+    "lavaCore": "#ffe28a",
+    "crust": "#7a2a12",
+    "smoke": "rgba(60,52,50,0.55)",
+    "smokeLight": "rgba(150,135,128,0.35)"
+  },
+  "decor": [
+    {
+      "kind": "volcano",
+      "side": "northwest",
+      "at": 0.5,
+      "depth": 0.4,
+      "scale": 1
+    },
+    {
+      "kind": "islet",
+      "side": "north",
+      "at": 0.78,
+      "depth": 0.5,
+      "scale": 0.7
+    },
+    {
+      "kind": "islet",
+      "side": "east",
+      "at": 0.62,
+      "depth": 0.5,
+      "scale": 0.55
+    },
+    {
+      "kind": "islet",
+      "side": "south",
+      "at": 0.2,
+      "depth": 0.5,
+      "scale": 0.6
+    }
+  ],
+  "life": {
+    "clouds": 3,
+    "birds": 0,
+    "mist": 0.12,
+    "embers": 14
+  },
+  "stage": 6,
+  "preview": {
+    "span": 21,
+    "focus": 0.55
+  }
+}

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { NEW_MARKS } from '@/composites/play/brand/logo/marks'
 import { PLAY_GAMES } from '@/declarations/play/games'
 import { PLAY_BRAND } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -95,6 +96,7 @@ const MARKS: Record<string, ReactNode> = {
       />
     </>
   ),
+  ...NEW_MARKS,
   playLudo: (
     <>
       <defs>
@@ -179,7 +181,17 @@ const MARKS: Record<string, ReactNode> = {
 }
 
 // Logos drawn bare, without their tile
-const BARE = new Set(['playBaccalaureat', 'playBomb', 'playGolf', 'playLudo', 'playNaval'])
+const BARE = new Set([
+  'playBaccalaureat',
+  'playBomb',
+  'playCroquis',
+  'playEcho',
+  'playGlitch',
+  'playGolf',
+  'playJumble',
+  'playLudo',
+  'playNaval',
+])
 
 // Game not announced yet
 const MYSTERY = {

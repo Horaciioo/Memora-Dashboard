@@ -9,7 +9,7 @@ import {
   rollDice,
   settleBoard,
 } from '@/core/services/play/ludo/LudoTurnService'
-import { ludoView } from '@/core/services/play/ludo/LudoViewService'
+import { ludoBoards, ludoView } from '@/core/services/play/ludo/LudoViewService'
 import { PLAY_ERRORS } from '@/declarations/play'
 import type { EngineSession, EngineStep, PlayEngine } from '@/types/play'
 
@@ -39,5 +39,6 @@ export const LUDO_ENGINE: PlayEngine = {
   },
   settle: settleBoard,
   view: ludoView,
+  viewFor: ludoBoards,
   extraStats: ludoStats,
 }

@@ -1,0 +1,20 @@
+{
+  "minPlayers": 2,
+  "maxPlayers": 10,
+  "countdownSeconds": 3,
+  "laps": { "default": 1, "min": 1, "max": 3 },
+  "roundSeconds": { "default": 75, "min": 30, "max": 150 },
+  "revealSeconds": 4,
+  "hintRatio": 0.5,
+  "wordLength": 30,
+  "scoring": {
+    "base": 10,
+    "speedBonus": 10,
+    "firstBonus": 5,
+    "drawerPerGuess": 6,
+    "drawerAllBonus": 6
+  },
+  "canvas": { "width": 800, "height": 600 },
+  "limits": { "strokes": 150, "pointsPerStroke": 600, "points": 4000 },
+  "feedSize": 40
+}

@@ -255,6 +255,7 @@ export const MODVIEW_UNBAN = {
 
 export const MODVIEW_TEAM_CHAT = {
   box: 'relative flex h-[calc(55dvh-5rem)] min-h-72 flex-col',
+  boxFill: 'h-full min-h-0',
   list: 'flex min-h-0 flex-1 flex-col overflow-y-auto px-1 pt-4 pb-1.5',
   line: 'group/line relative flex flex-col',
   // Bar floating over the top right corner of a hovered message
@@ -340,11 +341,19 @@ export const MODVIEW_ACTION_EDITOR = {
   preview:
     'rounded-[var(--radius-lg)] border border-[var(--glass-thick-line)] bg-[var(--twitch-head)] p-4 shadow-[var(--glass-thick-shadow)]',
   toolbar: 'flex flex-wrap items-center gap-2',
-  hint: 'mr-auto text-sm text-[var(--color-ink-subtle)]',
+  // Phone: the three buttons share one line
+  tools:
+    'flex w-full items-center justify-between gap-1 whitespace-nowrap sm:justify-end sm:gap-2 [&>button]:min-w-0 [&>button]:px-2 sm:[&>button]:px-3',
   // Glass over the glow, tone only on the tile
   card: 'glass-thick flex flex-col gap-3 rounded-[var(--radius-lg)] border p-4',
   tile: 'flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--tone)_18%,transparent)] text-[var(--tone)]',
   tileIcon: 'h-6 w-6 shrink-0',
+  // Glyph alone, in the tone of its kind
+  glyph: 'h-6 w-6 shrink-0 text-[var(--tone)]',
+  glyphOff: 'opacity-40',
+  // Dashed box closing the list, as the other add boxes
+  newBox:
+    'flex w-full items-center justify-center gap-2 rounded-[var(--radius-lg)] border-2 border-dashed border-[var(--color-border-strong)] py-4 text-sm font-bold text-[var(--color-ink-subtle)] enabled:hover:bg-[var(--color-hover)] disabled:opacity-50',
   dragging: 'opacity-40',
   cardRow: 'flex items-center gap-3',
   cardBody: 'flex min-w-0 flex-1 flex-col gap-0.5',
@@ -355,7 +364,7 @@ export const MODVIEW_ACTION_EDITOR = {
   list: 'flex flex-col gap-2',
   item: 'flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2',
   row: 'flex items-center gap-2',
-  grip: 'flex cursor-grab text-[var(--color-ink-subtle)] active:cursor-grabbing',
+  grip: '-mr-1 -ml-2 flex w-4 shrink-0 cursor-grab items-center justify-center self-stretch text-[var(--color-ink-subtle)] active:cursor-grabbing',
   summary: 'flex min-w-0 flex-1 items-center justify-between gap-2 text-left text-sm font-bold',
   off: 'text-[var(--color-ink-subtle)] line-through',
   turned: 'rotate-180',

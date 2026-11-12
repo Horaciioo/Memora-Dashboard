@@ -5,13 +5,16 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.RecruitmentManage,
   descriptor: {
-    summary: 'Read the candidates of every session by identity',
+    summary: 'Read the candidates of every session, session by session',
     tags: ['recruitment'],
   },
   handler: async ({ query, scope }) =>
     readHistory(await scope(), {
       search: query.get('q') ?? '',
       bannedOnly: query.get('banned') === '1',
+      outcomeId: query.get('outcome') ?? '',
+      recruiterId: query.get('recruiter') ?? '',
+      status: query.get('status') ?? '',
       page: Math.max(Number(query.get('page')) || 0, 0),
     }),
 })

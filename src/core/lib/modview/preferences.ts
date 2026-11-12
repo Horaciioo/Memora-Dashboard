@@ -13,11 +13,20 @@ export const MODVIEW_DEFAULTS = Object.fromEntries(
   Object.entries(MODVIEW_PREFERENCES).map(([name, rule]) => [name, rule.default])
 ) as unknown as ModPreferences
 
+// Known pages once each, the missing ones back at the end
+const readOrder = (value: unknown, known: readonly string[]): string[] | undefined => {
+  if (!Array.isArray(value)) return undefined
+  const kept = value.filter((entry, at) => known.includes(entry) && value.indexOf(entry) === at)
+
+  return [...kept, ...known.filter((entry) => !kept.includes(entry))]
+}
+
 // Value the rule accepts, cleaned, undefined when refused
 const readValue = (rule: PreferenceDefinition, value: unknown): unknown => {
   if (rule.kind === 'toggle') return typeof value === 'boolean' ? value : undefined
   if (rule.kind === 'actions') return sanitizeActions(value) ?? undefined
   if (rule.kind === 'words') return sanitizeWords(value, rule.max) ?? undefined
+  if (rule.kind === 'order') return readOrder(value, rule.default)
   if (rule.kind === 'badwords') return sanitizeBadwords(value, rule.max) ?? undefined
 
   return typeof value === 'string' && rule.options.includes(value) ? value : undefined

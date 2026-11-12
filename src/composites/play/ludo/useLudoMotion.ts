@@ -67,6 +67,8 @@ export interface LudoMotion {
   walking: LudoWalker | null
   // Pawn being eaten
   strike: LudoStrike | null
+  // Last revision the screen has finished playing
+  settledRev: number
 }
 
 /**
@@ -110,6 +112,7 @@ export const useLudoMotion = (
     hop: null,
     walking: null,
     strike: null,
+    settledRev: board.rev,
   }))
   const latest = useRef(board)
   const shown = useRef(board.rev)
@@ -138,24 +141,27 @@ export const useLudoMotion = (
     })
   }, [])
 
-  // Every line of the queue, in order
+  // Every line of the queue, in order, a failing beat never freezes the table
   const run = useCallback(async () => {
     isRunning.current = true
     setMotion((current) => ({ ...current, isBusy: true }))
-    while (queue.current.length && isAlive.current) {
-      const line = queue.current.shift()!
-      // Its feed line is told as its beat starts
-      setPlayed(sessionId, line.rev)
-      await playLine({
-        line,
-        next: queue.current[0],
-        board: latest.current,
-        viewerId,
-        place,
-        setMotion,
-      })
+    try {
+      while (queue.current.length && isAlive.current) {
+        const line = queue.current.shift()!
+        // Its feed line is told as its beat starts
+        setPlayed(sessionId, line.rev)
+        await playLine({
+          line,
+          next: queue.current[0],
+          board: latest.current,
+          viewerId,
+          place,
+          setMotion,
+        }).catch(() => undefined)
+      }
+    } finally {
+      isRunning.current = false
     }
-    isRunning.current = false
     if (!isAlive.current) return
     setPlayed(sessionId, latest.current.rev)
 
@@ -167,6 +173,7 @@ export const useLudoMotion = (
       hop: null,
       walking: null,
       strike: null,
+      settledRev: latest.current.rev,
     }))
   }, [place, viewerId, sessionId, setPlayed])
 
@@ -182,6 +189,7 @@ export const useLudoMotion = (
         ...current,
         pawns: pawnsOf(board.players),
         ...lastRoll(board.lines),
+        settledRev: board.rev,
       }))
       return
     }
@@ -191,11 +199,16 @@ export const useLudoMotion = (
     if (!isRunning.current && queue.current.length) void run()
     else if (!isRunning.current) {
       setPlayed(sessionId, board.rev)
-      setMotion((current) => ({ ...current, pawns: pawnsOf(board.players) }))
+      setMotion((current) => ({
+        ...current,
+        pawns: pawnsOf(board.players),
+        settledRev: board.rev,
+      }))
     }
   }, [board, run, sessionId, setPlayed])
 
-  return motion
+  // Busy from the render that brings a newer board, not one effect later
+  return { ...motion, isBusy: motion.isBusy || board.rev > motion.settledRev }
 }
 
 /**

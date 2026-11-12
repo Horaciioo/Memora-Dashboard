@@ -1,0 +1,27 @@
+/* Sign-in showcase: photograph settles once on load, scrims keep text readable */
+.showcase-photo {
+  animation: showcase-settle 2400ms var(--motion-ease-spring, ease-out) both;
+}
+
+@keyframes showcase-settle {
+  from {
+    transform: scale(1.06);
+  }
+}
+
+.showcase-scrim {
+  background:
+    linear-gradient(to bottom, rgb(18 12 28 / 0.5), transparent 30%),
+    linear-gradient(to top, rgb(18 12 28 / 0.55), transparent 40%);
+}
+
+/* Links over a photograph: they gain presence on hover */
+.link-media {
+  color: var(--color-on-media);
+  opacity: 0.85;
+  transition: opacity var(--motion-duration-fast) ease;
+}
+
+.link-media:hover {
+  opacity: 1;
+}

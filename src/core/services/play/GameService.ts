@@ -4,16 +4,21 @@ import { PlayNoticeKind } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { seatBoundsOf } from '@/core/lib/play/seats'
-import { conflict, notFound } from '@/core/lib/errors'
+import { conflict, notFound, toAppError } from '@/core/lib/errors'
 import { mayEnter, mayOversee } from '@/core/lib/play/access'
-import { signalPlay } from '@/core/lib/play/signal'
-import { clearSessionTimers, scheduleDeadline } from '@/core/lib/play/timers'
+import { signalPlay, signalStarted } from '@/core/lib/play/signal'
+import {
+  clearSessionTimers,
+  isSettled,
+  markSettled,
+  scheduleDeadline,
+} from '@/core/lib/play/timers'
 import { PLAY_ERRORS } from '@/declarations/play'
 import { areBotsAwake } from '@/declarations/play/bots'
 import type { EngineStep } from '@/core/engines/play'
-import { driveBots } from '@/core/engines/play/players/BotDriver'
+import { driveBots, isDriven } from '@/core/engines/play/players/BotDriver'
 import { logger } from '@/core/lib/logger'
-import { noteAction } from '@/core/services/play/PlayIdleService'
+import { forgetIdle, noteAction } from '@/core/services/play/PlayIdleService'
 import { tellFollowers } from '@/core/services/play/PlayFollowService'
 import { finishSession } from '@/core/services/play/RewardService'
 import { tournamentStandings } from '@/core/services/play/TournamentService'
@@ -27,6 +32,8 @@ import {
 import { isPresent, toEngineSession } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { toSessionView } from '@/core/lib/play/views'
+import { recordError } from '@/core/services/system/ErrorEventService'
+import { ErrorCodes } from '@/utils/constants/errors'
 import { PlayStatuses } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -45,15 +52,20 @@ const applyStep = async (
 ): Promise<void> => {
   if (step.finished) {
     clearSessionTimers(sessionId)
+    forgetIdle(sessionId)
     await finishSession(sessionId)
   } else if (step.deadline) {
     scheduleDeadline(sessionId, step.deadline, () => settleSession(sessionId))
+    markSettled(sessionId, step.deadline)
+  } else if (step.changed && !step.isCosmetic) {
+    // Next move unknown, the next read settles
+    markSettled(sessionId, null)
   }
 
   // A running table draws from its board alone, the page moves at the end
   if (step.changed || step.finished) await signalPlay(sessionId, step.finished, !step.finished)
-  // Bots answer the new board
-  if (step.changed && !step.finished) {
+  // Bots answer the new board, a typed draft aside
+  if (step.changed && !step.finished && !step.isCosmetic) {
     void driveBots(sessionId, game, playMove).catch((error: unknown) =>
       logger.warn('[play] bots stalled', error)
     )
@@ -69,12 +81,24 @@ const applyStep = async (
 export const settleSession = async (sessionId: string): Promise<LoadedSession> => {
   const session = await loadSession(sessionId)
   if (session.status !== PlayStatuses.Running) return session
+  // Bots lost with a restart move again
+  if (!isDriven(sessionId) && session.seats.some((seat) => isPresent(seat) && seat.account.botKind))
+    wakeBots(sessionId, session.game)
 
   const step = await engineOf(session.game).settle(toEngineSession(session))
   await applyStep(sessionId, session.game, step)
 
   return step.changed || step.finished ? loadSession(sessionId) : session
 }
+
+/**
+ * Game read for a page or a move, the locked settle skipped when nothing is due
+ * @param {string} sessionId - Game
+ * @return {Promise<LoadedSession>} - Game
+ */
+
+const freshSession = (sessionId: string): Promise<LoadedSession> =>
+  isSettled(sessionId) ? loadSession(sessionId) : settleSession(sessionId)
 
 /**
  * Next game of a finished tournament game
@@ -104,7 +128,7 @@ const nextGameId = async (session: LoadedSession): Promise<string | null> => {
  */
 
 export const readSession = async (sessionId: string, viewerId: string, canManage = false) => {
-  const session = await settleSession(sessionId)
+  const session = await freshSession(sessionId)
   // Private games stay shut to the uninvited, admins aside
   const isAllowed = mayOversee(session, canManage) || (await mayEnter(prisma, session, viewerId))
   if (!isAllowed) throw notFound(PLAY_ERRORS.sessionMissing)
@@ -168,6 +192,7 @@ export const startSession = async (sessionId: string, hostId: string): Promise<v
     throw error
   }
   noteAction(sessionId)
+  await signalStarted(sessionId)
   await signalPlay(sessionId, true)
   await tellFollowers(sessionId, PlayNoticeKind.STARTED)
 }
@@ -186,7 +211,22 @@ export const actInSession = async (
   raw: Record<string, unknown>
 ): Promise<void> => {
   noteAction(sessionId)
-  await playMove(sessionId, accountId, raw)
+  try {
+    await playMove(sessionId, accountId, raw)
+  } catch (error) {
+    // Expected refusals stay out of the console
+    if (toAppError(error).code === ErrorCodes.SystemFailure) {
+      void recordError({
+        severity: 'ERROR',
+        source: 'PLAY',
+        error,
+        route: 'play.act',
+        accountId,
+        context: { sessionId },
+      })
+    }
+    throw error
+  }
 }
 
 /**
@@ -202,7 +242,7 @@ const playMove = async (
   accountId: string,
   raw: Record<string, unknown>
 ): Promise<void> => {
-  const session = await settleSession(sessionId)
+  const session = await freshSession(sessionId)
   if (session.status !== PlayStatuses.Running) throw conflict(PLAY_ERRORS.notRunning)
   requireSeat(session, accountId)
 
@@ -210,5 +250,18 @@ const playMove = async (
     sessionId,
     session.game,
     await engineOf(session.game).act(toEngineSession(session), accountId, raw)
+  )
+}
+
+/**
+ * Let the bots of a game move again
+ * @param {string} sessionId - Game
+ * @param {PlayGameName} game - Game kind
+ * @return {void} - Started
+ */
+
+export const wakeBots = (sessionId: string, game: PlayGameName): void => {
+  void driveBots(sessionId, game, playMove).catch((error: unknown) =>
+    logger.warn('[play] bots stalled', error)
   )
 }

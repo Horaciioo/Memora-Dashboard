@@ -1,13 +1,11 @@
 'use client'
 
-import type { NavalEvent } from '@/composites/play/naval/battle/useNavalPlayback'
 import { calloutOf } from '@/composites/play/naval/battle/battleCall'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
-import { NavalMiniMap } from '@/composites/play/naval/ocean/NavalMiniMap'
 import { NavalOcean } from '@/composites/play/naval/ocean/NavalOcean'
 import type { OceanShip } from '@/composites/play/naval/ocean/paint/ships'
-import type { OceanStrike } from '@/composites/play/naval/ocean/paint/strike'
-import { useOceanCamera } from '@/composites/play/naval/ocean/useOceanCamera'
+import type { OceanStrike } from '@/composites/play/naval/fx/paintStrikes'
+import type { NavalCallout } from '@/composites/play/naval/fx/useNavalDirector'
 import type { useNavalAim } from '@/composites/play/naval/battle/useNavalAim'
 import type { SeaMark } from '@/core/lib/play/naval/sea'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -17,59 +15,60 @@ import { cn } from '@/utils/classnames'
 
 export interface NavalTargetSeaProps {
   size: number
-  seaKey: string
+  map: string
   target: NavalCaptainView
+  isMine?: boolean
+  isFading?: boolean
   marks: SeaMark[]
   ships: OceanShip[]
-  playing: OceanStrike | null
+  playing: OceanStrike[]
   aim: ReturnType<typeof useNavalAim>
-  callout: { event: NavalEvent; captains: NavalCaptainView[]; viewer: number } | null
+  callout: { callout: NavalCallout; captains: NavalCaptainView[]; viewer: number } | null
 }
 
 /**
- * Enemy sea: tilted, zoomable, the aim zone lit, its mini map and the callout of the last strike
+ * Sea shown: the enemy's with the aim zone lit, or the viewer's own when attacked
  * @param {NavalTargetSeaProps} props - Sea aimed at
  * @return {JSX.Element}
  */
 
 export const NavalTargetSea = ({
   size,
-  seaKey,
+  map,
   target,
+  isMine,
+  isFading,
   marks,
   ships,
   playing,
   aim,
   callout,
 }: NavalTargetSeaProps) => {
-  const [camera, setCamera] = useOceanCamera(size, seaKey)
-  const text = callout ? calloutOf(callout.event, callout.captains, callout.viewer) : null
+  const text = callout ? calloutOf(callout.callout, callout.captains, callout.viewer) : null
 
   return (
-    <div className={NAVAL_BOARD.target}>
+    <div className={cn(NAVAL_BOARD.target, isFading && NAVAL_BOARD.seaIn)}>
       <NavalOcean
         size={size}
-        camera={camera}
-        setCamera={setCamera}
+        map={map}
         marks={marks}
         ships={ships}
         playing={playing}
         hover={aim.isOpen ? aim.hover : null}
         zone={aim.zone}
-        isDim={!aim.isOpen && !playing}
-        label={fillPlayMessage(NAVAL_BOARD_COPY.seaOf, { name: target.name })}
+        isDim={!aim.isOpen && !playing.length}
+        isFoe={!isMine}
+        label={
+          isMine
+            ? NAVAL_BOARD_COPY.mine
+            : fillPlayMessage(NAVAL_BOARD_COPY.seaOf, { name: target.name })
+        }
         onHover={aim.onHover}
         onTap={aim.onTap}
       />
-      <NavalMiniMap
-        size={size}
-        marks={marks}
-        ships={ships.map((entry) => entry.ship)}
-        camera={camera}
-        setCamera={setCamera}
-      />
+      {isMine && <span className={NAVAL_BOARD.mineTag}>{NAVAL_BOARD_COPY.mine}</span>}
       {text && (
-        <div key={callout?.event.id} className={NAVAL_CALLOUT.root}>
+        <div key={callout?.callout.id} className={NAVAL_CALLOUT.root}>
           <span className={cn(NAVAL_CALLOUT.text, NAVAL_CALLOUT[text.tone])}>{text.text}</span>
         </div>
       )}

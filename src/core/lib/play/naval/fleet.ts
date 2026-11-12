@@ -1,5 +1,8 @@
 import type { NavalSea } from '@/core/lib/play/naval/settings'
 
+// What laying a fleet reads of a sea
+export type NavalLayoutSea = Pick<NavalSea, 'size' | 'fleet' | 'isSpaced'>
+
 /**
  * Ship on the sea
  * @typedef {Object} NavalShip
@@ -90,22 +93,22 @@ const isCrowded = (left: NavalShip, right: NavalShip, isSpaced: boolean): boolea
  * Ship allowed beside the others
  * @param {NavalShip} ship - Ship
  * @param {NavalShip[]} others - Ships already placed
- * @param {NavalSea} sea - Sea
+ * @param {NavalLayoutSea} sea - Sea
  * @return {boolean} - Allowed
  */
 
-export const canPlace = (ship: NavalShip, others: NavalShip[], sea: NavalSea): boolean =>
+export const canPlace = (ship: NavalShip, others: NavalShip[], sea: NavalLayoutSea): boolean =>
   isAfloat(ship, sea.size) &&
   others.every((other) => other.id === ship.id || !isCrowded(ship, other, sea.isSpaced))
 
 /**
  * Fleet the rules accept
  * @param {unknown} ships - Layout sent
- * @param {NavalSea} sea - Sea
+ * @param {NavalLayoutSea} sea - Sea
  * @return {ships is NavalShip[]} - Valid
  */
 
-export const isFleetValid = (ships: unknown, sea: NavalSea): ships is NavalShip[] => {
+export const isFleetValid = (ships: unknown, sea: NavalLayoutSea): ships is NavalShip[] => {
   if (!Array.isArray(ships) || ships.length !== sea.fleet.length) return false
   const fleet = ships as NavalShip[]
   const isShape = fleet.every(
@@ -133,7 +136,7 @@ export const isFleetValid = (ships: unknown, sea: NavalSea): ships is NavalShip[
  * @param {number} length - Squares
  * @param {number} id - Place in the fleet
  * @param {NavalShip[]} placed - Ships already placed
- * @param {NavalSea} sea - Sea
+ * @param {NavalLayoutSea} sea - Sea
  * @param {Rng} rng - Random source
  * @return {NavalShip | null} - Ship, none when crowded
  */
@@ -142,7 +145,7 @@ const dropShip = (
   length: number,
   id: number,
   placed: NavalShip[],
-  sea: NavalSea,
+  sea: NavalLayoutSea,
   rng: Rng
 ): NavalShip | null => {
   for (let attempt = 0; attempt < PLACE_TRIES; attempt += 1) {
@@ -163,14 +166,14 @@ const dropShip = (
 /**
  * Fleet finished from the ships already placed
  * @param {NavalShip[]} kept - Ships kept
- * @param {NavalSea} sea - Sea
+ * @param {NavalLayoutSea} sea - Sea
  * @param {Rng} [rng] - Random source
  * @return {NavalShip[]} - Full fleet
  */
 
 export const completeFleet = (
   kept: NavalShip[],
-  sea: NavalSea,
+  sea: NavalLayoutSea,
   rng: Rng = Math.random
 ): NavalShip[] => {
   for (let deal = 0; deal < DEAL_TRIES; deal += 1) {
@@ -197,10 +200,10 @@ export const completeFleet = (
 
 /**
  * Fleet laid out at random
- * @param {NavalSea} sea - Sea
+ * @param {NavalLayoutSea} sea - Sea
  * @param {Rng} [rng] - Random source
  * @return {NavalShip[]} - Fleet
  */
 
-export const randomFleet = (sea: NavalSea, rng: Rng = Math.random): NavalShip[] =>
+export const randomFleet = (sea: NavalLayoutSea, rng: Rng = Math.random): NavalShip[] =>
   completeFleet([], sea, rng)

@@ -107,17 +107,21 @@ export const TOAST_STYLES = {
   // Space once spread
   gapPx: 8,
   toast:
-    'toast-enter relative flex touch-pan-y items-start gap-3 overflow-hidden rounded-[var(--radius-xl)] glass-toast px-4 py-3 text-sm',
+    'toast-enter relative flex touch-pan-y items-start gap-3 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] py-3.5 pr-3 pl-3.5 text-sm shadow-[var(--shadow-lg)]',
   settle: 'transition-[transform,opacity] motion-reduce:transition-none',
-  badge: 'flex h-7 w-7 shrink-0 items-center justify-center rounded-full',
-  glyph: 'h-4 w-4',
-  body: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  title: 'font-semibold',
-  description: 'text-xs text-[var(--color-ink-subtle)]',
+  // Bare tone glyph, no badge behind it
+  glyph: 'mt-px h-7 w-7 shrink-0',
+  body: 'flex min-w-0 flex-1 flex-col gap-0.5 pt-1',
+  title: 'font-medium leading-snug text-[var(--color-ink)]',
+  // Result word of the line, red when it went wrong
+  verb: 'font-bold',
+  verbNegative: 'font-bold text-[var(--color-danger)]',
+  description: 'text-sm leading-snug text-[var(--color-ink-subtle)]',
   dismiss:
-    'shrink-0 text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+    '-mt-0.5 -mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  closeGlyph: 'h-4 w-4',
   // Duration set inline
-  countdown: 'toast-countdown absolute inset-x-0 bottom-0 h-0.5 origin-left',
+  countdown: 'toast-countdown absolute inset-x-0 bottom-0 h-1 origin-left',
   countdownPaused: '[animation-play-state:paused]',
 } as const
 

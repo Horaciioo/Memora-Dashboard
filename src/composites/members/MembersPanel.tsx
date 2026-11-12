@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FilterBar, type FilterDefinition } from '@/components/structures/data/FilterBar'
 import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
+import { PageOptions, type PageOption } from '@/components/structures/page/PageOptions'
 import { Section } from '@/components/structures/page/Section'
 import { useDerank } from '@/core/hooks/data/people/useDerank'
 import { useMembers } from '@/core/hooks/data/people/useMembers'
@@ -32,6 +33,7 @@ import { MemberCard } from '@/composites/members/MemberCard'
 import { RoleGlyph } from '@/composites/members/MemberBadges'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { AcceptedCandidate, MemberSummary } from '@/types/members'
+import { MemberStatuses } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
 import { withToggled } from '@/utils/format/arrays'
@@ -78,8 +80,33 @@ interface MemberGroup {
   image?: string | null
   banner?: string | null
   role?: MemberRoleName
+  // Members who left the team, one box per way out
+  former?: boolean
   members: MemberSummary[]
 }
+
+/**
+ * Whether a member left the team
+ * @param {MemberSummary} member - Member
+ * @return {boolean} - Dismissed or resigned
+ */
+
+const FORMER_STATUSES = [MemberStatuses.Dismissed, MemberStatuses.Resigned] as const
+
+const isFormer = (member: MemberSummary): boolean =>
+  (FORMER_STATUSES as readonly string[]).includes(member.status)
+
+/**
+ * Former members split by the way they left
+ * @param {MemberSummary[]} list - Members of a box
+ * @return {{ status: MemberStatusName, list: MemberSummary[] }[]} - One part per way out, empty ones left out
+ */
+
+const formerParts = (list: MemberSummary[]) =>
+  FORMER_STATUSES.map((status) => ({
+    status,
+    list: inReadingOrder(list.filter((member) => member.status === status)),
+  })).filter((part) => part.list.length > 0)
 
 /**
  * Moderator boxes
@@ -119,6 +146,7 @@ export const MembersPanel = ({
   const [pendingDeletion, setPendingDeletion] = useState<MemberSummary | null>(null)
   // Groups flipped from their default, role groups open and creators folded
   const [flipped, setFlipped] = useState<Set<string>>(new Set())
+  const [showFormer, setShowFormer] = useState(false)
   const [isDeranking, setDeranking] = useState(false)
   const [derankBody, setDerankBody] = useState<string | null>(null)
   const { isSaving: isDerankSaving, derank } = useDerank()
@@ -138,6 +166,9 @@ export const MembersPanel = ({
     return members.filter((member) => {
       // The employees hold every access without sitting in the list
       if (!isListedRole(member.role)) return false
+
+      // Those who left stay hidden until asked, or until a status filter names them
+      if (isFormer(member) && !showFormer && !filters.status) return false
 
       // Free text runs on the name and on the Discord identifier
       if (
@@ -166,21 +197,33 @@ export const MembersPanel = ({
 
       return true
     })
-  }, [members, search, filters])
+  }, [members, search, filters, showFormer])
 
   // One bucket per YouTuber
   const groups = useMemo((): MemberGroup[] => {
     // Narrowed to one creator
     if (creatorId) {
-      return listedRoles
+      const present = visibleMembers.filter((member) => !isFormer(member))
+      const roleGroups: MemberGroup[] = listedRoles
         .map((option) => ({
           key: option.value,
           label: option.label,
           role: option.value as MemberRoleName,
           youtuberId: creatorId,
-          members: inReadingOrder(visibleMembers.filter((member) => member.role === option.value)),
+          members: inReadingOrder(present.filter((member) => member.role === option.value)),
         }))
         .filter((group) => group.members.length > 0)
+      const formerGroups: MemberGroup[] = formerParts(
+        visibleMembers.filter((member) => isFormer(member))
+      ).map((part) => ({
+        key: `former-${part.status}`,
+        label: MEMBER_STATUS_REGISTRY.label(part.status),
+        youtuberId: creatorId,
+        former: true,
+        members: part.list,
+      }))
+
+      return [...roleGroups, ...formerGroups]
     }
 
     const buckets = new Map<string, MemberSummary[]>()
@@ -266,6 +309,15 @@ export const MembersPanel = ({
     },
   ]
 
+  const pageOptions: PageOption[] = [
+    {
+      id: 'former',
+      label: MEMBER_COPY.formerToggle,
+      checked: showFormer,
+      onChange: setShowFormer,
+    },
+  ]
+
   const openCreate = (youtuberId?: string) => {
     clearIssues()
     setCreateYoutuberId(youtuberId)
@@ -279,6 +331,7 @@ export const MembersPanel = ({
 
   return (
     <>
+      <PageOptions options={pageOptions} />
       <Section bare>
         <FilterBar
           searchLabel={MEMBER_FILTER_COPY.search}
@@ -290,17 +343,19 @@ export const MembersPanel = ({
           onReset={resetFilters}
           isFiltered={isFiltered}
           leading={
-            derankIds.length > 0 ? (
-              <button
-                type="button"
-                aria-label={DERANK_COPY.action}
-                title={DERANK_COPY.action}
-                onClick={() => setDeranking(true)}
-                className={cn(FILTER_STYLES.iconButton, FILTER_STYLES.iconButtonDanger)}
-              >
-                <ICONS.actBan className={FILTER_STYLES.glyph} aria-hidden="true" />
-              </button>
-            ) : undefined
+            <>
+              {derankIds.length > 0 && (
+                <button
+                  type="button"
+                  aria-label={DERANK_COPY.action}
+                  title={DERANK_COPY.action}
+                  onClick={() => setDeranking(true)}
+                  className={cn(FILTER_STYLES.iconButton, FILTER_STYLES.iconButtonDanger)}
+                >
+                  <ICONS.actBan className={FILTER_STYLES.glyph} aria-hidden="true" />
+                </button>
+              )}
+            </>
           }
         />
 
@@ -331,7 +386,8 @@ export const MembersPanel = ({
           <div className={GROUP_STYLES.stack}>
             {groups.map((group, index) => {
               const key = group.key
-              const isOpen = flipped.has(key) !== (isSearching || Boolean(group.role))
+              const isFlat = Boolean(group.role) || Boolean(group.former)
+              const isOpen = flipped.has(key) !== (isSearching || isFlat)
 
               const renderCards = (list: MemberSummary[]) => (
                 <div className={LIST_STYLES.grid}>
@@ -349,13 +405,20 @@ export const MembersPanel = ({
               )
 
               // A creator box splits into the Administration and the moderators
-              const { administration, moderators } = arrangeMembers(group.members)
+              const { administration, moderators } = arrangeMembers(
+                group.members.filter((member) => !isFormer(member))
+              )
               const sections = [
                 { key: 'administration', label: MEMBER_COPY.administration, list: administration },
                 { key: 'moderators', label: MEMBER_COPY.moderators, list: moderators },
+                ...formerParts(group.members).map((part) => ({
+                  key: `former-${part.status}`,
+                  label: MEMBER_STATUS_REGISTRY.label(part.status),
+                  list: part.list,
+                })),
               ].filter((section) => section.list.length > 0)
 
-              const cards = group.role ? (
+              const cards = isFlat ? (
                 renderCards(group.members)
               ) : (
                 <div className={CREATOR_GROUP.sections}>
@@ -372,7 +435,7 @@ export const MembersPanel = ({
               )
 
               // A creator is its banner, the moderators sit in a box beneath
-              if (!group.role) {
+              if (!isFlat) {
                 return (
                   <div key={key} className={cn(CREATOR_GROUP.root, index > 0 && 'mt-6')}>
                     <CreatorGroupBanner
@@ -408,7 +471,7 @@ export const MembersPanel = ({
                     onClick={() => toggleGroup(key)}
                     className={GROUP_STYLES.heading}
                   >
-                    <RoleGlyph role={group.role} />
+                    {group.role && <RoleGlyph role={group.role} />}
                     {group.label}
                     <ChevronIcon
                       className={cn(GROUP_STYLES.chevron, isOpen && GROUP_STYLES.chevronOpen)}

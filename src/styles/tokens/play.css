@@ -198,6 +198,7 @@
   --play-golf-card-done: #6f9d5a;
   --play-bomb: #e0743a;
   --play-bomb-deep: #7a2a12;
+  --play-bomb-red: #e5251f;
   --play-bomb-glow: #ffd08a;
   /* The drawn bomb: iron shell, brass cap, cord, spark */
   --play-bomb-shell: #2a2236;
@@ -206,6 +207,67 @@
   --play-bomb-cap: #6d6578;
   --play-bomb-cap-deep: #34303d;
   --play-bomb-cord: #d8b77a;
+  --play-croquis: #f0a30a;
+  --play-croquis-deep: #8a5600;
+  --play-croquis-glow: #ffe9b0;
+  --play-croquis-night: #1f1604;
+  --play-croquis-dusk: #46300a;
+  /* Croquis pens and paper */
+  --croquis-paper: #fffdf6;
+  --croquis-black: #26222e;
+  --croquis-red: #e5483f;
+  --croquis-orange: #f58a1f;
+  --croquis-yellow: #f6c823;
+  --croquis-green: #3fae5a;
+  --croquis-blue: #2f7be0;
+  --croquis-purple: #8a5cf6;
+  --croquis-brown: #8a5a36;
+  --play-echo: #11a6b5;
+  --play-echo-deep: #0a5560;
+  --play-echo-glow: #c9f3f7;
+  --play-echo-night: #051f26;
+  --play-echo-dusk: #0b4350;
+  /* Echo card: cream face, soft edge */
+  --echo-card: #fffaf0;
+  --echo-card-edge: #cfe3e6;
+  /* Echo symbol paints */
+  --echo-ink: #2b2140;
+  --echo-white: #ffffff;
+  --echo-grey: #b9b4c6;
+  --echo-wood: #b9783f;
+  --echo-red: #ef4b4b;
+  --echo-orange: #ff9a3d;
+  --echo-yellow: #ffd23f;
+  --echo-pink: #ff7eb6;
+  --echo-purple: #8a5cf6;
+  --echo-blue: #3b7bf0;
+  --echo-sky: #5ec8f2;
+  --play-jumble: #8a5cf6;
+  --play-jumble-deep: #3d1a9c;
+  --play-jumble-glow: #e2d6ff;
+  --play-jumble-night: #0f0a24;
+  --play-jumble-dusk: #2a1466;
+  /* Letter tiles: cream face, gold edge */
+  --play-jumble-tile: #fff4d6;
+  --play-jumble-tile-deep: #d9b45a;
+  --play-jumble-tile-ink: #2a1466;
+  --play-glitch: #e0369b;
+  --play-glitch-deep: #7d1457;
+  --play-glitch-glow: #ffd3ec;
+  --play-glitch-night: #200614;
+  --play-glitch-dusk: #4d0f35;
+  /* Picture of a round: warm paper, soft edge */
+  --glitch-paper: #fff8f1;
+  --glitch-edge: #f3c4de;
+  --glitch-ink: #2b1432;
+  /* Palette of the shapes and figures */
+  --glitch-c0: #e5484d;
+  --glitch-c1: #ff8a2b;
+  --glitch-c2: #f5c518;
+  --glitch-c3: #3b7bf0;
+  --glitch-c4: #8a5cf6;
+  --glitch-c5: #11a6b5;
+  --glitch-c6: #475069;
   --play-heart: #ff4d5e;
   --play-heart-gold: #ffc53d;
   /* Bomb difficulty buttons, easiest to hardest */
@@ -261,7 +323,7 @@
   --play-ludo-yellow-hole: #c97c44;
   --play-ludo-board: #ffffff;
   --play-ludo-line: #e3e7eb;
-  --play-ludo-star: #8d9ba8;
+  --play-ludo-star: #ecd9a0;
   --play-ludo-gold-light: #fff1b8;
   --play-ludo-gold: #e6b422;
   --play-ludo-gold-deep: #a8740c;
@@ -305,7 +367,7 @@
   --play-haze: #3a1d7a;
   --play-on-art: #ffffff;
   --play-panel: rgb(30 34 44 / 0.72);
-  --play-panel-strong: rgb(44 49 62 / 0.82);
+  --play-panel-strong: rgb(44 49 62);
   /* Frosted glass of the dock */
   --play-glass: rgb(26 30 40 / 0.78);
   --play-glass-solid: var(--play-night);

@@ -25,6 +25,8 @@ export const useOutsideDismiss = (
       const target = event.target as Element
       const bounds = Array.isArray(boundary) ? boundary : [boundary]
       if (bounds.some((ref) => ref.current?.contains(target))) return
+      // Select panels lifted to the body never dismiss
+      if (target.closest?.('[data-floating-layer]')) return
       if (keep && target.closest?.(keep)) return
 
       onDismiss()

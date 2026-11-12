@@ -1,0 +1,235 @@
+import type { DecorLight, DecorPainters } from '@/composites/play/naval/world/decor'
+import { boardOf, frameOf, placeOf } from '@/composites/play/naval/world/geometry'
+import type { WorldBoard } from '@/composites/play/naval/world/geometry'
+import type { DecorActor } from '@/composites/play/naval/world/life'
+import { pieceRng } from '@/composites/play/naval/world/noise'
+import type { Pen } from '@/composites/play/naval/world/pen'
+import { paintBed, paintCloudShadows, paintCrests } from '@/composites/play/naval/world/sea'
+import { NAVAL_MAPS, NavalDecorKinds } from '@/declarations/play/naval/maps'
+import type { NavalMapLook } from '@/declarations/play/naval/maps'
+
+/**
+ * Seed of a map, the same picture every time
+ * @param {string} id - Map key
+ * @return {number} - Seed
+ */
+
+const seedOf = (id: string): number =>
+  [...id].reduce((sum, char) => sum * 31 + char.charCodeAt(0), 7) | 0
+
+/**
+ * Grid lines over the playable water and its frame
+ * @param {Pen} pen - Pen in squares
+ * @param {WorldBoard} board - Board
+ * @param {NavalMapLook} look - Look
+ * @return {void}
+ */
+
+const paintGrid = (pen: Pen, board: WorldBoard, look: NavalMapLook): void => {
+  const { left, top, size } = board
+  const hair = 1 / pen.getTransform().a
+  pen.strokeStyle = look.water.grid
+  pen.lineWidth = hair * 0.8
+  pen.globalAlpha = Math.min(0.9, 10 / size + 0.3)
+  pen.beginPath()
+  for (let line = 1; line < size; line += 1) {
+    pen.moveTo(left + line, top)
+    pen.lineTo(left + line, top + size)
+    pen.moveTo(left, top + line)
+    pen.lineTo(left + size, top + line)
+  }
+  pen.stroke()
+  pen.globalAlpha = 1
+  pen.lineWidth = hair * 2
+  pen.strokeRect(left, top, size, size)
+}
+
+/**
+ * Mist drifting over the bands, light over the grid
+ * @param {Pen} pen - Pen in squares
+ * @param {WorldBoard} board - Board
+ * @param {NavalMapLook} look - Look
+ * @param {number} seed - Seed
+ * @return {void}
+ */
+
+const paintMist = (pen: Pen, board: WorldBoard, look: NavalMapLook, seed: number): void => {
+  const amount = look.life.mist ?? 0
+  if (!amount) return
+  const rng = pieceRng(seed + 99)
+  const span = Math.max(board.width, board.height)
+  for (let wisp = 0; wisp < 12; wisp += 1) {
+    const isEdge = wisp % 3 !== 0
+    const x = isEdge
+      ? rng() < 0.5
+        ? rng() * board.left
+        : board.width - rng() * (board.width - board.left - board.size)
+      : rng() * board.width
+    const y = rng() * board.height
+    const radius = span * (0.08 + rng() * 0.12)
+    const fog = pen.createRadialGradient(x, y, 0, x, y, radius)
+    fog.addColorStop(0, look.water.foam)
+    fog.addColorStop(1, 'rgba(0,0,0,0)')
+    pen.globalAlpha = amount * (isEdge ? 1.6 : 0.6)
+    pen.fillStyle = fog
+    pen.fillRect(x - radius, y - radius, radius * 2, radius * 2)
+  }
+  pen.globalAlpha = 1
+}
+
+/**
+ * Light of the hour and a soft vignette over the whole picture
+ * @param {Pen} pen - Pen, no transform
+ * @param {NavalMapLook} look - Look
+ * @return {void}
+ */
+
+const paintAir = (pen: Pen, look: NavalMapLook): void => {
+  const { width, height } = pen.canvas
+  const [sx, sy] = look.sun
+  const light = pen.createLinearGradient(
+    width / 2 + sx * width * 0.6,
+    height / 2 + sy * height * 0.6,
+    width / 2 - sx * width * 0.6,
+    height / 2 - sy * height * 0.6
+  )
+  light.addColorStop(0, look.light.tint)
+  light.addColorStop(1, 'rgba(0,0,0,0)')
+  pen.fillStyle = light
+  pen.fillRect(0, 0, width, height)
+  const vignette = pen.createRadialGradient(
+    width / 2,
+    height / 2,
+    width * 0.35,
+    width / 2,
+    height / 2,
+    width * 0.75
+  )
+  vignette.addColorStop(0, 'rgba(0,0,0,0)')
+  vignette.addColorStop(1, look.light.shade)
+  pen.fillStyle = vignette
+  pen.fillRect(0, 0, width, height)
+}
+
+/**
+ * Pixels per square and offset of the board on a pen without transform
+ * @typedef {Object} WorldFit
+ */
+
+export interface WorldFit {
+  scale: number
+  x: number
+  y: number
+}
+
+/**
+ * How a map is painted
+ * @typedef {Object} WorldPaint
+ * @property {DecorPainters} painters - Painters of its pieces, a missing one is left out
+ * @property {boolean} [isGame] - Inside a game: the grid is the game's and no piece covers it
+ * @property {number} [step] - Pixels per worked out pixel of the bed
+ * @property {(light: DecorLight) => void} [light] - Keeps the living lights
+ * @property {(actor: DecorActor) => void} [live] - Keeps the moving things
+ */
+
+export interface WorldPaint {
+  id: string
+  fit: WorldFit
+  painters: DecorPainters
+  isGame?: boolean
+  step?: number
+  light?: (light: DecorLight) => void
+  live?: (actor: DecorActor) => void
+}
+
+/**
+ * Pieces of the decor, the farthest first, kept off the sea in a game
+ * @param {Pen} pen - Pen in squares
+ * @param {Object} view - Board, map and how it is painted
+ * @return {void}
+ */
+
+const paintPieces = (
+  pen: Pen,
+  {
+    board,
+    look,
+    seed,
+    paint,
+  }: { board: WorldBoard; look: NavalMapLook; seed: number; paint: WorldPaint }
+): void => {
+  const pieces = look.decor
+    .map((piece, index) => ({ piece, index, place: placeOf(board, look, piece) }))
+    .toSorted((a, b) => a.place.y - b.place.y)
+  const paintOne = ({ piece, index, place }: (typeof pieces)[number]) => {
+    const painter = paint.painters[piece.kind]
+    if (!painter) return
+    pen.save()
+    painter({
+      pen,
+      board,
+      look,
+      piece,
+      place,
+      seed: seed + index * 101,
+      light: paint.light,
+      live: paint.live,
+    })
+    pen.restore()
+  }
+  // The sea floor lies under the grid too
+  pieces.filter(({ piece }) => piece.kind === NavalDecorKinds.Seabed).forEach(paintOne)
+  pen.save()
+  if (paint.isGame) {
+    pen.beginPath()
+    pen.rect(-board.width, -board.height, board.width * 3, board.height * 3)
+    pen.rect(board.left, board.top, board.size, board.size)
+    pen.clip('evenodd')
+  }
+  pieces.filter(({ piece }) => piece.kind !== NavalDecorKinds.Seabed).forEach(paintOne)
+  pen.restore()
+}
+
+/**
+ * Whole map drawn on a pen without transform: water, decor, grid, light
+ * @param {Pen} pen - Pen, sized already
+ * @param {WorldPaint} paint - Map and how
+ * @return {void}
+ */
+
+export const paintWorld = (pen: Pen, paint: WorldPaint): void => {
+  const map = NAVAL_MAPS.has(paint.id) ? NAVAL_MAPS.get(paint.id) : NAVAL_MAPS.list[0]
+  const { look } = map
+  const { fit } = paint
+  const board = boardOf(look, map.theatre.size)
+  const seed = seedOf(paint.id)
+  paintBed(pen, { board, look, fit, seed, step: paint.step })
+  pen.setTransform(fit.scale, 0, 0, fit.scale, fit.x, fit.y)
+  paintCloudShadows(pen, { board, look, seed })
+  paintCrests(pen, { board, look, seed })
+  if (!paint.isGame) paintGrid(pen, board, look)
+  paintPieces(pen, { board, look, seed, paint })
+  paintMist(pen, board, look, seed)
+  pen.setTransform(1, 0, 0, 1, 0, 0)
+  paintAir(pen, look)
+}
+
+/**
+ * Picture of a map, the board covering it
+ * @param {HTMLCanvasElement} canvas - Target, sized already
+ * @param {string} id - Map key
+ * @param {DecorPainters} painters - Painters of its pieces
+ * @return {void}
+ */
+
+export const paintMapScene = (
+  canvas: HTMLCanvasElement,
+  id: string,
+  painters: DecorPainters
+): void => {
+  const pen = canvas.getContext('2d')
+  const map = NAVAL_MAPS.has(id) ? NAVAL_MAPS.get(id) : NAVAL_MAPS.list[0]
+  if (!pen) return
+  const fit = frameOf(boardOf(map.look, map.theatre.size), map.look, canvas.width)
+  paintWorld(pen, { id, fit, painters })
+}

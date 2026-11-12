@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 
 import { LudoPlate } from '@/composites/play/ludo/LudoPlate'
 import type { LudoRanked } from '@/composites/play/ludo/LudoResult'
-import { GOAL_STEP } from '@/core/lib/play/ludo'
 import { LUDO_CORNERS } from '@/declarations/play/ludo/board'
 import { LUDO_SLOTS } from '@/declarations/ui/variants'
 
@@ -47,13 +46,7 @@ export const LudoPlates = ({ seats, turns, turnId, viewerId, clock, die }: LudoP
           <LudoPlate
             colour={LUDO_CORNERS[seat.corner]}
             isRight={RIGHT_SLOTS.has(slot)}
-            face={{
-              ...seat,
-              home: {
-                count: seat.pawns.filter((step) => step >= GOAL_STEP).length,
-                total: seat.pawns.length,
-              },
-            }}
+            face={seat}
             turn={isTurn ? clock : null}
             isMine={seat.accountId === viewerId}
             die={isTurn && die}

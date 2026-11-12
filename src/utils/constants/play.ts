@@ -9,6 +9,10 @@ export const PlayGames = {
   Bomb: 'BOMB',
   Ludo: 'LUDO',
   Naval: 'NAVAL',
+  Jumble: 'JUMBLE',
+  Echo: 'ECHO',
+  Glitch: 'GLITCH',
+  Croquis: 'CROQUIS',
 } as const
 
 export type PlayGameName = (typeof PlayGames)[keyof typeof PlayGames]
@@ -30,6 +34,7 @@ export type PlayBotKindName = (typeof PlayBotKinds)[keyof typeof PlayBotKinds]
 export const PlayStatuses = {
   Lobby: 'LOBBY',
   Running: 'RUNNING',
+  Paused: 'PAUSED',
   Finished: 'FINISHED',
   Abandoned: 'ABANDONED',
 } as const
@@ -44,6 +49,7 @@ export type PlayStatusName = (typeof PlayStatuses)[keyof typeof PlayStatuses]
 export const PLAY_OPEN_STATUSES: readonly PlayStatusName[] = [
   PlayStatuses.Lobby,
   PlayStatuses.Running,
+  PlayStatuses.Paused,
 ]
 
 /**
@@ -236,9 +242,61 @@ export const NavalWeapons = {
   Broadside: 'broadside',
   Flare: 'flare',
   Torpedo: 'torpedo',
+  Pair: 'pair',
+  Volley: 'volley',
+  Grenade: 'grenade',
+  Gunship: 'gunship',
 } as const
 
 export type NavalWeaponName = (typeof NavalWeapons)[keyof typeof NavalWeapons]
+
+/**
+ * Painted actors of a strike
+ * @type {Record<string, string>}
+ */
+
+export const NavalActors = {
+  Muzzle: 'muzzle',
+  Shell: 'shell',
+  Mortar: 'mortar',
+  Plane: 'plane',
+  Bomb: 'bomb',
+  Gunship: 'gunship',
+  Submarine: 'submarine',
+  Missile: 'missile',
+  Flare: 'flare',
+} as const
+
+export type NavalActorName = (typeof NavalActors)[keyof typeof NavalActors]
+
+/**
+ * Look of a landing
+ * @type {Record<string, string>}
+ */
+
+export const NavalImpacts = {
+  Blast: 'blast',
+  Shockwave: 'shockwave',
+  Light: 'light',
+} as const
+
+export type NavalImpactName = (typeof NavalImpacts)[keyof typeof NavalImpacts]
+
+/**
+ * Effect tiers of a sea, auto picks one
+ * @type {Object}
+ */
+
+export const NavalQualities = {
+  Auto: 'auto',
+  Full: 'full',
+  Reduced: 'reduced',
+  Minimal: 'minimal',
+} as const
+
+export type NavalQualityName = (typeof NavalQualities)[keyof typeof NavalQualities]
+
+export type NavalTierName = Exclude<NavalQualityName, typeof NavalQualities.Auto>
 
 /**
  * Footprint of a weapon on the sea

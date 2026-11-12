@@ -5,6 +5,7 @@ import {
   readInteger,
   readNode,
 } from '@/declarations/configurations/readers'
+import { NAVAL_MAPS } from '@/declarations/play/naval/maps'
 import { NAVAL_WEAPONS } from '@/declarations/play/naval/weapons'
 import { readRange } from '@/declarations/play/settings'
 import { NavalModes } from '@/utils/constants/play'
@@ -12,10 +13,8 @@ import type { NavalModeName } from '@/utils/constants/play'
 
 // Raw nodes
 const modes = readNode(naval.modes, 'play/naval.modes')
-const formats = readNode(naval.formats, 'play/naval.formats')
 const rules = readNode(naval.rules, 'play/naval.rules')
 const winnerXp = readNode(naval.winnerXp, 'play/naval.winnerXp')
-const ammo = readNode(naval.ammo, 'play/naval.ammo')
 
 /**
  * Seats a mode accepts
@@ -49,61 +48,6 @@ const SEATS = Object.fromEntries(
 ) as Record<NavalModeName, NavalSeats>
 
 /**
- * Sea and fleet of a format
- * @typedef {Object} NavalFormat
- * @property {number} size - Squares per side
- * @property {number[]} fleet - Ship lengths
- */
-
-export interface NavalFormat {
-  size: number
-  fleet: number[]
-}
-
-/**
- * Format read from the config
- * @param {string} key - Format key
- * @param {NavalFormat} fallback - Fallback format
- * @return {NavalFormat} - Format
- */
-
-const readFormat = (key: string, fallback: NavalFormat): NavalFormat => {
-  const node = readNode(formats[key], `play/naval.formats.${key}`)
-  const fleet = Array.isArray(node.fleet) ? (node.fleet as unknown[]) : fallback.fleet
-  const size = readInteger(node.size, {
-    path: `play/naval.formats.${key}.size`,
-    fallback: fallback.size,
-    min: 6,
-    max: 36,
-  })
-
-  return {
-    size,
-    fleet: fleet.map((length, index) =>
-      readInteger(length, {
-        path: `play/naval.formats.${key}.fleet.${index}`,
-        fallback: 2,
-        min: 1,
-        max: size,
-      })
-    ),
-  }
-}
-
-/**
- * Formats a host can pick
- * @type {Object}
- */
-
-const FORMATS = {
-  quick: readFormat('quick', { size: 10, fleet: [5, 4, 3, 3, 2] }),
-  standard: readFormat('standard', { size: 12, fleet: [5, 4, 3, 3, 2] }),
-  vast: readFormat('vast', { size: 36, fleet: [5, 4, 3, 3, 2] }),
-}
-
-export type NavalFormatName = keyof typeof FORMATS
-
-/**
  * Switchable house rules
  * @type {Record<string, boolean>}
  */
@@ -132,20 +76,13 @@ export const NAVAL_SETTINGS = {
     fallback: NavalModes.Duel,
     allowed: Object.values(NavalModes),
   }),
-  formats: FORMATS,
-  format: readChoice<NavalFormatName>(naval.format, {
-    path: 'play/naval.format',
-    fallback: 'vast',
-    allowed: Object.keys(FORMATS) as NavalFormatName[],
+  map: readChoice<string>(naval.map, {
+    path: 'play/naval.map',
+    fallback: NAVAL_MAPS.keys[0],
+    allowed: NAVAL_MAPS.keys,
   }),
   rules: RULES,
   weapons: NAVAL_WEAPONS,
-  offerSize: readInteger(naval.offerSize, { path: 'play/naval.offerSize', fallback: 2, min: 0 }),
-  ammo: {
-    start: readInteger(ammo.start, { path: 'play/naval.ammo.start', fallback: 2, min: 0 }),
-    perTurn: readInteger(ammo.perTurn, { path: 'play/naval.ammo.perTurn', fallback: 1, min: 0 }),
-    max: readInteger(ammo.max, { path: 'play/naval.ammo.max', fallback: 8, min: 0 }),
-  },
   countdownSeconds: readInteger(naval.countdownSeconds, {
     path: 'play/naval.countdownSeconds',
     fallback: 4,
@@ -171,8 +108,6 @@ export const NAVAL_SETTINGS = {
     fallback: 3,
     min: 1,
   }),
-  flightMs: readInteger(naval.flightMs, { path: 'play/naval.flightMs', fallback: 1500, min: 200 }),
-  impactMs: readInteger(naval.impactMs, { path: 'play/naval.impactMs', fallback: 900, min: 100 }),
   sunkMs: readInteger(naval.sunkMs, { path: 'play/naval.sunkMs', fallback: 1500, min: 100 }),
   roundPauseSeconds: readInteger(naval.roundPauseSeconds, {
     path: 'play/naval.roundPauseSeconds',

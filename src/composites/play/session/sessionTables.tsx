@@ -2,6 +2,14 @@ import type { ReactNode } from 'react'
 
 import { BaccalaureatBoard } from '@/composites/play/baccalaureat/BaccalaureatBoard'
 import type { BacBoardView } from '@/composites/play/baccalaureat/types'
+import { CroquisBoard } from '@/composites/play/croquis/CroquisBoard'
+import type { CroquisBoardView } from '@/composites/play/croquis/types'
+import { EchoBoard } from '@/composites/play/echo/EchoBoard'
+import type { EchoBoardView } from '@/composites/play/echo/types'
+import { GlitchBoard } from '@/composites/play/glitch/GlitchBoard'
+import type { GlitchBoardView } from '@/composites/play/glitch/types'
+import { JumbleBoard } from '@/composites/play/jumble/JumbleBoard'
+import type { JumbleBoardView } from '@/composites/play/jumble/types'
 import { BombBoard } from '@/composites/play/bomb/BombBoard'
 import type { BombBoardView } from '@/composites/play/bomb/types'
 import { GolfBoard } from '@/composites/play/golf/GolfBoard'
@@ -14,7 +22,14 @@ import type { NavalBoardView } from '@/core/lib/play/naval/state'
 import type { GolfBoardView } from '@/core/lib/play/golf'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlainLiveFeed } from '@/composites/play/session/live/PlainLiveFeed'
-import { BAC_FEED_COPY, BOMB_FEED_COPY } from '@/declarations/play'
+import {
+  BAC_FEED_COPY,
+  BOMB_FEED_COPY,
+  CROQUIS_FEED_COPY,
+  ECHO_FEED_COPY,
+  GLITCH_FEED_COPY,
+  JUMBLE_FEED_COPY,
+} from '@/declarations/play'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -109,6 +124,98 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
+  [PlayGames.Croquis]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const croquis = board as CroquisBoardView
+
+    return {
+      board: (
+        <CroquisBoard
+          sessionId={sessionId}
+          board={croquis}
+          faces={asPlayers(seats)}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      feed: (
+        <PlainLiveFeed
+          sessionId={sessionId}
+          board={croquis}
+          copy={CROQUIS_FEED_COPY}
+          players={[...seats, ...spectators]}
+        />
+      ),
+    }
+  },
+  [PlayGames.Echo]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const echo = board as EchoBoardView
+
+    return {
+      board: (
+        <EchoBoard
+          sessionId={sessionId}
+          board={echo}
+          faces={asPlayers(seats)}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      feed: (
+        <PlainLiveFeed
+          sessionId={sessionId}
+          board={echo}
+          copy={ECHO_FEED_COPY}
+          players={[...seats, ...spectators]}
+        />
+      ),
+    }
+  },
+  [PlayGames.Glitch]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const glitch = board as GlitchBoardView
+
+    return {
+      board: (
+        <GlitchBoard
+          sessionId={sessionId}
+          board={glitch}
+          faces={asPlayers(seats)}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      feed: (
+        <PlainLiveFeed
+          sessionId={sessionId}
+          board={glitch}
+          copy={GLITCH_FEED_COPY}
+          players={[...seats, ...spectators]}
+        />
+      ),
+    }
+  },
+  [PlayGames.Jumble]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const jumble = board as JumbleBoardView
+
+    return {
+      board: (
+        <JumbleBoard
+          sessionId={sessionId}
+          board={jumble}
+          faces={asPlayers(seats)}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      feed: (
+        <PlainLiveFeed
+          sessionId={sessionId}
+          board={jumble}
+          copy={JUMBLE_FEED_COPY}
+          players={[...seats, ...spectators]}
+        />
+      ),
+    }
+  },
   [PlayGames.Golf]: ({ sessionId, board, seats, spectators, viewerId, me, canInspect }) => {
     const golf = board as GolfBoardView
 
@@ -145,6 +252,8 @@ export const PLAY_SESSION_TABLES: Partial<
     return {
       board: (
         <LudoBoard
+          // A new game of a tournament starts from a clean screen
+          key={sessionId}
           sessionId={sessionId}
           board={ludo}
           faces={seats.map(({ id, name, avatarUrl, isHost }) => ({

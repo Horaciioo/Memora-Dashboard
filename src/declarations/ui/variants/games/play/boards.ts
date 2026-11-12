@@ -349,6 +349,8 @@ export const BAC_SESSION = {
   boxFull: 'play-boxfull flex min-h-0 flex-1 flex-col overflow-y-auto',
   // Same panel as the page so the ink stays readable, content centred as one group, dock margin dropped
   boxFullPad: `${PANEL} ${LIFT} m-4 mt-20 gap-5 p-5 sm:m-6 sm:mt-24 sm:p-6 *:first:mt-auto *:last:mb-auto *:pb-0!`,
+  // No panel on a phone: the table runs edge to edge, centred as one group
+  boxFullBare: '*:first:mt-auto *:last:mb-auto',
   // Stage keys: in the top bar, then floating over the table, shifted by the open chat
   keys: 'flex items-center gap-2',
   keysFull:

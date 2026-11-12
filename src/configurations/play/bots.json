@@ -34,6 +34,50 @@
       "max": 1600
     }
   },
+  "echo": {
+    "thinkMs": {
+      "min": 2500,
+      "max": 11000
+    },
+    "failRate": {
+      "EASY": 0.4,
+      "MEDIUM": 0.2,
+      "HARD": 0.05
+    }
+  },
+  "croquis": {
+    "thinkMs": {
+      "min": 12000,
+      "max": 55000
+    },
+    "failRate": {
+      "EASY": 0.35,
+      "MEDIUM": 0.2,
+      "HARD": 0.05
+    }
+  },
+  "glitch": {
+    "thinkMs": {
+      "min": 3500,
+      "max": 9000
+    },
+    "failRate": {
+      "EASY": 0.18,
+      "MEDIUM": 0.08,
+      "HARD": 0.02
+    }
+  },
+  "jumble": {
+    "thinkMs": {
+      "min": 4000,
+      "max": 12000
+    },
+    "failRate": {
+      "EASY": 0.45,
+      "MEDIUM": 0.25,
+      "HARD": 0.08
+    }
+  },
   "bomb": {
     "thinkMs": {
       "min": 1400,

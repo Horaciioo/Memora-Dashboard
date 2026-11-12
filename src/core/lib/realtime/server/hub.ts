@@ -3,7 +3,12 @@ import 'server-only'
 import type { IncomingMessage } from 'node:http'
 import type { RawData, WebSocket } from 'ws'
 
+import { randomUUID } from 'node:crypto'
+
 import { logger } from '@/core/lib/logger'
+import { noteSocketEvent } from '@/core/lib/realtime/server/journal'
+import { recordError } from '@/core/services/system/ErrorEventService'
+import { NEXUS_REALTIME } from '@/declarations/nexus/modulesSettings'
 import { dispatchFrame, spendFrame, unfollow } from '@/core/lib/realtime/server/dispatch'
 import type {
   FrameBudget,
@@ -21,9 +26,38 @@ import { MINUTE_MS, SECOND_MS } from '@/utils/constants/time'
  */
 
 interface HeldSocket extends LiveConnection {
+  id: string
   socket: WebSocket
   isAlive: boolean
   budget: FrameBudget
+  openedAt: number
+  lastSeenAt: number
+  frames: number
+}
+
+/**
+ * Socket as the console reads it
+ * @typedef {Object} SocketSnapshot
+ */
+
+export interface SocketSnapshot {
+  id: string
+  accountId: string
+  openedAt: string
+  lastSeenAt: string
+  topics: string[]
+  bufferedKilobytes: number
+  framesPerSecond: number
+}
+
+/**
+ * Sockets and topics of this process
+ * @typedef {Object} HubSnapshot
+ */
+
+export interface HubSnapshot {
+  sockets: SocketSnapshot[]
+  topics: Record<string, number>
 }
 
 /**
@@ -35,6 +69,8 @@ export interface RealtimeHub {
   accept: (socket: WebSocket, request: IncomingMessage) => void
   close: () => void
   count: () => number
+  snapshot: () => HubSnapshot
+  disconnect: (socketId: string) => boolean
 }
 
 /**
@@ -44,10 +80,11 @@ export interface RealtimeHub {
  */
 
 const writerOf =
-  (socket: WebSocket) =>
+  (socket: WebSocket, accountId: string) =>
   (frame: string): void => {
     if (socket.readyState !== socket.OPEN) return
     if (socket.bufferedAmount > REALTIME_SETTINGS.slowKilobytes * 1024) {
+      noteSocketEvent(accountId, 'slow')
       socket.close(REALTIME_CLOSE.slow)
       return
     }
@@ -97,12 +134,19 @@ const wireSocket = (
   })
   socket.on('message', (raw) => {
     held.isAlive = true
-    if (!spendFrame(held.budget)) return void socket.close(REALTIME_CLOSE.flooded)
+    held.lastSeenAt = Date.now()
+    held.frames += 1
+    if (!spendFrame(held.budget)) {
+      noteSocketEvent(held.session.id, 'flooded')
+      return void socket.close(REALTIME_CLOSE.flooded)
+    }
     const frame = readFrame(raw)
     if (frame) dispatchFrame(held, frame, registry)
+    else noteSocketEvent(held.session.id, 'invalid')
   })
   socket.on('error', () => socket.terminate())
-  socket.once('close', () => {
+  socket.once('close', (code) => {
+    noteSocketEvent(held.session.id, 'close', String(code))
     clearTimeout(expiry)
     sockets.delete(held)
     for (const topic of [...held.topics.keys()]) unfollow(held, topic)
@@ -138,15 +182,32 @@ export const createHub = (registry: RealtimeRegistry): RealtimeHub => {
       if (!session) return void socket.close(REALTIME_CLOSE.refused)
 
       const held: HeldSocket = {
+        id: randomUUID(),
         socket,
         session,
-        send: writerOf(socket),
+        send: writerOf(socket, session.id),
+        openedAt: Date.now(),
+        lastSeenAt: Date.now(),
+        frames: 0,
         topics: new Map(),
         isAlive: true,
         budget: { tokens: REALTIME_SETTINGS.messagesPerSecond, refilledAt: Date.now() },
       }
       sockets.add(held)
       wireSocket(held, sockets, registry)
+
+      // A loop of reconnections is worth a line
+      const opens = noteSocketEvent(session.id, 'open')
+      if (opens > NEXUS_REALTIME.reconnectPerMinute) {
+        void recordError({
+          severity: 'WARNING',
+          source: 'WEBSOCKET',
+          message: 'Socket reconnecting in a loop',
+          route: 'realtime.connect',
+          accountId: session.id,
+          context: { opensLastMinute: opens },
+        })
+      }
     },
     close: () => {
       clearInterval(beat)
@@ -154,5 +215,33 @@ export const createHub = (registry: RealtimeRegistry): RealtimeHub => {
       logger.info('[realtime] hub closed')
     },
     count: () => sockets.size,
+    snapshot: () => {
+      const now = Date.now()
+      const topics: Record<string, number> = {}
+      const rows = [...sockets].map((held) => {
+        const names = [...held.topics.keys()]
+        for (const name of names) topics[name] = (topics[name] ?? 0) + 1
+
+        return {
+          id: held.id,
+          accountId: held.session.id,
+          openedAt: new Date(held.openedAt).toISOString(),
+          lastSeenAt: new Date(held.lastSeenAt).toISOString(),
+          topics: names,
+          bufferedKilobytes: Math.round(held.socket.bufferedAmount / 1024),
+          framesPerSecond: Number(
+            (held.frames / Math.max(1, (now - held.openedAt) / SECOND_MS)).toFixed(2)
+          ),
+        }
+      })
+
+      return { sockets: rows, topics }
+    },
+    disconnect: (socketId) => {
+      const held = [...sockets].find((candidate) => candidate.id === socketId)
+      held?.socket.close(REALTIME_CLOSE.owner)
+
+      return Boolean(held)
+    },
   }
 }

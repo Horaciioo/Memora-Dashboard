@@ -1,10 +1,12 @@
 'use client'
 
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { TouchEvent } from 'react'
 
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { ChatComposer } from '@/composites/modview/ChatComposer'
 import { ChatModesMenu } from '@/composites/modview/ChatModesMenu'
+import { useMobileMod } from '@/composites/modview/mobile/MobileContext'
 import { ChatRow } from '@/composites/modview/ChatRow'
 import { ModWindow } from '@/composites/modview/ModWindow'
 import { PinnedBar } from '@/composites/modview/PinnedBar'
@@ -18,6 +20,7 @@ import { useHoldKey } from '@/core/hooks/interaction/state/useHoldKey'
 import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
 import { recentChatters } from '@/core/lib/modview/compose'
 import { repeatCounts } from '@/core/lib/modview/duplicates'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import {
   CHAT_MODES,
@@ -89,6 +92,8 @@ export const ChatWindow = ({
   const modesRef = useRef<HTMLButtonElement>(null)
   const optionsRef = useRef<HTMLButtonElement>(null)
   const { preferences, update } = useModPreferences()
+  const isMobile = useMobileMod()
+  const swipeStart = useRef<number | null>(null)
   // A pointer elsewhere folds the menu, its drawers and dialogs excepted
   const menuBounds = useMemo(() => [menusRef, modesRef, optionsRef], [])
   const foldMenu = useCallback(() => setMenu(null), [])
@@ -102,8 +107,26 @@ export const ChatWindow = ({
   const shown = useMemo(() => ({ ...preferences, ...forced }), [preferences, forced])
   const { listRef, lines, pause, resume, hold, listHandlers } = useChatPause(
     state.messages,
-    preferences.pauseMode === 'hover'
+    preferences.pauseMode === 'hover' && !isMobile
   )
+  // A short swipe up on the lines freezes the chat on a phone
+  const swipe = isMobile
+    ? {
+        onTouchStart: (event: TouchEvent<HTMLDivElement>) => {
+          swipeStart.current = event.touches[0].clientY
+        },
+        onTouchEnd: (event: TouchEvent<HTMLDivElement>) => {
+          const start = swipeStart.current
+          swipeStart.current = null
+          if (
+            start !== null &&
+            start - event.changedTouches[0].clientY > LIVE_SETTINGS.mobileFreezeSwipePx
+          ) {
+            hold(true)
+          }
+        },
+      }
+    : {}
   // Alt held freezes the chat
   useHoldKey('Alt', hold, preferences.pauseMode === 'alt')
   // Bots stay out when asked
@@ -192,12 +215,20 @@ export const ChatWindow = ({
         )}
       </div>
 
-      {state.poll && <PollBar key={state.poll.id} poll={state.poll} gate={gate} onAct={onAct} />}
-      {state.pinned && (
+      {!isMobile && state.poll && (
+        <PollBar key={state.poll.id} poll={state.poll} gate={gate} onAct={onAct} />
+      )}
+      {!isMobile && state.pinned && (
         <PinnedBar key={state.pinned.messageId} pin={state.pinned} gate={gate} onAct={onAct} />
       )}
 
-      <div className={MODVIEW_CHAT.scroller} ref={listRef} data-keep-menu {...listHandlers}>
+      <div
+        className={MODVIEW_CHAT.scroller}
+        ref={listRef}
+        data-keep-menu
+        {...listHandlers}
+        {...swipe}
+      >
         <p className={MODVIEW_CHAT.welcome}>
           {MODVIEW_COPY.welcome.replace('{channel}', state.channel.name)}
         </p>
@@ -213,7 +244,11 @@ export const ChatWindow = ({
               key={message.id}
               message={message}
               options={shown}
-              toolsPosition={preferences.toolsPosition}
+              toolsPosition={
+                isMobile && preferences.toolsPosition === 'hover'
+                  ? 'left'
+                  : preferences.toolsPosition
+              }
               actions={preferences.actions}
               confirmHarsh={preferences.confirmHarsh}
               repeat={repeats.get(message.id)}

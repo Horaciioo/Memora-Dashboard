@@ -249,7 +249,7 @@ export const joinSession = async (sessionId: string, accountId: string): Promise
     await tx.playSeat.upsert({
       where: { sessionId_accountId: { sessionId, accountId } },
       create: { sessionId, accountId, color },
-      update: { leftAt: null, color, joinedAt: new Date() },
+      update: { leftAt: null, readyAt: null, color, joinedAt: new Date() },
     })
     await touch(tx, sessionId)
 
@@ -299,6 +299,9 @@ const afterDeparture = async (
   session: LoadedSession,
   accountId: string
 ): Promise<void> => {
+  // A game over keeps its result, whoever walks out
+  if (!PLAY_OPEN_STATUSES.includes(session.status)) return
+
   // Bots alone never keep a table
   const remaining = session.seats.filter(
     (seat) => isPresent(seat) && seat.accountId !== accountId && !seat.account.botKind
@@ -332,6 +335,33 @@ const afterDeparture = async (
 }
 
 /**
+ * What follows a departure: a running game reacts at once, a forfeit counts now, then the journal
+ * @param {string} sessionId - Game
+ * @param {string} accountId - Player
+ * @param {PlayGameName} game - Game kind
+ * @param {boolean} quiet - Skip the journal line
+ * @return {Promise<void>} - Settled
+ */
+
+const settleDeparture = async (
+  sessionId: string,
+  accountId: string,
+  game: PlayGameName,
+  quiet: boolean
+): Promise<void> => {
+  const { settleSession } = await import('@/core/services/play/GameService')
+  await settleSession(sessionId).catch(() => undefined)
+  if (quiet) return
+  await journalPlay({
+    eventType: 'PlayLeft',
+    subjectId: accountId,
+    game,
+    template: PLAY_JOURNAL.left,
+    sessionId,
+  }).catch(() => undefined)
+}
+
+/**
  * Leave a game on purpose
  * @param {string} sessionId - Game
  * @param {string} accountId - Player
@@ -356,20 +386,13 @@ export const leaveSession = async (
 
     return session.game
   })
-  await announceInChat(sessionId, accountId, PlayMessageKinds.Left)
-  await signalPlay(sessionId, true)
-  // A running game reacts at once, a forfeit counts now
-  const { settleSession } = await import('@/core/services/play/GameService')
-  await settleSession(sessionId).catch(() => undefined)
-  if (!quiet) {
-    await journalPlay({
-      eventType: 'PlayLeft',
-      subjectId: accountId,
-      game,
-      template: PLAY_JOURNAL.left,
-      sessionId,
-    })
-  }
+  // The player is out already, the table is told without holding the answer back
+  void Promise.all([
+    announceInChat(sessionId, accountId, PlayMessageKinds.Left),
+    signalPlay(sessionId, true),
+  ])
+    .catch(() => undefined)
+    .then(() => settleDeparture(sessionId, accountId, game, quiet))
 }
 
 /**
@@ -420,6 +443,9 @@ export const kickPlayer = async (
   })
   await announceInChat(sessionId, accountId, PlayMessageKinds.Kicked)
   await signalPlay(sessionId, true)
+  // A kicked player on turn hands it on now
+  const { settleSession } = await import('@/core/services/play/GameService')
+  await settleSession(sessionId).catch(() => undefined)
   await journalPlay({
     eventType: 'PlayKicked',
     subjectId: accountId,

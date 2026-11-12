@@ -21,6 +21,7 @@ export const PWA_STYLES = {
   hintActions: 'flex flex-col gap-1',
   hintSecondary: 'flex items-center justify-center gap-2',
   // Fallback page
+  offlineFrame: 'flex w-full flex-col items-center gap-3 text-center',
   offlinePage:
     'mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center px-6 py-12',
 } as const

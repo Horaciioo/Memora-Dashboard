@@ -126,6 +126,7 @@ export const TWITCH_SUBSCRIPTIONS: readonly TwitchSubscription[] = [
   { type: 'automod.message.update', version: '2', holder: 'moderator' },
   { type: 'channel.unban_request.create', version: '1', holder: 'moderator' },
   { type: 'channel.unban_request.resolve', version: '1', holder: 'moderator' },
+  { type: 'channel.warning.acknowledge', version: '1', holder: 'moderator' },
   { type: 'channel.shield_mode.begin', version: '1', holder: 'moderator' },
   { type: 'channel.shield_mode.end', version: '1', holder: 'moderator' },
   { type: 'stream.online', version: '1', holder: 'none' },

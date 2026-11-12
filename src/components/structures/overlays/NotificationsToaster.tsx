@@ -22,14 +22,24 @@ const SWIPE_DISMISS_PX = 80
  * @return {JSX.Element}
  */
 
-const ToastTitle = ({ title, emphasis }: { title: string; emphasis?: string }) => {
+const ToastTitle = ({
+  title,
+  emphasis,
+  isNegative
+}: {
+  title: string
+  emphasis?: string
+  isNegative: boolean
+}) => {
   const index = emphasis ? title.indexOf(emphasis) : -1
   if (!emphasis || index === -1) return <>{title}</>
 
   return (
     <>
       {title.slice(0, index)}
-      <strong>{emphasis}</strong>
+      <strong className={isNegative ? TOAST_STYLES.verbNegative : TOAST_STYLES.verb}>
+        {emphasis}
+      </strong>
       {title.slice(index + emphasis.length)}
     </>
   )
@@ -122,12 +132,14 @@ const Toast = ({
         }}
         className={cn(TOAST_STYLES.toast, !isDragging && TOAST_STYLES.settle)}
       >
-        <span className={cn(TOAST_STYLES.badge, tone.soft, tone.text)}>
-          <ToneIcon className={TOAST_STYLES.glyph} aria-hidden="true" />
-        </span>
+        <ToneIcon className={cn(TOAST_STYLES.glyph, tone.text)} aria-hidden="true" />
         <div className={TOAST_STYLES.body}>
           <p className={TOAST_STYLES.title}>
-            <ToastTitle title={notification.title} emphasis={notification.emphasis} />
+            <ToastTitle
+              title={notification.title}
+              emphasis={notification.emphasis}
+              isNegative={notification.tone === 'danger'}
+            />
           </p>
           {notification.description && (
             <p className={TOAST_STYLES.description}>{notification.description}</p>
@@ -139,7 +151,7 @@ const Toast = ({
           aria-label={ACTION_COPY.close}
           className={TOAST_STYLES.dismiss}
         >
-          <CloseIcon className={TOAST_STYLES.glyph} aria-hidden="true" />
+          <CloseIcon className={TOAST_STYLES.closeGlyph} aria-hidden="true" />
         </button>
         <span
           key={generation}

@@ -24,7 +24,7 @@
   border-color: color-mix(in srgb, var(--color-surface-raised) 70%, transparent);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.55),
-    0 10px 30px -8px rgb(20 20 40 / 0.28);
+    0 -6px 24px -8px rgb(20 20 40 / 0.22);
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -212,15 +212,6 @@
     radial-gradient(60% 80% at 100% 0%, var(--color-mauve-100), transparent 70%),
     radial-gradient(60% 80% at 0% 100%, var(--color-brand-100), transparent 70%);
   pointer-events: none;
-}
-
-/* Apple-style notification: grey frosted glass */
-.glass-toast {
-  background: var(--glass-toast);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  backdrop-filter: blur(24px) saturate(1.8);
-  border: 1px solid var(--glass-line);
-  box-shadow: var(--shadow-md);
 }
 
 /* Thick glass strip, for the tab bars */

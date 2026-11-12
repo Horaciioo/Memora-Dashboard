@@ -6,9 +6,7 @@ import { playNaval } from '@/composites/play/naval/sound'
 import type { OceanZone } from '@/composites/play/naval/ocean/paint/zone'
 import type { OceanCell } from '@/composites/play/naval/ocean/useOceanGestures'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
-import { canWield, turnsOf, weaponOf, zoneOf } from '@/core/lib/play/naval/weapons'
-import { NAVAL_WEAPONS } from '@/declarations/play/naval/weapons'
-import { NavalWeapons } from '@/utils/constants/play'
+import { turnsOf, weaponOf, zoneOf } from '@/core/lib/play/naval/weapons'
 import type { NavalWeaponName } from '@/utils/constants/play'
 
 // Longest wait for the board pushed after a strike, in milliseconds
@@ -26,7 +24,10 @@ interface NavalAimInput {
   // Target account, none when nothing can be fired at
   target: string | null
   canFire: boolean
-  arms: { ammo: number; offer: string[] }
+  // Weapon drawn for this turn
+  weapon: NavalWeaponName
+  // Theatre weapon reach multiplier
+  reachScale: number
   // Changes when the aim must clear
   resetKey: string
 }
@@ -51,26 +52,22 @@ export const useNavalAim = ({
   size,
   target,
   canFire,
-  arms,
+  weapon,
+  reachScale,
   resetKey,
 }: NavalAimInput) => {
   const { act, isSaving } = usePlayAct(sessionId)
-  const [picked, setPicked] = useState<NavalWeaponName>(NavalWeapons.Cannon)
-  const [orientation, setOrientation] = useState(0)
+  const [turned, setTurned] = useState<{ key: string; value: number } | null>(null)
   const [held, setHeld] = useState<(OceanCell & { key: string }) | null>(null)
   const [hover, setHover] = useState<OceanCell | null>(null)
   const [sentRev, setSentRev] = useState<number | null>(null)
-  const weapon = canWield(picked, arms) ? picked : NavalWeapons.Cannon
+  const turnKey = `${resetKey}:${weapon}`
+  const orientation = turned?.key === turnKey ? turned.value : 0
   const aim = held?.key === resetKey ? held : null
   const isSending = isSaving || sentRev === rev
   const isOpen = canFire && !isSending
-
-  const pick = (name: NavalWeaponName) => {
-    if (!canWield(name, arms)) return
-    playNaval('tick', 0.6)
-    setOrientation((current) => (name === weapon ? (current + 1) % turnsOf(weaponOf(name)) : 0))
-    setPicked(name)
-  }
+  const turns = turnsOf(weaponOf(weapon))
+  const turn = (next: number) => setTurned({ key: turnKey, value: next % turns })
 
   const fire = async (cell: OceanCell | null = aim) => {
     if (!cell || !target || !isOpen) return
@@ -79,22 +76,18 @@ export const useNavalAim = ({
     if (done) window.setTimeout(() => setSentRev(null), PUSH_WAIT_MS)
     else setSentRev(null)
     setHeld(null)
-    setPicked(NavalWeapons.Cannon)
   }
 
-  // Number keys pick, R turns
-  const keys = useRef({ pick, weapon, isOpen })
+  // R turns the weapon
+  const keys = useRef({ orientation, turn, isOpen })
   useEffect(() => {
-    keys.current = { pick, weapon, isOpen }
+    keys.current = { orientation, turn, isOpen }
   })
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      const { pick: choose, weapon: current, isOpen: open } = keys.current
-      if (!open || event.target instanceof HTMLInputElement) return
-      const slot = NAVAL_WEAPONS[Number(event.key) - 1]
-      if (slot) choose(slot.name)
-      if (event.key.toLowerCase() === 'r')
-        setOrientation((value) => (value + 1) % turnsOf(weaponOf(current)))
+      const current = keys.current
+      if (!current.isOpen || event.target instanceof HTMLInputElement) return
+      if (event.key.toLowerCase() === 'r') current.turn(current.orientation + 1)
     }
     window.addEventListener('keydown', onKey)
 
@@ -104,19 +97,19 @@ export const useNavalAim = ({
   const focus = aim ?? hover
   const zone: OceanZone | null =
     isOpen && focus
-      ? { cells: zoneOf(weaponOf(weapon), focus, orientation, size), tone: 'aim' }
+      ? { cells: zoneOf(weaponOf(weapon, reachScale), focus, orientation, size), tone: 'aim' }
       : null
 
   return {
     weapon,
     orientation,
+    turnKey,
     aim,
     hover,
     zone,
     isOpen,
     isSending,
-    pick,
-    turn: (next: number) => setOrientation(next % turnsOf(weaponOf(weapon))),
+    turn,
     fire: () => void fire(),
     onHover: (cell: OceanCell | null) => setHover(cell),
     onTap: (cell: OceanCell) => {

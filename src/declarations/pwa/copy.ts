@@ -47,7 +47,7 @@ export const LIFECYCLE_COPY = {
   offlineTitle: 'Hors ligne',
   offlineLead:
     'Memora a besoin d’Internet pour afficher cette page. Elle revient dès que la connexion revient.',
-  offlineRetry: 'Réessayer',
+  offlineRetry: 'Recharger',
 } as const
 
 /**

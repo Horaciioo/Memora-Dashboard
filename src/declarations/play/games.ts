@@ -1,8 +1,16 @@
 import { createRegistry } from '@/core/lib/registry'
 import { BOMB_EMBERS } from '@/declarations/play/bomb/copy'
 import { BOMB_SETTINGS } from '@/declarations/play/bomb/settings'
+import { CROQUIS_HUB } from '@/declarations/play/croquis/copy'
+import { CROQUIS_SETTINGS } from '@/declarations/play/croquis/settings'
+import { ECHO_HUB } from '@/declarations/play/echo/copy'
+import { ECHO_SETTINGS } from '@/declarations/play/echo/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
+import { GLITCH_SETTINGS } from '@/declarations/play/glitch/settings'
+import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
+import { JUMBLE_SETTINGS } from '@/declarations/play/jumble/settings'
 import { LUDO_FELT } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { NAVAL_SEA } from '@/declarations/play/naval/copy'
@@ -83,6 +91,54 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     maxPlayers: BOMB_SETTINGS.maxPlayers,
     playable: true,
   },
+  [PlayGames.Echo]: {
+    label: 'Écho',
+    slug: 'echo',
+    tagline: 'Deux cartes, un symbole en commun : trouve-le avant tout le monde.',
+    tone: '--play-echo',
+    logo: 'playEcho',
+    backdrop: 'cards',
+    ground: ECHO_HUB.ground,
+    minPlayers: ECHO_SETTINGS.minPlayers,
+    maxPlayers: ECHO_SETTINGS.maxPlayers,
+    playable: true,
+  },
+  [PlayGames.Croquis]: {
+    label: 'Croquis',
+    slug: 'croquis',
+    tagline: 'Un mot à dessiner, les autres doivent le deviner avant la fin du temps.',
+    tone: '--play-croquis',
+    logo: 'playCroquis',
+    backdrop: 'sketch',
+    ground: CROQUIS_HUB.ground,
+    minPlayers: CROQUIS_SETTINGS.minPlayers,
+    maxPlayers: CROQUIS_SETTINGS.maxPlayers,
+    playable: true,
+  },
+  [PlayGames.Glitch]: {
+    label: 'Glitch',
+    slug: 'glitch',
+    tagline: 'Deux images presque identiques, repère toutes les différences avant les autres.',
+    tone: '--play-glitch',
+    logo: 'playGlitch',
+    backdrop: 'twins',
+    ground: GLITCH_HUB.ground,
+    minPlayers: GLITCH_SETTINGS.minPlayers,
+    maxPlayers: GLITCH_SETTINGS.maxPlayers,
+    playable: true,
+  },
+  [PlayGames.Jumble]: {
+    label: 'Jumble',
+    slug: 'jumble',
+    tagline: 'Des lettres en vrac, remets le mot dans l’ordre avant tout le monde.',
+    tone: '--play-jumble',
+    logo: 'playJumble',
+    backdrop: 'tiles',
+    ground: JUMBLE_HUB.ground,
+    minPlayers: JUMBLE_SETTINGS.minPlayers,
+    maxPlayers: JUMBLE_SETTINGS.maxPlayers,
+    playable: true,
+  },
   [PlayGames.Ludo]: {
     label: 'Ludo',
     slug: 'ludo',
@@ -105,9 +161,16 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: NAVAL_SEA.ground,
     minPlayers: NAVAL_SETTINGS.minPlayers,
     maxPlayers: NAVAL_SETTINGS.maxPlayers,
-    playable: APP_ENVIRONMENT === 'dev',
+    playable: APP_ENVIRONMENT === 'dev' || APP_ENVIRONMENT === 'staging',
   },
 })
+
+/**
+ * Featured games, the banner on top of the hub
+ * @type {PlayGameName[]}
+ */
+
+export const PLAY_FEATURED_GAMES: PlayGameName[] = [PlayGames.Naval]
 
 /**
  * Game behind a URL segment

@@ -10,6 +10,9 @@ const OUTPUT = join(ROOT, 'src/generated/openapi/manifest.ts')
 // Serves the document
 const SELF = join(API_DIR, 'openapi/route.ts')
 
+// Never documented
+const HIDDEN = join(API_DIR, 'nexus')
+
 // Exported HTTP verbs
 const METHOD_PATTERN = /export const (GET|POST|PUT|PATCH|DELETE)\b/g
 
@@ -40,7 +43,7 @@ const pathOf = (file: string): string =>
 
 // Static imports only
 const entries = routeFiles(API_DIR)
-  .filter((file) => file !== SELF)
+  .filter((file) => file !== SELF && !file.startsWith(HIDDEN))
   .sort()
   .flatMap((file) => {
     const methods = [...readFileSync(file, 'utf8').matchAll(METHOD_PATTERN)].map((m) => m[1])

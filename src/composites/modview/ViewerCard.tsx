@@ -6,6 +6,7 @@ import { Button } from '@/components/elements/actions/Button'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { DossierPosition } from '@/composites/modview/DossierPosition'
 import { climbedLadders } from '@/composites/modview/DossierLadders'
+import { ViewerHighlights } from '@/composites/modview/mobile/ViewerHighlights'
 import { ViewerBanBox } from '@/composites/modview/ViewerBanBox'
 import { ViewerChatHistory } from '@/composites/modview/ViewerChatHistory'
 import { ViewerMetrics } from '@/composites/modview/ViewerMetrics'
@@ -17,10 +18,11 @@ import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { useAvatar } from '@/core/hooks/data/lives/useAvatars'
 import { useBanDetail } from '@/core/hooks/data/lives/useBanDetail'
 import { useViewerChat } from '@/core/hooks/data/lives/useViewerChat'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { useViewerDossier } from '@/core/hooks/data/lives/useViewerDossier'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
-import { MODVIEW_USER } from '@/declarations/ui/variants'
+import { MODVIEW_MOBILE, MODVIEW_USER } from '@/declarations/ui/variants'
 import type { ChatMessage, Chatter } from '@/types/modview'
 import type { SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
@@ -74,7 +76,9 @@ export const ViewerCard = ({
   dossier,
 }: ViewerCardProps) => {
   const [tab, setTab] = useState<ViewerTab>('sanctions')
-  const [list, setList] = useState<ListTab>('messages')
+  const isMobile = useIsMobileShell()
+  // Timeouts first on a phone
+  const [list, setList] = useState<ListTab>(isMobile ? 'sanctions' : 'messages')
   const liveId = dossier?.liveId ?? null
   const { history } = useViewerDossier(liveId, chatter.id)
   const chat = useViewerChat(liveId, chatter.id)
@@ -113,7 +117,9 @@ export const ViewerCard = ({
 
   return (
     <aside
-      className={isDocked ? MODVIEW_USER.docked : MODVIEW_USER.panel}
+      className={
+        isDocked ? MODVIEW_USER.docked : isMobile ? MODVIEW_MOBILE.sheet : MODVIEW_USER.panel
+      }
       style={isDocked && width ? { width } : undefined}
       aria-label={MODVIEW_USER_COPY.title}
     >
@@ -147,6 +153,7 @@ export const ViewerCard = ({
       <ViewerTabs tabs={tabs} value={tab} onChange={setTab} />
 
       <div className={MODVIEW_USER.scroll}>
+        {isMobile && <ViewerHighlights history={history} />}
         <ViewerMetrics
           messages={dossier ? chat.total : messages.length}
           sanctions={dossier ? (history?.length ?? null) : liveSanctions}

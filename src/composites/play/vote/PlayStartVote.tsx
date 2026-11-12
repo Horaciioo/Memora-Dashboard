@@ -1,11 +1,12 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
-import { GolfVoteDeck } from '@/composites/play/golf/vote/GolfVoteDeck'
-import type { GolfVoteCard } from '@/composites/play/golf/vote/GolfVoteDeck'
-import { GolfVoteTimer } from '@/composites/play/golf/vote/GolfVoteTimer'
-import { useGolfVote } from '@/composites/play/golf/vote/useGolfVote'
+import { PlayVoteDeck } from '@/composites/play/vote/PlayVoteDeck'
+import type { PlayVoteCard } from '@/composites/play/vote/PlayVoteDeck'
+import { PlayVoteTimer } from '@/composites/play/vote/PlayVoteTimer'
+import { usePlayVote } from '@/composites/play/vote/usePlayVote'
 import type { PlayVoteProps } from '@/composites/play/registry'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { mostPicked, voteOf } from '@/core/lib/play/vote'
@@ -19,20 +20,27 @@ import { PLAY_VOTE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { PlayGameName } from '@/utils/constants/play'
 
+// Picture a game draws for a card, none keeps the glyph
+export type PlayVoteFace = (step: string, key: string) => ReactNode | null
+
 /**
  * Cards of a declared step
  * @param {PlayVoteStepSpec} spec - Step
- * @return {GolfVoteCard[]} - Cards
+ * @param {PlayVoteFace} [faceOf] - Game pictures
+ * @return {PlayVoteCard[]} - Cards
  */
 
-const cardsOf = (spec: PlayVoteStepSpec): GolfVoteCard[] =>
+const cardsOf = (spec: PlayVoteStepSpec, faceOf?: PlayVoteFace): PlayVoteCard[] =>
   spec.choices.map((choice) => {
     const Icon = choice.icon && ICONS[choice.icon]
+    const picture = faceOf?.(spec.key, choice.key)
 
     return {
       key: choice.key,
       label: choice.label,
-      face: Icon ? (
+      face: picture ? (
+        picture
+      ) : Icon ? (
         <Icon className={PLAY_VOTE.glyph} aria-hidden="true" />
       ) : (
         <span className={PLAY_VOTE.number}>{choice.key}</span>
@@ -54,12 +62,17 @@ const VoteScreen = ({
   viewerId,
   hostId,
   faces,
-}: Omit<PlayVoteProps, 'settings'> & { game: PlayGameName; vote: PlayVoteState }) => {
+  faceOf,
+}: Omit<PlayVoteProps, 'settings'> & {
+  game: PlayGameName
+  vote: PlayVoteState
+  faceOf?: PlayVoteFace
+}) => {
   const moves = usePlayMoves()
   const isHost = viewerId === hostId
   const spec = PLAY_VOTE_STEPS[game]?.find((entry) => entry.key === vote.step)
   const options = spec?.choices.map((choice) => choice.key) ?? []
-  const { picks, leader, pick, close, validate, back } = useGolfVote({
+  const { picks, leader, pick, close, validate, back } = usePlayVote({
     vote,
     winner: (picked) => mostPicked(options, picked, hostId),
     viewerId,
@@ -78,11 +91,12 @@ const VoteScreen = ({
           <h2 className={PLAY_VOTE.title}>{spec.title}</h2>
           <p className={PLAY_VOTE.lead}>{spec.lead}</p>
         </div>
-        <GolfVoteDeck
+        <PlayVoteDeck
           key={vote.step}
-          cards={cardsOf(spec)}
+          cards={cardsOf(spec, faceOf)}
           value={leader}
           voters={voters}
+          isCourse={Boolean(faceOf)}
           look={PLAY_VOTE}
           onPick={pick}
         />
@@ -100,7 +114,7 @@ const VoteScreen = ({
               {GOLF_VOTE_COPY.back}
             </button>
           )}
-          <GolfVoteTimer
+          <PlayVoteTimer
             key={vote.step}
             endsAt={vote.endsAt}
             serverTime={serverTime}
@@ -126,15 +140,19 @@ const VoteScreen = ({
 /**
  * Launch vote of a game with declared steps: every player picks the main rules
  * @param {PlayGameName} game - Game
+ * @param {PlayVoteFace} [faceOf] - Pictures the game draws for its cards
  * @return {(props: PlayVoteProps) => JSX.Element | null} - Vote of that game
  */
 
-export const declaredVote = (game: PlayGameName) => {
+export const declaredVote = (game: PlayGameName, faceOf?: PlayVoteFace) => {
   const PlayStartVote = ({ settings, ...props }: PlayVoteProps) => {
     const vote = voteOf(settings)
 
     return vote
-      ? createPortal(<VoteScreen {...props} game={game} vote={vote} />, document.body)
+      ? createPortal(
+          <VoteScreen {...props} game={game} vote={vote} faceOf={faceOf} />,
+          document.body
+        )
       : null
   }
 

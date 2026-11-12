@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 
 import { playTabIndexOf, PLAY_PHONE_TABS } from '@/composites/play/mobile/tabs'
+import { isInScroller } from '@/core/lib/gestures/scroller'
 import { useSwipe } from '@/core/hooks/interaction/gestures/useSwipe'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { PLAY_TABS } from '@/declarations/ui/variants'
@@ -16,21 +17,6 @@ const SESSION_PREFIX = ROUTES.playSession('')
 
 // Unbounded travel
 const FAR = 10000
-
-// A press inside a sideways scroller
-const isInScroller = (target: EventTarget): boolean => {
-  let node = target instanceof HTMLElement ? target : null
-
-  while (node) {
-    const overflow = getComputedStyle(node).overflowX
-    if ((overflow === 'auto' || overflow === 'scroll') && node.scrollWidth > node.clientWidth) {
-      return true
-    }
-    node = node.parentElement
-  }
-
-  return false
-}
 
 /**
  * Page slides in from the side of its tab

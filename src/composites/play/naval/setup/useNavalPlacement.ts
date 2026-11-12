@@ -6,9 +6,8 @@ import { playNaval } from '@/composites/play/naval/sound'
 import type { OceanZone } from '@/composites/play/naval/ocean/paint/zone'
 import type { OceanCell } from '@/composites/play/naval/ocean/useOceanGestures'
 import { canPlace, cellsOf, randomFleet } from '@/core/lib/play/naval/fleet'
-import type { NavalShip } from '@/core/lib/play/naval/fleet'
+import type { NavalLayoutSea, NavalShip } from '@/core/lib/play/naval/fleet'
 import { shipAt } from '@/core/lib/play/naval/sea'
-import type { NavalSea } from '@/core/lib/play/naval/settings'
 
 /**
  * Ship in hand while dragging
@@ -50,12 +49,12 @@ const shipOf = (drag: NavalDrag, size: number): NavalShip | null => {
 
 /**
  * Placement by drag: from the dock or from the sea, a tap turns, R turns the ship in hand
- * @param {NavalSea} sea - Sea
+ * @param {NavalLayoutSea} sea - Sea
  * @param {NavalShip[]} start - Fleet to start from
  * @return {Object} - Placement and handlers
  */
 
-export const useNavalPlacement = (sea: NavalSea, start: NavalShip[]) => {
+export const useNavalPlacement = (sea: NavalLayoutSea, start: NavalShip[]) => {
   const [ships, setShips] = useState<NavalShip[]>(start)
   const [drag, setDrag] = useState<NavalDrag | null>(null)
   const others = (id: number) => ships.filter((ship) => ship.id !== id)

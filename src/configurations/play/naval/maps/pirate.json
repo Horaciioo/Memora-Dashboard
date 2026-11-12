@@ -1,0 +1,108 @@
+{
+  "fleet": "heavy",
+  "theatre": {
+    "size": 16,
+    "fleet": [5, 4, 3, 3, 2],
+    "reachScale": 1.25,
+    "ramp": {
+      "everyTurns": 1,
+      "step": 0.25,
+      "max": 6
+    }
+  },
+  "frame": {
+    "band": {
+      "north": 5,
+      "east": 3,
+      "south": 2,
+      "west": 7
+    }
+  },
+  "light": {
+    "sun": [-0.88, -0.3],
+    "tint": "rgba(255,168,88,0.16)",
+    "shade": "rgba(48,22,30,0.3)"
+  },
+  "water": {
+    "deep": "#0d5a8c",
+    "mid": "#178fb3",
+    "shallow": "#3cc6c0",
+    "lagoon": "#94ead3",
+    "foam": "#fff7ea",
+    "sheen": "rgba(255,240,215,0.22)",
+    "grid": "rgba(255,255,255,0.25)"
+  },
+  "land": {
+    "sand": "#f1d9a6",
+    "sandDark": "#c9a66b",
+    "wet": "#c4a274",
+    "leaf": "#3d8a43",
+    "leafDark": "#1e5a2f",
+    "leafLight": "#84c45e",
+    "trunk": "#7a5536",
+    "nut": "#5a3b20",
+    "wood": "#8a5a32",
+    "woodDark": "#4c2f18",
+    "plank": "#a8744a",
+    "iron": "#2d2a28",
+    "rope": "#cbb385",
+    "canvas": "#e6d8ba",
+    "canvasDark": "#ab9672",
+    "sail": "#dccba4",
+    "flag": "#1c1a1e",
+    "mark": "#f2ede2",
+    "buoy": "#d4463a",
+    "gold": "#f2c443",
+    "fire": "rgba(255,146,56,0.65)",
+    "lamp": "#ffc56a",
+    "rock": "#9a9188",
+    "rockDark": "#5c554e",
+    "rockLight": "#cfc6ba"
+  },
+  "decor": [
+    {
+      "kind": "cove",
+      "side": "west",
+      "at": 0.55,
+      "depth": 0.5,
+      "scale": 1
+    },
+    {
+      "kind": "galleon",
+      "side": "north",
+      "at": 0.62,
+      "depth": 0.5,
+      "scale": 1
+    },
+    {
+      "kind": "flotsam",
+      "side": "north",
+      "at": 0.2,
+      "depth": 0.35,
+      "scale": 0.8
+    },
+    {
+      "kind": "flotsam",
+      "side": "east",
+      "at": 0.55,
+      "depth": 0.5,
+      "scale": 0.7
+    },
+    {
+      "kind": "rocks",
+      "side": "southeast",
+      "at": 0.5,
+      "depth": 0.6,
+      "scale": 0.6
+    }
+  ],
+  "life": {
+    "clouds": 3,
+    "birds": 3
+  },
+  "stage": 6,
+  "preview": {
+    "span": 22,
+    "focus": 0.35
+  }
+}

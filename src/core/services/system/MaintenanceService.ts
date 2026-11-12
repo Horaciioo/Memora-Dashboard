@@ -5,6 +5,8 @@ import { logger } from '@/core/lib/logger'
 import { pruneSessions } from '@/core/services/auth/SessionService'
 import { purgeChatMessages } from '@/core/services/lives/ChatHistoryService'
 import { purgeModerationLog } from '@/core/services/lives/ModerationLogService'
+import { purgeNexusTraces } from '@/core/services/nexus/NexusAuditService'
+import { purgeErrorEvents } from '@/core/services/system/ErrorEventService'
 import { pruneOrphanFiles } from '@/core/services/system/FileService'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import { RETENTION_POLICIES } from '@/declarations/system/security/privacy'
@@ -156,6 +158,10 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     pruneBans(),
     pruneOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
   ])
+
+  // The console keeps its own window and stays out of the report
+  await purgeNexusTraces().catch(() => undefined)
+  await purgeErrorEvents().catch(() => undefined)
 
   const report: MaintenanceReport = {
     sessions,

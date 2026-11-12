@@ -6,7 +6,7 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
  */
 
 export const LIVE_BOARD = {
-  wrapper: 'mx-auto flex w-full max-w-6xl flex-col gap-10',
+  wrapper: 'mx-auto flex w-full max-w-6xl flex-col gap-6 sm:gap-10',
   list: 'flex flex-col gap-6',
   group: 'flex flex-col gap-4',
   groupTitle: `${PROPERTY_LABEL} px-1`,
@@ -69,21 +69,22 @@ export const LIVE_TILE = {
   root: 'relative flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]',
   cover: 'relative h-36 shrink-0 overflow-hidden bg-[image:var(--gradient-soft)]',
   coverImage: 'h-full w-full scale-125 object-cover blur-xl saturate-150',
-  body: 'flex flex-1 flex-col gap-5 p-5 sm:p-6',
+  body: 'flex flex-1 flex-col gap-4 p-4 sm:gap-5 sm:p-6',
   // Portrait and bubble side by side, straddling the cover edge
   head: 'relative z-10 -mt-28 mb-16 flex items-center gap-4',
   portrait:
     'relative shrink-0 translate-y-12 shadow-[var(--shadow-md)] ring-4 ring-[var(--color-surface)]',
   // The creator "says" the title: a speech bubble, two small ones trailing left to the portrait, the bubble riding over the banner
-  speech: 'relative ml-8 translate-y-[4.5rem] flex min-w-0 flex-1 flex-col gap-0.5',
+  speech: 'relative ml-6 translate-y-[4.5rem] sm:ml-8 flex min-w-0 flex-1 flex-col gap-0.5',
   bubble:
-    'relative rounded-[var(--radius-xl)] bg-[var(--color-surface-raised)] px-5 py-3 shadow-[var(--shadow-md)] ring-1 ring-[var(--color-border)]',
+    'relative rounded-[var(--radius-xl)] bg-[var(--color-surface-raised)] px-4 py-3 sm:px-5 shadow-[var(--shadow-md)] ring-1 ring-[var(--color-border)]',
   bubbleDotNear:
     'absolute top-1/2 -left-4 size-3.5 -translate-y-1/2 rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)] ring-1 ring-[var(--color-border)]',
   bubbleDotFar:
     'absolute top-[38%] -left-7 size-2.5 -translate-y-1/2 rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)] ring-1 ring-[var(--color-border)]',
   identity: 'flex min-w-0 flex-1 flex-col gap-0.5 pb-1',
-  creator: 'flex items-center gap-2.5 text-2xl leading-tight font-bold tracking-tight break-words',
+  creator:
+    'flex items-center gap-2.5 text-xl leading-tight sm:text-2xl font-bold tracking-tight break-words',
   titleGlyph: 'size-6 shrink-0',
   // Indented past the platform glyph (size-6 + gap-2.5) to line up with the title
   title: 'pl-[2.125rem] text-sm text-[var(--color-ink-subtle)] italic',
@@ -481,7 +482,7 @@ export const LIVE_GATE = {
   title: 'text-2xl font-bold tracking-tight',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
   body: 'mx-auto flex w-full max-w-2xl flex-col gap-6',
-  stepper: 'flex items-center gap-2 border-b border-[var(--color-border)] pb-4',
+  stepper: 'flex min-w-0 items-center gap-2 border-b border-[var(--color-border)] pb-4',
   step: 'flex shrink-0 items-center gap-2 rounded-full border-2 border-transparent py-0.5 pr-3 pl-0.5 text-xs font-semibold text-[var(--color-ink-subtle)]',
   // Outline around the current step
   stepActive: 'border-[var(--color-ink)] text-[var(--color-ink)]',
@@ -491,13 +492,17 @@ export const LIVE_GATE = {
     'flex size-6 shrink-0 items-center justify-center rounded-full border border-current text-xs font-bold',
   stepNumberDone: 'border-transparent bg-[var(--color-success)] text-[var(--color-on-solid)]',
   stepGlyph: 'size-3.5',
-  stepName: 'whitespace-nowrap',
-  stepLine: 'h-px min-w-4 flex-1 bg-[var(--color-border-strong)]',
+  // Phone: only the current step keeps its name
+  stepName: 'hidden whitespace-nowrap sm:inline',
+  stepNameOn: 'inline',
+  stepLine: 'h-px min-w-2 flex-1 bg-[var(--color-border-strong)]',
   stepLineDone: 'bg-[var(--color-success)]',
   heading: 'text-section font-bold tracking-tight text-[var(--color-ink)]',
   side: 'flex min-w-0 flex-col gap-6',
   // Two boxes in one row
-  pair: 'grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2',
+  pair: 'contents sm:grid sm:grid-cols-2 sm:gap-3',
+  // Every box of a section, one gap between them
+  boxes: 'flex min-w-0 flex-col gap-3',
   group: 'flex min-w-0 flex-col gap-3',
   label: PROPERTY_LABEL,
   people: 'flex items-center -space-x-2',

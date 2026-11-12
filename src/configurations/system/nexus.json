@@ -1,0 +1,118 @@
+{
+  "password": {
+    "memoryKib": 65536,
+    "iterations": 3,
+    "parallelism": 1,
+    "minLength": 16,
+    "maxLength": 256
+  },
+  "session": {
+    "pendingSeconds": 180,
+    "dangerReauthSeconds": 300,
+    "reauthAlwaysSeconds": 60
+  },
+  "attempts": {
+    "windowMinutes": 15,
+    "maxFailures": 5,
+    "backoffSeconds": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "lockoutMinutes": 30,
+    "dayFailures": 20,
+    "dayLockoutHours": 24
+  },
+  "modes": {
+    "writeMinutes": 15,
+    "writeMaxMinutes": 15,
+    "dangerMinutes": 5
+  },
+  "commands": {
+    "maxLength": 2000,
+    "maxArguments": 30,
+    "timeoutMs": 10000,
+    "maxRows": 200,
+    "pageSize": 50,
+    "confirmSeconds": 120,
+    "auditPageSize": 50,
+    "slowCommandMs": 500,
+    "readTimeoutMs": 2000,
+    "writeTimeoutMs": 10000,
+    "heavyRows": 2000
+  },
+  "redaction": {
+    "patterns": [
+      "token",
+      "secret",
+      "password",
+      "hash",
+      "apikey",
+      "privatekey",
+      "secretkey",
+      "accesskey",
+      "cookie",
+      "vapid"
+    ]
+  },
+  "retention": {
+    "auditDays": 365,
+    "attemptDays": 30
+  },
+  "window": {
+    "shortcut": "Mod+Shift+M",
+    "defaultWidth": 760,
+    "defaultHeight": 460,
+    "minWidth": 420,
+    "minHeight": 260,
+    "maxWidth": 1400,
+    "maxHeight": 1000,
+    "historySize": 200,
+    "blocksKept": 100,
+    "pollSeconds": 60,
+    "discordWaitSeconds": 180,
+    "discordCheckMs": 1000,
+    "typeStepMs": 16,
+    "edgeMargin": 8
+  },
+  "observability": {
+    "errorRetentionDays": 30,
+    "maxErrorRows": 5000,
+    "minIntervalSeconds": 5,
+    "perMinuteCap": 120,
+    "slowQueryMs": 300,
+    "clientPerMinute": 20,
+    "clientMaxBytes": 8192,
+    "contextMaxBytes": 4000,
+    "logBuffer": 5000,
+    "infoSampleRate": 0.1,
+    "infoPerMinute": 200,
+    "windowsMinutes": [
+      1,
+      5,
+      60
+    ],
+    "routeKeysMax": 300
+  },
+  "db": {
+    "searchMinLength": 2,
+    "dependentDepth": 3,
+    "checkRows": 200
+  },
+  "system": {
+    "queueRows": 50,
+    "maintenanceNoticeSeconds": 30,
+    "restartTimeoutMs": 15000
+  },
+  "game": {
+    "eventRows": 50,
+    "turnRows": 50,
+    "pauseMaxMinutes": 240
+  },
+  "realtime": {
+    "eventsPerAccount": 200,
+    "eventsKeepMinutes": 15,
+    "reconnectPerMinute": 5
+  }
+}

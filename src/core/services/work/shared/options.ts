@@ -20,6 +20,35 @@ import type { Prisma } from '@prisma/client'
 import { peopleInScope } from '@/core/services/work/shared/people'
 
 /**
+ * Keep the members already seated in a list, whatever their function now
+ * @param {FieldOption[]} options - Members holding the function
+ * @param {string[]} kept - Members already seated
+ * @return {Promise<FieldOption[]>} - Options with the seated ones added, locked against a new pick
+ */
+
+export const withSeated = async (options: FieldOption[], kept: string[]): Promise<FieldOption[]> => {
+  const known = new Set(options.map((option) => option.value))
+  const missing = [...new Set(kept)].filter((id) => !known.has(id))
+  if (missing.length === 0) return options
+
+  const rows = await prisma.account.findMany({
+    where: { id: { in: missing } },
+    select: { id: true, displayName: true, avatarUrl: true },
+  })
+
+  // Seated before they lost the function, only the session itself lets them go
+  return [
+    ...options,
+    ...rows.map((row) => ({
+      value: row.id,
+      label: row.displayName,
+      image: row.avatarUrl ?? undefined,
+      disabled: true,
+    })),
+  ]
+}
+
+/**
  * Read the default column of one board
  * @param {WorkflowScopeName} scope - Board scope
  * @return {Promise<string | null>} - State identifier

@@ -68,20 +68,22 @@ const TeamGroup = ({ label, people, juniors = [] }: TeamGroupProps) => (
 export const LiveGateTeam = ({ live }: { live: LiveView }) => (
   <section className={LIVE_GATE.side}>
     <h3 className={LIVE_GATE.heading}>{LIVE_PAGE_COPY.team}</h3>
-    <div className={LIVE_GATE.pair}>
+    <div className={LIVE_GATE.boxes}>
+      <div className={LIVE_GATE.pair}>
+        <TeamGroup
+          label={LIVE_PAGE_COPY.recapResponsables}
+          people={live.responsables.map((person) => ({ person }))}
+        />
+        <TeamGroup
+          label={LIVE_PAGE_COPY.recapCoordinators}
+          people={live.coordinators.map((seat) => ({ person: seat.person, seat }))}
+        />
+      </div>
       <TeamGroup
-        label={LIVE_PAGE_COPY.recapResponsables}
-        people={live.responsables.map((person) => ({ person }))}
-      />
-      <TeamGroup
-        label={LIVE_PAGE_COPY.recapCoordinators}
-        people={live.coordinators.map((seat) => ({ person: seat.person, seat }))}
+        label={LIVE_PAGE_COPY.members}
+        people={live.members.filter((person) => person.rank).map((person) => ({ person }))}
+        juniors={live.members.filter((person) => !person.rank).map((person) => ({ person }))}
       />
     </div>
-    <TeamGroup
-      label={LIVE_PAGE_COPY.members}
-      people={live.members.filter((person) => person.rank).map((person) => ({ person }))}
-      juniors={live.members.filter((person) => !person.rank).map((person) => ({ person }))}
-    />
   </section>
 )

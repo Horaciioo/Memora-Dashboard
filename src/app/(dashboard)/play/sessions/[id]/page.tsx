@@ -12,6 +12,7 @@ import { PLAY_SESSION_TABLES } from '@/composites/play/session/sessionTables'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { inviteCandidates, listMessages, listSpectators, readSession } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
+import { nullIfMissing } from '@/core/lib/errors'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_GAMES, PLAY_HUB_COPY, playKeysOf } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
@@ -40,23 +41,22 @@ const STAGE_COPY: Record<string, string> = {
 export default async function PlaySessionPage({ params }: PlaySessionPageProps) {
   const { session, access } = await requirePermission(Permissions.PlayAccess)
   const { id } = await params
-  const game = await readSession(id, session.id, access.can(Permissions.PlayManage)).catch(
-    () => null
-  )
+  // Chat read beside the game, shown only once the game lets the reader in, a breakdown shows the retry page
+  const [game, messages] = await Promise.all([
+    readSession(id, session.id, access.can(Permissions.PlayManage)).catch(nullIfMissing),
+    listMessages(id).catch(() => []),
+  ])
   if (!game) notFound()
 
   const meta = PLAY_GAMES.get(game.game)
   const isLobby = game.status === PlayStatuses.Lobby
   const canInvite = game.me.isSeated && PLAY_OPEN_STATUSES.includes(game.status)
-  const [messages, candidates] = await Promise.all([
-    listMessages(id),
-    canInvite
-      ? inviteCandidates(
-          game.seats.filter((seat) => !seat.hasLeft).map((seat) => seat.accountId),
-          session.id
-        )
-      : [],
-  ])
+  const candidates = canInvite
+    ? await inviteCandidates(
+        game.seats.filter((seat) => !seat.hasLeft).map((seat) => seat.accountId),
+        session.id
+      )
+    : []
   const BackIcon = ICONS.playBack
   const title = STAGE_COPY[game.status] ?? PLAY_HUB_COPY.lobbyFinished
   const chat = {
@@ -72,10 +72,19 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
     invite: canInvite ? { candidates, canSeat: isLobby } : null,
   }
 
-  // Finished single games can be replayed
+  // Finished single games can be replayed, tournament ones lead to the next game
+  const { tournament } = game
   const replay =
-    game.status === PlayStatuses.Finished && !game.tournament
-      ? { canReplay: true, rematch: game.rematch }
+    game.status === PlayStatuses.Finished
+      ? {
+          canReplay: !tournament,
+          rematch: tournament ? null : game.rematch,
+          tournament: tournament && {
+            index: tournament.index,
+            gamesCount: tournament.gamesCount,
+            nextId: tournament.nextId,
+          },
+        }
       : null
 
   // Started game with its own table

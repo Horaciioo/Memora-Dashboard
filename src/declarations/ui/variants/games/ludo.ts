@@ -1,7 +1,8 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play'
 
 // Name under a player plate
-const NAME = 'max-w-[9rem] truncate text-base font-extrabold text-[var(--play-ink)] drop-shadow-sm'
+const NAME =
+  'max-w-[6rem] truncate text-xs font-extrabold text-[var(--play-ink)] drop-shadow-sm sm:max-w-[9rem] sm:text-base'
 
 /**
  * Ludo table: a plate at each corner, the die beside the player on turn
@@ -11,14 +12,15 @@ const NAME = 'max-w-[9rem] truncate text-base font-extrabold text-[var(--play-in
 export const LUDO_BOARD = {
   // Phones: plates over and under the board; wide screens: plates in the four corners around it
   board:
-    'relative mx-auto grid w-full grid-cols-2 gap-x-6 gap-y-3 pb-16 select-none [grid-template-areas:"tl_tr"_"board_board"_"status_status"_"bl_br"] lg:w-fit lg:grid-cols-[minmax(11rem,1fr)_auto_minmax(11rem,1fr)] lg:grid-rows-[1fr_1fr_auto] lg:[grid-template-areas:"tl_board_tr"_"bl_board_br"_"._status_."]',
+    'relative mx-auto grid w-full grid-cols-2 gap-x-3 gap-y-2 px-2 pb-6 select-none sm:gap-x-6 sm:gap-y-3 sm:px-0 sm:pb-16 [grid-template-areas:"tl_tr"_"board_board"_"status_status"_"bl_br"] lg:w-fit lg:grid-cols-[minmax(11rem,1fr)_auto_minmax(11rem,1fr)] lg:grid-rows-[1fr_1fr_auto] lg:[grid-template-areas:"tl_board_tr"_"bl_board_br"_"._status_."]',
   figure: 'play-figure text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
   // Same size on every turn, so the table never moves
   status:
-    'my-4 min-h-7 max-w-full self-center justify-self-center truncate text-center text-lg leading-7 font-extrabold text-[var(--play-ink)] [grid-area:status]',
+    'my-2 min-h-7 max-w-full self-center justify-self-center truncate text-center text-lg leading-7 font-extrabold text-[var(--play-ink)] [grid-area:status]',
   // The viewer's turn: blue text, no box
   statusCall: 'text-[var(--play-ludo-call)]',
-  frame: 'ludo-frame w-full [grid-area:board] lg:w-[min(36rem,calc(100dvh-13rem))]',
+  frame:
+    'ludo-frame [grid-area:board] max-lg:-mx-2 max-lg:w-auto lg:w-[min(36rem,calc(100dvh-13rem))]',
   // The viewer's turn: the frame lights in their colour
   frameMine: 'ludo-frame-mine',
   // Call over the board as the turn comes
@@ -38,10 +40,10 @@ export const LUDO_BOARD = {
  */
 
 export const LUDO_SLOTS = [
-  'self-start [grid-area:tl]',
-  'self-start justify-self-end [grid-area:tr]',
-  'self-end justify-self-end [grid-area:br]',
-  'self-end [grid-area:bl]',
+  'self-start -translate-x-2 sm:-translate-x-4 [grid-area:tl]',
+  'self-start justify-self-end translate-x-2 sm:translate-x-4 [grid-area:tr]',
+  'self-end justify-self-end translate-x-2 sm:translate-x-4 [grid-area:br]',
+  'self-end -translate-x-2 sm:-translate-x-4 [grid-area:bl]',
 ] as const
 
 /**
@@ -51,30 +53,36 @@ export const LUDO_SLOTS = [
 
 export const LUDO_PLATE = {
   plate:
-    'ludo-plate flex min-w-0 flex-col gap-1.5 transition-opacity duration-[var(--motion-duration-panel)]',
+    'ludo-plate relative z-20 flex min-w-0 flex-col gap-1.5 transition-opacity duration-[var(--motion-duration-panel)]',
   // Player on turn: lifted, ringed in their colour, tagged
   plateTurn: 'ludo-plate-turn',
-  tagSlot: 'flex h-6 items-center',
+  tagSlot: 'flex h-5 items-center sm:h-6',
   tag: 'ludo-turn-tag',
   plateRight: 'ludo-plate-right items-end',
+  // Out of flow on the board side, so the avatar never moves
+  dieSlot:
+    'absolute top-5 left-full ml-2 -translate-y-1/2 scale-[0.6] origin-left sm:top-[2.3rem] sm:ml-3 sm:scale-100',
+  dieSlotRight:
+    'absolute top-5 right-full mr-2 -translate-y-1/2 scale-[0.6] origin-right sm:top-[2.3rem] sm:mr-3 sm:scale-100',
   off: 'opacity-45 grayscale',
-  row: 'flex items-center gap-3',
+  row: 'relative flex items-start gap-1.5 sm:gap-3',
+  // Avatar, name and home count share one centred column
+  // Core as wide as the avatar, so every avatar sits at the same spot whatever the name
+  core: 'relative flex w-10 shrink-0 flex-col items-center gap-1 sm:w-[4.6rem]',
   rowRight: 'flex-row-reverse',
   // Avatar inside the turn clock
-  ring: 'ludo-ring grid size-[4.6rem] shrink-0 place-items-center rounded-full p-[0.25rem]',
+  ring: 'ludo-ring grid size-10 shrink-0 place-items-center rounded-full p-[0.14rem] sm:size-[4.6rem] sm:p-[0.25rem]',
   ringAlert: 'ludo-ring-alert',
-  face: 'rounded-full ring-[0.2rem] ring-[var(--play-ludo-felt)]',
-  chip: 'w-11 shrink-0',
-  nameRow: 'flex items-center gap-1.5 px-1',
-  nameRowRight: 'flex-row-reverse',
+  face: '!size-full rounded-full text-xs ring-[0.15rem] ring-[var(--play-ludo-felt)] sm:text-xl sm:ring-[0.2rem]',
+  chip: 'mt-0.5 w-5 shrink-0 sm:mt-2 sm:w-11',
+  nameRow: 'flex w-max items-center justify-center gap-1 px-1 sm:gap-1.5',
   name: NAME,
-  crown: 'size-4 shrink-0 text-[var(--play-ludo-crown)]',
-  dot: 'size-2.5 shrink-0 rounded-full',
+  crown: 'size-3 shrink-0 sm:size-4 text-[var(--play-ludo-crown)]',
+  dot: 'size-2 shrink-0 sm:size-2.5 rounded-full',
   online: 'bg-[var(--play-ludo-online)]',
   away: 'bg-[var(--play-ludo-away)]',
-  note: 'text-xs font-bold text-[var(--play-ink-soft)] tabular-nums',
   place:
-    'rounded-full bg-[var(--play-ludo-crown)] px-2 py-0.5 text-xs font-black text-[var(--play-ludo-felt)]',
+    'w-max rounded-full bg-[var(--play-ludo-crown)] px-2 py-0.5 text-xs font-black text-[var(--play-ludo-felt)]',
 } as const
 
 /**

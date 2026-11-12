@@ -181,7 +181,7 @@ export const readBeacon = async (
       status: true,
       platform: true,
       plannedStartAt: true,
-      youtuber: { select: { name: true, avatarUrl: true } },
+      youtuber: { select: { id: true, name: true, avatarUrl: true } },
       members: { where: { accountId: viewerId, reinforcement: true }, select: { accountId: true } },
     },
     orderBy: { plannedStartAt: 'asc' },
@@ -207,6 +207,7 @@ export const readBeacon = async (
       : LiveStatuses.Announced,
     lives: rows.map((row) => ({
       id: row.id,
+      creatorId: row.youtuber.id,
       creator: row.youtuber.name,
       creatorAvatar: row.youtuber.avatarUrl,
       platform: row.platform,

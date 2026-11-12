@@ -28,21 +28,7 @@
     "max": 60
   },
   "graceSeconds": 1,
-  "formats": {
-    "quick": {
-      "size": 10,
-      "fleet": [5, 4, 3, 3, 2]
-    },
-    "standard": {
-      "size": 12,
-      "fleet": [5, 4, 3, 3, 2]
-    },
-    "vast": {
-      "size": 36,
-      "fleet": [5, 4, 3, 3, 2]
-    }
-  },
-  "format": "vast",
+  "map": "tropical",
   "rules": {
     "hitReplay": true,
     "spacedShips": false
@@ -51,43 +37,59 @@
     "cannon": {
       "shape": "point",
       "reach": 0,
-      "cost": 0,
-      "weight": 0
+      "weight": 30,
+      "ramps": false
     },
     "airstrike": {
       "shape": "line",
-      "reach": 7,
-      "cost": 4,
-      "weight": 2
+      "reach": 4,
+      "weight": 4,
+      "ramps": true
     },
     "broadside": {
       "shape": "cross",
       "reach": 2,
-      "cost": 3,
-      "weight": 3
+      "weight": 4,
+      "ramps": true
     },
     "flare": {
       "shape": "square",
-      "reach": 3,
-      "cost": 2,
-      "weight": 3
+      "reach": 2,
+      "weight": 8,
+      "ramps": false
     },
     "torpedo": {
+      "shape": "line",
+      "reach": 6,
+      "weight": 6,
+      "ramps": true
+    },
+    "pair": {
+      "shape": "line",
+      "reach": 2,
+      "weight": 20,
+      "ramps": false
+    },
+    "volley": {
+      "shape": "line",
+      "reach": 3,
+      "weight": 12,
+      "ramps": true
+    },
+    "grenade": {
+      "shape": "cross",
+      "reach": 1,
+      "weight": 12,
+      "ramps": false
+    },
+    "gunship": {
       "shape": "ray",
       "reach": 0,
-      "cost": 3,
-      "weight": 2
+      "weight": 1,
+      "ramps": true
     }
   },
-  "offerSize": 2,
-  "ammo": {
-    "start": 2,
-    "perTurn": 1,
-    "max": 8
-  },
   "strikesToForfeit": 3,
-  "flightMs": 1500,
-  "impactMs": 900,
   "sunkMs": 1500,
   "roundPauseSeconds": 5,
   "alertSeconds": 5,
@@ -96,20 +98,38 @@
     "bracket": 3
   },
   "view": {
-    "tilt": 14,
+    "tilt": 0,
     "perspective": 1600,
-    "startCells": 14,
-    "minCells": 6,
-    "zoomStep": 1.15,
     "tapSlopPx": 10,
     "swipePx": 24,
-    "mapFrom": 13
+    "idleFps": 30
+  },
+  "quality": {
+    "ecoFps": 15,
+    "slowFrameMs": 20,
+    "slowForMs": 2000,
+    "tiers": {
+      "full": { "pixelRatio": 2, "particles": 600, "life": 1, "follow": true, "shake": 1 },
+      "reduced": { "pixelRatio": 1.5, "particles": 250, "life": 0.5, "follow": true, "shake": 0.5 },
+      "minimal": { "pixelRatio": 1, "particles": 80, "life": 0, "follow": false, "shake": 0 }
+    },
+    "device": {
+      "fullCores": 8,
+      "fullMemoryGb": 8,
+      "fullScreenPx": 900,
+      "minimalCores": 4,
+      "minimalMemoryGb": 2
+    }
   },
   "shake": {
     "cannon": 3,
     "airstrike": 9,
     "broadside": 6,
     "flare": 0,
-    "torpedo": 5
+    "torpedo": 3,
+    "pair": 2,
+    "volley": 3,
+    "grenade": 4,
+    "gunship": 6
   }
 }

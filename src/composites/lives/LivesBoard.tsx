@@ -9,13 +9,12 @@ import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FakeLivePanel } from '@/composites/lives/FakeLivePanel'
 import { LiveEndedDialog } from '@/composites/lives/notices/LiveEndedDialog'
-import { LiveRecent } from '@/composites/lives/LiveRecent'
 import { LiveTile } from '@/composites/lives/LiveTile'
 import { useLives } from '@/core/hooks/data/lives/useLives'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { LIVE_PRESET } from '@/declarations/lives/registries'
 import { ROUTES } from '@/declarations/navigation'
-import { BUTTON_STYLES, LIVE_BOARD, LIVE_RECENT } from '@/declarations/ui/variants'
+import { BUTTON_STYLES, LIVE_BOARD } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { LiveStatuses } from '@/utils/constants/lives'
@@ -51,7 +50,7 @@ export const LivesBoard = ({
   showFakeLive = false,
   isEmbedded = false,
 }: LivesBoardProps) => {
-  const { lives, recent, isSaving, endedId, dismissEnded, move, reopen } = useLives(
+  const { lives, recent, isSaving, endedId, dismissEnded, move } = useLives(
     initialLives,
     initialRecent
   )
@@ -123,20 +122,7 @@ export const LivesBoard = ({
         </>
       )}
 
-      {recent.length > 0 && (
-        <section className={LIVE_BOARD.group}>
-          <h2 className={LIVE_BOARD.groupTitle}>{LIVE_COPY.recentSection}</h2>
-          <ul className={LIVE_RECENT.list}>
-            {recent.map((live) => (
-              <li key={live.id}>
-                <LiveRecent live={live} isSaving={isSaving} onReopen={() => void reopen(live.id)} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {canAnnounce && (lives.length > 0 || recent.length > 0) && (
+      {canAnnounce && (
         <FloatingAdd
           offer={ASSISTANT_OFFERS.live}
           onClick={() => router.push(ROUTES.calendarNew(LIVE_PRESET))}

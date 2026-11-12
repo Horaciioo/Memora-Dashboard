@@ -8,19 +8,22 @@ export const GET = createProtectedRoute({
   permission: Permissions.RecruitmentCandidateWrite,
   descriptor: { summary: 'Find candidates by name or identifier', tags: ['recruitment'] },
   handler: async ({ query, scope }) => {
-    const { entries } = await readHistory(await scope(), {
+    const { sessions } = await readHistory(await scope(), {
       // Bounded, it goes into a database search
       search: (query.get('q') ?? '').slice(0, SEARCH_MAX_LENGTH),
       bannedOnly: false,
+      outcomeId: '',
+      recruiterId: '',
+      status: '',
       page: 0,
     })
 
     // One line per passage, the session tells homonyms apart
-    return entries.flatMap((entry) =>
-      entry.passages.map((passage) => ({
-        candidateId: passage.candidateId,
+    return sessions.flatMap((session) =>
+      session.candidates.map((entry) => ({
+        candidateId: entry.candidateId,
         name: entry.name,
-        sessionName: passage.sessionName,
+        sessionName: session.name,
       }))
     )
   },

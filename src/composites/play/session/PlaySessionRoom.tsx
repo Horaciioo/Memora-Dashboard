@@ -14,7 +14,7 @@ import { PlayStageKeys } from '@/composites/play/session/PlayStageKeys'
 import { PlayChat } from '@/composites/play/session/PlayChat'
 import type { PlayChatProps } from '@/composites/play/session/PlayChat'
 import { PlayEndActions } from '@/composites/play/session/PlayEndActions'
-import type { PlayRematchState } from '@/composites/play/session/PlayEndActions'
+import type { PlayRematchState, PlayTournamentStep } from '@/composites/play/session/PlayEndActions'
 import { usePlayCrowd } from '@/core/hooks/data/play/usePlayCrowd'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { useBoxSpan } from '@/core/hooks/interaction/layout/measure/useBoxSpan'
@@ -41,7 +41,11 @@ export interface PlaySessionRoomProps {
   // Feed window under the chat
   feed: ReactNode
   // Offer once the game is over
-  replay: { canReplay: boolean; rematch: PlayRematchState | null } | null
+  replay: {
+    canReplay: boolean
+    rematch: PlayRematchState | null
+    tournament?: PlayTournamentStep | null
+  } | null
   // The game table
   children: ReactNode
 }
@@ -91,6 +95,8 @@ export const PlaySessionRoom = ({
   // Golf keeps its own keys in the course HUD
   const hasKeys = game !== PlayGames.Golf
   const { ground } = PLAY_GAMES.get(game)
+  // Ludo on a phone: the board takes the whole screen, no panel around it
+  const isBare = isMobile && game === PlayGames.Ludo
 
   return (
     <div
@@ -173,7 +179,10 @@ export const PlaySessionRoom = ({
           ref={boxRef}
           className={
             isFullscreen
-              ? cn(BAC_SESSION.boxFull, hasKeys && BAC_SESSION.boxFullPad)
+              ? cn(
+                  BAC_SESSION.boxFull,
+                  hasKeys && (isBare ? BAC_SESSION.boxFullBare : BAC_SESSION.boxFullPad)
+                )
               : BAC_SESSION.box
           }
         >

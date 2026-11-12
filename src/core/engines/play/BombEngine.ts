@@ -11,7 +11,7 @@ import {
   submitWord,
   typeDraft,
 } from '@/core/services/play/bomb/BombTurnService'
-import { bombView } from '@/core/services/play/bomb/BombViewService'
+import { bombBoards, bombView } from '@/core/services/play/bomb/BombViewService'
 
 // Player actions
 const ACTIONS: Record<
@@ -39,5 +39,6 @@ export const BOMB_ENGINE: PlayEngine = {
   },
   settle: settleTable,
   view: bombView,
+  viewFor: bombBoards,
   extraStats: bombStats,
 }

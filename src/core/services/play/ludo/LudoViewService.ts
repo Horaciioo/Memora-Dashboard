@@ -33,13 +33,12 @@ const feedLineOf = (move: LudoMove) => ({
 })
 
 /**
- * Board of a Ludo game
+ * Boards of a Ludo game read once
  * @param {EngineSession} session - Game
- * @param {string} viewerId - Reader
- * @return {Promise<object>} - Board
+ * @return {Promise<(viewerId: string) => object>} - Board of each reader
  */
 
-export const ludoView = async (session: EngineSession, viewerId: string) => {
+export const ludoBoards = async (session: EngineSession) => {
   const where = { sessionId: session.id }
   const newest = { orderBy: { rev: 'desc' as const }, take: LUDO_SETTINGS.feedSize }
   const [table, seats, lines, feed] = await Promise.all([
@@ -59,22 +58,14 @@ export const ludoView = async (session: EngineSession, viewerId: string) => {
   const board = seats
     .filter((seat) => present.has(seat.accountId))
     .map(({ accountId, corner, pawns }) => ({ accountId, corner, pawns }))
-  const isMyTurn = table?.turnId === viewerId
-
-  return {
+  const base = {
     settings,
     rev: table?.rev ?? 0,
     startsAt: table?.startsAt ?? new Date(),
     turnEndsAt: table?.turnEndsAt ?? new Date(),
     turnId: table?.turnId ?? null,
     dice: table?.dice ?? null,
-    isMyTurn,
     isOver: isBoardOver({ seats, players: session.players, ending: settings.ending }),
-    // Pawns the viewer may move with the die on the table
-    movable:
-      isMyTurn && table?.dice
-        ? legalMoves(board, viewerId, table.dice, settings).map(({ pawn, to }) => ({ pawn, to }))
-        : [],
     players: seats.map((seat) => ({
       accountId: seat.accountId,
       corner: seat.corner,
@@ -98,4 +89,28 @@ export const ludoView = async (session: EngineSession, viewerId: string) => {
     feed: feed.map(feedLineOf),
     serverTime: new Date(),
   }
+
+  return (viewerId: string) => {
+    const isMyTurn = table?.turnId === viewerId
+
+    return {
+      ...base,
+      isMyTurn,
+      // Pawns the viewer may move with the die on the table
+      movable:
+        isMyTurn && table?.dice
+          ? legalMoves(board, viewerId, table.dice, settings).map(({ pawn, to }) => ({ pawn, to }))
+          : [],
+    }
+  }
 }
+
+/**
+ * Board of a Ludo game for one reader
+ * @param {EngineSession} session - Game
+ * @param {string} viewerId - Reader
+ * @return {Promise<object>} - Board
+ */
+
+export const ludoView = async (session: EngineSession, viewerId: string) =>
+  (await ludoBoards(session))(viewerId)

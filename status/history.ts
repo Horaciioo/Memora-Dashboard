@@ -1,5 +1,5 @@
 import { SETTINGS } from './declarations.ts'
-import type { Health } from './declarations.ts'
+import type { DayLevel, Health } from './declarations.ts'
 
 /**
  * Checks counted for a day
@@ -124,14 +124,20 @@ export const recordCheck = (
 /**
  * Worst level of a day
  * @param {DayTally | undefined} tally - Day counts
- * @return {Health | null} - Day level
+ * @return {DayLevel | null} - Day level
  */
 
-export const dayHealth = (tally: DayTally | undefined): Health | null => {
+export const dayHealth = (tally: DayTally | undefined): DayLevel | null => {
   if (!tally) return null
-  if (tally.down >= SETTINGS.redDayChecks) return 'down'
 
-  return tally.down + tally.degraded > 0 ? 'degraded' : 'up'
+  const { yellow, orange, red, black } = SETTINGS.dayChecks
+  const bad = tally.down + tally.degraded
+
+  if (tally.down >= black) return 'outage'
+  if (tally.down >= red) return 'down'
+  if (bad >= orange) return 'degraded'
+
+  return bad >= yellow ? 'minor' : 'up'
 }
 
 /**

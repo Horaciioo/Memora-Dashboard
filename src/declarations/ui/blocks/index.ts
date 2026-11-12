@@ -18,6 +18,7 @@ export {
   CREATOR_VIEW,
   ACCOUNT_NOTIFICATIONS,
   AUTH_SHELL,
+  LOGIN_SHELL,
   SPLASH,
   SIMULATION_BLOCK,
 } from '@/declarations/ui/blocks/shell'

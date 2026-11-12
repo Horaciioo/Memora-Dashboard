@@ -1028,9 +1028,10 @@
   }
 }
 
-/* Shell glowing hot */
+/* Shell glowing hot, orange turning red */
 .play-bomb-heat {
-  opacity: calc(var(--heat, 0) * 0.6);
+  fill: color-mix(in srgb, var(--play-bomb-red) calc(var(--heat, 0) * 100%), var(--play-bomb));
+  opacity: calc(var(--heat, 0) * 0.85);
 }
 
 /* Spark swelling with the heat */
@@ -1527,4 +1528,80 @@
 /* Heavy decor cut from the Play settings */
 .play-room[data-light] :is(.play-floor, .play-floor *, .play-art, .play-art *) {
   animation: none !important;
+}
+
+/* Hub scenery: rays turn slowly, set pieces bob and sway */
+.play-scenery-rays {
+  animation: play-scenery-turn 160s linear infinite;
+}
+
+.play-scenery-bob {
+  animation: play-scenery-bob 7s ease-in-out infinite;
+}
+
+.play-scenery-late {
+  animation-delay: -3.5s;
+}
+
+.play-scenery-sway {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: play-scenery-sway 9s ease-in-out infinite;
+}
+
+@keyframes play-scenery-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes play-scenery-bob {
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes play-scenery-sway {
+  50% {
+    rotate: 5deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-scenery-rays,
+  .play-scenery-bob,
+  .play-scenery-sway {
+    animation: none;
+  }
+}
+
+/* Featured game: each turn slides in, the poster settles */
+.play-feature-in {
+  animation: play-feature-in 600ms var(--motion-ease-out) both;
+}
+
+.play-feature-in .play-feature-poster {
+  animation: play-feature-poster 800ms var(--motion-ease-out) both;
+}
+
+@keyframes play-feature-in {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+@keyframes play-feature-poster {
+  from {
+    opacity: 0;
+    rotate: 12deg;
+    translate: 2rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-feature-in,
+  .play-feature-in .play-feature-poster {
+    animation: none;
+  }
 }

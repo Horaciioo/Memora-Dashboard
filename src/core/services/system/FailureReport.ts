@@ -3,19 +3,17 @@ import 'server-only'
 import type { NextRequest } from 'next/server'
 
 import { toAppError } from '@/core/lib/errors'
+import { messageOf, traceOf } from '@/core/lib/errors/text'
+import { recordError } from '@/core/services/system/ErrorEventService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import type { ActivityError } from '@/core/services/system/ActivityService'
-import { ACTIVITY_COPY } from '@/declarations/activity/copy'
 import { FAILURE_SETTINGS } from '@/declarations/configurations/settings'
+import { NEXUS_PATHS } from '@/declarations/nexus/paths'
 import { ErrorCodes } from '@/utils/constants/errors'
-import { Prisma } from '@prisma/client'
 import { SECOND_MS } from '@/utils/constants/time'
 
 // Moments each failure was last kept
 const lastKept = new Map<string, number>()
-
-// Stack lines only, the first line repeats the message
-const STACK_LINE = /^\s+at /
 
 /**
  * Check a failure was kept lately
@@ -38,41 +36,9 @@ const isRecent = (key: string): boolean => {
   return false
 }
 
-/**
- * Message safe for the journal
- * @param {unknown} error - Thrown value
- * @return {string} - First line, no query values
- */
-
-const messageOf = (error: unknown): string => {
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    return ACTIVITY_COPY.errorDatabase.replace('{code}', error.code)
-  }
-  if (!(error instanceof Error)) return ACTIVITY_COPY.errorFallback
-
-  // Query values sit below the first line
-  return (error.message.split('\n')[0] ?? ACTIVITY_COPY.errorFallback).slice(
-    0,
-    FAILURE_SETTINGS.messageMaxLength
-  )
-}
-
-/**
- * Stack without the message or machine paths
- * @param {unknown} error - Thrown value
- * @return {string | undefined} - Frames kept
- */
-
-const traceOf = (error: unknown): string | undefined => {
-  if (!(error instanceof Error) || !error.stack) return undefined
-
-  return error.stack
-    .split('\n')
-    .filter((line) => STACK_LINE.test(line))
-    .join('\n')
-    .replaceAll(process.cwd(), '')
-    .slice(0, FAILURE_SETTINGS.traceMaxLength)
-}
+// Routes the journal never names
+const isHiddenRoute = (request: NextRequest): boolean =>
+  request.nextUrl.pathname.startsWith(NEXUS_PATHS.api)
 
 /**
  * Keep an unexpected failure in the journal
@@ -87,9 +53,14 @@ export const reportFailure = async (
   actorId: string | null,
   error: unknown
 ): Promise<void> => {
-  if (!actorId || toAppError(error).code !== ErrorCodes.SystemFailure) return
+  if (toAppError(error).code !== ErrorCodes.SystemFailure) return
 
   const route = `${request.method} ${request.nextUrl.pathname}`
+
+  // The console keeps all of them, visitors included
+  await recordError({ severity: 'ERROR', source: 'API', error, route, accountId: actorId })
+
+  if (!actorId || isHiddenRoute(request)) return
   const message = messageOf(error)
   if (isRecent(`${route} ${message}`)) return
 
@@ -125,9 +96,16 @@ export const reportRefusal = async (
   error: unknown
 ): Promise<void> => {
   const code = toAppError(error).code
-  if (!(code in REFUSALS)) return
+  if (!(code in REFUSALS) || isHiddenRoute(request)) return
 
   const route = `${request.method} ${request.nextUrl.pathname}`
+  await recordError({
+    severity: 'WARNING',
+    source: 'API',
+    message: `${code} ${route}`,
+    route,
+    accountId: actorId,
+  })
   if (isRecent(`${code} ${actorId ?? ''} ${route}`)) return
 
   await recordEvent({

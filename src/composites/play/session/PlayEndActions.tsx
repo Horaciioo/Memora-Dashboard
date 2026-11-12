@@ -25,6 +25,18 @@ export interface PlayRematchState {
   myInviteId: string | null
 }
 
+/**
+ * Place of a finished game in its tournament
+ * @typedef {Object} PlayTournamentStep
+ */
+
+export interface PlayTournamentStep {
+  index: number
+  gamesCount: number
+  // Next game of the tournament, null after the last
+  nextId: string | null
+}
+
 export interface PlayEndActionsProps {
   game: PlayGameName
   gameSlug: string
@@ -33,6 +45,7 @@ export interface PlayEndActionsProps {
   rematch: PlayRematchState | null
   // Tournaments chain their own games
   canReplay: boolean
+  tournament?: PlayTournamentStep | null
 }
 
 /**
@@ -48,6 +61,7 @@ export const PlayEndActions = ({
   isSeated,
   rematch,
   canReplay,
+  tournament = null,
 }: PlayEndActionsProps) => {
   const moves = usePlayMoves()
   const invites = usePlayInvites()
@@ -81,6 +95,15 @@ export const PlayEndActions = ({
             {PLAY_HUB_COPY.rematchDecline}
           </Button>
         </>
+      )}
+
+      {tournament?.nextId && (
+        <AppLink
+          href={ROUTES.playSession(tournament.nextId)}
+          className={cn(BUTTON_STYLES.base, BUTTON_STYLES.arcade, PLAY_END.action)}
+        >
+          {PLAY_HUB_COPY.tournamentNext}
+        </AppLink>
       )}
 
       {canReplay && isSeated && !rematch && (
@@ -117,6 +140,17 @@ export const PlayEndActions = ({
       >
         {PLAY_HUB_COPY.backToHub}
       </AppLink>
+
+      {tournament && (
+        <p className={PLAY_END.count} role="status">
+          {tournament.nextId
+            ? fillPlayMessage(PLAY_HUB_COPY.tournamentStep, {
+                current: tournament.index + 1,
+                total: tournament.gamesCount,
+              })
+            : PLAY_HUB_COPY.tournamentOver}
+        </p>
+      )}
 
       {rematch && (
         <p className={PLAY_END.count} role="status">

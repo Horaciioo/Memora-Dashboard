@@ -1,3 +1,4 @@
+import { withTwitchBanners } from '@/core/services/platforms/TwitchBannerService'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Status } from '@/components/elements/display/Status'
@@ -54,8 +55,9 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
   const { id } = await params
   const { session, access, scope } = await requirePermission(Permissions.ReferenceRead)
 
-  const youtuber = await readYoutuber(id)
-  if (!youtuber) notFound()
+  const found = await readYoutuber(id)
+  if (!found) notFound()
+  const [youtuber] = await withTwitchBanners([found])
 
   const [teams, anchors, channels, design] = await Promise.all([
     readCreatorTeams(id, await scope()),

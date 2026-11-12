@@ -3,7 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { activeFunctions } from '@/core/services/reference/lookups'
 import { functionOptions, rowsToOptions, toOptions } from '@/core/lib/forms/options'
-import { teamOptions } from '@/core/services/work/shared'
+import { teamOptions, withSeated } from '@/core/services/work/shared'
 import { REFERENT_FUNCTION } from '@/declarations/reference/fixed'
 import { ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
 import {
@@ -32,12 +32,18 @@ const REVIEW_STAGE_OPTIONS: FieldOption[] = REVIEW_STAGES.map((stage) => ({
 /**
  * Build the session form declarations
  * @param {string} [youtuberId] - Creator of the linked campaign, narrowing the referents
+ * @param {string[]} [keptReferents] - Referents already seated, whatever their function now
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const sessionFields = async (youtuberId?: string): Promise<FieldDefinition[]> => {
+export const sessionFields = async (
+  youtuberId?: string,
+  keptReferents: string[] = []
+): Promise<FieldDefinition[]> => {
   const [referents, functions] = await Promise.all([
-    teamOptions({ functionName: REFERENT_FUNCTION, youtuberId }),
+    teamOptions({ functionName: REFERENT_FUNCTION, youtuberId }).then((options) =>
+      withSeated(options, keptReferents)
+    ),
     activeFunctions(),
   ])
 

@@ -64,7 +64,7 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
 
   return {
     settings,
-    sea: { size: sea.size, fleet: sea.fleet },
+    sea: { size: sea.size, fleet: sea.fleet, reachScale: sea.reachScale },
     phase,
     rev: game?.rev ?? 0,
     startsAt: game?.startsAt ?? new Date(),
@@ -91,8 +91,7 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
       ? {
           fleet: (me.fleet ?? null) as unknown as NavalShip[] | null,
           isReady: Boolean(me.readyAt),
-          ammo: me.ammo,
-          offer: me.offer.map(readWeaponName),
+          weapon: readWeaponName(me.weapon),
         }
       : null,
     fleets:

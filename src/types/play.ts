@@ -51,12 +51,14 @@ export interface EngineSession {
  * @property {boolean} changed - Players must refresh
  * @property {boolean} finished - Game over
  * @property {Date | null} deadline - Next timed move
+ * @property {boolean} [isCosmetic] - Only the screen moved, bots keep their plans
  */
 
 export interface EngineStep {
   changed: boolean
   finished: boolean
   deadline: Date | null
+  isCosmetic?: boolean
 }
 
 /**
@@ -79,6 +81,8 @@ export interface PlayEngine {
   isViewShared?: boolean
   // Light board read once per bot pass
   botView?: (session: EngineSession) => Promise<unknown>
+  // One read, then each reader's board drawn from it
+  viewFor?: (session: EngineSession) => Promise<(viewerId: string) => unknown>
   extraStats: (sessionId: string) => Promise<Map<string, Record<string, number>>>
   // XP factor of the winner
   winnerMultiplier?: (settings: Prisma.JsonValue) => number

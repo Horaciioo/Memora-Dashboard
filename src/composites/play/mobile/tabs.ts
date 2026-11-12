@@ -26,9 +26,6 @@ export const PLAY_TAB_ORDER: PlayTab[] = [
 // Tabs of the phone bar
 export const PLAY_PHONE_TABS = PLAY_TAB_ORDER.filter((tab) => !tab.isDesktopOnly)
 
-// The profile sits right after this tab on desktop
-export const PLAY_ME_AFTER: PlayTabGlyphName = 'home'
-
 // Words of each tab
 export const PLAY_TAB_LABELS: Record<PlayTabGlyphName, string> = {
   group: PLAY_MOBILE_COPY.tabGroup,

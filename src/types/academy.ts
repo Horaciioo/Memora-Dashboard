@@ -685,3 +685,55 @@ export interface JuniorLiveView {
   startedAt: string
   attendance: AttendanceStatusName
 }
+
+/**
+ * One junior inside a session of the Academy history
+ * @typedef {Object} AcademyHistoryJunior
+ * @property {string} id - Junior identifier
+ * @property {string} name - Display name
+ * @property {string | null} avatarUrl - Portrait
+ * @property {AcademyJuniorStatusName} status - Outcome so far
+ * @property {string | null} referent - Referent in charge
+ * @property {string} startedAt - ISO arrival date
+ */
+
+export interface AcademyHistoryJunior {
+  id: string
+  name: string
+  avatarUrl: string | null
+  status: AcademyJuniorStatusName
+  referent: string | null
+  startedAt: string
+}
+
+/**
+ * One session of the Academy history with its juniors
+ * @typedef {Object} AcademyHistorySession
+ * @property {string} id - Session identifier
+ * @property {string} title - Session title
+ * @property {AcademySessionStatusName} status - Phase in force
+ * @property {string} startsAt - ISO first day
+ * @property {AcademyHistoryJunior[]} juniors - Juniors matching the filters
+ */
+
+export interface AcademyHistorySession {
+  id: string
+  title: string
+  status: AcademySessionStatusName
+  startsAt: string
+  juniors: AcademyHistoryJunior[]
+}
+
+/**
+ * One page of the Academy history
+ * @typedef {Object} AcademyHistoryPage
+ * @property {AcademyHistorySession[]} sessions - Sessions of the page, newest first
+ * @property {{ id: string, label: string }[]} referents - Referents the filter offers
+ * @property {boolean} hasMore - Another page follows
+ */
+
+export interface AcademyHistoryPage {
+  sessions: AcademyHistorySession[]
+  referents: { id: string; label: string }[]
+  hasMore: boolean
+}

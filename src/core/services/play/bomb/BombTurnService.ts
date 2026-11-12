@@ -325,5 +325,5 @@ export const typeDraft = async (
     data: { draft, missWord: null, missReason: null },
   })
 
-  return { ...IDLE_STEP, changed: count > 0 }
+  return { ...IDLE_STEP, changed: count > 0, isCosmetic: true }
 }

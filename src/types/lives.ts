@@ -92,6 +92,8 @@ export interface CoordinationRequest {
 
 export interface LiveView {
   id: string
+  // Calendar entry the live is filed under
+  calendarEventId: string | null
   // Open to enter, too early, or over
   access: LiveAccess
   // ISO moment the doors open, before the planned start
@@ -137,6 +139,7 @@ export interface LiveBeacon {
   status: LiveStatusName
   lives: {
     id: string
+    creatorId: string
     creator: string
     creatorAvatar: string | null
     platform: LivePlatformName
@@ -584,4 +587,16 @@ export interface ModViewCreator {
   avatar: string | null
   liveId: string | null
   isActive: boolean
+}
+
+/**
+ * What the assistant needs to plan a live
+ * @typedef {Object} LivePlanning
+ * @property {{ platform: LivePlatformName, templateId: string, isSoon: boolean }[]} platforms - Calendar model per platform
+ * @property {{ id: string, name: string }[]} creators - Creators the member may announce for
+ */
+
+export interface LivePlanning {
+  platforms: { platform: LivePlatformName; templateId: string; isSoon: boolean }[]
+  creators: { id: string; name: string }[]
 }

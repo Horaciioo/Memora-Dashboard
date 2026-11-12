@@ -101,8 +101,13 @@ const planOf = ({
   const isSafe = square !== null && SAFE_SQUARES.has(square)
   const rivals = square === null ? [] : rivalsOn(seats, mover.accountId, square).flat()
 
-  // Safe squares share: rivals stay, nobody is eaten. A pawn leaving the yard eats whoever sits on its start
+  // One pawn per square: never on one of your own, never on a safe square a rival holds
+  const isOwnSquare = to < GOAL_STEP && mover.pawns.some((step, index) => index !== pawn && step === to)
+  if (isOwnSquare) return null
+
+  // Safe squares protect: a rival sitting there stays and blocks. A pawn leaving the yard eats whoever sits on its start
   const isShielded = safeSquares && isSafe && !isExit
+  if (isShielded && rivals.length) return null
 
   return {
     pawn,

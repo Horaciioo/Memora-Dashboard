@@ -42,7 +42,7 @@ export {
   setPlayLevel,
 } from '@/core/services/play/PlayAdminService'
 export { readPlayActivity } from '@/core/services/play/PlayJournalService'
-export { announceInChat, listMessages, postMessage } from '@/core/services/play/PlayChatService'
+export { announceInChat, listMessages, postMessage, readMessages } from '@/core/services/play/PlayChatService'
 export {
   answerInvite,
   inviteCandidates,

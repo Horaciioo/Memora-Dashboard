@@ -24,9 +24,12 @@ export const usePlayNoticeFeed = (): void => {
 
   useEffect(() => {
     let isAlive = true
+    // Reads crossing on the wire, only the latest lands
+    let asked = 0
     const read = async () => {
+      const turn = (asked += 1)
       const invites = await apiGet<PlayNoticeView[]>(API_ROUTES.playNotices).catch(() => null)
-      if (!invites || !isAlive) return
+      if (!invites || !isAlive || turn !== asked) return
 
       // Chime for an invitation landing now
       const heard = known.current
@@ -45,7 +48,10 @@ export const usePlayNoticeFeed = (): void => {
     // Every signal of the topic, the catch up after a drop included
     const stop = listenRealtime(PLAY_TOPICS.notices, onRead)
     onRead()
-    const timer = window.setInterval(onRead, PLAY_INVITE_SETTINGS.pollSeconds * SECOND_MS)
+    // A hidden tab skips the poll, focus catches up
+    const timer = window.setInterval(() => {
+      if (!document.hidden) onRead()
+    }, PLAY_INVITE_SETTINGS.pollSeconds * SECOND_MS)
     window.addEventListener('focus', onRead)
 
     return () => {

@@ -246,6 +246,8 @@ enum ModerationKind {
   UNBAN_REQUEST_APPROVE
   UNBAN_REQUEST_DENY
   MESSAGE_SEND
+  ROLE_CHANGE
+  WARN_ACK
 }
 
 // Where a moderation gesture was made
@@ -330,6 +332,7 @@ model Account {
   functions AccountFunction[]
 
   sessions              Session[]
+  nexusSessions         NexusSession[]
   pushSubscriptions     PushSubscription[]
   modViewPreferences    ModViewPreference[]
   sharedWordsAdded      ModSharedWord[]
@@ -407,6 +410,11 @@ model Account {
   baccalaureatVotes     BaccalaureatVote[]
   bombPlayers           BombPlayer[]
   bombMoves             BombMove[]
+  jumbleRounds          JumbleRound[]
+  echoFinds             EchoFind[]
+  glitchProgress        GlitchProgress[]
+  croquisRounds         CroquisRound[]
+  croquisGuesses        CroquisGuess[]
   golfPlayers           GolfPlayer[]
   golfMoves             GolfMove[]
   ludoPlayers           LudoPlayer[]
@@ -509,6 +517,7 @@ model Session {
 
   account           Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
   pushSubscriptions PushSubscription[]
+  nexusSessions     NexusSession[]
 
   @@index([accountId])
   @@index([expiresAt])
@@ -725,6 +734,7 @@ model Youtuber {
   lives               Live[]
   viewerComments      ViewerComment[]
   sharedWords         ModSharedWord[]
+  unbanRule           ModUnbanRule?
   chatMessages        LiveChatMessage[]
   chatStats           ViewerChatStat[]
   sanctionOffenses    SanctionOffense[]
@@ -2160,6 +2170,19 @@ model ModSharedWord {
   @@map("mod_shared_words")
 }
 
+// How the team handles unban requests on a channel
+model ModUnbanRule {
+  id            String   @id @default(cuid())
+  youtuberId    String   @unique
+  // A refusal must carry a reason
+  requireReason Boolean  @default(false)
+  updatedAt     DateTime @updatedAt
+
+  youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+
+  @@map("mod_unban_rules")
+}
+
 // Chat message of a viewer, kept for the dossier
 model LiveChatMessage {
   id             String       @id @default(cuid())
@@ -2199,8 +2222,8 @@ model LiveTeamMessage {
   scope     String   @default("all")
   createdAt DateTime @default(now())
 
-  live      Live                 @relation(fields: [liveId], references: [id], onDelete: Cascade)
-  author    Account              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  live      Live               @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  author    Account            @relation(fields: [authorId], references: [id], onDelete: Cascade)
   reactions LiveTeamReaction[]
 
   @@index([liveId, createdAt])
@@ -2327,6 +2350,8 @@ model ActivityLog {
   ip         String?
   userAgent  String?
   route      String?
+  // Request that raised it, for the console trace
+  requestId  String?
   createdAt  DateTime @default(now())
 
   actor   Account? @relation("LogActor", fields: [actorId], references: [id], onDelete: SetNull)
@@ -2338,6 +2363,7 @@ model ActivityLog {
   @@index([createdAt])
   @@index([actorId, createdAt])
   @@index([level, createdAt])
+  @@index([requestId])
   @@map("activity_logs")
 }
 
@@ -2956,6 +2982,10 @@ enum PlayGame {
   BOMB
   LUDO
   NAVAL
+  JUMBLE
+  ECHO
+  GLITCH
+  CROQUIS
 }
 
 // Play bot level
@@ -2975,6 +3005,7 @@ enum PlayVisibility {
 enum PlaySessionStatus {
   LOBBY
   RUNNING
+  PAUSED
   FINISHED
   ABANDONED
 }
@@ -3020,32 +3051,45 @@ model PlaySession {
   settings        Json
   startedAt       DateTime?
   finishedAt      DateTime?
+  // Set while an Administration pause holds the game
+  pausedAt        DateTime?
+  pausedById      String?
+  pauseReason     String?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  host         Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
-  tournament   PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  rematchOf    PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
-  rematch      PlaySession?        @relation("PlayRematch")
-  seats        PlaySeat[]
-  bacRounds    BaccalaureatRound[]
-  bombGame     BombGame?
-  bombSeats    BombPlayer[]
-  bombMoves    BombMove[]
-  golfGame     GolfGame?
-  golfPlayers  GolfPlayer[]
-  golfMoves    GolfMove[]
-  ludoGame     LudoGame?
-  ludoPlayers  LudoPlayer[]
-  ludoMoves    LudoMove[]
-  navalGame    NavalGame?
-  navalPlayers NavalPlayer[]
-  navalMatches NavalMatch[]
-  navalShots   NavalShot[]
-  messages     PlayMessage[]
-  invites      PlayInvite[]
-  follows      PlayFollow[]
-  notices      PlayNotice[]
+  host           Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+  tournament     PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  rematchOf      PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
+  rematch        PlaySession?        @relation("PlayRematch")
+  seats          PlaySeat[]
+  bacRounds      BaccalaureatRound[]
+  bombGame       BombGame?
+  bombSeats      BombPlayer[]
+  bombMoves      BombMove[]
+  jumbleGame     JumbleGame?
+  jumbleRounds   JumbleRound[]
+  echoGame       EchoGame?
+  echoFinds      EchoFind[]
+  glitchGame     GlitchGame?
+  glitchProgress GlitchProgress[]
+  croquisGame    CroquisGame?
+  croquisRounds  CroquisRound[]
+  croquisGuesses CroquisGuess[]
+  golfGame       GolfGame?
+  golfPlayers    GolfPlayer[]
+  golfMoves      GolfMove[]
+  ludoGame       LudoGame?
+  ludoPlayers    LudoPlayer[]
+  ludoMoves      LudoMove[]
+  navalGame      NavalGame?
+  navalPlayers   NavalPlayer[]
+  navalMatches   NavalMatch[]
+  navalShots     NavalShot[]
+  messages       PlayMessage[]
+  invites        PlayInvite[]
+  follows        PlayFollow[]
+  notices        PlayNotice[]
 
   @@index([status, game])
   @@index([tournamentId, tournamentIndex])
@@ -3536,10 +3580,8 @@ model NavalPlayer {
   place        Int?
   // Turns lost to the clock in a row
   strikes      Int       @default(0)
-  // Ammo for special weapons
-  ammo         Int       @default(0)
-  // Weapons drawn for the current turn
-  offer        String[]  @default([])
+  // Weapon drawn for the current turn
+  weapon       String    @default("cannon")
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
@@ -3843,4 +3885,397 @@ model FeatureSwitch {
   updatedAt   DateTime @updatedAt
 
   @@map("feature_switches")
+}
+
+// Stage of an owner console session
+enum NexusStage {
+  PASSWORD
+  UNLOCKED
+}
+
+// Factor an owner console attempt tried
+enum NexusAttemptKind {
+  PASSWORD
+  DISCORD
+  REAUTH
+}
+
+// Owner console session, bound to the sign-in session that opened it
+model NexusSession {
+  id            String     @id @default(cuid())
+  // SHA-256 of the cookie token
+  tokenHash     String     @unique
+  sessionId     String
+  accountId     String
+  stage         NexusStage
+  passwordAt    DateTime
+  discordAt     DateTime?
+  reauthAt      DateTime
+  lastUsedAt    DateTime   @default(now())
+  expiresAt     DateTime
+  // Armed modes lapse on their own
+  writeUntil    DateTime?
+  dangerUntil   DateTime?
+  revokedAt     DateTime?
+  revokedReason String?
+  address       String?
+  userAgent     String?
+  createdAt     DateTime   @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([sessionId])
+  @@index([expiresAt])
+  @@map("nexus_sessions")
+}
+
+// One try at a factor, success or not
+model NexusAttempt {
+  id        String           @id @default(cuid())
+  accountId String
+  address   String
+  kind      NexusAttemptKind
+  succeeded Boolean
+  createdAt DateTime         @default(now())
+
+  @@index([accountId, createdAt])
+  @@index([address, createdAt])
+  @@map("nexus_attempts")
+}
+
+// Pause after too many failures, one row per account and address
+model NexusLockout {
+  key       String   @id
+  until     DateTime
+  strikes   Int      @default(1)
+  updatedAt DateTime @updatedAt
+
+  @@map("nexus_lockouts")
+}
+
+// How a console command ended
+enum NexusAuditStatus {
+  OK
+  REFUSED
+  FAILED
+  PREVIEWED
+}
+
+// One line per console command, answered or refused
+model NexusAudit {
+  id             String           @id @default(cuid())
+  // Kept after the session closes
+  nexusSessionId String?
+  accountId      String
+  commandId      String?
+  // Typed text with secret arguments masked
+  input          String
+  level          String?
+  status         NexusAuditStatus
+  // Pipeline step that refused
+  refusal        String?
+  // Entity and identifier aimed at
+  target         String?
+  before         Json?
+  after          Json?
+  reversible     Boolean          @default(false)
+  revertedById   String?
+  requestId      String
+  durationMs     Int              @default(0)
+  address        String?
+  createdAt      DateTime         @default(now())
+
+  @@index([accountId, createdAt])
+  @@index([target, createdAt])
+  @@index([commandId])
+  @@index([createdAt])
+  @@map("nexus_audits")
+}
+
+enum ErrorSeverity {
+  FATAL
+  ERROR
+  WARNING
+}
+
+enum ErrorSource {
+  SERVER
+  CLIENT
+  API
+  PRISMA
+  WEBSOCKET
+  JOB
+  PLAY
+  FEATURE
+}
+
+// Errors grouped by fingerprint, read by the console only
+model ErrorEvent {
+  id          String        @id @default(cuid())
+  // Route, normalised message and first frame
+  fingerprint String        @unique
+  occurrences Int           @default(1)
+  firstAt     DateTime      @default(now())
+  lastAt      DateTime      @default(now())
+  severity    ErrorSeverity
+  service     String
+  environment String
+  source      ErrorSource
+  route       String?
+  accountId   String?
+  sessionId   String?
+  requestId   String?
+  traceId     String?
+  message     String
+  stack       String?
+  // Cause chain and database code
+  rootCause   String?
+  // Masked and bounded
+  context     Json?
+  resolvedAt  DateTime?
+
+  @@index([lastAt])
+  @@index([source, lastAt])
+  @@index([severity, lastAt])
+  @@index([requestId])
+  @@index([accountId, lastAt])
+  @@map("error_events")
+}
+
+// Setting the owner changed from the console, applied at the next start
+model ConfigOverride {
+  id          String    @id @default(cuid())
+  // Folder and file, such as system/realtime
+  category    String
+  // Dotted key inside the file
+  path        String
+  value       Json
+  previous    Json?
+  updatedById String
+  expiresAt   DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([category, path])
+  @@map("config_overrides")
+}
+
+// Switch the owner flips from the console, kept apart from feature switches
+model SystemFlag {
+  key         String    @id
+  enabled     Boolean   @default(false)
+  // Words members read
+  message     String?
+  until       DateTime?
+  updatedById String?
+  updatedAt   DateTime  @updatedAt
+
+  @@map("system_flags")
+}
+
+// Jumble table: the scrambled word of the round and its clock
+model JumbleGame {
+  sessionId   String    @id
+  // Round in play, from one
+  round       Int
+  // Comparable form, never sent before the reveal
+  answer      String
+  // Written form with its accents
+  display     String
+  scrambled   String
+  startsAt    DateTime
+  endsAt      DateTime
+  // Moment the first letter is given away
+  hintAt      DateTime
+  isHinted    Boolean   @default(false)
+  solverId    String?
+  solvedAt    DateTime?
+  // Reveal over, the next round opens
+  revealUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_jumble_games")
+}
+
+// One round played, solved or run out of time
+model JumbleRound {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  // Written form of the word
+  word      String
+  // Null when nobody found it
+  solverId  String?
+  points    Int      @default(0)
+  // Time the solver took
+  ms        Int      @default(0)
+  // Rounds in a row for the solver
+  streak    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  solver  Account?    @relation(fields: [solverId], references: [id], onDelete: SetNull)
+
+  @@unique([sessionId, round])
+  @@map("play_jumble_rounds")
+}
+
+// Echo table: the deal of the round and its clock
+model EchoGame {
+  sessionId   String    @id
+  // Round in play, from one
+  round       Int
+  // Center card, a card per player and the layout seed
+  deal        Json
+  // Moment each player may try again after a miss
+  locks       Json      @default("{}")
+  startsAt    DateTime
+  endsAt      DateTime
+  // Reveal over, the next round opens
+  revealUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_echo_games")
+}
+
+// Symbol found by a player on a round
+model EchoFind {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  accountId String
+  // Place among the finders, from one
+  rank      Int
+  points    Int      @default(0)
+  // Time the player took
+  ms        Int      @default(0)
+  // Symbol id found
+  symbol    Int
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round, accountId])
+  @@index([sessionId, round])
+  @@map("play_echo_finds")
+}
+
+// Glitch table: the seed of the two pictures and the clock of the round
+model GlitchGame {
+  sessionId   String    @id
+  // Round in play, from one
+  round       Int
+  // Draws both pictures and their differences, never sent as is
+  seed        Int
+  startsAt    DateTime
+  endsAt      DateTime
+  // Reveal over, the next round opens
+  revealUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_glitch_games")
+}
+
+// What a player found on a round
+model GlitchProgress {
+  id        String    @id @default(cuid())
+  sessionId String
+  round     Int
+  accountId String
+  // Differences found, by index in the round
+  found     Int[]
+  misses    Int       @default(0)
+  // Wrong click, the picture stays shut until then
+  lockUntil DateTime?
+  // Place among those who found everything, from one
+  rank      Int?
+  points    Int       @default(0)
+  // Time of the last find
+  ms        Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round, accountId])
+  @@index([sessionId, round])
+  @@map("play_glitch_progress")
+}
+
+// Croquis table: the word being drawn, the strokes so far and the clock
+model CroquisGame {
+  sessionId   String    @id
+  // Round in play, from one
+  round       Int
+  // Rounds of the whole game, one per drawer and per lap
+  rounds      Int
+  // Drawers in turn, drawn at the start
+  order       Json
+  drawerId    String
+  // Comparable word and its written form, kept back until the reveal
+  word        String
+  display     String
+  // Strokes drawn so far, shared with every reader
+  strokes     Json      @default("[]")
+  startsAt    DateTime
+  endsAt      DateTime
+  hintAt      DateTime
+  isHinted    Boolean   @default(false)
+  // Reveal over, the next round opens
+  revealUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_croquis_games")
+}
+
+// Round of a Croquis game once over
+model CroquisRound {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  drawerId  String
+  word      String
+  // Players who found it
+  solvers   Int      @default(0)
+  // Points the drawer earned
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  drawer  Account     @relation(fields: [drawerId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round])
+  @@map("play_croquis_rounds")
+}
+
+// Word found by a player on a round
+model CroquisGuess {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  accountId String
+  // Place among the finders, from one
+  rank      Int
+  points    Int      @default(0)
+  // Time the player took
+  ms        Int      @default(0)
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round, accountId])
+  @@index([sessionId, round])
+  @@map("play_croquis_guesses")
 }

@@ -6,10 +6,12 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls/fields'
  */
 
 export const LIVE_HUB_STYLES = {
-  wrapper: 'mx-auto flex w-full max-w-7xl flex-col gap-0',
+  wrapper:
+    'mx-auto flex w-full max-w-7xl flex-col gap-0 pb-[calc(var(--shell-dock-clearance)+5rem)] md:pb-32',
   pickerRow: 'relative z-10 -mt-12 flex items-start px-4 sm:-mt-20 sm:px-8',
   // Creator identity
-  identity: 'grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-12 gap-y-4',
+  identity:
+    'grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-8 gap-y-4 sm:gap-x-12',
   // Same box as the portrait so every ring around it stays a circle
   portraitWrap: 'relative size-20 shrink-0 sm:size-28',
   profile: 'col-span-2 row-start-2 flex min-w-0 flex-col gap-2',
@@ -21,14 +23,14 @@ export const LIVE_HUB_STYLES = {
   fade: 'hub-fade',
   body: 'mt-8 flex flex-col gap-7 px-4 sm:mt-10 sm:px-8',
   stats: 'grid flex-1 auto-rows-fr grid-cols-2 gap-3',
-  stat: 'flex min-h-40 flex-col justify-between gap-4 rounded-[var(--radius-xl)] border card-surface p-5 shadow-[var(--shadow-sm)]',
+  stat: 'flex min-h-32 flex-col justify-between gap-3 rounded-[var(--radius-xl)] border card-surface p-4 shadow-[var(--shadow-sm)] sm:min-h-40 sm:gap-4 sm:p-5',
   statHead: 'flex items-center gap-2',
   statChip:
     'inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)]/15 text-[var(--color-primary)]',
   statGlyph: 'size-4',
   groups: 'grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]',
   group: 'flex min-w-0 flex-col gap-3',
-  groupTitle: 'flex items-center gap-2 text-2xl font-bold tracking-tight',
+  groupTitle: 'flex items-center gap-2 text-xl font-bold tracking-tight sm:text-2xl',
   teamCard:
     'flex flex-1 flex-col rounded-[var(--radius-xl)] border card-surface p-2 shadow-[var(--shadow-sm)]',
   teamRow:
@@ -103,9 +105,9 @@ export const LIVE_HUB_STYLES = {
   bubbleKicker: 'text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   bubbleTitle:
     'flex items-center gap-2.5 text-xl leading-tight font-bold tracking-tight break-words sm:text-3xl',
-  // Mod View access in the corner Memora's button holds elsewhere
+  // Mod View access, centred at the bottom of the page
   modDock:
-    'fixed isolate right-5 bottom-[calc(var(--shell-dock-clearance)+1rem)] z-30 flex h-14 items-center gap-3 rounded-full border border-white/50 bg-[var(--color-media-shade)] px-6 text-sm font-semibold text-white shadow-[var(--shadow-lg)] [text-shadow:0_1px_3px_rgb(0_0_0/0.5)] transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-spring)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] md:right-12 md:bottom-16 print:hidden',
+    'fixed isolate left-1/2 -translate-x-1/2 bottom-[calc(var(--shell-dock-clearance)+1rem)] z-30 flex h-14 items-center gap-3 rounded-full border border-white/50 bg-[var(--color-media-shade)] px-6 text-sm font-semibold text-white shadow-[var(--shadow-lg)] [text-shadow:0_1px_3px_rgb(0_0_0/0.5)] transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-spring)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] md:bottom-16 print:hidden',
   // Waves leaving the button while the creator is on air
   modRays: 'pointer-events-none absolute -inset-2 rounded-full',
   modWave:

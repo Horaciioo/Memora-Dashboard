@@ -75,7 +75,10 @@ export const loadRecruitment = async (
   const [candidate, step, sessionForm, activity] = await Promise.all([
     candidateFields(String(detail.summary.values.youtuberId), keptObservers, id),
     stepFields(),
-    sessionFields(perimeter, String(detail.summary.values.youtuberId), keptObservers),
+    sessionFields(perimeter, String(detail.summary.values.youtuberId), keptObservers, {
+      recruiters: detail.summary.values.recruiterIds as string[],
+      responsables: detail.summary.values.responsableIds as string[],
+    }),
     canReadLogs
       ? readRecordTreeActivity(
           JOURNAL_FILES.Recruitment,

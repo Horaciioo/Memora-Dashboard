@@ -21,8 +21,21 @@ import type { Prisma } from '@prisma/client'
  * @property {string} summary - One line description
  * @property {ChangeSummary | null} [change] - What an edit moved
  * @property {ActivityError} [error] - Failure behind the event
+ * @property {ActivitySubject} [subject] - What the event is about
  * @property {Prisma.InputJsonValue} [payload] - Extra detail
  */
+
+/**
+ * What an event is about, shown under its sentence
+ * @typedef {Object} ActivitySubject
+ * @property {string[]} parts - Short facts, most precise first
+ * @property {string} [network] - Platform whose logo leads the line
+ */
+
+export interface ActivitySubject {
+  parts: string[]
+  network?: string
+}
 
 /**
  * Failure kept with an entry
@@ -49,6 +62,7 @@ export interface EventInput {
   summary: string
   change?: ChangeSummary | null
   error?: ActivityError
+  subject?: ActivitySubject
   payload?: Prisma.InputJsonValue
 }
 
@@ -59,11 +73,12 @@ export interface EventInput {
  */
 
 const toPayload = (input: EventInput): Prisma.InputJsonValue | undefined => {
-  if (!input.change && !input.error) return undefined
+  if (!input.change && !input.error && !input.subject) return undefined
 
   return {
     ...(input.change ? { change: input.change } : {}),
     ...(input.error ? { error: input.error } : {}),
+    ...(input.subject ? { subject: input.subject } : {}),
   } as Prisma.InputJsonValue
 }
 
@@ -86,6 +101,7 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
       ip: origin.ip,
       userAgent: origin.userAgent,
       route: origin.route,
+      requestId: origin.requestId,
       actorId: input.actorId ?? null,
       subjectId: input.subjectId ?? null,
       targetType: input.targetType,
@@ -114,6 +130,7 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
  * @property {string | null} targetId - Target resource identifier
  * @property {ChangeSummary | null} change - What the edit moved
  * @property {ActivityError | null} error - Failure behind the entry
+ * @property {ActivitySubject | null} subject - What the entry is about
  */
 
 export interface ActivityEntry {
@@ -132,6 +149,7 @@ export interface ActivityEntry {
   targetId: string | null
   change: ChangeSummary | null
   error: ActivityError | null
+  subject: ActivitySubject | null
 }
 
 // Stored payload read as a loose record
@@ -175,6 +193,22 @@ const readError = (payload: Prisma.JsonValue): ActivityError | null => {
   }
 }
 
+/**
+ * Read what the entry is about off a stored payload
+ * @param {Prisma.JsonValue} payload - Stored payload
+ * @return {ActivitySubject | null} - Subject
+ */
+
+const readSubject = (payload: Prisma.JsonValue): ActivitySubject | null => {
+  const subject = asRecord(asRecord(payload)?.subject)
+  if (!subject || !Array.isArray(subject.parts)) return null
+
+  const parts = subject.parts.filter((part): part is string => typeof part === 'string')
+  if (parts.length === 0) return null
+
+  return { parts, ...(typeof subject.network === 'string' ? { network: subject.network } : {}) }
+}
+
 // Row shape every reader maps from
 export type ActivityRow = Prisma.ActivityLogGetPayload<{
   include: { actor: { select: { displayName: true; avatarUrl: true } } }
@@ -202,6 +236,7 @@ export const toEntry = (row: ActivityRow): ActivityEntry => ({
   targetId: row.targetId,
   change: readChange(row.payload),
   error: readError(row.payload),
+  subject: readSubject(row.payload),
 })
 
 /**

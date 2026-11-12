@@ -1,6 +1,5 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
@@ -13,11 +12,12 @@ import {
 import type { PlayRulesValue } from '@/composites/play/registry'
 import { PlayLobbyExtras } from '@/composites/play/hub/PlayLobbyExtras'
 import { PlayLobbyLink } from '@/composites/play/hub/lobby/PlayLobbyLink'
+import { PlayLoadingScreen } from '@/composites/play/loading/PlayLoadingScreen'
 import { PlayInviteSlot } from '@/composites/play/session/PlayInviteSlot'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
+import { usePlayStarting } from '@/core/hooks/data/play/usePlayStarting'
 import { usePlayPeopleMenu } from '@/core/hooks/interaction/state/play/usePlayPeopleMenu'
-import { PLAY_INVITE_QUERY } from '@/declarations/navigation'
 import { botSeatNote, fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_HUB, PLAY_ROOM } from '@/declarations/ui/variants'
@@ -93,7 +93,6 @@ export const PlayLobby = ({
 }: PlayLobbyProps) => {
   const moves = usePlayMoves()
   // Fresh table lands on the picker
-  const isFresh = useSearchParams().get(PLAY_INVITE_QUERY) === '1'
   const isPrivate = visibility === PlayVisibilities.Private
   const [isRulesOpen, setRulesOpen] = useState(false)
   const isMobile = useIsMobileShell()
@@ -115,9 +114,17 @@ export const PlayLobby = ({
   // The host edits, the others read
   const canEdit = isLobby && me.isHost && Boolean(Setup)
   const closeRules = () => setRulesOpen(false)
+  // Loading screen from the start click, or the host's signal, until the game replaces the lobby
+  const isStarting = usePlayStarting(id)
+  const [isLaunching, setLaunching] = useState(false)
+  const launch = async () => {
+    setLaunching(true)
+    setLaunching(await moves.start(id))
+  }
 
   return (
     <div className={PLAY_ROOM.middle} data-play-box>
+      {(isLaunching || isStarting) && isLobby && <PlayLoadingScreen isCover />}
       <section className={PLAY_ROOM.box}>
         <h2 className={PLAY_ROOM.playersTitle}>{PLAY_HUB_COPY.playersTitle}</h2>
         <div className={PLAY_ROOM.summary}>
@@ -195,7 +202,6 @@ export const PlayLobby = ({
                   key={`free-${index}`}
                   sessionId={id}
                   candidates={candidates}
-                  isOpenAtStart={index === 0 && isFresh}
                   extras={me.isHost ? <PlayLobbyExtras sessionId={id} game={game} /> : undefined}
                 />
               )
@@ -210,7 +216,7 @@ export const PlayLobby = ({
               variant="arcadeHero"
               disabled={present.length < minPlayers}
               isLoading={moves.isSaving}
-              onClick={() => void (Vote ? moves.openVote(id) : moves.start(id))}
+              onClick={() => void (Vote ? moves.openVote(id) : launch())}
             >
               {waiting > 0 ? PLAY_HUB_COPY.startAnyway : PLAY_HUB_COPY.start}
             </Button>

@@ -202,16 +202,14 @@ export const NAV_SHEET = {
   stack: 'nav-sheet flex flex-col gap-4',
   // Level switch sits first
   switch: 'w-full',
-  // Search and bell share a line
-  searchRow: 'flex items-center gap-2',
+  // Boxed account left, bare bell right
+  accountRow: 'flex items-center justify-between gap-3',
   notifications:
-    'glass-panel relative flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-lg)] text-[var(--color-ink)]',
+    'relative flex size-11 shrink-0 items-center justify-center text-[var(--color-ink)]',
   notificationsIcon: 'size-5 shrink-0',
   dot: 'absolute top-2 right-2 size-2 rounded-full bg-[var(--color-danger)]',
-  // Account sits last, under a rule
-  divider: 'h-px border-0 bg-[var(--color-border)]',
   account:
-    'flex min-h-11 items-center gap-3 rounded-[var(--radius-lg)] px-3 text-left text-body font-semibold transition-colors hover:bg-[var(--color-surface)]',
+    'glass-panel flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-lg)] px-3 text-left text-body font-semibold transition-colors',
   accountName: 'min-w-0 flex-1 truncate',
 } as const
 
@@ -221,7 +219,7 @@ export const NAV_SHEET = {
  */
 
 export const MOBILE_DOCK = {
-  bar: 'dock-glass fixed inset-x-3 bottom-[calc(var(--shell-dock-gap)+env(safe-area-inset-bottom))] z-40 flex h-[var(--shell-dock-h)] items-center justify-around rounded-full border px-1.5 md:hidden print:hidden',
+  bar: 'dock-glass fixed inset-x-0 bottom-0 z-40 flex h-[calc(var(--shell-dock-h)+env(safe-area-inset-bottom))] items-center justify-around rounded-none border-x-0 border-b-0 px-1.5 pb-[env(safe-area-inset-bottom)] md:hidden print:hidden',
   item: 'relative flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full transition-colors active:bg-[var(--color-hover)] motion-reduce:transition-none',
   itemRest: 'text-[var(--color-ink-subtle)]',
   itemActive: 'text-[var(--color-ink-accent)]',
@@ -476,6 +474,23 @@ export const AUTH_SHELL = {
   wordmark: 'h-auto w-40',
   card: 'card-surface rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 shadow-[var(--shadow-md)] sm:p-8',
   title: 'mb-6 text-2xl font-bold tracking-tight',
+} as const
+
+/**
+ * Sign-in showcase classes
+ * @type {Record<string, string>}
+ */
+
+export const LOGIN_SHELL = {
+  page: 'relative isolate flex min-h-dvh flex-col overflow-hidden bg-[var(--color-background)] text-[var(--color-on-media)]',
+  photo: 'showcase-photo -z-20 object-cover object-[50%_35%]',
+  scrim: 'showcase-scrim absolute inset-0 -z-10',
+  header: 'flex items-center justify-between gap-4 px-6 py-6 sm:px-10 lg:px-16',
+  wordmark: 'h-auto w-32 brightness-0 invert sm:w-36',
+  link: 'link-media truncate text-caption font-medium',
+  main: 'flex flex-1 items-center justify-center px-4 pb-8 pt-24 sm:px-10 lg:pt-32',
+  card: 'card-surface flex w-full flex-col gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 text-[var(--color-ink)] shadow-[var(--shadow-md)] sm:max-w-md sm:p-8',
+  cardTitle: 'text-page font-bold tracking-tight',
 } as const
 
 /**

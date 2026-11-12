@@ -45,6 +45,62 @@ export const PLAY_CONCEPT: Record<PlayGameName, PlayConceptStep[]> = {
       text: 'Mot validé, la bombe passe au suivant. Si elle t’explose dans les mains, tu perds une vie.',
     },
   ],
+  [PlayGames.Echo]: [
+    {
+      title: 'Deux cartes, un seul point commun',
+      text: 'Chaque joueur reçoit une carte, une autre trône au centre. Elles partagent toujours exactement un symbole.',
+    },
+    {
+      title: 'Clique dessus le premier',
+      text: 'Repère le symbole en commun sur ta carte, même s’il est tout petit ou penché. Une erreur verrouille ta carte un instant.',
+    },
+    {
+      title: 'Plus vite, plus de points',
+      text: 'Chaque symbole trouvé rapporte des points, le premier à le trouver a un bonus.',
+    },
+  ],
+  [PlayGames.Croquis]: [
+    {
+      title: 'Un mot, un crayon',
+      text: 'À chaque manche, un joueur tiré au hasard reçoit un mot en secret. Tout le monde dessine à son tour.',
+    },
+    {
+      title: 'Dessine sans écrire',
+      text: 'Pas de lettres ni de chiffres : seulement des traits. Des formes simples suffisent.',
+    },
+    {
+      title: 'Trouve le mot du dessin',
+      text: 'Les autres tapent leurs idées. Plus tôt tu trouves, plus tu gagnes, et le dessinateur aussi.',
+    },
+  ],
+  [PlayGames.Glitch]: [
+    {
+      title: 'Deux images jumelles',
+      text: 'Des chiffres, des lettres, des formes : la copie diffère du modèle en quelques détails.',
+    },
+    {
+      title: 'Clique sur chaque écart',
+      text: 'Couleur, taille, forme, un élément en trop ou en moins. Un faux clic fige ton image un instant.',
+    },
+    {
+      title: 'Boucle l’image la première',
+      text: 'Chaque différence rapporte, le premier à tout trouver empoche le plus gros bonus.',
+    },
+  ],
+  [PlayGames.Jumble]: [
+    {
+      title: 'Des lettres en vrac',
+      text: 'Un mot apparaît mélangé, la même chose pour tout le monde en même temps.',
+    },
+    {
+      title: 'Trouve-le le premier',
+      text: 'Tape le mot dans l’ordre. Le plus rapide empoche la manche, un indice tombe si ça traîne.',
+    },
+    {
+      title: 'Enchaîne les éclairs',
+      text: 'Plus tu réponds vite, plus tu marques. Gagne plusieurs manches de suite pour faire grimper la série.',
+    },
+  ],
   [PlayGames.Golf]: [
     {
       title: 'Vise',

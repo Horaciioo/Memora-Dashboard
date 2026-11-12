@@ -13,6 +13,9 @@ export const CookieKeys = {
   navigationView: 'navigation_view',
   activeYoutuber: 'active_youtuber',
   activeYoutuberAuto: 'active_youtuber_auto',
+  nexus: 'nexus',
+  nexusPending: 'nexus_pending',
+  nexusVerifier: 'nexus_verifier',
 } as const
 
 export type CookieKey = keyof typeof CookieKeys

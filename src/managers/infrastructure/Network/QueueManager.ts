@@ -5,6 +5,8 @@ import type { Job } from 'bullmq'
 import RedisClient from 'ioredis'
 import type { Redis } from 'ioredis'
 
+import { OBSERVABILITY } from '@/core/lib/nexus/observe/registry'
+import { recordError } from '@/core/services/system/ErrorEventService'
 import type Sharding from '@/managers/infrastructure/Core/Sharding'
 import type LoggerManager from '@/managers/infrastructure/Core/LoggerManager'
 import { JOB_REGISTRY } from '@/declarations/system/jobs'
@@ -434,6 +436,14 @@ export default class QueueManager {
 
     worker.on('failed', (_job, error) => {
       this.logger.error(`Job ${handler.queueName} failed`, error)
+      OBSERVABILITY.jobs.add(handler.queueName, 0, true)
+      void recordError({ severity: 'ERROR', source: 'JOB', error, route: handler.queueName })
+    })
+    worker.on('completed', (job) => {
+      OBSERVABILITY.jobs.add(
+        handler.queueName,
+        job.finishedOn && job.processedOn ? job.finishedOn - job.processedOn : 0
+      )
     })
 
     this._workers.set(handler.queueName, worker)

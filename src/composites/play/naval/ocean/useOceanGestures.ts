@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import type { PointerEvent as ReactPointerEvent, RefObject } from 'react'
 
-import { clampCamera, panBy, seaPointOf, untilt, zoomAt } from '@/core/lib/play/naval/camera'
+import { seaPointOf, untilt } from '@/core/lib/play/naval/camera'
 import type { NavalCamera, NavalPoint } from '@/core/lib/play/naval/camera'
 import { NAVAL_VIEW } from '@/declarations/play/naval/view'
 
@@ -41,7 +41,6 @@ interface OceanGestureInput extends OceanHandlers {
   size: number
   camera: NavalCamera
   tilt: number
-  setCamera: (camera: NavalCamera) => void
 }
 
 /**
@@ -73,7 +72,7 @@ export const locate = (
 }
 
 /**
- * Pointers on a sea: hover, tap, drag to pan or move a ship, pinch and wheel to zoom
+ * Pointers on a sea: hover, tap and drag a ship
  * @param {OceanGestureInput} input - Sea and handlers
  * @return {Object} - Pointer handlers for the box
  */
@@ -85,23 +84,6 @@ export const useOceanGestures = (input: OceanGestureInput) => {
   })
   const pointers = useRef(new Map<number, NavalPoint>())
   const press = useRef<{ start: NavalPoint; moved: boolean; grabbed: boolean } | null>(null)
-
-  // Wheel zoom, kept off the page scroll
-  useEffect(() => {
-    const box = input.box.current
-    if (!box) return
-    const onWheel = (event: WheelEvent) => {
-      const { camera, size, tilt, setCamera } = latest.current
-      if (camera.span >= size && event.deltaY > 0) return
-      event.preventDefault()
-      const { px } = locate(box, { x: event.clientX, y: event.clientY }, { camera, size, tilt })
-      const factor = NAVAL_VIEW.zoomStep ** (event.deltaY < 0 ? 1 : -1)
-      setCamera(clampCamera(zoomAt(camera, px, box.clientWidth, factor), size, NAVAL_VIEW.minCells))
-    }
-    box.addEventListener('wheel', onWheel, { passive: false })
-
-    return () => box.removeEventListener('wheel', onWheel)
-  }, [input.box])
 
   const cellOf = (event: ReactPointerEvent) => {
     const { box, camera, size, tilt } = latest.current
@@ -121,43 +103,17 @@ export const useOceanGestures = (input: OceanGestureInput) => {
   }
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const { camera, size, setCamera, onHover, onDrag, box } = latest.current
-    const width = box.current?.clientWidth ?? 1
+    const { onHover, onDrag } = latest.current
     const before = pointers.current.get(event.pointerId)
     const here = { x: event.clientX, y: event.clientY }
     if (!before) return onHover?.(cellOf(event).cell)
     pointers.current.set(event.pointerId, here)
 
-    // Two fingers: pinch around their middle
-    if (pointers.current.size === 2) {
-      const [a, b] = [...pointers.current.values()]
-      const other = a === here ? b : a
-      const factor =
-        Math.hypot(here.x - other.x, here.y - other.y) /
-        Math.max(1, Math.hypot(before.x - other.x, before.y - other.y))
-      const rect = box.current?.getBoundingClientRect()
-      const middle = {
-        x: (here.x + other.x) / 2 - (rect?.left ?? 0),
-        y: (here.y + other.y) / 2 - (rect?.top ?? 0),
-      }
-      setCamera(clampCamera(zoomAt(camera, middle, width, factor), size, NAVAL_VIEW.minCells))
-      if (press.current) press.current.moved = true
-
-      return
-    }
     const held = press.current
     if (!held) return
     const travel = Math.hypot(here.x - held.start.x, here.y - held.start.y)
     if (travel > NAVAL_VIEW.tapSlopPx) held.moved = true
     if (held.grabbed) return onDrag?.(cellOf(event).cell)
-    if (held.moved)
-      setCamera(
-        clampCamera(
-          panBy(camera, { x: here.x - before.x, y: here.y - before.y }, width),
-          size,
-          NAVAL_VIEW.minCells
-        )
-      )
   }
 
   const onPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {

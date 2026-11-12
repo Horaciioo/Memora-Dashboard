@@ -55,9 +55,13 @@ export const PLAY_REWARD = {
 export const PLAY_SHELL = {
   room: 'play-room fixed inset-0 z-40 flex flex-col overflow-hidden',
   floor: 'play-floor',
+  // Page and sidebar side by side
+  body: 'relative z-10 flex min-h-0 w-full flex-1',
+  // Room left to the sidebar
+  withAside: 'flex min-h-full flex-col md:pr-[21.5rem] xl:pr-[23.5rem]',
   // Pages scroll here, the room itself never does
   content:
-    'relative z-10 flex min-h-0 w-full flex-1 flex-col gap-8 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pt-8 pb-36 sm:px-8 xl:px-12',
+    'relative z-10 flex min-h-0 min-w-0 flex-1 flex-col gap-8 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pt-8 pb-36 sm:px-8 xl:px-12',
 } as const
 
 /**
@@ -105,17 +109,18 @@ export const PLAY_HUB = {
   games: 'grid gap-5 sm:grid-cols-2 2xl:grid-cols-4',
   main: 'flex min-w-0 flex-col gap-10',
   // Phone: a wide row, art right, name left
-  card: `play-card relative flex aspect-[3/4] min-h-96 flex-col justify-end overflow-hidden rounded-[2rem] text-[var(--play-on-art)] ${LIFT} ring-2 ring-white/20 transition-transform duration-100 active:scale-[0.98] max-md:aspect-[5/2] max-md:min-h-28 max-md:justify-center max-md:rounded-3xl`,
+  // Trading card from md: game-coloured frame, inner keyline, plate under the art
+  card: `play-card relative flex aspect-[3/4] min-h-96 flex-col justify-end overflow-hidden rounded-[2rem] text-[var(--play-on-art)] ${LIFT} ring-2 ring-white/20 transition-transform duration-200 active:scale-[0.98] max-md:aspect-[5/2] max-md:min-h-28 max-md:justify-center max-md:rounded-3xl md:rounded-3xl md:ring-[0.4rem] md:ring-[var(--game)] md:hover:-translate-y-2 md:hover:-rotate-1 md:after:pointer-events-none md:after:absolute md:after:inset-2 md:after:rounded-[1.1rem] md:after:border md:after:border-white/40 md:after:content-['']`,
   cardShade:
     'absolute inset-0 bg-linear-to-t from-[var(--play-night)] from-5% via-[var(--play-night)]/55 via-35% to-transparent to-65% max-md:bg-linear-to-r max-md:via-45% max-md:to-80%',
   cardLink:
     'absolute inset-0 z-10 rounded-[2rem] max-md:rounded-3xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
   cardBody:
-    'relative flex flex-col items-center gap-2 p-7 text-center max-md:w-3/5 max-md:items-start max-md:gap-1 max-md:p-5 max-md:text-left',
+    'relative flex flex-col items-center gap-2 p-7 text-center max-md:w-3/5 max-md:items-start max-md:gap-1 max-md:p-5 max-md:text-left md:mx-4 md:mb-4 md:gap-1 md:rounded-2xl md:bg-[var(--play-night)]/80 md:p-3',
   cardName:
-    'truncate text-3xl font-extrabold tracking-tight uppercase max-md:max-w-full max-md:text-xl max-md:whitespace-normal',
-  cardTagline:
-    'line-clamp-3 text-sm text-[var(--play-on-art)]/85 max-md:line-clamp-2 max-md:text-xs',
+    'truncate text-3xl font-extrabold tracking-tight uppercase max-md:max-w-full max-md:text-xl max-md:whitespace-normal md:text-xl',
+  // Seat count, the card's one figure
+  cardSeats: 'text-xs font-extrabold tabular-nums text-[var(--game)] max-md:hidden',
   skeleton:
     'min-h-64 animate-pulse rounded-[1.75rem] bg-[var(--play-panel-strong)] motion-reduce:animate-none',
   // Game hub, centred and fitted to the room: logo | divider | actions, never scrolling
@@ -157,7 +162,17 @@ export const PLAY_HUB = {
   word: 'play-pen',
   // Syllables rising like embers
   embers: 'pointer-events-none fixed inset-0 z-0 overflow-hidden',
+  // Painted set under the floaters
+  scenery: 'absolute inset-0 size-full',
   ember: 'play-ember',
+  // Scribbles rising like bubbles
+  croquisFloat: 'play-croquis-float',
+  // Symbols rising like bubbles
+  echoFloat: 'play-echo-float',
+  // Shapes and figures rising like bubbles
+  glitchFloat: 'play-glitch-float',
+  // Letters rising like bubbles
+  jumbleFloat: 'play-jumble-float',
   // Big bomb behind the hub
   bombBanner: 'play-bomb-banner absolute -right-24 -bottom-24 w-[46rem] max-w-[90vw]',
   // Tables

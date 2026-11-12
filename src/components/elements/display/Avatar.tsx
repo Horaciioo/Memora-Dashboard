@@ -1,3 +1,4 @@
+import { AvatarImage } from '@/components/elements/display/AvatarImage'
 import { initialsOf } from '@/utils/format/initials'
 import { AVATAR_STYLES, type AvatarSize } from '@/declarations/ui/variants/surfaces'
 import { cn } from '@/utils/classnames'
@@ -37,18 +38,7 @@ export const Avatar = ({ name, src, size = 'sm', className, title = name }: Avat
     title={title || undefined}
   >
     {src ? (
-      /*
-       * A portrait is member supplied and usually served by the session guarded file route
-       */
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={src}
-        alt=""
-        width={PIXEL_SIZES[size]}
-        height={PIXEL_SIZES[size]}
-        loading="lazy"
-        className="h-full w-full object-cover"
-      />
+      <AvatarImage name={name} src={src} size={PIXEL_SIZES[size]} />
     ) : (
       initialsOf(name)
     )}

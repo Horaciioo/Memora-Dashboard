@@ -4,11 +4,11 @@ import type { NavalMatch, NavalShot } from '@prisma/client'
 
 import { conflict } from '@/core/lib/errors'
 import {
-  canWield,
   cellsOf,
   chooseSquare,
   indexOf,
   isInside,
+  longestStrikeMs,
   nextShooter,
   shipsAfloat,
   strike,
@@ -17,7 +17,7 @@ import {
   weaponOf,
 } from '@/core/lib/play/naval'
 import type { NavalCell, NavalKnowledge, NavalStrikeCell } from '@/core/lib/play/naval'
-import { armCaptain, spendWeapon } from '@/core/services/play/naval/NavalArmsService'
+import { armCaptain } from '@/core/services/play/naval/NavalArmsService'
 import { finishMatch, eliminate } from '@/core/services/play/naval/NavalOutcomeService'
 import {
   aliveIn,
@@ -28,6 +28,7 @@ import {
   shotsAt,
 } from '@/core/services/play/naval/NavalTable'
 import type { NavalTable } from '@/core/services/play/naval/NavalTable'
+import { NAVAL_CHOREOGRAPHIES, NAVAL_DIRECTION } from '@/declarations/play/naval/choreographies'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
 import { NavalModes, NavalResults, NavalWeapons, PlayBotKinds } from '@/utils/constants/play'
@@ -35,13 +36,16 @@ import type { NavalWeaponName } from '@/utils/constants/play'
 import { SECOND_MS } from '@/utils/constants/time'
 
 /**
- * Milliseconds the screens need to play a shot
+ * Milliseconds the screens need to play a strike
+ * @param {NavalWeaponName} weapon - Weapon
+ * @param {number} count - Squares struck
  * @param {boolean} isSunk - A ship went down
  * @return {number} - Duration
  */
 
-const playbackMs = (isSunk: boolean): number =>
-  NAVAL_SETTINGS.flightMs + NAVAL_SETTINGS.impactMs + (isSunk ? NAVAL_SETTINGS.sunkMs : 0)
+const playbackMs = (weapon: NavalWeaponName, count: number, isSunk: boolean): number =>
+  longestStrikeMs(NAVAL_CHOREOGRAPHIES[weapon], count, NAVAL_DIRECTION.variety.variance) +
+  (isSunk ? NAVAL_SETTINGS.sunkMs : 0)
 
 /**
  * Clock of the next shooter, the last shot left to play out first
@@ -66,7 +70,7 @@ export const passTurn = async (table: NavalTable, match: NavalMatch): Promise<vo
   const alive = new Set(aliveIn(table, match))
   const nextId = nextShooter(match.fighters, alive, match.turnId)
   await saveMatch(table, match, { turnId: nextId, turnEndsAt: clockFrom(table) })
-  if (nextId) await armCaptain(table, nextId, true)
+  if (nextId) await armCaptain(table, match, nextId)
 }
 
 /**
@@ -96,7 +100,7 @@ const strikeCells = (
   { targetId, cell, weapon, orientation }: NavalStrikeAsk
 ): NavalStrikeCell[] =>
   strike({
-    weapon: weaponOf(weapon),
+    weapon: weaponOf(weapon, table.sea.reachScale),
     origin: cell,
     orientation,
     fleet: captainOf(table, targetId)?.fleet ?? [],
@@ -140,7 +144,6 @@ export const fireShot = async (
   })
   table.shots.push(...shots)
   table.isDirty = true
-  await spendWeapon(table, shooterId, weapon)
 
   // A sunk fleet leaves the fight, a bracket waits for its match to close
   const isFleetDown = shipsAfloat(fleet, shotsAt(table, match.id, targetId)).length === 0
@@ -161,9 +164,9 @@ export const fireShot = async (
   const isSunk = cells.some(({ result }) => result === NavalResults.Sunk)
   await saveMatch(table, match, {
     turnId: nextId,
-    turnEndsAt: clockFrom(table, playbackMs(isSunk)),
+    turnEndsAt: clockFrom(table, playbackMs(weapon, cells.length, isSunk)),
   })
-  if (nextId) await armCaptain(table, nextId, !keeps)
+  if (nextId) await armCaptain(table, match, nextId)
 
   return shots
 }
@@ -257,11 +260,11 @@ export const checkShot = (
   const target = targetId ?? (enemies.length === 1 ? enemies[0] : null)
   if (!target || !enemies.includes(target)) throw conflict(PLAY_ERRORS.badTarget)
 
-  // Weapon held, paid for and turned a valid way
+  // Weapon drawn and turned a valid way
   const shooter = captainOf(table, shooterId)
   const isTurned =
     Number.isInteger(orientation) && orientation >= 0 && orientation < turnsOf(weaponOf(weapon))
-  if (!shooter || !canWield(weapon, shooter) || !isTurned) throw conflict(PLAY_ERRORS.badWeapon)
+  if (!shooter || shooter.weapon !== weapon || !isTurned) throw conflict(PLAY_ERRORS.badWeapon)
 
   // Inside the sea, something left to strike
   const isAimed = isInside(cell.x, cell.y, table.sea.size)

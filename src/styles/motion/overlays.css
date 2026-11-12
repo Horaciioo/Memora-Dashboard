@@ -127,6 +127,99 @@ body {
   }
 }
 
+/* Unban requests turn like a carousel, the old one leaves as the new one comes */
+.unban-enter-next {
+  animation: unban-enter-next var(--motion-duration-carousel) var(--motion-ease-settle) both;
+}
+
+.unban-enter-previous {
+  animation: unban-enter-previous var(--motion-duration-carousel) var(--motion-ease-settle) both;
+}
+
+.unban-leave-next {
+  animation: unban-leave-next var(--motion-duration-carousel) var(--motion-ease-settle) both;
+}
+
+.unban-leave-previous {
+  animation: unban-leave-previous var(--motion-duration-carousel) var(--motion-ease-settle) both;
+}
+
+@keyframes unban-enter-next {
+  from {
+    opacity: 0;
+    transform: translateX(70%) rotateY(-40deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes unban-enter-previous {
+  from {
+    opacity: 0;
+    transform: translateX(-70%) rotateY(40deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes unban-leave-next {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-70%) rotateY(40deg) scale(0.9);
+  }
+}
+
+@keyframes unban-leave-previous {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(70%) rotateY(-40deg) scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unban-enter-next,
+  .unban-enter-previous {
+    animation: none;
+  }
+
+  .unban-leave-next,
+  .unban-leave-previous {
+    display: none;
+  }
+}
+
+/* Information banner of the phone Mod View, the message runs right to left */
+.info-ticker-run {
+  animation: info-ticker var(--ticker-duration, 16s) linear infinite;
+}
+
+@keyframes info-ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .info-ticker-run {
+    animation: none;
+  }
+}
+
 /* Floating listbox of the select menu and the date picker */
 .popover-enter {
   animation: popover-enter var(--motion-duration-fast) var(--motion-ease-out);
@@ -374,6 +467,89 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .tab-slide-next,
   .tab-slide-prev {
+    animation: none;
+  }
+}
+
+/* Console window, rises from its corner then a line sweeps the title bar */
+.nexus-enter {
+  transform-origin: bottom right;
+  animation: nexus-open var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+@keyframes nexus-open {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.nexus-head::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: var(--color-ink-accent);
+  transform-origin: left;
+  animation: nexus-sweep 520ms var(--motion-ease-out) 120ms both;
+}
+
+@keyframes nexus-sweep {
+  from {
+    opacity: 0.9;
+    transform: scaleX(0);
+  }
+  60% {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+.nexus-body {
+  animation: nexus-body-in 260ms ease-out 140ms both;
+}
+
+@keyframes nexus-body-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Progress lines are written by the component, only the prompt mark is drawn here */
+.nexus-line::before {
+  content: '> ';
+}
+
+/* Locked mark, the outline draws itself once */
+.nexus-sigil-ring {
+  stroke-dasharray: 1;
+  animation: nexus-draw 900ms var(--motion-ease-out) 200ms both;
+}
+
+@keyframes nexus-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nexus-sigil-ring,
+  .nexus-enter,
+  .nexus-head::after,
+  .nexus-body {
     animation: none;
   }
 }

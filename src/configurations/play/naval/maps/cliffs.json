@@ -1,0 +1,86 @@
+{
+  "fleet": "stealth",
+  "legacyFormat": "vast",
+  "theatre": {
+    "size": 16,
+    "fleet": [5, 4, 3, 3, 2],
+    "reachScale": 1.25,
+    "ramp": {
+      "everyTurns": 1,
+      "step": 0.25,
+      "max": 6
+    }
+  },
+  "frame": {
+    "band": {
+      "north": 2,
+      "east": 6,
+      "south": 2,
+      "west": 6
+    }
+  },
+  "light": {
+    "sun": [0.9, -0.35],
+    "tint": "rgba(220,235,240,0.08)",
+    "shade": "rgba(10,28,36,0.4)"
+  },
+  "water": {
+    "deep": "#143a4c",
+    "mid": "#2a6b78",
+    "shallow": "#4f9a96",
+    "lagoon": "#86c2b6",
+    "foam": "#f1f7f6",
+    "sheen": "rgba(210,240,240,0.16)",
+    "grid": "rgba(235,250,250,0.22)"
+  },
+  "land": {
+    "rock": "#8d8677",
+    "rockDark": "#4a463f",
+    "rockLight": "#c4bca8",
+    "strata": "rgba(40,34,26,0.22)",
+    "cave": "#1c1a18",
+    "grass": "#6f8f4e",
+    "grassDark": "#4b6a35",
+    "scree": "#a59d8b"
+  },
+  "decor": [
+    {
+      "kind": "cliff",
+      "side": "west",
+      "at": 0.5,
+      "depth": 0.5,
+      "scale": 1
+    },
+    {
+      "kind": "cliff",
+      "side": "east",
+      "at": 0.5,
+      "depth": 0.5,
+      "scale": 1
+    },
+    {
+      "kind": "rocks",
+      "side": "west",
+      "at": 0.12,
+      "depth": 0.1,
+      "scale": 0.6
+    },
+    {
+      "kind": "rocks",
+      "side": "east",
+      "at": 0.86,
+      "depth": 0.1,
+      "scale": 0.7
+    }
+  ],
+  "life": {
+    "clouds": 6,
+    "birds": 2,
+    "mist": 0.18
+  },
+  "stage": 6,
+  "preview": {
+    "span": 20,
+    "focus": 0.45
+  }
+}

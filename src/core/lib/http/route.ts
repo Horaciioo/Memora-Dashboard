@@ -19,6 +19,7 @@ import { consume, readIdentity } from '@/core/lib/http/rateLimit'
 import { fail, succeed } from '@/core/lib/http/response'
 import { logger } from '@/core/lib/logger'
 import { runWithOrigin } from '@/core/lib/http/requestOrigin'
+import { recordError } from '@/core/services/system/ErrorEventService'
 import { reportFailure, reportRefusal } from '@/core/services/system/FailureReport'
 import { isFeatureOpen } from '@/core/services/features'
 import { featureOfApi } from '@/declarations/features'
@@ -35,6 +36,7 @@ import type { RateLimitName } from '@/declarations/system/security/rateLimits'
 import { MEDIA_HEADERS, MEDIA_VISIBILITIES } from '@/declarations/system/storage'
 import { STREAM_HEADERS } from '@/declarations/system/streams'
 import type { MediaVisibility } from '@/declarations/system/storage'
+import { assertNotInMaintenance } from '@/core/services/system/MaintenanceModeService'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import { ErrorCodes } from '@/utils/constants/errors'
@@ -300,7 +302,17 @@ const assertWritable = (request: NextRequest, session: SessionUser): void => {
 
 const assertFeatureOpen = async (request: NextRequest, isAdmin: boolean): Promise<void> => {
   const key = featureOfApi(request.nextUrl.pathname)
-  if (key && !(await isFeatureOpen(key, isAdmin))) throw forbidden(FEATURE_COPY.apiClosed)
+  if (!key || (await isFeatureOpen(key, isAdmin))) return
+
+  // A cut feature that still gets called is worth a line
+  void recordError({
+    severity: 'WARNING',
+    source: 'FEATURE',
+    message: `Feature ${key} closed`,
+    route: `${request.method} ${request.nextUrl.pathname}`,
+    context: { feature: key },
+  })
+  throw forbidden(FEATURE_COPY.apiClosed)
 }
 
 /**
@@ -319,6 +331,8 @@ const authenticate = async (
   const session = await getSession()
   if (!session) throw notAuthenticated()
 
+  // Members wait outside during maintenance
+  await assertNotInMaintenance(session.discordId)
   await guard(request, options.rateLimit, session.id)
 
   // Simulated view reads only

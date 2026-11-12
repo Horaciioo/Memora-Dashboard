@@ -1,6 +1,5 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { WindowFrame } from '@/components/structures/page/WindowFrame'
 import { MobileHold } from '@/components/structures/overlays/MobileHold'
@@ -9,14 +8,15 @@ import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { PlayInviteHost } from '@/composites/play/invites/PlayInviteHost'
 import { AccessSignalListener } from '@/composites/access/AccessSignalListener'
 import { FeatureGate } from '@/composites/features/FeatureGate'
-import { ROUTES } from '@/declarations/navigation'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { TourHost } from '@/composites/tour/TourHost'
 import { LeftSidebar } from '@/composites/shell/LeftSidebar'
+import { DockSwipe } from '@/composites/shell/mobile/DockSwipe'
 import { MobileDock } from '@/composites/shell/mobile/MobileDock'
 import { MobileTopBar } from '@/composites/shell/mobile/MobileTopBar'
 import { OfflineBanner } from '@/composites/pwa/OfflineBanner'
+import { NexusLauncher } from '@/composites/nexus/NexusLauncher'
 import { PwaHost } from '@/composites/pwa/PwaHost'
 import { AssistantDock } from '@/composites/search/assistant/AssistantDock'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
@@ -28,6 +28,7 @@ import type { HeldRoutes } from '@/declarations/ui/responsive'
 import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { useAutoRefresh } from '@/core/hooks/interaction/state/useAutoRefresh'
 import { useFeatures } from '@/managers/front-end/FeaturesManager'
+import { NexusProvider } from '@/managers/front-end/NexusManager'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
 import { TourProvider } from '@/managers/front-end/TourManager'
 import type { ViewContext } from '@/types/access'
@@ -43,6 +44,7 @@ export interface AppShellProps {
   tour: TourState | null
   heldRoutes: HeldRoutes
   isPushReady: boolean
+  isNexusReady: boolean
   children: ReactNode
 }
 
@@ -55,6 +57,7 @@ export interface AppShellProps {
  * @param {TourState | null} tour - First visit resolved server-side
  * @param {HeldRoutes} heldRoutes - Areas held back on small screens
  * @param {boolean} isPushReady - Pushes configured on the server
+ * @param {boolean} isNexusReady - Console open to this member
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
@@ -67,25 +70,29 @@ export const AppShell = ({
   tour,
   heldRoutes,
   isPushReady,
+  isNexusReady,
   children,
 }: AppShellProps) => {
   return (
-    <RailSlotProvider>
-      <BrandSplash />
-      {/* A visit reset on the server starts over, a visit under way is left alone */}
-      <TourProvider key={String(tour !== null && !tour.isIntroSeen)} initial={tour}>
-        <AppShellFrame
-          unreadCount={unreadCount}
-          viewContext={viewContext}
-          twoFactor={twoFactor}
-          seal={seal}
-          heldRoutes={heldRoutes}
-          isPushReady={isPushReady}
-        >
-          {children}
-        </AppShellFrame>
-      </TourProvider>
-    </RailSlotProvider>
+    <NexusProvider isReady={isNexusReady}>
+      <RailSlotProvider>
+        <BrandSplash />
+        {/* A visit reset on the server starts over, a visit under way is left alone */}
+        <TourProvider key={String(tour !== null && !tour.isIntroSeen)} initial={tour}>
+          <AppShellFrame
+            unreadCount={unreadCount}
+            viewContext={viewContext}
+            twoFactor={twoFactor}
+            seal={seal}
+            heldRoutes={heldRoutes}
+            isPushReady={isPushReady}
+            isNexusReady={isNexusReady}
+          >
+            {children}
+          </AppShellFrame>
+        </TourProvider>
+      </RailSlotProvider>
+    </NexusProvider>
   )
 }
 
@@ -102,13 +109,12 @@ const AppShellFrame = ({
   seal,
   heldRoutes,
   isPushReady,
+  isNexusReady,
   children,
 }: Omit<AppShellProps, 'tour'>) => {
   const { session, can } = useAuthContext()
   const { isClaimed, isBare, setSlot } = useRailSlot()
   const { isOpen } = useFeatures()
-  // The Lives page puts its Mod View button in Memora's corner
-  const isLivesPage = usePathname() === ROUTES.lives
 
   useAutoRefresh()
 
@@ -132,7 +138,13 @@ const AppShellFrame = ({
           {session && <MobileTopBar />}
           <main className={APP_SHELL.content} {...beaconProps(TOUR_BEACONS.page)}>
             <MobileHold routes={heldRoutes}>
-              <FeatureGate>{children}</FeatureGate>
+              {session ? (
+                <DockSwipe viewContext={viewContext} held={heldRoutes.phone}>
+                  <FeatureGate>{children}</FeatureGate>
+                </DockSwipe>
+              ) : (
+                <FeatureGate>{children}</FeatureGate>
+              )}
             </MobileHold>
           </main>
         </div>
@@ -147,10 +159,9 @@ const AppShellFrame = ({
           />
         )}
         {session && <PwaHost isPushReady={isPushReady} />}
+        {session && isNexusReady && <NexusLauncher />}
         {session && <NudgeHost />}
-        {session && !isBare && !isLivesPage && isOpen('assistant') && (
-          <AssistantDock viewContext={viewContext} />
-        )}
+        {session && !isBare && isOpen('assistant') && <AssistantDock viewContext={viewContext} />}
         {session && !isBare && can(Permissions.PlayAccess) && isOpen('play.notices') && (
           <PlayInviteHost />
         )}

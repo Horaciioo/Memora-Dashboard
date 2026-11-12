@@ -26,6 +26,8 @@ export const PLAY_TOPICS = {
 export const PLAY_STREAM_EVENTS = {
   // Seats or stage moved, read the page again
   changed: 'changed',
+  // The host started the game, the table is being built
+  started: 'started',
   // Only the board moved, pushed to each reader
   moved: 'moved',
   // Board of the reader, ready to draw

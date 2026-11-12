@@ -1,0 +1,305 @@
+/* Jumble ground: violet night, letters rising like bubbles */
+.play-room:has(.play-jumble) {
+  background:
+    radial-gradient(
+      70rem 34rem at 50% 115%,
+      color-mix(in srgb, var(--play-jumble) 50%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      40rem 24rem at 12% -8%,
+      color-mix(in srgb, var(--play-jumble-glow) 16%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-jumble-night) 0%, var(--play-jumble-dusk) 100%);
+}
+
+.play-room:has(.play-jumble) .play-floor {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--play-jumble) 28%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--play-jumble) 28%, transparent) 1px,
+      transparent 1px
+    );
+}
+
+/* A hub letter rises, spins a little, fades out */
+.play-jumble-float {
+  position: absolute;
+  bottom: -4rem;
+  left: var(--x);
+  display: grid;
+  width: var(--size);
+  height: var(--size);
+  place-items: center;
+  border-radius: 22%;
+  background: var(--play-jumble-tile);
+  color: var(--play-jumble-tile-ink);
+  font-size: calc(var(--size) * 0.6);
+  font-weight: 900;
+  box-shadow: 0 0.25rem 0 var(--play-jumble-tile-deep);
+  opacity: 0;
+  animation: play-jumble-float var(--rise) linear var(--delay) infinite;
+}
+
+@keyframes play-jumble-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--tilt));
+  }
+  12% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
+  }
+}
+
+/* Countdown in the violet glow */
+.play-figure-jumble {
+  color: var(--play-jumble-glow);
+  --play-key: var(--play-jumble);
+}
+
+/* Invite and arcade keys of the game */
+.play-key-violet {
+  background: var(--play-jumble);
+  color: var(--play-on-art);
+  box-shadow:
+    0 0.3rem 0 var(--play-jumble-deep),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+/* Tile: drops in, then breathes on its own beat */
+.play-jumble-tile {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 22%;
+  background: linear-gradient(180deg, #fffaf0, var(--play-jumble-tile));
+  color: var(--play-jumble-tile-ink);
+  font-weight: 900;
+  box-shadow:
+    0 0.35rem 0 var(--play-jumble-tile-deep),
+    0 0.9rem 1.4rem rgb(0 0 0 / 0.35);
+  rotate: var(--tilt);
+  animation:
+    play-jumble-drop 520ms var(--motion-ease-out) backwards var(--delay),
+    play-jumble-bob 2.4s ease-in-out infinite calc(var(--delay) + 520ms);
+}
+
+@keyframes play-jumble-drop {
+  0% {
+    opacity: 0;
+    translate: 0 -4rem;
+    scale: 1.5;
+    rotate: calc(var(--tilt) * 4);
+  }
+  60% {
+    opacity: 1;
+    translate: 0 0.3rem;
+    scale: 0.94;
+  }
+  100% {
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@keyframes play-jumble-bob {
+  50% {
+    translate: 0 -0.35rem;
+  }
+}
+
+/* Answer tiles flip face up one after the other */
+.play-jumble-flip {
+  animation: play-jumble-flip 560ms var(--motion-ease-out) backwards var(--delay);
+  rotate: 0deg;
+}
+
+.play-jumble-won {
+  background: linear-gradient(180deg, #eaffd6, #b7f08a);
+  box-shadow:
+    0 0.35rem 0 #6fb83c,
+    0 0 1.6rem rgb(155 240 100 / 0.55);
+}
+
+.play-jumble-lost {
+  background: linear-gradient(180deg, #ffe3e0, #ffb4ad);
+  box-shadow: 0 0.35rem 0 #c8524a;
+}
+
+@keyframes play-jumble-flip {
+  0% {
+    transform: rotateX(90deg) scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: rotateX(0) scale(1);
+  }
+}
+
+/* Empty slot under the tiles, the hint one lit */
+.play-jumble-slot {
+  border-bottom: 0.25rem solid color-mix(in srgb, var(--play-jumble-glow) 45%, transparent);
+  color: var(--play-jumble-glow);
+  text-align: center;
+  font-weight: 900;
+  animation: play-jumble-slot-in 300ms var(--motion-ease-out) backwards;
+}
+
+.play-jumble-slot-hint {
+  border-color: var(--play-gold);
+  color: var(--play-gold);
+  animation: play-jumble-pop 520ms var(--motion-ease-out);
+}
+
+@keyframes play-jumble-slot-in {
+  from {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+}
+
+@keyframes play-jumble-pop {
+  0% {
+    scale: 2;
+    opacity: 0;
+  }
+  60% {
+    scale: 0.9;
+    opacity: 1;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+/* Clock bar drains over the time left, red and nervous at the end */
+.play-jumble-clock {
+  position: relative;
+  transform-origin: left center;
+  animation: play-jumble-drain var(--left) linear var(--wait, 0ms) both;
+  background: linear-gradient(90deg, var(--play-jumble-glow), var(--play-jumble));
+}
+
+@keyframes play-jumble-drain {
+  from {
+    transform: scaleX(var(--from));
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.play-jumble-clock::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--play-bomb), var(--play-bomb-red));
+  opacity: 0;
+  animation: play-jumble-redden var(--left) linear var(--wait, 0ms) both;
+}
+
+@keyframes play-jumble-redden {
+  0%,
+  65% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Wrong guess shakes the field */
+.play-jumble-shake {
+  animation: play-jumble-shake 380ms ease-in-out;
+}
+
+@keyframes play-jumble-shake {
+  20% {
+    translate: -0.6rem 0;
+  }
+  40% {
+    translate: 0.6rem 0;
+  }
+  60% {
+    translate: -0.4rem 0;
+  }
+  80% {
+    translate: 0.3rem 0;
+  }
+}
+
+/* Points thrown up over the solved word */
+.play-jumble-gain {
+  animation: play-jumble-gain 900ms var(--motion-ease-out) backwards;
+  text-shadow:
+    0 0.15rem 0 var(--play-jumble-deep),
+    0 0 1.6rem var(--play-jumble);
+}
+
+@keyframes play-jumble-gain {
+  0% {
+    opacity: 0;
+    scale: 0.3;
+    translate: 0 2rem;
+  }
+  55% {
+    opacity: 1;
+    scale: 1.35;
+    translate: 0 -0.5rem;
+  }
+  100% {
+    scale: 1;
+    translate: 0 0;
+  }
+}
+
+/* Lightning ribbon of a very quick answer */
+.play-jumble-flash {
+  animation: play-jumble-flash 700ms steps(2) infinite alternate;
+}
+
+@keyframes play-jumble-flash {
+  to {
+    filter: brightness(1.6) saturate(1.4);
+  }
+}
+
+/* Row of the scoreboard that just scored */
+.play-jumble-scored {
+  animation: play-jumble-scored 1100ms var(--motion-ease-out);
+}
+
+@keyframes play-jumble-scored {
+  0% {
+    background-color: color-mix(in srgb, var(--play-gold) 60%, transparent);
+    scale: 1.04;
+  }
+  100% {
+    background-color: transparent;
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-jumble-float,
+  .play-jumble-tile,
+  .play-jumble-flip,
+  .play-jumble-slot,
+  .play-jumble-slot-hint,
+  .play-jumble-clock::after,
+  .play-jumble-shake,
+  .play-jumble-gain,
+  .play-jumble-flash,
+  .play-jumble-scored {
+    animation: none;
+  }
+}

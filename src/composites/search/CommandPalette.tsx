@@ -13,12 +13,14 @@ import { useAssistantPreview } from '@/core/hooks/data/system/useAssistantPrevie
 import { useSearch } from '@/core/hooks/data/system/useSearch'
 import { useFocusTrap } from '@/core/hooks/interaction/layout/overlay/useFocusTrap'
 import { useRecentSearches } from '@/core/hooks/interaction/state/saved/useRecentSearches'
+import { isNexusInput } from '@/core/lib/nexus/intercept'
 import { useScrollLock } from '@/core/hooks/interaction/layout/overlay/useScrollLock'
 import { useAssistantStore } from '@/core/store/assistant'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { SEARCH_SETTINGS } from '@/declarations/configurations/settings'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { PALETTE_STYLES } from '@/declarations/ui/variants'
+import { useNexusHandoff, useNexusReady } from '@/managers/front-end/NexusManager'
 import type { SearchHit } from '@/types/search'
 
 export interface CommandPaletteProps {
@@ -46,9 +48,12 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
   }
 
   const chat = useAssistantChat(openHref)
+  const handoff = useNexusHandoff()
+  // The console reads it, so neither search nor Memora does
+  const isConsole = useNexusReady() && !chat.turns.length && isNexusInput(term)
   const isChat = chat.turns.length > 0
-  const preview = useAssistantPreview(isChat ? '' : term)
-  const { sections, isLoading } = useSearch(isChat ? '' : term)
+  const preview = useAssistantPreview(isChat || isConsole ? '' : term)
+  const { sections, isLoading } = useSearch(isChat || isConsole ? '' : term)
 
   // Memora's row leads the list
   const hits = useMemo(() => sections.flatMap((section) => section.hits), [sections])
@@ -89,6 +94,12 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
   }
 
   const onKeyDown = (event: React.KeyboardEvent) => {
+    // Handed over, not run
+    if (event.key === 'Enter' && isConsole && handoff(term)) {
+      event.preventDefault()
+      onClose()
+      return
+    }
     if (event.key === 'Enter' && isChat) {
       event.preventDefault()
       submitChat()

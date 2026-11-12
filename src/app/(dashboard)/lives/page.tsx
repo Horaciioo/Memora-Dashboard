@@ -16,7 +16,12 @@ export const metadata: Metadata = { title: LIVE_COPY.title }
  * @return {Promise<JSX.Element>} - Live en cours page
  */
 
-export default async function LivesPage() {
+export default async function LivesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ creator?: string }>
+}) {
+  const { creator } = await searchParams
   const { session, access, scope } = await requirePermission(Permissions.LiveRead)
   const perimeter = await scope()
   const canAnnounce = access.can(Permissions.LiveAnnounce)
@@ -38,7 +43,7 @@ export default async function LivesPage() {
         recent={recent}
         canAnnounce={canAnnounce}
         showFakeLive={TWITCH_MOCK_ORIGIN !== null && access.isAdmin}
-        initialId={perimeter.activeYoutuberId}
+        initialId={creator ?? perimeter.activeYoutuberId}
         past={past}
         canReport={canReadLogs}
         canDelete={access.isResponsable}

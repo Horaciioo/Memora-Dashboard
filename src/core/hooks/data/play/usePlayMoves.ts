@@ -112,11 +112,15 @@ export const usePlayMoves = () => {
         PLAY_HUB_COPY.moved,
         null
       ),
-    leave: (id: string) =>
-      go(
+    leave: (id: string) => {
+      // The hub loads while the request runs
+      router.prefetch(ROUTES.play)
+
+      return go(
         () => apiPost(API_ROUTES.playLeave(id), {}),
         PLAY_HUB_COPY.leftDone,
         () => ROUTES.play
-      ),
+      )
+    },
   }
 }

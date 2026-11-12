@@ -1,8 +1,7 @@
 import { indexOf } from '@/core/lib/play/naval/fleet'
 import type { Rng } from '@/core/lib/play/naval/fleet'
-import { canWield, turnsOf } from '@/core/lib/play/naval/weapons'
-import { NAVAL_WEAPONS } from '@/declarations/play/naval/weapons'
-import { NavalShapes, NavalWeapons, PlayBotKinds } from '@/utils/constants/play'
+import { turnsOf, weaponOf, zoneOf } from '@/core/lib/play/naval/weapons'
+import { NavalShapes, PlayBotKinds } from '@/utils/constants/play'
 import type { NavalWeaponName, PlayBotKindName } from '@/utils/constants/play'
 
 /**
@@ -13,6 +12,7 @@ import type { NavalWeaponName, PlayBotKindName } from '@/utils/constants/play'
  * @property {Set<number>} wounds - Squares hit on ships still afloat
  * @property {number[]} remaining - Lengths of the ships afloat
  * @property {Set<number>} [spotted] - Ship squares lit by a flare, not struck
+ * @property {number} [reachScale] - Theatre weapon reach multiplier
  */
 
 export interface NavalKnowledge {
@@ -21,6 +21,7 @@ export interface NavalKnowledge {
   wounds: Set<number>
   remaining: number[]
   spotted?: Set<number>
+  reachScale?: number
 }
 
 /**
@@ -54,24 +55,36 @@ const freeSquares = ({ size, fired }: NavalKnowledge): number[] =>
   Array.from({ length: size * size }, (_, index) => index).filter((index) => !fired.has(index))
 
 /**
- * Likelihood of each square from the ships that could lie there
+ * Likelihood of each square from the ships that could lie there, flat arrays for the wide seas
  * @param {NavalKnowledge} knowledge - Knowledge
- * @return {number[]} - Weight per square
+ * @return {Float64Array} - Weight per square
  */
 
-const densityOf = ({ size, fired, wounds, remaining }: NavalKnowledge): number[] => {
-  const density = Array.from({ length: size * size }, () => 0)
-  for (const length of remaining) {
-    for (const isHorizontal of [true, false]) {
+const densityOf = ({ size, fired, wounds, remaining }: NavalKnowledge): Float64Array => {
+  const density = new Float64Array(size * size)
+  // Known water and sunk ships block, wounds attract
+  const wall = new Uint8Array(size * size)
+  const wound = new Uint8Array(size * size)
+  for (const cell of fired) if (!wounds.has(cell)) wall[cell] = 1
+  for (const cell of wounds) wound[cell] = 1
+  for (const length of new Set(remaining)) {
+    const copies = remaining.filter((entry) => entry === length).length
+    for (const stride of [1, size]) {
+      const isHorizontal = stride === 1
       for (let y = 0; y < size - (isHorizontal ? 0 : length - 1); y += 1) {
         for (let x = 0; x < size - (isHorizontal ? length - 1 : 0); x += 1) {
-          const cells = Array.from({ length }, (_, step) =>
-            indexOf(x + (isHorizontal ? step : 0), y + (isHorizontal ? 0 : step), size)
-          )
-          // Walls of known water and sunk ships are out
-          if (cells.some((cell) => fired.has(cell) && !wounds.has(cell))) continue
-          const weight = 1 + cells.filter((cell) => wounds.has(cell)).length * WOUND_WEIGHT
-          for (const cell of cells) if (!fired.has(cell)) density[cell] += weight
+          const first = indexOf(x, y, size)
+          let blocked = false
+          let hits = 0
+          for (let step = 0; step < length && !blocked; step += 1) {
+            blocked = wall[first + step * stride] === 1
+            hits += wound[first + step * stride]
+          }
+          if (blocked) continue
+          const weight = (1 + hits * WOUND_WEIGHT) * copies
+          for (let step = 0; step < length; step += 1) {
+            if (!fired.has(first + step * stride)) density[first + step * stride] += weight
+          }
         }
       }
     }
@@ -156,7 +169,7 @@ export const chooseSquare = ({
 
   // Hard fires where most ships could still lie
   const density = densityOf(knowledge)
-  const best = Math.max(...free.map((square) => density[square]))
+  const best = free.reduce((top, square) => Math.max(top, density[square]), 0)
 
   return draw(
     free.filter((square) => density[square] === best),
@@ -165,40 +178,72 @@ export const chooseSquare = ({
 }
 
 /**
- * Weapon a captain fires, the cannon when nothing better is held
- * @param {Object} input - Choice
- * @param {NavalKnowledge} input.knowledge - What is known
- * @param {PlayBotKindName} input.level - Skill
- * @param {{ ammo: number; offer: string[] }} input.arms - Ammo and weapons drawn
- * @param {Rng} [input.rng] - Random source
+ * Heading a captain gives the weapon drawn for it
+ * @param {NavalWeaponName} weapon - Weapon drawn
+ * @param {Rng} [rng] - Random source
  * @return {NavalArmsChoice} - Weapon and orientation
  */
 
-export const chooseWeapon = ({
+export const chooseHeading = (
+  weapon: NavalWeaponName,
+  rng: Rng = Math.random
+): NavalArmsChoice => ({
+  weapon,
+  orientation: Math.floor(rng() * turnsOf(weaponOf(weapon))),
+})
+
+/**
+ * Whether a weapon aimed at a square still has something to strike
+ * @param {NavalKnowledge} knowledge - What is known
+ * @param {NavalArmsChoice} arms - Weapon and heading
+ * @param {number} square - Square aimed at
+ * @return {boolean} - Something new inside the zone
+ */
+
+const hasTarget = (knowledge: NavalKnowledge, arms: NavalArmsChoice, square: number): boolean => {
+  const { size, fired, spotted, reachScale } = knowledge
+  const weapon = weaponOf(arms.weapon, reachScale)
+  const origin = { x: square % size, y: Math.floor(square / size) }
+
+  return zoneOf(weapon, origin, arms.orientation, size).some((cell) => {
+    const at = indexOf(cell.x, cell.y, size)
+
+    return !fired.has(at) && !(weapon.shape === NavalShapes.Square && spotted?.has(at))
+  })
+}
+
+/**
+ * Heading and square a captain gives the weapon drawn, never a strike that hits nothing new
+ * @param {Object} input - Choice
+ * @param {NavalKnowledge} input.knowledge - What is known
+ * @param {PlayBotKindName} input.level - Skill
+ * @param {number} input.mistakeRate - Share of blind shots
+ * @param {NavalWeaponName} input.weapon - Weapon drawn
+ * @param {Rng} [input.rng] - Random source
+ * @return {{ arms: NavalArmsChoice; square: number } | null} - Strike, none when nothing is left
+ */
+
+export const chooseStrike = ({
   knowledge,
   level,
-  arms,
+  mistakeRate,
+  weapon,
   rng = Math.random,
 }: {
   knowledge: NavalKnowledge
   level: PlayBotKindName
-  arms: { ammo: number; offer: string[] }
+  mistakeRate: number
+  weapon: NavalWeaponName
   rng?: Rng
-}): NavalArmsChoice => {
-  const held = NAVAL_WEAPONS.filter((weapon) => canWield(weapon.name, arms) && weapon.cost > 0)
-  const isTracking = knowledge.wounds.size > 0 || (knowledge.spotted?.size ?? 0) > 0
-  const cannon = { weapon: NavalWeapons.Cannon, orientation: 0 }
-  if (!held.length) return cannon
+}): { arms: NavalArmsChoice; square: number } | null => {
+  const arms = chooseHeading(weapon, rng)
+  const wanted = chooseSquare({ knowledge, level, mistakeRate, rng })
+  if (wanted !== null && hasTarget(knowledge, arms, wanted)) return { arms, square: wanted }
 
-  // Easy spends at random, the others hunt with zones and track with the cannon
-  const pick =
-    level === PlayBotKinds.Easy
-      ? held[Math.floor(rng() * held.length)]
-      : isTracking
-        ? held.find((weapon) => weapon.shape === NavalShapes.Cross)
-        : (held.find((weapon) => weapon.shape === NavalShapes.Square) ??
-          held.toSorted((a, b) => b.cost - a.cost)[0])
-  if (!pick) return cannon
+  // The best square lights nothing for this weapon, any other square that does will do
+  const squares = Array.from({ length: knowledge.size * knowledge.size }, (_, at) => at)
+  const open = squares.filter((square) => hasTarget(knowledge, arms, square))
+  if (!open.length) return null
 
-  return { weapon: pick.name, orientation: Math.floor(rng() * turnsOf(pick)) }
+  return { arms, square: open[Math.floor(rng() * open.length)] }
 }

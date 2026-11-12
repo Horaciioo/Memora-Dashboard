@@ -1,6 +1,6 @@
 {
   "name": "memora-dashboard",
-  "version": "0.12.0-snapshot.1",
+  "version": "0.13.0-snapshot.1",
   "private": true,
   "scripts": {
     "dev": "yarn worker:build && node server.mjs",
@@ -15,7 +15,9 @@
     "status:dev": "STATUS_DATA_FILE=.next/status-state.json STATUS_APP_URL=http://127.0.0.1:3000/api/health STATUS_DATABASE_ADDRESS=127.0.0.1:5432 STATUS_CACHE_ADDRESS=127.0.0.1:6379 node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON status/server.ts",
     "lint": "eslint .",
     "type-check": "yarn openapi:generate && tsc --noEmit && tsc --noEmit -p src/worker/tsconfig.json",
+    "nexus:hash": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/scripts/nexus/hash.ts",
     "comments:trim": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/scripts/comments/trim.ts",
+    "clean": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/scripts/clean.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "validate": "yarn type-check && yarn lint && yarn test && yarn build",
@@ -35,6 +37,7 @@
   },
   "dependencies": {
     "@logtail/node": "^0.5.8",
+    "@node-rs/argon2": "^2.2.2",
     "@phosphor-icons/react": "^2.1.10",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",

@@ -33,15 +33,29 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
     Object.fromEntries(round.answers.map((answer) => [answer.category, answer.word]))
   )
   const pending = useRef<number | null>(null)
+  // Words the server holds, nothing sent while they match
+  const saved = useRef(JSON.stringify(words))
+
+  /**
+   * Send the words once they differ from the saved ones
+   * @param {Record<string, string>} answers - Words typed
+   * @return {Promise<void>} - Sent
+   */
+
+  const save = async (answers: Record<string, string>) => {
+    const text = JSON.stringify(answers)
+    if (text === saved.current) return
+    if (await drafts.act({ type: 'write', answers })) saved.current = text
+  }
 
   // Debounced draft save, no refresh
   useEffect(() => {
     if (!isSeated) return
     if (pending.current) window.clearTimeout(pending.current)
-    pending.current = window.setTimeout(
-      () => void drafts.act({ type: 'write', answers: words }),
-      SAVE_DELAY_MS
-    )
+    pending.current = window.setTimeout(() => {
+      pending.current = null
+      void save(words)
+    }, SAVE_DELAY_MS)
 
     return () => {
       if (pending.current) window.clearTimeout(pending.current)
@@ -55,7 +69,9 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
   const hasStopButton = settings.stop && !settings.autoStop
   const DoneIcon = ICONS.playTick
   const stop = async () => {
-    await drafts.act({ type: 'write', answers: words })
+    if (pending.current) window.clearTimeout(pending.current)
+    pending.current = null
+    await save(words)
     await act({ type: 'stop' })
   }
 

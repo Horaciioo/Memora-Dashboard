@@ -50,6 +50,10 @@
   --color-caution: #e3b341;
   --color-warning: #f0a35c;
   --color-danger: #f08080;
+  --color-status-minor: #ecd47e;
+  --color-status-degraded: #eaa56c;
+  --color-status-down: #de7d78;
+  --color-status-outage: #4b4b54;
   --color-info: #8dbbe8;
   --color-neutral: #a1a1a6;
   --color-success-soft: #14301f;

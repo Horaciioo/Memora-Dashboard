@@ -33,7 +33,6 @@ export const openBattle = async (session: EngineSession): Promise<EngineStep> =>
         sessionId: session.id,
         accountId,
         slot,
-        ammo: NAVAL_SETTINGS.ammo.start,
       })),
     }),
     prisma.navalGame.create({ data: { sessionId: session.id, startsAt, phaseEndsAt } }),

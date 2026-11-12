@@ -21,13 +21,15 @@ export const QUERY_KEYS = {
   sanctionOffense: (id: string) => ['sanctions', 'offense', id] as const,
   reviewDesk: (juniorId: string) => ['academy', 'review-desk', juniorId] as const,
   blockQuiz: (blockId: string) => ['academy', 'quiz', blockId] as const,
+  liveOwnFigures: ['lives', 'own-figures'] as const,
   liveRoster: (liveId: string) => ['lives', 'roster', liveId] as const,
   liveEmotes: (liveId: string) => ['lives', 'emotes', liveId] as const,
   liveInspect: (liveId: string, accountId: string) =>
     ['lives', 'inspect', liveId, accountId] as const,
   exerciseLinks: (candidateId: string) => ['recruitment', 'exercises', candidateId] as const,
-  recruitmentHistory: (search: string, bannedOnly: boolean) =>
-    ['recruitment', 'history', search, bannedOnly] as const,
+  recruitmentHistory: (filters: Record<string, string | boolean>) =>
+    ['recruitment', 'history', filters] as const,
+  academyHistory: (filters: Record<string, string>) => ['academy', 'history', filters] as const,
   workComments: (kind: string, id: string) => ['work', 'comments', kind, id] as const,
   playProfile: ['play', 'profile'] as const,
   liveBan: (liveId: string, viewerId: string) => ['lives', 'ban', liveId, viewerId] as const,

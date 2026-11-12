@@ -40,6 +40,7 @@
   },
   "seatColors": 15,
   "leaderboardSize": 20,
+  "sidebarGames": 1,
   "historySize": 30,
   "historyPage": 15,
   "profileRecent": 5,

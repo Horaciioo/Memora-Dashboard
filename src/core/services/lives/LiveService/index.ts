@@ -8,6 +8,7 @@ export {
   withTemplatePlatform,
   liveFormFields,
   readLiveInput,
+  readLivePlanning,
 } from '@/core/services/lives/LiveService/forms'
 export type { LiveInput } from '@/core/services/lives/LiveService/forms'
 export {

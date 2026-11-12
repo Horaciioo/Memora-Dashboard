@@ -7,17 +7,30 @@ import { BacRulesDrawer } from '@/composites/play/baccalaureat/BacRulesDrawer'
 import { BacSetupDrawer } from '@/composites/play/baccalaureat/BacSetupDrawer'
 import { BombRulesDrawer } from '@/composites/play/bomb/BombRulesDrawer'
 import { BombSetupDrawer } from '@/composites/play/bomb/BombSetupDrawer'
+import { CroquisRulesDrawer } from '@/composites/play/croquis/CroquisRulesDrawer'
+import { CroquisSetupDrawer } from '@/composites/play/croquis/CroquisSetupDrawer'
+import { EchoRulesDrawer } from '@/composites/play/echo/EchoRulesDrawer'
+import { EchoSetupDrawer } from '@/composites/play/echo/EchoSetupDrawer'
+import { GlitchRulesDrawer } from '@/composites/play/glitch/GlitchRulesDrawer'
+import { GlitchSetupDrawer } from '@/composites/play/glitch/GlitchSetupDrawer'
 import { GolfRulesDrawer } from '@/composites/play/golf/setup/GolfRulesDrawer'
 import { GolfSetupDrawer } from '@/composites/play/golf/setup/GolfSetupDrawer'
 import { GolfStartVote } from '@/composites/play/golf/vote/GolfStartVote'
+import { JumbleRulesDrawer } from '@/composites/play/jumble/JumbleRulesDrawer'
+import { JumbleSetupDrawer } from '@/composites/play/jumble/JumbleSetupDrawer'
 import { LudoRulesDrawer } from '@/composites/play/ludo/LudoRulesDrawer'
 import { LudoSetupDrawer } from '@/composites/play/ludo/LudoSetupDrawer'
 import { NavalRulesDrawer } from '@/composites/play/naval/setup/NavalRulesDrawer'
 import { NavalSetupDrawer } from '@/composites/play/naval/setup/NavalSetupDrawer'
+import { navalVoteFace } from '@/composites/play/naval/world/navalVoteFace'
 import { declaredVote } from '@/composites/play/vote/PlayStartVote'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
+import { croquisSettingsOf } from '@/core/lib/play/croquis/settings'
+import { echoSettingsOf } from '@/core/lib/play/echo/settings'
+import { glitchSettingsOf } from '@/core/lib/play/glitch/settings'
 import { golfSettingsOf } from '@/core/lib/play/golf/settings'
+import { jumbleSettingsOf } from '@/core/lib/play/jumble/settings'
 import { ludoSettingsOf } from '@/core/lib/play/ludo/settings'
 import { navalSettingsOf } from '@/core/lib/play/naval/settings'
 import { PlayGames } from '@/utils/constants/play'
@@ -85,6 +98,10 @@ export const PLAY_SETUP_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   [PlayGames.Golf]: GolfSetupDrawer,
   [PlayGames.Ludo]: LudoSetupDrawer,
   [PlayGames.Naval]: NavalSetupDrawer,
+  [PlayGames.Jumble]: JumbleSetupDrawer,
+  [PlayGames.Echo]: EchoSetupDrawer,
+  [PlayGames.Glitch]: GlitchSetupDrawer,
+  [PlayGames.Croquis]: CroquisSetupDrawer,
 }
 
 /**
@@ -97,6 +114,10 @@ export const PLAY_START_VOTES: Partial<Record<PlayGameName, ComponentType<PlayVo
   [PlayGames.Baccalaureat]: declaredVote(PlayGames.Baccalaureat),
   [PlayGames.Bomb]: declaredVote(PlayGames.Bomb),
   [PlayGames.Ludo]: declaredVote(PlayGames.Ludo),
+  [PlayGames.Naval]: declaredVote(PlayGames.Naval, navalVoteFace),
+  [PlayGames.Echo]: declaredVote(PlayGames.Echo),
+  [PlayGames.Glitch]: declaredVote(PlayGames.Glitch),
+  [PlayGames.Croquis]: declaredVote(PlayGames.Croquis),
 }
 
 /**
@@ -116,6 +137,18 @@ export const PLAY_RULES_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   ),
   [PlayGames.Ludo]: ({ open, onClose, settings }) => (
     <LudoRulesDrawer open={open} onClose={onClose} settings={ludoSettingsOf(settings)} />
+  ),
+  [PlayGames.Croquis]: ({ open, onClose, settings }) => (
+    <CroquisRulesDrawer open={open} onClose={onClose} settings={croquisSettingsOf(settings)} />
+  ),
+  [PlayGames.Glitch]: ({ open, onClose, settings }) => (
+    <GlitchRulesDrawer open={open} onClose={onClose} settings={glitchSettingsOf(settings)} />
+  ),
+  [PlayGames.Echo]: ({ open, onClose, settings }) => (
+    <EchoRulesDrawer open={open} onClose={onClose} settings={echoSettingsOf(settings)} />
+  ),
+  [PlayGames.Jumble]: ({ open, onClose, settings }) => (
+    <JumbleRulesDrawer open={open} onClose={onClose} settings={jumbleSettingsOf(settings)} />
   ),
   [PlayGames.Naval]: ({ open, onClose, settings }) => (
     <NavalRulesDrawer open={open} onClose={onClose} settings={navalSettingsOf(settings)} />

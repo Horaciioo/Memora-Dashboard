@@ -6,6 +6,13 @@ import { ICONS } from '@/declarations/ui/icons'
 import { MemberRoles } from '@/utils/constants/hierarchy'
 
 /**
+ * Internal chat shown to the team, off by the responsables' call
+ * @type {boolean}
+ */
+
+export const TEAM_CHAT_ENABLED = false
+
+/**
  * Group a message can call
  * @typedef {'everyone' | 'team' | 'coordinator' | 'responsables' | 'admins' | 'designated'} TeamMentionKind
  */
@@ -117,6 +124,7 @@ export const TEAM_CHAT_COPY = {
   title: 'Chat interne',
   placeholder: 'Écris à l’équipe',
   offline: 'Le chat interne est disponible pendant un live.',
+  rosterOffline: 'L’équipe est disponible pendant un live.',
   locked: 'Le chat interne n’envoie rien tant que le live n’a pas commencé.',
   send: 'Envoyer',
   mention: 'Mentionner',

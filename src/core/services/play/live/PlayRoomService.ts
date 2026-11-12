@@ -38,7 +38,11 @@ const globalForRooms = globalThis as unknown as { playRooms?: Map<string, PlayRo
 const rooms = (globalForRooms.playRooms ??= new Map())
 
 // Signals handed on as they are, the board goes on its own
-const FORWARDED: string[] = [PLAY_STREAM_EVENTS.changed, PLAY_STREAM_EVENTS.chat]
+const FORWARDED: string[] = [
+  PLAY_STREAM_EVENTS.changed,
+  PLAY_STREAM_EVENTS.started,
+  PLAY_STREAM_EVENTS.chat,
+]
 
 /**
  * Read the game once, then send each reader its own board
@@ -60,12 +64,13 @@ const sendBoards = async (sessionId: string, room: PlayRoom): Promise<void> => {
     byViewer.set(member.session.id, [...(byViewer.get(member.session.id) ?? []), member])
   }
 
-  // One read when boards match
+  // One read when boards match, or one read drawn for each reader
   const shared = engine.isViewShared ? engine.view(table, '') : null
+  const drawFor = shared ? null : await engine.viewFor?.(table)
 
   await Promise.all(
     [...byViewer].map(async ([viewerId, members]) => {
-      const board = await (shared ?? engine.view(table, viewerId))
+      const board = drawFor ? drawFor(viewerId) : await (shared ?? engine.view(table, viewerId))
       const frame = eventFrame(topic, PLAY_STREAM_EVENTS.board, { board })
       for (const member of members) member.send(frame)
     })

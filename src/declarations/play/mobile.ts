@@ -72,3 +72,14 @@ export const PLAY_MOBILE_COPY = {
  */
 
 export const PLAY_BUBBLES = { max: 3, ttlMs: 7000 } as const
+
+/**
+ * Copy of the profile sidebar
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_ME_COPY = {
+  open: 'Voir mon profil',
+  allStats: 'Mes stats',
+  settings: 'Réglages',
+} as const

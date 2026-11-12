@@ -8,6 +8,7 @@ import { listMembers, memberFields } from '@/core/services/members/MemberService
 import { BELOW_LEAD_ROLES } from '@/core/services/members/MemberService/rules'
 import { listAcceptedCandidates } from '@/core/services/recruitment'
 import { activeFunctions, activeYoutubers, allDivisions } from '@/core/services/reference/lookups'
+import { withTwitchBanners } from '@/core/services/platforms/TwitchBannerService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -67,7 +68,7 @@ export default async function MembersPage() {
         accepted={accepted}
         fields={fields}
         divisions={rowsToOptions(divisions)}
-        youtubers={rowsToOptions(youtubers)}
+        youtubers={rowsToOptions(await withTwitchBanners(youtubers))}
         functions={rowsToOptions(functions)}
         creatorId={creatorId}
         canCreate={access.can(Permissions.MemberCreate)}

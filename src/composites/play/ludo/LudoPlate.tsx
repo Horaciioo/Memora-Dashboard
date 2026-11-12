@@ -4,7 +4,6 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { LudoPawn } from '@/composites/play/ludo/LudoPawn'
 import type { LudoCornerName } from '@/declarations/play/ludo/board'
 import { LUDO_BOARD_COPY, ludoPlaceLabel } from '@/declarations/play/ludo/copy'
-import { fillPlayMessage } from '@/declarations/play/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { LUDO_PLATE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -20,7 +19,6 @@ export interface LudoPlateFace {
   isHost: boolean
   hasLeft: boolean
   place: number | null
-  home: { count: number; total: number }
 }
 
 export interface LudoPlateProps {
@@ -43,7 +41,7 @@ export interface LudoPlateProps {
  */
 
 export const LudoPlate = ({ face, colour, isRight, turn, isMine, die }: LudoPlateProps) => {
-  const { name, avatarUrl, isHost, hasLeft, place, home } = face
+  const { name, avatarUrl, isHost, hasLeft, place } = face
   const CrownIcon = ICONS.playCrown
 
   return (
@@ -66,27 +64,27 @@ export const LudoPlate = ({ face, colour, isRight, turn, isMine, die }: LudoPlat
       </span>
       <div className={cn(LUDO_PLATE.row, isRight && LUDO_PLATE.rowRight)}>
         <LudoPawn colour={colour} className={LUDO_PLATE.chip} />
-        <span
-          className={cn(LUDO_PLATE.ring, turn?.isAlert && LUDO_PLATE.ringAlert)}
-          style={{ '--left': turn?.clock ?? 0 } as CSSProperties}
-        >
-          <Avatar name={name} src={avatarUrl} size="lg" className={LUDO_PLATE.face} />
-        </span>
-        {die}
+        <div className={LUDO_PLATE.core}>
+          <span
+            className={cn(LUDO_PLATE.ring, turn?.isAlert && LUDO_PLATE.ringAlert)}
+            style={{ '--left': turn?.clock ?? 0 } as CSSProperties}
+          >
+            <Avatar name={name} src={avatarUrl} size="lg" className={LUDO_PLATE.face} />
+          </span>
+          <div className={LUDO_PLATE.nameRow}>
+            {isHost && <CrownIcon className={LUDO_PLATE.crown} aria-label={LUDO_BOARD_COPY.host} />}
+            <span
+              className={cn(LUDO_PLATE.dot, hasLeft ? LUDO_PLATE.away : LUDO_PLATE.online)}
+              title={hasLeft ? LUDO_BOARD_COPY.left : undefined}
+            />
+            <span className={LUDO_PLATE.name}>{name}</span>
+          </div>
+          {die && (
+            <span className={isRight ? LUDO_PLATE.dieSlotRight : LUDO_PLATE.dieSlot}>{die}</span>
+          )}
+          {place && <span className={LUDO_PLATE.place}>{ludoPlaceLabel(place)}</span>}
+        </div>
       </div>
-      <div className={cn(LUDO_PLATE.nameRow, isRight && LUDO_PLATE.nameRowRight)}>
-        {isHost && <CrownIcon className={LUDO_PLATE.crown} aria-label={LUDO_BOARD_COPY.host} />}
-        <span
-          className={cn(LUDO_PLATE.dot, hasLeft ? LUDO_PLATE.away : LUDO_PLATE.online)}
-          title={hasLeft ? LUDO_BOARD_COPY.left : undefined}
-        />
-        <span className={LUDO_PLATE.name}>{name}</span>
-      </div>
-      {place ? (
-        <span className={LUDO_PLATE.place}>{ludoPlaceLabel(place)}</span>
-      ) : (
-        <span className={LUDO_PLATE.note}>{fillPlayMessage(LUDO_BOARD_COPY.home, home)}</span>
-      )}
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { ABSENCE_SCENARIO } from '@/core/lib/assistant/scenarios/absence'
 import { CANDIDATE_SCENARIO } from '@/core/lib/assistant/scenarios/candidate'
 import { IDENTITY_SCENARIO } from '@/core/lib/assistant/scenarios/identity'
 import { JUNIOR_SCENARIO } from '@/core/lib/assistant/scenarios/junior'
+import { LIVE_SCENARIO } from '@/core/lib/assistant/scenarios/live'
 import { TASK_SCENARIO } from '@/core/lib/assistant/scenarios/task'
 import { RECRUITMENT_SCENARIO } from '@/core/lib/assistant/scenarios/recruitment'
 import { isStop, matchChoice } from '@/core/lib/assistant/scenarios/answers'
@@ -40,6 +41,7 @@ const SCENARIOS: Record<ScenarioId, Scenario> = {
   task: TASK_SCENARIO,
   junior: JUNIOR_SCENARIO,
   identity: IDENTITY_SCENARIO,
+  live: LIVE_SCENARIO,
 }
 
 export type { ScenarioId }

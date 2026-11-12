@@ -3,10 +3,11 @@
 import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 
+import { NavalShipSprite } from '@/composites/play/naval/NavalShipSprite'
 import { locate } from '@/composites/play/naval/ocean/useOceanGestures'
 import type { OceanCell } from '@/composites/play/naval/ocean/useOceanGestures'
-import type { NavalCamera } from '@/core/lib/play/naval/camera'
 import { NAVAL_SHIP_NAMES } from '@/declarations/play/naval/copy'
+import { navalStageOf } from '@/declarations/play/naval/maps'
 import { NAVAL_VIEW } from '@/declarations/play/naval/view'
 import { NAVAL_PLACE } from '@/declarations/ui/variants/games/naval'
 import { cn } from '@/utils/classnames'
@@ -16,7 +17,8 @@ export interface NavalDockProps {
   placed: number[]
   heldId: number | null
   box: RefObject<HTMLDivElement | null>
-  view: { camera: NavalCamera; size: number }
+  size: number
+  map: string
   onGrab: (id: number) => void
   onDrag: (cell: OceanCell | null) => void
   onDrop: (cell: OceanCell | null) => void
@@ -33,15 +35,16 @@ export const NavalDock = ({
   placed,
   heldId,
   box,
-  view,
+  size,
+  map,
   onGrab,
   onDrag,
   onDrop,
 }: NavalDockProps) => {
   const isDragging = useRef(false)
-  const latest = useRef({ view, onDrag, onDrop })
+  const latest = useRef({ size, map, onDrag, onDrop })
   useEffect(() => {
-    latest.current = { view, onDrag, onDrop }
+    latest.current = { size, map, onDrag, onDrop }
   })
 
   // The finger leaves the dock, the sea follows it
@@ -51,7 +54,11 @@ export const NavalDock = ({
         ? locate(
             box.current,
             { x: event.clientX, y: event.clientY },
-            { ...latest.current.view, tilt: NAVAL_VIEW.tilt }
+            {
+              camera: navalStageOf(latest.current.map, latest.current.size).camera,
+              size: latest.current.size,
+              tilt: NAVAL_VIEW.tilt,
+            }
           ).cell
         : null
     const onMove = (event: PointerEvent) =>
@@ -90,12 +97,9 @@ export const NavalDock = ({
             onGrab(id)
           }}
         >
-          <span className={NAVAL_PLACE.cells}>
-            {Array.from({ length }, (_, cell) => (
-              <i key={cell} className={NAVAL_PLACE.cellBlock} />
-            ))}
+          <span className={NAVAL_PLACE.sprite}>
+            <NavalShipSprite length={length} id={id} cell={NAVAL_PLACE.spriteCell} map={map} />
           </span>
-          <span className={NAVAL_PLACE.shipName}>{NAVAL_SHIP_NAMES[length]}</span>
         </button>
       ))}
     </div>

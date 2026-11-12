@@ -1,6 +1,5 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { CREATOR_GROUP } from '@/declarations/ui/blocks'
-import { LIVE_STAGE } from '@/declarations/ui/variants'
 import { ICONS } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 
@@ -41,10 +40,10 @@ export const CreatorGroupBanner = ({
     >
       {backdrop && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={backdrop} alt="" loading="lazy" className={LIVE_STAGE.backdrop} />
+        <img src={backdrop} alt="" loading="lazy" className={CREATOR_GROUP.backdrop} />
       )}
-      <span className={LIVE_STAGE.wash} aria-hidden="true" />
-      <Avatar name={name} src={avatarUrl} size="lg" className={CREATOR_GROUP.portrait} />
+      <span className={CREATOR_GROUP.wash} aria-hidden="true" />
+      <Avatar name={name} src={avatarUrl} size="md" className={CREATOR_GROUP.portrait} />
       <span className={CREATOR_GROUP.name}>{name}</span>
       <Chevron
         className={cn(CREATOR_GROUP.chevron, isOpen && CREATOR_GROUP.chevronOpen)}

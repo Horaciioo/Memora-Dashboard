@@ -1,5 +1,5 @@
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
-import type { NavalEvent, NavalPlayback } from '@/composites/play/naval/battle/useNavalPlayback'
+import type { NavalCallout, NavalPlayback } from '@/composites/play/naval/fx/useNavalDirector'
 import { isHitCode, isSinking, isStriking, NavalCodes } from '@/core/lib/play/naval/state'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -38,7 +38,7 @@ export const callOf = ({
   }
 
   // Shell coming for the viewer
-  if (playback.playing?.strike.target === viewer) {
+  if (playback.playing.some(({ strike }) => strike.match === match && strike.target === viewer)) {
     return { call: NAVAL_BOARD_COPY.incoming, tone: 'danger' }
   }
   if (current.turn === viewer) {
@@ -59,14 +59,14 @@ export const callOf = ({
 
 /**
  * Callout for a strike just landed
- * @param {NavalEvent} event - Strike
+ * @param {NavalCallout} callout - Strike
  * @param {NavalCaptainView[]} captains - Captains
  * @param {number} viewer - Seat of the viewer
  * @return {{ text: string; tone: 'hit' | 'sunk' | 'miss' | 'eliminated' }} - Callout
  */
 
 export const calloutOf = (
-  { strike, shipLength, isEliminated }: NavalEvent,
+  { strike, shipLength, isEliminated }: NavalCallout,
   captains: NavalCaptainView[],
   viewer: number
 ): { text: string; tone: 'hit' | 'sunk' | 'miss' | 'eliminated' } => {

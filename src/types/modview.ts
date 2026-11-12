@@ -98,7 +98,7 @@ export interface ChatMessage {
 
 /**
  * Kind of moderation act
- * @typedef {'delete' | 'warn' | 'timeout' | 'ban' | 'unban' | 'automodApprove' | 'automodDeny' | 'termAdd' | 'termRemove' | 'mode' | 'unbanRequest'} ModActKind
+ * @typedef {'delete' | 'warn' | 'timeout' | 'ban' | 'unban' | 'automodApprove' | 'automodDeny' | 'termAdd' | 'termRemove' | 'mode' | 'unbanRequest' | 'role' | 'warnAck'} ModActKind
  */
 
 export type ModActKind =
@@ -113,6 +113,8 @@ export type ModActKind =
   | 'termRemove'
   | 'mode'
   | 'unbanRequest'
+  | 'role'
+  | 'warnAck'
 
 /**
  * One line of the moderator actions window
@@ -269,6 +271,13 @@ export interface LiveEmotes {
  * @property {'compact' | 'normal' | 'airy'} density - Room around each line
  */
 
+/**
+ * Page of the phone Mod View
+ * @typedef {'settings' | 'team' | 'live' | 'feed'} MobilePageKey
+ */
+
+export type MobilePageKey = 'settings' | 'team' | 'live' | 'feed'
+
 export interface ModPreferences {
   timestamps: boolean
   badges: boolean
@@ -285,6 +294,10 @@ export interface ModPreferences {
   hideBots: boolean
   textSize: 'small' | 'normal' | 'large'
   density: 'compact' | 'normal' | 'airy'
+  // Stream above the chat on a phone
+  showStream: boolean
+  // Pages of the phone Mod View, left to right
+  pageOrder: MobilePageKey[]
 }
 
 /**

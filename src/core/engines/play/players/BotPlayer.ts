@@ -16,6 +16,21 @@ export const sharedBotView = (session: LoadedSession): Promise<unknown> =>
   engineOf(session.game).botView?.(toEngineSession(session)) ?? Promise.resolve(undefined)
 
 /**
+ * Board of each bot of a pass, read once when the game can
+ * @param {LoadedSession} session - Game
+ * @return {Promise<(botId: string) => unknown>} - Board of a bot, undefined to read its own
+ */
+
+export const botBoards = async (session: LoadedSession): Promise<(botId: string) => unknown> => {
+  const engine = engineOf(session.game)
+  const shared = await sharedBotView(session)
+  if (shared !== undefined || !engine.viewFor) return () => shared
+  const drawFor = await engine.viewFor(toEngineSession(session))
+
+  return (botId) => drawFor(botId)
+}
+
+/**
  * Next move of a bot, read from its own view
  * @param {LoadedSession} session - Game
  * @param {PlayPlayer} bot - Bot seat

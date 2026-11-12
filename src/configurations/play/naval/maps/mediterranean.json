@@ -1,0 +1,118 @@
+{
+  "fleet": "patrol",
+  "theatre": {
+    "size": 20,
+    "fleet": [5, 4, 3, 3, 2],
+    "reachScale": 1.5,
+    "ramp": {
+      "everyTurns": 1,
+      "step": 0.25,
+      "max": 6
+    }
+  },
+  "frame": {
+    "band": {
+      "north": 3,
+      "east": 4,
+      "south": 9,
+      "west": 7
+    }
+  },
+  "light": {
+    "sun": [0.35, 0.8],
+    "tint": "rgba(255,238,200,0.12)",
+    "shade": "rgba(20,40,70,0.3)"
+  },
+  "water": {
+    "deep": "#145f9e",
+    "mid": "#1f86c4",
+    "shallow": "#35b9c6",
+    "lagoon": "#7fe1d4",
+    "foam": "#fffaf0",
+    "sheen": "rgba(230,250,255,0.22)",
+    "grid": "rgba(255,255,255,0.26)"
+  },
+  "land": {
+    "whitewash": "#f8f3e9",
+    "whitewashShade": "#d9cdb6",
+    "tile": "#c9683f",
+    "tileDark": "#8f3f24",
+    "tileLight": "#e9946a",
+    "dome": "#5f9c8a",
+    "stone": "#d9c39a",
+    "stoneDark": "#a68d60",
+    "stoneLight": "#efe3c4",
+    "paving": "#dcc597",
+    "earth": "#c4a777",
+    "wood": "#9a6a3e",
+    "woodDark": "#5f3d22",
+    "plank": "#b98a58",
+    "iron": "#3d3a37",
+    "net": "#8a6a42",
+    "float": "#efc44d",
+    "amphora": "#bd6b3d",
+    "amphoraDark": "#4a2414",
+    "bloom": "#dc3b93",
+    "bloomViolet": "#9d4fd0",
+    "leaf": "#6c8c45",
+    "leafDark": "#3f5f2e",
+    "olive": "#93a477",
+    "cypress": "#2f4d31",
+    "shutter": "#2e72b8",
+    "boatBlue": "#2b78c2",
+    "boatYellow": "#f2c230",
+    "boatRed": "#d2453a",
+    "boatGreen": "#2f9a6a",
+    "boatWhite": "#f6f2ea",
+    "lamp": "#ffd98a",
+    "rock": "#cdbb98",
+    "rockDark": "#8f7c5c",
+    "rockLight": "#efe4c8"
+  },
+  "decor": [
+    {
+      "kind": "quay",
+      "side": "south",
+      "at": 0.5,
+      "depth": 0.2,
+      "scale": 1
+    },
+    {
+      "kind": "village",
+      "side": "south",
+      "at": 0.5,
+      "depth": 0.36,
+      "scale": 1
+    },
+    {
+      "kind": "beacon",
+      "side": "west",
+      "at": 0.6,
+      "depth": 0.36,
+      "scale": 1
+    },
+    {
+      "kind": "rocks",
+      "side": "east",
+      "at": 0.25,
+      "depth": 0.55,
+      "scale": 0.55
+    },
+    {
+      "kind": "rocks",
+      "side": "northwest",
+      "at": 0.5,
+      "depth": 0.6,
+      "scale": 0.5
+    }
+  ],
+  "life": {
+    "clouds": 2,
+    "birds": 4
+  },
+  "stage": 6,
+  "preview": {
+    "span": 29,
+    "focus": 0.4
+  }
+}

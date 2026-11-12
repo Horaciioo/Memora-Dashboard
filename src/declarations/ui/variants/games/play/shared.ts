@@ -25,5 +25,17 @@ export const SETUP_TILE =
 export const SETUP_BLUE =
   'border-[var(--play-baccalaureat)] bg-[var(--play-baccalaureat)] text-white hover:border-[var(--play-baccalaureat)]'
 
+export const SETUP_TEAL =
+  'border-[var(--play-echo)] bg-[var(--play-echo)] text-white hover:border-[var(--play-echo)]'
+
+export const SETUP_PINK =
+  'border-[var(--play-glitch)] bg-[var(--play-glitch)] text-white hover:border-[var(--play-glitch)]'
+
+export const SETUP_VIOLET =
+  'border-[var(--play-jumble)] bg-[var(--play-jumble)] text-white hover:border-[var(--play-jumble)]'
+
+export const SETUP_AMBER =
+  'border-[var(--play-croquis)] bg-[var(--play-croquis)] text-[var(--play-croquis-night)] hover:border-[var(--play-croquis)]'
+
 export const SETUP_FIRE =
   'border-[var(--play-bomb)] bg-[var(--play-bomb)] text-white hover:border-[var(--play-bomb)]'

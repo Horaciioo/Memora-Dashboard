@@ -8,6 +8,10 @@
 @import './tokens/vision.css';
 @import './tokens/play.css';
 @import './play/arcade.css';
+@import './play/croquis.css';
+@import './play/echo.css';
+@import './play/glitch.css';
+@import './play/jumble.css';
 @import './play/ludo.css';
 @import './play/naval.css';
 @import './play/golf.css';
@@ -24,6 +28,7 @@
 @import './shell/surfaces.css';
 @import './shell/switch.css';
 @import './shell/welcome.css';
+@import './shell/showcase.css';
 @import './motion/feedback.css';
 @import './motion/overlays.css';
 @import './motion/focus.css';

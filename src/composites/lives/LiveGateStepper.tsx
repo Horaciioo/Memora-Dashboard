@@ -45,7 +45,9 @@ export const LiveGateStepper = ({ steps, current, label }: LiveGateStepperProps)
               <span className={cn(LIVE_GATE.stepNumber, isDone && LIVE_GATE.stepNumberDone)}>
                 {isDone ? <Check className={LIVE_GATE.stepGlyph} aria-hidden="true" /> : index + 1}
               </span>
-              <span className={LIVE_GATE.stepName}>{name}</span>
+              <span className={cn(LIVE_GATE.stepName, index === current && LIVE_GATE.stepNameOn)}>
+                {name}
+              </span>
             </li>
           </Fragment>
         )

@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { decideBotMove, sharedBotView } from '@/core/engines/play/players/BotPlayer'
+import { botBoards, decideBotMove } from '@/core/engines/play/players/BotPlayer'
 import { playersOf } from '@/core/engines/play/players/PlayPlayer'
 import { areBotsAwake } from '@/declarations/play/bots'
 import { toAppError } from '@/core/lib/errors'
@@ -53,6 +53,24 @@ const tableOf = (sessionId: string): BotTable => {
 
   return table
 }
+
+/**
+ * Forget a table's planned moves, its timers already dropped
+ * @param {string} sessionId - Game
+ * @return {void}
+ */
+
+export const forgetBots = (sessionId: string): void => {
+  tables.delete(sessionId)
+}
+
+/**
+ * Table whose bots this process already drives
+ * @param {string} sessionId - Game
+ * @return {boolean} - Driven
+ */
+
+export const isDriven = (sessionId: string): boolean => tables.has(sessionId)
 
 /**
  * Play a planned move in turn
@@ -133,10 +151,13 @@ const drivePass = async (sessionId: string, act: BotAct): Promise<void> => {
   }
 
   const bots = playersOf(session).filter((player) => player.botKind)
-  if (!bots.length) return
-  const view = await sharedBotView(session)
+  if (!bots.length) {
+    tables.delete(sessionId)
+    return
+  }
+  const boardOf = await botBoards(session)
   // One after another, the pool stays free
-  for (const bot of bots) await driveBot(session, bot, { view, act })
+  for (const bot of bots) await driveBot(session, bot, { view: boardOf(bot.accountId), act })
 }
 
 /**

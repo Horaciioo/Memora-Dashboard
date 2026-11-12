@@ -1,13 +1,15 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
+import { useMobileMod, useMobileSlot } from '@/composites/modview/mobile/MobileContext'
 import { WindowControls, windowMenu } from '@/composites/modview/workspace/WindowControls'
 import { useWindowChrome } from '@/composites/modview/workspace/WindowChrome'
 import { useMenu } from '@/managers/front-end'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
-import { MODVIEW_WINDOW } from '@/declarations/ui/variants'
+import { MODVIEW_MOBILE, MODVIEW_WINDOW } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 export interface ModWindowProps {
@@ -47,6 +49,20 @@ export const ModWindow = ({
 }: ModWindowProps) => {
   const chrome = useWindowChrome()
   const { contextMenu } = useMenu()
+  const isMobile = useMobileMod()
+  const { slot, isActive } = useMobileSlot()
+
+  if (isMobile) {
+    return (
+      <section
+        aria-label={label ?? (typeof title === 'string' ? title : undefined)}
+        className={MODVIEW_MOBILE.window}
+      >
+        {actions && slot && isActive && createPortal(actions, slot)}
+        <div className={flush ? MODVIEW_WINDOW.flush : MODVIEW_WINDOW.body}>{children}</div>
+      </section>
+    )
+  }
 
   return (
     <section

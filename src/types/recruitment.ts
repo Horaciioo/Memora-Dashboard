@@ -346,51 +346,89 @@ export interface BanView {
 }
 
 /**
- * One passage of a person through a session
- * @typedef {Object} HistoryPassage
+ * One candidate inside a session of the history
+ * @typedef {Object} HistoryCandidate
  * @property {string} candidateId - Candidate row
- * @property {string} sessionId - Session identifier
- * @property {string} sessionName - Session name
- * @property {{ label: string, accent: string | null } | null} outcome - Issue of the passage
- * @property {string} at - ISO moment, interview else arrival
- * @property {RecruitmentRef[]} recruiters - Who led the interview
- */
-
-export interface HistoryPassage {
-  candidateId: string
-  sessionId: string
-  sessionName: string
-  outcome: { label: string; accent: string | null } | null
-  at: string
-  recruiters: RecruitmentRef[]
-}
-
-/**
- * One Discord identity and every session it went through
- * @typedef {Object} HistoryEntry
  * @property {string} discordId - Identity
  * @property {string} name - Last known name
  * @property {string | null} avatarUrl - Portrait
- * @property {HistoryPassage[]} passages - Sessions, newest first
- * @property {BanView | null} ban - Blacklist state
+ * @property {{ label: string, accent: string | null } | null} outcome - Issue of the passage
+ * @property {string} at - ISO moment, interview else arrival
+ * @property {RecruitmentRef[]} recruiters - Who led the interview
+ * @property {BanView | null} ban - Blacklist state of the identity
  */
 
-export interface HistoryEntry {
+export interface HistoryCandidate {
+  candidateId: string
   discordId: string
   name: string
   avatarUrl: string | null
-  passages: HistoryPassage[]
+  outcome: { label: string; accent: string | null } | null
+  at: string
+  recruiters: RecruitmentRef[]
   ban: BanView | null
+}
+
+/**
+ * One session of the history with the candidates that went through it
+ * @typedef {Object} HistorySession
+ * @property {string} id - Session identifier
+ * @property {string} name - Session name
+ * @property {RecruitmentStatusName} status - Phase in force
+ * @property {string} youtuber - Creator recruited for
+ * @property {string} createdAt - ISO creation moment
+ * @property {HistoryCandidate[]} candidates - Candidates matching the filters
+ */
+
+export interface HistorySession {
+  id: string
+  name: string
+  status: RecruitmentStatusName
+  youtuber: string
+  createdAt: string
+  candidates: HistoryCandidate[]
+}
+
+/**
+ * Values the history filters can take
+ * @typedef {Object} HistoryOptions
+ * @property {{ id: string, name: string }[]} outcomes - Issues a candidacy can reach
+ * @property {{ id: string, label: string }[]} recruiters - Moderators who led interviews
+ */
+
+export interface HistoryOptions {
+  outcomes: { id: string; name: string }[]
+  recruiters: { id: string; label: string }[]
+}
+
+/**
+ * Identity blacklisted whose candidacies are long purged
+ * @typedef {Object} HistoryOrphan
+ * @property {string} discordId - Identity
+ * @property {string} name - Last known name
+ * @property {string | null} avatarUrl - Portrait
+ * @property {BanView} ban - Blacklist state
+ */
+
+export interface HistoryOrphan {
+  discordId: string
+  name: string
+  avatarUrl: string | null
+  ban: BanView
 }
 
 /**
  * One page of the history
  * @typedef {Object} HistoryPage
- * @property {HistoryEntry[]} entries - Identities of the page
+ * @property {HistorySession[]} sessions - Sessions of the page, newest first
+ * @property {HistoryOrphan[]} orphans - Blacklisted identities without a kept candidacy
+ * @property {HistoryOptions} options - Filter values
  * @property {boolean} hasMore - Another page follows
  */
 
 export interface HistoryPage {
-  entries: HistoryEntry[]
+  sessions: HistorySession[]
+  orphans: HistoryOrphan[]
+  options: HistoryOptions
   hasMore: boolean
 }

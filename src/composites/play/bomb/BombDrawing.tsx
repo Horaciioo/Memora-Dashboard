@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import { useId, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import { BombBlast } from '@/composites/play/bomb/BombBlast'
@@ -12,6 +12,9 @@ import { cn } from '@/utils/classnames'
  */
 
 const stop = (token: string) => ({ style: { stopColor: `var(${token})` } })
+
+// Spark rest position at the cord tip
+const SPARK_HOME = { x: 168, y: 54 }
 
 // Heat from which the bomb trembles
 const TREMBLE_HEAT = 0.75
@@ -37,6 +40,16 @@ export const BombDrawing = ({ prompt, heat, isBlasting, className }: BombDrawing
   const shell = `${id}-shell`
   const cap = `${id}-cap`
   const glow = `${id}-glow`
+  const cord = useRef<SVGPathElement>(null)
+  const [tip, setTip] = useState({ x: 0, y: 0 })
+
+  // Spark rides the burning end of the cord
+  useLayoutEffect(() => {
+    const path = cord.current
+    if (!path) return
+    const point = path.getPointAtLength(path.getTotalLength() * (1 - heat))
+    setTip({ x: point.x - SPARK_HOME.x, y: point.y - SPARK_HOME.y - 2 })
+  }, [heat])
 
   return (
     <div
@@ -69,12 +82,14 @@ export const BombDrawing = ({ prompt, heat, isBlasting, className }: BombDrawing
 
         {/* Cord curling out of the cap */}
         <path
+          ref={cord}
+          pathLength={100}
           d="M132 52c6-14 18-22 30-18s14 16 6 22"
           fill="none"
           stroke="var(--play-bomb-cord)"
           strokeWidth="5"
           strokeLinecap="round"
-          strokeDasharray="7 4"
+          strokeDasharray={`${Math.max((1 - heat) * 100, 0.01)} 100`}
         />
 
         {/* Cap */}
@@ -106,10 +121,12 @@ export const BombDrawing = ({ prompt, heat, isBlasting, className }: BombDrawing
         />
 
         {/* Spark at the cord tip */}
-        <g className={BOMB_BOARD.sparkGrow}>
-          <g className={BOMB_BOARD.spark}>
-            <circle cx="168" cy="54" r="16" fill={`url(#${glow})`} />
-            <path d="m168 40 3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="var(--play-bomb-glow)" />
+        <g transform={`translate(${tip.x} ${tip.y})`}>
+          <g className={BOMB_BOARD.sparkGrow}>
+            <g className={BOMB_BOARD.spark}>
+              <circle cx="168" cy="54" r="16" fill={`url(#${glow})`} />
+              <path d="m168 40 3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="var(--play-bomb-glow)" />
+            </g>
           </g>
         </g>
       </svg>

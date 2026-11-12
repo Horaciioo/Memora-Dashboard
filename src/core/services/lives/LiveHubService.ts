@@ -1,3 +1,4 @@
+import { readTwitchBanners } from '@/core/services/platforms/TwitchBannerService'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
@@ -95,6 +96,7 @@ export const readLiveHub = async (
     orderBy: { position: 'asc' },
   })
 
+  const banners = await readTwitchBanners(creators.map((creator) => creator.id))
   const now = Date.now()
   const split = new Date(now - LIVE_HUB.periodDays * DAY_MS)
   const start = new Date(now - 2 * LIVE_HUB.periodDays * DAY_MS)
@@ -118,7 +120,7 @@ export const readLiveHub = async (
         name: creator.name,
         avatarUrl: creator.avatarUrl,
         accent: creator.accent,
-        banner: creator.fadeBannerUrl ?? creator.bannerUrl,
+        banner: banners.get(creator.id) ?? creator.fadeBannerUrl ?? creator.bannerUrl,
         figures: keys.map((key, index) => ({
           key,
           value: latest[index],

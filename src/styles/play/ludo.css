@@ -24,6 +24,14 @@
     0 1.4rem 2.8rem rgb(0 0 0 / 0.4);
 }
 
+/* Phones: the board runs edge to edge, square and flat */
+@media (max-width: 1023px) {
+  .ludo-frame {
+    border-radius: 0;
+    padding: 1.5%;
+  }
+}
+
 .ludo-board {
   position: relative;
   aspect-ratio: 1;
@@ -285,8 +293,8 @@
 }
 
 .ludo-star-shape-lit {
-  scale: 1.6;
-  filter: drop-shadow(0 0 0.09px var(--play-ludo-gold-deep));
+  scale: 1.55;
+  filter: drop-shadow(0 0 0.12px var(--play-ludo-gold-deep));
 }
 
 /* Way of the pawn under the pointer: a dot on each square, a ghost pawn where it lands */
@@ -414,13 +422,9 @@
 }
 
 /* Player on turn: lifted, in their colour, the others stay quiet */
+/* No scale or shift, the plate never moves */
 .ludo-plate-turn {
-  scale: 1.04;
-  transform-origin: top left;
-}
-
-.ludo-plate-turn.ludo-plate-right {
-  transform-origin: top right;
+  position: relative;
 }
 
 .ludo-turn-tag {
@@ -432,6 +436,7 @@
   background: var(--pawn-tone);
   color: var(--play-ludo-felt);
   font-size: 0.75rem;
+  line-height: 1;
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;

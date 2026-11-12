@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { readPageContext } from '@/core/lib/assistant/context'
+import { isNexusInput } from '@/core/lib/nexus/intercept'
 import { parseCommand } from '@/core/lib/assistant/parse'
 import { resolveAbsence } from '@/core/services/assistant/absences'
 import { resolveLive } from '@/core/services/assistant/lives'
@@ -38,6 +39,9 @@ export const interpret = async (
   request: AssistantRequest,
   context: Omit<ResolverContext, 'parsed' | 'request' | 'page'>
 ): Promise<AssistantProposal> => {
+  // The console has its own door only
+  if (isNexusInput(request.text)) return notUnderstood()
+
   // Today in the member zone
   const today = instantToWall(new Date()).slice(0, 10)
   const parsed = parseCommand(request.text, today)

@@ -95,6 +95,10 @@ export const PLAY_INVITE_GAMES: Record<PlayGameName, { play: string; watch: stri
   [PlayGames.Baccalaureat]: { play: 'au Baccalauréat', watch: 'de Baccalauréat' },
   [PlayGames.Golf]: { play: 'au Golf', watch: 'de Golf' },
   [PlayGames.Bomb]: { play: 'à Bomb Party', watch: 'de Bomb Party' },
+  [PlayGames.Echo]: { play: 'à Écho', watch: 'd’Écho' },
+  [PlayGames.Jumble]: { play: 'au Jumble', watch: 'de Jumble' },
+  [PlayGames.Croquis]: { play: 'à Croquis', watch: 'de Croquis' },
+  [PlayGames.Glitch]: { play: 'à Glitch', watch: 'de Glitch' },
   [PlayGames.Ludo]: { play: 'au Ludo', watch: 'de Ludo' },
   [PlayGames.Naval]: { play: 'à la Bataille navale', watch: 'de Bataille navale' },
 }

@@ -1,9 +1,16 @@
 /**
  * Guided talks Memora can lead
- * @type {'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity'}
+ * @type {'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity' | 'live'}
  */
 
-export type ScenarioId = 'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity'
+export type ScenarioId =
+  | 'absence'
+  | 'recruitment'
+  | 'candidate'
+  | 'task'
+  | 'junior'
+  | 'identity'
+  | 'live'
 
 /**
  * One answer Memora offers
