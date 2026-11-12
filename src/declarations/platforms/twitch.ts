@@ -1,18 +1,9 @@
 import { readSecret } from '@/declarations/platforms/credentials'
-import { APP_ENVIRONMENT } from '@/declarations/system/environments'
-
-// Fake Twitch, dev only
-const MOCK_ORIGIN =
-  APP_ENVIRONMENT === 'dev' ? readSecret(process.env.TWITCH_MOCK_URL)?.replace(/\/+$/, '') : null
-
-// Path the app serves the fake consent page on, forwarded to the fake Twitch
-export const TWITCH_MOCK_PATH = '/faux-twitch'
-export const TWITCH_MOCK_ORIGIN = MOCK_ORIGIN ?? null
 
 // Server side origins
-const ID_ORIGIN = MOCK_ORIGIN ?? 'https://id.twitch.tv'
-const API_ORIGIN = MOCK_ORIGIN ?? 'https://api.twitch.tv'
-const EVENTSUB_ORIGIN = MOCK_ORIGIN?.replace(/^http/, 'ws') ?? 'wss://eventsub.wss.twitch.tv'
+const ID_ORIGIN = 'https://id.twitch.tv'
+const API_ORIGIN = 'https://api.twitch.tv'
+const EVENTSUB_ORIGIN = 'wss://eventsub.wss.twitch.tv'
 
 /**
  * Twitch endpoints

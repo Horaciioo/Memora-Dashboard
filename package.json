@@ -29,8 +29,6 @@
     "fixtures:seed": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./src/fixtures/loader.mjs src/fixtures/seed-demo.ts",
     "fixtures:qa": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./src/fixtures/loader.mjs src/fixtures/qa.ts",
     "fixtures:clear": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./src/fixtures/loader.mjs src/fixtures/teardown.ts",
-    "live:fake": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./src/fixtures/loader.mjs src/scripts/fake-live/index.ts",
-    "live:fake:clear": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./src/fixtures/loader.mjs src/scripts/fake-live/index.ts --nettoyer",
     "db:verify-backup": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file=.env src/scripts/verify-backup.ts",
     "test": "vitest run",
     "test:watch": "vitest"
