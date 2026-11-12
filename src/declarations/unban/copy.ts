@@ -93,3 +93,18 @@ export const UNBAN_FORM_COPY = {
   noDraft: 'Il n’y a pas de brouillon.',
   unknownAnswer: 'Cette réponse ne correspond à aucune question.',
 } as const
+
+/**
+ * Reasons a link action is refused
+ * @type {Record<string, string>}
+ */
+
+export const UNBAN_ERRORS = {
+  intakeClosed: 'Les demandes publiques sont fermées pour le moment.',
+  badExpiry: 'Cette durée de validité n’est pas proposée.',
+  badDiscordId: 'Cet identifiant Discord est incorrect.',
+  labelTooLong: 'Cette note est trop longue.',
+  linkUsed: 'Ce lien a déjà servi, son dossier garde son lien.',
+  linkRevoked: 'Ce lien est révoqué, génère-en un nouveau.',
+  badPage: 'Cette page n’existe pas.',
+} as const

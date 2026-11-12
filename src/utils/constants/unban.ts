@@ -42,3 +42,30 @@ export const UnbanQuestionTypes = {
 } as const
 
 export type UnbanQuestionTypeName = (typeof UnbanQuestionTypes)[keyof typeof UnbanQuestionTypes]
+
+/**
+ * Feature switch that opens the public side of Déban.
+ * @type {string}
+ */
+
+export const UNBAN_INTAKE_FEATURE = 'unban.intake'
+
+/**
+ * Shape of the secrets a link and a request are made of
+ * @type {Record<string, number | string>}
+ */
+
+export const UNBAN_TOKEN = {
+  // 256 bits of entropy
+  bytes: 32,
+  // Characters of 32 bytes in base64url
+  length: 43,
+  referencePrefix: 'DB-',
+  referenceLength: 5,
+  // No 0, O, 1 or I
+  referenceAlphabet: '23456789ABCDEFGHJKLMNPQRSTUVWXYZ',
+  referenceAttempts: 5,
+} as const
+
+// Longest note a moderator attaches to a link
+export const UNBAN_LABEL_MAX_LENGTH = 80

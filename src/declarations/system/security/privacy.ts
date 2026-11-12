@@ -48,6 +48,8 @@ export const RETENTION_POLICIES = {
   chatMessages: RETENTION_SETTINGS.chatMessageDays,
   rejectedCandidates: RETENTION_SETTINGS.rejectedCandidateDays,
   bannedCandidates: RETENTION_SETTINGS.bannedCandidateDays,
+  unbanDecided: RETENTION_SETTINGS.unbanDecidedDays,
+  unbanUnusedLinks: RETENTION_SETTINGS.unbanUnusedLinkDays,
 }
 
 /**
