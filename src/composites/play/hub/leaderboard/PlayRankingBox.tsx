@@ -26,7 +26,7 @@ export const PlayRankingBox = ({ games, game, leaders, meId }: PlayRankingBoxPro
   const router = useRouter()
 
   return (
-    <section className={PLAY_BOX.root}>
+    <section className={PLAY_BOX.flat}>
       <SelectMenu
         isPlay
         label={PLAY_MOBILE_COPY.rankingGame}

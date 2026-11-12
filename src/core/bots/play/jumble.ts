@@ -29,10 +29,10 @@ export const JUMBLE_BOT: PlayBotStrategy = {
     const word = wordOfLetters(board.scrambled)
     if (!word) return null
 
-    // Longer words take longer to read, a five letter word sets the base
+    // Longer words take longer to read, a word of the pace length sets the base
     const { min, max } = PLAY_BOT_SETTINGS.jumble.thinkMs
     const reach = seeded(`${botId}:${turn}:pace`)
-    const size = board.length / JUMBLE_SETTINGS.lengths.min
+    const size = board.length / JUMBLE_SETTINGS.paceLength
 
     return {
       key: `guess:${turn}`,

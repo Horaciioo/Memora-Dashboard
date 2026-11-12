@@ -31,7 +31,7 @@ export const ECHO_SETTINGS = {
   }),
   // Prime order of the deck, symbols per card minus one
   order: readInteger(echo.order, { path: 'play/echo.order', fallback: 5, min: 2 }),
-  rounds: readRange(echo.rounds, 'play/echo.rounds', { initial: 12, min: 3, max: 30 }),
+  rounds: readRange(echo.rounds, 'play/echo.rounds', { initial: 5, min: 3, max: 30 }),
   roundSeconds: readRange(echo.roundSeconds, 'play/echo.roundSeconds', {
     initial: 15,
     min: 8,

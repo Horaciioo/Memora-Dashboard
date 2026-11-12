@@ -7,12 +7,14 @@ import type { PlayDockProps } from '@/composites/play/dock/PlayDock'
 
 import { PlayRoomBanner } from '@/composites/play/brand/PlayRoomBanner'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
+import { PlayTrophyNotice } from '@/composites/play/hub/notices/PlayTrophyNotice'
 import { PlayReward } from '@/composites/play/hub/notices/PlayReward'
 import { PlayMeSidebar } from '@/composites/play/me/PlayMeSidebar'
 import { PlayOnlineProvider } from '@/composites/play/mobile/PlayOnline'
 import { PlaySlide } from '@/composites/play/mobile/PlaySlide'
 import { PlayTabBar } from '@/composites/play/mobile/PlayTabBar'
 import { PlayInviteHost } from '@/composites/play/invites/PlayInviteHost'
+import type { TrophyNotice } from '@/core/services/play'
 import { usePlayMotionStore } from '@/core/store/play/playMotion'
 import { usePlayReward } from '@/core/hooks/data/play/usePlayReward'
 import { useBareShell } from '@/core/hooks/interaction/layout/useBareShell'
@@ -25,10 +27,19 @@ import { PLAY_SHELL } from '@/declarations/ui/variants'
  * @param {Object} props - Room
  * @param {ReactNode} props.children - Play page
  * @param {PlayDockProps} props.dock - Bottom dock data
+ * @param {TrophyNotice | null} props.trophyNotice - Trophy back payment to read
  * @return {JSX.Element}
  */
 
-export const PlayShell = ({ children, dock }: { children: ReactNode; dock: PlayDockProps }) => {
+export const PlayShell = ({
+  children,
+  dock,
+  trophyNotice,
+}: {
+  children: ReactNode
+  dock: PlayDockProps
+  trophyNotice: TrophyNotice | null
+}) => {
   useBareShell(true)
   const reward = usePlayReward(dock.profile)
   const isHub = usePathname() === ROUTES.play
@@ -55,6 +66,7 @@ export const PlayShell = ({ children, dock }: { children: ReactNode; dock: PlayD
         <PlaySignal topic={PLAY_TOPICS.groups} />
         <PlayTabBar invites={dock.invites} presence={dock.presence} groupCalls={dock.groupCalls} />
         <PlayReward reward={reward} />
+        <PlayTrophyNotice notice={trophyNotice} />
         <PlayInviteHost isPlay />
       </div>
     </PlayOnlineProvider>

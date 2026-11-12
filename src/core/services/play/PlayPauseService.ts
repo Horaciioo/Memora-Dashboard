@@ -48,6 +48,13 @@ const SHIFTERS: Record<
         "hintAt" = "hintAt" + (${s}::float8 * interval '1 second'),
         "revealUntil" = "revealUntil" + (${s}::float8 * interval '1 second')
     WHERE "sessionId" = ${id}`,
+  SUSPENS: (tx, id, s) => tx.$executeRaw`
+    UPDATE play_suspens_games
+    SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),
+        "pickEndsAt" = "pickEndsAt" + (${s}::float8 * interval '1 second'),
+        "turnEndsAt" = "turnEndsAt" + (${s}::float8 * interval '1 second'),
+        "revealUntil" = "revealUntil" + (${s}::float8 * interval '1 second')
+    WHERE "sessionId" = ${id}`,
   ECHO: (tx, id, s) => tx.$executeRaw`
     UPDATE play_echo_games
     SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),

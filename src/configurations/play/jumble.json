@@ -6,7 +6,15 @@
   "roundSeconds": { "default": 25, "min": 10, "max": 60 },
   "revealSeconds": 3,
   "hintRatio": 0.5,
-  "lengths": { "min": 5, "max": 12 },
+  "lengths": { "min": 3, "max": 12 },
+  "paceLength": 5,
+  "difficulty": "easy",
+  "difficulties": {
+    "easy": { "min": 3, "max": 6 },
+    "medium": { "min": 4, "max": 7 },
+    "hard": { "min": 5, "max": 10 },
+    "extreme": { "min": 7, "max": 12 }
+  },
   "scoring": {
     "base": 10,
     "speedBonus": 10,

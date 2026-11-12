@@ -1,4 +1,5 @@
 import type { LudoCornerName } from '@/declarations/play/ludo/board'
+import type { LudoEffectName } from '@/declarations/play/ludo/chaos'
 
 /**
  * Copy of the Ludo table
@@ -12,6 +13,7 @@ export const LUDO_BOARD_COPY = {
   yourMove: 'Touche un pion qui rebondit pour le jouer',
   yourTurn: 'À toi de jouer !',
   turnMine: 'Ton tour',
+  homeCount: 'Pions rentrés',
   turnTheirs: 'Son tour',
   eaten: 'Mangé !',
   eating: '{name} a mangé un pion de {victim}',
@@ -57,6 +59,8 @@ export const LUDO_FEED_COPY = {
   SKIP: 'a *laissé filer* le temps',
   PENALTY: 'a *fait* trois six de suite',
   FINISH: 'a *fini* {place}',
+  EFFECT: 'a déclenché *{effect}*',
+  JOKER: 'a joué son *Joker* contre {effect}',
 } as const
 
 /**
@@ -67,7 +71,6 @@ export const LUDO_FEED_COPY = {
 export const LUDO_SETUP_COPY = {
   title: 'Nouvelle partie de Ludo',
   tabs: 'Réglages de la partie',
-  tabGame: 'Partie',
   tabRules: 'Règles',
   pawns: 'Pions par joueur',
   pawnsHint: 'Moins de pions, une partie plus courte.',
@@ -116,6 +119,10 @@ export const LUDO_RULE_COPY = {
   safeSquares: {
     label: 'Cases protégées',
     hint: 'Personne ne se fait manger sur une étoile ni sur une case de départ, et une case protégée déjà occupée est fermée aux autres pions.',
+  },
+  chaos: {
+    label: 'Chaos Jubilatoire',
+    hint: 'Des cases action cachent des bonus et des malus. Chaque joueur garde un Joker pour éviter un malus.',
   },
 } as const
 
@@ -166,3 +173,76 @@ export const LUDO_FELT = {
 
 export const ludoPlaceLabel = (place: number): string =>
   place === 1 ? LUDO_BOARD_COPY.firstPlace : LUDO_BOARD_COPY.place.replace('{place}', String(place))
+
+/**
+ * Name and rule of each Chaos effect
+ * @type {Record<LudoEffectName, { name: string, text: string }>}
+ */
+
+export const LUDO_CHAOS_COPY: Record<LudoEffectName, { name: string; text: string }> = {
+  // Bonuses
+  ghost: {
+    name: 'Pion fantôme',
+    text: 'Ton pion se dédouble pendant {turns} tours. Toi seul sais lequel est le vrai.',
+  },
+  double: {
+    name: 'Double lancer',
+    text: 'Au prochain tour, tu lances deux dés et tu gardes celui que tu veux.',
+  },
+  boost: {
+    name: 'Accélération',
+    text: 'Ton prochain lancer ne peut pas être inférieur à {min}.',
+  },
+  chameleon: {
+    name: 'Caméléon',
+    text: 'Pendant {turns} tours, tu prends la couleur d’un autre. Personne ne sait qui est qui.',
+  },
+
+  // Maluses
+  duel: {
+    name: 'Duel de dés',
+    text: 'Tout le monde lance un dé. Le plus haut te fait reculer.',
+  },
+  faulty: {
+    name: 'Dé défectueux',
+    text: 'Pendant {turns} tours, ton dé reste entre 1 et {max}.',
+  },
+  stall: {
+    name: 'Panne de dé',
+    text: 'Tu ne peux pas jouer pendant le prochain tour.',
+  },
+  blind: {
+    name: 'À l’aveuglette',
+    text: 'Pendant {turns} tours, tu ne vois plus jusqu’où ton pion ira.',
+  },
+}
+
+/**
+ * Chaos table words: joker, answers and tags
+ * @type {Record<string, string>}
+ */
+
+export const LUDO_CHAOS_UI = {
+  joker: 'Joker',
+  jokerCount: 'Jokers',
+  offerLead: 'Un malus arrive',
+  play: 'Touche la carte pour jouer ton Joker',
+  endure: 'Subir le malus',
+  saved: 'Malus évité',
+  yourDie: 'Ton pion',
+  pickLead: 'Choisis ton dé',
+  pickDie: 'Garder ce dé',
+  stalled: '{name} passe son tour',
+  duelWin: '{name} gagne le duel',
+  duelRoll: 'Lance ton dé pour le duel',
+  duelOthers: 'Les autres lancent leur dé',
+  duelTheirs: 'Le duel attend les dés',
+  duelDraw: 'Égalité, personne ne recule',
+  recoil: '{name} recule de {steps}',
+  bonus: 'Bonus',
+  malus: 'Malus',
+  expired: 'Effet terminé',
+  blind: '?',
+  theirOffer: '{name} peut jouer son Joker',
+  theirPick: '{name} choisit un dé',
+} as const

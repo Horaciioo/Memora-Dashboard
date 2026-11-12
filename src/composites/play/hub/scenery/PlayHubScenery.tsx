@@ -7,7 +7,7 @@ const RAYS = Array.from({ length: 18 }, (_, index) => index * 20)
 
 export interface PlayHubSceneryProps {
   // Set key, also the tone suffix
-  set: 'echo' | 'croquis' | 'glitch' | 'jumble'
+  set: 'echo' | 'croquis' | 'glitch' | 'jumble' | 'suspens'
 }
 
 /**

@@ -7,9 +7,11 @@ import { PLAY_PANEL } from '@/declarations/ui/variants/games/play'
 
 export const PLAY_BOX = {
   stack: 'mx-auto flex w-full max-w-2xl flex-col gap-4',
-  groupStack: 'mx-auto flex w-full max-w-5xl flex-col gap-4',
-  groupGrid: 'grid w-full grid-cols-1 gap-4 md:grid-cols-2',
+  groupStack: 'mx-auto flex w-full max-w-2xl flex-col gap-4',
+  groupGrid: 'grid w-full grid-cols-1 gap-3',
   root: `${PLAY_PANEL} flex flex-col gap-4 p-4 shadow-[var(--shadow-sm)] sm:p-5`,
+  // Content already inside a scroll box
+  flat: 'flex flex-col gap-4',
   // Dashed box that opens another one
   add: 'w-full',
   addIcon: 'size-5',

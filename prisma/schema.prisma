@@ -406,6 +406,7 @@ model Account {
   playSeats             PlaySeat[]
   playStats             PlayGameStat[]
   playProfile           PlayProfile?
+  playTrophyWins        PlayTrophyWin[]
   baccalaureatAnswers   BaccalaureatAnswer[]
   baccalaureatVotes     BaccalaureatVote[]
   bombPlayers           BombPlayer[]
@@ -415,6 +416,8 @@ model Account {
   glitchProgress        GlitchProgress[]
   croquisRounds         CroquisRound[]
   croquisGuesses        CroquisGuess[]
+  suspensMoves          SuspensMove[]
+  suspensRounds         SuspensRound[]
   golfPlayers           GolfPlayer[]
   golfMoves             GolfMove[]
   ludoPlayers           LudoPlayer[]
@@ -2986,6 +2989,7 @@ enum PlayGame {
   ECHO
   GLITCH
   CROQUIS
+  SUSPENS
 }
 
 // Play bot level
@@ -3076,6 +3080,9 @@ model PlaySession {
   croquisGame    CroquisGame?
   croquisRounds  CroquisRound[]
   croquisGuesses CroquisGuess[]
+  suspensGame    SuspensGame?
+  suspensMoves   SuspensMove[]
+  suspensRounds  SuspensRound[]
   golfGame       GolfGame?
   golfPlayers    GolfPlayer[]
   golfMoves      GolfMove[]
@@ -3238,19 +3245,39 @@ model PlayGameStat {
 
 // Global side of a player, outside any game
 model PlayProfile {
-  accountId  String    @id
+  accountId         String    @id
   // XP given on the global line alone
-  bonusXp    Int       @default(0)
-  bannedAt   DateTime?
-  banReason  String?
+  bonusXp           Int       @default(0)
+  bannedAt          DateTime?
+  banReason         String?
   // Last time the member left Play, for "recently online"
-  lastSeenAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  lastSeenAt        DateTime?
+  // Trophies already won were paid once, null until then
+  trophiesClaimedAt DateTime?
+  // Box announcing the back payment still to read
+  trophyNotice      Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("play_profiles")
+}
+
+// Trophy won once, its XP is the level it completed
+model PlayTrophyWin {
+  accountId String
+  // Key of the trophy declared in code
+  trophy    String
+  xp        Int
+  // Paid at once for a trophy reached before they paid
+  backfill  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([accountId, trophy])
+  @@map("play_trophy_wins")
 }
 
 // One letter of a Baccalaureat game, its phases read from the dates
@@ -3467,6 +3494,8 @@ model LudoGame {
   turnEndsAt DateTime
   // Bumped on every move, the newest board wins
   rev        Int      @default(0)
+  // Chaos choice the turn waits on: a joker offer or a die to keep
+  pending    Json?
   updatedAt  DateTime @updatedAt
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -3485,6 +3514,10 @@ model LudoPlayer {
   pawns      Int[]
   finishedAt DateTime?
   place      Int?
+  // Jokers left in Chaos mode
+  joker      Int       @default(0)
+  // Chaos effects at work on this colour
+  effects    Json      @default("{}")
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
@@ -3502,6 +3535,17 @@ enum LudoMoveKind {
   SKIP
   PENALTY
   FINISH
+  EFFECT
+  OFFER
+  JOKER
+  DOUBLE
+  PICK
+  SPLIT
+  FADE
+  EXPIRE
+  DUEL
+  RECOIL
+  STALL
 }
 
 // One roll, one pawn moved or one pawn sent back
@@ -3518,6 +3562,10 @@ model LudoMove {
   to        Int?
   // Player whose pawn was taken
   victimId  String?
+  // Chaos effect the line is about
+  effect    String?
+  // Effect detail: a colour, a distance
+  value     Int?
   createdAt DateTime     @default(now())
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -4278,4 +4326,85 @@ model CroquisGuess {
   @@unique([sessionId, round, accountId])
   @@index([sessionId, round])
   @@map("play_croquis_guesses")
+}
+
+// Suspens table: the secret word, the letters tried and the clocks of the round
+model SuspensGame {
+  sessionId   String    @id
+  // Round in play, from one
+  round       Int
+  // Rounds of the whole game, one per setter and per lap
+  rounds      Int
+  // Setters in turn, drawn at the start, also the order of the guessers
+  order       Json
+  setterId    String
+  // Comparable word and its written form, empty while the setter chooses, kept back until the reveal
+  word        String?
+  display     String?
+  // Letters tried so far, capitals
+  tried       String[]
+  // Wrong letters, wrong words and missed turns
+  errors      Int       @default(0)
+  // Moves played on the round, tells two turns apart
+  turnNo      Int       @default(0)
+  // Guesser on turn
+  turnId      String?
+  startsAt    DateTime
+  // The setter has until then to choose
+  pickEndsAt  DateTime
+  turnEndsAt  DateTime?
+  // Reveal over, the next round opens
+  revealUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_suspens_games")
+}
+
+// Round of a Suspens game once over
+model SuspensRound {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  setterId  String
+  word      String
+  // Errors made on the round
+  errors    Int      @default(0)
+  // Word completed, else the figure was hanged
+  isSolved  Boolean  @default(false)
+  // Guesser who completed the word
+  solverId  String?
+  // Points the setter earned
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  setter  Account     @relation(fields: [setterId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round])
+  @@map("play_suspens_rounds")
+}
+
+// Letter, word or missed turn of a guesser
+model SuspensMove {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  accountId String
+  // LETTER, WORD or TIMEOUT
+  kind      String
+  // Letter or word tried, comparable form
+  value     String?
+  isHit     Boolean  @default(false)
+  // Cells uncovered by the move
+  cells     Int      @default(0)
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, round])
+  @@map("play_suspens_moves")
 }

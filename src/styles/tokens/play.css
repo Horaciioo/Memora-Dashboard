@@ -207,6 +207,19 @@
   --play-bomb-cap: #6d6578;
   --play-bomb-cap-deep: #34303d;
   --play-bomb-cord: #d8b77a;
+  --play-suspens: #a8702f;
+  --play-suspens-deep: #5e3a17;
+  --play-suspens-glow: #f5e1c4;
+  --play-suspens-night: #1a0f06;
+  --play-suspens-dusk: #3b2410;
+  /* Suspens gallows, rope and keys */
+  --suspens-wood: #b98650;
+  --suspens-rope: #e9d3a3;
+  --suspens-chalk: #fff6e3;
+  --suspens-hit: #3fae5a;
+  --suspens-miss: #e5483f;
+  --suspens-key: #f3e4c9;
+  --suspens-key-ink: #3a2410;
   --play-croquis: #f0a30a;
   --play-croquis-deep: #8a5600;
   --play-croquis-glow: #ffe9b0;
@@ -341,6 +354,15 @@
   --play-ludo-online: #5ad15a;
   --play-ludo-away: #8a8f98;
   --play-ludo-crown: #f5a524;
+  /* Chaos mode: bonus violet, malus pink, dark glass cards */
+  --play-ludo-bonus: #a58bff;
+  --play-ludo-bonus-deep: #5a3fd0;
+  --play-ludo-malus: #ff6b9a;
+  --play-ludo-malus-deep: #b01e56;
+  --play-ludo-malus-mark: #e5304a;
+  --play-ludo-danger: #ff5a5f;
+  --play-ludo-card: #22222b;
+  --play-ludo-card-line: #3b3b4a;
   --play-mystery: #3b2f7a;
   --play-mystery-deep: #17112f;
   --play-mystery-glow: #8b7fd6;

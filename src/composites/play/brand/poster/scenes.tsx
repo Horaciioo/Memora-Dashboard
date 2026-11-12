@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { NEW_MARKS } from '@/composites/play/brand/logo/marks'
 import { Sheen, Sparks, tint } from '@/composites/play/brand/poster/stage'
 
 // Five on a die, cell units
@@ -137,70 +138,27 @@ export const SCENES: Record<string, (tone: string) => ReactNode> = {
       <Sparks />
     </>
   ),
-  cards: (tone) => (
+  cards: () => (
     <>
-      <circle cx="74" cy="-74" r="64" {...tint('--echo-card-edge')} />
-      <circle cx="74" cy="-74" r="56" {...tint('--echo-card')} />
-      <circle cx="96" cy="-90" r="16" {...tint('--echo-pink')} />
-      <circle r="112" {...tint('--echo-card-edge')} />
-      <circle r="102" {...tint('--echo-card')} />
-      <circle cx="-38" cy="-34" r="26" {...tint('--play-gold')} />
-      <circle cx="34" cy="20" r="40" {...tint(tone)} />
-      <circle cx="-34" cy="44" r="16" {...tint('--echo-pink')} />
-      <path d="M22 -66l14 24h-28z" {...tint('--echo-red')} />
-      <Sheen radius={112} />
+      <g transform="translate(-122 -128) scale(3.8)">{NEW_MARKS.playEcho}</g>
       <Sparks />
     </>
   ),
-  sketch: (tone) => (
+  gallows: () => (
     <>
-      <g transform="rotate(-8)">
-        <rect x="-118" y="-96" width="236" height="192" rx="18" {...tint('--croquis-paper')} />
-        <path
-          d="M-90 50c26-64 52-64 78 0s52 36 70-26 34-44 52-8"
-          fill="none"
-          strokeWidth="12"
-          strokeLinecap="round"
-          style={{ stroke: 'var(--croquis-blue)' }}
-        />
-        <circle cx="-50" cy="-40" r="24" {...tint('--croquis-yellow')} />
-        <path
-          d="M50 -50l22 40h-44z"
-          fill="none"
-          strokeWidth="9"
-          strokeLinejoin="round"
-          style={{ stroke: 'var(--croquis-red)' }}
-        />
-      </g>
-      <g transform="translate(74 -150) rotate(32)">
-        <rect width="30" height="140" rx="6" {...tint(tone)} />
-        <rect width="10" height="140" rx="5" fill="white" opacity="0.3" />
-        <path d="M0 140h30l-15 36z" {...tint('--croquis-paper')} />
-        <path d="M9 162h12l-6 14z" {...tint('--croquis-black')} />
-        <rect width="30" height="20" rx="6" {...tint('--play-gold')} />
-      </g>
+      <g transform="translate(-122 -128) scale(3.8)">{NEW_MARKS.playSuspens}</g>
       <Sparks />
     </>
   ),
-  twins: (tone) => (
+  sketch: () => (
     <>
-      <g transform="rotate(42)">
-        <rect x="88" y="-16" width="96" height="32" rx="14" {...tint('--play-night')} />
-        <rect x="96" y="-14" width="80" height="8" rx="4" fill="white" opacity="0.2" />
-      </g>
-      <circle r="104" {...tint('--play-night')} />
-      <circle r="84" {...tint('--glitch-paper')} />
-      <circle cx="-28" cy="-20" r="24" {...tint('--glitch-c3')} />
-      <path d="M8 34l30-52 30 52z" {...tint('--glitch-c1')} />
-      <rect x="-44" y="22" width="34" height="34" rx="8" {...tint(`${tone}-deep`)} />
-      <circle
-        r="84"
-        fill="none"
-        strokeWidth="6"
-        opacity="0.5"
-        style={{ stroke: `var(${tone}-glow)` }}
-      />
-      <Sheen radius={104} />
+      <g transform="translate(-122 -128) scale(3.8)">{NEW_MARKS.playCroquis}</g>
+      <Sparks />
+    </>
+  ),
+  twins: () => (
+    <>
+      <g transform="translate(-122 -128) scale(3.8)">{NEW_MARKS.playGlitch}</g>
       <Sparks />
     </>
   ),

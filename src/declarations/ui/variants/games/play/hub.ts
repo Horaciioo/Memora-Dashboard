@@ -1,6 +1,12 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 import { BOTTOM_SHEET } from '@/declarations/ui/variants/surfaces'
-import { HEADING, LIFT, NOTE, PANEL } from '@/declarations/ui/variants/games/play/shared'
+import {
+  HEADING,
+  LIFT,
+  NOTE,
+  PANEL,
+  PLAY_GOLD_TILE,
+} from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Play blocks of a moderator file
@@ -167,6 +173,8 @@ export const PLAY_HUB = {
   ember: 'play-ember',
   // Scribbles rising like bubbles
   croquisFloat: 'play-croquis-float',
+  // Chalk letters rising like bubbles
+  suspensFloat: 'play-suspens-float',
   // Symbols rising like bubbles
   echoFloat: 'play-echo-float',
   // Shapes and figures rising like bubbles
@@ -260,14 +268,15 @@ export const PLAY_STATS = {
   gameHead: 'flex items-baseline justify-between gap-2',
   gameName: 'truncate text-lg font-extrabold',
   gameLevel: 'text-sm font-extrabold tabular-nums text-[var(--play-accent)]',
-  trophies: 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3',
+  trophies: 'grid grid-cols-1 gap-3 @md:grid-cols-2 @3xl:grid-cols-3',
+  trophiesBox: '@container',
   trophy: `${PANEL} flex items-center gap-4 p-4`,
   trophyOn:
     'bg-[color-mix(in_srgb,var(--play-gold)_16%,var(--play-panel))] ring-[var(--play-gold)]/60',
   trophyIcon:
     'grid size-14 shrink-0 place-items-center rounded-full bg-[var(--play-chip)] text-[var(--play-ink-faint)]',
-  trophyIconOn:
-    'bg-[var(--play-gold)] text-[var(--play-night)] shadow-[0_0.2rem_0_var(--play-gold-deep)]',
+  trophyIconOn: PLAY_GOLD_TILE,
+  trophyIdle: 'opacity-55',
   glyph: 'size-6',
   trophyText: 'flex min-w-0 flex-1 flex-col gap-1',
   trophyName: 'truncate text-base font-extrabold',
@@ -401,4 +410,40 @@ export const PLAY_GROUP = {
 
 export const PLAY_NOTE = {
   note: 'play-glass fixed inset-x-4 bottom-28 z-50 mx-auto w-fit max-w-md rounded-2xl px-5 py-3 text-center text-sm font-semibold text-[var(--play-ink)] shadow-lg',
+} as const
+
+/**
+ * Leave game question, a glass window over the room
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_LEAVE_UI = {
+  window: 'max-w-sm items-center gap-5 p-6 text-center',
+  title: 'text-xl font-extrabold tracking-tight text-[var(--play-ink)]',
+  text: 'text-sm text-[var(--play-ink-soft)]',
+  keys: 'flex w-full flex-col-reverse gap-3 sm:flex-row sm:justify-center',
+  key: 'justify-center',
+} as const
+
+/**
+ * Trophy change window, banner on top and three figures
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_TROPHY_UI = {
+  window: 'max-w-md gap-0 rounded-3xl p-0',
+  banner: 'relative h-36 shrink-0 overflow-hidden',
+  art: 'absolute inset-0 size-full object-cover',
+  shade: 'absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,var(--play-glass-solid))]',
+  medal: `${PLAY_GOLD_TILE} absolute bottom-0 left-1/2 grid size-20 -translate-x-1/2 translate-y-1/2 place-items-center rounded-full`,
+  medalIcon: 'size-10',
+  body: 'flex flex-col items-center gap-5 px-6 pt-14 pb-6 text-center',
+  title: 'text-2xl font-extrabold tracking-tight text-[var(--play-ink)]',
+  text: 'max-w-xs text-sm text-[var(--play-ink-soft)]',
+  figures: 'grid w-full grid-cols-3 gap-2',
+  figure:
+    'play-rise-item flex flex-col items-center gap-0.5 rounded-2xl bg-[var(--play-chip)] px-2 py-3',
+  value: 'text-2xl font-extrabold tabular-nums text-[var(--play-ink)]',
+  label: 'text-micro font-bold tracking-wide text-[var(--play-ink-soft)] uppercase',
+  key: 'w-full justify-center',
 } as const

@@ -7,7 +7,8 @@ import { LudoImpact } from '@/composites/play/ludo/LudoImpact'
 import { LudoPath } from '@/composites/play/ludo/LudoPath'
 import { LudoPawn } from '@/composites/play/ludo/LudoPawn'
 import type { LudoMotion } from '@/composites/play/ludo/useLudoMotion'
-import { GOAL_STEP, pawnPoint, turnPoint, YARD_STEP } from '@/core/lib/play/ludo'
+import { GOAL_STEP, HIDDEN_STEP, pawnPoint, turnPoint, YARD_STEP } from '@/core/lib/play/ludo'
+import type { LudoGhostView } from '@/core/lib/play/ludo'
 import {
   LUDO_CORNERS,
   LUDO_CROWD_SCALE,
@@ -18,9 +19,9 @@ import {
 } from '@/declarations/play/ludo/board'
 import type { LudoCell } from '@/declarations/play/ludo/board'
 import { fillPlayMessage } from '@/declarations/play/copy'
-import { LUDO_BOARD_COPY } from '@/declarations/play/ludo/copy'
+import { LUDO_BOARD_COPY, LUDO_CHAOS_UI } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
-import { LUDO_PIECES } from '@/declarations/ui/variants'
+import { LUDO_CHAOS_PIECES, LUDO_PIECES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 // Depth steps per cell, lower pawns in front
@@ -41,6 +42,7 @@ interface LudoSpot {
   accountId: string
   corner: number
   pawn: number
+  step: number
   point: LudoCell
   offset: LudoCell
   scale: number
@@ -69,13 +71,20 @@ const spotsOf = ({
   turns: number
 }): LudoSpot[] => {
   const laid = players.flatMap(({ accountId, corner }) =>
-    (pawns[accountId] ?? []).map((step, pawn) => ({
-      accountId,
-      corner,
-      pawn,
-      step,
-      point: turnPoint(pawnPoint(corner, step, pawn), turns),
-    }))
+    (pawns[accountId] ?? []).flatMap((step, pawn) =>
+      // A slot blanked for this screen has no pawn
+      step === HIDDEN_STEP || step === undefined
+        ? []
+        : [
+            {
+              accountId,
+              corner,
+              pawn,
+              step,
+              point: turnPoint(pawnPoint(corner, step, pawn), turns),
+            },
+          ]
+    )
   )
   const keyOf = ({ point }: { point: LudoCell }) =>
     point.map((value) => value.toFixed(SPOT_DIGITS)).join(':')
@@ -118,6 +127,21 @@ const spotsOf = ({
   })
 }
 
+/**
+ * Place of the mark standing for a landing the player cannot see
+ * @param {number} corner - Pawn colour
+ * @param {number} step - Pawn step
+ * @param {number} pawn - Pawn index
+ * @param {number} turns - View turn
+ * @return {CSSProperties} - Style
+ */
+
+const blindSpot = (corner: number, step: number, pawn: number, turns: number): CSSProperties => {
+  const [y, x] = turnPoint(pawnPoint(corner, step, pawn), turns)
+
+  return { '--x': x, '--y': y } as CSSProperties
+}
+
 export interface LudoPawnsProps {
   players: { accountId: string; corner: number }[]
   pawns: Record<string, number[]>
@@ -128,6 +152,15 @@ export interface LudoPawnsProps {
   hop: { accountId: string; pawn: number; key: number } | null
   strike: LudoMotion['strike']
   onPick: (pawn: number) => void
+  // Chaos: colour drawn per player, phantom pairs, pawns vanishing or pushed back
+  looks: Record<string, number>
+  ghosts: Record<string, LudoGhostView>
+  fading: LudoMotion['fading']
+  rewind: LudoMotion['rewind']
+  // The viewer cannot see where a pawn lands
+  isBlind: boolean
+  // The viewer wears another colour
+  isDisguised: boolean
 }
 
 /**
@@ -145,6 +178,12 @@ export const LudoPawns = ({
   hop,
   strike,
   onPick,
+  looks,
+  ghosts,
+  fading,
+  rewind,
+  isBlind,
+  isDisguised,
 }: LudoPawnsProps) => {
   // Aim is dropped once the turn or choices change
   const [aim, setAim] = useState<{ pawn: number; scope: string } | null>(null)
@@ -158,7 +197,7 @@ export const LudoPawns = ({
 
   return (
     <>
-      {mine && target && (
+      {mine && target && !isBlind && (
         <LudoPath
           corner={mine.corner}
           pawn={target.pawn}
@@ -168,10 +207,34 @@ export const LudoPawns = ({
         />
       )}
 
+      {isBlind && mine && target && (
+        <span
+          className={LUDO_CHAOS_PIECES.blindMark}
+          style={blindSpot(
+            mine.corner,
+            pawns[viewerId]?.[target.pawn] ?? YARD_STEP,
+            target.pawn,
+            turns
+          )}
+        >
+          {LUDO_CHAOS_UI.blind}
+        </span>
+      )}
+
       {strike && <LudoImpact key={strike.key} strike={strike} players={players} turns={turns} />}
 
       {spotsOf({ players, pawns, turns }).map((spot) => {
-        const colour = LUDO_CORNERS[spot.corner]
+        const colour = LUDO_CORNERS[looks[spot.accountId] ?? spot.corner]
+        const ghost = ghosts[spot.accountId]
+        const isGhost = Boolean(ghost?.pair.includes(spot.pawn))
+        const isReal = isGhost && ghost.real === spot.pawn && spot.accountId === viewerId
+        const isFading = fading?.accountId === spot.accountId && fading.pawn === spot.pawn
+        const isRewind = rewind?.accountId === spot.accountId && rewind.pawn === spot.pawn
+        const isOwnTag =
+          isDisguised &&
+          spot.accountId === viewerId &&
+          spot.step > YARD_STEP &&
+          spot.step < GOAL_STEP
         const canPick =
           spot.accountId === viewerId && movable.some((entry) => entry.pawn === spot.pawn)
         const isHopping = hop?.accountId === spot.accountId && hop.pawn === spot.pawn
@@ -180,7 +243,13 @@ export const LudoPawns = ({
           <LudoPawn
             key={isHopping ? hop.key : 'still'}
             colour={colour}
-            className={cn(isHopping && LUDO_PIECES.pawnHop)}
+            className={cn(
+              isHopping && LUDO_PIECES.pawnHop,
+              isGhost && LUDO_CHAOS_PIECES.pawnGhost,
+              isReal && LUDO_CHAOS_PIECES.pawnReal,
+              isFading && LUDO_CHAOS_PIECES.pawnFade,
+              isRewind && LUDO_CHAOS_PIECES.pawnRewind
+            )}
           />
         )
 
@@ -231,6 +300,7 @@ export const LudoPawns = ({
             ) : (
               art
             )}
+            {isOwnTag && <span className={LUDO_CHAOS_PIECES.ownTag}>{LUDO_CHAOS_UI.yourDie}</span>}
             {spot.rank !== null && (
               <span className={cn(LUDO_PIECES.rank, spot.isLeft && LUDO_PIECES.rankLeft)}>
                 {spot.rank}

@@ -18,8 +18,7 @@ export const NAVAL_BOARD = {
   // Phones stack, wide screens set the sea beside a slim rail
   battle: 'my-auto flex flex-col items-center gap-4',
   // Bar, sea and weapon share the width of the sea, as large as the screen allows
-  stage:
-    'mx-auto flex w-[min(100%,calc(100dvh-17rem))] min-w-[19rem] flex-col gap-2.5',
+  stage: 'mx-auto flex w-[min(100%,calc(100dvh-17rem))] min-w-[19rem] flex-col gap-2.5',
   rail: 'flex w-full max-w-[34rem] flex-col gap-3 empty:hidden',
   target: 'relative mx-auto w-full',
   // Melee: a new sea fades in
@@ -195,7 +194,8 @@ export const NAVAL_ARSENAL = {
   idle: 'opacity-80',
   card: 'naval-draw flex min-w-0 items-center gap-3 rounded-xl bg-white/10 px-2.5 py-1.5 text-left text-[var(--play-naval-ink)] transition-transform active:scale-[0.98]',
   cardFixed: 'cursor-default active:scale-100 disabled:opacity-100',
-  glyphBox: 'grid size-12 shrink-0 place-items-center rounded-lg bg-black/25 text-[var(--play-naval-reticle)]',
+  glyphBox:
+    'grid size-12 shrink-0 place-items-center rounded-lg bg-black/25 text-[var(--play-naval-reticle)]',
   glyph: 'size-9 fill-current',
   text: 'flex min-w-0 flex-col',
   name: 'truncate text-lg leading-6 font-black',
@@ -214,4 +214,13 @@ export const NAVAL_MAP_CARD = {
   // Soft tint while the picture is being drawn
   pending: 'absolute inset-0 animate-pulse bg-white/10',
   size: 'absolute right-2 bottom-2 rounded-full bg-black/55 px-2 py-0.5 text-xs font-extrabold tabular-nums text-white backdrop-blur-sm sm:text-sm',
+} as const
+
+/**
+ * Sketched faces of the rule cards in the launch vote
+ * @type {Record<string, string>}
+ */
+
+export const NAVAL_VOTE_FACE = {
+  art: 'size-[78%] text-white',
 } as const

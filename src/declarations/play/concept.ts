@@ -73,6 +73,20 @@ export const PLAY_CONCEPT: Record<PlayGameName, PlayConceptStep[]> = {
       text: 'Les autres tapent leurs idées. Plus tôt tu trouves, plus tu gagnes, et le dessinateur aussi.',
     },
   ],
+  [PlayGames.Suspens]: [
+    {
+      title: 'Un mot, des tirets',
+      text: 'À chaque manche, un meneur choisit un mot en secret. Les autres ne voient que ses cases vides.',
+    },
+    {
+      title: 'Une lettre à la fois',
+      text: 'À tour de rôle, propose une lettre. Elle apparaît partout où elle se cache, sinon le bonhomme prend un trait.',
+    },
+    {
+      title: 'Complète avant la potence',
+      text: 'Le mot complet ou le bonhomme pendu ferme la manche. Chaque lettre rapporte, le meneur gagne si tu échoues.',
+    },
+  ],
   [PlayGames.Glitch]: [
     {
       title: 'Deux images jumelles',

@@ -1,0 +1,23 @@
+-- AlterEnum
+ALTER TYPE "LudoMoveKind" ADD VALUE 'EFFECT';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'OFFER';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'JOKER';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'DOUBLE';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'PICK';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'SPLIT';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'FADE';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'EXPIRE';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'DUEL';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'RECOIL';
+ALTER TYPE "LudoMoveKind" ADD VALUE 'STALL';
+
+-- AlterTable
+ALTER TABLE "play_ludo_games" ADD COLUMN "pending" JSONB;
+
+-- AlterTable
+ALTER TABLE "play_ludo_players" ADD COLUMN "joker" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN "effects" JSONB NOT NULL DEFAULT '{}';
+
+-- AlterTable
+ALTER TABLE "play_ludo_moves" ADD COLUMN "effect" TEXT,
+ADD COLUMN "value" INTEGER;

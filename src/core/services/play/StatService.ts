@@ -2,6 +2,7 @@ import 'server-only'
 
 import type { Prisma } from '@prisma/client'
 
+import { awardTrophies } from '@/core/services/play/TrophyService'
 import { PlayOutcomes } from '@/utils/constants/play'
 import type { PlayGameName, PlayOutcomeName } from '@/utils/constants/play'
 
@@ -104,4 +105,9 @@ export const recordResults = async (
       update: counters,
     })
   }
+
+  await awardTrophies(
+    tx,
+    entries.map((entry) => entry.accountId)
+  )
 }

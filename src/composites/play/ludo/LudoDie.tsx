@@ -20,6 +20,8 @@ export interface LudoDieProps {
   // The viewer may throw it
   canRoll: boolean
   onRoll: () => void
+  // Name read out when the die is a choice
+  label?: string
 }
 
 /**
@@ -50,7 +52,7 @@ const useShuffledFace = (isRolling: boolean): number => {
  * @return {JSX.Element}
  */
 
-export const LudoDie = ({ face, isRolling, canRoll, onRoll }: LudoDieProps) => {
+export const LudoDie = ({ face, isRolling, canRoll, onRoll, label }: LudoDieProps) => {
   const shuffled = useShuffledFace(isRolling)
   const shown = isRolling ? shuffled : (face ?? FACES[FACES.length - 1])
 
@@ -59,7 +61,7 @@ export const LudoDie = ({ face, isRolling, canRoll, onRoll }: LudoDieProps) => {
       type="button"
       disabled={!canRoll}
       onClick={onRoll}
-      aria-label={canRoll ? LUDO_BOARD_COPY.roll : String(face ?? '')}
+      aria-label={canRoll ? (label ?? LUDO_BOARD_COPY.roll) : String(face ?? '')}
       className={cn(LUDO_PIECES.dieButton, canRoll && LUDO_PIECES.dieReady)}
     >
       <span

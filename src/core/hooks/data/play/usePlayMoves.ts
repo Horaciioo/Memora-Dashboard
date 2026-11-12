@@ -96,6 +96,12 @@ export const usePlayMoves = () => {
         PLAY_HUB_COPY.cancelled,
         () => ROUTES.playGame(gameSlug)
       ),
+    end: (id: string, gameSlug: string) =>
+      go(
+        () => apiPost(API_ROUTES.playEnd(id), {}),
+        PLAY_HUB_COPY.ended,
+        () => ROUTES.playGame(gameSlug)
+      ),
     bots: (id: string, level: PlayBotKindName, fill = false) =>
       go(
         () => apiPost(API_ROUTES.playBots(id), { level, fill }),

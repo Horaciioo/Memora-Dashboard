@@ -36,8 +36,11 @@ export default async function PlayRankingPage({ searchParams }: PlayRankingPageP
   return (
     <div className={PLAY_BOX.stack}>
       <PlaySignal topic={PLAY_TOPICS.lobbies} />
-      <PlayPageTitle>{PLAY_MOBILE_COPY.rankingTitle}</PlayPageTitle>
-      <PlayRankingBox games={games} game={game} leaders={leaders} meId={session.id} />
+      <PlayPageTitle
+        body={<PlayRankingBox games={games} game={game} leaders={leaders} meId={session.id} />}
+      >
+        {PLAY_MOBILE_COPY.rankingTitle}
+      </PlayPageTitle>
     </div>
   )
 }

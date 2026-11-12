@@ -69,3 +69,28 @@ export const linesSince = (lines: LudoLineView[], shownRev: number): LudoLineVie
 
 export const pawnsOf = (players: LudoPlayerView[]): Record<string, number[]> =>
   Object.fromEntries(players.map((player) => [player.accountId, [...player.pawns]]))
+
+/**
+ * Phantom pair of a colour
+ * @typedef {Object} LudoGhostView
+ */
+
+export interface LudoGhostView {
+  pair: number[]
+  real: number | null
+}
+
+/**
+ * Phantom pairs by player, the real pawn known to its owner only
+ * @param {LudoPlayerView[]} players - Colours
+ * @return {Record<string, LudoGhostView>} - Pairs
+ */
+
+export const ghostsOf = (players: LudoPlayerView[]): Record<string, LudoGhostView> =>
+  Object.fromEntries(
+    players.flatMap((player) =>
+      player.effects.ghost
+        ? [[player.accountId, { pair: player.effects.ghost.pair, real: player.effects.ghost.real }]]
+        : []
+    )
+  )

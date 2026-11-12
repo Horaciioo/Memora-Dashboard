@@ -14,6 +14,7 @@ const GAMES = [
   'jumble',
   'echo',
   'glitch',
+  'suspens',
   'croquis',
 ]
 

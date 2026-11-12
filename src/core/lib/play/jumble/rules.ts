@@ -1,5 +1,6 @@
 import { normalizeWord } from '@/core/lib/play/baccalaureat/words'
 import { JUMBLE_SETTINGS, JUMBLE_WORDS } from '@/declarations/play'
+import type { JumbleLevel } from '@/declarations/play/jumble/settings'
 import { SECOND_MS } from '@/utils/constants/time'
 
 /**
@@ -55,11 +56,16 @@ export const scramble = (answer: string, random: () => number = Math.random): st
  * Word length wanted at a round, longer as the game goes
  * @param {number} round - Round, from one
  * @param {number} rounds - Rounds in the game
+ * @param {JumbleLevel} [level] - Difficulty, its band of lengths
  * @return {number} - Letters
  */
 
-export const targetLength = (round: number, rounds: number): number => {
-  const { min, max } = JUMBLE_SETTINGS.lengths
+export const targetLength = (
+  round: number,
+  rounds: number,
+  level: JumbleLevel = JUMBLE_SETTINGS.difficulty
+): number => {
+  const { min, max } = JUMBLE_SETTINGS.difficulties[level]
   const progress = rounds > 1 ? (round - 1) / (rounds - 1) : 0
 
   return Math.round(min + progress * (max - min))
@@ -70,6 +76,7 @@ export const targetLength = (round: number, rounds: number): number => {
  * @param {number} round - Round, from one
  * @param {number} rounds - Rounds in the game
  * @param {Set<string>} used - Comparable words already played
+ * @param {JumbleLevel} [level] - Difficulty
  * @param {() => number} [random] - Source in [0, 1)
  * @return {JumbleWord} - Word
  */
@@ -78,9 +85,10 @@ export const drawWord = (
   round: number,
   rounds: number,
   used: Set<string>,
+  level: JumbleLevel = JUMBLE_SETTINGS.difficulty,
   random: () => number = Math.random
 ): JumbleWord => {
-  const target = targetLength(round, rounds)
+  const target = targetLength(round, rounds, level)
   const fresh = POOL.filter(({ answer }) => !used.has(answer))
   const pool = fresh.length ? fresh : POOL
 

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { Button } from '@/components/elements/actions/Button'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayGameChatBar } from '@/composites/play/mobile/PlayGameChatBar'
 import { PlayGameMenu } from '@/composites/play/mobile/PlayGameMenu'
@@ -16,7 +15,6 @@ import type { PlayChatProps } from '@/composites/play/session/PlayChat'
 import { PlayEndActions } from '@/composites/play/session/PlayEndActions'
 import type { PlayRematchState, PlayTournamentStep } from '@/composites/play/session/PlayEndActions'
 import { usePlayCrowd } from '@/core/hooks/data/play/usePlayCrowd'
-import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { useBoxSpan } from '@/core/hooks/interaction/layout/measure/useBoxSpan'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlayFullscreen } from '@/core/hooks/interaction/state/play/usePlayFullscreen'
@@ -36,7 +34,7 @@ export interface PlaySessionRoomProps {
   title: string
   players: PlayFace[]
   spectators: PlayFace[]
-  me: { isSeated: boolean }
+  me: { isSeated: boolean; isHost: boolean }
   chat: Omit<PlayChatProps, 'onFold' | 'isSide'>
   // Feed window under the chat
   feed: ReactNode
@@ -69,7 +67,6 @@ export const PlaySessionRoom = ({
   replay,
   children,
 }: PlaySessionRoomProps) => {
-  const moves = usePlayMoves()
   const isMobile = useIsMobileShell()
   const crowd = usePlayCrowd(chat.sessionId, players, spectators)
   // Absent seats shown dimmed
@@ -80,12 +77,11 @@ export const PlaySessionRoom = ({
   // Chat and feed fold together
   const [isSideOpen, setSideOpen] = useState(true)
   const BackIcon = ICONS.playBack
-  const LeaveIcon = ICONS.playLeave
   const UnfoldIcon = ICONS.playUnfold
   const rootRef = useRef<HTMLDivElement>(null)
   const boxRef = useRef<HTMLElement>(null)
   const { isFullscreen, isChatOpen, toggleChat } = usePlayStageStore()
-  usePlayFullscreen(rootRef)
+  usePlayFullscreen()
   // Windowed: the column stands level with the table
   const span = useBoxSpan(boxRef, !isFullscreen)
   // Every game opens full screen
@@ -132,17 +128,6 @@ export const PlaySessionRoom = ({
               <BackIcon className={BAC_SESSION.exitIcon} aria-hidden="true" />
               {PLAY_HUB_COPY.backToHub}
             </AppLink>
-            {me.isSeated && (
-              <Button
-                variant="arcadeDanger"
-                className={BAC_SESSION.exit}
-                isLoading={moves.isSaving}
-                onClick={() => void moves.leave(chat.sessionId)}
-              >
-                <LeaveIcon className={BAC_SESSION.exitIcon} aria-hidden="true" />
-                {PLAY_HUB_COPY.leave}
-              </Button>
-            )}
           </div>
           <div className={BAC_SESSION.identity}>
             {hasKeys && !isFullscreen && (
@@ -151,6 +136,8 @@ export const PlaySessionRoom = ({
                 sessionId={chat.sessionId}
                 gameSlug={gameSlug}
                 isSeated={me.isSeated}
+                isHost={me.isHost}
+                isOver={replay !== null}
               />
             )}
             <div className={BAC_SESSION.titles}>
@@ -173,6 +160,8 @@ export const PlaySessionRoom = ({
             sessionId={chat.sessionId}
             gameSlug={gameSlug}
             isSeated={me.isSeated}
+            isHost={me.isHost}
+            isOver={replay !== null}
           />
         )}
         <section
@@ -202,7 +191,13 @@ export const PlaySessionRoom = ({
       {isMobile ? (
         <>
           {hasKeys && (
-            <PlayGameMenu sessionId={chat.sessionId} gameSlug={gameSlug} isSeated={me.isSeated} />
+            <PlayGameMenu
+              sessionId={chat.sessionId}
+              gameSlug={gameSlug}
+              isSeated={me.isSeated}
+              isHost={me.isHost}
+              isOver={replay !== null}
+            />
           )}
           <PlayGameChatBar
             chat={chat}

@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 import { BottomSheet } from '@/components/structures/overlays/BottomSheet'
 import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
-import { PlaySettingsPanel } from '@/composites/play/mobile/PlaySettingsPanel'
 import { PLAY_MOBILE_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_GAME_BAR } from '@/declarations/ui/variants'
@@ -13,15 +12,23 @@ export interface PlayGameMenuProps {
   sessionId: string
   gameSlug: string
   isSeated: boolean
+  isHost: boolean
+  isOver: boolean
 }
 
 /**
- * Phone gear: back to the hub, all games, give up, settings
+ * Phone gear: hub, all games, settings, give up or end
  * @param {PlayGameMenuProps} props - Session and seat
  * @return {JSX.Element}
  */
 
-export const PlayGameMenu = ({ sessionId, gameSlug, isSeated }: PlayGameMenuProps) => {
+export const PlayGameMenu = ({
+  sessionId,
+  gameSlug,
+  isSeated,
+  isHost,
+  isOver,
+}: PlayGameMenuProps) => {
   const [isOpen, setOpen] = useState(false)
   const GearIcon = ICONS.settings
 
@@ -48,9 +55,10 @@ export const PlayGameMenu = ({ sessionId, gameSlug, isSeated }: PlayGameMenuProp
             sessionId={sessionId}
             gameSlug={gameSlug}
             isSeated={isSeated}
+            isHost={isHost}
+            isOver={isOver}
             onLeft={() => setOpen(false)}
           />
-          <PlaySettingsPanel gameSlug={gameSlug} />
         </div>
       </BottomSheet>
     </>

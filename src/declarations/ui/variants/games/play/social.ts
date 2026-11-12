@@ -53,14 +53,24 @@ export const PLAY_FEATURE = {
   shade:
     'absolute inset-0 bg-linear-to-r from-[var(--play-night)] from-10% via-[var(--play-night)]/70 via-45% to-transparent',
   body: 'relative flex max-w-sm flex-col items-start gap-2 pl-10 text-[var(--play-on-art)]',
+  // Corner window matching the ring's outer curve, the sash is cut by it so it wraps the card
+  badgeClip:
+    'pointer-events-none absolute -top-[0.4rem] -left-[0.4rem] z-10 size-44 overflow-hidden rounded-tl-[2.4rem]',
   badge:
-    'rounded-full bg-[var(--play-gold)] px-3 py-1 text-xs font-extrabold tracking-wide text-[var(--play-night)] uppercase',
+    'absolute top-[3.7rem] left-[3.7rem] flex h-9 w-48 -translate-x-1/2 -translate-y-1/2 -rotate-45 items-center justify-center bg-linear-to-b from-[color-mix(in_srgb,var(--play-gold)_70%,white)] via-[var(--play-gold)] to-[color-mix(in_srgb,var(--play-gold)_75%,black)] text-xs font-extrabold tracking-[0.25em] text-[var(--play-night)] uppercase shadow-[0_0.3rem_0.6rem_rgb(0_0_0/0.45),inset_0_0.1rem_0_rgb(255_255_255/0.55),inset_0_-0.1rem_0_rgb(0_0_0/0.2)] [text-shadow:0_1px_0_rgb(255_255_255/0.4)]',
   name: 'text-5xl font-extrabold tracking-tight uppercase',
   tagline: 'text-sm text-[var(--play-on-art)]/85',
   seats: 'text-xs font-extrabold tabular-nums text-[var(--game)]',
   play: 'mt-2 rounded-2xl bg-[var(--game)] px-6 py-2.5 text-sm font-extrabold text-[var(--play-night)] shadow-[0_0.3rem_0_rgb(0_0_0/0.35)] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
   poster:
-    'play-feature-poster absolute top-1/2 right-12 aspect-[3/4] w-52 -translate-y-1/2 rotate-3 overflow-hidden rounded-3xl ring-[0.3rem] ring-white/70 shadow-[0_1.5rem_3rem_rgb(0_0_0/0.45)] lg:w-60',
+    'play-feature-poster absolute z-20 top-1/2 right-12 aspect-[3/4] w-52 -translate-y-1/2 rotate-3 cursor-pointer [transform-style:preserve-3d] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[var(--play-key)] lg:w-60',
+  flip: 'play-feature-flip absolute inset-0 block [transform-style:preserve-3d]',
+  front:
+    'absolute inset-0 block overflow-hidden rounded-3xl ring-[0.3rem] ring-white/70 shadow-[0_1.5rem_3rem_rgb(0_0_0/0.45)] [backface-visibility:hidden]',
+  back: 'absolute inset-0 flex flex-col justify-center gap-2.5 overflow-hidden rounded-3xl bg-[var(--play-night)] p-5 text-left text-[var(--play-on-art)] ring-[0.3rem] ring-[var(--game)] shadow-[0_1.5rem_3rem_rgb(0_0_0/0.45)] [backface-visibility:hidden] [transform:rotateY(180deg)]',
+  backTitle: 'text-lg font-extrabold tracking-tight text-[var(--game)] uppercase',
+  backStep:
+    'block text-xs leading-snug text-[var(--play-on-art)]/85 [&>strong]:block [&>strong]:text-[var(--play-on-art)]',
   dots: 'mt-3 flex justify-center gap-2',
   dot: 'h-2 w-2 rounded-full bg-[var(--play-ink-faint)] transition-[width,background-color] duration-300 aria-[current=true]:w-6 aria-[current=true]:bg-[var(--play-ink)]',
 } as const
@@ -76,23 +86,31 @@ export const PLAY_CROSS = {
   heading: `${HEADING} text-center max-md:sr-only sm:text-3xl`,
   // Three by three on desktop, one column on a phone
   cross: 'grid w-full gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-3',
-  card: 'min-h-0! w-[var(--card)] shrink-0',
+  card: 'relative z-10 min-h-0! w-[var(--card)] shrink-0',
   // Phone keeps the plain list
   list: 'flex flex-col gap-4 md:hidden',
   // One row of cards, the middle one larger
-  row: 'flex w-full flex-col gap-4 max-md:hidden',
+  row: 'flex w-full flex-col gap-4 max-md:hidden md:w-[calc(100%+12rem)] md:max-w-[100vw]',
   rowTitle: 'text-center text-lg font-extrabold tracking-wide text-[var(--play-ink)] uppercase',
-  track: 'relative overflow-hidden py-6 [--card:10.5rem] [--gap:1.5rem] focus-visible:outline-none',
+  frame: 'flex items-center gap-3',
+  track:
+    'relative min-w-0 flex-1 overflow-hidden py-6 [--card:10.5rem] [--gap:1.5rem] [--info:15rem] [mask-image:linear-gradient(to_right,transparent,#000_14%,#000_86%,transparent)] focus-visible:outline-none',
   strip:
-    'ml-[50%] flex w-max gap-[var(--gap)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] translate-x-[calc(var(--card)/-2-var(--at)*(var(--card)+var(--gap)))]',
-  slot: 'relative scale-90 opacity-70 transition-[scale,opacity] duration-500 data-[active=true]:z-10 data-[active=true]:scale-110 data-[active=true]:opacity-100',
+    'ml-[50%] flex w-max gap-[var(--gap)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] translate-x-[calc(var(--card)/-2-var(--info)/2-var(--at)*(var(--card)+var(--gap)))]',
+  slot: 'group/slot relative flex scale-90 items-stretch opacity-70 transition-[scale,opacity] duration-500 data-[active=true]:z-10 data-[active=true]:scale-100 data-[active=true]:opacity-100',
+  // Unfolds right of the active card, no edge of its own
+  info: 'flex w-0 items-center overflow-hidden py-2 text-[var(--play-on-art)] opacity-0 transition-[width,opacity,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[active=true]/slot:w-[var(--info)] group-data-[active=true]/slot:-ml-5 group-data-[active=true]/slot:opacity-100',
+  // Tucked under the card like the title boxes, same border and hard shadow
+  infoBox:
+    'flex w-[var(--info)] shrink-0 flex-col items-start gap-3 rounded-r-3xl border-[0.2rem] border-l-0 border-[var(--game)] bg-[color-mix(in_srgb,var(--play-panel-strong)_93%,var(--game))] py-4 pr-4 pl-9 shadow-[inset_0_-0.35rem_0_color-mix(in_srgb,var(--game)_14%,transparent),0_0.3rem_0_var(--game)]',
+  infoText: 'text-sm leading-snug font-semibold text-[var(--play-on-art)]/90',
+  infoPlay:
+    'w-fit rounded-xl bg-[var(--game)] px-4 py-1.5 text-sm font-extrabold text-[var(--play-night)] shadow-[0_0.3rem_0_rgb(0_0_0/0.35)] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-ink)]',
   // Side card: a click brings it to the middle
   slotPick: 'absolute inset-0 z-20 cursor-pointer rounded-3xl',
   arrow:
-    'play-glass absolute top-1/2 z-30 grid size-10 -translate-y-1/2 place-items-center rounded-full text-[var(--play-ink)] transition-opacity hover:bg-[var(--play-chip)] disabled:opacity-0',
-  arrowPrev: 'left-2',
-  arrowNext: 'right-2',
-  arrowIcon: 'size-5',
+    'grid size-12 shrink-0 place-items-center rounded-2xl bg-[var(--play-on-art)] text-[var(--play-night)] shadow-[0_0.3rem_0_rgb(0_0_0/0.35)] transition-[transform,box-shadow,opacity] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_0.1rem_0_rgb(0_0_0/0.35)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-ink)] disabled:pointer-events-none disabled:opacity-30',
+  arrowIcon: 'size-6',
   live: 'min-h-0 shrink',
   online: 'min-h-0 shrink-0',
 } as const
@@ -167,31 +185,59 @@ export const PLAY_ROOM = {
   back: 'inline-flex shrink-0 items-center gap-1.5 text-xs font-extrabold tracking-wider text-[var(--play-ink-soft)] uppercase hover:text-[var(--play-ink)]',
   // Players and gestures, centred
   middle: 'mx-auto flex w-full max-w-2xl flex-col items-center gap-6',
-  // Line under the title: access, count, rules
+  // Title block: label, waiting line, one sentence
+  lobbyHead: 'flex flex-col items-center gap-2 text-center',
+  eyebrow:
+    'rounded-full bg-[var(--play-ink)] px-4 py-1.5 text-[0.65rem] font-extrabold tracking-[0.25em] text-[var(--play-panel-strong)] uppercase',
+  lobbyTitle:
+    'text-3xl font-extrabold tracking-tight text-balance text-[var(--play-ink)] sm:text-4xl',
+  lobbySub: 'text-sm font-semibold text-balance text-[var(--play-ink-soft)] sm:text-base',
+  // Line under the title: access and rules
   summary:
-    'grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm font-bold text-[var(--play-ink-soft)]',
-  summaryCount: 'text-center',
+    'flex w-full items-center justify-between gap-2 text-sm font-bold text-[var(--play-ink-soft)]',
   summaryLink:
-    'justify-self-start rounded-xl bg-[var(--play-chip)] px-3 py-1.5 font-extrabold text-[var(--play-ink)] transition-colors hover:bg-[var(--play-panel-strong)] focus-visible:outline-3 focus-visible:outline-[var(--play-key)] disabled:cursor-default disabled:hover:bg-[var(--play-chip)]',
-  summaryEnd: 'justify-self-end',
-  // The table: seats as faces, empty ones as dashed rounds
-  table: 'flex w-full flex-wrap justify-center gap-x-3 gap-y-4 py-2 md:gap-x-5 md:gap-y-6',
-  tile: 'flex w-20 flex-col items-center gap-1 text-center md:w-24 md:gap-1.5',
-  tileOff: 'opacity-50',
-  tileName: 'w-full truncate text-xs font-extrabold md:text-sm',
-  tileNote:
-    'text-[0.6rem] font-extrabold tracking-wider md:text-xs text-[var(--play-ink-faint)] uppercase',
-  tileReady:
-    'inline-flex items-center gap-1 text-[0.6rem] md:text-xs font-extrabold text-[var(--play-ink)]',
-  tileEmpty:
-    'grid size-10 place-items-center rounded-full border-2 border-dashed md:size-16 border-[var(--play-line)] text-[var(--play-ink-soft)] transition-colors hover:border-[var(--play-ink-faint)] hover:text-[var(--play-ink)]',
-  tileEmptyIcon: 'size-4 md:size-6',
-  // Share row, always in reach
+    'rounded-xl bg-[var(--play-chip)] px-3 py-1.5 font-extrabold text-[var(--play-ink)] transition-colors hover:bg-[var(--play-panel-strong)] focus-visible:outline-3 focus-visible:outline-[var(--play-key)] disabled:cursor-default disabled:hover:bg-[var(--play-chip)]',
+  summaryEnd: 'ml-auto',
+  // The table: one card per seat, two across on a phone
+  table:
+    'grid w-full grid-cols-2 justify-center gap-3 py-1 sm:grid-cols-[repeat(var(--cols),9rem)] md:gap-4',
+  seat: `play-seat ${PANEL} relative flex min-w-0 flex-col items-center gap-1.5 px-2 pt-6 pb-4 text-center transition-[opacity,box-shadow] duration-300 rounded-3xl`,
+  seatReady: 'shadow-[var(--shadow-md)]',
+  seatIdle: 'opacity-75',
+  seatMine: 'ring-2 ring-[var(--play-key)]',
+  seatOff: 'opacity-40',
+  seatAvatar: 'relative',
+  seatCrown: 'absolute -top-4 left-1/2 size-5 -translate-x-1/2 text-[var(--play-gold)]',
+  seatBadge:
+    'play-badge-pop absolute -right-1 -bottom-1 grid size-5 place-items-center rounded-full bg-[var(--play-golf-glow)] text-black/70',
+  seatBadgeIcon: 'size-3',
+  seatName: 'w-full truncate text-sm font-extrabold',
+  seatRole: 'text-[0.6rem] font-extrabold tracking-wider text-[var(--play-gold-ink)] uppercase',
+  seatState:
+    'play-rise-item inline-flex items-center gap-1 text-xs font-extrabold tracking-wider text-[var(--play-ink)] uppercase',
+  seatStateIdle: 'text-[var(--play-ink-faint)]',
+  seatYou:
+    'absolute top-2 left-2 rounded-full bg-[var(--play-key)] px-2 py-0.5 text-[0.6rem] font-extrabold tracking-wider text-[var(--play-key-ink)] uppercase',
+  seatKick:
+    'absolute top-1.5 right-1.5 grid size-6 place-items-center rounded-full text-[var(--play-ink-faint)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
+  seatKickIcon: 'size-3.5',
+  seatAction: 'mt-1.5 w-full',
+  // Empty seat, one tap opens the picker
+  slot: 'flex min-h-40 w-full flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-[var(--play-line)] text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
+  slotIcon: 'grid size-12 place-items-center rounded-full bg-[var(--play-chip)]',
+  slotIconSvg: 'size-5',
+  slotLabel: 'text-xs font-extrabold tracking-wider uppercase',
+  // Share row of a public game, always in reach
   link: 'flex w-full max-w-sm items-center gap-3 rounded-2xl bg-[var(--play-chip)] px-4 py-3 text-left text-sm font-bold text-[var(--play-ink-soft)] hover:text-[var(--play-ink)]',
   linkMain: 'mr-auto truncate',
   linkCode: 'text-lg font-extrabold tracking-[0.5em] text-[var(--play-ink)]',
   linkCopy: 'shrink-0 text-xs font-extrabold text-[var(--play-ink)]',
-  playersTitle: `${HEADING} text-center`,
+  // Share card of a private game, at the centre of the room
+  share: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-4 rounded-3xl p-5 text-center sm:flex-row sm:text-left`,
+  shareText: 'flex min-w-0 flex-1 flex-col items-center gap-1 sm:items-start',
+  shareLabel:
+    'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
+  shareCode: 'text-3xl font-extrabold tracking-[0.35em] text-[var(--play-ink)] sm:text-4xl',
   box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 rounded-[2rem] p-5 sm:p-8`,
   // Plain column, flows under the players
   actions: 'flex w-full max-w-sm flex-col gap-3',

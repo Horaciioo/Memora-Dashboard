@@ -92,11 +92,7 @@ export const CROQUIS_FEED_COPY = {
 export const CROQUIS_SETUP_COPY = {
   title: 'Nouvelle partie de Croquis',
   tabs: 'Réglages de la partie',
-  tabRounds: 'Tours',
   tabWords: 'Mots',
-  tabSpeed: 'Rythme',
-  laps: 'Tours de table',
-  lapsHint: 'À chaque tour, chaque joueur dessine une fois, dans un ordre tiré au hasard.',
   count: '{count} tours',
   difficulty: 'Difficulté',
   difficultyHint:

@@ -3,8 +3,11 @@ import { useId } from 'react'
 import { LudoBoardDrawing } from '@/composites/play/ludo/LudoGrid'
 import { LudoPawnShape } from '@/composites/play/ludo/LudoPawn'
 import { squareOf, TRACK, turnPoint } from '@/core/lib/play/ludo'
-import { LUDO_LAYOUT } from '@/declarations/play/ludo/board'
+import { LUDO_CORNERS, LUDO_LAYOUT } from '@/declarations/play/ludo/board'
 import type { LudoCell, LudoCornerName } from '@/declarations/play/ludo/board'
+
+// Each corner in its own colour
+const IDLE_PALETTE = LUDO_CORNERS.map((_, corner) => corner)
 
 // Board corner radius, cell units
 const RADIUS = 1.1
@@ -91,7 +94,7 @@ export const LudoBoardArt = ({
         />
         <g clipPath={`url(#${clip})`}>
           <g transform={`translate(${-half} ${-half})`}>
-            <LudoBoardDrawing turns={0} lit={0} />
+            <LudoBoardDrawing turns={0} lit={0} palette={IDLE_PALETTE} isChaos={false} />
           </g>
         </g>
         {SCENE_PAWNS.map(({ colour, point: [y, x] }) => (

@@ -484,6 +484,35 @@ export const cancelSession = async (sessionId: string, hostId: string): Promise<
 }
 
 /**
+ * Host ends a started game for everyone, no result and no XP
+ * @param {string} sessionId - Game
+ * @param {string} hostId - Host
+ * @return {Promise<void>} - Ended
+ */
+
+export const endSession = async (sessionId: string, hostId: string): Promise<void> => {
+  await prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, sessionId)
+    requireHost(session, hostId)
+    if (![PlayStatuses.Running, PlayStatuses.Paused].some((status) => status === session.status))
+      throw conflict(PLAY_ERRORS.notRunning)
+
+    await tx.playSession.update({
+      where: { id: sessionId },
+      data: { status: PlayStatuses.Abandoned },
+    })
+    if (session.tournamentId) {
+      await tx.playTournament.update({
+        where: { id: session.tournamentId },
+        data: { status: PlayStatuses.Abandoned },
+      })
+    }
+    clearSessionTimers(sessionId)
+  })
+  await signalPlay(sessionId, true)
+}
+
+/**
  * Tournament change a lobby edit asks for
  * @param {Prisma.TransactionClient} tx - Transaction
  * @param {LoadedSession} session - Lobby

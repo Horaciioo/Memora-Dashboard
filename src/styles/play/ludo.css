@@ -703,7 +703,60 @@
   }
 }
 
+/* Vote faces: a pawn hops over the squares, or each pawn hops in place */
+.ludo-vote-travel {
+  animation: ludo-vote-travel 2.6s ease-in-out infinite;
+}
+
+.ludo-vote-jump {
+  display: block;
+  animation: ludo-vote-jump 0.9s ease-in-out calc(var(--i) * 0.18s) infinite;
+}
+
+@keyframes ludo-vote-travel {
+  0% {
+    translate: 0 0;
+    opacity: 0;
+  }
+  8%,
+  14% {
+    translate: 0 0;
+    opacity: 1;
+  }
+  26% {
+    translate: 50% -55%;
+  }
+  38%,
+  46% {
+    translate: 100% 0;
+  }
+  58% {
+    translate: 150% -55%;
+  }
+  70%,
+  90% {
+    translate: 200% 0;
+    opacity: 1;
+  }
+  100% {
+    translate: 200% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes ludo-vote-jump {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  40% {
+    translate: 0 -45%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .ludo-vote-travel,
+  .ludo-vote-jump,
   .ludo-walker,
   .ludo-hopper,
   .ludo-walker-shadow,

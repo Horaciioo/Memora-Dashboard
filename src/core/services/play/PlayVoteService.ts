@@ -84,8 +84,10 @@ const open = async (context: VoteContext): Promise<VoteOutcome> => {
   if (session.seats.filter(isPresent).length < seatBoundsOf(session.game, session.settings).min) {
     throw conflict(PLAY_ERRORS.tooFewPlayers)
   }
-  if (!vote)
-    await store(context, withVote(session.settings, voteAt(rules.steps({})[0], Date.now())))
+  const seated = session.seats.filter(isPresent).length
+  if (!vote) {
+    await store(context, withVote(session.settings, voteAt(rules.steps({}, seated)[0], Date.now())))
+  }
 
   return { isStarting: false }
 }
@@ -139,7 +141,7 @@ const close = async (context: VoteContext): Promise<VoteOutcome> => {
     ...vote.chosen,
     [vote.step]: rules.winner(vote.step, picks, session.hostId, session.settings),
   }
-  const steps = rules.steps(chosen)
+  const steps = rules.steps(chosen, present.size)
   const next = steps[steps.indexOf(vote.step) + 1]
   if (next) {
     await store(context, withVote(session.settings, voteAt(next, Date.now(), chosen)))
@@ -148,7 +150,7 @@ const close = async (context: VoteContext): Promise<VoteOutcome> => {
   }
 
   // Last step: the winners become the rules, the game starts
-  const asked = rules.settings(chosen, session.settings)
+  const asked = rules.settings(chosen, session.settings, present.size)
   const settled = engineOf(session.game).readSettings(asked, session.settings)
   const dealt = rules.deal?.(settled as Prisma.JsonValue)
   if (dealt) {

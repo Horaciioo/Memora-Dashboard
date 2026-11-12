@@ -45,9 +45,10 @@ const winRate = ({ wins, played }: { wins: number; played: number }): number =>
  */
 
 export const readPlayProfile = cache(async (accountId: string) => {
-  const [stats, profile] = await Promise.all([
+  const [stats, profile, trophyWins] = await Promise.all([
     prisma.playGameStat.findMany({ where: { accountId } }),
     prisma.playProfile.findUnique({ where: { accountId } }),
+    prisma.playTrophyWin.aggregate({ where: { accountId }, _sum: { xp: true } }),
   ])
   const byGame = new Map(stats.map((stat) => [stat.game, stat]))
 
@@ -55,9 +56,9 @@ export const readPlayProfile = cache(async (accountId: string) => {
   const totals = Object.fromEntries(
     TOTAL_FIELDS.map((field) => [field, stats.reduce((sum, stat) => sum + stat[field], 0)])
   ) as Record<(typeof TOTAL_FIELDS)[number], number>
-  // Global XP also holds its own bonus
+  // Global XP also holds its own bonus and the trophies
   const bonusXp = profile?.bonusXp ?? 0
-  totals.xp = Math.max(0, totals.xp + bonusXp)
+  totals.xp = Math.max(0, totals.xp + bonusXp + (trophyWins._sum.xp ?? 0))
 
   return {
     global: {

@@ -1,0 +1,266 @@
+/* Scroll title: ribbon with folded tails, the box below is narrower */
+.play-scroll {
+  --scroll-tone: var(--play-key);
+  --scroll-deep: color-mix(in srgb, var(--scroll-tone) 55%, black);
+  --scroll-fold: color-mix(in srgb, var(--scroll-tone) 72%, black);
+  --scroll-light: color-mix(in srgb, var(--scroll-tone) 55%, white);
+  --scroll-edge: color-mix(in srgb, var(--scroll-tone) 25%, black);
+  --scroll-sheen: color-mix(in srgb, white 16%, transparent);
+  --scroll-gold: color-mix(in srgb, var(--play-gold, #ffcf4a) 85%, var(--scroll-tone));
+}
+
+.play-ribbon {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  margin-inline: 2rem;
+}
+
+.play-ribbon-tail {
+  position: absolute;
+  z-index: -1;
+  top: -0.2rem;
+  width: 4.6rem;
+  height: calc(100% + 1rem);
+  overflow: visible;
+}
+
+.play-ribbon-tail path {
+  stroke: var(--scroll-edge);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.play-ribbon-tail-back {
+  fill: var(--scroll-fold);
+}
+
+.play-ribbon-tail-body {
+  fill: color-mix(in srgb, var(--scroll-tone) 78%, black);
+}
+
+.play-ribbon-tail-lip {
+  fill: none;
+  stroke: var(--scroll-gold);
+}
+
+.play-ribbon-tail-left {
+  left: -3.2rem;
+}
+
+.play-ribbon-tail-right {
+  right: -3.2rem;
+  transform: scaleX(-1);
+}
+
+.play-ribbon-plate {
+  position: relative;
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 5%,
+      var(--scroll-sheen) 5% 9%,
+      transparent 9% 91%,
+      var(--scroll-sheen) 91% 95%,
+      transparent 95%
+    ),
+    var(--scroll-tone);
+  border-radius: 0.5rem / 0.35rem;
+  box-shadow:
+    inset 0 0.16rem 0 var(--scroll-gold),
+    inset 0 -0.16rem 0 var(--scroll-gold),
+    0 0 0 0.14rem var(--scroll-edge);
+}
+
+.play-ribbon-text {
+  margin: 0;
+  color: var(--play-on-art);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0.1rem 0.2rem color-mix(in srgb, var(--scroll-edge) 60%, transparent);
+}
+
+/* Box tucked under the ribbon, narrower like an unrolled page */
+.play-scroll-box {
+  position: relative;
+  margin-inline: 2.5rem;
+  margin-top: -0.9rem;
+  padding: 1.9rem 1rem 1rem;
+  background: color-mix(in srgb, var(--play-panel-strong) 93%, var(--scroll-tone));
+  border: 0.2rem solid var(--scroll-deep);
+  border-top-width: 0;
+  border-radius: 0 0 1.1rem 1.1rem;
+  box-shadow:
+    inset 0 -0.35rem 0 color-mix(in srgb, var(--scroll-tone) 14%, transparent),
+    0 0.3rem 0 var(--scroll-deep);
+}
+
+.play-scroll-box::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--scroll-deep) 38%, transparent),
+    transparent
+  );
+  pointer-events: none;
+}
+
+@media (max-width: 40rem) {
+  .play-ribbon {
+    margin-inline: 1.4rem;
+  }
+
+  .play-ribbon-tail {
+    width: 3.4rem;
+  }
+
+  .play-ribbon-tail-left {
+    left: -2.2rem;
+  }
+
+  .play-ribbon-tail-right {
+    right: -2.2rem;
+  }
+
+  .play-scroll-box {
+    margin-inline: 1.4rem;
+    padding-inline: 0.75rem;
+  }
+}
+
+/* Unroll: plate opens from the centre, tails slide out, box drops */
+@media (prefers-reduced-motion: no-preference) {
+  .play-ribbon-plate {
+    animation: scroll-plate-open 0.6s cubic-bezier(0.3, 0.7, 0.2, 1) backwards;
+  }
+
+  .play-ribbon-plate::before,
+  .play-ribbon-plate::after {
+    content: '';
+    position: absolute;
+    top: -0.3rem;
+    bottom: -0.3rem;
+    width: 0.7rem;
+    border-radius: 0.35rem;
+    background: linear-gradient(
+      90deg,
+      var(--scroll-fold),
+      var(--scroll-gold) 45%,
+      var(--scroll-fold)
+    );
+    box-shadow: 0 0 0 0.12rem var(--scroll-edge);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .play-ribbon-plate::before {
+    animation: scroll-rod-left 0.6s cubic-bezier(0.3, 0.7, 0.2, 1) backwards;
+  }
+
+  .play-ribbon-plate::after {
+    animation: scroll-rod-right 0.6s cubic-bezier(0.3, 0.7, 0.2, 1) backwards;
+  }
+
+  .play-ribbon-tail-left {
+    animation: scroll-tail-left 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) 0.4s backwards;
+  }
+
+  .play-ribbon-tail-right {
+    animation: scroll-tail-right 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) 0.4s backwards;
+  }
+
+  .play-scroll-box {
+    animation: scroll-box-drop 0.7s cubic-bezier(0.3, 0.7, 0.2, 1) 0.6s backwards;
+  }
+}
+
+@keyframes scroll-plate-open {
+  from {
+    clip-path: inset(-0.4rem 50% -0.4rem 50%);
+  }
+
+  to {
+    clip-path: inset(-0.4rem -0.8rem -0.4rem -0.8rem);
+  }
+}
+
+@keyframes scroll-rod-left {
+  0% {
+    left: 50%;
+    opacity: 1;
+  }
+
+  85% {
+    left: -0.35rem;
+    opacity: 1;
+  }
+
+  100% {
+    left: -0.35rem;
+    opacity: 0;
+  }
+}
+
+@keyframes scroll-rod-right {
+  0% {
+    right: 50%;
+    opacity: 1;
+  }
+
+  85% {
+    right: -0.35rem;
+    opacity: 1;
+  }
+
+  100% {
+    right: -0.35rem;
+    opacity: 0;
+  }
+}
+
+@keyframes scroll-tail-left {
+  from {
+    translate: 2.4rem 0;
+    opacity: 0;
+  }
+
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes scroll-tail-right {
+  from {
+    translate: -2.4rem 0;
+    opacity: 0;
+  }
+
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes scroll-box-drop {
+  from {
+    clip-path: inset(0 -1rem 100% -1rem);
+  }
+
+  to {
+    clip-path: inset(0 -1rem -1rem -1rem);
+  }
+}
+
+/* Medal: hexagon, number, two tails */
+.play-medal {
+  display: inline-block;
+  flex: none;
+  filter: drop-shadow(0 0.1rem 0 color-mix(in srgb, var(--play-night) 45%, transparent));
+}

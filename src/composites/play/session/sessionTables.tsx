@@ -6,6 +6,8 @@ import { CroquisBoard } from '@/composites/play/croquis/CroquisBoard'
 import type { CroquisBoardView } from '@/composites/play/croquis/types'
 import { EchoBoard } from '@/composites/play/echo/EchoBoard'
 import type { EchoBoardView } from '@/composites/play/echo/types'
+import { SuspensBoard } from '@/composites/play/suspens/SuspensBoard'
+import type { SuspensBoardView } from '@/composites/play/suspens/types'
 import { GlitchBoard } from '@/composites/play/glitch/GlitchBoard'
 import type { GlitchBoardView } from '@/composites/play/glitch/types'
 import { JumbleBoard } from '@/composites/play/jumble/JumbleBoard'
@@ -26,6 +28,7 @@ import {
   BAC_FEED_COPY,
   BOMB_FEED_COPY,
   CROQUIS_FEED_COPY,
+  SUSPENS_FEED_COPY,
   ECHO_FEED_COPY,
   GLITCH_FEED_COPY,
   JUMBLE_FEED_COPY,
@@ -142,6 +145,29 @@ export const PLAY_SESSION_TABLES: Partial<
           sessionId={sessionId}
           board={croquis}
           copy={CROQUIS_FEED_COPY}
+          players={[...seats, ...spectators]}
+        />
+      ),
+    }
+  },
+  [PlayGames.Suspens]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const suspens = board as SuspensBoardView
+
+    return {
+      board: (
+        <SuspensBoard
+          sessionId={sessionId}
+          board={suspens}
+          faces={asPlayers(seats)}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      feed: (
+        <PlainLiveFeed
+          sessionId={sessionId}
+          board={suspens}
+          copy={SUSPENS_FEED_COPY}
           players={[...seats, ...spectators]}
         />
       ),

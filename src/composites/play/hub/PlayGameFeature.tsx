@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react'
 
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayPosterArt } from '@/composites/play/brand/PlayPosterArt'
+import { PlayFeatureCard } from '@/composites/play/hub/PlayFeatureCard'
 import { ROUTES } from '@/declarations/navigation'
 import { fillPlayMessage, PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_FEATURE } from '@/declarations/ui/variants'
@@ -51,7 +52,6 @@ export const PlayGameFeature = ({ games }: PlayGameFeatureProps) => {
         <PlayPosterArt game={game} className={PLAY_FEATURE.backdrop} />
         <span className={PLAY_FEATURE.shade} aria-hidden="true" />
         <div className={PLAY_FEATURE.body}>
-          <span className={PLAY_FEATURE.badge}>{PLAY_HUB_COPY.featureBadge}</span>
           <h2 className={PLAY_FEATURE.name}>{meta.label}</h2>
           <p className={PLAY_FEATURE.tagline}>{meta.tagline}</p>
           <p className={PLAY_FEATURE.seats}>
@@ -61,10 +61,11 @@ export const PlayGameFeature = ({ games }: PlayGameFeatureProps) => {
             {PLAY_HUB_COPY.featurePlay}
           </AppLink>
         </div>
-        <div className={PLAY_FEATURE.poster} aria-hidden="true">
-          <PlayPosterArt game={game} />
-        </div>
       </div>
+      <PlayFeatureCard key={`${game}-poster`} game={game} />
+      <span className={PLAY_FEATURE.badgeClip} aria-hidden="true">
+        <span className={PLAY_FEATURE.badge}>{PLAY_HUB_COPY.featureBadge}</span>
+      </span>
       {games.length > 1 && (
         <div className={PLAY_FEATURE.dots}>
           {games.map((entry, index) => (

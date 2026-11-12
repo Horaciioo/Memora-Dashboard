@@ -9,7 +9,7 @@ import { PLAY_ROOM } from '@/declarations/ui/variants'
 import type { PlayInviteCandidate } from '@/types/play'
 
 /**
- * Empty seat of the table, one tap opens the picker under it
+ * Empty seat card, one tap opens the picker under it
  * @param {Object} props - Game and candidates
  * @param {string} props.sessionId - Game
  * @param {PlayInviteCandidate[]} props.candidates - Members to call
@@ -37,14 +37,15 @@ export const PlayInviteSlot = ({
       candidates={candidates}
       canSeat
       centered
+      className="flex"
       extras={extras}
       isOpenAtStart={isOpenAtStart}
       trigger={(toggle, isOpen) => (
-        <button type="button" aria-expanded={isOpen} className={PLAY_ROOM.tile} onClick={toggle}>
-          <span className={PLAY_ROOM.tileEmpty}>
-            <AddIcon className={PLAY_ROOM.tileEmptyIcon} />
+        <button type="button" aria-expanded={isOpen} className={PLAY_ROOM.slot} onClick={toggle}>
+          <span className={PLAY_ROOM.slotIcon}>
+            <AddIcon className={PLAY_ROOM.slotIconSvg} aria-hidden="true" />
           </span>
-          <span className={PLAY_ROOM.tileNote}>{PLAY_HUB_COPY.slotFree}</span>
+          <span className={PLAY_ROOM.slotLabel}>{PLAY_HUB_COPY.slotFree}</span>
         </button>
       )}
     />

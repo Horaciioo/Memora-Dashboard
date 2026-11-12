@@ -34,8 +34,19 @@ export const SETUP_PINK =
 export const SETUP_VIOLET =
   'border-[var(--play-jumble)] bg-[var(--play-jumble)] text-white hover:border-[var(--play-jumble)]'
 
+export const SETUP_WOOD =
+  'border-[var(--play-suspens)] bg-[var(--play-suspens)] text-white hover:border-[var(--play-suspens)]'
+
 export const SETUP_AMBER =
   'border-[var(--play-croquis)] bg-[var(--play-croquis)] text-[var(--play-croquis-night)] hover:border-[var(--play-croquis)]'
 
 export const SETUP_FIRE =
   'border-[var(--play-bomb)] bg-[var(--play-bomb)] text-white hover:border-[var(--play-bomb)]'
+
+/**
+ * Gold tile of a won trophy, black glyph, relief and glow
+ * @type {string}
+ */
+
+export const PLAY_GOLD_TILE =
+  'relative bg-[linear-gradient(150deg,color-mix(in_oklab,var(--play-gold)_60%,white),var(--play-gold)_40%,var(--play-gold-deep))] text-[var(--play-night)]! shadow-[inset_0_2px_0_rgb(255_255_255/0.6),inset_0_-3px_0_color-mix(in_oklab,var(--play-gold-deep)_70%,black)] ring-2 ring-[color-mix(in_oklab,var(--play-gold-deep)_80%,black)]'

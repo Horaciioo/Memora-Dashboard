@@ -137,11 +137,13 @@ export const PlaySetupDrawer = ({
       title={isEditing ? PLAY_HUB_COPY.rulesHost : copy.title}
       icon="play"
       subheader={
-        <div className={DRAWER_STYLES.subheaderRow}>
-          <div className={DRAWER_STYLES.subheaderTabs}>
-            <Tabs items={tabs} value={tab} onChange={setTab} label={copy.tabs} emphasis />
+        tabs.length > 1 && (
+          <div className={DRAWER_STYLES.subheaderRow}>
+            <div className={DRAWER_STYLES.subheaderTabs}>
+              <Tabs items={tabs} value={tab} onChange={setTab} label={copy.tabs} emphasis />
+            </div>
           </div>
-        </div>
+        )
       }
       footer={
         isCompact ? (
@@ -168,7 +170,7 @@ export const PlaySetupDrawer = ({
           <div className={DRAWER_ACTIONS.stack}>
             {tabs.length > 1 && <div className={DRAWER_ACTIONS.steps}>{stepButtons}</div>}
             {isLast && (
-              <>
+              <div className={DRAWER_ACTIONS.pair}>
                 <FooterLine
                   label={saveLabel}
                   disabled={isSaving || !canSubmit}
@@ -182,7 +184,6 @@ export const PlaySetupDrawer = ({
                     )
                   }
                 />
-                <span className={DRAWER_ACTIONS.divider} aria-hidden="true" />
                 <FooterLine
                   label={copy.cancel}
                   disabled={isSaving}
@@ -190,7 +191,7 @@ export const PlaySetupDrawer = ({
                   onClick={onClose}
                   icon={<CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />}
                 />
-              </>
+              </div>
             )}
           </div>
         )

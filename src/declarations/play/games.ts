@@ -7,6 +7,8 @@ import { ECHO_HUB } from '@/declarations/play/echo/copy'
 import { ECHO_SETTINGS } from '@/declarations/play/echo/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { SUSPENS_HUB } from '@/declarations/play/suspens/copy'
+import { SUSPENS_SETTINGS } from '@/declarations/play/suspens/settings'
 import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
 import { GLITCH_SETTINGS } from '@/declarations/play/glitch/settings'
 import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
@@ -113,6 +115,18 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: CROQUIS_HUB.ground,
     minPlayers: CROQUIS_SETTINGS.minPlayers,
     maxPlayers: CROQUIS_SETTINGS.maxPlayers,
+    playable: true,
+  },
+  [PlayGames.Suspens]: {
+    label: 'Suspens',
+    slug: 'suspens',
+    tagline: 'Un mot caché, des lettres à deviner avant que le bonhomme soit pendu.',
+    tone: '--play-suspens',
+    logo: 'playSuspens',
+    backdrop: 'gallows',
+    ground: SUSPENS_HUB.ground,
+    minPlayers: SUSPENS_SETTINGS.minPlayers,
+    maxPlayers: SUSPENS_SETTINGS.maxPlayers,
     playable: true,
   },
   [PlayGames.Glitch]: {

@@ -120,6 +120,8 @@ export const DRAWER_ACTIONS = {
   stepNext: 'ml-auto',
   stepLabel: 'hidden min-w-0 truncate md:block',
   stepIcon: 'h-5 w-5 shrink-0 text-[var(--color-ink-accent)] md:h-4 md:w-4',
+  // Save and cancel side by side on wide screens
+  pair: 'contents md:grid md:grid-cols-2 md:gap-2',
   // Filled gestures
   line: 'flex size-11 shrink-0 items-center justify-center gap-2.5 rounded-full text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60 md:size-auto md:w-full md:rounded-[var(--radius-md)] md:px-4 md:py-3',
   lineLabel: 'hidden md:inline',

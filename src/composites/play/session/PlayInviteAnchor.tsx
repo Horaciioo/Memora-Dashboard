@@ -7,12 +7,15 @@ import { PlayInvitePicker } from '@/composites/play/session/PlayInvitePicker'
 import type { PlayInvitePickerProps } from '@/composites/play/session/PlayInvitePicker'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { PLAY_INVITE } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 export interface PlayInviteAnchorProps extends Omit<PlayInvitePickerProps, 'onDone'> {
   // Trigger, told how to open the picker
   trigger: (toggle: () => void, isOpen: boolean) => ReactNode
   // Picker already open on arrival
   isOpenAtStart?: boolean
+  // Extra classes of the wrapper
+  className?: string
 }
 
 /**
@@ -25,6 +28,7 @@ export const PlayInviteAnchor = ({
   trigger,
   inline,
   isOpenAtStart = false,
+  className,
   ...picker
 }: PlayInviteAnchorProps) => {
   const [isOpen, setOpen] = useState(isOpenAtStart)
@@ -35,7 +39,10 @@ export const PlayInviteAnchor = ({
   return (
     <div
       ref={box}
-      className={inline || picker.above ? PLAY_INVITE.anchorInline : PLAY_INVITE.anchor}
+      className={cn(
+        inline || picker.above ? PLAY_INVITE.anchorInline : PLAY_INVITE.anchor,
+        className
+      )}
     >
       {trigger(() => setOpen((current) => !current), isOpen)}
       {isOpen && <PlayInvitePicker {...picker} inline={inline} onDone={close} />}

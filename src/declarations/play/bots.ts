@@ -26,6 +26,7 @@ const bomb = readNode(bots.bomb, 'play/bots.bomb')
 const echo = readNode(bots.echo, 'play/bots.echo')
 const croquis = readNode(bots.croquis, 'play/bots.croquis')
 const glitch = readNode(bots.glitch, 'play/bots.glitch')
+const suspens = readNode(bots.suspens, 'play/bots.suspens')
 const jumble = readNode(bots.jumble, 'play/bots.jumble')
 const baccalaureat = readNode(bots.baccalaureat, 'play/bots.baccalaureat')
 const golf = readNode(bots.golf, 'play/bots.golf')
@@ -87,6 +88,10 @@ export const PLAY_BOT_SETTINGS = {
   croquis: {
     thinkMs: delay(croquis.thinkMs, 'play/bots.croquis.thinkMs'),
     failRate: perLevel(croquis.failRate, 'play/bots.croquis.failRate', 0.2),
+  },
+  suspens: {
+    thinkMs: delay(suspens.thinkMs, 'play/bots.suspens.thinkMs'),
+    failRate: perLevel(suspens.failRate, 'play/bots.suspens.failRate', 0.2),
   },
   glitch: {
     thinkMs: delay(glitch.thinkMs, 'play/bots.glitch.thinkMs'),

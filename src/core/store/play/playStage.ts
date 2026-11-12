@@ -61,11 +61,17 @@ interface PlayStageStore {
   leave: () => void
 }
 
-export const usePlayStageStore = create<PlayStageStore>()((set) => ({
+export const usePlayStageStore = create<PlayStageStore>()((set, get) => ({
   isFullscreen: false,
   isChatOpen: false,
-  toggleFullscreen: () =>
-    morphStage(() => set((state) => ({ isFullscreen: !state.isFullscreen, isChatOpen: false }))),
+  toggleFullscreen: () => {
+    // Real screen on: the key hands it back
+    if (document.fullscreenElement) return void document.exitFullscreen()
+    // Already on the stage: take the screen at once, the click is still fresh
+    if (get().isFullscreen)
+      return void document.documentElement.requestFullscreen?.().catch(() => get().leave())
+    morphStage(() => set({ isFullscreen: true, isChatOpen: false }))
+  },
   toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
   enter: () => set({ isFullscreen: true, isChatOpen: window.matchMedia(MEDIA.lg).matches }),
   leave: () => set({ isFullscreen: false, isChatOpen: false }),

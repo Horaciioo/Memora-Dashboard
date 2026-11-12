@@ -1,5 +1,5 @@
 /**
- * Common French words to unscramble, accents kept, length drives the difficulty
+ * Common French words to unscramble, accents kept, length drives the difficulty, from three letters
  * @type {readonly string[]}
  */
 
@@ -224,4 +224,37 @@ export const JUMBLE_WORDS = [
   'champion',
   'victoire',
   'compétition',
+  'sac',
+  'lit',
+  'nez',
+  'feu',
+  'riz',
+  'bus',
+  'mer',
+  'pot',
+  'roi',
+  'mur',
+  'lune',
+  'chat',
+  'pain',
+  'vent',
+  'pied',
+  'main',
+  'bras',
+  'dent',
+  'nuit',
+  'jour',
+  'lait',
+  'miel',
+  'rose',
+  'bleu',
+  'noir',
+  'vert',
+  'roue',
+  'loup',
+  'ours',
+  'lion',
+  'cerf',
+  'paon',
+  'pont',
 ] as const

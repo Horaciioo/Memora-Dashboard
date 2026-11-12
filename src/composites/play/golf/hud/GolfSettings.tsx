@@ -62,6 +62,7 @@ export const GolfSettings = ({ sessionId, isSeated }: { sessionId: string; isSea
           sessionId={sessionId}
           gameSlug={PLAY_GAMES.get(PlayGames.Golf).slug}
           isSeated={isSeated}
+          hasSettings={false}
           itemClass={cn(GOLF_BOARD.setting, 'justify-start')}
           iconClass="size-5"
         />

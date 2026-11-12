@@ -1,17 +1,15 @@
 'use client'
 
 import { useEffect } from 'react'
-import type { RefObject } from 'react'
 
 import { stageSettled, usePlayStageStore } from '@/core/store/play/playStage'
 
 /**
- * Keep the browser full screen in step with the play stage store
- * @param {RefObject<HTMLElement | null>} target - Element shown full screen
+ * Keep the whole page full screen, dialogs included, in step with the play stage store
  * @return {void}
  */
 
-export const usePlayFullscreen = (target: RefObject<HTMLElement | null>) => {
+export const usePlayFullscreen = () => {
   const isFullscreen = usePlayStageStore((state) => state.isFullscreen)
   const leave = usePlayStageStore((state) => state.leave)
 
@@ -19,10 +17,10 @@ export const usePlayFullscreen = (target: RefObject<HTMLElement | null>) => {
     // Browser mode follows the morph, a viewport change would abort it
     void stageSettled().then(() => {
       if (isFullscreen && !document.fullscreenElement && navigator.userActivation?.isActive)
-        void target.current?.requestFullscreen?.().catch(() => {})
+        void document.documentElement.requestFullscreen?.().catch(() => {})
       if (!isFullscreen && document.fullscreenElement) void document.exitFullscreen()
     })
-  }, [isFullscreen, target])
+  }, [isFullscreen])
 
   // Escape leaves the browser mode first
   useEffect(() => {

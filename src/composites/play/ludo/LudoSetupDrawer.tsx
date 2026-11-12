@@ -6,29 +6,20 @@ import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { InfoHint } from '@/components/elements/feedback/InfoHint'
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
-import { SetupChips, SetupSection, SetupStepper } from '@/composites/play/setup/PlaySetupFields'
+import { SetupSection, SetupStepper } from '@/composites/play/setup/PlaySetupFields'
 import { ludoSettingsOf } from '@/core/lib/play/ludo/settings'
 import type { LudoGameSettings } from '@/core/lib/play/ludo/settings'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { LUDO_RULE_COPY, LUDO_SETUP_COPY } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
-import type { LudoExitRule, LudoRuleName } from '@/declarations/play/ludo/settings'
+import type { LudoRuleName } from '@/declarations/play/ludo/settings'
 import { FIELD_STYLES, LUDO_SETUP } from '@/declarations/ui/variants'
 
 // Tabs of the drawer
-const TABS = [
-  { value: 'game', label: LUDO_SETUP_COPY.tabGame, icon: 'playPawn' as const },
-  { value: 'rules', label: LUDO_SETUP_COPY.tabRules, icon: 'playRules' as const },
-]
+const TABS = [{ value: 'rules', label: LUDO_SETUP_COPY.tabRules, icon: 'playRules' as const }]
 
-// Exit rules as chips
-const EXITS = (Object.keys(LUDO_SETTINGS.exits) as LudoExitRule[]).map((value) => ({
-  value,
-  label: LUDO_SETUP_COPY[value],
-}))
-
-// House rules, in reading order
-const RULES = Object.keys(LUDO_RULE_COPY) as LudoRuleName[]
+// House rules in reading order, Chaos is voted by the table
+const RULES = (Object.keys(LUDO_RULE_COPY) as LudoRuleName[]).filter((name) => name !== 'chaos')
 
 /**
  * Rules picked before a Ludo game opens
@@ -59,57 +50,39 @@ export const LudoSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
       onClose={onClose}
       onSubmit={() => onSubmit({ settings })}
     >
-      {(tab) => (
+      {() => (
         <div className={LUDO_SETUP.body}>
-          {tab === 'game' && (
-            <>
-              <SetupSection
-                styles={LUDO_SETUP}
-                title={LUDO_SETUP_COPY.turn}
-                hint={LUDO_SETUP_COPY.turnHint}
-              >
-                <SetupStepper
-                  styles={LUDO_SETUP}
-                  value={settings.turnSeconds}
-                  range={LUDO_SETTINGS.turnSeconds}
-                  step={LUDO_SETTINGS.turnStep}
-                  display={fillPlayMessage(LUDO_SETUP_COPY.seconds, {
-                    seconds: settings.turnSeconds,
-                  })}
-                  onChange={set('turnSeconds')}
-                  labels={steps}
-                />
-              </SetupSection>
-              <SetupSection
-                styles={LUDO_SETUP}
-                title={LUDO_SETUP_COPY.exit}
-                hint={LUDO_SETUP_COPY.exitHint}
-              >
-                <SetupChips
-                  styles={LUDO_SETUP}
-                  options={EXITS}
-                  value={settings.exit}
-                  onChange={set('exit')}
-                />
-              </SetupSection>
-            </>
-          )}
-
-          {tab === 'rules' &&
-            RULES.map((name) => (
-              <div key={name} className={LUDO_SETUP.switchRow}>
-                <span className={FIELD_STYLES.labelRow}>
-                  <span className={LUDO_SETUP.switchLabel}>{LUDO_RULE_COPY[name].label}</span>
-                  <InfoHint text={LUDO_RULE_COPY[name].hint} align="start" />
-                </span>
-                <Toggle
-                  bare
-                  checked={settings.rules[name]}
-                  onChange={setRule(name)}
-                  label={LUDO_RULE_COPY[name].label}
-                />
-              </div>
-            ))}
+          <SetupSection
+            styles={LUDO_SETUP}
+            title={LUDO_SETUP_COPY.turn}
+            hint={LUDO_SETUP_COPY.turnHint}
+          >
+            <SetupStepper
+              styles={LUDO_SETUP}
+              value={settings.turnSeconds}
+              range={LUDO_SETTINGS.turnSeconds}
+              step={LUDO_SETTINGS.turnStep}
+              display={fillPlayMessage(LUDO_SETUP_COPY.seconds, {
+                seconds: settings.turnSeconds,
+              })}
+              onChange={set('turnSeconds')}
+              labels={steps}
+            />
+          </SetupSection>
+          {RULES.map((name) => (
+            <div key={name} className={LUDO_SETUP.switchRow}>
+              <span className={FIELD_STYLES.labelRow}>
+                <span className={LUDO_SETUP.switchLabel}>{LUDO_RULE_COPY[name].label}</span>
+                <InfoHint text={LUDO_RULE_COPY[name].hint} align="start" />
+              </span>
+              <Toggle
+                bare
+                checked={settings.rules[name]}
+                onChange={setRule(name)}
+                label={LUDO_RULE_COPY[name].label}
+              />
+            </div>
+          ))}
         </div>
       )}
     </PlaySetupDrawer>

@@ -1,0 +1,20 @@
+{
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "countdownSeconds": 3,
+  "laps": { "default": 1, "min": 1, "max": 3 },
+  "errors": { "default": 6, "min": 6, "max": 10 },
+  "turnSeconds": { "default": 20, "min": 8, "max": 60 },
+  "pickSeconds": { "default": 40, "min": 15, "max": 90 },
+  "revealSeconds": 5,
+  "wordLength": { "min": 4, "max": 14 },
+  "scoring": {
+    "cell": 2,
+    "solve": 6,
+    "setterPerError": 2,
+    "setterHang": 8
+  },
+  "alphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "frequency": "EAISNRTOLUDCMPGBVHFQYXJKWZ",
+  "feedSize": 40
+}
