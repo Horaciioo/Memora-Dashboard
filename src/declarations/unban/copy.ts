@@ -31,6 +31,10 @@ export const UNBAN_COPY = {
   expectedDiscordId: 'Identifiant Discord attendu',
   expectedDiscordIdHint: 'Facultatif. Seul ce compte Discord pourra ouvrir le lien.',
   expiry: 'Valable',
+  formVersion: 'Version {number}',
+  formVersionTag: 'Formulaire v{number}',
+  emptyAnswer: 'Pas de réponse',
+  formNewer: 'Une version plus récente existe.',
   formDraft: 'Brouillon non publié',
   formPublish: 'Publier le formulaire',
   formDiscard: 'Abandonner le brouillon',
@@ -62,4 +66,30 @@ export const UNBAN_PUBLIC_COPY = {
   decision: 'Décision',
   answer: 'Réponse de l’équipe',
   tooFast: 'Merci de prendre le temps de relire votre demande avant de l’envoyer.',
+} as const
+
+/**
+ * Reasons a form is refused
+ * @type {Record<string, string>}
+ */
+
+export const UNBAN_FORM_COPY = {
+  notAForm: 'Le formulaire est illisible.',
+  noQuestion: 'Ajoute au moins une question.',
+  tooManyQuestions: 'Il y a trop de questions.',
+  duplicateQuestion: 'Deux questions portent le même identifiant.',
+  unknownType: 'Ce type de question n’existe pas.',
+  labelRequired: 'Chaque question a besoin d’un intitulé.',
+  labelTooLong: 'Cet intitulé est trop long.',
+  optionsRequired: 'Une question à choix propose au moins deux options.',
+  tooManyOptions: 'Il y a trop d’options.',
+  duplicateOption: 'Deux options portent le même identifiant.',
+  optionLabelRequired: 'Chaque option a besoin d’un libellé.',
+  optionsNotAllowed: 'Ce type de question ne propose pas d’options.',
+  badScale: 'Les bornes de l’échelle sont incorrectes.',
+  scaleMissing: 'Une échelle a besoin de ses bornes.',
+  badLength: 'La longueur maximale est incorrecte.',
+  nothingChanged: 'Rien n’a changé.',
+  noDraft: 'Il n’y a pas de brouillon.',
+  unknownAnswer: 'Cette réponse ne correspond à aucune question.',
 } as const

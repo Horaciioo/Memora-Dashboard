@@ -1,9 +1,5 @@
 import { createRegistry } from '@/core/lib/registry'
-import {
-  UnbanLinkStates,
-  UnbanQuestionTypes,
-  UnbanStatuses,
-} from '@/utils/constants/unban'
+import { UnbanLinkStates, UnbanQuestionTypes, UnbanStatuses } from '@/utils/constants/unban'
 import type { IconName } from '@/declarations/ui/icons'
 import type { Tone } from '@/declarations/ui/theme'
 import type { FieldKind } from '@/types/forms'
@@ -51,30 +47,55 @@ export const UNBAN_LINK_STATE_REGISTRY = createRegistry(LINK_STATE_MAP)
  * @property {string} label - Display label
  * @property {IconName} icon - Glyph
  * @property {FieldKind} fieldKind - Kind of form field it becomes
+ * @property {boolean} hasOptions - Answers come from a list
+ * @property {boolean} isList - Options drawn as a visible list
  */
 
 interface UnbanQuestionTypeOption {
   label: string
   icon: IconName
   fieldKind: FieldKind
+  hasOptions: boolean
+  isList: boolean
 }
 
+const FREE = { hasOptions: false, isList: false }
+const CHOICE = { hasOptions: true, isList: true }
+
 const QUESTION_TYPE_MAP: Record<UnbanQuestionTypeName, UnbanQuestionTypeOption> = {
-  [UnbanQuestionTypes.ShortText]: { label: 'Texte court', icon: 'dash', fieldKind: 'text' },
-  [UnbanQuestionTypes.LongText]: { label: 'Texte long', icon: 'paragraph', fieldKind: 'textarea' },
+  [UnbanQuestionTypes.ShortText]: {
+    label: 'Texte court',
+    icon: 'dash',
+    fieldKind: 'text',
+    ...FREE,
+  },
+  [UnbanQuestionTypes.LongText]: {
+    label: 'Texte long',
+    icon: 'paragraph',
+    fieldKind: 'textarea',
+    ...FREE,
+  },
   [UnbanQuestionTypes.SingleChoice]: {
     label: 'Choix unique',
     icon: 'bulletRing',
     fieldKind: 'select',
+    ...CHOICE,
   },
   [UnbanQuestionTypes.MultipleChoice]: {
     label: 'Choix multiple',
     icon: 'checkbox',
     fieldKind: 'multiselect',
+    ...CHOICE,
   },
-  [UnbanQuestionTypes.Dropdown]: { label: 'Liste déroulante', icon: 'expand', fieldKind: 'select' },
-  [UnbanQuestionTypes.Scale]: { label: 'Échelle', icon: 'metrics', fieldKind: 'scale' },
-  [UnbanQuestionTypes.Date]: { label: 'Date', icon: 'deadline', fieldKind: 'date' },
+  [UnbanQuestionTypes.Dropdown]: {
+    label: 'Liste déroulante',
+    icon: 'expand',
+    fieldKind: 'select',
+    hasOptions: true,
+    isList: false,
+  },
+  [UnbanQuestionTypes.Scale]: { label: 'Échelle', icon: 'metrics', fieldKind: 'scale', ...FREE },
+  [UnbanQuestionTypes.Date]: { label: 'Date', icon: 'deadline', fieldKind: 'date', ...FREE },
 }
 
 export const UNBAN_QUESTION_TYPE_REGISTRY = createRegistry(QUESTION_TYPE_MAP)
