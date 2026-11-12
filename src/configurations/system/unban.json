@@ -11,5 +11,6 @@
   "listedLinks": 50,
   "ticketMinutes": 120,
   "statsRecentDays": 7,
-  "statsMonthDays": 30
+  "statsMonthDays": 30,
+  "notifyMax": 20
 }

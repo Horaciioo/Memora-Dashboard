@@ -6,16 +6,19 @@ import { checkSubmission, sealAnswers } from '@/core/lib/unban/answers'
 import { checkFillToken, FILL_REFUSALS } from '@/core/lib/unban/fillToken'
 import { accessStateOf } from '@/core/lib/unban/linkState'
 import { createReference } from '@/core/lib/unban/token'
+import { isFeatureOn } from '@/core/services/features/FeatureService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { readVersion } from '@/core/services/unban/UnbanFormService'
 import { findLinkByToken } from '@/core/services/unban/links/public'
-import { UNBAN_FORM_COPY, UNBAN_PUBLIC_COPY } from '@/declarations/unban/copy'
+import { UNBAN_ERRORS, UNBAN_FORM_COPY, UNBAN_PUBLIC_COPY } from '@/declarations/unban/copy'
 import {
   UNBAN_FORM_FIELDS,
+  UNBAN_INTAKE_FEATURE,
   UNBAN_TOKEN,
   UnbanLinkStates,
   UnbanStatuses,
 } from '@/utils/constants/unban'
+import { alertHandlers } from './alerts'
 import { filingIdentity } from './identity'
 import type { UnbanIdentity, UnbanTicket } from '@/core/lib/unban/ticket'
 import type { PublicLinkRow } from '@/core/services/unban/links/public'
@@ -111,7 +114,7 @@ const freeReference = async (tx: Prisma.TransactionClient): Promise<string> => {
  * @param {PublicLinkRow} link - Link being submitted
  * @param {UnbanIdentity} identity - Account filing
  * @param {{ formVersionId: string, answers: UnbanAnswer[] }} filing - Version and answers
- * @return {Promise<{ outcome: SubmitOutcome, isNew: boolean }>} - Outcome and whether it is new
+ * @return {Promise<{ outcome: SubmitOutcome, created: { id: string, youtuberId: string, discordName: string } | null }>} - Outcome and the request when new
  */
 
 const fileRequest = (
@@ -122,6 +125,9 @@ const fileRequest = (
   prisma.$transaction(async (tx) => {
     // The second of two simultaneous sends waits here, then finds the first one's request
     await tx.$queryRaw`SELECT id FROM unban_links WHERE id = ${link.id} FOR UPDATE`
+    // A send that left before the switch was cut and landed after it
+    if (!(await isFeatureOn(UNBAN_INTAKE_FEATURE))) throw forbidden(UNBAN_ERRORS.intakeClosed)
+
     const fresh = await tx.unbanLink.findUniqueOrThrow({
       where: { id: link.id },
       include: { request: true },
@@ -133,7 +139,7 @@ const fileRequest = (
 
       return {
         outcome: { reference: fresh.request.reference, linkExpiresAt: expiresAt },
-        isNew: false,
+        created: null,
       }
     }
     if (accessStateOf(fresh) !== UnbanLinkStates.Active) throw forbidden()
@@ -148,7 +154,7 @@ const fileRequest = (
     if (open) throw conflict(UNBAN_PUBLIC_COPY.alreadyOpen)
 
     const reference = await freeReference(tx)
-    await tx.unbanRequest.create({
+    const created = await tx.unbanRequest.create({
       data: {
         reference,
         linkId: link.id,
@@ -162,7 +168,7 @@ const fileRequest = (
     })
     await tx.unbanLink.update({ where: { id: link.id }, data: { usedAt: new Date() } })
 
-    return { outcome: { reference, linkExpiresAt: expiresAt }, isNew: true }
+    return { outcome: { reference, linkExpiresAt: expiresAt }, created }
   })
 
 /**
@@ -206,19 +212,21 @@ export const submitRequest = async ({
   const checked = checkSubmission(version.snapshot, answers)
   if (checked.issues.length > 0) throw invalidInput(checked.issues)
 
-  const { outcome, isNew } = await fileRequest(link, identity, {
+  const { outcome, created } = await fileRequest(link, identity, {
     formVersionId: version.id,
     answers: checked.answers,
   })
 
   // After the commit, a failure here never undoes the filing
-  if (isNew) {
+  if (created) {
     await recordEvent({
       eventType: 'UnbanSubmitted',
       targetType: 'unbanRequest',
+      targetId: created.id,
       summary: outcome.reference,
       payload: { reference: outcome.reference },
     }).catch(() => undefined)
+    await alertHandlers(created)
   }
 
   return outcome

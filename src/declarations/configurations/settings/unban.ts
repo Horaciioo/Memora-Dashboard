@@ -21,7 +21,7 @@ const shortAnswerMaxLength = readInteger(unban.shortAnswerMaxLength, {
 
 /**
  * Unban requests, links and form bounds
- * @type {{ expiryChoicesDays: number[], defaultExpiryDays: number, requireDiscordIdentity: boolean, minFillSeconds: number, maxQuestions: number, maxOptions: number, answerMaxLength: number, shortAnswerMaxLength: number, reviewNoteMaxLength: number, listedLinks: number, ticketMinutes: number, statsRecentDays: number, statsMonthDays: number }}
+ * @type {{ expiryChoicesDays: number[], defaultExpiryDays: number, requireDiscordIdentity: boolean, minFillSeconds: number, maxQuestions: number, maxOptions: number, answerMaxLength: number, shortAnswerMaxLength: number, reviewNoteMaxLength: number, listedLinks: number, ticketMinutes: number, statsRecentDays: number, statsMonthDays: number, notifyMax: number }}
  */
 
 export const UNBAN_SETTINGS = {
@@ -81,6 +81,12 @@ export const UNBAN_SETTINGS = {
   statsMonthDays: readInteger(unban.statsMonthDays, {
     path: 'system/unban.statsMonthDays',
     fallback: 30,
+    min: 1,
+  }),
+  // Most members alerted by one filing
+  notifyMax: readInteger(unban.notifyMax, {
+    path: 'system/unban.notifyMax',
+    fallback: 20,
     min: 1,
   }),
 } as const
