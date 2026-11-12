@@ -282,6 +282,44 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
       ))}
     </>
   ),
+  sketch: (tone) => (
+    <>
+      <circle cx="180" cy="300" r="150" {...tint(`${tone}-glow`, 0.2)} />
+      <g transform="translate(36 150) rotate(-7)">
+        <rect
+          width="290"
+          height="220"
+          rx="18"
+          fill="black"
+          opacity="0.28"
+          transform="translate(0 10)"
+        />
+        <rect width="290" height="220" rx="18" {...tint('--croquis-paper')} />
+        <path
+          d="M30 160c30-70 60-70 90 0s60 40 80-30 40-50 60-10"
+          fill="none"
+          strokeWidth="12"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ stroke: 'var(--croquis-blue)' }}
+        />
+        <circle cx="86" cy="64" r="26" {...tint('--croquis-yellow')} />
+        <path
+          d="M190 60l24 44h-48z"
+          fill="none"
+          strokeWidth="10"
+          strokeLinejoin="round"
+          style={{ stroke: 'var(--croquis-red)' }}
+        />
+      </g>
+      <g transform="translate(250 60) rotate(32)">
+        <rect width="30" height="140" rx="6" {...tint('--play-croquis')} />
+        <path d="M0 140h30l-15 36z" {...tint('--croquis-paper')} />
+        <path d="M9 162h12l-6 14z" {...tint('--croquis-black')} />
+        <rect width="30" height="20" rx="6" {...tint('--play-gold')} />
+      </g>
+    </>
+  ),
   cards: (tone) => (
     <>
       <circle cx="180" cy="300" r="150" {...tint(`${tone}-glow`, 0.2)} />

@@ -163,6 +163,25 @@ const MARKS: Record<string, ReactNode> = {
       <circle cx="47" cy="26" r="9.5" fill="none" stroke="var(--play-gold)" strokeWidth="2.6" />
     </>
   ),
+  playCroquis: (
+    <>
+      <circle cx="30" cy="34" r="22" {...tint('--play-croquis-glow')} />
+      <path
+        d="M14 46c6-18 12-18 18-4s12 6 18-14"
+        stroke="var(--play-croquis-deep)"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <g transform="rotate(38 46 20)">
+        <rect x="41" y="2" width="10" height="30" rx="2" {...tint('--play-croquis')} />
+        <path d="M41 32h10l-5 10z" {...tint('--croquis-paper')} />
+        <path d="M44 38h4l-2 4z" {...tint('--croquis-black')} />
+        <rect x="41" y="2" width="10" height="6" rx="2" {...tint('--play-gold')} />
+      </g>
+    </>
+  ),
   playEcho: (
     <>
       <circle cx="24" cy="32" r="19" {...tint('--play-echo-glow')} />
@@ -261,6 +280,7 @@ const MARKS: Record<string, ReactNode> = {
 const BARE = new Set([
   'playBaccalaureat',
   'playBomb',
+  'playCroquis',
   'playEcho',
   'playGlitch',
   'playGolf',

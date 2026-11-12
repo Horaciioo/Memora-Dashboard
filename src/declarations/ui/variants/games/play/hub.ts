@@ -160,6 +160,8 @@ export const PLAY_HUB = {
   ember: 'play-ember',
   // Symbols rising like bubbles
   echoFloat: 'play-echo-float',
+  // Scribbles rising like bubbles
+  croquisFloat: 'play-croquis-float',
   // Shapes and figures rising like bubbles
   glitchFloat: 'play-glitch-float',
   // Letters rising like bubbles

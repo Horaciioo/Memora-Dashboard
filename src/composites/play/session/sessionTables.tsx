@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 
 import { BaccalaureatBoard } from '@/composites/play/baccalaureat/BaccalaureatBoard'
 import type { BacBoardView } from '@/composites/play/baccalaureat/types'
+import { CroquisBoard } from '@/composites/play/croquis/CroquisBoard'
+import type { CroquisBoardView } from '@/composites/play/croquis/types'
 import { EchoBoard } from '@/composites/play/echo/EchoBoard'
 import type { EchoBoardView } from '@/composites/play/echo/types'
 import { GlitchBoard } from '@/composites/play/glitch/GlitchBoard'
@@ -23,6 +25,7 @@ import { PlainLiveFeed } from '@/composites/play/session/live/PlainLiveFeed'
 import {
   BAC_FEED_COPY,
   BOMB_FEED_COPY,
+  CROQUIS_FEED_COPY,
   ECHO_FEED_COPY,
   GLITCH_FEED_COPY,
   JUMBLE_FEED_COPY,
@@ -116,6 +119,29 @@ export const PLAY_SESSION_TABLES: Partial<
           sessionId={sessionId}
           board={bomb}
           copy={BOMB_FEED_COPY}
+          players={[...seats, ...spectators]}
+        />
+      ),
+    }
+  },
+  [PlayGames.Croquis]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const croquis = board as CroquisBoardView
+
+    return {
+      board: (
+        <CroquisBoard
+          sessionId={sessionId}
+          board={croquis}
+          faces={asPlayers(seats)}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      feed: (
+        <PlainLiveFeed
+          sessionId={sessionId}
+          board={croquis}
+          copy={CROQUIS_FEED_COPY}
           players={[...seats, ...spectators]}
         />
       ),

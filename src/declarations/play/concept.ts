@@ -59,6 +59,20 @@ export const PLAY_CONCEPT: Record<PlayGameName, PlayConceptStep[]> = {
       text: 'Chaque symbole trouvé rapporte des points, le premier à le trouver a un bonus.',
     },
   ],
+  [PlayGames.Croquis]: [
+    {
+      title: 'Un mot, un crayon',
+      text: 'À chaque manche, un joueur tiré au hasard reçoit un mot en secret. Tout le monde dessine à son tour.',
+    },
+    {
+      title: 'Dessine sans écrire',
+      text: 'Pas de lettres ni de chiffres : seulement des traits. Des formes simples suffisent.',
+    },
+    {
+      title: 'Trouve le mot du dessin',
+      text: 'Les autres tapent leurs idées. Plus tôt tu trouves, plus tu gagnes, et le dessinateur aussi.',
+    },
+  ],
   [PlayGames.Glitch]: [
     {
       title: 'Deux images jumelles',

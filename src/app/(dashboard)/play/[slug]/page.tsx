@@ -13,6 +13,7 @@ import { PlayHubMenu } from '@/composites/play/hub/PlayHubMenu'
 import { PlayLeaderboard } from '@/composites/play/hub/leaderboard/PlayLeaderboard'
 import { PlayLiveTables } from '@/composites/play/hub/lobby/PlayLiveTables'
 import { PlayEmbers } from '@/composites/play/hub/PlayEmbers'
+import { PlayCroquisFloaters } from '@/composites/play/hub/PlayCroquisFloaters'
 import { PlayEchoFloaters } from '@/composites/play/hub/PlayEchoFloaters'
 import { PlayGlitchFloaters } from '@/composites/play/hub/PlayGlitchFloaters'
 import { PlayJumbleLetters } from '@/composites/play/hub/PlayJumbleLetters'
@@ -36,6 +37,7 @@ import { requirePermission } from '@/core/wrappers/requireUser'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_CONCEPT_COPY } from '@/declarations/play/concept'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
+import { CROQUIS_HUB } from '@/declarations/play/croquis/copy'
 import { ECHO_HUB } from '@/declarations/play/echo/copy'
 import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
 import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
@@ -61,6 +63,7 @@ const GROUND_LAYERS: Record<string, ComponentType> = {
   [BOMB_EMBERS.ground]: PlayEmbers,
   [JUMBLE_HUB.ground]: PlayJumbleLetters,
   [ECHO_HUB.ground]: PlayEchoFloaters,
+  [CROQUIS_HUB.ground]: PlayCroquisFloaters,
   [GLITCH_HUB.ground]: PlayGlitchFloaters,
   [GOLF_TURF.ground]: GolfPanorama,
   [LUDO_FELT.ground]: LudoHopField,

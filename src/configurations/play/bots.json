@@ -45,6 +45,17 @@
       "HARD": 0.05
     }
   },
+  "croquis": {
+    "thinkMs": {
+      "min": 12000,
+      "max": 55000
+    },
+    "failRate": {
+      "EASY": 0.35,
+      "MEDIUM": 0.2,
+      "HARD": 0.05
+    }
+  },
   "glitch": {
     "thinkMs": {
       "min": 3500,

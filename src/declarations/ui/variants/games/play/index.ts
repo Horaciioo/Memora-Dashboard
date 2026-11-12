@@ -39,6 +39,7 @@ export {
   BAC_RULES,
 } from '@/declarations/ui/variants/games/play/boards'
 export type { PlaySetupStyles } from '@/declarations/ui/variants/games/play/boards'
+export { CROQUIS_BOARD, CROQUIS_SETUP } from '@/declarations/ui/variants/games/play/croquis'
 export { ECHO_BOARD, ECHO_SETUP } from '@/declarations/ui/variants/games/play/echo'
 export { GLITCH_BOARD, GLITCH_SETUP } from '@/declarations/ui/variants/games/play/glitch'
 export { JUMBLE_BOARD, JUMBLE_SETUP } from '@/declarations/ui/variants/games/play/jumble'

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { BACCALAUREAT_ENGINE } from '@/core/engines/play/BaccalaureatEngine'
 import { BOMB_ENGINE } from '@/core/engines/play/BombEngine'
+import { CROQUIS_ENGINE } from '@/core/engines/play/CroquisEngine'
 import { ECHO_ENGINE } from '@/core/engines/play/EchoEngine'
 import { GLITCH_ENGINE } from '@/core/engines/play/GlitchEngine'
 import { GOLF_ENGINE } from '@/core/engines/play/GolfEngine'
@@ -26,6 +27,7 @@ export const PLAY_ENGINES: Partial<Record<PlayGameName, PlayEngine>> = {
   [PlayGames.Jumble]: JUMBLE_ENGINE,
   [PlayGames.Glitch]: GLITCH_ENGINE,
   [PlayGames.Echo]: ECHO_ENGINE,
+  [PlayGames.Croquis]: CROQUIS_ENGINE,
 }
 
 export type { EngineSession, EngineStep, PlayEngine } from '@/types/play'

@@ -1,0 +1,220 @@
+/* Croquis ground: warm amber night, scribbles rising like bubbles */
+.play-room:has(.play-croquis) {
+  background:
+    radial-gradient(
+      70rem 34rem at 50% 115%,
+      color-mix(in srgb, var(--play-croquis) 46%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      40rem 24rem at 12% -8%,
+      color-mix(in srgb, var(--play-croquis-glow) 16%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-croquis-night) 0%, var(--play-croquis-dusk) 100%);
+}
+
+.play-room:has(.play-croquis) .play-floor {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--play-croquis) 26%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--play-croquis) 26%, transparent) 1px,
+      transparent 1px
+    );
+}
+
+/* A hub scribble rises, spins a little, fades out */
+.play-croquis-float {
+  position: absolute;
+  bottom: -5rem;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  opacity: 0;
+  animation: play-croquis-float var(--rise) linear var(--delay) infinite;
+}
+
+@keyframes play-croquis-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--tilt));
+  }
+  12% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
+  }
+}
+
+/* Countdown in the amber glow */
+.play-figure-croquis {
+  color: var(--play-croquis-glow);
+  --play-key: var(--play-croquis);
+}
+
+/* Paper of the table: cream sheet lifted off the ground */
+.play-croquis-paper {
+  background: var(--croquis-paper);
+  box-shadow:
+    0 0.35rem 0 color-mix(in srgb, var(--play-croquis-deep) 70%, transparent),
+    0 1rem 1.6rem rgb(0 0 0 / 0.35);
+}
+
+.play-croquis-blank {
+  color: color-mix(in srgb, var(--croquis-black) 45%, transparent);
+  pointer-events: none;
+}
+
+/* Pen swatch: a round dot, ringed when picked */
+.play-croquis-pen {
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.55);
+  transition:
+    transform var(--motion-duration-fast, 140ms) var(--motion-ease-out),
+    box-shadow var(--motion-duration-fast, 140ms) var(--motion-ease-out);
+}
+
+.play-croquis-pen:hover:not(:disabled) {
+  transform: scale(1.12);
+}
+
+.play-croquis-pen:disabled {
+  opacity: 0.45;
+}
+
+.play-croquis-pen-on {
+  transform: scale(1.18);
+  box-shadow:
+    inset 0 0 0 2px rgb(255 255 255 / 0.9),
+    0 0 0 3px var(--play-ink);
+}
+
+/* Word slots: an underline per letter, the hint letter lit */
+.play-croquis-slot {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 0.8;
+  border-bottom: 0.2rem solid var(--play-ink-soft);
+  color: var(--play-ink);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.play-croquis-slot-hint {
+  border-bottom-color: var(--play-croquis);
+  color: var(--play-croquis);
+  animation: play-croquis-pop 420ms var(--motion-ease-out);
+}
+
+@keyframes play-croquis-pop {
+  0% {
+    scale: 0.4;
+    opacity: 0;
+  }
+  70% {
+    scale: 1.2;
+  }
+  100% {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+/* The drawer's word settles in */
+.play-croquis-word {
+  animation: play-croquis-pop 460ms var(--motion-ease-out);
+}
+
+/* Time bar drains and reddens */
+.play-croquis-clock {
+  position: relative;
+  transform-origin: left center;
+  animation: play-croquis-drain var(--left) linear var(--wait, 0ms) both;
+  background: linear-gradient(90deg, var(--play-croquis-glow), var(--play-croquis));
+}
+
+@keyframes play-croquis-drain {
+  from {
+    transform: scaleX(var(--from));
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.play-croquis-clock::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--play-bomb), var(--play-bomb-red));
+  opacity: 0;
+  animation: play-croquis-redden var(--left) linear var(--wait, 0ms) both;
+}
+
+@keyframes play-croquis-redden {
+  0%,
+  65% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Wrong guess shakes the field */
+.play-croquis-shake {
+  animation: play-croquis-shake 380ms ease-in-out;
+}
+
+@keyframes play-croquis-shake {
+  20% {
+    translate: -0.6rem 0;
+  }
+  40% {
+    translate: 0.6rem 0;
+  }
+  60% {
+    translate: -0.4rem 0;
+  }
+  80% {
+    translate: 0.3rem 0;
+  }
+}
+
+/* Found banner and revealed word pop in */
+.play-croquis-found,
+.play-croquis-gain {
+  animation: play-croquis-pop 520ms var(--motion-ease-out);
+}
+
+/* Row lights up when its player finds the word */
+.play-croquis-scored {
+  animation: play-croquis-glow 1.4s ease-out;
+}
+
+@keyframes play-croquis-glow {
+  0% {
+    background: color-mix(in srgb, var(--play-croquis) 45%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-croquis-float,
+  .play-croquis-clock::after,
+  .play-croquis-shake,
+  .play-croquis-word,
+  .play-croquis-slot-hint,
+  .play-croquis-found,
+  .play-croquis-gain,
+  .play-croquis-scored {
+    animation: none;
+  }
+}

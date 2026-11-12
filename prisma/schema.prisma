@@ -413,6 +413,8 @@ model Account {
   jumbleRounds          JumbleRound[]
   echoFinds             EchoFind[]
   glitchProgress        GlitchProgress[]
+  croquisRounds         CroquisRound[]
+  croquisGuesses        CroquisGuess[]
   golfPlayers           GolfPlayer[]
   golfMoves             GolfMove[]
   ludoPlayers           LudoPlayer[]
@@ -2983,6 +2985,7 @@ enum PlayGame {
   JUMBLE
   ECHO
   GLITCH
+  CROQUIS
 }
 
 // Play bot level
@@ -3055,35 +3058,38 @@ model PlaySession {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  host         Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
-  tournament   PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  rematchOf    PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
-  rematch      PlaySession?        @relation("PlayRematch")
-  seats        PlaySeat[]
-  bacRounds    BaccalaureatRound[]
-  bombGame     BombGame?
-  bombSeats    BombPlayer[]
-  bombMoves    BombMove[]
-  jumbleGame   JumbleGame?
-  jumbleRounds JumbleRound[]
-  echoGame     EchoGame?
-  echoFinds    EchoFind[]
-  glitchGame   GlitchGame?
+  host           Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+  tournament     PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  rematchOf      PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
+  rematch        PlaySession?        @relation("PlayRematch")
+  seats          PlaySeat[]
+  bacRounds      BaccalaureatRound[]
+  bombGame       BombGame?
+  bombSeats      BombPlayer[]
+  bombMoves      BombMove[]
+  jumbleGame     JumbleGame?
+  jumbleRounds   JumbleRound[]
+  echoGame       EchoGame?
+  echoFinds      EchoFind[]
+  glitchGame     GlitchGame?
   glitchProgress GlitchProgress[]
-  golfGame     GolfGame?
-  golfPlayers  GolfPlayer[]
-  golfMoves    GolfMove[]
-  ludoGame     LudoGame?
-  ludoPlayers  LudoPlayer[]
-  ludoMoves    LudoMove[]
-  navalGame    NavalGame?
-  navalPlayers NavalPlayer[]
-  navalMatches NavalMatch[]
-  navalShots   NavalShot[]
-  messages     PlayMessage[]
-  invites      PlayInvite[]
-  follows      PlayFollow[]
-  notices      PlayNotice[]
+  croquisGame    CroquisGame?
+  croquisRounds  CroquisRound[]
+  croquisGuesses CroquisGuess[]
+  golfGame       GolfGame?
+  golfPlayers    GolfPlayer[]
+  golfMoves      GolfMove[]
+  ludoGame       LudoGame?
+  ludoPlayers    LudoPlayer[]
+  ludoMoves      LudoMove[]
+  navalGame      NavalGame?
+  navalPlayers   NavalPlayer[]
+  navalMatches   NavalMatch[]
+  navalShots     NavalShot[]
+  messages       PlayMessage[]
+  invites        PlayInvite[]
+  follows        PlayFollow[]
+  notices        PlayNotice[]
 
   @@index([status, game])
   @@index([tournamentId, tournamentIndex])
@@ -4203,4 +4209,73 @@ model GlitchProgress {
   @@unique([sessionId, round, accountId])
   @@index([sessionId, round])
   @@map("play_glitch_progress")
+}
+
+// Croquis table: the word being drawn, the strokes so far and the clock
+model CroquisGame {
+  sessionId   String    @id
+  // Round in play, from one
+  round       Int
+  // Rounds of the whole game, one per drawer and per lap
+  rounds      Int
+  // Drawers in turn, drawn at the start
+  order       Json
+  drawerId    String
+  // Comparable word and its written form, kept back until the reveal
+  word        String
+  display     String
+  // Strokes drawn so far, shared with every reader
+  strokes     Json      @default("[]")
+  startsAt    DateTime
+  endsAt      DateTime
+  hintAt      DateTime
+  isHinted    Boolean   @default(false)
+  // Reveal over, the next round opens
+  revealUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_croquis_games")
+}
+
+// Round of a Croquis game once over
+model CroquisRound {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  drawerId  String
+  word      String
+  // Players who found it
+  solvers   Int      @default(0)
+  // Points the drawer earned
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  drawer  Account     @relation(fields: [drawerId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round])
+  @@map("play_croquis_rounds")
+}
+
+// Word found by a player on a round
+model CroquisGuess {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  accountId String
+  // Place among the finders, from one
+  rank      Int
+  points    Int      @default(0)
+  // Time the player took
+  ms        Int      @default(0)
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, round, accountId])
+  @@index([sessionId, round])
+  @@map("play_croquis_guesses")
 }

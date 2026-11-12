@@ -12,6 +12,7 @@ export const PlayGames = {
   Jumble: 'JUMBLE',
   Echo: 'ECHO',
   Glitch: 'GLITCH',
+  Croquis: 'CROQUIS',
 } as const
 
 export type PlayGameName = (typeof PlayGames)[keyof typeof PlayGames]

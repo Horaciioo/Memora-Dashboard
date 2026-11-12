@@ -415,6 +415,21 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'id',
     search: [],
   },
+  croquisGame: { model: 'CroquisGame', exposure: 'full', display: 'sessionId', search: [] },
+  croquisRound: {
+    model: 'CroquisRound',
+    exposure: 'readOnly',
+    reason: 'Historique de manches',
+    display: 'id',
+    search: [],
+  },
+  croquisGuess: {
+    model: 'CroquisGuess',
+    exposure: 'readOnly',
+    reason: 'Historique de mots trouvés',
+    display: 'id',
+    search: [],
+  },
   glitchGame: { model: 'GlitchGame', exposure: 'full', display: 'sessionId', search: [] },
   glitchProgress: {
     model: 'GlitchProgress',

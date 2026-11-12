@@ -8,6 +8,7 @@
 @import './tokens/vision.css';
 @import './tokens/play.css';
 @import './play/arcade.css';
+@import './play/croquis.css';
 @import './play/echo.css';
 @import './play/glitch.css';
 @import './play/jumble.css';

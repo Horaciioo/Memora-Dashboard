@@ -45,6 +45,11 @@ export const PLAY_HISTORY_FACTS: Record<PlayGameName, Array<{ key: string; label
     { key: 'found', label: 'Symboles trouvés' },
     { key: 'firsts', label: 'Premières places' },
   ],
+  [PlayGames.Croquis]: [
+    { key: 'found', label: 'Mots trouvés' },
+    { key: 'drawn', label: 'Dessins faits' },
+    { key: 'understood', label: 'Dessins compris' },
+  ],
   [PlayGames.Glitch]: [
     { key: 'completed', label: 'Images bouclées' },
     { key: 'found', label: 'Différences trouvées' },

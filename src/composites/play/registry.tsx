@@ -7,6 +7,8 @@ import { BacRulesDrawer } from '@/composites/play/baccalaureat/BacRulesDrawer'
 import { BacSetupDrawer } from '@/composites/play/baccalaureat/BacSetupDrawer'
 import { BombRulesDrawer } from '@/composites/play/bomb/BombRulesDrawer'
 import { BombSetupDrawer } from '@/composites/play/bomb/BombSetupDrawer'
+import { CroquisRulesDrawer } from '@/composites/play/croquis/CroquisRulesDrawer'
+import { CroquisSetupDrawer } from '@/composites/play/croquis/CroquisSetupDrawer'
 import { EchoRulesDrawer } from '@/composites/play/echo/EchoRulesDrawer'
 import { EchoSetupDrawer } from '@/composites/play/echo/EchoSetupDrawer'
 import { GlitchRulesDrawer } from '@/composites/play/glitch/GlitchRulesDrawer'
@@ -24,6 +26,7 @@ import { navalVoteFace } from '@/composites/play/naval/world/navalVoteFace'
 import { declaredVote } from '@/composites/play/vote/PlayStartVote'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
+import { croquisSettingsOf } from '@/core/lib/play/croquis/settings'
 import { echoSettingsOf } from '@/core/lib/play/echo/settings'
 import { glitchSettingsOf } from '@/core/lib/play/glitch/settings'
 import { golfSettingsOf } from '@/core/lib/play/golf/settings'
@@ -98,6 +101,7 @@ export const PLAY_SETUP_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   [PlayGames.Jumble]: JumbleSetupDrawer,
   [PlayGames.Echo]: EchoSetupDrawer,
   [PlayGames.Glitch]: GlitchSetupDrawer,
+  [PlayGames.Croquis]: CroquisSetupDrawer,
 }
 
 /**
@@ -113,6 +117,7 @@ export const PLAY_START_VOTES: Partial<Record<PlayGameName, ComponentType<PlayVo
   [PlayGames.Naval]: declaredVote(PlayGames.Naval, navalVoteFace),
   [PlayGames.Echo]: declaredVote(PlayGames.Echo),
   [PlayGames.Glitch]: declaredVote(PlayGames.Glitch),
+  [PlayGames.Croquis]: declaredVote(PlayGames.Croquis),
 }
 
 /**
@@ -132,6 +137,9 @@ export const PLAY_RULES_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   ),
   [PlayGames.Ludo]: ({ open, onClose, settings }) => (
     <LudoRulesDrawer open={open} onClose={onClose} settings={ludoSettingsOf(settings)} />
+  ),
+  [PlayGames.Croquis]: ({ open, onClose, settings }) => (
+    <CroquisRulesDrawer open={open} onClose={onClose} settings={croquisSettingsOf(settings)} />
   ),
   [PlayGames.Glitch]: ({ open, onClose, settings }) => (
     <GlitchRulesDrawer open={open} onClose={onClose} settings={glitchSettingsOf(settings)} />

@@ -207,6 +207,21 @@
   --play-bomb-cap: #6d6578;
   --play-bomb-cap-deep: #34303d;
   --play-bomb-cord: #d8b77a;
+  --play-croquis: #f0a30a;
+  --play-croquis-deep: #8a5600;
+  --play-croquis-glow: #ffe9b0;
+  --play-croquis-night: #1f1604;
+  --play-croquis-dusk: #46300a;
+  /* Croquis pens and paper */
+  --croquis-paper: #fffdf6;
+  --croquis-black: #26222e;
+  --croquis-red: #e5483f;
+  --croquis-orange: #f58a1f;
+  --croquis-yellow: #f6c823;
+  --croquis-green: #3fae5a;
+  --croquis-blue: #2f7be0;
+  --croquis-purple: #8a5cf6;
+  --croquis-brown: #8a5a36;
   --play-echo: #11a6b5;
   --play-echo-deep: #0a5560;
   --play-echo-glow: #c9f3f7;

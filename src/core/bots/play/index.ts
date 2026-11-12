@@ -2,6 +2,7 @@ import 'server-only'
 
 import { BACCALAUREAT_BOT } from '@/core/bots/play/baccalaureat'
 import { BOMB_BOT } from '@/core/bots/play/bomb'
+import { CROQUIS_BOT } from '@/core/bots/play/croquis'
 import { ECHO_BOT } from '@/core/bots/play/echo'
 import { GLITCH_BOT } from '@/core/bots/play/glitch'
 import { GOLF_BOT } from '@/core/bots/play/golf'
@@ -26,4 +27,5 @@ export const PLAY_BOTS: Record<PlayGameName, PlayBotStrategy> = {
   [PlayGames.Jumble]: JUMBLE_BOT,
   [PlayGames.Glitch]: GLITCH_BOT,
   [PlayGames.Echo]: ECHO_BOT,
+  [PlayGames.Croquis]: CROQUIS_BOT,
 }

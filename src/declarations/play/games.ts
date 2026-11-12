@@ -1,6 +1,8 @@
 import { createRegistry } from '@/core/lib/registry'
 import { BOMB_EMBERS } from '@/declarations/play/bomb/copy'
 import { BOMB_SETTINGS } from '@/declarations/play/bomb/settings'
+import { CROQUIS_HUB } from '@/declarations/play/croquis/copy'
+import { CROQUIS_SETTINGS } from '@/declarations/play/croquis/settings'
 import { ECHO_HUB } from '@/declarations/play/echo/copy'
 import { ECHO_SETTINGS } from '@/declarations/play/echo/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
@@ -99,6 +101,18 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: ECHO_HUB.ground,
     minPlayers: ECHO_SETTINGS.minPlayers,
     maxPlayers: ECHO_SETTINGS.maxPlayers,
+    playable: true,
+  },
+  [PlayGames.Croquis]: {
+    label: 'Croquis',
+    slug: 'croquis',
+    tagline: 'Un mot à dessiner, les autres doivent le deviner avant la fin du temps.',
+    tone: '--play-croquis',
+    logo: 'playCroquis',
+    backdrop: 'sketch',
+    ground: CROQUIS_HUB.ground,
+    minPlayers: CROQUIS_SETTINGS.minPlayers,
+    maxPlayers: CROQUIS_SETTINGS.maxPlayers,
     playable: true,
   },
   [PlayGames.Glitch]: {

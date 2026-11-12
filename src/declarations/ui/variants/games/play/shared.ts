@@ -34,5 +34,8 @@ export const SETUP_PINK =
 export const SETUP_VIOLET =
   'border-[var(--play-jumble)] bg-[var(--play-jumble)] text-white hover:border-[var(--play-jumble)]'
 
+export const SETUP_AMBER =
+  'border-[var(--play-croquis)] bg-[var(--play-croquis)] text-[var(--play-croquis-night)] hover:border-[var(--play-croquis)]'
+
 export const SETUP_FIRE =
   'border-[var(--play-bomb)] bg-[var(--play-bomb)] text-white hover:border-[var(--play-bomb)]'

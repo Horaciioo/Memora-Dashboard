@@ -41,6 +41,13 @@ const SHIFTERS: Record<
       SET "restsAt" = "restsAt" + (${s}::float8 * interval '1 second')
       WHERE "sessionId" = ${id}`
   },
+  CROQUIS: (tx, id, s) => tx.$executeRaw`
+    UPDATE play_croquis_games
+    SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),
+        "endsAt" = "endsAt" + (${s}::float8 * interval '1 second'),
+        "hintAt" = "hintAt" + (${s}::float8 * interval '1 second'),
+        "revealUntil" = "revealUntil" + (${s}::float8 * interval '1 second')
+    WHERE "sessionId" = ${id}`,
   ECHO: (tx, id, s) => tx.$executeRaw`
     UPDATE play_echo_games
     SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),
