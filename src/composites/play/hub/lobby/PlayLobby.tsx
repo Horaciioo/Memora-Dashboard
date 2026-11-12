@@ -81,7 +81,7 @@ export const PlayLobby = ({
   status,
   minPlayers,
   maxPlayers,
-  seats,
+  seats: rawSeats,
   candidates,
   viewerId,
   me,
@@ -103,6 +103,18 @@ export const PlayLobby = ({
     viewerId,
     isViewerHost: me.isHost,
   })
+  // Own ready shown at once, the server read confirms it
+  const [readyWish, setReadyWish] = useState<boolean | null>(null)
+  const serverReady = rawSeats.find((seat) => seat.accountId === viewerId)?.isReady
+  if (readyWish !== null && serverReady === readyWish) setReadyWish(null)
+  const toggleReady = () => {
+    const next = !(readyWish ?? serverReady)
+    setReadyWish(next)
+    void moves.ready(id, next).then((done) => !done && setReadyWish(null))
+  }
+  const seats = rawSeats.map((seat) =>
+    seat.accountId === viewerId && readyWish !== null ? { ...seat, isReady: readyWish } : seat
+  )
   const present = seats.filter((seat) => !seat.hasLeft)
   const isLobby = status === PlayStatuses.Lobby
   const waiting = present.filter((seat) => !seat.isReady).length
@@ -182,7 +194,7 @@ export const PlayLobby = ({
               onKick={() => void moves.kick(id, seat.accountId)}
               onToggleReady={
                 isLobby && me.isSeated && !me.isHost && seat.accountId === viewerId
-                  ? () => void moves.ready(id, !seat.isReady)
+                  ? toggleReady
                   : null
               }
               onContextMenu={menuOf(
