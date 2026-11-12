@@ -386,12 +386,13 @@ export const leaveSession = async (
 
     return session.game
   })
-  await Promise.all([
+  // The player is out already, the table is told without holding the answer back
+  void Promise.all([
     announceInChat(sessionId, accountId, PlayMessageKinds.Left),
     signalPlay(sessionId, true),
   ])
-  // The player is out already, the forfeit and the journal follow without holding the answer back
-  void settleDeparture(sessionId, accountId, game, quiet)
+    .catch(() => undefined)
+    .then(() => settleDeparture(sessionId, accountId, game, quiet))
 }
 
 /**
