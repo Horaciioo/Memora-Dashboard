@@ -6,6 +6,11 @@ import { pruneSessions } from '@/core/services/auth/SessionService'
 import { purgeChatMessages } from '@/core/services/lives/ChatHistoryService'
 import { purgeModerationLog } from '@/core/services/lives/ModerationLogService'
 import { purgeNexusTraces } from '@/core/services/nexus/NexusAuditService'
+import {
+  markExpiredLinks,
+  purgeDecidedRequests,
+  purgeUnusedLinks,
+} from '@/core/services/unban/UnbanLinkService'
 import { purgeErrorEvents } from '@/core/services/system/ErrorEventService'
 import { pruneOrphanFiles } from '@/core/services/system/FileService'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
@@ -22,6 +27,8 @@ import { DAY_MS } from '@/utils/constants/time'
  * @property {number} candidates - Rejected candidacies dropped
  * @property {number} bans - Lapsed blacklist entries dropped
  * @property {number} files - Orphan files dropped
+ * @property {number} unbanLinks - Unused Deban. links dropped
+ * @property {number} unbanRequests - Decided Deban. requests dropped
  * @property {number} storedBytes - Weight the binaries add to every backup
  */
 
@@ -35,6 +42,8 @@ export interface MaintenanceReport {
   candidates: number
   bans: number
   files: number
+  unbanLinks: number
+  unbanRequests: number
   storedBytes: number
 }
 
@@ -146,6 +155,8 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     candidates,
     bans,
     files,
+    unbanLinks,
+    unbanRequests,
   ] = await Promise.all([
     pruneSessions(RETENTION_POLICIES.expiredSessions),
     pruneNotifications(),
@@ -157,7 +168,12 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     pruneRejectedCandidates(),
     pruneBans(),
     pruneOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
+    purgeUnusedLinks().catch(() => 0),
+    purgeDecidedRequests().catch(() => 0),
   ])
+
+  // Journaled once whatever the number of passes
+  await markExpiredLinks().catch(() => 0)
 
   // The console keeps its own window and stays out of the report
   await purgeNexusTraces().catch(() => undefined)
@@ -173,6 +189,8 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     candidates,
     bans,
     files,
+    unbanLinks,
+    unbanRequests,
     // Weighed after the sweep
     storedBytes: await storedBytes(),
   }
