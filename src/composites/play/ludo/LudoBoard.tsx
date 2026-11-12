@@ -19,6 +19,7 @@ import { useLudoMotion } from '@/composites/play/ludo/useLudoMotion'
 import type { LudoMotion } from '@/composites/play/ludo/useLudoMotion'
 import { useLudoBoard } from '@/core/hooks/data/play/useLudoBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
+import { usePlayStageStore } from '@/core/store/play/playStage'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import { heldStars } from '@/core/lib/play/ludo'
 import type { LudoBoardState, LudoBoardView } from '@/core/lib/play/ludo'
@@ -138,6 +139,8 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
   const board = useLudoBoard(sessionId, initial)
   const now = useServerNow(initial.serverTime)
   const motion = useLudoMotion(board, viewerId, sessionId)
+  const isFullscreen = usePlayStageStore((state) => state.isFullscreen)
+  const isChatOpen = usePlayStageStore((state) => state.isChatOpen)
   const { act, isSaving } = usePlayAct(sessionId)
   // Revision a move was sent on: the board stays shut until a newer one is pushed
   const [sentRev, setSentRev] = useState<number | null>(null)
@@ -217,7 +220,11 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
       <LudoPlates {...row} />
 
       <div
-        className={cn(LUDO_BOARD.frame, board.isMyTurn && countdown === 0 && LUDO_BOARD.frameMine)}
+        className={cn(
+          LUDO_BOARD.frame,
+          board.isMyTurn && countdown === 0 && LUDO_BOARD.frameMine,
+          isFullscreen && (isChatOpen ? LUDO_BOARD.frameFullChat : LUDO_BOARD.frameFull)
+        )}
         style={tone as CSSProperties}
       >
         <div

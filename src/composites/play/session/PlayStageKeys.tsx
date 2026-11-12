@@ -32,6 +32,7 @@ export const PlayStageKeys = ({
   isSeated,
   isHost = false,
   isOver = false,
+  isDocked = false,
 }: {
   game: PlayGameName
   sessionId: string
@@ -39,6 +40,8 @@ export const PlayStageKeys = ({
   isSeated: boolean
   isHost?: boolean
   isOver?: boolean
+  // Sits above the chat column instead of floating
+  isDocked?: boolean
 }) => {
   const { isFullscreen, isChatOpen, toggleFullscreen, toggleChat } = usePlayStageStore()
   const isMobile = useIsMobileShell()
@@ -51,7 +54,9 @@ export const PlayStageKeys = ({
     <div
       className={cn(
         BAC_SESSION.keys,
-        isFullscreen && [BAC_SESSION.keysFull, isChatOpen && BAC_SESSION.keysShifted]
+        isDocked
+          ? BAC_SESSION.keysDocked
+          : isFullscreen && [BAC_SESSION.keysFull, isChatOpen && BAC_SESSION.keysShifted]
       )}
     >
       {game === PlayGames.Golf ? (

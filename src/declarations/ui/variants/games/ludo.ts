@@ -12,11 +12,14 @@ const NAME =
 export const LUDO_BOARD = {
   // Phones: plates over and under the board; wide screens: plates in the four corners around it
   board:
-    'relative mx-auto grid w-full grid-cols-2 gap-x-3 gap-y-2 px-2 pb-6 select-none sm:gap-x-6 sm:gap-y-3 sm:px-0 sm:pb-16 [grid-template-areas:"tl_tr"_"board_board"_"status_status"_"bl_br"] lg:w-fit lg:grid-cols-[minmax(11rem,1fr)_auto_minmax(11rem,1fr)] lg:grid-rows-[1fr_1fr_auto] lg:[grid-template-areas:"tl_board_tr"_"bl_board_br"_"._status_."]',
+    'relative mx-auto grid w-full grid-cols-2 gap-x-3 gap-y-2 px-2 pb-6 select-none sm:gap-x-6 sm:gap-y-3 sm:px-0 sm:pb-16 in-[.play-boxfull]:pt-10 in-[.play-boxfull]:pb-0 [grid-template-areas:"tl_tr"_"board_board"_"status_status"_"bl_br"] lg:w-fit lg:grid-cols-[minmax(11rem,1fr)_auto_minmax(11rem,1fr)] lg:grid-rows-[1fr_1fr_auto] lg:[grid-template-areas:"tl_board_tr"_"bl_board_br"_"._status_."]',
   figure: 'play-figure text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
   // Same size on every turn, so the table never moves
   status:
     'my-2 min-h-7 max-w-full self-center justify-self-center truncate text-center text-lg leading-7 font-extrabold text-[var(--play-ink)] [grid-area:status]',
+  // Full screen: the board takes the height left, less the chat when open
+  frameFull: 'lg:w-[min(64rem,calc(100dvh-9rem),calc(100vw-30rem))]!',
+  frameFullChat: 'lg:w-[min(64rem,calc(100dvh-9rem),calc(100vw-58rem))]!',
   // The viewer's turn: blue text, no box
   statusCall: 'text-[var(--play-ludo-call)]',
   frame:
