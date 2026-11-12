@@ -191,6 +191,18 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un mode « Chaos » dans le « Ludo » : des cases d’action offrent des bonus ou des malus, et un Joker se joue au bon moment.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de trophées dans « Memora Play » : chaque trophée atteint rapporte de l’expérience et s’annonce dans une notification.',
+      },
+      {
+        tag: ChangelogTags.Added,
         page: ROUTES.modView,
         permission: Permissions.LiveRead,
         text: 'Ajout d’une Mod. View pour téléphone : le flux, les actions, l’équipe et les réglages se parcourent en pages, le stream reste en haut de l’écran et un glissement vers le haut fige le chat.',
