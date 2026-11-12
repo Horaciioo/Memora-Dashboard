@@ -422,13 +422,9 @@
 }
 
 /* Player on turn: lifted, in their colour, the others stay quiet */
+/* No scale or shift, the plate never moves */
 .ludo-plate-turn {
-  scale: 1.04;
-  transform-origin: top left;
-}
-
-.ludo-plate-turn.ludo-plate-right {
-  transform-origin: top right;
+  position: relative;
 }
 
 .ludo-turn-tag {
@@ -440,6 +436,7 @@
   background: var(--pawn-tone);
   color: var(--play-ludo-felt);
   font-size: 0.75rem;
+  line-height: 1;
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;

@@ -79,9 +79,11 @@ export const LudoPlate = ({ face, colour, isRight, turn, isMine, die }: LudoPlat
             />
             <span className={LUDO_PLATE.name}>{name}</span>
           </div>
+          {die && (
+            <span className={isRight ? LUDO_PLATE.dieSlotRight : LUDO_PLATE.dieSlot}>{die}</span>
+          )}
           {place && <span className={LUDO_PLATE.place}>{ludoPlaceLabel(place)}</span>}
         </div>
-        {die && <span className={LUDO_PLATE.dieSlot}>{die}</span>}
       </div>
     </div>
   )

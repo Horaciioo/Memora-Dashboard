@@ -40,10 +40,10 @@ export const LUDO_BOARD = {
  */
 
 export const LUDO_SLOTS = [
-  'self-start [grid-area:tl]',
-  'self-start justify-self-end [grid-area:tr]',
-  'self-end justify-self-end [grid-area:br]',
-  'self-end [grid-area:bl]',
+  'self-start -translate-x-2 sm:-translate-x-4 [grid-area:tl]',
+  'self-start justify-self-end translate-x-2 sm:translate-x-4 [grid-area:tr]',
+  'self-end justify-self-end translate-x-2 sm:translate-x-4 [grid-area:br]',
+  'self-end -translate-x-2 sm:-translate-x-4 [grid-area:bl]',
 ] as const
 
 /**
@@ -53,32 +53,36 @@ export const LUDO_SLOTS = [
 
 export const LUDO_PLATE = {
   plate:
-    'ludo-plate flex min-w-0 flex-col gap-1.5 transition-opacity duration-[var(--motion-duration-panel)]',
+    'ludo-plate relative z-20 flex min-w-0 flex-col gap-1.5 transition-opacity duration-[var(--motion-duration-panel)]',
   // Player on turn: lifted, ringed in their colour, tagged
   plateTurn: 'ludo-plate-turn',
   tagSlot: 'flex h-5 items-center sm:h-6',
   tag: 'ludo-turn-tag',
   plateRight: 'ludo-plate-right items-end',
-  // Die beside the avatar, level with it
-  dieSlot: 'mt-0 shrink-0 scale-[0.6] origin-top sm:mt-1 sm:scale-100',
+  // Out of flow on the board side, so the avatar never moves
+  dieSlot:
+    'absolute top-5 left-full ml-2 -translate-y-1/2 scale-[0.6] origin-left sm:top-[2.3rem] sm:ml-3 sm:scale-100',
+  dieSlotRight:
+    'absolute top-5 right-full mr-2 -translate-y-1/2 scale-[0.6] origin-right sm:top-[2.3rem] sm:mr-3 sm:scale-100',
   off: 'opacity-45 grayscale',
-  row: 'flex items-start gap-1.5 sm:gap-3',
+  row: 'relative flex items-start gap-1.5 sm:gap-3',
   // Avatar, name and home count share one centred column
-  core: 'flex min-w-0 flex-col items-center gap-1',
+  // Core as wide as the avatar, so every avatar sits at the same spot whatever the name
+  core: 'relative flex w-10 shrink-0 flex-col items-center gap-1 sm:w-[4.6rem]',
   rowRight: 'flex-row-reverse',
   // Avatar inside the turn clock
   ring: 'ludo-ring grid size-10 shrink-0 place-items-center rounded-full p-[0.14rem] sm:size-[4.6rem] sm:p-[0.25rem]',
   ringAlert: 'ludo-ring-alert',
   face: '!size-full rounded-full text-xs ring-[0.15rem] ring-[var(--play-ludo-felt)] sm:text-xl sm:ring-[0.2rem]',
   chip: 'mt-0.5 w-5 shrink-0 sm:mt-2 sm:w-11',
-  nameRow: 'flex items-center justify-center gap-1 px-1 sm:gap-1.5',
+  nameRow: 'flex w-max items-center justify-center gap-1 px-1 sm:gap-1.5',
   name: NAME,
   crown: 'size-3 shrink-0 sm:size-4 text-[var(--play-ludo-crown)]',
   dot: 'size-2 shrink-0 sm:size-2.5 rounded-full',
   online: 'bg-[var(--play-ludo-online)]',
   away: 'bg-[var(--play-ludo-away)]',
   place:
-    'rounded-full bg-[var(--play-ludo-crown)] px-2 py-0.5 text-xs font-black text-[var(--play-ludo-felt)]',
+    'w-max rounded-full bg-[var(--play-ludo-crown)] px-2 py-0.5 text-xs font-black text-[var(--play-ludo-felt)]',
 } as const
 
 /**

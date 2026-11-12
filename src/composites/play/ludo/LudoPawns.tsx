@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import { LudoImpact } from '@/composites/play/ludo/LudoImpact'
@@ -146,7 +146,12 @@ export const LudoPawns = ({
   strike,
   onPick,
 }: LudoPawnsProps) => {
-  const [aimed, setAimed] = useState<number | null>(null)
+  // Aim is dropped once the turn or choices change
+  const [aim, setAim] = useState<{ pawn: number; scope: string } | null>(null)
+  const isTouch = useRef(false)
+  const scope = `${turns}:${movable.map((entry) => entry.pawn).join()}`
+  const aimed = aim?.scope === scope ? aim.pawn : null
+  const setAimed = (pawn: number | null) => setAim(pawn === null ? null : { pawn, scope })
   const mine = players.find((player) => player.accountId === viewerId)
   const target = movable.find((entry) => entry.pawn === aimed)
   const glide = { '--glide': `${LUDO_SETTINGS.stepMs}ms` } as CSSProperties
@@ -205,14 +210,21 @@ export const LudoPawns = ({
                 type="button"
                 className={LUDO_PIECES.pawnButton}
                 aria-label={fillPlayMessage(LUDO_BOARD_COPY.pawn, { number: spot.pawn + 1 })}
+                onPointerDown={(event) => {
+                  isTouch.current = event.pointerType !== 'mouse'
+                }}
                 onClick={() => {
+                  if (isTouch.current && movable.length > 1 && aimed !== spot.pawn) {
+                    setAimed(spot.pawn)
+                    return
+                  }
                   setAimed(null)
                   onPick(spot.pawn)
                 }}
-                onPointerEnter={() => setAimed(spot.pawn)}
-                onPointerLeave={() => setAimed(null)}
+                onPointerEnter={(event) => event.pointerType === 'mouse' && setAimed(spot.pawn)}
+                onPointerLeave={(event) => event.pointerType === 'mouse' && setAimed(null)}
                 onFocus={() => setAimed(spot.pawn)}
-                onBlur={() => setAimed(null)}
+                onBlur={() => !isTouch.current && setAimed(null)}
               >
                 {art}
               </button>
