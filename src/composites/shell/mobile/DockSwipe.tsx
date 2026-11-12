@@ -64,7 +64,7 @@ export const DockSwipe = ({ viewContext, held, children }: DockSwipeProps) => {
     <div
       {...swipe.handlers}
       onPointerDown={onPointerDown}
-      className="min-h-full"
+      className="flex min-h-full flex-1 flex-col gap-6"
       style={{
         ...swipe.axisStyle,
         // A transform would trap fixed children, so only while dragging
