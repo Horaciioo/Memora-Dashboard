@@ -407,6 +407,14 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'id',
     search: [],
   },
+  jumbleGame: { model: 'JumbleGame', exposure: 'full', display: 'sessionId', search: [] },
+  jumbleRound: {
+    model: 'JumbleRound',
+    exposure: 'readOnly',
+    reason: 'Historique de manches',
+    display: 'id',
+    search: [],
+  },
   golfGame: { model: 'GolfGame', exposure: 'full', display: 'sessionId', search: [] },
   golfPlayer: { model: 'GolfPlayer', exposure: 'full', display: 'id', search: [] },
   golfMove: {

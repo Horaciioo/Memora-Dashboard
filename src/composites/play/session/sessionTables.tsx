@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 
 import { BaccalaureatBoard } from '@/composites/play/baccalaureat/BaccalaureatBoard'
 import type { BacBoardView } from '@/composites/play/baccalaureat/types'
+import { JumbleBoard } from '@/composites/play/jumble/JumbleBoard'
+import type { JumbleBoardView } from '@/composites/play/jumble/types'
 import { BombBoard } from '@/composites/play/bomb/BombBoard'
 import type { BombBoardView } from '@/composites/play/bomb/types'
 import { GolfBoard } from '@/composites/play/golf/GolfBoard'
@@ -14,7 +16,7 @@ import type { NavalBoardView } from '@/core/lib/play/naval/state'
 import type { GolfBoardView } from '@/core/lib/play/golf'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlainLiveFeed } from '@/composites/play/session/live/PlainLiveFeed'
-import { BAC_FEED_COPY, BOMB_FEED_COPY } from '@/declarations/play'
+import { BAC_FEED_COPY, BOMB_FEED_COPY, JUMBLE_FEED_COPY } from '@/declarations/play'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -104,6 +106,29 @@ export const PLAY_SESSION_TABLES: Partial<
           sessionId={sessionId}
           board={bomb}
           copy={BOMB_FEED_COPY}
+          players={[...seats, ...spectators]}
+        />
+      ),
+    }
+  },
+  [PlayGames.Jumble]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const jumble = board as JumbleBoardView
+
+    return {
+      board: (
+        <JumbleBoard
+          sessionId={sessionId}
+          board={jumble}
+          faces={asPlayers(seats)}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      feed: (
+        <PlainLiveFeed
+          sessionId={sessionId}
+          board={jumble}
+          copy={JUMBLE_FEED_COPY}
           players={[...seats, ...spectators]}
         />
       ),

@@ -41,6 +41,13 @@ const SHIFTERS: Record<
       SET "restsAt" = "restsAt" + (${s}::float8 * interval '1 second')
       WHERE "sessionId" = ${id}`
   },
+  JUMBLE: (tx, id, s) => tx.$executeRaw`
+    UPDATE play_jumble_games
+    SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),
+        "endsAt" = "endsAt" + (${s}::float8 * interval '1 second'),
+        "hintAt" = "hintAt" + (${s}::float8 * interval '1 second'),
+        "revealUntil" = "revealUntil" + (${s}::float8 * interval '1 second')
+    WHERE "sessionId" = ${id}`,
   LUDO: (tx, id, s) => tx.$executeRaw`
     UPDATE play_ludo_games
     SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),

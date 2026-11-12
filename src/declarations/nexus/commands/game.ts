@@ -5,7 +5,7 @@ import type { CommandInput, NexusCommand } from '@/declarations/nexus/commands/t
 // Declaration without its family
 type GameInput = Omit<CommandInput, 'category'>
 
-const GAMES = ['baccalaureat', 'golf', 'bomb', 'ludo', 'naval']
+const GAMES = ['baccalaureat', 'golf', 'bomb', 'ludo', 'naval', 'jumble']
 
 const GAME_ARG: ArgSpec = { name: 'game', type: 'id', required: true }
 

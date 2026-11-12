@@ -3,6 +3,7 @@ import 'server-only'
 import { BACCALAUREAT_BOT } from '@/core/bots/play/baccalaureat'
 import { BOMB_BOT } from '@/core/bots/play/bomb'
 import { GOLF_BOT } from '@/core/bots/play/golf'
+import { JUMBLE_BOT } from '@/core/bots/play/jumble'
 import { LUDO_BOT } from '@/core/bots/play/ludo'
 import { NAVAL_BOT } from '@/core/bots/play/naval'
 import type { PlayBotStrategy } from '@/types/play'
@@ -20,4 +21,5 @@ export const PLAY_BOTS: Record<PlayGameName, PlayBotStrategy> = {
   [PlayGames.Golf]: GOLF_BOT,
   [PlayGames.Ludo]: LUDO_BOT,
   [PlayGames.Naval]: NAVAL_BOT,
+  [PlayGames.Jumble]: JUMBLE_BOT,
 }

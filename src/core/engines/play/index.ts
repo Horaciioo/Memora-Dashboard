@@ -3,6 +3,7 @@ import 'server-only'
 import { BACCALAUREAT_ENGINE } from '@/core/engines/play/BaccalaureatEngine'
 import { BOMB_ENGINE } from '@/core/engines/play/BombEngine'
 import { GOLF_ENGINE } from '@/core/engines/play/GolfEngine'
+import { JUMBLE_ENGINE } from '@/core/engines/play/JumbleEngine'
 import { LUDO_ENGINE } from '@/core/engines/play/LudoEngine'
 import { NAVAL_ENGINE } from '@/core/engines/play/NavalEngine'
 import type { PlayEngine } from '@/types/play'
@@ -20,6 +21,7 @@ export const PLAY_ENGINES: Partial<Record<PlayGameName, PlayEngine>> = {
   [PlayGames.Golf]: GOLF_ENGINE,
   [PlayGames.Ludo]: LUDO_ENGINE,
   [PlayGames.Naval]: NAVAL_ENGINE,
+  [PlayGames.Jumble]: JUMBLE_ENGINE,
 }
 
 export type { EngineSession, EngineStep, PlayEngine } from '@/types/play'

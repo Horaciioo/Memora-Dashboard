@@ -95,6 +95,63 @@ const MARKS: Record<string, ReactNode> = {
       />
     </>
   ),
+  playJumble: (
+    <>
+      <rect
+        x="4"
+        y="22"
+        width="26"
+        height="26"
+        rx="6"
+        transform="rotate(-12 17 35)"
+        {...tint('--play-jumble-tile')}
+      />
+      <rect
+        x="34"
+        y="14"
+        width="26"
+        height="26"
+        rx="6"
+        transform="rotate(10 47 27)"
+        {...tint('--play-gold')}
+      />
+      <rect
+        x="22"
+        y="38"
+        width="26"
+        height="22"
+        rx="6"
+        transform="rotate(-4 35 49)"
+        {...tint('--play-jumble-glow')}
+      />
+      <path
+        d="M12 38l5-12 5 12M14 34h6"
+        stroke="var(--play-jumble-tile-ink)"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        transform="rotate(-12 17 35)"
+      />
+      <path
+        d="M43 20v14h8"
+        stroke="var(--play-jumble-tile-ink)"
+        strokeWidth="3.4"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        transform="rotate(10 47 27)"
+      />
+      <path
+        d="M28 45h14M35 45v10"
+        stroke="var(--play-jumble-tile-ink)"
+        strokeWidth="3.4"
+        fill="none"
+        strokeLinecap="round"
+        transform="rotate(-4 35 49)"
+      />
+    </>
+  ),
   playLudo: (
     <>
       <defs>
@@ -179,7 +236,14 @@ const MARKS: Record<string, ReactNode> = {
 }
 
 // Logos drawn bare, without their tile
-const BARE = new Set(['playBaccalaureat', 'playBomb', 'playGolf', 'playLudo', 'playNaval'])
+const BARE = new Set([
+  'playBaccalaureat',
+  'playBomb',
+  'playGolf',
+  'playJumble',
+  'playLudo',
+  'playNaval',
+])
 
 // Game not announced yet
 const MYSTERY = {

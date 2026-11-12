@@ -3,6 +3,8 @@ import { BOMB_EMBERS } from '@/declarations/play/bomb/copy'
 import { BOMB_SETTINGS } from '@/declarations/play/bomb/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
+import { JUMBLE_SETTINGS } from '@/declarations/play/jumble/settings'
 import { LUDO_FELT } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { NAVAL_SEA } from '@/declarations/play/naval/copy'
@@ -81,6 +83,18 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: BOMB_EMBERS.ground,
     minPlayers: BOMB_SETTINGS.minPlayers,
     maxPlayers: BOMB_SETTINGS.maxPlayers,
+    playable: true,
+  },
+  [PlayGames.Jumble]: {
+    label: 'Jumble',
+    slug: 'jumble',
+    tagline: 'Des lettres en vrac, remets le mot dans l’ordre avant tout le monde.',
+    tone: '--play-jumble',
+    logo: 'playJumble',
+    backdrop: 'tiles',
+    ground: JUMBLE_HUB.ground,
+    minPlayers: JUMBLE_SETTINGS.minPlayers,
+    maxPlayers: JUMBLE_SETTINGS.maxPlayers,
     playable: true,
   },
   [PlayGames.Ludo]: {

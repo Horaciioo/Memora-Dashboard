@@ -45,6 +45,20 @@ export const PLAY_CONCEPT: Record<PlayGameName, PlayConceptStep[]> = {
       text: 'Mot validé, la bombe passe au suivant. Si elle t’explose dans les mains, tu perds une vie.',
     },
   ],
+  [PlayGames.Jumble]: [
+    {
+      title: 'Des lettres en vrac',
+      text: 'Un mot apparaît mélangé, la même chose pour tout le monde en même temps.',
+    },
+    {
+      title: 'Trouve-le le premier',
+      text: 'Tape le mot dans l’ordre. Le plus rapide empoche la manche, un indice tombe si ça traîne.',
+    },
+    {
+      title: 'Enchaîne les éclairs',
+      text: 'Plus tu réponds vite, plus tu marques. Gagne plusieurs manches de suite pour faire grimper la série.',
+    },
+  ],
   [PlayGames.Golf]: [
     {
       title: 'Vise',

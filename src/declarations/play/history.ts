@@ -41,6 +41,10 @@ export const PLAY_HISTORY_FACTS: Record<PlayGameName, Array<{ key: string; label
     { key: 'words', label: 'Mots posés' },
     { key: 'blasts', label: 'Explosions' },
   ],
+  [PlayGames.Jumble]: [
+    { key: 'solved', label: 'Mots trouvés' },
+    { key: 'bestStreak', label: 'Meilleure série' },
+  ],
   [PlayGames.Ludo]: [
     { key: 'captures', label: 'Pions pris' },
     { key: 'pawnsHome', label: 'Pions rentrés' },

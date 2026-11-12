@@ -25,5 +25,10 @@ export const SETUP_TILE =
 export const SETUP_BLUE =
   'border-[var(--play-baccalaureat)] bg-[var(--play-baccalaureat)] text-white hover:border-[var(--play-baccalaureat)]'
 
+export const SETUP_TEAL =
+
+export const SETUP_VIOLET =
+  'border-[var(--play-jumble)] bg-[var(--play-jumble)] text-white hover:border-[var(--play-jumble)]'
+
 export const SETUP_FIRE =
   'border-[var(--play-bomb)] bg-[var(--play-bomb)] text-white hover:border-[var(--play-bomb)]'

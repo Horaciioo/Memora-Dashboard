@@ -410,6 +410,7 @@ model Account {
   baccalaureatVotes     BaccalaureatVote[]
   bombPlayers           BombPlayer[]
   bombMoves             BombMove[]
+  jumbleRounds          JumbleRound[]
   golfPlayers           GolfPlayer[]
   golfMoves             GolfMove[]
   ludoPlayers           LudoPlayer[]
@@ -2977,6 +2978,7 @@ enum PlayGame {
   BOMB
   LUDO
   NAVAL
+  JUMBLE
 }
 
 // Play bot level
@@ -3058,6 +3060,8 @@ model PlaySession {
   bombGame     BombGame?
   bombSeats    BombPlayer[]
   bombMoves    BombMove[]
+  jumbleGame   JumbleGame?
+  jumbleRounds JumbleRound[]
   golfGame     GolfGame?
   golfPlayers  GolfPlayer[]
   golfMoves    GolfMove[]
@@ -4054,4 +4058,53 @@ model SystemFlag {
   updatedAt   DateTime @updatedAt
 
   @@map("system_flags")
+}
+
+// Jumble table: the scrambled word of the round and its clock
+model JumbleGame {
+  sessionId   String    @id
+  // Round in play, from one
+  round       Int
+  // Comparable form, never sent before the reveal
+  answer      String
+  // Written form with its accents
+  display     String
+  scrambled   String
+  startsAt    DateTime
+  endsAt      DateTime
+  // Moment the first letter is given away
+  hintAt      DateTime
+  isHinted    Boolean   @default(false)
+  solverId    String?
+  solvedAt    DateTime?
+  // Reveal over, the next round opens
+  revealUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_jumble_games")
+}
+
+// One round played, solved or run out of time
+model JumbleRound {
+  id        String   @id @default(cuid())
+  sessionId String
+  round     Int
+  // Written form of the word
+  word      String
+  // Null when nobody found it
+  solverId  String?
+  points    Int      @default(0)
+  // Time the solver took
+  ms        Int      @default(0)
+  // Rounds in a row for the solver
+  streak    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  solver  Account?    @relation(fields: [solverId], references: [id], onDelete: SetNull)
+
+  @@unique([sessionId, round])
+  @@map("play_jumble_rounds")
 }

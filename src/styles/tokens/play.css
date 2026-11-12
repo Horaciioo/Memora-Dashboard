@@ -207,6 +207,15 @@
   --play-bomb-cap: #6d6578;
   --play-bomb-cap-deep: #34303d;
   --play-bomb-cord: #d8b77a;
+  --play-jumble: #8a5cf6;
+  --play-jumble-deep: #3d1a9c;
+  --play-jumble-glow: #e2d6ff;
+  --play-jumble-night: #0f0a24;
+  --play-jumble-dusk: #2a1466;
+  /* Letter tiles: cream face, gold edge */
+  --play-jumble-tile: #fff4d6;
+  --play-jumble-tile-deep: #d9b45a;
+  --play-jumble-tile-ink: #2a1466;
   --play-heart: #ff4d5e;
   --play-heart-gold: #ffc53d;
   /* Bomb difficulty buttons, easiest to hardest */

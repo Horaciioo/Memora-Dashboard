@@ -249,6 +249,39 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
       ))}
     </>
   ),
+  tiles: (tone) => (
+    <>
+      <circle cx="180" cy="300" r="150" {...tint(`${tone}-glow`, 0.2)} />
+      {[
+        { x: 70, y: 150, r: -14, letter: 'J', size: 112, fill: '--play-jumble-tile' },
+        { x: 196, y: 108, r: 9, letter: 'U', size: 128, fill: '--play-gold' },
+        { x: 120, y: 268, r: -5, letter: 'M', size: 120, fill: '--play-jumble-glow' },
+        { x: 252, y: 250, r: 15, letter: 'B', size: 96, fill: '--play-jumble-tile' },
+      ].map((tile) => (
+        <g key={tile.letter} transform={`translate(${tile.x} ${tile.y}) rotate(${tile.r})`}>
+          <rect
+            width={tile.size}
+            height={tile.size}
+            rx={tile.size * 0.22}
+            y="8"
+            fill="black"
+            opacity="0.28"
+          />
+          <rect width={tile.size} height={tile.size} rx={tile.size * 0.22} {...tint(tile.fill)} />
+          <text
+            x={tile.size / 2}
+            y={tile.size * 0.72}
+            textAnchor="middle"
+            fontSize={tile.size * 0.62}
+            fontWeight="900"
+            {...tint('--play-jumble-tile-ink')}
+          >
+            {tile.letter}
+          </text>
+        </g>
+      ))}
+    </>
+  ),
   board: (tone) => (
     <LudoBoardArt
       tone={tone}

@@ -34,6 +34,17 @@
       "max": 1600
     }
   },
+  "jumble": {
+    "thinkMs": {
+      "min": 4000,
+      "max": 12000
+    },
+    "failRate": {
+      "EASY": 0.45,
+      "MEDIUM": 0.25,
+      "HARD": 0.08
+    }
+  },
   "bomb": {
     "thinkMs": {
       "min": 1400,
