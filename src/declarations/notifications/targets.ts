@@ -25,6 +25,7 @@ export type NotificationTargetName =
   | 'identity'
   | 'playGame'
   | 'playGroup'
+  | 'unbanRequest'
 
 /**
  * Where one notification leads
@@ -67,6 +68,10 @@ const NOTIFICATION_TARGET_MAP: Record<NotificationTargetName, NotificationTarget
   identity: { label: 'l’identifiant', route: () => null },
   playGame: { label: 'la partie', route: (id) => (id ? ROUTES.playSession(id) : ROUTES.play) },
   playGroup: { label: 'le groupe', route: () => ROUTES.play },
+  unbanRequest: {
+    label: 'la demande de déban',
+    route: (id) => (id ? ROUTES.unbanRequest(id) : ROUTES.unban),
+  },
   page: { label: 'la page', route: (id) => (id ? ROUTES.page(id) : ROUTES.pages) },
   calendar: {
     label: 'le calendrier',

@@ -177,6 +177,22 @@ export const TOUR_PAGES: TourPage[] = [
     ],
   },
   {
+    route: ROUTES.unban,
+    functions: [FunctionNames.Discord],
+    steps: [
+      {
+        beacon: TOUR_BEACONS.unbanList,
+        title: 'Les demandes',
+        body: 'Chaque personne bannie qui demande à revenir arrive ici. Filtre par statut ou par YouTubeur, puis ouvre une demande pour la traiter.',
+      },
+      {
+        beacon: TOUR_BEACONS.unbanDetail,
+        title: 'La fiche',
+        body: 'Lis ses réponses, prends la demande en charge, laisse une note à l’équipe, puis accepte ou refuse avec une réponse pour la personne.',
+      },
+    ],
+  },
+  {
     route: ROUTES.changelog,
     steps: [
       {

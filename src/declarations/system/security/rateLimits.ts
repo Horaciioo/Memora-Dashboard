@@ -63,6 +63,9 @@ const RATE_LIMIT_MAP = {
   nexus: policy('nexus', 'Console command', RATE_LIMIT_SCOPES.Account, 60, 60),
   nexusWrite: policy('nexusWrite', 'Console change', RATE_LIMIT_SCOPES.Account, 60, 10),
   clientErrors: policy('clientErrors', 'Browser errors', RATE_LIMIT_SCOPES.Account, 60, 20),
+  // Strangers filing requests, counted per address
+  unbanSubmit: policy('unbanSubmit', 'Unban request', RATE_LIMIT_SCOPES.Address, HOUR_SECONDS, 5),
+  unbanPublic: policy('unbanPublic', 'Unban page', RATE_LIMIT_SCOPES.Address, 60, 30),
   // Autosave fires on every pause in typing
 } satisfies Record<string, RateLimitPolicy>
 

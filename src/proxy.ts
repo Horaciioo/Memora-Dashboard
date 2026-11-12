@@ -28,7 +28,7 @@ const SHARE_PATH = new RegExp(
 )
 
 // Path prefixes
-const PUBLIC_PREFIXES: string[] = ['/integration', '/exercise', ROUTES.welcome]
+const PUBLIC_PREFIXES: string[] = ['/integration', '/exercise', '/unban', ROUTES.welcome]
 
 /**
  * Build the per-request nonce and the policy carrying it

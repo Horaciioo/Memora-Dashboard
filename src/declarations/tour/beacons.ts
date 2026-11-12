@@ -20,4 +20,6 @@ export const TOUR_BEACONS = {
   sanctionsOffenses: 'tour:sanctions-offenses',
   marshaFamilies: 'tour:marsha-families',
   marshaList: 'tour:marsha-list',
+  unbanList: 'tour:unban-list',
+  unbanDetail: 'tour:unban-detail',
 } as const

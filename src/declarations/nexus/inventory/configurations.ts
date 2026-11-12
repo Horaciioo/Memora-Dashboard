@@ -52,6 +52,7 @@ export const CONFIGURATION_FILES: Record<ConfigurationFolder, string[]> = {
     'timeouts',
     'tour',
     'two-factor',
+    'unban',
     'versioning',
   ],
   play: [

@@ -51,6 +51,8 @@ export const NOTIFICATION_KINDS = createEnumeration({
   PlayInvited: { id: 41, label: 'Invitation à jouer' },
   PlayGroupInvited: { id: 42, label: 'Invitation de groupe' },
   PlayFollowedStarted: { id: 43, label: 'Partie suivie lancée' },
+  UnbanSubmitted: { id: 44, label: 'Demande de déban' },
+  UnbanAssigned: { id: 45, label: 'Demande de déban confiée' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids

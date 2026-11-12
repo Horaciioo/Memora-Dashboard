@@ -31,6 +31,8 @@
   "sanctions": true,
   "discord": true,
   "marsha": true,
+  "unban": true,
+  "unban.intake": true,
   "recruitments": true,
   "recruitments.interview": true,
   "recruitments.blacklist": true,

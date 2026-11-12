@@ -17,6 +17,7 @@ export type PushCategoryName =
   | 'academy'
   | 'announcements'
   | 'play'
+  | 'unban'
 
 /**
  * How one push family reads in the settings
@@ -77,6 +78,11 @@ const PUSH_CATEGORY_MAP: Record<PushCategoryName, PushCategoryOption> = {
     description: 'Invitations à jouer, groupes et parties que tu suis.',
     icon: 'play',
     urgent: true,
+  },
+  unban: {
+    label: 'Déban.',
+    description: 'Les demandes de déban Discord qui arrivent ou qu’on te confie.',
+    icon: 'unlock',
   },
   announcements: {
     label: 'Annonces et accès',
@@ -139,4 +145,6 @@ export const PUSH_CATEGORY_OF_KIND: Record<NotificationKindName, PushCategoryNam
   PlayInvited: 'play',
   PlayGroupInvited: 'play',
   PlayFollowedStarted: 'play',
+  UnbanSubmitted: 'unban',
+  UnbanAssigned: 'unban',
 }
