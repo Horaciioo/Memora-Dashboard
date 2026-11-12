@@ -12,7 +12,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_INVITE } from '@/declarations/ui/variants'
 import type { PlayInviteCandidate } from '@/types/play'
 import { cn } from '@/utils/classnames'
-import { PlayInviteRoles } from '@/utils/constants/play'
+import { PLAY_INVITE_SHOWN, PlayInviteRoles } from '@/utils/constants/play'
 import { foldText } from '@/utils/format/strings'
 
 export interface PlayInvitePickerProps {
@@ -59,13 +59,19 @@ export const PlayInvitePicker = ({
     () => groupCandidates(candidates, new Set(online.map((member) => member.accountId))),
     [candidates, online]
   )
-  // Live members first, then the lately seen ones
+  // Members in Play now, then lately played with, one row each
   const sections = [
     {
       title: PLAY_HUB_COPY.inviteOnline,
-      people: [...groups[PlayInviteGroups.Online], ...groups[PlayInviteGroups.Recent]],
+      people: groups[PlayInviteGroups.Online].slice(0, PLAY_INVITE_SHOWN),
     },
-    { title: PLAY_HUB_COPY.invitePlayedWith, people: groups[PlayInviteGroups.PlayedWith] },
+    {
+      title: PLAY_HUB_COPY.invitePlayedWith,
+      people: [...groups[PlayInviteGroups.Recent], ...groups[PlayInviteGroups.PlayedWith]].slice(
+        0,
+        PLAY_INVITE_SHOWN
+      ),
+    },
   ]
   const matches = useMemo(
     () => candidates.filter((entry) => foldText(entry.displayName).includes(foldText(query))),
@@ -129,7 +135,7 @@ export const PlayInvitePicker = ({
           </button>
         </div>
 
-        <div className={PLAY_INVITE.people}>
+        <div className={cn(PLAY_INVITE.people, query.trim() !== '' && PLAY_INVITE.peopleSearch)}>
           {query.trim() !== '' ? (
             <>
               <PlayInviteSection people={matches} sent={sent} onSend={send} />

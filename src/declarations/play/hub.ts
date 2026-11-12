@@ -204,7 +204,7 @@ export const PLAY_HUB_COPY = {
   inviteSent: 'Invité',
   inviteSpectatorOption: 'En spectateur',
   inviteOnline: 'En ligne',
-  invitePlayedWith: 'Ont déjà joué avec toi',
+  invitePlayedWith: 'Récemment joué avec',
   inviteClose: 'Fermer',
   // Private games
   publicOption: 'Publique',

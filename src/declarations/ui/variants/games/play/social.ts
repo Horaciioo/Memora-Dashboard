@@ -336,7 +336,9 @@ export const PLAY_INVITE = {
   section: 'flex flex-col',
   sectionTitle:
     'px-2 pt-2 pb-1 text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
-  people: 'flex max-h-60 flex-col overflow-y-auto max-md:max-h-none max-md:flex-1',
+  people: 'flex flex-col max-md:flex-1',
+  // Search results can run long, only they scroll
+  peopleSearch: 'max-h-48 overflow-y-auto max-md:max-h-none',
   // Faces side by side, name under each
   faces: 'grid grid-cols-5 gap-x-1.5 gap-y-2 px-1 pb-1.5 md:gap-x-2 md:gap-y-3 md:pb-2',
   face: 'flex min-w-0 flex-col items-center gap-1 rounded-xl p-1.5 transition-colors hover:bg-[var(--play-chip)]',

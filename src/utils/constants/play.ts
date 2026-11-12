@@ -78,6 +78,9 @@ export const PlayInviteRoles = {
 
 export type PlayInviteRoleName = (typeof PlayInviteRoles)[keyof typeof PlayInviteRoles]
 
+// Faces shown per picker section, search reaches the rest
+export const PLAY_INVITE_SHOWN = 5
+
 /**
  * Kinds of Play notice
  * @type {Record<string, string>}
