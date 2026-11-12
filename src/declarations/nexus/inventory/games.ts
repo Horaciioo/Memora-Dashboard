@@ -55,6 +55,10 @@ export const GAME_INVENTORY: Record<PlayGameName, GameEntry> = {
     moves: ['CroquisGuess', 'CroquisRound'],
     capabilities: ['pause', 'resume', 'kick', 'setScore'],
   },
+  [PlayGames.Suspens]: {
+    moves: ['SuspensMove', 'SuspensRound'],
+    capabilities: ['pause', 'resume', 'kick', 'setScore'],
+  },
   [PlayGames.Glitch]: {
     moves: ['GlitchProgress'],
     capabilities: ['pause', 'resume', 'kick', 'setScore'],
