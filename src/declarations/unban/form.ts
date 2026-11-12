@@ -1,6 +1,8 @@
 import { UNBAN_SETTINGS } from '@/declarations/configurations/settings'
+import { UNBAN_PUBLIC_COPY } from '@/declarations/unban/copy'
 import { UNBAN_QUESTION_TYPE_REGISTRY } from '@/declarations/unban/registries'
 import type { FieldDefinition, FieldValue } from '@/types/forms'
+import { UNBAN_FORM_FIELDS } from '@/utils/constants/unban'
 import type { UnbanQuestionTypeName } from '@/utils/constants/unban'
 
 /**
@@ -144,3 +146,27 @@ export const toFieldDefinition = (question: UnbanQuestion): FieldDefinition => {
 
 export const toFieldDefinitions = (snapshot: UnbanFormSnapshot): FieldDefinition[] =>
   snapshot.questions.map(toFieldDefinition)
+
+/**
+ * Fields a person types when the Discord proof is off
+ * @type {FieldDefinition[]}
+ */
+
+export const TYPED_IDENTITY_FIELDS: FieldDefinition[] = [
+  {
+    name: UNBAN_FORM_FIELDS.discordId,
+    kind: 'text',
+    label: UNBAN_PUBLIC_COPY.typedId,
+    required: true,
+    span: 'full',
+    maxLength: 25,
+  },
+  {
+    name: UNBAN_FORM_FIELDS.discordName,
+    kind: 'text',
+    label: UNBAN_PUBLIC_COPY.typedName,
+    required: true,
+    span: 'full',
+    maxLength: 100,
+  },
+]

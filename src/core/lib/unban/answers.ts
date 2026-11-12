@@ -1,3 +1,4 @@
+import { decryptSecret, encryptSecret } from '@/core/lib/crypto'
 import { parseFormValues } from '@/core/lib/forms/parse'
 import { UNBAN_FORM_COPY } from '@/declarations/unban/copy'
 import { toFieldDefinitions } from '@/declarations/unban/form'
@@ -87,4 +88,29 @@ export const answerText = (answer: UnbanAnswer): string | null => {
   if (answer.type === UnbanQuestionTypes.Date) return formatDay(String(answer.value))
 
   return String(answer.value)
+}
+
+/**
+ * Answers as they are stored, through the cipher
+ * @param {UnbanAnswer[]} answers - Kept answers
+ * @return {string} - Stored text
+ */
+
+export const sealAnswers = (answers: UnbanAnswer[]): string =>
+  encryptSecret(JSON.stringify(answers))
+
+/**
+ * Answers back from their stored text, none when unreadable
+ * @param {string} stored - Stored text
+ * @return {UnbanAnswer[]} - Answers
+ */
+
+export const readAnswers = (stored: string): UnbanAnswer[] => {
+  try {
+    const parsed: unknown = JSON.parse(decryptSecret(stored) ?? '[]')
+
+    return Array.isArray(parsed) ? (parsed as UnbanAnswer[]) : []
+  } catch {
+    return []
+  }
 }

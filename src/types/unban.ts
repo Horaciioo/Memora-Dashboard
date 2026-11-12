@@ -1,3 +1,4 @@
+import type { IntegrationCreator } from '@/types/onboarding'
 import type { UnbanLinkStateName, UnbanStatusName } from '@/utils/constants/unban'
 import type { UnbanFormSnapshot } from '@/declarations/unban/form'
 
@@ -60,27 +61,13 @@ export interface CreatedUnbanLink {
 }
 
 /**
- * Creator shown on the public pages
- * @typedef {Object} UnbanCreator
- * @property {string} name - Display name
- * @property {string | null} avatarUrl - Avatar
- * @property {string | null} bannerUrl - Banner
- */
-
-export interface UnbanCreator {
-  name: string
-  avatarUrl: string | null
-  bannerUrl: string | null
-}
-
-/**
  * What the public page learns from a token
  * @typedef {Object} PublicLinkContext
  * @property {string} linkId - Link identifier
  * @property {UnbanLinkStateName} state - Current state
  * @property {boolean} requiresAccount - A given Discord account is expected
  * @property {string} expiresAt - ISO expiry
- * @property {UnbanCreator} creator - Creator it belongs to
+ * @property {IntegrationCreator} creator - Creator it belongs to
  */
 
 export interface PublicLinkContext {
@@ -88,5 +75,71 @@ export interface PublicLinkContext {
   state: UnbanLinkStateName
   requiresAccount: boolean
   expiresAt: string
-  creator: UnbanCreator
+  creator: IntegrationCreator
+}
+
+/**
+ * One answer as the requester reads it back
+ * @typedef {Object} PublicAnswerView
+ * @property {string} label - Question asked
+ * @property {string | null} text - Answer, null when left blank
+ */
+
+export interface PublicAnswerView {
+  label: string
+  text: string | null
+}
+
+/**
+ * Everything a requester may know of their own request,
+ * @typedef {Object} PublicRequestView
+ * @property {string} reference - Short code
+ * @property {UnbanStatusName} status - Where it stands
+ * @property {string} statusLabel - Words for that status
+ * @property {string} submittedAt - ISO submission
+ * @property {string} updatedAt - ISO last change of status or decision
+ * @property {string | null} decidedAt - ISO decision
+ * @property {string | null} reviewNote - Answer of the team
+ * @property {PublicAnswerView[]} answers - The requester's own answers
+ * @property {string} youtuberName - Creator it was filed with
+ * @property {string} linkExpiresAt - ISO expiry of the link
+ */
+
+export interface PublicRequestView {
+  reference: string
+  status: UnbanStatusName
+  statusLabel: string
+  submittedAt: string
+  updatedAt: string
+  decidedAt: string | null
+  reviewNote: string | null
+  answers: PublicAnswerView[]
+  youtuberName: string
+  linkExpiresAt: string
+}
+
+/**
+ * What the person is told once the request is filed
+ * @typedef {Object} SubmitOutcome
+ * @property {string} reference - Short code of the request
+ * @property {string} linkExpiresAt - ISO expiry of the link that follows it
+ */
+
+export interface SubmitOutcome {
+  reference: string
+  linkExpiresAt: string
+}
+
+/**
+ * Account shown back to the person filing
+ * @typedef {Object} UnbanIdentityView
+ * @property {string} discordId - Discord identifier
+ * @property {string} name - Display name
+ * @property {string | null} avatarUrl - Portrait
+ */
+
+export interface UnbanIdentityView {
+  discordId: string
+  name: string
+  avatarUrl: string | null
 }
