@@ -43,7 +43,7 @@ export const JumbleHud = ({
       key: 'clock',
       caption: JUMBLE_HUD_COPY.clock,
       figure: (
-        <span className="block w-32">
+        <span className="block w-32 max-w-full">
           {isReveal ? (
             <span className={JUMBLE_BOARD.clockTrack} />
           ) : (

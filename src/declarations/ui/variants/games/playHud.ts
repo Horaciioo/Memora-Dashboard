@@ -22,9 +22,9 @@ export const PLAY_HUD = {
   // No strip beside it: centred on the screen
   cardAlone: `${BLOCK} pointer-events-auto flex w-[32rem] max-w-full items-center gap-4 px-6 py-3.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:absolute md:left-1/2 md:-translate-x-1/2`,
   block:
-    'flex min-w-0 flex-1 basis-0 items-baseline justify-center gap-2 max-md:flex-col max-md:items-center max-md:gap-1',
-  caption: `${CAPTION} max-md:text-[0.65rem] max-md:text-center`,
-  figure: `${FIGURE} whitespace-nowrap max-md:max-w-full max-md:truncate max-md:text-xl`,
+    'flex min-w-0 flex-auto items-baseline justify-center gap-2 max-md:flex-col max-md:items-center max-md:gap-1',
+  caption: `${CAPTION} shrink-0 max-md:text-[0.65rem] max-md:text-center`,
+  figure: `${FIGURE} min-w-0 truncate whitespace-nowrap max-md:max-w-full max-md:truncate max-md:text-xl`,
   divider: 'w-px self-stretch bg-[var(--play-line)]',
   rule: 'my-1 h-px bg-[var(--play-line)]',
   // Keys and the settings card hanging under them
@@ -37,7 +37,7 @@ export const PLAY_HUD = {
   keyDesktop: 'max-md:hidden',
   settings: `${BLOCK} absolute top-full right-0 z-10 mt-3 flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-1 p-3`,
   setting:
-    'flex items-center justify-start gap-3 px-1 py-1.5 text-left text-base font-extrabold text-[var(--play-ink)]',
+    'flex items-center justify-between gap-3 px-1 py-1.5 text-left text-base font-extrabold text-[var(--play-ink)]',
   soundRow: 'flex flex-col gap-1 px-1 py-1.5 text-base font-extrabold text-[var(--play-ink)]',
   // Game boxes, set aside on the left
   lead: 'absolute top-1/2 left-3 -translate-y-1/2 max-md:hidden md:left-7',
