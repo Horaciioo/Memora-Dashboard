@@ -5,6 +5,7 @@ import { useCallback, useMemo, useRef } from 'react'
 import { StopGoDock } from '@/composites/play/stopgo/cards/StopGoDock'
 import { StopGoFlights } from '@/composites/play/stopgo/fx/StopGoFlights'
 import { useStopGoFx } from '@/composites/play/stopgo/fx/useStopGoFx'
+import { StopGoResult } from '@/composites/play/stopgo/result/StopGoResult'
 import { StopGoHud } from '@/composites/play/stopgo/hud/StopGoHud'
 import { StopGoCar } from '@/composites/play/stopgo/board/StopGoCar'
 import { StopGoDecor } from '@/composites/play/stopgo/board/StopGoDecor'
@@ -19,6 +20,7 @@ import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import type { StopGoCarColor } from '@/declarations/play/stopgo/art'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { STOPGO_TRACK } from '@/declarations/play/stopgo/track'
+import { StopGoPhases } from '@/utils/constants/play'
 
 export interface StopGoBoardProps {
   sessionId: string
@@ -78,6 +80,8 @@ export const StopGoBoard = ({
     followKey: `${focusKm}:${board.turnNo}`,
     isActive: true,
   })
+
+  if (board.phase === StopGoPhases.Over) return <StopGoResult board={board} faces={faces} />
 
   return (
     <div className="relative size-full">

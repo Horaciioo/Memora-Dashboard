@@ -196,3 +196,16 @@ export const STOPGO_FEED_COPY = {
   SHUFFLE: '*a remélangé* la défausse dans la pioche',
   FINISH: '*a passé* la ligne d’arrivée',
 } as const
+
+/**
+ * Result screen of a Stop & Go race
+ * @type {Record<string, string>}
+ */
+
+export const STOPGO_RESULT_COPY = {
+  first: 'Vainqueur · {km} km',
+  place: '{place}e · {km} km',
+  left: 'Parti · {km} km',
+  strip: 'Positions à l’arrivée',
+  sealed: 'Cartes scellées restées en main',
+} as const

@@ -498,3 +498,37 @@
     transition: none;
   }
 }
+
+/* Loading scene: lamps turning on one by one, cars idling */
+.stopgo-load-lamp {
+  fill: rgb(255 255 255 / 0.16);
+  animation: stopgo-load-lamp 2s steps(1) infinite;
+}
+
+.stopgo-load-car {
+  animation: stopgo-load-idle 0.18s ease-in-out infinite alternate;
+}
+
+@keyframes stopgo-load-lamp {
+  0%,
+  100% {
+    fill: rgb(255 255 255 / 0.16);
+  }
+  25%,
+  85% {
+    fill: var(--stopgo-family-attack);
+  }
+}
+
+@keyframes stopgo-load-idle {
+  to {
+    translate: 0 1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stopgo-load-lamp,
+  .stopgo-load-car {
+    animation: none;
+  }
+}

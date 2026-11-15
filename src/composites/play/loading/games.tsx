@@ -8,6 +8,7 @@ import { JumbleLoading } from '@/composites/play/jumble/loading/JumbleLoading'
 import type { PlayLoadingProps } from '@/composites/play/loading/PlayLoadingScreen'
 import { LudoLoading } from '@/composites/play/ludo/loading/LudoLoading'
 import { NavalLoading } from '@/composites/play/naval/loading/NavalLoading'
+import { StopGoLoading } from '@/composites/play/stopgo/loading/StopGoLoading'
 import { SuspensLoading } from '@/composites/play/suspens/loading/SuspensLoading'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -24,4 +25,5 @@ export const PLAY_LOADINGS: Partial<
   [PlayGames.Glitch]: (props) => <GlitchLoading {...props} />,
   [PlayGames.Croquis]: (props) => <CroquisLoading {...props} />,
   [PlayGames.Suspens]: (props) => <SuspensLoading {...props} />,
+  [PlayGames.StopGo]: (props) => <StopGoLoading {...props} />,
 }

@@ -88,3 +88,20 @@ export const STOPGO_FX_ANCHORS = {
   panel: (id: string) => `[data-stopgo-panel="${id}"]`,
   car: (id: string) => `[data-stopgo-car="${id}"]`,
 } as const
+
+/**
+ * Result screen: podium, then the race strip and the sealed cards
+ * @type {Record<string, string>}
+ */
+
+export const STOPGO_RESULT = {
+  root: 'flex min-h-0 w-full flex-1 flex-col items-center justify-center',
+  under:
+    'flex w-full max-w-3xl shrink-0 flex-col items-center gap-[clamp(0.4rem,1.2dvh,0.8rem)] px-4 pb-[clamp(0.5rem,2dvh,1.25rem)]',
+  caption: 'text-xs font-extrabold tracking-wide text-[var(--play-ink-faint)] uppercase',
+  strip: 'h-[clamp(2.5rem,8dvh,4.5rem)] w-full',
+  sealedRow: 'flex flex-wrap items-center justify-center gap-2',
+  sealed:
+    'inline-flex items-center gap-1.5 rounded-lg bg-[var(--play-chip)] px-2 py-1 text-xs font-bold text-[var(--play-ink)]',
+  sealedGlyph: 'size-5',
+} as const
