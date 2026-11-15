@@ -11,7 +11,7 @@ import {
 import { advance } from '@/core/services/play/naval/NavalFlowService'
 import { navalStats } from '@/core/services/play/naval/NavalStatsService'
 import { withTable } from '@/core/services/play/naval/NavalTable'
-import { navalView } from '@/core/services/play/naval/NavalViewService'
+import { navalBoards, navalView } from '@/core/services/play/naval/NavalViewService'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { PLAY_ERRORS } from '@/declarations/play'
 import type { EngineSession, EngineStep, PlayEngine } from '@/types/play'
@@ -43,6 +43,7 @@ export const NAVAL_ENGINE: PlayEngine = {
   },
   settle: (session) => withTable(session, advance),
   view: navalView,
+  viewFor: navalBoards,
   extraStats: navalStats,
   winnerMultiplier: (settings) => NAVAL_SETTINGS.winnerXp[navalSettingsOf(settings).mode],
 }

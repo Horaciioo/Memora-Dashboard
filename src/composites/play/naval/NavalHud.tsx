@@ -6,6 +6,7 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { NavalClock } from '@/composites/play/naval/NavalClock'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import { PlayHudKeys } from '@/composites/play/hud/PlayHudKeys'
+import { usePlayPrefsStore } from '@/core/store/play/playPrefs'
 import { NavalCodes } from '@/core/lib/play/naval/state'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
 import { NAVAL_HUD_COPY } from '@/declarations/play'
@@ -41,30 +42,33 @@ export const NavalHud = ({
   clock,
   actions,
 }: NavalHudProps) => {
+  const isHidden = usePlayPrefsStore((state) => state.isHudHidden)
   const sunk = (seat: number) =>
     board.shots.filter((shot) => shot[2] === seat && shot[6] === NavalCodes.Sunk).length
 
   return (
     <div className={NAVAL_HUD.root} data-hud={PlayGames.Naval.toLowerCase()}>
-      <ul className={NAVAL_HUD.crew} aria-label={NAVAL_HUD_COPY.crew}>
-        {captains.map((captain) => (
-          <li
-            key={captain.accountId}
-            className={cn(NAVAL_HUD.captain, captain.isOut && NAVAL_HUD.captainOut)}
-            title={captain.name}
-          >
-            <span className={NAVAL_HUD.face}>
-              <Avatar name={captain.name} src={captain.avatarUrl} size="xs" />
-            </span>
-            <span
-              className={cn(NAVAL_HUD.sunk, captain.index === viewer && NAVAL_HUD.sunkMine)}
-              title={NAVAL_HUD_COPY.sunk}
+      {!isHidden && (
+        <ul className={NAVAL_HUD.crew} aria-label={NAVAL_HUD_COPY.crew}>
+          {captains.map((captain) => (
+            <li
+              key={captain.accountId}
+              className={cn(NAVAL_HUD.captain, captain.isOut && NAVAL_HUD.captainOut)}
+              title={captain.name}
             >
-              {sunk(captain.index)}
-            </span>
-          </li>
-        ))}
-      </ul>
+              <span className={NAVAL_HUD.face}>
+                <Avatar name={captain.name} src={captain.avatarUrl} size="xs" />
+              </span>
+              <span
+                className={cn(NAVAL_HUD.sunk, captain.index === viewer && NAVAL_HUD.sunkMine)}
+                title={NAVAL_HUD_COPY.sunk}
+              >
+                {sunk(captain.index)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
       <div className={NAVAL_HUD.bridge}>
         <span
           key={call}
