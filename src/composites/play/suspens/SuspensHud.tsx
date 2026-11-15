@@ -69,7 +69,7 @@ export const SuspensHud = ({
           {
             key: 'setter',
             caption: SUSPENS_HUD_COPY.setter,
-            figure: <span className="block max-w-28 truncate">{setter.name}</span>,
+            figure: <span className="block max-w-48 truncate">{setter.name}</span>,
           },
         ]
       : []),

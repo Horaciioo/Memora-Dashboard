@@ -215,7 +215,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Fixed,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
-        text: 'Correction de l’interface de jeu de « Memora Play » : le chronomètre et le nom du dessinateur de « Croquis » étaient coupés, et les réglages n’étaient pas alignés.',
+        text: 'Correction de l’interface de jeu de « Memora Play » : le chronomètre et le nom du joueur en haut de « Croquis » et de « Suspens » étaient coupés, et les réglages n’étaient pas alignés.',
       },
       {
         tag: ChangelogTags.Fixed,
