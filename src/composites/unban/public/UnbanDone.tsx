@@ -1,7 +1,6 @@
 import { UNBAN_PUBLIC_COPY } from '@/declarations/unban/copy'
 import { UNBAN_PUBLIC_STYLES } from '@/declarations/ui/variants'
 import { ONBOARDING_STYLES } from '@/declarations/ui/variants'
-import { formatDay } from '@/utils/format/time/dates'
 import type { SubmitOutcome } from '@/types/unban'
 
 export interface UnbanDoneProps {
@@ -21,8 +20,5 @@ export const UnbanDone = ({ outcome }: UnbanDoneProps) => (
     <span className={UNBAN_PUBLIC_STYLES.label}>{UNBAN_PUBLIC_COPY.reference}</span>
     <p className={UNBAN_PUBLIC_STYLES.reference}>{outcome.reference}</p>
     <p className={ONBOARDING_STYLES.lead}>{UNBAN_PUBLIC_COPY.keepLink}</p>
-    <p className={ONBOARDING_STYLES.lead}>
-      {UNBAN_PUBLIC_COPY.validUntil} {formatDay(outcome.linkExpiresAt)}
-    </p>
   </div>
 )

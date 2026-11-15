@@ -2,65 +2,47 @@ import 'server-only'
 
 import { cookies } from 'next/headers'
 
-import { accessStateOf } from '@/core/lib/unban/linkState'
-import { forbidden, notFound, unavailable } from '@/core/lib/errors'
+import { notFound, unavailable } from '@/core/lib/errors'
 import type { AppError } from '@/core/lib/errors'
-import { isExpectedAccount, unpackUnbanTicket } from '@/core/lib/unban/ticket'
+import { unpackUnbanTicket } from '@/core/lib/unban/ticket'
 import { UNBAN_TICKET_COOKIE } from '@/core/lib/auth/unbanTicket'
-import { findLinkByToken } from '@/core/services/unban/links/public'
+import { findContestCreator } from '@/core/services/unban/contest/creator'
 import type { DiscordIdentity } from '@/core/services/auth/DiscordService'
 import { isFeatureOn } from '@/core/services/features/FeatureService'
-import { recordEvent } from '@/core/services/system/ActivityService'
 import { ROUTES } from '@/declarations/navigation'
 import { UNBAN_FAILURE_PARAM, UNBAN_FAILURES } from '@/declarations/unban/failures'
 import { ErrorCodes } from '@/utils/constants/errors'
-import { UNBAN_INTAKE_FEATURE, UnbanLinkStates } from '@/utils/constants/unban'
-import type { PublicLinkRow } from '@/core/services/unban/links/public'
+import { UNBAN_INTAKE_FEATURE } from '@/utils/constants/unban'
+import type { IntegrationCreator } from '@/types/onboarding'
 import type { UnbanIdentity } from '@/core/lib/unban/ticket'
 
-// States a Discord sign-in still makes sense in: filing, then following
-const SIGN_IN_STATES: string[] = [UnbanLinkStates.Active, UnbanLinkStates.Used]
-
 /**
- * Link a sign-in may start on, a dead one never reaches Discord
- * @param {string} token - Secret from the address
- * @return {Promise<PublicLinkRow>} - Live link
+ * Creator a sign-in may start on, an unknown one never reaches Discord
+ * @param {string} slug - Creator segment from the address
+ * @return {Promise<IntegrationCreator>} - Creator
  */
 
-export const resolveSignInLink = async (token: string): Promise<PublicLinkRow> => {
+export const resolveSignInCreator = async (slug: string): Promise<IntegrationCreator> => {
   if (!(await isFeatureOn(UNBAN_INTAKE_FEATURE))) throw unavailable()
 
-  const link = await findLinkByToken(token)
-  if (!link || !SIGN_IN_STATES.includes(accessStateOf(link))) throw notFound()
+  const creator = await findContestCreator(slug)
+  if (!creator) throw notFound()
 
-  return link
+  return creator
 }
 
 /**
  * Hold the account Discord returned as the one filing
- * @param {string} token - Link the round trip started on
+ * @param {string} slug - Creator the round trip started on
  * @param {DiscordIdentity} identity - Account Discord returned
  * @return {Promise<UnbanIdentity>} - Identity to seal in the ticket
  */
 
 export const claimUnbanIdentity = async (
-  token: string,
+  slug: string,
   identity: DiscordIdentity
 ): Promise<UnbanIdentity> => {
-  const link = await resolveSignInLink(token)
-
-  // A nominative link opens for its account alone
-  if (!isExpectedAccount(link.expectedDiscordId, identity.id)) {
-    await recordEvent({
-      eventType: 'AccessDenied',
-      level: 'Warning',
-      targetType: 'unbanLink',
-      targetId: link.id,
-      summary: link.youtuber.name,
-    })
-
-    throw forbidden()
-  }
+  await resolveSignInCreator(slug)
 
   return {
     discordId: identity.id,
@@ -73,7 +55,7 @@ export const claimUnbanIdentity = async (
  * Destination of a refused identity check
  * @param {AppError} error - Caught failure
  * @param {Record<string, string>} params - Dynamic segments
- * @return {Promise<string>} - Public page of the link
+ * @return {Promise<string>} - Public page of the creator
  */
 
 export const unbanFailure = async (
@@ -82,15 +64,15 @@ export const unbanFailure = async (
 ): Promise<string> => {
   const cookieStore = await cookies()
   const ticket = unpackUnbanTicket(cookieStore.get(UNBAN_TICKET_COOKIE)?.value)
-  const token = params.token ?? ticket?.token
+  const slug = params.creator ?? ticket?.creator
 
-  // Without a token there is nowhere to go back to
-  if (!token) return ROUTES.login
+  // Without a creator there is nowhere to go back to
+  if (!slug) return ROUTES.login
 
   const reason =
     error.code === ErrorCodes.InsufficientPermissions
       ? UNBAN_FAILURES.WrongAccount
       : UNBAN_FAILURES.Refused
 
-  return `${ROUTES.unbanPublic(token)}?${UNBAN_FAILURE_PARAM}=${reason}`
+  return `${ROUTES.unbanPublic(slug)}?${UNBAN_FAILURE_PARAM}=${reason}`
 }

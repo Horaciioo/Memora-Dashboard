@@ -225,7 +225,7 @@ export const publishDraft = async (
     actorId,
     targetType: 'unbanForm',
     targetId: version.id,
-    summary: UNBAN_COPY.formVersion.replace('{number}', String(version.number)),
+    summary: UNBAN_COPY.formPublishedLine,
     payload: { ...diffSnapshots(before, view.snapshot) },
   })
 

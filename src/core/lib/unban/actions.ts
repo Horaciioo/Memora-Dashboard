@@ -50,13 +50,16 @@ const ownsRequest = ({ assigneeId, actorId, access }: ActionContext): boolean =>
   assigneeId === null || assigneeId === actorId || access.can(Permissions.UnbanManage)
 
 const RULES: Record<UnbanActionName, (context: ActionContext) => boolean> = {
-  [UnbanActions.Take]: (c) => canTransition(c.status, InReview, c.access, Status) && ownsRequest(c),
+  // A decided request is reopened, never taken
+  [UnbanActions.Take]: (c) =>
+    c.status === Pending && canTransition(c.status, InReview, c.access, Status) && ownsRequest(c),
   [UnbanActions.Release]: (c) =>
     canTransition(c.status, Pending, c.access, Status) && ownsRequest(c),
+  // Moderators vote, the Discord lead decides
   [UnbanActions.Accept]: (c) =>
-    canTransition(c.status, Accepted, c.access, Decision) && ownsRequest(c),
+    canTransition(c.status, Accepted, c.access, Decision) && c.access.can(Permissions.UnbanManage),
   [UnbanActions.Refuse]: (c) =>
-    canTransition(c.status, Refused, c.access, Decision) && ownsRequest(c),
+    canTransition(c.status, Refused, c.access, Decision) && c.access.can(Permissions.UnbanManage),
   [UnbanActions.Reopen]: (c) => canTransition(c.status, InReview, c.access, Status),
   [UnbanActions.Lift]: (c) => c.status === Accepted && c.access.can(Permissions.UnbanHandle),
   [UnbanActions.Assign]: (c) =>

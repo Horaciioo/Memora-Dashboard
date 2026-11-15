@@ -10,10 +10,12 @@ import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { groupQuestions } from '@/core/lib/unban/steps'
 import { UNBAN_PUBLIC_COPY } from '@/declarations/unban/copy'
+import { CONTACT_FIELDS } from '@/declarations/unban/form'
 import { UNBAN_PUBLIC_STYLES } from '@/declarations/ui/variants'
 import { UNBAN_FORM_FIELDS } from '@/utils/constants/unban'
 import { IntakeIntro, IntakeReview } from './IntakeSteps'
 import { UnbanDone } from './UnbanDone'
+import type { UnbanPageGroup } from '@/declarations/unban/form'
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { SubmitOutcome, UnbanIdentityView } from '@/types/unban'
 
@@ -21,15 +23,17 @@ import type { SubmitOutcome, UnbanIdentityView } from '@/types/unban'
 const EMPTY_FORM: FormValues = {}
 
 export interface UnbanIntakeProps {
-  token: string
+  slug: string
   // Key of the draft, derived from the link and never the link itself
   draftKey: string
-  fields: FieldDefinition[]
+  pages: UnbanPageGroup[]
   typedFields: FieldDefinition[]
   fillToken: string
   intro?: string
   outro?: string
   identity: UnbanIdentityView | null
+  // Address each option leads to, by option identifier
+  redirects: Record<string, string>
 }
 
 /**
@@ -39,14 +43,15 @@ export interface UnbanIntakeProps {
  */
 
 export const UnbanIntake = ({
-  token,
+  slug,
   draftKey,
-  fields,
+  pages,
   typedFields,
   fillToken,
   intro,
   outro,
   identity,
+  redirects,
 }: UnbanIntakeProps) => {
   const [values, setValues, eraseDraft] = useSessionDraft<FormValues>(draftKey, EMPTY_FORM)
   const [trap, setTrap] = useState('')
@@ -55,15 +60,21 @@ export const UnbanIntake = ({
   const [hasFailed, setFailed] = useState(false)
   const { isSaving, issues, run } = useMutation()
 
-  const onChange = (name: string, value: FieldValue) =>
+  const onChange = (name: string, value: FieldValue) => {
     setValues((current) => ({ ...current, [name]: value }))
 
+    // A choice that leads elsewhere sends the person there
+    if (typeof value === 'string' && redirects[value]) window.location.assign(redirects[value])
+  }
+
   const steps: WizardStep[] = useMemo(() => {
-    const questions = groupQuestions(fields).map((group, position) => ({
-      id: `questions-${position}`,
-      label: UNBAN_PUBLIC_COPY.questionsStep,
-      fields: group,
-    }))
+    const questions = pages.flatMap((page) =>
+      groupQuestions(page.fields).map((group, position) => ({
+        id: `questions-${page.id}-${position}`,
+        label: page.title ?? UNBAN_PUBLIC_COPY.questionsStep,
+        fields: group,
+      }))
+    )
     const typed = typedFields.length
       ? [{ id: 'typed', label: UNBAN_PUBLIC_COPY.typedIdStep, fields: typedFields }]
       : []
@@ -76,6 +87,7 @@ export const UnbanIntake = ({
       },
       ...typed,
       ...questions,
+      { id: 'contact', label: UNBAN_PUBLIC_COPY.contactStep, fields: CONTACT_FIELDS },
       {
         id: 'review',
         label: UNBAN_PUBLIC_COPY.reviewStep,
@@ -92,11 +104,11 @@ export const UnbanIntake = ({
         ),
       },
     ]
-  }, [confirmed, fields, identity, intro, outro, typedFields, values])
+  }, [confirmed, identity, intro, outro, pages, typedFields, values])
 
   const submit = async () => {
     const body = { ...values, [UNBAN_FORM_FIELDS.fillToken]: fillToken, [UNBAN_FORM_FIELDS.trap]: trap }
-    const result = await run(() => apiPost<SubmitOutcome>(API_ROUTES.unbanSubmit(token), body))
+    const result = await run(() => apiPost<SubmitOutcome>(API_ROUTES.unbanSubmit(slug), body))
 
     setFailed(result === null)
     if (!result) return

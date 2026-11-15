@@ -13,20 +13,6 @@ export const UnbanStatuses = {
 export type UnbanStatusName = (typeof UnbanStatuses)[keyof typeof UnbanStatuses]
 
 /**
- * Where a link stands, worked out from its dates and uses
- * @type {Record<string, string>}
- */
-
-export const UnbanLinkStates = {
-  Active: 'ACTIVE',
-  Used: 'USED',
-  Expired: 'EXPIRED',
-  Revoked: 'REVOKED',
-} as const
-
-export type UnbanLinkStateName = (typeof UnbanLinkStates)[keyof typeof UnbanLinkStates]
-
-/**
  * Kinds of question a form can ask
  * @type {Record<string, string>}
  */
@@ -51,24 +37,17 @@ export type UnbanQuestionTypeName = (typeof UnbanQuestionTypes)[keyof typeof Unb
 export const UNBAN_INTAKE_FEATURE = 'unban.intake'
 
 /**
- * Shape of the secrets a link and a request are made of
+ * Shape of a request reference
  * @type {Record<string, number | string>}
  */
 
 export const UNBAN_TOKEN = {
-  // 256 bits of entropy
-  bytes: 32,
-  // Characters of 32 bytes in base64url
-  length: 43,
   referencePrefix: 'DB-',
   referenceLength: 5,
   // No 0, O, 1 or I
   referenceAlphabet: '23456789ABCDEFGHJKLMNPQRSTUVWXYZ',
   referenceAttempts: 5,
 } as const
-
-// Longest note a moderator attaches to a link
-export const UNBAN_LABEL_MAX_LENGTH = 80
 
 /**
  * Names of the fields the public form carries besides the questions
@@ -81,6 +60,7 @@ export const UNBAN_FORM_FIELDS = {
   trap: 'website',
   discordId: 'discordId',
   discordName: 'discordName',
+  email: 'email',
 } as const
 
 /**

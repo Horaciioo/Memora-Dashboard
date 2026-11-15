@@ -1,11 +1,10 @@
 import { DISCORD_ID_PATTERN } from '@/core/lib/auth/session'
 import { forbidden, invalidInput } from '@/core/lib/errors'
-import { identityFor, isExpectedAccount } from '@/core/lib/unban/ticket'
+import { identityFor } from '@/core/lib/unban/ticket'
 import { UNBAN_SETTINGS } from '@/declarations/configurations/settings'
 import { UNBAN_PUBLIC_COPY } from '@/declarations/unban/copy'
 import { UNBAN_FORM_FIELDS } from '@/utils/constants/unban'
 import type { UnbanIdentity, UnbanTicket } from '@/core/lib/unban/ticket'
-import type { PublicLinkRow } from '@/core/services/unban/links/public'
 
 // Longest pseudonym a person types
 const NAME_MAX_LENGTH = 100
@@ -35,24 +34,22 @@ const readTyped = (typed: Record<string, unknown>): UnbanIdentity => {
 
 /**
  * Account that files the request, proven by Discord or typed when the proof is off
- * @param {PublicLinkRow} link - Link being submitted
  * @param {UnbanTicket | null} ticket - Ticket of the browser
- * @param {string} token - Secret from the address
+ * @param {string} slug - Creator segment from the address
  * @param {Record<string, unknown>} typed - Reserved fields of the body
  * @return {UnbanIdentity} - Account filing
  */
 
 export const filingIdentity = (
-  link: PublicLinkRow,
   ticket: UnbanTicket | null,
-  token: string,
+  slug: string,
   typed: Record<string, unknown>
 ): UnbanIdentity => {
   const identity = UNBAN_SETTINGS.requireDiscordIdentity
-    ? identityFor(ticket, token)
+    ? identityFor(ticket, slug)
     : readTyped(typed)
 
-  if (!identity || !isExpectedAccount(link.expectedDiscordId, identity.discordId)) throw forbidden()
+  if (!identity) throw forbidden()
 
   return identity
 }

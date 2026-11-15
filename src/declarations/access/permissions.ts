@@ -38,7 +38,7 @@ const PERMISSION_GROUP_MAP: Record<PermissionGroup, PermissionGroupOption> = {
   [PermissionGroups.Configuration]: { label: 'Configuration', position: 13 },
   [PermissionGroups.Access]: { label: 'Accès & console', position: 14 },
   [PermissionGroups.Play]: { label: 'Memora Play', position: 15 },
-  [PermissionGroups.Unban]: { label: 'Déban.', position: 16 },
+  [PermissionGroups.Unban]: { label: 'Débannissement', position: 16 },
 }
 
 export const PERMISSION_GROUP_REGISTRY = createRegistry(PERMISSION_GROUP_MAP)

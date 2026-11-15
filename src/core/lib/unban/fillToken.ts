@@ -29,38 +29,42 @@ export interface FillCheck {
 
 /**
  * Token signed when the form is shown
- * @param {string} linkId - Link opened
+ * @param {string} youtuberId - Creator opened
  * @param {string} formVersionId - Version served
  * @param {number} [now] - Moment of issue
  * @return {string} - Token for a hidden field
  */
 
 export const issueFillToken = (
-  linkId: string,
+  youtuberId: string,
   formVersionId: string,
   now: number = Date.now()
-): string => seal({ linkId, formVersionId, issuedAt: now })
+): string => seal({ youtuberId, formVersionId, issuedAt: now })
 
 // Refusal with no version
 const refuse = (refusal: FillRefusalName): FillCheck => ({ formVersionId: null, refusal })
 
 /**
- * Check a fill token against the link being submitted
+ * Check a fill token against the creator being filed
  * @param {string | undefined} token - Value of the hidden field
- * @param {string} linkId - Link being submitted
+ * @param {string} youtuberId - Creator being filed
  * @param {number} [now] - Moment of the submission
  * @return {FillCheck} - Version served, or the refusal
  */
 
 export const checkFillToken = (
   token: string | undefined,
-  linkId: string,
+  youtuberId: string,
   now: number = Date.now()
 ): FillCheck => {
   const content = unseal(token)
-  const { linkId: issuedFor, formVersionId, issuedAt } = content ?? {}
+  const { youtuberId: issuedFor, formVersionId, issuedAt } = content ?? {}
 
-  if (issuedFor !== linkId || typeof formVersionId !== 'string' || typeof issuedAt !== 'number') {
+  if (
+    issuedFor !== youtuberId ||
+    typeof formVersionId !== 'string' ||
+    typeof issuedAt !== 'number'
+  ) {
     return refuse(FILL_REFUSALS.Invalid)
   }
 

@@ -8,7 +8,7 @@ import { UNBAN_COPY, UNBAN_PUBLIC_COPY } from '@/declarations/unban/copy'
 import { UNBAN_STATUS_REGISTRY } from '@/declarations/unban/registries'
 import { ONBOARDING_STYLES, UNBAN_PUBLIC_STYLES } from '@/declarations/ui/variants'
 import { UnbanStatuses } from '@/utils/constants/unban'
-import { formatDay, formatDayTime } from '@/utils/format/time/dates'
+import { formatDayTime } from '@/utils/format/time/dates'
 import type { PublicRequestView } from '@/types/unban'
 
 // Where each step stands for each status
@@ -36,7 +36,7 @@ const stepsOf = (status: PublicRequestView['status']): TimelineStep[] => {
 }
 
 export interface UnbanFollowUpProps {
-  token: string
+  slug: string
   initial: PublicRequestView
 }
 
@@ -46,8 +46,8 @@ export interface UnbanFollowUpProps {
  * @return {JSX.Element}
  */
 
-export const UnbanFollowUp = ({ token, initial }: UnbanFollowUpProps) => {
-  const { view, hasFailed } = useFollowUp(token, initial)
+export const UnbanFollowUp = ({ slug, initial }: UnbanFollowUpProps) => {
+  const { view, hasFailed } = useFollowUp(slug, initial)
   const option = UNBAN_STATUS_REGISTRY.get(view.status)
   const isDecided = view.decidedAt !== null
 
@@ -81,9 +81,6 @@ export const UnbanFollowUp = ({ token, initial }: UnbanFollowUpProps) => {
         </span>
         <span>
           {UNBAN_PUBLIC_COPY.lastUpdate} {formatDayTime(view.updatedAt)}
-        </span>
-        <span>
-          {UNBAN_PUBLIC_COPY.validUntil} {formatDay(view.linkExpiresAt)}
         </span>
         {hasFailed && <span className={UNBAN_PUBLIC_STYLES.error}>{UNBAN_PUBLIC_COPY.refreshFailed}</span>}
       </div>

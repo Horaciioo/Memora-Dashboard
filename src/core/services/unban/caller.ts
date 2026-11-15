@@ -3,7 +3,7 @@ import 'server-only'
 import { readNumberValue } from '@/core/lib/forms/values'
 import type { ProtectedRouteContext, RouteContext } from '@/core/lib/http/route'
 import type { ReviewTarget } from '@/core/services/unban/UnbanRequestService'
-import type { UnbanCaller } from '@/core/services/unban/links/shared'
+import type { UnbanCaller } from '@/core/services/unban/requests/caller'
 
 /**
  * Caller behind a protected route, with the perimeter resolved

@@ -25,16 +25,16 @@ export const readOpenUnban = (packed: string | undefined): UnbanTicket | null =>
 
 /**
  * Cookie of a round trip that just left for Discord, short lived
- * @param {string} token - Link the round trip belongs to
+ * @param {string} slug - Creator the round trip belongs to
  * @return {Promise<void>}
  */
 
-export const openUnbanRoundTrip = async (token: string): Promise<void> => {
+export const openUnbanRoundTrip = async (slug: string): Promise<void> => {
   const cookieStore = await cookies()
 
   cookieStore.set(
     UNBAN_TICKET_COOKIE,
-    packUnbanTicket({ token }),
+    packUnbanTicket({ creator: slug }),
     unbanCookieOptions(AUTH_SETTINGS.stateTtlSeconds)
   )
 }
@@ -50,14 +50,14 @@ export const completeUnbanSignIn = async (
   open: UnbanTicket,
   identity: DiscordIdentity
 ): Promise<string> => {
-  const proven = await claimUnbanIdentity(open.token, identity)
+  const proven = await claimUnbanIdentity(open.creator, identity)
   const cookieStore = await cookies()
 
   cookieStore.set(
     UNBAN_TICKET_COOKIE,
-    packUnbanTicket({ token: open.token, identity: proven }),
+    packUnbanTicket({ creator: open.creator, identity: proven }),
     unbanCookieOptions(UNBAN_SETTINGS.ticketMinutes * MINUTE_SECONDS)
   )
 
-  return ROUTES.unbanPublic(open.token)
+  return ROUTES.unbanPublic(open.creator)
 }

@@ -266,7 +266,7 @@ export const PAGE_FEATURES: FeatureDefinition[] = [
   },
   {
     key: 'unban',
-    label: 'Déban.',
+    label: 'Débannissement',
     description: 'Les demandes de débannissement Discord et leur traitement.',
     kind: 'page',
     section: 'discord',

@@ -1,5 +1,5 @@
 import type { IntegrationCreator } from '@/types/onboarding'
-import type { UnbanLinkStateName, UnbanStatusName } from '@/utils/constants/unban'
+import type { UnbanStatusName } from '@/utils/constants/unban'
 import type { UnbanActionName } from '@/core/lib/unban/actions'
 import type { UnbanAnswer, UnbanFormSnapshot } from '@/declarations/unban/form'
 
@@ -17,66 +17,6 @@ export interface UnbanFormVersionView {
   number: number
   snapshot: UnbanFormSnapshot
   publishedAt: string | null
-}
-
-/**
- * Link as a moderator sees it, never carries the secret
- * @typedef {Object} UnbanLinkView
- * @property {string} id - Link identifier
- * @property {string} youtuberId - Creator it belongs to
- * @property {string} youtuberName - Name of that creator
- * @property {string | null} label - Note of the moderator
- * @property {string | null} expectedDiscordId - Only account allowed to open it
- * @property {UnbanLinkStateName} state - Current state
- * @property {boolean} isExpired - Past its expiry whatever its state
- * @property {string} expiresAt - ISO expiry
- * @property {string | null} usedAt - ISO first use
- * @property {string} createdAt - ISO creation
- * @property {{ reference: string, status: UnbanStatusName } | null} request - Request it produced
- */
-
-export interface UnbanLinkView {
-  id: string
-  youtuberId: string
-  youtuberName: string
-  label: string | null
-  expectedDiscordId: string | null
-  state: UnbanLinkStateName
-  isExpired: boolean
-  expiresAt: string
-  usedAt: string | null
-  createdAt: string
-  request: { reference: string; status: UnbanStatusName } | null
-}
-
-/**
- * Link just made, the only time its address exists
- * @typedef {Object} CreatedUnbanLink
- * @property {UnbanLinkView} link - Stored link
- * @property {string} path - Address to hand out, to prefix with the public origin
- */
-
-export interface CreatedUnbanLink {
-  link: UnbanLinkView
-  path: string
-}
-
-/**
- * What the public page learns from a token
- * @typedef {Object} PublicLinkContext
- * @property {string} linkId - Link identifier
- * @property {UnbanLinkStateName} state - Current state
- * @property {boolean} requiresAccount - A given Discord account is expected
- * @property {string} expiresAt - ISO expiry
- * @property {IntegrationCreator} creator - Creator it belongs to
- */
-
-export interface PublicLinkContext {
-  linkId: string
-  state: UnbanLinkStateName
-  requiresAccount: boolean
-  expiresAt: string
-  creator: IntegrationCreator
 }
 
 /**
@@ -103,7 +43,6 @@ export interface PublicAnswerView {
  * @property {string | null} reviewNote - Answer of the team
  * @property {PublicAnswerView[]} answers - The requester's own answers
  * @property {string} youtuberName - Creator it was filed with
- * @property {string} linkExpiresAt - ISO expiry of the link
  */
 
 export interface PublicRequestView {
@@ -116,19 +55,16 @@ export interface PublicRequestView {
   reviewNote: string | null
   answers: PublicAnswerView[]
   youtuberName: string
-  linkExpiresAt: string
 }
 
 /**
  * What the person is told once the request is filed
  * @typedef {Object} SubmitOutcome
  * @property {string} reference - Short code of the request
- * @property {string} linkExpiresAt - ISO expiry of the link that follows it
  */
 
 export interface SubmitOutcome {
   reference: string
-  linkExpiresAt: string
 }
 
 /**
@@ -202,6 +138,24 @@ export interface UnbanRequestPage {
 }
 
 /**
+ * Opinion of the moderators on a request
+ * @typedef {Object} UnbanVoteSummary
+ * @property {number} voters - Moderators who voted
+ * @property {boolean} canVote - The caller may give an opinion now
+ * @property {'FOR' | 'AGAINST' | null} mine - Side the caller took
+ * @property {number | null} forCount - Votes for, hidden from the one who decides
+ * @property {number | null} againstCount - Votes against, hidden from the one who decides
+ */
+
+export interface UnbanVoteSummary {
+  voters: number
+  canVote: boolean
+  mine: 'FOR' | 'AGAINST' | null
+  forCount: number | null
+  againstCount: number | null
+}
+
+/**
  * Request with everything the team reads
  * @typedef {Object} UnbanRequestDetail
  * @property {number} version - Counter the next write must quote
@@ -213,7 +167,7 @@ export interface UnbanRequestPage {
  * @property {UnbanPerson | null} decidedBy - Member who decided
  * @property {string | null} discordLiftedAt - ISO confirmation of the lift on Discord
  * @property {UnbanPerson | null} discordLiftedBy - Member who confirmed it
- * @property {{ id: string, state: UnbanLinkStateName, expiresAt: string }} link - Link it came from
+ * @property {UnbanVoteSummary} votes - Opinion of the moderators
  * @property {UnbanActionName[]} actions - What the caller may do to it
  */
 
@@ -227,26 +181,7 @@ export interface UnbanRequestDetail extends UnbanRequestItem {
   decidedBy: UnbanPerson | null
   discordLiftedAt: string | null
   discordLiftedBy: UnbanPerson | null
-  link: { id: string; state: UnbanLinkStateName; expiresAt: string }
+  votes: UnbanVoteSummary
   actions: UnbanActionName[]
 }
 
-/**
- * Figures of the overview
- * @typedef {Object} UnbanOverview
- * @property {number} pending - Waiting requests
- * @property {number} inReview - Requests being handled
- * @property {number} receivedRecent - Received over the short window
- * @property {number} receivedMonth - Received over the long window
- * @property {number} decidedMonth - Decided over the long window
- * @property {number | null} medianDecisionMs - Median time to a decision over the long window
- */
-
-export interface UnbanOverview {
-  pending: number
-  inReview: number
-  receivedRecent: number
-  receivedMonth: number
-  decidedMonth: number
-  medianDecisionMs: number | null
-}

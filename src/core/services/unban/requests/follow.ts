@@ -1,59 +1,61 @@
 import 'server-only'
 
+import { prisma } from '@/core/lib/db'
 import { forbidden, notFound } from '@/core/lib/errors'
 import { toPublicView } from '@/core/lib/unban/publicView'
-import { accessStateOf } from '@/core/lib/unban/linkState'
-import { findLinkByToken } from '@/core/services/unban/links/public'
-import { UNBAN_SETTINGS } from '@/declarations/configurations/settings'
-import { UnbanLinkStates } from '@/utils/constants/unban'
+import { findContestCreator } from '@/core/services/unban/contest/creator'
 import type { UnbanIdentity } from '@/core/lib/unban/ticket'
-import type { PublicLinkRow } from '@/core/services/unban/links/public'
 import type { PublicRequestView } from '@/types/unban'
 
+// What a requester may read of their own request, never notes or deciders
+const OWN_SELECT = {
+  reference: true,
+  status: true,
+  submittedAt: true,
+  statusChangedAt: true,
+  decidedAt: true,
+  reviewNote: true,
+  answers: true,
+} as const
+
 /**
- * Whether the browser may read the request behind a link
- * @param {NonNullable<PublicLinkRow['request']>} request - Request of the link
+ * Newest request an account filed with a creator
+ * @param {string} youtuberId - Creator
  * @param {UnbanIdentity | null} identity - Account proven by the browser
- * @return {boolean} - Allowed
+ * @return {Promise<PublicRequestView | null>} - View, null when nothing was filed
  */
 
-const mayFollow = (
-  request: NonNullable<PublicLinkRow['request']>,
+export const ownRequestView = async (
+  youtuberId: string,
+  creatorName: string,
   identity: UnbanIdentity | null
-): boolean => !UNBAN_SETTINGS.requireDiscordIdentity || identity?.discordId === request.discordId
+): Promise<PublicRequestView | null> => {
+  if (!identity) return null
 
-/**
- * Request of a link as its requester reads it, nothing else
- * @param {PublicLinkRow} link - Link with its request
- * @param {UnbanIdentity | null} identity - Account proven by the browser
- * @return {PublicRequestView | null} - View, null when there is nothing to show this browser
- */
+  const request = await prisma.unbanRequest.findFirst({
+    where: { youtuberId, discordId: identity.discordId },
+    orderBy: { submittedAt: 'desc' },
+    select: OWN_SELECT,
+  })
 
-export const followView = (
-  link: PublicLinkRow,
-  identity: UnbanIdentity | null
-): PublicRequestView | null => {
-  if (accessStateOf(link) !== UnbanLinkStates.Used || !link.request) return null
-  if (!mayFollow(link.request, identity)) return null
-
-  return toPublicView(link.request, link.youtuber.name, link.expiresAt)
+  return request ? toPublicView(request, creatorName) : null
 }
 
 /**
  * Follow-up for the refresh route, a refusal looks the same whatever the reason
- * @param {string} token - Secret from the address
+ * @param {string} slug - Creator segment from the address
  * @param {UnbanIdentity | null} identity - Account proven by the browser
  * @return {Promise<PublicRequestView>} - View
  */
 
 export const readFollowUp = async (
-  token: string,
+  slug: string,
   identity: UnbanIdentity | null
 ): Promise<PublicRequestView> => {
-  const link = await findLinkByToken(token)
-  if (!link) throw notFound()
+  const creator = await findContestCreator(slug)
+  if (!creator) throw notFound()
 
-  const view = followView(link, identity)
+  const view = await ownRequestView(creator.id, creator.name, identity)
   if (!view) throw forbidden()
 
   return view

@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { isSessionTokenValid } from '@/core/lib/auth/getSession'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { readPublicOrigin } from '@/core/lib/http/origin'
-import { UNBAN_PRIVATE_PAGES } from '@/declarations/unban/headers'
+import { UNBAN_CONTEST_PATH, UNBAN_PRIVATE_PAGES } from '@/declarations/unban/headers'
 import { buildContentSecurityPolicy } from '@/declarations/system/security/contentSecurityPolicy'
 import { NONCE_HEADER, PATH_HEADER } from '@/declarations/system/security/securityHeaders'
 import { DEMO_EVENT_ID, EVENT_ID_PATTERN } from '@/core/lib/share/sharedEvent'
@@ -82,6 +82,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   const isOpenToEveryone =
     PUBLIC_PATHS.includes(pathname) ||
     SHARE_PATH.test(pathname) ||
+    UNBAN_CONTEST_PATH.test(pathname) ||
     PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(`${prefix}/`))
 
   // A stale token fails closed rather than crashing the proxy
@@ -102,8 +103,8 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   const response = withPolicy(request)
 
-  // The address of a Deban. link is a secret
-  if (pathname.startsWith(UNBAN_PRIVATE_PAGES.prefix)) {
+  // A Deban. page depends on who opens it
+  if (pathname.startsWith(UNBAN_PRIVATE_PAGES.prefix) || UNBAN_CONTEST_PATH.test(pathname)) {
     Object.entries(UNBAN_PRIVATE_PAGES.headers).forEach(([name, value]) =>
       response.headers.set(name, value)
     )

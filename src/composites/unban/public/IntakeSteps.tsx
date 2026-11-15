@@ -1,8 +1,9 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
+import { InlineMarkdown, Markdown } from '@/components/elements/display/Markdown'
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { UNBAN_COPY, UNBAN_PUBLIC_COPY } from '@/declarations/unban/copy'
-import { ONBOARDING_STYLES, UNBAN_PUBLIC_STYLES } from '@/declarations/ui/variants'
+import { ONBOARDING_STYLES, UNBAN_PUBLIC_STYLES, UNBAN_SHELL_STYLES } from '@/declarations/ui/variants'
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { UnbanIdentityView } from '@/types/unban'
 
@@ -20,7 +21,7 @@ export interface IntakeIntroProps {
 
 export const IntakeIntro = ({ intro, identity }: IntakeIntroProps) => (
   <div className={UNBAN_PUBLIC_STYLES.stack}>
-    {intro && <p className={`${ONBOARDING_STYLES.lead} whitespace-pre-wrap`}>{intro}</p>}
+    {intro && <Markdown source={intro} className={UNBAN_SHELL_STYLES.intro} />}
     {identity && (
       <div className={ONBOARDING_STYLES.identity}>
         <Avatar name={identity.name} src={identity.avatarUrl} size="lg" />
@@ -94,7 +95,9 @@ export const IntakeReview = ({
 
           return (
             <div key={field.name} className={UNBAN_PUBLIC_STYLES.answer}>
-              <span className={UNBAN_PUBLIC_STYLES.label}>{field.label}</span>
+              <span className={UNBAN_PUBLIC_STYLES.label}>
+                {field.rich ? <InlineMarkdown source={field.label} /> : field.label}
+              </span>
               <p className={text ? UNBAN_PUBLIC_STYLES.answerText : UNBAN_PUBLIC_STYLES.empty}>
                 {text ?? UNBAN_COPY.emptyAnswer}
               </p>
@@ -103,7 +106,7 @@ export const IntakeReview = ({
         })}
       </section>
     ))}
-    {outro && <p className={`${ONBOARDING_STYLES.lead} whitespace-pre-wrap`}>{outro}</p>}
+    {outro && <Markdown source={outro} className={ONBOARDING_STYLES.lead} />}
     <Toggle checked={confirmed} onChange={onConfirm} label={UNBAN_PUBLIC_COPY.confirm} />
   </div>
 )

@@ -14,7 +14,7 @@ const FAILURES: Record<UnbanFailureName, string> = {
 }
 
 export interface UnbanGateProps {
-  token: string
+  slug: string
   failure: UnbanFailureName | null
   // A request exists but belongs to another account
   isOtherAccount?: boolean
@@ -22,13 +22,13 @@ export interface UnbanGateProps {
 
 /**
  * Discord sign-in asked before the form or the follow-up
- * @param {string} token - Link secret
+ * @param {string} slug - Creator segment
  * @param {UnbanFailureName | null} failure - Why the last attempt was refused
  * @param {boolean} [isOtherAccount] - The signed-in account is not the one of the request
  * @return {JSX.Element}
  */
 
-export const UnbanGate = ({ token, failure, isOtherAccount }: UnbanGateProps) => (
+export const UnbanGate = ({ slug, failure, isOtherAccount }: UnbanGateProps) => (
   <div className={UNBAN_PUBLIC_STYLES.stack}>
     <p className={ONBOARDING_STYLES.lead}>{UNBAN_PUBLIC_COPY.signInHint}</p>
     {failure && <p className={UNBAN_PUBLIC_STYLES.error}>{FAILURES[failure]}</p>}
@@ -39,7 +39,7 @@ export const UnbanGate = ({ token, failure, isOtherAccount }: UnbanGateProps) =>
       <Button
         variant="primary"
         icon="discord"
-        onClick={() => window.location.assign(API_ROUTES.unbanDiscord(token))}
+        onClick={() => window.location.assign(API_ROUTES.unbanDiscord(slug))}
       >
         {UNBAN_PUBLIC_COPY.signIn}
       </Button>

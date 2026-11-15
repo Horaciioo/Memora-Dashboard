@@ -33,8 +33,11 @@ const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_APP_VERSION: displayVersion(version, stageOfBranch(deployedBranch)) },
   // Old French addresses keep working
   redirects: async () => LEGACY_REDIRECTS.map((entry) => ({ ...entry, permanent: false })),
-  rewrites: async () =>
-    mockOrigin ? [{ source: '/faux-twitch/:path*', destination: `${mockOrigin}/:path*` }] : [],
+  rewrites: async () => [
+    // The permanent Deban. address of a creator
+    { source: '/:creator/contest', destination: '/unban/:creator' },
+    ...(mockOrigin ? [{ source: '/faux-twitch/:path*', destination: `${mockOrigin}/:path*` }] : []),
+  ],
   // The content security policy carries a per-request nonce
   headers: async () => [
     { source: '/:path*', headers: STATIC_SECURITY_HEADERS },

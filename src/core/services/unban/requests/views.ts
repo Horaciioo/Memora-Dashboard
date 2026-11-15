@@ -1,8 +1,8 @@
 import { decryptField } from '@/core/lib/crypto'
 import { allowedActions } from '@/core/lib/unban/actions'
+import { summarizeVotes } from '@/core/lib/unban/votes'
 import { readAnswers } from '@/core/lib/unban/answers'
-import { linkStateOf } from '@/core/lib/unban/linkState'
-import type { UnbanCaller } from '@/core/services/unban/links/shared'
+import type { UnbanCaller } from '@/core/services/unban/requests/caller'
 import type { UnbanPerson, UnbanRequestDetail, UnbanRequestItem } from '@/types/unban'
 import type { Prisma } from '@prisma/client'
 
@@ -18,7 +18,7 @@ export const DETAIL_INCLUDE = {
   decidedBy: PERSON,
   liftedBy: PERSON,
   formVersion: { select: { id: true, number: true } },
-  link: { select: { id: true, expiresAt: true, usedAt: true, revokedAt: true } },
+  votes: { select: { voterId: true, choice: true } },
 } as const
 
 export type ItemRow = Prisma.UnbanRequestGetPayload<{ include: typeof ITEM_INCLUDE }>
@@ -78,11 +78,7 @@ export const toDetail = (
   decidedBy: toPerson(row.decidedBy),
   discordLiftedAt: row.discordLiftedAt?.toISOString() ?? null,
   discordLiftedBy: toPerson(row.liftedBy),
-  link: {
-    id: row.link.id,
-    state: linkStateOf(row.link),
-    expiresAt: row.link.expiresAt.toISOString(),
-  },
+  votes: summarizeVotes(row.votes, row.status, caller),
   actions: allowedActions({
     status: row.status,
     assigneeId: row.assigneeId,

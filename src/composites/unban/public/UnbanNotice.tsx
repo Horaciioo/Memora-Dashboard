@@ -1,4 +1,4 @@
-import { OnboardingShell } from '@/layouts/OnboardingShell'
+import { UnbanShell } from '@/composites/unban/public/UnbanShell'
 import { ONBOARDING_STYLES } from '@/declarations/ui/variants'
 import type { IntegrationCreator } from '@/types/onboarding'
 
@@ -17,7 +17,7 @@ export interface UnbanNoticeProps {
  */
 
 export const UnbanNotice = ({ title, text, creator }: UnbanNoticeProps) => (
-  <OnboardingShell title={title} creator={creator}>
+  <UnbanShell title={title} creator={creator}>
     <p className={ONBOARDING_STYLES.lead}>{text}</p>
-  </OnboardingShell>
+  </UnbanShell>
 )

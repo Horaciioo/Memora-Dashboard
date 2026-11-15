@@ -23,14 +23,12 @@ export interface PublicRequestSource {
  * Projection of a request for its requester, built key by key so nothing else can slip in
  * @param {PublicRequestSource} request - Stored request
  * @param {string} youtuberName - Creator it was filed with
- * @param {Date} linkExpiresAt - Expiry of its link
  * @return {PublicRequestView} - What the requester may read
  */
 
 export const toPublicView = (
   request: PublicRequestSource,
-  youtuberName: string,
-  linkExpiresAt: Date
+  youtuberName: string
 ): PublicRequestView => ({
   reference: request.reference,
   status: request.status,
@@ -45,5 +43,4 @@ export const toPublicView = (
     text: answerText(answer),
   })),
   youtuberName,
-  linkExpiresAt: linkExpiresAt.toISOString(),
 })

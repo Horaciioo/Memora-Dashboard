@@ -10,11 +10,13 @@ import type { UnbanQuestionTypeName } from '@/utils/constants/unban'
  * @typedef {Object} UnbanOption
  * @property {string} id - Stable identifier
  * @property {string} label - Display label
+ * @property {string} [redirectUrl] - Address a pick of this option leads to
  */
 
 export interface UnbanOption {
   id: string
   label: string
+  redirectUrl?: string
 }
 
 /**
@@ -39,7 +41,8 @@ export interface UnbanScale {
  * @property {string} id - Stable identifier
  * @property {UnbanQuestionTypeName} type - Kind of question
  * @property {string} label - Question text
- * @property {string} [hint] - Helper line
+ * @property {string} [hint] - Optional description under the question, markdown
+ * @property {string} [pageId] - Page the question sits on, the first one when absent
  * @property {boolean} required - Must be answered
  * @property {UnbanOption[]} [options] - Choices
  * @property {number} [maxLength] - Longest text answer
@@ -51,6 +54,7 @@ export interface UnbanQuestion {
   type: UnbanQuestionTypeName
   label: string
   hint?: string
+  pageId?: string
   required: boolean
   options?: UnbanOption[]
   maxLength?: number
@@ -58,15 +62,29 @@ export interface UnbanQuestion {
 }
 
 /**
+ * Page of the form
+ * @typedef {Object} UnbanPage
+ * @property {string} id - Stable identifier
+ * @property {string} [title] - Optional name
+ */
+
+export interface UnbanPage {
+  id: string
+  title?: string
+}
+
+/**
  * Whole form as frozen in a version
  * @typedef {Object} UnbanFormSnapshot
- * @property {UnbanQuestion[]} questions - Ordered questions
+ * @property {UnbanQuestion[]} questions - Questions, ordered by page
+ * @property {UnbanPage[]} [pages] - Pages, one implicit page when absent
  * @property {string} [intro] - Text above the questions
  * @property {string} [outro] - Text below the questions
  */
 
 export interface UnbanFormSnapshot {
   questions: UnbanQuestion[]
+  pages?: UnbanPage[]
   intro?: string
   outro?: string
 }
@@ -116,6 +134,7 @@ export const toFieldDefinition = (question: UnbanQuestion): FieldDefinition => {
     kind: type.fieldKind,
     label: question.label,
     hint: question.hint,
+    rich: true,
     required: question.required,
     span: 'full',
     ...(type.fieldKind === 'text' || type.fieldKind === 'textarea'
@@ -148,6 +167,41 @@ export const toFieldDefinitions = (snapshot: UnbanFormSnapshot): FieldDefinition
   snapshot.questions.map(toFieldDefinition)
 
 /**
+ * Fields of one page
+ * @typedef {Object} UnbanPageGroup
+ * @property {string} id - Page identifier
+ * @property {string} [title] - Optional name
+ * @property {FieldDefinition[]} fields - Questions of the page
+ */
+
+export interface UnbanPageGroup {
+  id: string
+  title?: string
+  fields: FieldDefinition[]
+}
+
+/**
+ * Fields of a form cut into its pages, a single page when none is declared
+ * @param {UnbanFormSnapshot} snapshot - Frozen form
+ * @return {UnbanPageGroup[]} - One group per page
+ */
+
+export const toPageGroups = (snapshot: UnbanFormSnapshot): UnbanPageGroup[] => {
+  const pages = snapshot.pages?.length ? snapshot.pages : [{ id: 'main' }]
+
+  return pages.map((page, position) => ({
+    ...page,
+    fields: snapshot.questions
+      .filter((question) =>
+        position === 0
+          ? !pages.some((entry) => entry.id === question.pageId) || question.pageId === page.id
+          : question.pageId === page.id
+      )
+      .map(toFieldDefinition),
+  }))
+}
+
+/**
  * Fields a person types when the Discord proof is off
  * @type {FieldDefinition[]}
  */
@@ -168,5 +222,23 @@ export const TYPED_IDENTITY_FIELDS: FieldDefinition[] = [
     required: true,
     span: 'full',
     maxLength: 100,
+  },
+]
+
+/**
+ * Field every request carries, the address the mails go to
+ * @type {FieldDefinition[]}
+ */
+
+export const CONTACT_FIELDS: FieldDefinition[] = [
+  {
+    name: UNBAN_FORM_FIELDS.email,
+    kind: 'text',
+    label: UNBAN_PUBLIC_COPY.email,
+    hint: UNBAN_PUBLIC_COPY.emailHint,
+    placeholder: UNBAN_PUBLIC_COPY.emailPlaceholder,
+    required: true,
+    span: 'full',
+    maxLength: 254,
   },
 ]

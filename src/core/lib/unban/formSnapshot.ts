@@ -8,6 +8,7 @@ import type { AppErrorIssue } from '@/core/lib/errors'
 import type {
   UnbanFormSnapshot,
   UnbanOption,
+  UnbanPage,
   UnbanQuestion,
   UnbanScale,
 } from '@/declarations/unban/form'
@@ -47,6 +48,28 @@ const cleanText = (value: unknown): string | undefined =>
 export const newQuestionId = (): string => randomUUID()
 
 /**
+ * Keep an address a choice leads to, secure ones only
+ * @param {unknown} raw - Raw address
+ * @param {string} path - Issue location
+ * @param {Issues} issues - Collected issues
+ * @return {string | undefined} - Clean address
+ */
+
+const readRedirect = (raw: unknown, path: string, issues: Issues): string | undefined => {
+  const text = cleanText(raw)
+  if (!text) return undefined
+
+  try {
+    if (new URL(text).protocol === 'https:' && text.length <= 500) return text
+  } catch {
+    // Falls through to the refusal
+  }
+  issues.push({ field: path, message: UNBAN_FORM_COPY.redirectInvalid })
+
+  return undefined
+}
+
+/**
  * Check the choices of a question
  * @param {unknown} raw - Raw options
  * @param {string} path - Issue location
@@ -75,7 +98,9 @@ const readOptions = (raw: unknown, path: string, issues: Issues): UnbanOption[] 
     if (!id || !label || seen.has(id)) return []
     seen.add(id)
 
-    return [{ id, label }]
+    const redirectUrl = readRedirect(isRecord(entry) ? entry.redirectUrl : undefined, path, issues)
+
+    return [{ id, label, ...(redirectUrl ? { redirectUrl } : {}) }]
   })
 }
 
@@ -170,6 +195,7 @@ const readQuestion = (raw: unknown, index: number, issues: Issues): UnbanQuestio
     type,
     label: label ?? '',
     hint: cleanText(raw.hint),
+    pageId: cleanText(raw.pageId),
     required: raw.required === true,
     ...(hasOptions ? { options: readOptions(raw.options, `${path}.options`, issues) } : {}),
     ...(kind.fieldKind === 'scale' ? { scale: readScale(raw.scale, `${path}.scale`, issues) } : {}),
@@ -205,6 +231,49 @@ const readQuestions = (raw: unknown, issues: Issues): UnbanQuestion[] => {
 }
 
 /**
+ * Check the pages of a form
+ * @param {unknown} raw - Raw pages
+ * @param {Issues} issues - Collected issues
+ * @return {UnbanPage[] | undefined} - Clean pages, none for a single page
+ */
+
+const readPages = (raw: unknown, issues: Issues): UnbanPage[] | undefined => {
+  if (!Array.isArray(raw) || raw.length === 0) return undefined
+  if (raw.length > UNBAN_SETTINGS.maxPages) {
+    issues.push({ field: 'pages', message: UNBAN_FORM_COPY.tooManyPages })
+  }
+
+  const pages = raw.flatMap((entry, index): UnbanPage[] => {
+    const id = isRecord(entry) ? cleanText(entry.id) : undefined
+    const title = isRecord(entry) ? cleanText(entry.title) : undefined
+    if (!id || (title?.length ?? 0) > LABEL_MAX_LENGTH) {
+      issues.push({ field: `pages.${index}`, message: UNBAN_FORM_COPY.notAForm })
+
+      return []
+    }
+
+    return [{ id, ...(title ? { title } : {}) }]
+  })
+  if (new Set(pages.map((page) => page.id)).size !== pages.length) {
+    issues.push({ field: 'pages', message: UNBAN_FORM_COPY.notAForm })
+  }
+
+  return pages
+}
+
+/**
+ * Questions tied to a page that exists, the pageId of a single page form is dropped
+ * @param {UnbanQuestion[]} questions - Clean questions
+ * @param {UnbanPage[] | undefined} pages - Clean pages
+ * @return {UnbanQuestion[]} - Questions
+ */
+
+const tieToPages = (questions: UnbanQuestion[], pages: UnbanPage[] | undefined): UnbanQuestion[] =>
+  questions.map(({ pageId, ...question }) =>
+    pages && pages.some((page) => page.id === pageId) ? { ...question, pageId } : question
+  )
+
+/**
  * Result of checking a form
  * @typedef {Object} SnapshotCheck
  * @property {UnbanFormSnapshot} snapshot - Clean form
@@ -233,7 +302,10 @@ export const checkSnapshot = (raw: unknown): SnapshotCheck => {
     issues.push({ message: UNBAN_FORM_COPY.labelTooLong })
   }
 
-  return { snapshot: { questions: readQuestions(source.questions, issues), intro, outro }, issues }
+  const pages = readPages(source.pages, issues)
+  const questions = tieToPages(readQuestions(source.questions, issues), pages)
+
+  return { snapshot: { questions, ...(pages ? { pages } : {}), intro, outro }, issues }
 }
 
 /**

@@ -6,16 +6,20 @@ import { UnbanActions } from '@/core/lib/unban/actions'
 import { unbanTaskFragment } from '@/core/lib/unban/taskKey'
 import { closeSystemTasks } from '@/core/services/personal/SystemTaskService'
 import { notify } from '@/core/services/system/NotificationService'
+import { MailKinds } from '@/utils/constants/mail'
+import { mailRequester } from './mails'
 import { UNBAN_SETTINGS } from '@/declarations/configurations/settings'
-import { UNBAN_ERRORS } from '@/declarations/unban/copy'
+import { journalEvent, memberNames, statusLine } from './journal'
+import { UNBAN_COPY, UNBAN_ERRORS } from '@/declarations/unban/copy'
 import { Permissions } from '@/utils/constants/permissions'
 import { UnbanStatuses } from '@/utils/constants/unban'
 import { assertCanHandleFor } from './assignee'
 import { assertCanAct, loadRequest, writeVersioned } from './guard'
 import type { ReviewTarget } from './guard'
 import { readRequest } from './query'
-import type { UnbanCaller } from '@/core/services/unban/links/shared'
+import type { UnbanCaller } from '@/core/services/unban/requests/caller'
 import type { UnbanRequestDetail } from '@/types/unban'
+import type { UnbanStatusName } from '@/utils/constants/unban'
 import type { UnbanRequest } from '@prisma/client'
 
 /**
@@ -77,15 +81,15 @@ export const takeRequest = async (
       ...target,
       takeRace: true,
       data: { status: InReview, assigneeId, statusChangedAt: new Date() },
-      event: {
-        eventType: 'UnbanTaken',
-        summary: row.reference,
+      event: journalEvent('UnbanTaken', 'pris en charge', row, [statusLine(row.status, InReview)], {
         payload: { from: row.status, to: InReview },
-      },
+      }),
     },
     caller
   )
   await closeSystemTasks(unbanTaskFragment(row.id), assigneeId)
+  // Only the first look tells the requester, taking it back from a colleague stays silent
+  if (row.status === Pending) mailRequester(MailKinds.UnbanTaken, row)
 
   return detail
 }
@@ -113,11 +117,9 @@ export const releaseRequest = async (
         cycle: { increment: 1 },
         statusChangedAt: new Date(),
       },
-      event: {
-        eventType: 'UnbanReleased',
-        summary: row.reference,
+      event: journalEvent('UnbanReleased', 'relâché', row, [statusLine(row.status, Pending)], {
         payload: { from: row.status, to: Pending },
-      },
+      }),
     },
     caller
   )
@@ -176,17 +178,26 @@ export const assignRequest = async (
 ): Promise<UnbanRequestDetail> => {
   const row = await loadRequest(target, caller)
   await assertCanAssign(assigneeId, row, caller)
+  const names = await memberNames([assigneeId, row.assigneeId])
 
   const detail = await writeVersioned(
     {
       ...target,
       // A new cycle, so the ones who lost it find it again if it comes back
       data: { assigneeId, cycle: { increment: 1 } },
-      event: {
-        eventType: 'UnbanAssigned',
-        summary: row.reference,
-        payload: { assigneeId, previousAssigneeId: row.assigneeId },
-      },
+      event: journalEvent(
+        'UnbanAssigned',
+        'attribué',
+        row,
+        [
+          {
+            label: UNBAN_COPY.journalAssignee,
+            before: names.get(row.assigneeId ?? '') ?? UNBAN_COPY.journalNobody,
+            after: names.get(assigneeId ?? '') ?? UNBAN_COPY.journalNobody,
+          },
+        ],
+        { payload: { assigneeId, previousAssigneeId: row.assigneeId } }
+      ),
     },
     caller
   )
@@ -238,15 +249,18 @@ export const decideRequest = async (
         statusChangedAt: now,
       },
       // The answer to the requester never enters the journal
-      event: {
-        eventType: 'UnbanDecided',
-        summary: row.reference,
-        payload: { from: row.status, to: outcome, outcome },
-      },
+      event: journalEvent(
+        'UnbanDecided',
+        outcome === Accepted ? 'accepté' : 'refusé',
+        row,
+        [statusLine(row.status, outcome as UnbanStatusName)],
+        { payload: { from: row.status, to: outcome, outcome } }
+      ),
     },
     caller
   )
   await closeSystemTasks(unbanTaskFragment(row.id))
+  mailRequester(outcome === Accepted ? MailKinds.UnbanAccepted : MailKinds.UnbanRefused, row, note)
 
   return detail
 }
@@ -280,16 +294,23 @@ export const reopenRequest = async (
         cycle: { increment: 1 },
         statusChangedAt: new Date(),
       },
-      event: {
-        eventType: 'UnbanReopened',
-        summary: row.reference,
-        payload: {
-          from: row.status,
-          to: InReview,
-          reason: why,
-          decidedAt: row.decidedAt?.toISOString() ?? null,
-        },
-      },
+      event: journalEvent(
+        'UnbanReopened',
+        'rouvert',
+        row,
+        [
+          statusLine(row.status, InReview),
+          { label: UNBAN_COPY.journalReason, before: null, after: why },
+        ],
+        {
+          payload: {
+            from: row.status,
+            to: InReview,
+            reason: why,
+            decidedAt: row.decidedAt?.toISOString() ?? null,
+          },
+        }
+      ),
     },
     caller
   )
@@ -314,7 +335,7 @@ export const markDiscordLifted = async (
     {
       ...target,
       data: { discordLiftedAt: new Date(), discordLiftedById: caller.actorId },
-      event: { eventType: 'UnbanDiscordLifted', summary: row.reference },
+      event: journalEvent('UnbanDiscordLifted', 'confirmé le débannissement Discord de', row),
     },
     caller
   )

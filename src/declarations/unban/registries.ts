@@ -1,13 +1,9 @@
 import { createRegistry } from '@/core/lib/registry'
-import { UnbanLinkStates, UnbanQuestionTypes, UnbanStatuses } from '@/utils/constants/unban'
+import { UnbanQuestionTypes, UnbanStatuses } from '@/utils/constants/unban'
 import type { IconName } from '@/declarations/ui/icons'
 import type { Tone } from '@/declarations/ui/theme'
 import type { FieldKind } from '@/types/forms'
-import type {
-  UnbanLinkStateName,
-  UnbanQuestionTypeName,
-  UnbanStatusName,
-} from '@/utils/constants/unban'
+import type { UnbanQuestionTypeName, UnbanStatusName } from '@/utils/constants/unban'
 
 /**
  * Labelled state with its glyph and colour
@@ -31,15 +27,6 @@ const STATUS_MAP: Record<UnbanStatusName, UnbanStateOption> = {
 }
 
 export const UNBAN_STATUS_REGISTRY = createRegistry(STATUS_MAP)
-
-const LINK_STATE_MAP: Record<UnbanLinkStateName, UnbanStateOption> = {
-  [UnbanLinkStates.Active]: { label: 'Actif', icon: 'link', accent: 'success' },
-  [UnbanLinkStates.Used]: { label: 'Utilisé', icon: 'check', accent: 'info' },
-  [UnbanLinkStates.Expired]: { label: 'Expiré', icon: 'clock', accent: 'neutral' },
-  [UnbanLinkStates.Revoked]: { label: 'Révoqué', icon: 'blocked', accent: 'danger' },
-}
-
-export const UNBAN_LINK_STATE_REGISTRY = createRegistry(LINK_STATE_MAP)
 
 /**
  * Question type with the field kind that renders it

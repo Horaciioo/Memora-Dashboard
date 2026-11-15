@@ -10,7 +10,7 @@ import { UnbanStatuses } from '@/utils/constants/unban'
 import { readRequest } from './query'
 import type { UnbanActionName } from '@/core/lib/unban/actions'
 import type { EventInput } from '@/core/services/system/ActivityService'
-import type { UnbanCaller } from '@/core/services/unban/links/shared'
+import type { UnbanCaller } from '@/core/services/unban/requests/caller'
 import type { UnbanRequestDetail } from '@/types/unban'
 import type { Prisma, UnbanRequest } from '@prisma/client'
 

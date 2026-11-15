@@ -11,7 +11,7 @@ import { PAGINATION_SETTINGS } from '@/declarations/configurations/settings'
 import { Permissions } from '@/utils/constants/permissions'
 import { DETAIL_INCLUDE, ITEM_INCLUDE, toDetail, toItem } from './views'
 import type { RequestFilters } from '@/core/lib/unban/requestFilter'
-import type { UnbanCaller } from '@/core/services/unban/links/shared'
+import type { UnbanCaller } from '@/core/services/unban/requests/caller'
 import type { UnbanRequestDetail, UnbanRequestPage } from '@/types/unban'
 
 /**
@@ -96,9 +96,9 @@ export const readHistory = async (id: string, caller: UnbanCaller): Promise<Acti
 
   const row = await prisma.unbanRequest.findFirst({
     where: scopedWhere('unbanRequest', caller.scope, { id }),
-    select: { linkId: true },
+    select: { id: true },
   })
   if (!row) throw notFound()
 
-  return readRecordTreeActivity('unbanRequest', id, 'unbanLink', [row.linkId])
+  return readRecordTreeActivity('unbanRequest', id, 'unbanRequest', [])
 }

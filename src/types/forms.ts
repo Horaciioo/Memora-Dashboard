@@ -296,6 +296,7 @@ export interface FieldNeed {
  * @property {'menu' | 'list'} [presentation] - Choices as a menu or as a visible list
  * @property {[string, string]} [scaleLabels] - Captions of the two ends of a scale
  * @property {BusySlot[]} [busy] - Events a date field warns about
+ * @property {boolean} [rich] - Label and hint written in markdown
  */
 
 export interface FieldDefinition {
@@ -304,6 +305,8 @@ export interface FieldDefinition {
   label: string
   placeholder?: string
   hint?: string
+  // Label and hint written in markdown
+  rich?: boolean
   info?: string
   preset?: FieldPreset
   initial?: string | boolean

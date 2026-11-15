@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { InlineMarkdown, Markdown } from '@/components/elements/display/Markdown'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { InfoHint } from '@/components/elements/feedback/InfoHint'
 import type { MaturityName } from '@/declarations/maturity/registries'
@@ -10,6 +11,8 @@ export interface FieldProps {
   id: string
   label: string
   hint?: string
+  // Label and hint written in markdown
+  rich?: boolean
   // Explanation behind the info glyph
   info?: string
   error?: string
@@ -26,6 +29,7 @@ export interface FieldProps {
  * @param {string} id - Identifier of the wrapped control
  * @param {string} label - Field label
  * @param {string} [hint] - Helper line below the control
+ * @param {boolean} [rich] - Label and hint written in markdown
  * @param {string} [info] - Explanation behind the info glyph
  * @param {string} [error] - Rejection message replacing the hint
  * @param {string} [notice] - Warning shown under the control
@@ -40,6 +44,7 @@ export const Field = ({
   id,
   label,
   hint,
+  rich,
   info,
   error,
   notice,
@@ -55,7 +60,7 @@ export const Field = ({
     <div className={cn(FIELD_STYLES.wrapper, className)}>
       <span className={FIELD_STYLES.labelRow}>
         <label htmlFor={id} className={FIELD_STYLES.label}>
-          {label}
+          {rich ? <InlineMarkdown source={label} /> : label}
           {required && <span className={FIELD_STYLES.required}> *</span>}
         </label>
         {info && <InfoHint text={info} align="start" />}
@@ -75,9 +80,9 @@ export const Field = ({
         </p>
       ) : (
         hint && (
-          <p id={`${id}-hint`} className={FIELD_STYLES.hint}>
-            {hint}
-          </p>
+          <div id={`${id}-hint`} className={FIELD_STYLES.hint}>
+            {rich ? <Markdown source={hint} /> : hint}
+          </div>
         )
       )}
     </div>

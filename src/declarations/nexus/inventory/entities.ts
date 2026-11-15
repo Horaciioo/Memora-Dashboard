@@ -69,6 +69,13 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'id',
     search: [],
   },
+  mailDelivery: {
+    model: 'MailDelivery',
+    exposure: 'readOnly',
+    reason: 'Journal d’envoi, jamais réécrit',
+    display: 'id',
+    search: [],
+  },
   twoFactorCredential: {
     model: 'TwoFactorCredential',
     exposure: 'excluded',
@@ -403,13 +410,12 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'number',
     search: [],
   },
-  unbanLink: {
-    model: 'UnbanLink',
+  unbanVote: {
+    model: 'UnbanVote',
     exposure: 'readOnly',
-    reason: 'Liens de déban, jeton haché',
+    reason: 'Avis des modérateurs, jamais réécrits',
     display: 'id',
     search: [],
-    hidden: ['tokenHash'],
   },
   unbanRequest: {
     model: 'UnbanRequest',

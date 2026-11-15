@@ -9,6 +9,5 @@
   "orphanFileHours": 24,
   "consentVersion": 1,
   "chatMessageDays": 180,
-  "unbanDecidedDays": 365,
-  "unbanUnusedLinkDays": 90
+  "unbanDecidedDays": 365
 }

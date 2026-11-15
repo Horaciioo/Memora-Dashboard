@@ -1,3 +1,4 @@
+import { DAY_MS } from '@/utils/constants/time'
 import { UnbanStatuses } from '@/utils/constants/unban'
 import type { UnbanStatusName } from '@/utils/constants/unban'
 import type { Prisma } from '@prisma/client'
@@ -153,3 +154,12 @@ export const parseRequestFilters = (query: URLSearchParams): RequestFilters => {
     limit: Number.isInteger(limit) && limit > 0 ? limit : undefined,
   }
 }
+
+/**
+ * First moment of a period that ends now
+ * @param {number} days - Days back, zero for no limit
+ * @return {string} - ISO moment, empty for no limit
+ */
+
+export const periodStart = (days: number): string =>
+  days > 0 ? new Date(new Date().setHours(0, 0, 0, 0) - days * DAY_MS).toISOString() : ''

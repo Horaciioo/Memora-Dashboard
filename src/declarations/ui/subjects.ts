@@ -43,6 +43,7 @@ export const FORM_SUBJECTS = {
   livecon: { label: 'Niveau', gender: 'masculine', icon: 'livecon' },
   sanction: { label: 'Fiche', gender: 'feminine', icon: 'sanctions' },
   live: { label: 'Live', gender: 'masculine', icon: 'liveDot' },
+  unbanDecision: { label: 'Décision', gender: 'feminine', icon: 'unbanRequest' },
 } as const satisfies Record<string, FormSubject>
 
 /**

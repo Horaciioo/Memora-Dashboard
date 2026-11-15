@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { parseMarkdown } from '@/core/lib/markdown'
+import { parseInline, parseMarkdown } from '@/core/lib/markdown'
 import type { BlockNode, InlineNode } from '@/core/lib/markdown'
 import { COMMENT_THREAD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -96,6 +96,20 @@ const renderBlock = (block: BlockNode, index: number, lit = false) => {
       return <p key={index}>{renderInline(block.children, lit)}</p>
   }
 }
+
+export interface InlineMarkdownProps {
+  source: string
+}
+
+/**
+ * Render one line of markdown, no block around it
+ * @param {string} source - Raw markdown
+ * @return {JSX.Element}
+ */
+
+export const InlineMarkdown = ({ source }: InlineMarkdownProps) => (
+  <>{renderInline(parseInline(source))}</>
+)
 
 export interface MarkdownProps {
   source: string

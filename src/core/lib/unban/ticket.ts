@@ -19,13 +19,13 @@ export interface UnbanIdentity {
 /**
  * What the cookie carries between the link and the server
  * @typedef {Object} UnbanTicket
- * @property {string} token - Link the ticket belongs to
+ * @property {string} creator - Creator slug the ticket belongs to
  * @property {UnbanIdentity} [identity] - Account proven, absent while the round trip is open
  * @property {number} at - Moment it was issued, in ms
  */
 
 export interface UnbanTicket {
-  token: string
+  creator: string
   identity?: UnbanIdentity
   at: number
 }
@@ -73,31 +73,21 @@ export const unpackUnbanTicket = (
   now: number = Date.now()
 ): UnbanTicket | null => {
   const content = unseal(packed)
-  const token = textOf(content?.token)
-  if (!content || !token || typeof content.at !== 'number') return null
+  const creator = textOf(content?.creator)
+  if (!content || !creator || typeof content.at !== 'number') return null
 
   // The identity outlives the sign-in round trip, but not the filling
   if (now - content.at > UNBAN_SETTINGS.ticketMinutes * MINUTE_MS) return null
 
-  return { token, identity: readIdentity(content.identity), at: content.at }
+  return { creator, identity: readIdentity(content.identity), at: content.at }
 }
 
 /**
- * Identity a ticket proves for one link, none for another link's ticket
+ * Identity a ticket proves for one creator, none for another creator's ticket
  * @param {UnbanTicket | null} ticket - Ticket
- * @param {string} token - Link opened
+ * @param {string} creator - Creator slug opened
  * @return {UnbanIdentity | null} - Proven account
  */
 
-export const identityFor = (ticket: UnbanTicket | null, token: string): UnbanIdentity | null =>
-  ticket && ticket.token === token ? (ticket.identity ?? null) : null
-
-/**
- * Whether an account is the one a link was made for, any account when it names none
- * @param {string | null} expectedDiscordId - Account the link names
- * @param {string} discordId - Account proven
- * @return {boolean} - Allowed
- */
-
-export const isExpectedAccount = (expectedDiscordId: string | null, discordId: string): boolean =>
-  !expectedDiscordId || expectedDiscordId === discordId
+export const identityFor = (ticket: UnbanTicket | null, creator: string): UnbanIdentity | null =>
+  ticket && ticket.creator === creator ? (ticket.identity ?? null) : null

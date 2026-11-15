@@ -73,7 +73,7 @@ export const UNBAN_SIGNAL: ChangeSignal = {
   event: 'unban',
   settleMs: 400,
   writes: new Set(WRITES),
-  watched: { UnbanRequest: true, UnbanLink: true },
+  watched: { UnbanRequest: true },
 }
 
 /**
