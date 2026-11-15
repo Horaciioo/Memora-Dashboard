@@ -16,7 +16,7 @@ export const JUMBLE_BOARD = {
   lead: 'text-center text-sm text-[var(--play-ink-soft)]',
   // Tiles and slots
   tiles: 'flex w-full max-w-3xl flex-wrap items-center justify-center gap-2 sm:gap-3',
-  tile: 'play-jumble-tile w-[clamp(2.2rem,min(8vw,9dvh),4.6rem)] text-[clamp(1.3rem,min(5vw,5.6dvh),2.8rem)] uppercase',
+  tile: 'play-jumble-tile w-[clamp(2.6rem,min(13vw,9dvh),4.6rem)] text-[clamp(1.5rem,min(6.5vw,5.6dvh),2.8rem)] uppercase',
   tileFlip: 'play-jumble-flip',
   tileWon: 'play-jumble-won',
   tileLost: 'play-jumble-lost',
