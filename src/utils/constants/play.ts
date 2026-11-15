@@ -14,6 +14,7 @@ export const PlayGames = {
   Glitch: 'GLITCH',
   Croquis: 'CROQUIS',
   Suspens: 'SUSPENS',
+  StopGo: 'STOP_GO',
 } as const
 
 export type PlayGameName = (typeof PlayGames)[keyof typeof PlayGames]
@@ -340,3 +341,45 @@ export const SuspensMoves = {
   Word: 'WORD',
   Timeout: 'TIMEOUT',
 } as const
+
+/**
+ * Phases of a Stop & Go race
+ * @type {Record<string, string>}
+ */
+
+export const StopGoPhases = {
+  Playing: 'PLAYING',
+  Over: 'OVER',
+} as const
+
+export type StopGoPhaseName = (typeof StopGoPhases)[keyof typeof StopGoPhases]
+
+/**
+ * Moves of a Stop & Go race
+ * @type {Record<string, string>}
+ */
+
+export const StopGoMoveKinds = {
+  Distance: 'DISTANCE',
+  Green: 'GREEN',
+  Attack: 'ATTACK',
+  Remedy: 'REMEDY',
+  Immunity: 'IMMUNITY',
+  Cleanup: 'CLEANUP',
+  GoodDraw: 'GOOD_DRAW',
+  Mystery: 'MYSTERY',
+  Reveal: 'REVEAL',
+  Discard: 'DISCARD',
+  Timeout: 'TIMEOUT',
+  Shuffle: 'SHUFFLE',
+  Finish: 'FINISH',
+} as const
+
+export type StopGoMoveKindName = (typeof StopGoMoveKinds)[keyof typeof StopGoMoveKinds]
+
+/**
+ * Slug of Stop & Go in urls
+ * @type {string}
+ */
+
+export const STOPGO_SLUG = 'stop-and-go'

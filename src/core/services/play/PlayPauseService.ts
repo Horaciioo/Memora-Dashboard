@@ -79,6 +79,12 @@ const SHIFTERS: Record<
     SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),
         "turnEndsAt" = "turnEndsAt" + (${s}::float8 * interval '1 second')
     WHERE "sessionId" = ${id}`,
+  STOP_GO: (tx, id, s) => tx.$executeRaw`
+    UPDATE play_stopgo_games
+    SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),
+        "turnEndsAt" = "turnEndsAt" + (${s}::float8 * interval '1 second'),
+        "pendingEndsAt" = "pendingEndsAt" + (${s}::float8 * interval '1 second')
+    WHERE "sessionId" = ${id}`,
   NAVAL: async (tx, id, s) => {
     await tx.$executeRaw`
       UPDATE play_naval_games
@@ -121,7 +127,7 @@ export const pauseSession = async (
     })
   })
 
-  // Deadlines and bots stop with the clock, plans and idle clock drawn again on resume
+  // Deadlines and bots stop with the clock
   clearSessionTimers(sessionId)
   forgetBots(sessionId)
   forgetIdle(sessionId)

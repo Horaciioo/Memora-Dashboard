@@ -422,6 +422,8 @@ model Account {
   golfMoves             GolfMove[]
   ludoPlayers           LudoPlayer[]
   ludoMoves             LudoMove[]
+  stopGoPlayers         StopGoPlayer[]
+  stopGoMoves           StopGoMove[]
   playMessages          PlayMessage[]
   navalPlayers          NavalPlayer[]
   playInvitesSent       PlayInvite[]             @relation("PlayInviteFrom")
@@ -2794,7 +2796,7 @@ model RecruitmentAnswer {
 
 // Remark left on a project, a task, a communication or a meeting
 model WorkComment {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   projectId       String?
   taskId          String?
   communicationId String?
@@ -2804,7 +2806,7 @@ model WorkComment {
   body            String
   // Held at the top of the thread
   pinnedAt        DateTime?
-  createdAt       DateTime @default(now())
+  createdAt       DateTime  @default(now())
 
   project       Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   task          Task?          @relation(fields: [taskId], references: [id], onDelete: Cascade)
@@ -2905,7 +2907,7 @@ enum MailStatus {
 
 // One mail handed to the provider, the address is never kept here
 model MailDelivery {
-  id         String       @id @default(cuid())
+  id         String     @id @default(cuid())
   kind       String
   requestId  String?
   // Kept apart so the line stays readable once the request is gone
@@ -2914,8 +2916,8 @@ model MailDelivery {
   providerId String?
   // Why it failed or was left unsent
   detail     String?
-  isTest     Boolean      @default(false)
-  createdAt  DateTime     @default(now())
+  isTest     Boolean    @default(false)
+  createdAt  DateTime   @default(now())
 
   request UnbanRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
 
@@ -3127,6 +3129,7 @@ enum PlayGame {
   GLITCH
   CROQUIS
   SUSPENS
+  STOP_GO
 }
 
 // Play bot level
@@ -3222,6 +3225,9 @@ model PlaySession {
   suspensGame    SuspensGame?
   suspensMoves   SuspensMove[]
   suspensRounds  SuspensRound[]
+  stopGoGame     StopGoGame?
+  stopGoPlayers  StopGoPlayer[]
+  stopGoMoves    StopGoMove[]
   golfGame       GolfGame?
   golfPlayers    GolfPlayer[]
   golfMoves      GolfMove[]
@@ -4546,4 +4552,84 @@ model SuspensMove {
 
   @@index([sessionId, round])
   @@map("play_suspens_moves")
+}
+
+// Stop & Go table: the secret pile, the discard and the turn clock
+model StopGoGame {
+  sessionId     String    @id
+  // PLAYING or OVER
+  phase         String
+  turnId        String
+  // Turns played, checked on every move to refuse a stale one
+  turnNo        Int       @default(0)
+  // Bumped on every move, the newest board wins
+  rev           Int       @default(0)
+  startsAt      DateTime
+  turnEndsAt    DateTime
+  // Cards { id, key } in order, whole objects so a settings change mid game changes nothing, never read by a view
+  drawPile      Json
+  // Same objects, face up
+  discard       Json
+  // Times the discard went back into the pile
+  reshuffles    Int       @default(0)
+  // Immunity window or Good draw choice the turn waits on, never holds a drawn card
+  pending       Json?
+  // Clock of the pending choice, its own column so the pause shifts it in plain SQL
+  pendingEndsAt DateTime?
+  updatedAt     DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_stopgo_games")
+}
+
+// A car at the table with its hand
+model StopGoPlayer {
+  id             String    @id @default(cuid())
+  sessionId      String
+  accountId      String
+  // Seat colour on the track, red blue green yellow
+  slot           Int
+  km             Int       @default(0)
+  // Cards { id, key, isPicking? }, private to the player
+  hand           Json
+  // Mystery cards { id, card, fromId, at }, read only by the mystery service
+  sealed         Json
+  isGreen        Boolean   @default(false)
+  // Attack keys suffered, one per type, the speed limit included
+  hazards        String[]
+  immunityUsedAt DateTime?
+  cleanupUsedAt  DateTime?
+  // Turns missed in a row
+  strikes        Int       @default(0)
+  finishedAt     DateTime?
+  place          Int?
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@map("play_stopgo_players")
+}
+
+// Public log of the race, a card only when played face up
+model StopGoMove {
+  id        String   @id @default(cuid())
+  sessionId String
+  accountId String
+  // Board revision it belongs to
+  rev       Int
+  kind      String
+  targetIds String[]
+  // Card key, only for a card played face up
+  card      String?
+  km        Int?
+  value     Int?
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, rev])
+  @@map("play_stopgo_moves")
 }
