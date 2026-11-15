@@ -47,7 +47,7 @@ export const PLAY_MOBILE_COPY = {
   outcomeLOSS: 'Défaite',
   hubTabs: 'Sections du jeu',
   hubStats: 'Stats',
-  hubPlay: 'Créer une partie',
+  hubPlay: 'Jouer à plusieurs',
   hubSessions: 'Sessions',
   hubBack: 'Tous les jeux',
   hubRanking: 'Classement',

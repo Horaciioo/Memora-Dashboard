@@ -54,7 +54,7 @@ export const PLAY_HUB_COPY = {
   tournament: 'Tournoi en {games} parties',
   hostedBy: 'Partie de {host}',
   enter: 'Entrer dans le hub',
-  create: 'Créer une partie',
+  create: 'Jouer à plusieurs',
   // Hub menu
   menuLeaders: 'Classement',
   menuStats: 'Voir mes stats',
