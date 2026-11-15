@@ -34,6 +34,7 @@ export const StopGoPiles = ({
       className={cn(STOPGO_HAND.pile, isDropTarget && STOPGO_HAND.pileOver)}
       onDragOver={(event) => isDropTarget && event.preventDefault()}
       onDrop={onDiscardDrop}
+      data-stopgo-discard
     >
       {discardTop ? (
         <StopGoCard cardKey={discardTop} isPlayable={false} />

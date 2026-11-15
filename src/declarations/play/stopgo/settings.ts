@@ -19,6 +19,7 @@ const accident = readNode(stopgo.accident, 'play/stopgo.accident')
 const limit = readNode(stopgo.limit, 'play/stopgo.limit')
 const track = readNode(stopgo.track, 'play/stopgo.track')
 const camera = readNode(stopgo.camera, 'play/stopgo.camera')
+const fx = readNode(stopgo.fx, 'play/stopgo.fx')
 
 // Seat bounds
 const minPlayers = readInteger(stopgo.minPlayers, {
@@ -121,6 +122,9 @@ export const STOPGO_SETTINGS = {
     fallback: 4,
     min: 0,
   }),
+  flightMs: readInteger(fx.flightMs, { path: 'play/stopgo.fx.flightMs', fallback: 650, min: 100 }),
+  markMs: readInteger(fx.markMs, { path: 'play/stopgo.fx.markMs', fallback: 900, min: 100 }),
+  drawMs: readInteger(fx.drawMs, { path: 'play/stopgo.fx.drawMs', fallback: 450, min: 100 }),
   colors: readStringList(stopgo.colors, {
     path: 'play/stopgo.colors',
     fallback: ['red', 'blue', 'green', 'yellow'],

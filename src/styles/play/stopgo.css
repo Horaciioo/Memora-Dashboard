@@ -157,6 +157,12 @@
   pointer-events: none;
   background: linear-gradient(0deg, rgb(0 0 0 / 0.35), transparent);
 }
+/* The HUD chat rests on the right edge, the piles stop short of it */
+@media (min-width: 768px) {
+  .stopgo-dock {
+    padding-right: 23rem;
+  }
+}
 
 .stopgo-dock > * {
   pointer-events: auto;
@@ -171,6 +177,12 @@
 
 .stopgo-hand-slot {
   min-width: 0;
+}
+/* Narrow hand: slots shrink and the cards overlap, the one in focus comes forward */
+.stopgo-hand-slot:hover,
+.stopgo-hand-slot:has(.stopgo-card-chosen) {
+  position: relative;
+  z-index: 2;
 }
 
 .stopgo-tray {
@@ -306,11 +318,14 @@
 
 .stopgo-rivals {
   position: absolute;
-  top: 0.8rem;
-  right: 0.8rem;
+  top: 6.5rem;
+  left: 1.75rem;
   z-index: 20;
   display: grid;
   gap: 0.4rem;
+  max-height: calc(100dvh - 22rem);
+  overflow-y: auto;
+  scrollbar-width: none;
   pointer-events: auto;
 }
 .stopgo-rivals .stopgo-panel {
@@ -361,7 +376,123 @@
   background: var(--stopgo-gold);
   transition: width 0.25s linear;
 }
+/* Moments: cards in the air, rings and shakes on the cars, a card slid into the hand */
+.stopgo-fx-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  overflow: hidden;
+  pointer-events: none;
+}
+.stopgo-fx-flight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.stopgo-fx-ring {
+  fill: none;
+  stroke-width: 5;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: stopgo-ring 0.9s ease-out both;
+}
+.stopgo-fx-hit {
+  stroke: var(--stopgo-family-attack);
+}
+.stopgo-fx-heal,
+.stopgo-fx-sweep {
+  stroke: var(--stopgo-gold);
+}
+.stopgo-fx-shield {
+  stroke: var(--stopgo-kerb-white);
+  stroke-width: 8;
+}
+.stopgo-fx-sweep {
+  animation-duration: 1.2s;
+}
+
+.stopgo-fx-shake {
+  animation: stopgo-shake 0.5s linear both;
+}
+
+.stopgo-car-badge {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  padding: 0.12rem;
+  border-radius: 999px;
+  background: var(--stopgo-kerb-white);
+  color: var(--stopgo-asphalt-deep);
+}
+.stopgo-fx-badge {
+  animation: stopgo-pop 0.4s ease-out backwards;
+}
+
+.stopgo-hand-slot-drawn {
+  animation: stopgo-draw var(--stopgo-draw-ms, 450ms) cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+}
+
+@keyframes stopgo-ring {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+@keyframes stopgo-shake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-5px, 2px);
+  }
+  40% {
+    transform: translate(5px, -2px);
+  }
+  60% {
+    transform: translate(-3px, 1px);
+  }
+  80% {
+    transform: translate(3px, -1px);
+  }
+}
+@keyframes stopgo-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes stopgo-draw {
+  0% {
+    opacity: 0;
+    transform: translate(14rem, 2rem) rotate(8deg) scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .stopgo-fx-ring,
+  .stopgo-fx-shake,
+  .stopgo-fx-badge,
+  .stopgo-hand-slot-drawn {
+    animation: none;
+  }
+
   .stopgo-card,
   .stopgo-target {
     transition: none;

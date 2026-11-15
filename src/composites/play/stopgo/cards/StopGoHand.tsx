@@ -1,12 +1,15 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import type { CSSProperties } from 'react'
 
 import { StopGoCard } from '@/composites/play/stopgo/cards/StopGoCard'
 import { reasonOf } from '@/composites/play/stopgo/cards/reasons'
 import type { StopGoHandCardView } from '@/composites/play/stopgo/cards/types'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
+import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { STOPGO_HAND } from '@/declarations/ui/variants/games/play/stopgo'
+import { cn } from '@/utils/classnames'
 
 type Player = StopGoBoardView['players'][number]
 
@@ -41,6 +44,17 @@ export const StopGoHand = ({
   onChoose,
   onQuickPlay,
 }: StopGoHandProps) => {
+  // Cards held at the last render, the others slide in from the pile
+  const ids = cards.map((card) => card.id)
+  const [held, setHeld] = useState<ReadonlySet<string>>(() => new Set(ids))
+  const key = ids.join()
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setHeld(new Set(key ? key.split(',') : [])), 700)
+
+    return () => window.clearTimeout(timer)
+  }, [key])
+
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (isTyping(event.target) || event.metaKey || event.ctrlKey) return
@@ -55,12 +69,20 @@ export const StopGoHand = ({
   }, [cards, chosenId, onChoose, onQuickPlay])
 
   return (
-    <div className={STOPGO_HAND.hand}>
+    <div className={STOPGO_HAND.hand} data-stopgo-hand>
       {cards.map((card, index) => {
         const aims = isTurn ? playable[card.id] : undefined
 
         return (
-          <div key={card.id} className={STOPGO_HAND.slot}>
+          <div
+            key={card.id}
+            className={cn(STOPGO_HAND.slot, !held.has(card.id) && STOPGO_HAND.slotDrawn)}
+            style={
+              held.has(card.id)
+                ? undefined
+                : ({ '--stopgo-draw-ms': `${STOPGO_SETTINGS.drawMs}ms` } as CSSProperties)
+            }
+          >
             <StopGoCard
               cardKey={card.key}
               index={index}

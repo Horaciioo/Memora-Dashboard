@@ -162,3 +162,37 @@ export const STOPGO_HAND_COPY = {
   you: 'Toi',
   count: '{count} cartes',
 } as const
+
+/**
+ * HUD card captions
+ * @type {Record<string, string>}
+ */
+
+export const STOPGO_HUD_COPY = {
+  target: 'Distance',
+  turn: 'Tour',
+  time: 'Temps',
+  pile: 'Pioche',
+  km: '{km} km',
+} as const
+
+/**
+ * Feed templates per log kind, the player's name leads and the verb between stars is coloured
+ * @type {Record<string, string>}
+ */
+
+export const STOPGO_FEED_COPY = {
+  DISTANCE: '*a avancé* de {km} km',
+  GREEN: '*a démarré* avec un Feu vert',
+  ATTACK: '*a lancé* {card} sur {others}',
+  REMEDY: '*a réparé* avec {card}',
+  IMMUNITY: '*a paré* l’attaque de {others}',
+  CLEANUP: '*a nettoyé* tous ses malus',
+  GOOD_DRAW: '*a pioché* deux cartes et en a gardé une',
+  MYSTERY: '*a glissé* une carte scellée chez {others}',
+  REVEAL: '*a révélé* la carte scellée et perd {km} km',
+  DISCARD: '*a défaussé* {card}',
+  TIMEOUT: '*a manqué* son tour',
+  SHUFFLE: '*a remélangé* la défausse dans la pioche',
+  FINISH: '*a passé* la ligne d’arrivée',
+} as const

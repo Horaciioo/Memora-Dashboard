@@ -72,3 +72,9 @@ de marimba.
 
 Fond du hub (`/play/naval/mer-crepuscule.jpg`) : photo Unsplash
 (https://unsplash.com/photos/014607f694d7), licence Unsplash.
+
+## Stop & Go (`stopgo/`)
+
+Sept effets synthétisés pour Memora avec FFmpeg (bruit filtré, sinus, glissandos), sans échantillon
+extérieur, versés au domaine public (CC0 1.0) : `pioche`, `carte`, `attaque`, `reparation`, `joker`,
+`moteur` (départ) et `arrivee`.

@@ -3,12 +3,16 @@
 import { useCallback, useMemo, useRef } from 'react'
 
 import { StopGoDock } from '@/composites/play/stopgo/cards/StopGoDock'
+import { StopGoFlights } from '@/composites/play/stopgo/fx/StopGoFlights'
+import { useStopGoFx } from '@/composites/play/stopgo/fx/useStopGoFx'
+import { StopGoHud } from '@/composites/play/stopgo/hud/StopGoHud'
 import { StopGoCar } from '@/composites/play/stopgo/board/StopGoCar'
 import { StopGoDecor } from '@/composites/play/stopgo/board/StopGoDecor'
 import { StopGoSigns } from '@/composites/play/stopgo/board/StopGoSigns'
 import { StopGoProgress } from '@/composites/play/stopgo/board/StopGoProgress'
 import { StopGoTrack } from '@/composites/play/stopgo/board/StopGoTrack'
 import { useTrackCamera } from '@/composites/play/stopgo/board/useTrackCamera'
+import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { pointAt, trackOf } from '@/core/lib/play/stopgo'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
@@ -18,9 +22,11 @@ import { STOPGO_TRACK } from '@/declarations/play/stopgo/track'
 
 export interface StopGoBoardProps {
   sessionId: string
+  // Board of the page render, the live one follows
   board: StopGoBoardView
   faces: PlayFace[]
   viewerId: string
+  isSeated: boolean
 }
 
 // Maps kept in the page around the one in view
@@ -32,7 +38,15 @@ const NEIGHBOURS = 1
  * @return {JSX.Element}
  */
 
-export const StopGoBoard = ({ sessionId, board, faces, viewerId }: StopGoBoardProps) => {
+export const StopGoBoard = ({
+  sessionId,
+  board: initial,
+  faces,
+  viewerId,
+  isSeated,
+}: StopGoBoardProps) => {
+  const board = usePlainBoard(sessionId, initial)
+  const { flights, marks, land } = useStopGoFx(board)
   const { players, target } = board
   const lanes = players.length
   const plan = useMemo(() => trackOf(target, lanes), [target, lanes])
@@ -100,6 +114,7 @@ export const StopGoBoard = ({ sessionId, board, faces, viewerId }: StopGoBoardPr
             return (
               <StopGoCar
                 key={player.accountId}
+                accountId={player.accountId}
                 plan={plan}
                 lane={lane}
                 km={player.km}
@@ -107,6 +122,8 @@ export const StopGoBoard = ({ sessionId, board, faces, viewerId }: StopGoBoardPr
                 name={face?.name ?? ''}
                 avatarUrl={face?.avatarUrl ?? null}
                 hasLeft={player.hasLeft}
+                hazards={player.hazards}
+                mark={marks[player.accountId]}
               />
             )
           })}
@@ -119,6 +136,14 @@ export const StopGoBoard = ({ sessionId, board, faces, viewerId }: StopGoBoardPr
         names={Object.fromEntries(faces.map(({ id, name }) => [id, name]))}
         colors={colors}
       />
+      <StopGoHud
+        sessionId={sessionId}
+        board={board}
+        faces={faces}
+        viewerId={viewerId}
+        isSeated={isSeated}
+      />
+      <StopGoFlights flights={flights} viewerId={viewerId} onLand={land} />
       <StopGoProgress
         scroller={scroller}
         plan={plan}

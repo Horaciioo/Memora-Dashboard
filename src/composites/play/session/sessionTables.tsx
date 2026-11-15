@@ -7,6 +7,7 @@ import type { CroquisBoardView } from '@/composites/play/croquis/types'
 import { EchoBoard } from '@/composites/play/echo/EchoBoard'
 import type { EchoBoardView } from '@/composites/play/echo/types'
 import { StopGoBoard } from '@/composites/play/stopgo/board/StopGoBoard'
+import { StopGoFeed } from '@/composites/play/stopgo/hud/StopGoFeed'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
 import { SuspensBoard } from '@/composites/play/suspens/SuspensBoard'
 import type { SuspensBoardView } from '@/composites/play/suspens/types'
@@ -176,16 +177,23 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
-  [PlayGames.StopGo]: ({ sessionId, board, seats, viewerId }) => ({
+  [PlayGames.StopGo]: ({ sessionId, board, seats, spectators, viewerId, me }) => ({
     board: (
       <StopGoBoard
         sessionId={sessionId}
         board={board as StopGoBoardView}
         faces={seats}
         viewerId={viewerId}
+        isSeated={me.isSeated}
       />
     ),
-    feed: null,
+    feed: (
+      <StopGoFeed
+        sessionId={sessionId}
+        board={board as StopGoBoardView}
+        players={[...seats, ...spectators]}
+      />
+    ),
   }),
   [PlayGames.Echo]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
     const echo = board as EchoBoardView

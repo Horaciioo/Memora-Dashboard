@@ -42,6 +42,7 @@ export const STOPGO_HAND = {
   rivals: 'stopgo-rivals',
   hand: 'stopgo-hand',
   slot: 'stopgo-hand-slot',
+  slotDrawn: 'stopgo-hand-slot-drawn',
   tray: 'stopgo-tray',
   trayText: 'stopgo-tray-text',
   targets: 'stopgo-targets',
@@ -64,4 +65,26 @@ export const STOPGO_HAND = {
   offerRow: 'stopgo-offer-row',
   offerLead: 'stopgo-offer-lead',
   offerClock: 'stopgo-offer-clock',
+} as const
+
+/**
+ * Layer of flying cards
+ * @type {Record<string, string>}
+ */
+
+export const STOPGO_FX_STYLES = {
+  layer: 'stopgo-fx-layer',
+  flight: 'stopgo-fx-flight',
+} as const
+
+/**
+ * Elements the animations find on screen
+ * @type {Object}
+ */
+
+export const STOPGO_FX_ANCHORS = {
+  hand: '[data-stopgo-hand]',
+  discard: '[data-stopgo-discard]',
+  panel: (id: string) => `[data-stopgo-panel="${id}"]`,
+  car: (id: string) => `[data-stopgo-car="${id}"]`,
 } as const

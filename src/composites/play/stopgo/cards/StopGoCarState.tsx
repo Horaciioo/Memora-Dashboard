@@ -44,7 +44,7 @@ export const StopGoCarState = ({
   const hazards = player.hazards.filter((hazard) => hazard !== 'limit' || player.isLimited)
 
   return (
-    <section className={STOPGO_HAND.panel} aria-label={name}>
+    <section className={STOPGO_HAND.panel} aria-label={name} data-stopgo-panel={player.accountId}>
       <h3 className={STOPGO_HAND.panelTitle}>{isMe ? STOPGO_HAND_COPY.myCar : name}</h3>
       <p className={STOPGO_HAND.state}>
         {state}

@@ -57,6 +57,11 @@
   "camera": {
     "resumeSeconds": 4
   },
+  "fx": {
+    "flightMs": 650,
+    "markMs": 900,
+    "drawMs": 450
+  },
   "colors": ["red", "blue", "green", "yellow"],
   "feedSize": 40
 }
