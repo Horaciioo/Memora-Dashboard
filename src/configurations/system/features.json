@@ -85,6 +85,7 @@
   "system.logs": true,
   "system.queues": true,
   "system.push": true,
+  "system.mail": true,
   "system.probes": true,
   "system.health": true,
   "system.storage": true,

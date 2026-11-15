@@ -2,13 +2,14 @@ import { VIEW_COPY } from '@/declarations/access/copy'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { FEATURE_COPY } from '@/declarations/features/copy'
 import { PAGE_REGISTRY_COPY } from '@/declarations/pages/copy'
+import { MAIL_CONSOLE_COPY } from '@/declarations/mail/copy'
 import { PUSH_CONSOLE_COPY } from '@/declarations/pwa/copy'
 import type { MaturityName } from '@/declarations/maturity/registries'
 import type { IconName } from '@/declarations/ui/icons'
 
 /**
  * Route key one system screen answers on
- * @type {'storage' | 'journal' | 'queues' | 'push' | 'probes' | 'analytics' | 'health' | 'privileged' | 'administration' | 'systemPages'}
+ * @type {'storage' | 'journal' | 'queues' | 'push' | 'mail' | 'probes' | 'analytics' | 'health' | 'privileged' | 'administration' | 'systemPages'}
  */
 
 export type SystemRouteKey =
@@ -16,6 +17,7 @@ export type SystemRouteKey =
   | 'journal'
   | 'queues'
   | 'push'
+  | 'mail'
   | 'probes'
   | 'analytics'
   | 'health'
@@ -104,6 +106,13 @@ export const SYSTEM_SCREENS: SystemScreen[] = [
     label: PUSH_CONSOLE_COPY.title,
     description: PUSH_CONSOLE_COPY.lead,
     icon: 'bell',
+  },
+  {
+    route: 'mail',
+    group: 'monitoring',
+    label: MAIL_CONSOLE_COPY.title,
+    description: MAIL_CONSOLE_COPY.lead,
+    icon: 'mail',
   },
   {
     route: 'probes',
