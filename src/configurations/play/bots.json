@@ -162,5 +162,23 @@
       "MEDIUM": 0.15,
       "HARD": 0.0
     }
+  },
+  "stopgo": {
+    "thinkMs": {
+      "min": 1200,
+      "max": 3200
+    },
+    "nearFinish": {
+      "EASY": 0.5,
+      "MEDIUM": 0.5,
+      "HARD": 0.35
+    },
+    "revealMargin": {
+      "EASY": 200,
+      "MEDIUM": 100,
+      "HARD": 50
+    },
+    "threatKm": 250,
+    "finishZoneKm": 200
   }
 }

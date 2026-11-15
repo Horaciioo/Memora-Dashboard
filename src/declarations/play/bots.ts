@@ -9,8 +9,10 @@ import type { Bounds } from '@/declarations/configurations/readers'
 import { PlayBotKinds, PlayGames } from '@/utils/constants/play'
 import type { PlayBotKindName, PlayGameName } from '@/utils/constants/play'
 
-// Games whose bots sleep, all for now
-const ASLEEP_GAMES: readonly PlayGameName[] = Object.values(PlayGames)
+// Games whose bots sleep, all but Stop & Go
+const ASLEEP_GAMES: readonly PlayGameName[] = Object.values(PlayGames).filter(
+  (game) => game !== PlayGames.StopGo
+)
 
 /**
  * Bots of a game are awake
@@ -31,6 +33,7 @@ const jumble = readNode(bots.jumble, 'play/bots.jumble')
 const baccalaureat = readNode(bots.baccalaureat, 'play/bots.baccalaureat')
 const golf = readNode(bots.golf, 'play/bots.golf')
 const naval = readNode(bots.naval, 'play/bots.naval')
+const stopgo = readNode(bots.stopgo, 'play/bots.stopgo')
 
 // Levels in menu order
 const LEVELS = Object.values(PlayBotKinds)
@@ -123,6 +126,21 @@ export const PLAY_BOT_SETTINGS = {
     typoRate: perLevel(baccalaureat.typoRate, 'play/bots.baccalaureat.typoRate', 0.06),
     blunderRate: perLevel(baccalaureat.blunderRate, 'play/bots.baccalaureat.blunderRate', 0.02),
     voteMs: delay(baccalaureat.voteMs, 'play/bots.baccalaureat.voteMs'),
+  },
+  stopgo: {
+    thinkMs: delay(stopgo.thinkMs, 'play/bots.stopgo.thinkMs'),
+    nearFinish: perLevel(stopgo.nearFinish, 'play/bots.stopgo.nearFinish', 0.5),
+    revealMargin: perLevel(stopgo.revealMargin, 'play/bots.stopgo.revealMargin', 100),
+    threatKm: readNumber(stopgo.threatKm, {
+      path: 'play/bots.stopgo.threatKm',
+      fallback: 250,
+      min: 25,
+    }),
+    finishZoneKm: readNumber(stopgo.finishZoneKm, {
+      path: 'play/bots.stopgo.finishZoneKm',
+      fallback: 200,
+      min: 25,
+    }),
   },
   golf: {
     thinkMs: delay(golf.thinkMs, 'play/bots.golf.thinkMs'),
