@@ -90,10 +90,11 @@ export const PlayInvitePicker = ({
     },
     {
       title: PLAY_HUB_COPY.invitePlayedWith,
-      people: [...groups[PlayInviteGroups.Recent], ...groups[PlayInviteGroups.PlayedWith]].slice(
-        0,
-        PLAY_INVITE_SHOWN
-      ),
+      // Only people met at a table, the latest game first
+      people: [...groups[PlayInviteGroups.Recent], ...groups[PlayInviteGroups.PlayedWith]]
+        .filter((entry) => entry.hasPlayedWith)
+        .sort((a, b) => b.playedAt - a.playedAt)
+        .slice(0, PLAY_INVITE_SHOWN),
     },
   ]
   const matches = useMemo(

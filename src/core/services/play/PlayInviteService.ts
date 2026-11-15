@@ -99,25 +99,31 @@ export const inviteToSession = async (
 }
 
 /**
- * Members who shared a finished game with a player
+ * Members who shared a game with a player, with the time of the latest one
  * @param {string} accountId - Player
- * @return {Promise<Set<string>>} - Former opponents
+ * @return {Promise<Map<string, number>>} - Former opponents and ms of their latest shared game
  */
 
-const playedWith = async (accountId: string): Promise<Set<string>> => {
+const playedWith = async (accountId: string): Promise<Map<string, number>> => {
   const games = await prisma.playSeat.findMany({
-    where: { accountId, session: { status: PlayStatuses.Finished } },
+    where: {
+      accountId,
+      session: { status: { in: [PlayStatuses.Running, PlayStatuses.Finished] } },
+    },
     orderBy: { joinedAt: 'desc' },
     take: PLAY_SETTINGS.historySize * 4,
     select: { sessionId: true },
   })
   const seats = await prisma.playSeat.findMany({
-    where: { sessionId: { in: games.map((game) => game.sessionId) } },
-    distinct: ['accountId'],
-    select: { accountId: true },
+    where: { sessionId: { in: games.map((game) => game.sessionId) }, accountId: { not: accountId } },
+    select: { accountId: true, joinedAt: true },
   })
+  const latest = new Map<string, number>()
+  for (const { accountId: other, joinedAt } of seats) {
+    latest.set(other, Math.max(latest.get(other) ?? 0, joinedAt.getTime()))
+  }
 
-  return new Set(seats.map((seat) => seat.accountId))
+  return latest
 }
 
 /**
@@ -163,6 +169,7 @@ export const inviteCandidates = async (seated: string[], viewerId: string) => {
   return members.map((member) => ({
     ...member,
     hasPlayedWith: former.has(member.id),
+    playedAt: former.get(member.id) ?? 0,
     isRecent: recent.has(member.id),
   }))
 }
