@@ -160,7 +160,7 @@ export const BOMB_BOARD = {
   letterUsed:
     'text-[var(--play-ink-faint)] line-through decoration-2 decoration-[var(--play-bomb)] opacity-45',
   // Clear of the dock at the bottom
-  stage: 'flex min-w-0 flex-col items-center gap-4',
+  stage: 'flex w-full min-w-0 flex-col items-center gap-4',
   // Square table, seats on an orbit
   table: 'play-bomb-table relative aspect-square w-full max-w-[min(34rem,50dvh)]',
   center: 'absolute top-1/2 left-1/2 w-[36%] -translate-x-1/2 -translate-y-1/2',
