@@ -24,7 +24,7 @@ export const PLAY_HUD = {
   block:
     'flex min-w-0 flex-1 basis-0 items-baseline justify-center gap-2 max-md:flex-col max-md:items-center max-md:gap-1',
   caption: `${CAPTION} max-md:text-[0.65rem] max-md:text-center`,
-  figure: `${FIGURE} whitespace-nowrap max-md:text-xl`,
+  figure: `${FIGURE} whitespace-nowrap max-md:max-w-full max-md:truncate max-md:text-xl`,
   divider: 'w-px self-stretch bg-[var(--play-line)]',
   rule: 'my-1 h-px bg-[var(--play-line)]',
   // Keys and the settings card hanging under them

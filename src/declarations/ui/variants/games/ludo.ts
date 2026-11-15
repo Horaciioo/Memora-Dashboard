@@ -23,9 +23,11 @@ export const LUDO_BOARD = {
   frameFull: 'lg:w-[min(64rem,calc(100dvh-16rem),calc(100vw-24rem))]!',
   // The viewer's turn: blue text, no box
   statusCall: 'text-[var(--play-ludo-call)]',
-  frame: 'ludo-frame max-lg:-mx-2 max-lg:w-auto lg:w-[min(36rem,calc(100dvh-13rem))]',
+  frame:
+    'ludo-frame max-lg:w-[min(calc(100%+1rem),calc(100dvh-18rem))] lg:w-[min(36rem,calc(100dvh-13rem))]',
   // The star is larger, so its frame is too
-  frameStar: 'ludo-frame max-lg:-mx-2 max-lg:w-auto lg:w-[min(46rem,calc(100dvh-13rem))]',
+  frameStar:
+    'ludo-frame max-lg:w-[min(calc(100%+1rem),calc(100dvh-18rem))] lg:w-[min(46rem,calc(100dvh-13rem))]',
   // The viewer's turn: the frame lights in their colour
   frameMine: 'ludo-frame-mine',
   // Call over the board as the turn comes
