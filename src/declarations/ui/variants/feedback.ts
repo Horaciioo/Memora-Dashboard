@@ -70,9 +70,9 @@ export const SKELETON_BASE = 'skeleton-shimmer rounded-[var(--radius-md)] bg-[va
 
 export const EMPTY_STATE_STYLES = {
   frame:
-    'card-surface flex flex-col items-center justify-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] px-6 py-16 text-center',
+    'card-surface relative flex flex-col items-center justify-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] px-6 py-16 after:pointer-events-none after:absolute after:content-[""] after:border after:border-dashed after:border-[var(--color-border-strong)] after:rounded-[var(--radius-lg)] after:inset-3 text-center',
   frameCompact:
-    'card-surface flex flex-col items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] px-6 py-10 text-center',
+    'card-surface relative flex flex-col items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] px-6 py-10 after:pointer-events-none after:absolute after:content-[""] after:border after:border-dashed after:border-[var(--color-border-strong)] after:rounded-[var(--radius-lg)] after:inset-2.5 text-center',
   start: { illustration: 'course-pop h-32 w-32' },
   filter: { illustration: 'course-pop h-28 w-28' },
   compact: { illustration: 'course-pop h-20 w-20' },
@@ -123,6 +123,11 @@ export const TOAST_STYLES = {
   // Duration set inline
   countdown: 'toast-countdown absolute inset-x-0 bottom-0 h-1 origin-left',
   countdownPaused: '[animation-play-state:paused]',
+  // Ongoing: hopping logo, travelling bar instead of the countdown
+  ongoingGlyph: 'play-busy-logo mt-px size-7 shrink-0 object-contain',
+  dots: 'inline-flex gap-px',
+  dot: 'play-busy-dot',
+  running: 'toast-running absolute bottom-0 left-0 h-1 w-1/3',
 } as const
 
 /**

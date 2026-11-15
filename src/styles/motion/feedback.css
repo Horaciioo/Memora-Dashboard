@@ -158,6 +158,28 @@
   }
 }
 
+/* Ongoing toast: a bar travelling along the bottom edge */
+.toast-running {
+  animation: toast-running 1.4s ease-in-out infinite;
+}
+
+@keyframes toast-running {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-running {
+    animation: none;
+    width: 100%;
+    opacity: 0.4;
+  }
+}
+
 /* Notification bubble */
 .nudge-enter {
   transform-origin: left center;

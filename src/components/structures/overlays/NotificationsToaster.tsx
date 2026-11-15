@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
@@ -9,6 +10,7 @@ import { TONE_ICON, TONES } from '@/declarations/ui/theme'
 import { TOAST_STYLES } from '@/declarations/ui/variants'
 import { TOAST_VISIBLE } from '@/declarations/ui/responsive'
 import { ACTION_COPY } from '@/declarations/ui/copy'
+import { APP_ASSETS } from '@/declarations/app'
 import { ICONS } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 
@@ -132,7 +134,17 @@ const Toast = ({
         }}
         className={cn(TOAST_STYLES.toast, !isDragging && TOAST_STYLES.settle)}
       >
-        <ToneIcon className={cn(TOAST_STYLES.glyph, tone.text)} aria-hidden="true" />
+        {notification.isOngoing ? (
+          <Image
+            src={APP_ASSETS.brain}
+            alt=""
+            width={28}
+            height={28}
+            className={TOAST_STYLES.ongoingGlyph}
+          />
+        ) : (
+          <ToneIcon className={cn(TOAST_STYLES.glyph, tone.text)} aria-hidden="true" />
+        )}
         <div className={TOAST_STYLES.body}>
           <p className={TOAST_STYLES.title}>
             <ToastTitle
@@ -140,6 +152,13 @@ const Toast = ({
               emphasis={notification.emphasis}
               isNegative={notification.tone === 'danger'}
             />
+            {notification.isOngoing && (
+              <span className={TOAST_STYLES.dots} aria-hidden="true">
+                <span className={TOAST_STYLES.dot}>.</span>
+                <span className={TOAST_STYLES.dot}>.</span>
+                <span className={TOAST_STYLES.dot}>.</span>
+              </span>
+            )}
           </p>
           {notification.description && (
             <p className={TOAST_STYLES.description}>{notification.description}</p>
@@ -153,16 +172,20 @@ const Toast = ({
         >
           <CloseIcon className={TOAST_STYLES.closeGlyph} aria-hidden="true" />
         </button>
-        <span
-          key={generation}
-          className={cn(
-            TOAST_STYLES.countdown,
-            tone.solid,
-            isSpread && TOAST_STYLES.countdownPaused
-          )}
-          style={{ animationDuration: `${notification.durationMs}ms` }}
-          aria-hidden="true"
-        />
+        {notification.isOngoing ? (
+          <span className={cn(TOAST_STYLES.running, tone.solid)} aria-hidden="true" />
+        ) : (
+          <span
+            key={generation}
+            className={cn(
+              TOAST_STYLES.countdown,
+              tone.solid,
+              isSpread && TOAST_STYLES.countdownPaused
+            )}
+            style={{ animationDuration: `${notification.durationMs}ms` }}
+            aria-hidden="true"
+          />
+        )}
       </div>
     </div>
   )

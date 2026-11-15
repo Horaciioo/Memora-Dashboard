@@ -16,6 +16,7 @@ import type { Tone } from '@/declarations/ui/theme'
  * @property {string} [emphasis] - Substring of the title rendered bold
  * @property {string} [description] - Description
  * @property {number} durationMs - Lifetime
+ * @property {boolean} [isOngoing] - Something is happening right now, stays until settled
  */
 
 export interface Notification {
@@ -25,7 +26,11 @@ export interface Notification {
   emphasis?: string
   description?: string
   durationMs: number
+  isOngoing?: boolean
 }
+
+// What a running notification can change
+export type NotificationPatch = Partial<Omit<Notification, 'id' | 'durationMs'>>
 
 /**
  * Notifications context
@@ -33,6 +38,7 @@ export interface Notification {
  * @property {Notification[]} notifications - Toast queue
  * @property {(notification: Omit<Notification, 'id' | 'durationMs'>) => string} notify - Add notification
  * @property {(error: unknown, fallback?: string) => string} notifyError - Error notification
+ * @property {(id: string, patch: NotificationPatch) => void} update - Change a toast, ending its ongoing state starts its countdown
  * @property {(id: string) => void} dismiss - Dismiss toast
  * @property {() => void} clear - Clear all
  * @property {(id: string) => void} pause - Pause dismiss
@@ -43,6 +49,7 @@ interface NotificationsContextValue {
   notifications: Notification[]
   notify: (notification: Omit<Notification, 'id' | 'durationMs'>) => string
   notifyError: (error: unknown, fallback?: string) => string
+  update: (id: string, patch: NotificationPatch) => void
   dismiss: (id: string) => void
   clear: () => void
   pause: (id: string) => void
@@ -89,12 +96,38 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
       const durationMs = MOTION_TIMERS.autoDismissMs
 
       setNotifications((current) => [...current, { ...notification, id, durationMs }])
-      timers.current.set(
-        id,
-        setTimeout(() => dismiss(id), durationMs)
-      )
+      // An ongoing one waits for its end
+      if (!notification.isOngoing) {
+        timers.current.set(
+          id,
+          setTimeout(() => dismiss(id), durationMs)
+        )
+      }
 
       return id
+    },
+    [dismiss]
+  )
+
+  /**
+   * Change a toast in place
+   * @param {string} id - Notification ID
+   * @param {NotificationPatch} patch - New content
+   * @return {void}
+   */
+
+  const update = useCallback(
+    (id: string, patch: NotificationPatch) => {
+      setNotifications((current) =>
+        current.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry))
+      )
+      // Settled: it now leaves like any other
+      if (patch.isOngoing === false && !timers.current.has(id)) {
+        timers.current.set(
+          id,
+          setTimeout(() => dismiss(id), MOTION_TIMERS.autoDismissMs)
+        )
+      }
     },
     [dismiss]
   )
@@ -142,7 +175,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
       if (timers.current.has(id)) return
 
       const notification = notifications.find((entry) => entry.id === id)
-      if (!notification) return
+      if (!notification || notification.isOngoing) return
 
       timers.current.set(
         id,
@@ -157,12 +190,13 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
       notifications,
       notify,
       notifyError,
+      update,
       dismiss,
       clear: () => setNotifications([]),
       pause,
       resume,
     }),
-    [notifications, notify, notifyError, dismiss, pause, resume]
+    [notifications, notify, notifyError, update, dismiss, pause, resume]
   )
 
   return <NotificationsContext.Provider value={value}>{children}</NotificationsContext.Provider>
