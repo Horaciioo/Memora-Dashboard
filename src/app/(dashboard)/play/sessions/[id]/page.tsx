@@ -16,7 +16,7 @@ import { inviteCandidates, listMessages, listSpectators, readSession } from '@/c
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { nullIfMissing } from '@/core/lib/errors'
 import { ROUTES } from '@/declarations/navigation'
-import { PLAY_GAMES, PLAY_HUB_COPY, playKeysOf } from '@/declarations/play'
+import { PLAY_GAMES, PLAY_HUB_COPY, hudSkinOf, playKeysOf } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION, PLAY_HUB, PLAY_ROOM } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
@@ -147,7 +147,11 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
     })
 
     return (
-      <div className={meta.ground ?? undefined} style={playKeysOf(game.game)}>
+      <div
+        className={meta.ground ?? undefined}
+        style={playKeysOf(game.game)}
+        data-hud-skin={hudSkinOf(game.game, game.board)}
+      >
         <PlaySignal topic={PLAY_TOPICS.session(id)} />
         <PlaySessionRoom
           game={game.game}

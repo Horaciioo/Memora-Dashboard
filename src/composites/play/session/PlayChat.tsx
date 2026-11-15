@@ -227,6 +227,7 @@ export const PlayChat = ({
                 message={item.message}
                 previous={before && 'message' in before ? before.message : undefined}
                 onMenu={menuOn(item.message.author)}
+                isHud={isHud}
               />
             </li>
           )

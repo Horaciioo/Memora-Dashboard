@@ -117,6 +117,10 @@ export const PLAY_VOTE_HUD: VoteLook = {
   root: 'play-room fixed inset-0 z-[80] overflow-y-auto text-white select-none',
   title: `${BLOCK} px-10 py-4 text-center text-4xl font-black tracking-tight text-[var(--play-ink)] sm:text-5xl`,
   lead: 'text-center text-base font-bold text-white/80 sm:text-lg',
+  // Cards also follow the height so two rows fit a short window
+  deck: 'relative flex w-full flex-col items-center py-2 [--vote-card:clamp(4.5rem,min(12vw,14dvh),11rem)] [--vote-gap:clamp(1rem,3vw,3rem)]',
+  // Two lines kept so a long hint never moves the buttons
+  hint: 'min-h-12 max-w-xl px-6 py-2 text-center text-base font-bold text-white/80',
   face: `${BLOCK} relative grid aspect-square w-full place-items-center overflow-hidden transition-[filter,translate] duration-150 group-hover/card:-translate-y-1 group-focus-visible/card:ring-4 group-focus-visible/card:ring-white group-data-[picked=true]/card:bg-[var(--hud-chip)]! group-data-[picked=true]/card:-translate-y-1`,
   faceOn: '',
   faceFramed: '',

@@ -257,6 +257,10 @@ export const PLAY_CHAT_UI = {
   listHud: 'flex flex-col justify-end gap-0.5 overflow-hidden px-2 py-2',
   // Same gap on every side, pill inside the rounded block
   composerHud: 'relative flex items-center gap-2 p-3',
+  // One line per message: author then text, cut with an ellipsis
+  lineHud: 'items-center gap-2 overflow-hidden py-1.5! whitespace-nowrap',
+  bodyHud: 'flex-row items-baseline gap-2 overflow-hidden',
+  textHud: 'min-w-0 truncate whitespace-nowrap',
   inviteHud: 'size-11 rounded-full!',
   inputHud: 'rounded-full! px-5! py-2.5!',
   // Inside the session side column: takes the room left under the players

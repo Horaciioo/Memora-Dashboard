@@ -32,6 +32,7 @@ const follows = (message: PlayMessageView, previous?: PlayMessageView): boolean 
  * @param {PlayMessageView} props.message - Line
  * @param {PlayMessageView} [props.previous] - Chat line just above
  * @param {(event: MouseEvent) => void} props.onMenu - Right click on the author
+ * @param {boolean} [props.isHud] - Single line
  * @return {JSX.Element}
  */
 
@@ -39,17 +40,20 @@ export const PlayChatLine = ({
   message,
   previous,
   onMenu,
+  isHud = false,
 }: {
   message: PlayMessageView
   previous?: PlayMessageView
   onMenu: (event: MouseEvent) => void
+  // Compact HUD chat: one line per message
+  isHud?: boolean
 }) => {
   // Table event: who, and what happened
   if (message.kind !== PlayMessageKinds.Text) {
     return (
-      <div className={PLAY_CHAT_UI.event} onContextMenu={onMenu}>
+      <div className={cn(PLAY_CHAT_UI.event, isHud && PLAY_CHAT_UI.lineHud)} onContextMenu={onMenu}>
         <Avatar name={message.author.name} src={message.author.avatarUrl} size="xs" />
-        <span>
+        <span className={cn(isHud && 'truncate')}>
           <span className={PLAY_CHAT_UI.eventName}>{message.author.name}</span>{' '}
           <span className={cn(PLAY_CHAT_UI.eventVerb, PLAY_CHAT_VERBS[message.kind])}>
             {PLAY_CHAT_EVENTS[message.kind].verb}
@@ -61,18 +65,21 @@ export const PlayChatLine = ({
   }
 
   return follows(message, previous) ? (
-    <p className={cn(PLAY_CHAT_UI.follow, PLAY_CHAT_UI.text)} onContextMenu={onMenu}>
+    <p
+      className={cn(PLAY_CHAT_UI.follow, PLAY_CHAT_UI.text, isHud && PLAY_CHAT_UI.textHud)}
+      onContextMenu={onMenu}
+    >
       {message.body}
     </p>
   ) : (
-    <div className={PLAY_CHAT_UI.message} onContextMenu={onMenu}>
+    <div className={cn(PLAY_CHAT_UI.message, isHud && PLAY_CHAT_UI.lineHud)} onContextMenu={onMenu}>
       <Avatar name={message.author.name} src={message.author.avatarUrl} size="xs" />
-      <div className={PLAY_CHAT_UI.body}>
+      <div className={cn(PLAY_CHAT_UI.body, isHud && PLAY_CHAT_UI.bodyHud)}>
         <span className={PLAY_CHAT_UI.meta}>
           <span className={PLAY_CHAT_UI.author}>{message.author.name}</span>
-          <span className={PLAY_CHAT_UI.time}>{formatClock(message.createdAt)}</span>
+          {!isHud && <span className={PLAY_CHAT_UI.time}>{formatClock(message.createdAt)}</span>}
         </span>
-        <p className={PLAY_CHAT_UI.text}>{message.body}</p>
+        <p className={cn(PLAY_CHAT_UI.text, isHud && PLAY_CHAT_UI.textHud)}>{message.body}</p>
       </div>
     </div>
   )

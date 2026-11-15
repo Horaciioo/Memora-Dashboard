@@ -12,7 +12,7 @@ import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { mostPicked, voteOf } from '@/core/lib/play/vote'
 import type { PlayVoteState } from '@/core/lib/play/vote'
 import { PLAY_GAMES, playKeysOf } from '@/declarations/play/games'
-import { PLAY_HUD_SKINS } from '@/declarations/play/hud'
+import { PLAY_HUD_SKINS, voteSkinOf } from '@/declarations/play/hud'
 import { GOLF_VOTE_COPY } from '@/declarations/play/golf/vote'
 import { PLAY_VOTE_STEPS } from '@/declarations/play/votes'
 import type { PlayVoteStepSpec } from '@/declarations/play/votes'
@@ -96,6 +96,7 @@ const VoteScreen = ({
       className={look.root}
       style={playKeysOf(game)}
       data-hud={hasHud ? game.toLowerCase() : undefined}
+      data-hud-skin={voteSkinOf(game, vote, leader)}
       role="dialog"
       aria-label={spec.title}
     >

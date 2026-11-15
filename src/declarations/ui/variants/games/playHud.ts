@@ -39,10 +39,11 @@ export const PLAY_HUD = {
   setting:
     'flex items-center justify-start gap-3 px-1 py-1.5 text-left text-base font-extrabold text-[var(--play-ink)]',
   soundRow: 'flex flex-col gap-1 px-1 py-1.5 text-base font-extrabold text-[var(--play-ink)]',
-  // Score card bottom left, live lines above the ranking
+  // Game boxes, set aside on the left
   lead: 'absolute top-1/2 left-3 -translate-y-1/2 max-md:hidden md:left-7',
+  // Score card, always resting on the chat
   corner:
-    'absolute bottom-3 left-3 flex max-w-[40vw] flex-col items-start gap-3 max-md:hidden md:bottom-7 md:left-7',
+    'absolute right-3 bottom-[22.5rem] flex w-80 max-w-[40%] flex-col items-end [&>*]:w-full max-md:hidden md:right-7',
   panel: `${BLOCK} pointer-events-auto flex w-72 max-w-full flex-col overflow-hidden`,
   head: 'flex items-center justify-between gap-2 px-4 py-3',
   title:
