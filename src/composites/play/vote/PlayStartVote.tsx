@@ -46,7 +46,14 @@ const cardsOf = (spec: PlayVoteStepSpec, look: VoteLook, faceOf?: PlayVoteFace):
       ) : Icon ? (
         <Icon className={look.glyph} aria-hidden="true" />
       ) : (
-        <span className={look.number}>{choice.key}</span>
+        <span
+          className={look.number}
+          style={{
+            fontSize: `calc(var(--vote-card) * ${Math.min(0.52, 1.4 / choice.key.length)})`,
+          }}
+        >
+          {choice.key}
+        </span>
       ),
     }
   })

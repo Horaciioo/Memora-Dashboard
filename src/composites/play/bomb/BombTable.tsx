@@ -7,11 +7,13 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { BombDrawing } from '@/composites/play/bomb/BombDrawing'
 import { BombHearts } from '@/composites/play/bomb/BombHearts'
 import type { BombFace } from '@/composites/play/bomb/types'
+import { usePlayPref } from '@/core/store/play/playPrefs'
 import { forwardAngle, seatAngle } from '@/core/lib/play/bomb/table'
 import { BOMB_BOARD_COPY, BOMB_MISS_COPY, fillPlayMessage } from '@/declarations/play'
 import type { BombMissReason } from '@/declarations/play'
 import { BOMB_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+import { PlayGames } from '@/utils/constants/play'
 
 export interface BombTableProps {
   seats: BombFace[]
@@ -42,6 +44,8 @@ export const BombTable = ({
   heat,
   maxLives,
 }: BombTableProps) => {
+  const hasShake = usePlayPref(PlayGames.Bomb, 'shake')
+  const hasWords = usePlayPref(PlayGames.Bomb, 'words')
   const index = seats.findIndex((seat) => seat.accountId === turnId)
   const target = seatAngle(Math.max(0, index), seats.length)
   // Arrow keeps turning the same way
@@ -60,7 +64,7 @@ export const BombTable = ({
       <BombDrawing
         prompt={prompt}
         heat={heat}
-        isBlasting={Boolean(blastId)}
+        isBlasting={hasShake && Boolean(blastId)}
         className={BOMB_BOARD.center}
       />
 
@@ -74,7 +78,7 @@ export const BombTable = ({
               BOMB_BOARD.seat,
               isTurn && BOMB_BOARD.seatTurn,
               (seat.isOut || seat.hasLeft) && BOMB_BOARD.seatOut,
-              seat.accountId === blastId && BOMB_BOARD.seatBlast
+              hasShake && seat.accountId === blastId && BOMB_BOARD.seatBlast
             )}
             style={{ '--angle': `${seatAngle(place, seats.length)}deg` } as CSSProperties}
           >
@@ -84,10 +88,10 @@ export const BombTable = ({
               <BombHearts lives={seat.lives} max={maxLives} />
             )}
             <Avatar name={seat.name} src={seat.avatarUrl} size="md" />
-            {!(isTurn && (draft || miss)) && seat.lastWord && (
+            {hasWords && !(isTurn && (draft || miss)) && seat.lastWord && (
               <span className={BOMB_BOARD.lastWord}>{seat.lastWord}</span>
             )}
-            {isTurn && (draft || miss) && (
+            {hasWords && isTurn && (draft || miss) && (
               <span className={cn(BOMB_BOARD.draft, miss && BOMB_BOARD.draftMiss)}>
                 {miss?.word ?? draft}
               </span>

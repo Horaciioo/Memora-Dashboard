@@ -1,5 +1,3 @@
-import { BACCALAUREAT_CATEGORIES } from '@/declarations/play/baccalaureat/categories'
-import { BACCALAUREAT_PACKS } from '@/declarations/play/baccalaureat/packs'
 import { BOMB_SETUP_COPY } from '@/declarations/play/bomb/copy'
 import { BOMB_SETTINGS } from '@/declarations/play/bomb/settings'
 import type { BombLevel } from '@/declarations/play/bomb/settings'
@@ -56,14 +54,14 @@ export interface PlayVoteStepSpec {
   isAsked?: (seated: number) => boolean
 }
 
-// Bac formats offered, the flash one is its own format
-const BAC_FORMATS = [
-  ...(['classic', 'popCulture', 'twitch'] as const).map((key) => ({
-    key: key as string,
-    label: BACCALAUREAT_PACKS[key].label,
-    hint: `${BACCALAUREAT_PACKS[key].categories.map((id) => BACCALAUREAT_CATEGORIES[id].label).join(', ')}.`,
+// Bac modes offered, categories are the host's pick in the drawer
+const BAC_MODES = [
+  {
+    key: 'normal',
+    label: 'Normal',
+    hint: 'Les catégories choisies par l’hôte, une durée au choix.',
     icon: 'playLetters' as IconName,
-  })),
+  },
   {
     key: 'flash',
     label: 'Éclair',
@@ -105,10 +103,10 @@ const ROUNDS_COPY = {
 export const PLAY_VOTE_STEPS: Partial<Record<PlayGameName, PlayVoteStepSpec[]>> = {
   [PlayGames.Baccalaureat]: [
     {
-      key: 'pack',
-      title: 'Format',
-      lead: 'Choisis les catégories ou le mode éclair.',
-      choices: BAC_FORMATS,
+      key: 'mode',
+      title: 'Mode',
+      lead: 'Partie normale ou mode éclair ?',
+      choices: BAC_MODES,
     },
     {
       key: 'rounds',
@@ -384,8 +382,7 @@ export const PLAY_VOTE_SETTINGS: Partial<
   Record<PlayGameName, (chosen: Record<string, string>, seated: number) => Record<string, unknown>>
 > = {
   [PlayGames.Baccalaureat]: (chosen) => ({
-    flash: chosen.pack === 'flash',
-    ...(chosen.pack !== 'flash' && { pack: chosen.pack }),
+    flash: chosen.mode === 'flash',
     rounds: Number(chosen.rounds),
   }),
   [PlayGames.Bomb]: (chosen) => ({

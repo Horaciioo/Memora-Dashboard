@@ -47,30 +47,41 @@ const FORWARDED: string[] = [
 /**
  * Read the game once, then send each reader its own board
  * @param {string} sessionId - Game
- * @param {PlayRoom} room - Readers
+ * @param {Iterable<RealtimeConnection>} readers - Sockets to serve
  * @return {Promise<void>} - Sent
  */
 
-const sendBoards = async (sessionId: string, room: PlayRoom): Promise<void> => {
+const sendBoards = async (
+  sessionId: string,
+  readers: Iterable<RealtimeConnection>
+): Promise<void> => {
   const session = await loadSession(sessionId)
   if (session.status === PlayStatuses.Lobby) return
 
   const engine = engineOf(session.game)
   const table = toEngineSession(session)
   const topic = PLAY_TOPICS.session(sessionId)
-  // One view per member, whatever their tabs
-  const byViewer = new Map<string, RealtimeConnection[]>()
-  for (const member of room.members) {
-    byViewer.set(member.session.id, [...(byViewer.get(member.session.id) ?? []), member])
+
+  // Same board for all, one frame serialised once
+  if (engine.isViewShared) {
+    const frame = eventFrame(topic, PLAY_STREAM_EVENTS.board, {
+      board: await engine.view(table, ''),
+    })
+    for (const member of readers) member.send(frame)
+    return
   }
 
-  // One read when boards match, or one read drawn for each reader
-  const shared = engine.isViewShared ? engine.view(table, '') : null
-  const drawFor = shared ? null : await engine.viewFor?.(table)
+  // One view per member, whatever their tabs
+  const byViewer = new Map<string, RealtimeConnection[]>()
+  for (const member of readers) {
+    byViewer.set(member.session.id, [...(byViewer.get(member.session.id) ?? []), member])
+  }
+  // One read drawn for each reader, else one read each
+  const drawFor = await engine.viewFor?.(table)
 
   await Promise.all(
     [...byViewer].map(async ([viewerId, members]) => {
-      const board = drawFor ? drawFor(viewerId) : await (shared ?? engine.view(table, viewerId))
+      const board = drawFor ? drawFor(viewerId) : await engine.view(table, viewerId)
       const frame = eventFrame(topic, PLAY_STREAM_EVENTS.board, { board })
       for (const member of members) member.send(frame)
     })
@@ -93,7 +104,7 @@ const pushBoards = async (sessionId: string, room: PlayRoom): Promise<void> => {
   do {
     room.isQueued = false
     try {
-      await sendBoards(sessionId, room)
+      await sendBoards(sessionId, room.members)
     } catch (error) {
       logger.warn('[play] board push failed', error)
     }
@@ -174,8 +185,10 @@ export const joinPlayRoom = async (
   const leavePresence = isInvited
     ? joinPresence(PLAY_TOPICS.session(sessionId), connection)
     : () => {}
-  // The newcomer's board, missed moves included
-  void pushBoards(sessionId, room)
+  // Only the newcomer's board, missed moves included
+  void sendBoards(sessionId, [connection]).catch((error: unknown) =>
+    logger.warn('[play] board push failed', error)
+  )
 
   return () => {
     leavePresence()

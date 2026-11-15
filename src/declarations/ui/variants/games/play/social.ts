@@ -200,7 +200,7 @@ export const PLAY_ROOM = {
   summaryEnd: 'ml-auto',
   // The table: one card per seat, two across on a phone
   table:
-    'grid w-full grid-cols-2 justify-center gap-3 py-1 sm:grid-cols-[repeat(var(--cols),9rem)] md:gap-4 lg:min-h-0 lg:flex-1 lg:auto-rows-fr lg:content-center',
+    'grid w-full grid-cols-2 justify-center gap-3 py-1 sm:grid-cols-[repeat(var(--cols),9rem)] md:gap-4',
   seat: `play-seat ${PANEL} relative flex min-w-0 flex-col items-center gap-1.5 px-2 pt-6 pb-4 text-center transition-[opacity,box-shadow] duration-300 rounded-3xl`,
   seatReady: 'shadow-[var(--shadow-md)]',
   seatIdle: 'opacity-75',
@@ -221,7 +221,7 @@ export const PLAY_ROOM = {
   seatKickIcon: 'size-3.5',
   seatAction: 'mt-1.5 w-full',
   // Empty seat, one tap opens the picker
-  slot: 'flex min-h-40 lg:min-h-28 w-full flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-[var(--play-line)] text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
+  slot: 'flex min-h-40 lg:min-h-36 w-full flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-[var(--play-line)] text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
   slotIcon: 'grid size-12 place-items-center rounded-full bg-[var(--play-chip)]',
   slotIconSvg: 'size-5',
   slotLabel: 'text-xs font-extrabold tracking-wider uppercase',
@@ -236,7 +236,7 @@ export const PLAY_ROOM = {
   shareLabel:
     'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
   shareCode: 'text-3xl font-extrabold tracking-[0.35em] text-[var(--play-ink)] sm:text-4xl',
-  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 rounded-[2rem] p-5 sm:p-8 lg:min-h-0 lg:flex-1 lg:justify-between lg:gap-3 lg:p-6`,
+  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 rounded-[2rem] p-5 sm:p-8 lg:gap-4 lg:p-6`,
   // Plain column, flows under the players
   actions: 'flex w-full max-w-sm flex-col gap-3',
   // Quiet way out, under the main key
