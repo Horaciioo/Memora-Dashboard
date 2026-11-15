@@ -74,6 +74,11 @@ export const STOPGO_SETTINGS = {
   }),
   turnStep: readInteger(stopgo.turnStep, { path: 'play/stopgo.turnStep', fallback: 5, min: 1 }),
   strikes: readInteger(stopgo.strikes, { path: 'play/stopgo.strikes', fallback: 3, min: 1 }),
+  afkSeconds: readInteger(stopgo.afkSeconds, {
+    path: 'play/stopgo.afkSeconds',
+    fallback: 5,
+    min: 1,
+  }),
   reshuffles: readInteger(stopgo.reshuffles, {
     path: 'play/stopgo.reshuffles',
     fallback: 2,

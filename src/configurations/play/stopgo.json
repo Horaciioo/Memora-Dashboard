@@ -31,6 +31,7 @@
   },
   "turnStep": 5,
   "strikes": 3,
+  "afkSeconds": 5,
   "reshuffles": 2,
   "immunity": {
     "seconds": 6

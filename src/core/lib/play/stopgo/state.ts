@@ -52,3 +52,69 @@ export const freshCar = (): StopGoCar => ({
   hazards: [],
   jokers: { immunity: true, cleanup: true },
 })
+
+/**
+ * Card in a hand
+ * @typedef {Object} StopGoHandCard
+ * @property {boolean} [isPicking] - One of two cards of a Good draw still to choose
+ */
+
+export interface StopGoHandCard extends StopGoCard {
+  isPicking?: boolean
+}
+
+/**
+ * Seat of a race as stored
+ * @typedef {Object} StopGoSeatState
+ */
+
+export interface StopGoSeatState {
+  id: string
+  accountId: string
+  slot: number
+  km: number
+  hand: StopGoHandCard[]
+  // Mystery cards, read by the mystery service only
+  sealed: unknown
+  isGreen: boolean
+  hazards: StopGoHazard[]
+  immunityUsedAt: Date | null
+  cleanupUsedAt: Date | null
+  strikes: number
+  finishedAt: Date | null
+  place: number | null
+}
+
+/**
+ * Race clock and piles as stored
+ * @typedef {Object} StopGoGameState
+ */
+
+export interface StopGoGameState {
+  phase: string
+  turnId: string
+  turnNo: number
+  rev: number
+  startsAt: Date
+  turnEndsAt: Date
+  drawPile: StopGoCard[]
+  discard: StopGoCard[]
+  reshuffles: number
+  pending: unknown
+  pendingEndsAt: Date | null
+}
+
+/**
+ * Line of the public log
+ * @typedef {Object} StopGoLogLine
+ */
+
+export interface StopGoLogLine {
+  rev: number
+  kind: string
+  accountId: string
+  targetIds: string[]
+  card: StopGoCardKey | null
+  km: number | null
+  value: number | null
+}

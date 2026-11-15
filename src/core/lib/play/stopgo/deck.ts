@@ -26,12 +26,12 @@ export const buildDeck = (counts: Record<StopGoCardKey, number>): StopGoCard[] =
 
 /**
  * Fisher-Yates shuffle
- * @param {StopGoCard[]} cards - Cards
+ * @param {T[]} cards - Items
  * @param {Random} random - Random source
- * @return {StopGoCard[]} - New array
+ * @return {T[]} - New array
  */
 
-export const shuffle = (cards: StopGoCard[], random: Random): StopGoCard[] => {
+export const shuffle = <T>(cards: T[], random: Random): T[] => {
   const result = [...cards]
 
   // Swap from the end

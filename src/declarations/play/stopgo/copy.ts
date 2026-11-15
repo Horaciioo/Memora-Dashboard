@@ -45,4 +45,9 @@ export const STOPGO_ERRORS: Record<StopGoRefusal, string> = {
   alreadyHit: 'Cet adversaire subit déjà ce malus.',
   jokerSpent: 'Ce Joker est déjà utilisé.',
   nothingToClean: 'Aucun malus à nettoyer.',
+  notYourTurn: 'Ce n’est pas ton tour.',
+  staleTurn: 'Ce tour est déjà passé.',
+  notInHand: 'Cette carte n’est pas dans ta main.',
+  raceOver: 'La course est terminée.',
+  notYet: 'Cette carte n’est pas encore jouable.',
 }

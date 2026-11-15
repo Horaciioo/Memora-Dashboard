@@ -17,6 +17,11 @@ export const StopGoRefusals = {
   AlreadyHit: 'alreadyHit',
   JokerSpent: 'jokerSpent',
   NothingToClean: 'nothingToClean',
+  NotYourTurn: 'notYourTurn',
+  StaleTurn: 'staleTurn',
+  NotInHand: 'notInHand',
+  RaceOver: 'raceOver',
+  NotYet: 'notYet',
 } as const
 
 export type StopGoRefusal = (typeof StopGoRefusals)[keyof typeof StopGoRefusals]

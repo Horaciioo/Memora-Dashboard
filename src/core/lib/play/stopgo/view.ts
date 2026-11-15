@@ -1,0 +1,140 @@
+import { STOPGO_CARDS, StopGoTargets } from '@/declarations/play/stopgo/cards'
+import type { StopGoCardKey } from '@/declarations/play/stopgo/cards'
+import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
+import { StopGoPhases } from '@/utils/constants/play'
+
+import { canPlay, isMoving, opponentsOf } from '@/core/lib/play/stopgo/rules'
+import type { StopGoGameSettings } from '@/core/lib/play/stopgo/settings'
+import type {
+  StopGoGameState,
+  StopGoLogLine,
+  StopGoSeatState,
+  StopGoTable,
+} from '@/core/lib/play/stopgo/state'
+import { carOf, isOpenCard, raceOf } from '@/core/lib/play/stopgo/turn'
+
+/**
+ * Everything one read of a race holds
+ * @typedef {Object} StopGoViewInput
+ */
+
+export interface StopGoViewInput {
+  settings: StopGoGameSettings
+  game: StopGoGameState
+  seats: StopGoSeatState[]
+  log: StopGoLogLine[]
+  present: ReadonlySet<string>
+  now: Date
+}
+
+/**
+ * Opponents a card may aim at, null when it cannot be played
+ * @param {StopGoCardKey} key - Card
+ * @param {string} accountId - Player on turn
+ * @param {StopGoTable} race - Race
+ * @return {string[] | null} - Targets, empty for a card without one
+ */
+
+const targetsFor = (key: StopGoCardKey, accountId: string, race: StopGoTable): string[] | null => {
+  const spec = STOPGO_CARDS[key]
+  if (!isOpenCard(key)) return null
+  if (spec.target === StopGoTargets.None) return canPlay(key, accountId, [], race) ? null : []
+
+  // Opponents not already hit by this malus
+  const aimable = opponentsOf(race, accountId).filter(
+    (id) => !spec.hazard || !race.cars[id].hazards.includes(spec.hazard)
+  )
+  if (spec.target === StopGoTargets.One) return aimable.length ? aimable : null
+
+  return canPlay(key, accountId, aimable, race) ? null : aimable
+}
+
+/**
+ * Hand of the reader with the moves each card allows
+ * @param {StopGoViewInput} input - One read of the race
+ * @param {StopGoSeatState} seat - Seat of the reader
+ * @return {object} - Private part of the board
+ */
+
+const privateOf = ({ game, seats, settings }: StopGoViewInput, seat: StopGoSeatState) => {
+  const isTurn =
+    game.phase === StopGoPhases.Playing && game.turnId === seat.accountId && !game.pending
+  const racing = seats.filter((entry) => !entry.finishedAt)
+  const race = raceOf(racing, settings.target)
+
+  return {
+    hand: seat.hand.map((card) => ({ id: card.id, key: card.key })),
+    // Card id to the targets it may aim at
+    playable: Object.fromEntries(
+      isTurn
+        ? seat.hand
+            .filter((card) => !card.isPicking)
+            .map((card) => [card.id, targetsFor(card.key, seat.accountId, race)] as const)
+            .filter(([, targets]) => targets)
+        : []
+    ),
+  }
+}
+
+/**
+ * Boards of a race, one per reader, built field by field
+ * @param {StopGoViewInput} input - One read of the race
+ * @return {(viewerId: string) => object} - Board of a reader
+ */
+
+export const buildBoards = (input: StopGoViewInput) => {
+  const { settings, game, seats, log, present, now } = input
+  const top = game.discard.at(-1)
+  const players = seats.map((seat) => {
+    const car = carOf(seat)
+
+    return {
+      accountId: seat.accountId,
+      slot: seat.slot,
+      km: seat.km,
+      isGreen: seat.isGreen,
+      isMoving: isMoving(car),
+      hazards: seat.hazards,
+      isLimited: seat.hazards.includes('limit'),
+      jokers: car.jokers,
+      handCount: seat.hand.length,
+      strikes: seat.strikes,
+      place: seat.place,
+      hasLeft: !present.has(seat.accountId),
+    }
+  })
+
+  const board = {
+    phase: game.phase,
+    rev: game.rev,
+    turnId: game.turnId,
+    turnNo: game.turnNo,
+    startsAt: game.startsAt,
+    turnEndsAt: game.turnEndsAt,
+    serverTime: now,
+    target: settings.target,
+    turnSeconds: settings.turnSeconds,
+    mapKm: STOPGO_SETTINGS.mapKm,
+    signKm: STOPGO_SETTINGS.signKm,
+    pileCount: game.drawPile.length,
+    discardCount: game.discard.length,
+    discardTop: top ? top.key : null,
+    players,
+    log: log.map((line) => ({
+      rev: line.rev,
+      kind: line.kind,
+      accountId: line.accountId,
+      targetIds: line.targetIds,
+      card: line.card,
+      km: line.km,
+      value: line.value,
+    })),
+  }
+
+  return (viewerId: string) => {
+    const seat = seats.find((entry) => entry.accountId === viewerId)
+
+    // Spectators and admins read the public part only
+    return { ...board, you: seat ? privateOf(input, seat) : null }
+  }
+}
