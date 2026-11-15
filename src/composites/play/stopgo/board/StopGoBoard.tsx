@@ -8,6 +8,7 @@ import { useStopGoFx } from '@/composites/play/stopgo/fx/useStopGoFx'
 import { StopGoResult } from '@/composites/play/stopgo/result/StopGoResult'
 import { StopGoHud } from '@/composites/play/stopgo/hud/StopGoHud'
 import { StopGoCar } from '@/composites/play/stopgo/board/StopGoCar'
+import { StopGoMeadow } from '@/composites/play/stopgo/board/StopGoMeadow'
 import { StopGoDecor } from '@/composites/play/stopgo/board/StopGoDecor'
 import { StopGoSigns } from '@/composites/play/stopgo/board/StopGoSigns'
 import { StopGoProgress } from '@/composites/play/stopgo/board/StopGoProgress'
@@ -21,7 +22,8 @@ import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import type { StopGoCarColor } from '@/declarations/play/stopgo/art'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { STOPGO_TRACK } from '@/declarations/play/stopgo/track'
-import { StopGoPhases } from '@/utils/constants/play'
+import { PlayGames, StopGoPhases } from '@/utils/constants/play'
+import { usePlayPref } from '@/core/store/play/playPrefs'
 
 export interface StopGoBoardProps {
   sessionId: string
@@ -51,6 +53,7 @@ export const StopGoBoard = ({
   const board = usePlainBoard(sessionId, initial)
   const isMobile = useIsMobileShell()
   const { flights, marks, land } = useStopGoFx(board)
+  const hasFlights = usePlayPref(PlayGames.StopGo, 'flights')
   const { players, target } = board
   const lanes = players.length
   const plan = useMemo(() => trackOf(target, lanes), [target, lanes])
@@ -94,7 +97,7 @@ export const StopGoBoard = ({
     <div className="relative size-full">
       <div
         ref={scroller}
-        className="size-full touch-pan-y [scrollbar-width:none] overflow-x-hidden overflow-y-auto overscroll-contain"
+        className="stopgo-ground size-full touch-pan-y [scrollbar-width:none] overflow-x-hidden overflow-y-auto overscroll-contain"
       >
         <svg
           viewBox={`${plan.minX} ${viewTop} ${plan.width} ${height}`}
@@ -114,6 +117,9 @@ export const StopGoBoard = ({
               />
             </pattern>
           </defs>
+          {maps.map((map) => (
+            <StopGoMeadow key={`meadow-${map}`} plan={plan} seed={sessionId} map={map} />
+          ))}
           {maps.map((map) => (
             <StopGoDecor key={map} plan={plan} seed={sessionId} map={map} />
           ))}
@@ -155,7 +161,7 @@ export const StopGoBoard = ({
         viewerId={viewerId}
         isSeated={isSeated}
       />
-      <StopGoFlights flights={flights} viewerId={viewerId} onLand={land} />
+      {hasFlights && <StopGoFlights flights={flights} viewerId={viewerId} onLand={land} />}
       <StopGoProgress
         scroller={scroller}
         plan={plan}

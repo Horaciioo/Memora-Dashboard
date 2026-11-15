@@ -24,6 +24,7 @@ export const StopGoFamilies = {
   Attack: 'attack',
   Remedy: 'remedy',
   Bonus: 'bonus',
+  Safety: 'safety',
 } as const
 
 export type StopGoFamily = (typeof StopGoFamilies)[keyof typeof StopGoFamilies]
@@ -95,6 +96,11 @@ const remedy = (hazard: StopGoHazard): StopGoCardSpec => ({
   hazard,
 })
 
+const safety = (): StopGoCardSpec => ({
+  family: StopGoFamilies.Safety,
+  target: StopGoTargets.None,
+})
+
 const bonus = (target: StopGoTarget): StopGoCardSpec => ({
   family: StopGoFamilies.Bonus,
   target,
@@ -121,6 +127,10 @@ export const STOPGO_CARDS = {
   petrol: remedy('fuel'),
   spare: remedy('flat'),
   repair: remedy('crash'),
+  siren: safety(),
+  tank: safety(),
+  tyres: safety(),
+  ace: safety(),
   goodDraw: bonus(StopGoTargets.None),
   mystery: bonus(StopGoTargets.One),
 } satisfies Record<string, StopGoCardSpec>
@@ -130,13 +140,26 @@ export type StopGoCardKey = keyof typeof STOPGO_CARDS
 export const STOPGO_CARD_KEYS = Object.keys(STOPGO_CARDS) as StopGoCardKey[]
 
 /**
- * Jokers, one token each
- * @type {Record<string, string>}
+ * Safeties, kept in hand then laid down for good: hazards each one stops
+ * @type {Object}
  */
 
-export const StopGoJokers = {
-  Immunity: 'immunity',
-  Cleanup: 'cleanup',
-} as const
+export const STOPGO_SAFETIES = {
+  siren: ['red', 'limit'],
+  tank: ['fuel'],
+  tyres: ['flat'],
+  ace: ['crash'],
+} as const satisfies Record<string, readonly StopGoHazard[]>
 
-export type StopGoJoker = (typeof StopGoJokers)[keyof typeof StopGoJokers]
+export type StopGoSafety = keyof typeof STOPGO_SAFETIES
+
+export const STOPGO_SAFETY_KEYS = Object.keys(STOPGO_SAFETIES) as StopGoSafety[]
+
+/**
+ * Safety that stops a hazard
+ * @param {StopGoHazard} hazard - Attack key
+ * @return {StopGoSafety} - Safety
+ */
+
+export const safetyAgainst = (hazard: StopGoHazard): StopGoSafety =>
+  STOPGO_SAFETY_KEYS.find((key) => (STOPGO_SAFETIES[key] as readonly string[]).includes(hazard))!

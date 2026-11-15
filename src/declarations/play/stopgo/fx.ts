@@ -42,7 +42,7 @@ export const STOPGO_FX: Record<string, StopGoFxSpec> = {
   attack: { sound: 'attack', flight: 'toTargets' },
   remedy: { sound: 'remedy', flight: 'toSelf' },
   shield: { sound: 'joker', flight: 'toDiscard', mark: 'shield' },
-  sweep: { sound: 'joker', mark: 'sweep' },
+  counter: { sound: 'joker', flight: 'toSelf', mark: 'shield' },
   draw: { sound: 'draw' },
   mystery: { sound: 'attack', flight: 'toTargets', isBack: true },
   reveal: { sound: 'joker' },

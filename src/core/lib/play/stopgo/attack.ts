@@ -1,21 +1,23 @@
-import type { StopGoCardKey } from '@/declarations/play/stopgo/cards'
+import { STOPGO_CARDS } from '@/declarations/play/stopgo/cards'
+import type { StopGoCardKey, StopGoHazard } from '@/declarations/play/stopgo/cards'
 
-import type { StopGoTable } from '@/core/lib/play/stopgo/state'
+import { counterOf } from '@/core/lib/play/stopgo/rules'
+import type { StopGoCard, StopGoTable } from '@/core/lib/play/stopgo/state'
 
 /**
- * Attack waiting on the answers of its targets
+ * Attack waiting for a safety played out of turn (coup fourré)
  * @typedef {Object} StopGoWindow
- * @property {'immunity'} kind - Window type
+ * @property {'counter'} kind - Window type
  * @property {string} cardId - Attack card, consumed once the window closes
  * @property {StopGoCardKey} card - Attack kind
  * @property {string} fromId - Attacker
  * @property {string[]} targets - Players aimed at
- * @property {string[]} waiting - Targets who still have to answer
- * @property {string[]} saved - Targets who played their Immunity
+ * @property {string[]} waiting - Targets holding the matching safety who have not answered
+ * @property {string[]} saved - Targets who played it, in order
  */
 
 export interface StopGoWindow {
-  kind: 'immunity'
+  kind: 'counter'
   cardId: string
   card: StopGoCardKey
   fromId: string
@@ -33,24 +35,37 @@ export interface StopGoWindow {
 export const windowOf = (pending: unknown): StopGoWindow | null => {
   const window = pending as StopGoWindow | null
 
-  return window?.kind === 'immunity' ? window : null
+  return window?.kind === 'counter' ? window : null
 }
 
 /**
- * Targets who can still cancel the attack
- * @param {string[]} targets - Players aimed at
- * @param {StopGoTable} table - Race
- * @return {string[]} - Targets holding their Immunity
+ * Hazard an attack card poses
+ * @param {StopGoCardKey} card - Attack
+ * @return {StopGoHazard} - Hazard
  */
 
-export const respondersOf = (targets: string[], table: StopGoTable): string[] =>
-  targets.filter((id) => table.cars[id]?.jokers.immunity)
+export const hazardOf = (card: StopGoCardKey): StopGoHazard =>
+  STOPGO_CARDS[card].hazard as StopGoHazard
+
+/**
+ * Targets who hold the matching safety in hand
+ * @param {string[]} targets - Players aimed at
+ * @param {StopGoCardKey} card - Attack
+ * @param {Record<string, StopGoCard[]>} hands - Hand per player
+ * @return {string[]} - Targets able to counter
+ */
+
+export const respondersOf = (
+  targets: string[],
+  card: StopGoCardKey,
+  hands: Record<string, StopGoCard[]>
+): string[] => targets.filter((id) => counterOf(hands[id] ?? [], hazardOf(card)))
 
 /**
  * Window after one target answered
  * @param {StopGoWindow} window - Open window
  * @param {string} accountId - Target who answers
- * @param {boolean} isSaved - Immunity played
+ * @param {boolean} isSaved - Safety played
  * @return {StopGoWindow} - New window
  */
 
@@ -68,7 +83,7 @@ export const answerWindow = (
  * Targets who suffer the attack once the window closes
  * @param {StopGoWindow} window - Window
  * @param {StopGoTable} table - Race
- * @return {string[]} - Targets without a played Immunity, still racing
+ * @return {string[]} - Targets without a played safety, still racing
  */
 
 export const hitBy = (window: StopGoWindow, table: StopGoTable): string[] =>

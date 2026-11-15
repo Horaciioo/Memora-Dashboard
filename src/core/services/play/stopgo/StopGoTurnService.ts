@@ -3,10 +3,10 @@ import 'server-only'
 import { readBodyList } from '@/core/lib/play/parse'
 import { applyCard, canPlay, isOpenCard, raceOf } from '@/core/lib/play/stopgo'
 import type { StopGoHandCard } from '@/core/lib/play/stopgo'
-import { passTurn, closeRace } from '@/core/services/play/stopgo/StopGoFlowService'
+import { closeRace, giveTurn, passTurn } from '@/core/services/play/stopgo/StopGoFlowService'
 import { launchAttack } from '@/core/services/play/stopgo/StopGoAttackService'
 import { refuse, requireTurn } from '@/core/services/play/stopgo/StopGoGuards'
-import { releaseCard } from '@/core/services/play/stopgo/StopGoHand'
+import { layCard, releaseCard } from '@/core/services/play/stopgo/StopGoHand'
 import { openGoodDraw } from '@/core/services/play/stopgo/StopGoDrawService'
 import { sealMystery } from '@/core/services/play/stopgo/StopGoMysteryService'
 import { racing, saveCars, seatOf, withTable } from '@/core/services/play/stopgo/StopGoTable'
@@ -89,13 +89,23 @@ export const playCard = (
 
     // An attack waits for the answers of its targets
     if (STOPGO_CARDS[card.key].family === StopGoFamilies.Attack) {
-      return launchAttack(table, accountId, card, targets, race)
+      return launchAttack(table, accountId, card, targets)
     }
 
     // Bonus cards
     if (card.key === 'goodDraw') return openGoodDraw(table, accountId, card)
     if (card.key === 'mystery') return sealMystery(table, accountId, card, targets)
     const after = applyCard(card.key, accountId, targets, race)
+
+    // A safety stays on the car and gives another turn
+    if (STOPGO_CARDS[card.key].family === StopGoFamilies.Safety) {
+      await saveCars(table, race, after)
+      await layCard(table, accountId, card)
+
+      return giveTurn(table, accountId, [
+        { kind: StopGoMoveKinds.Safety, accountId, card: card.key },
+      ])
+    }
 
     await saveCars(table, race, after)
     await releaseCard(table, accountId, card)

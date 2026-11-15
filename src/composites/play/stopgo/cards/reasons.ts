@@ -28,6 +28,7 @@ export const reasonOf = (key: StopGoCardKey, me: Player, target: number): string
   if (spec.family === 'remedy' && spec.hazard && !me.hazards.includes(spec.hazard)) {
     return STOPGO_ERRORS.noHazard
   }
+  if (spec.family === 'safety') return STOPGO_ERRORS.alreadyLaid
   if (spec.family === 'attack' || key === 'mystery') return STOPGO_ERRORS.noOpponent
 
   return STOPGO_HAND_COPY.notYet

@@ -78,10 +78,13 @@ export const StopGoRulesDrawer = ({ open, onClose, settings }: StopGoRulesDrawer
       value: fillPlayMessage(copy.mysteryValue, { cost: STOPGO_SETTINGS.mysteryCost }),
     },
     {
-      label: copy.immunity,
-      value: fillPlayMessage(copy.immunityValue, { seconds: STOPGO_SETTINGS.immunitySeconds }),
+      label: copy.safeties,
+      value: fillPlayMessage(copy.safetiesValue, { list: namesOf(StopGoFamilies.Safety) }),
     },
-    { label: copy.cleanup, value: copy.cleanupValue },
+    {
+      label: copy.counter,
+      value: fillPlayMessage(copy.counterValue, { seconds: STOPGO_SETTINGS.counterSeconds }),
+    },
     {
       label: copy.strikes,
       value: fillPlayMessage(copy.strikesValue, {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { StopGoCarState } from '@/composites/play/stopgo/cards/StopGoCarState'
 import { StopGoHand } from '@/composites/play/stopgo/cards/StopGoHand'
-import { StopGoImmunity } from '@/composites/play/stopgo/cards/StopGoImmunity'
+import { StopGoCounter } from '@/composites/play/stopgo/cards/StopGoCounter'
 import { StopGoPick } from '@/composites/play/stopgo/cards/StopGoPick'
 import { StopGoRivalRow } from '@/composites/play/stopgo/cards/StopGoRivalRow'
 import { StopGoPiles } from '@/composites/play/stopgo/cards/StopGoPiles'
@@ -101,14 +101,7 @@ export const StopGoDock = ({
       </div>
       <div className={STOPGO_HAND.dock}>
         <StopGoRivalRow players={players} rivals={rivals} avatars={avatars} />
-        <StopGoCarState
-          player={me}
-          name={names[viewerId] ?? ''}
-          isMe
-          canCleanup={you.canCleanup}
-          isSaving={moves.isSaving}
-          onCleanup={moves.cleanup}
-        />
+        <StopGoCarState player={me} name={names[viewerId] ?? ''} isMe />
         <div className={STOPGO_HAND.mid}>
           {chosen && (
             <StopGoTray
@@ -163,14 +156,14 @@ export const StopGoDock = ({
           onDiscardDrop={() => chosen && void discard(chosen.id)}
         />
       </div>
-      {you.canImmunize && window && (
-        <StopGoImmunity
+      {you.isAimed && window && (
+        <StopGoCounter
           card={window.card}
           fromName={names[window.fromId] ?? ''}
-          hasImmunity
-          clock={shareLeft(window.endsAt, now, STOPGO_SETTINGS.immunitySeconds)}
+          counterKey={cards.find((card) => card.id === you.counterId)?.key ?? null}
+          clock={shareLeft(window.endsAt, now, STOPGO_SETTINGS.counterSeconds)}
           isSaving={moves.isSaving}
-          onImmunity={moves.immunity}
+          onCounter={moves.counter}
           onPass={moves.decline}
         />
       )}

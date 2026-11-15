@@ -48,7 +48,7 @@ export const carOf = (seat: StopGoSeatState): StopGoCar => ({
   km: seat.km,
   isGreen: seat.isGreen,
   hazards: seat.hazards,
-  jokers: { immunity: !seat.immunityUsedAt, cleanup: !seat.cleanupUsedAt },
+  shields: seat.shields,
 })
 
 /**

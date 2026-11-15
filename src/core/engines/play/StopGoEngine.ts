@@ -4,11 +4,7 @@ import { conflict } from '@/core/lib/errors'
 import { readStopGoSettings, stopGoDefaults } from '@/core/lib/play/stopgo'
 import { pickCard } from '@/core/services/play/stopgo/StopGoDrawService'
 import { openRace } from '@/core/services/play/stopgo/StopGoDealService'
-import {
-  declineAttack,
-  useCleanup,
-  useImmunity,
-} from '@/core/services/play/stopgo/StopGoJokerService'
+import { declineAttack, useCounter } from '@/core/services/play/stopgo/StopGoCounterService'
 import { revealMystery } from '@/core/services/play/stopgo/StopGoMysteryService'
 import { advance } from '@/core/services/play/stopgo/StopGoSettleService'
 import { withTable } from '@/core/services/play/stopgo/StopGoTable'
@@ -25,9 +21,8 @@ const ACTIONS: Record<
 > = {
   play: playCard,
   discard: discardCard,
-  immunity: useImmunity,
+  counter: useCounter,
   decline: declineAttack,
-  cleanup: useCleanup,
   pick: pickCard,
   reveal: revealMystery,
 }

@@ -4572,7 +4572,7 @@ model StopGoGame {
   discard       Json
   // Times the discard went back into the pile
   reshuffles    Int       @default(0)
-  // Immunity window or Good draw choice the turn waits on, never holds a drawn card
+  // Coup fourré window or Good draw choice the turn waits on, never holds a drawn card
   pending       Json?
   // Clock of the pending choice, its own column so the pause shifts it in plain SQL
   pendingEndsAt DateTime?
@@ -4598,6 +4598,9 @@ model StopGoPlayer {
   isGreen        Boolean   @default(false)
   // Attack keys suffered, one per type, the speed limit included
   hazards        String[]
+  // Safeties laid down for good, siren tank tyres ace
+  shields        String[]  @default([])
+  // Unused since safeties replaced the jokers
   immunityUsedAt DateTime?
   cleanupUsedAt  DateTime?
   // Turns missed in a row

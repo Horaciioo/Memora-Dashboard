@@ -1,6 +1,8 @@
 import {
   STOPGO_CARDS,
   STOPGO_HAZARDS,
+  STOPGO_SAFETIES,
+  safetyAgainst,
   StopGoFamilies,
   StopGoHazardKinds,
   StopGoTargets,
@@ -9,7 +11,7 @@ import type {
   StopGoCardKey,
   StopGoCardSpec,
   StopGoHazard,
-  StopGoJoker,
+  StopGoSafety,
 } from '@/declarations/play/stopgo/cards'
 import { StopGoRefusals } from '@/declarations/play/stopgo/refusals'
 import type { StopGoRefusal } from '@/declarations/play/stopgo/refusals'
@@ -23,12 +25,34 @@ type Verdict = StopGoRefusal | null
 /**
  * Car can gain distance
  * @param {StopGoCar} car - Car
- * @return {boolean} - Green and unblocked
+ * @return {boolean} - Green (or siren) and unblocked
  */
 
 export const isMoving = (car: StopGoCar): boolean =>
-  car.isGreen &&
+  (car.isGreen || car.shields.includes('siren')) &&
   !car.hazards.some((hazard) => STOPGO_HAZARDS[hazard].kind !== StopGoHazardKinds.Limit)
+
+/**
+ * Car is immune to a hazard
+ * @param {StopGoCar} car - Car
+ * @param {StopGoHazard} hazard - Attack key
+ * @return {boolean} - A laid safety stops it
+ */
+
+export const isShielded = (car: StopGoCar, hazard: StopGoHazard): boolean =>
+  car.shields.some((shield) => (STOPGO_SAFETIES[shield] as readonly string[]).includes(hazard))
+
+/**
+ * Card of a hand that stops a hazard right away
+ * @param {{ id: string, key: StopGoCardKey }[]} hand - Hand
+ * @param {StopGoHazard} hazard - Attack key
+ * @return {{ id: string, key: StopGoCardKey } | undefined} - Safety held
+ */
+
+export const counterOf = <T extends { key: StopGoCardKey }>(
+  hand: T[],
+  hazard: StopGoHazard
+): T | undefined => hand.find((card) => card.key === safetyAgainst(hazard))
 
 /**
  * Other cars in the race
@@ -82,7 +106,7 @@ const remedyVerdict = (spec: StopGoCardSpec, car: StopGoCar): Verdict => {
 
   // Green also starts a stopped car
   if (hazard === 'red') {
-    return car.isGreen && !car.hazards.includes('red') ? StopGoRefusals.AlreadyGreen : null
+    return isMoving(car) && !car.hazards.includes('red') ? StopGoRefusals.AlreadyGreen : null
   }
 
   return car.hazards.includes(hazard) ? null : StopGoRefusals.NoHazard
@@ -118,6 +142,9 @@ const targetVerdict = (
 
   // One malus per type
   const hazard = spec.hazard
+  if (hazard && targets.some((id) => isShielded(table.cars[id], hazard))) {
+    return StopGoRefusals.Shielded
+  }
   const isHit = hazard && targets.some((id) => table.cars[id].hazards.includes(hazard))
 
   return isHit ? StopGoRefusals.AlreadyHit : null
@@ -145,20 +172,10 @@ export const canPlay = (
   // Per family
   if (spec.family === StopGoFamilies.Distance) return distanceVerdict(spec, car, table.targetKm)
   if (spec.family === StopGoFamilies.Remedy) return remedyVerdict(spec, car)
+  if (spec.family === StopGoFamilies.Safety) {
+    return car.shields.includes(key as StopGoSafety) ? StopGoRefusals.AlreadyLaid : null
+  }
   if (spec.target === StopGoTargets.None) return null
 
   return targetVerdict(spec, targets, table, accountId)
-}
-
-/**
- * Why a Joker cannot be used
- * @param {StopGoJoker} joker - Joker
- * @param {StopGoCar} car - Holder car
- * @return {Verdict} - Refusal or null
- */
-
-export const canUseJoker = (joker: StopGoJoker, car: StopGoCar): Verdict => {
-  if (!car.jokers[joker]) return StopGoRefusals.JokerSpent
-
-  return joker === 'cleanup' && !car.hazards.length ? StopGoRefusals.NothingToClean : null
 }

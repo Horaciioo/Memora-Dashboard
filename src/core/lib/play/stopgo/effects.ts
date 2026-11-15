@@ -4,7 +4,8 @@ import {
   StopGoFamilies,
   StopGoHazardKinds,
 } from '@/declarations/play/stopgo/cards'
-import type { StopGoCardKey, StopGoJoker } from '@/declarations/play/stopgo/cards'
+import { STOPGO_SAFETIES } from '@/declarations/play/stopgo/cards'
+import type { StopGoCardKey, StopGoSafety } from '@/declarations/play/stopgo/cards'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 
 import type { StopGoCar, StopGoTable } from '@/core/lib/play/stopgo/state'
@@ -61,47 +62,29 @@ export const applyCard = (
     })
   }
 
+  // Lay a safety down: it lifts the hazards it stops and keeps them away
+  if (spec.family === StopGoFamilies.Safety) {
+    const stopped: readonly string[] = STOPGO_SAFETIES[key as StopGoSafety]
+
+    return patchCar(table, accountId, {
+      shields: [...car.shields, key as StopGoSafety],
+      hazards: car.hazards.filter((current) => !stopped.includes(current)),
+    })
+  }
+
   // Pose a hazard
   const hazard = spec.hazard
   if (spec.family !== StopGoFamilies.Attack || !hazard) return table
 
-  return targets.reduce(
-    (next, id) => patchCar(next, id, { hazards: [...next.cars[id].hazards, hazard] }),
-    table
-  )
+  return targets.reduce((next, id) => {
+    const target = next.cars[id]
+    const isSafe = target.shields.some((shield) =>
+      (STOPGO_SAFETIES[shield] as readonly string[]).includes(hazard)
+    )
+
+    return isSafe ? next : patchCar(next, id, { hazards: [...target.hazards, hazard] })
+  }, table)
 }
-
-/**
- * Spend a Joker token
- * @param {StopGoCar} car - Holder car
- * @param {StopGoJoker} joker - Joker
- * @return {StopGoCar} - Car after
- */
-
-const spendJoker = (car: StopGoCar, joker: StopGoJoker): StopGoCar => ({
-  ...car,
-  jokers: { ...car.jokers, [joker]: false },
-})
-
-/**
- * Cancel an attack
- * @param {StopGoTable} table - Race
- * @param {string} accountId - Targeted player
- * @return {StopGoTable} - New race
- */
-
-export const applyImmunity = (table: StopGoTable, accountId: string): StopGoTable =>
-  patchCar(table, accountId, spendJoker(table.cars[accountId], 'immunity'))
-
-/**
- * Clear every hazard
- * @param {StopGoTable} table - Race
- * @param {string} accountId - Player
- * @return {StopGoTable} - New race
- */
-
-export const applyCleanup = (table: StopGoTable, accountId: string): StopGoTable =>
-  patchCar(table, accountId, { ...spendJoker(table.cars[accountId], 'cleanup'), hazards: [] })
 
 /**
  * Pay to reveal a mystery card

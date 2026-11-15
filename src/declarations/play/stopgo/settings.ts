@@ -12,7 +12,7 @@ import type { StopGoCardKey } from '@/declarations/play/stopgo/cards'
 
 // Raw nodes
 const deck = readNode(stopgo.deck, 'play/stopgo.deck')
-const immunity = readNode(stopgo.immunity, 'play/stopgo.immunity')
+const counter = readNode(stopgo.counter, 'play/stopgo.counter')
 const goodDraw = readNode(stopgo.goodDraw, 'play/stopgo.goodDraw')
 const mystery = readNode(stopgo.mystery, 'play/stopgo.mystery')
 const accident = readNode(stopgo.accident, 'play/stopgo.accident')
@@ -86,9 +86,9 @@ export const STOPGO_SETTINGS = {
     fallback: 2,
     min: 0,
   }),
-  immunitySeconds: readInteger(immunity.seconds, {
-    path: 'play/stopgo.immunity.seconds',
-    fallback: 6,
+  counterSeconds: readInteger(counter.seconds, {
+    path: 'play/stopgo.counter.seconds',
+    fallback: 5,
     min: 1,
   }),
   goodDrawSeconds: readInteger(goodDraw.seconds, {

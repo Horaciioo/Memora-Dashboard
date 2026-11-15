@@ -11,7 +11,7 @@ import type {
   StopGoSeatState,
 } from '@/core/lib/play/stopgo'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
-import type { StopGoCardKey, StopGoHazard } from '@/declarations/play/stopgo/cards'
+import type { StopGoCardKey, StopGoHazard, StopGoSafety } from '@/declarations/play/stopgo/cards'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import type { EngineSession } from '@/types/play'
 
@@ -42,6 +42,7 @@ export const stopGoBoards = async (session: EngineSession) => {
     ...seat,
     hand: seat.hand as unknown as StopGoHandCard[],
     hazards: seat.hazards as StopGoHazard[],
+    shields: seat.shields as StopGoSafety[],
   }))
   const log: StopGoLogLine[] = moves.toReversed().map((move) => ({
     ...move,

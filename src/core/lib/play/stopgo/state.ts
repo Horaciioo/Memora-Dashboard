@@ -1,4 +1,4 @@
-import type { StopGoCardKey, StopGoHazard, StopGoJoker } from '@/declarations/play/stopgo/cards'
+import type { StopGoCardKey, StopGoHazard, StopGoSafety } from '@/declarations/play/stopgo/cards'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 
 /**
@@ -19,14 +19,14 @@ export interface StopGoCard {
  * @property {number} km - Distance, never negative
  * @property {boolean} isGreen - Cleared to go
  * @property {StopGoHazard[]} hazards - Suffered, one per type
- * @property {Record<StopGoJoker, boolean>} jokers - Still held
+ * @property {StopGoSafety[]} shields - Safeties laid down for good
  */
 
 export interface StopGoCar {
   km: number
   isGreen: boolean
   hazards: StopGoHazard[]
-  jokers: Record<StopGoJoker, boolean>
+  shields: StopGoSafety[]
 }
 
 /**
@@ -50,7 +50,7 @@ export const freshCar = (): StopGoCar => ({
   km: 0,
   isGreen: !STOPGO_SETTINGS.startsStopped,
   hazards: [],
-  jokers: { immunity: true, cleanup: true },
+  shields: [],
 })
 
 /**
@@ -78,8 +78,7 @@ export interface StopGoSeatState {
   sealed: unknown
   isGreen: boolean
   hazards: StopGoHazard[]
-  immunityUsedAt: Date | null
-  cleanupUsedAt: Date | null
+  shields: StopGoSafety[]
   strikes: number
   finishedAt: Date | null
   place: number | null

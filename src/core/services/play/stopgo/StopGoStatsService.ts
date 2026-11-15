@@ -9,8 +9,8 @@ const EMPTY = {
   attacks: 0,
   suffered: 0,
   remedies: 0,
-  immunities: 0,
-  cleanups: 0,
+  safeties: 0,
+  counters: 0,
   revealed: 0,
 }
 
@@ -39,8 +39,8 @@ export const stopGoStats = async (
     const entry = entryOf(accountId)
     if (kind === StopGoMoveKinds.Distance) entry.km += km ?? 0
     if (kind === StopGoMoveKinds.Remedy || kind === StopGoMoveKinds.Green) entry.remedies += 1
-    if (kind === StopGoMoveKinds.Immunity) entry.immunities += 1
-    if (kind === StopGoMoveKinds.Cleanup) entry.cleanups += 1
+    if (kind === StopGoMoveKinds.Safety) entry.safeties += 1
+    if (kind === StopGoMoveKinds.Counter) entry.counters += 1
     if (kind === StopGoMoveKinds.Reveal) entry.revealed += 1
     if (kind === StopGoMoveKinds.Attack) {
       entry.attacks += 1
@@ -49,7 +49,7 @@ export const stopGoStats = async (
   }
   // A saved attack never landed
   for (const { accountId, kind } of moves) {
-    if (kind === StopGoMoveKinds.Immunity) entryOf(accountId).suffered -= 1
+    if (kind === StopGoMoveKinds.Counter) entryOf(accountId).suffered -= 1
   }
 
   return stats

@@ -23,9 +23,9 @@ export const STOPGO_TRACK = {
   // Sign post clearance beside the outer kerb
   signClear: 34,
   // Car move over a gap of km
-  move: { perKm: 7, minMs: 450, maxMs: 1700 },
+  move: { perKm: 24, minMs: 1500, maxMs: 5500 },
   // Camera glide, key steps and page share
-  camera: { glideMs: 900, step: 120, pageShare: 0.8, focusShare: 0.5, phoneFocusShare: 0.34 },
+  camera: { glideMs: 3000, step: 120, pageShare: 0.8, focusShare: 0.5, phoneFocusShare: 0.34 },
 } as const
 
 /**
@@ -68,6 +68,19 @@ export const STOPGO_DECOR = {
   tries: number
   gap: number
 }
+
+/**
+ * Meadow drawn under the road: tufts, flowers and darker patches, per map
+ * @type {Object}
+ */
+
+export const STOPGO_MEADOW = {
+  tufts: 220,
+  flowers: 60,
+  patches: 14,
+  // Flower petal colours
+  petals: ['#ffffff', '#ffd84a', '#ff9ec2', '#c9a6ff'],
+} as const
 
 /**
  * Board words

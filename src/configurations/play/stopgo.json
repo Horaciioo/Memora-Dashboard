@@ -21,6 +21,10 @@
     "petrol": 6,
     "spare": 6,
     "repair": 6,
+    "siren": 1,
+    "tank": 1,
+    "tyres": 1,
+    "ace": 1,
     "goodDraw": 4,
     "mystery": 3
   },
@@ -33,8 +37,8 @@
   "strikes": 3,
   "afkSeconds": 5,
   "reshuffles": 2,
-  "immunity": {
-    "seconds": 6
+  "counter": {
+    "seconds": 5
   },
   "goodDraw": {
     "seconds": 15

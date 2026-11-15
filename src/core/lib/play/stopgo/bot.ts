@@ -1,6 +1,11 @@
 import { PLAY_BOT_SETTINGS } from '@/declarations/play/bots'
-import { STOPGO_CARDS, StopGoFamilies, StopGoTargets } from '@/declarations/play/stopgo/cards'
-import type { StopGoCardKey } from '@/declarations/play/stopgo/cards'
+import {
+  STOPGO_CARDS,
+  STOPGO_SAFETIES,
+  StopGoFamilies,
+  StopGoTargets,
+} from '@/declarations/play/stopgo/cards'
+import type { StopGoCardKey, StopGoSafety } from '@/declarations/play/stopgo/cards'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { PlayBotKinds, StopGoPhases } from '@/utils/constants/play'
 import type { PlayBotKindName } from '@/utils/constants/play'
@@ -62,33 +67,13 @@ const move = (
 })
 
 /**
- * Bot is far enough along to guard its Immunity
- * @param {Player} me - Bot
- * @param {StopGoBoardView} board - Board
- * @param {PlayBotKindName} level - Level
- * @return {boolean} - Near the finish
- */
-
-const isNear = (me: Player, board: StopGoBoardView, level: PlayBotKindName): boolean =>
-  me.km >= board.target * TUNING.nearFinish[level]
-
-/**
- * Immunity played against the attack aimed at the bot
+ * Safety played against the attack aimed at the bot, a coup fourré
  * @param {StopGoBotInput} input - Bot and board
- * @param {Player} me - Bot
  * @return {boolean} - Played
  */
 
-const wantsImmunity = ({ board, level, random }: StopGoBotInput, me: Player): boolean => {
-  const card = board.window?.card
-  const isNearEnd = isNear(me, board, level)
-  if (level === PlayBotKinds.Easy) return random() < 0.5
-
-  // Medium saves it for an Accident or a red light near the finish
-  if (level === PlayBotKinds.Medium) return (card === 'crash' || card === 'red') && isNearEnd
-
-  return card === 'crash' || isNearEnd
-}
+const wantsCounter = ({ level, random }: StopGoBotInput): boolean =>
+  level === PlayBotKinds.Easy ? random() < 0.6 : true
 
 /**
  * Worth of keeping a card
@@ -106,6 +91,7 @@ const worthOf = (key: StopGoCardKey, me: Player, board: StopGoBoardView): number
     // A distance past the finish line never plays again
     return me.km + km > board.target ? 1 : 20 + km / 4
   }
+  if (spec.family === StopGoFamilies.Safety) return 400
   if (spec.family === StopGoFamilies.Remedy) {
     const isNeeded = spec.hazard && (me.hazards.includes(spec.hazard) || !me.isGreen)
 
@@ -187,6 +173,13 @@ const scoreOf = (
   const isHard = level === PlayBotKinds.Hard
   const km = spec.km ?? 0
   if (spec.family === StopGoFamilies.Remedy) return 1000
+  if (spec.family === StopGoFamilies.Safety) {
+    const stopped: readonly string[] = STOPGO_SAFETIES[option.key as StopGoSafety]
+    const isHit = me.hazards.some((hazard) => stopped.includes(hazard))
+
+    // Kept in hand for a coup fourré unless it frees the car now (easy plays it at once)
+    return isHit ? 1100 : level === PlayBotKinds.Easy ? 600 : 30
+  }
   if (spec.family === StopGoFamilies.Distance) {
     const gap = board.target - me.km - km
     if (!isHard) return 500 + km
@@ -212,7 +205,7 @@ const scoreOf = (
 }
 
 /**
- * Joker or sealed card used before any card
+ * Sealed card revealed before any card
  * @param {StopGoBotInput} input - Bot and board
  * @param {Player} me - Bot
  * @param {You} you - Private part
@@ -221,12 +214,6 @@ const scoreOf = (
 
 const specialMove = (input: StopGoBotInput, me: Player, you: You): StopGoBotMove | null => {
   const { board, level } = input
-  const isHard = level === PlayBotKinds.Hard
-  const hasHeavyLoad =
-    me.hazards.length >= 2 || (isHard && !!me.hazards.length && isNear(me, board, level))
-  if (you.canCleanup && level !== PlayBotKinds.Easy && hasHeavyLoad) {
-    return move(board, 'cleanup', {})
-  }
 
   // Margin kept after paying the price of the reveal
   const isRich = me.km >= STOPGO_SETTINGS.mysteryCost + TUNING.revealMargin[level]
@@ -275,7 +262,7 @@ const pickMove = (input: StopGoBotInput, me: Player, you: You): StopGoBotMove =>
 }
 
 /**
- * Own turn: Joker, then the best card, else a discard
+ * Own turn: reveal, then the best card, else a discard
  * @param {StopGoBotInput} input - Bot and board
  * @param {Player} me - Bot
  * @param {You} you - Private part
@@ -314,10 +301,11 @@ export const decideStopGo = (input: StopGoBotInput): StopGoBotMove | null => {
   if (board.phase !== StopGoPhases.Playing || !me || !you) return null
 
   // An attack aims at the bot, it answers before anything else
-  if (board.window?.waiting.includes(botId)) {
-    const isSaved = you.canImmunize && wantsImmunity(input, me)
+  if (you.isAimed && board.window) {
+    // Without a safety the bot has nothing to answer, the window runs out
+    if (!you.counterId) return null
 
-    return move(board, isSaved ? 'immunity' : 'decline', {})
+    return move(board, wantsCounter(input) ? 'counter' : 'decline', {})
   }
   if (board.pickerId === botId) return pickMove(input, me, you)
   if (board.turnId !== botId || board.window || board.pickerId) return null

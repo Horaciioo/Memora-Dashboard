@@ -70,7 +70,6 @@ export const passTurn = async (
   fromId: string,
   lines: StopGoMoveInput[]
 ): Promise<EngineStep> => {
-  const { game, settings } = table
   const road = racing(table).map((seat) => seat.accountId)
   const nextId = nextRacer(
     table.seats.map((seat) => seat.accountId),
@@ -81,6 +80,24 @@ export const passTurn = async (
   // A lone racer wins
   if (!nextId) return closeRace(table, null, lines)
   if (road.length < 2) return closeRace(table, nextId, lines)
+
+  return giveTurn(table, nextId, lines)
+}
+
+/**
+ * Give the turn to a racer and draw for them, the same one again after a safety
+ * @param {StopGoLockedTable} table - Table
+ * @param {string} nextId - Player who plays next
+ * @param {StopGoMoveInput[]} lines - Lines of the move that ended the last turn
+ * @return {Promise<EngineStep>} - Step
+ */
+
+export const giveTurn = async (
+  table: StopGoLockedTable,
+  nextId: string,
+  lines: StopGoMoveInput[]
+): Promise<EngineStep> => {
+  const { game, settings } = table
 
   // A sealed card takes the place of the draw
   const next = seatOf(table, nextId)!

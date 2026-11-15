@@ -15,7 +15,7 @@ import type {
 } from '@/core/lib/play/stopgo'
 import { holdSession } from '@/core/services/play/PlaySessionService'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
-import type { StopGoHazard } from '@/declarations/play/stopgo/cards'
+import type { StopGoHazard, StopGoSafety } from '@/declarations/play/stopgo/cards'
 import type { EngineSession, EngineStep } from '@/types/play'
 import type { StopGoMoveKindName } from '@/utils/constants/play'
 
@@ -85,6 +85,7 @@ export const withTable = <T>(
         ...seat,
         hand: seat.hand as unknown as StopGoHandCard[],
         hazards: seat.hazards as StopGoHazard[],
+        shields: seat.shields as StopGoSafety[],
       })),
       now: new Date(),
       isDirty: false,
@@ -178,7 +179,12 @@ export const saveCars = async (
 ): Promise<void> => {
   for (const [id, car] of Object.entries(after.cars)) {
     if (car === before.cars[id]) continue
-    await saveSeat(table, id, { km: car.km, isGreen: car.isGreen, hazards: car.hazards })
+    await saveSeat(table, id, {
+      km: car.km,
+      isGreen: car.isGreen,
+      hazards: car.hazards,
+      shields: car.shields,
+    })
   }
 }
 

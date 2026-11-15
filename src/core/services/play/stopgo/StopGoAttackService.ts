@@ -2,8 +2,8 @@ import 'server-only'
 
 import { after } from '@/core/lib/play/clock'
 import { applyCard, hitBy, raceOf, respondersOf } from '@/core/lib/play/stopgo'
-import type { StopGoHandCard, StopGoTable, StopGoWindow } from '@/core/lib/play/stopgo'
-import { passTurn } from '@/core/services/play/stopgo/StopGoFlowService'
+import type { StopGoHandCard, StopGoWindow } from '@/core/lib/play/stopgo'
+import { giveTurn, passTurn } from '@/core/services/play/stopgo/StopGoFlowService'
 import {
   racing,
   saveCars,
@@ -17,7 +17,7 @@ import type { EngineStep } from '@/types/play'
 import { StopGoMoveKinds } from '@/utils/constants/play'
 
 /**
- * Close the window: the malus lands on every target who kept quiet, the card is spent
+ * Close the window: the malus lands on every target who did not counter, the card is spent
  * @param {StopGoLockedTable} table - Table
  * @param {StopGoWindow} window - Window to close
  * @param {StopGoMoveInput[]} lines - Lines of the move that closes it
@@ -40,6 +40,12 @@ export const resolveWindow = async (
   game.pendingEndsAt = null
   table.isDirty = true
 
+  // The first target who countered plays next, else the turn goes on
+  const [counterId] = window.saved.filter((id) => table.seats.some((seat) => seat.accountId === id))
+  if (counterId && racing(table).some((seat) => seat.accountId === counterId)) {
+    return giveTurn(table, counterId, lines)
+  }
+
   return passTurn(table, window.fromId, lines)
 }
 
@@ -49,7 +55,6 @@ export const resolveWindow = async (
  * @param {string} accountId - Attacker
  * @param {StopGoHandCard} card - Attack card from the hand
  * @param {string[]} targets - Players aimed at, already checked
- * @param {StopGoTable} race - Race before the attack
  * @return {Promise<EngineStep>} - Step
  */
 
@@ -57,21 +62,21 @@ export const launchAttack = async (
   table: StopGoLockedTable,
   accountId: string,
   card: StopGoHandCard,
-  targets: string[],
-  race: StopGoTable
+  targets: string[]
 ): Promise<EngineStep> => {
   const seat = seatOf(table, accountId)!
   await saveSeat(table, accountId, {
     hand: seat.hand.filter((entry) => entry.id !== card.id),
     strikes: 0,
   })
+  const hands = Object.fromEntries(table.seats.map((entry) => [entry.accountId, entry.hand]))
   const window: StopGoWindow = {
-    kind: 'immunity',
+    kind: 'counter',
     cardId: card.id,
     card: card.key,
     fromId: accountId,
     targets,
-    waiting: respondersOf(targets, race),
+    waiting: respondersOf(targets, card.key, hands),
     saved: [],
   }
   const line: StopGoMoveInput = {
@@ -81,11 +86,9 @@ export const launchAttack = async (
     targetIds: targets,
   }
 
-  // Nobody can answer: the malus lands now
-  if (!window.waiting.length) return resolveWindow(table, window, [line])
-
+  // Always a pause, so the table never learns who holds a safety
   table.game.pending = window
-  table.game.pendingEndsAt = after(table.now, STOPGO_SETTINGS.immunitySeconds)
+  table.game.pendingEndsAt = after(table.now, STOPGO_SETTINGS.counterSeconds)
   await writeMoves(table, [line])
 
   return { changed: true, finished: false, deadline: table.game.pendingEndsAt }

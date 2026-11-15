@@ -17,9 +17,8 @@ export const useStopGoPlay = (sessionId: string, board: StopGoBoardView) => {
     play: (cardId: string, targets: string[] = []) => send({ type: 'play', cardId, targets }),
     discard: (cardId: string) => send({ type: 'discard', cardId }),
     pick: (cardId: string) => send({ type: 'pick', cardId }),
-    immunity: () => send({ type: 'immunity' }),
+    counter: () => send({ type: 'counter' }),
     decline: () => send({ type: 'decline' }),
-    cleanup: () => send({ type: 'cleanup' }),
     reveal: () => send({ type: 'reveal' }),
   }
 }

@@ -83,6 +83,44 @@ const GLYPHS: Record<string, ReactNode> = {
       fill={FILL}
     />
   ),
+  siren: (
+    <>
+      <path d="M12 38V26a12 12 0 0 1 24 0v12Z" fill={RED} stroke={FILL} strokeWidth="3" />
+      <rect x="8" y="38" width="32" height="6" rx="2" fill={FILL} />
+      <path
+        d="M24 4v6M7 12l4 4M41 12l-4 4"
+        stroke={AMBER}
+        strokeWidth="3.5"
+        strokeLinecap="round"
+      />
+    </>
+  ),
+  tank: (
+    <>
+      {drop}
+      <path d="M24 16 14 22v8c0 6 5 10 10 12 5-2 10-6 10-12v-8Z" fill="white" opacity=".9" />
+      <path d="M24 22v14M17 29h14" stroke={FILL} strokeWidth="3.5" strokeLinecap="round" />
+    </>
+  ),
+  tyres: (
+    <>
+      {tyre}
+      <path
+        d="M24 6 8 12v10c0 9 7 15 16 19 9-4 16-10 16-19V12Z"
+        fill="none"
+        stroke={AMBER}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+    </>
+  ),
+  ace: (
+    <>
+      <circle cx="24" cy="24" r="18" fill="none" stroke={FILL} strokeWidth="5" />
+      <path d="M24 6v36M6 24h36" stroke={FILL} strokeWidth="4" />
+      <circle cx="24" cy="24" r="6" fill={AMBER} stroke={FILL} strokeWidth="3" />
+    </>
+  ),
   goodDraw: (
     <>
       <rect x="6" y="10" width="22" height="30" rx="4" fill={DIM} transform="rotate(-12 17 25)" />

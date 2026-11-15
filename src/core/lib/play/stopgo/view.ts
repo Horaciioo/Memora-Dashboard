@@ -3,8 +3,8 @@ import type { StopGoCardKey } from '@/declarations/play/stopgo/cards'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { StopGoPhases } from '@/utils/constants/play'
 
-import { windowOf } from '@/core/lib/play/stopgo/attack'
-import { canPlay, canUseJoker, isMoving, opponentsOf } from '@/core/lib/play/stopgo/rules'
+import { hazardOf, windowOf } from '@/core/lib/play/stopgo/attack'
+import { canPlay, counterOf, isMoving, isShielded, opponentsOf } from '@/core/lib/play/stopgo/rules'
 import type { StopGoGameSettings } from '@/core/lib/play/stopgo/settings'
 import type {
   StopGoGameState,
@@ -50,7 +50,9 @@ const targetsFor = (
   // Opponents not already hit, nor carrying a sealed card
   const aimable = opponentsOf(race, accountId).filter(
     (id) =>
-      (!spec.hazard || !race.cars[id].hazards.includes(spec.hazard)) &&
+      (!spec.hazard ||
+        (!race.cars[id].hazards.includes(spec.hazard) &&
+          !isShielded(race.cars[id], spec.hazard))) &&
       (key !== 'mystery' || !carrying.has(id))
   )
   if (spec.target === StopGoTargets.One) return aimable.length ? aimable : null
@@ -73,15 +75,17 @@ const privateOf = ({ game, seats, settings }: StopGoViewInput, seat: StopGoSeatS
     game.phase === StopGoPhases.Playing && game.turnId === seat.accountId && !game.pending
   const racing = seats.filter((entry) => !entry.finishedAt)
   const race = raceOf(racing, settings.target)
-  const car = carOf(seat)
   const window = windowOf(game.pending)
   const isLive = game.phase === StopGoPhases.Playing
 
   return {
-    // Answer to an attack aimed at the reader
-    canImmunize:
-      isLive && !!window?.waiting.includes(seat.accountId) && !canUseJoker('immunity', car),
-    canCleanup: isTurn && !canUseJoker('cleanup', car),
+    // Safety of the hand that stops the attack aimed at the reader, null without one
+    counterId:
+      isLive && window?.waiting.includes(seat.accountId)
+        ? (counterOf(seat.hand, hazardOf(window.card))?.id ?? null)
+        : null,
+    // Attack aimed at the reader, whatever the hand holds
+    isAimed: isLive && !!window?.targets.includes(seat.accountId),
     canReveal: isTurn && sealedOf(seat.sealed).length > 0,
     // Slots taken by sealed cards, nothing of their content
     sealedCount: sealedOf(seat.sealed).length,
@@ -119,7 +123,7 @@ export const buildBoards = (input: StopGoViewInput) => {
       isMoving: isMoving(car),
       hazards: seat.hazards,
       isLimited: seat.hazards.includes('limit'),
-      jokers: car.jokers,
+      shields: seat.shields,
       handCount: seat.hand.length + sealedOf(seat.sealed).length,
       // Shown once the race is over
       sealedLeft:
@@ -142,14 +146,12 @@ export const buildBoards = (input: StopGoViewInput) => {
     turnSeconds: settings.turnSeconds,
     mapKm: STOPGO_SETTINGS.mapKm,
     signKm: STOPGO_SETTINGS.signKm,
-    // Attack waiting for answers, nothing of the Jokers beyond what is public
+    // Attack waiting, nothing of who holds a safety: a table without one waits as long
     window: window
       ? {
           card: window.card,
           fromId: window.fromId,
           targets: window.targets,
-          waiting: window.waiting,
-          saved: window.saved,
           endsAt: game.pendingEndsAt,
         }
       : null,
