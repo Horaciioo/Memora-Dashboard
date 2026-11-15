@@ -193,6 +193,48 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.PlayAccess,
         text: 'Correction des parties de « Golf » contre des joueurs automatiques, qui jouaient mal.',
       },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de « Bomb » : la bombe arrivait chez le joueur suivant avec une mèche déjà presque consumée et explosait trop vite.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction du lancement d’une partie de « Memora Play » : l’écran de chargement restait bloqué quand la table ne s’ouvrait pas, et une page vide pouvait apparaître.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction du vote de lancement d’une partie de « Memora Play » : le choix d’un joueur mettait du temps à s’afficher chez les autres.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de l’interface de jeu de « Memora Play » : le chronomètre et le nom du dessinateur de « Croquis » étaient coupés, et les réglages n’étaient pas alignés.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de « Écho » sur ordinateur : les cartes passaient sous le chat.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de la liste des invitations de « Memora Play » : la section des joueurs déjà croisés affichait des membres jamais rencontrés, et ne classait pas les plus récents en premier.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction du mode éclair de « Baccalauréat » : le quitter ne rendait pas les catégories et la durée choisies par l’hôte.',
+      },
     ],
     comments: [
       {
