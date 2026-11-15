@@ -7,7 +7,12 @@ import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useDebouncedValue } from '@/core/hooks/interaction/state/useDebouncedValue'
 import { SEARCH_SETTINGS } from '@/declarations/configurations/settings'
-import type { HistoryOptions, HistoryOrphan, HistoryPage, HistorySession } from '@/types/recruitment'
+import type {
+  HistoryOptions,
+  HistoryOrphan,
+  HistoryPage,
+  HistorySession,
+} from '@/types/recruitment'
 
 /**
  * Filters of the history

@@ -247,7 +247,7 @@ export const CANDIDATE_RAIL = {
   notice:
     'flex items-start gap-3 rounded-[var(--radius-md)] bg-[var(--color-danger-soft)] p-3 text-sm font-semibold text-[var(--color-danger)]',
   noticeGlyph: 'mt-0.5 size-4 shrink-0',
-  back: 'absolute top-1/2 left-0 hidden -translate-y-1/2 cursor-pointer items-center md:flex gap-2 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  back: 'absolute top-1/2 left-0 hidden -translate-y-1/2 cursor-pointer items-center md:flex gap-2 py-2 lg:w-[21rem] lg:justify-center text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   // Under the tabs on a phone
   backInline:
     '-mb-4 flex cursor-pointer items-center gap-2 self-center py-1 text-sm font-semibold text-[var(--color-ink-subtle)] md:hidden',

@@ -2,7 +2,12 @@ import { prisma } from '@/core/lib/db'
 import { activeFunctions } from '@/core/services/reference/lookups'
 import { functionOptions, toOptions } from '@/core/lib/forms/options'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { memberOptions, teamOptions, withSeated, youtuberOptions } from '@/core/services/work/shared'
+import {
+  memberOptions,
+  teamOptions,
+  withSeated,
+  youtuberOptions,
+} from '@/core/services/work/shared'
 import {
   JUNIOR_FUNCTION_OF,
   OBSERVER_FUNCTION,
