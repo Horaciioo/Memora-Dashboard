@@ -28,8 +28,6 @@ export const LUDO_BOARD = {
   // The star is larger, so its frame is too
   frameStar:
     'ludo-frame max-lg:w-[min(calc(100%+1rem),calc(100dvh-18rem))] lg:w-[min(46rem,calc(100dvh-13rem))]',
-  // The viewer's turn: the frame lights in their colour
-  frameMine: 'ludo-frame-mine',
   // Call over the board as the turn comes
   banner: 'ludo-banner',
   bannerText: 'ludo-banner-text',

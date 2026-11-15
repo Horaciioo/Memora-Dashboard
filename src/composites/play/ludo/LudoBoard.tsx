@@ -249,7 +249,6 @@ export const LudoBoard = ({
         <div
           className={cn(
             map.name === 'star' ? LUDO_BOARD.frameStar : LUDO_BOARD.frame,
-            board.isMyTurn && countdown === 0 && LUDO_BOARD.frameMine,
             LUDO_BOARD.frameFull
           )}
           style={tone as CSSProperties}

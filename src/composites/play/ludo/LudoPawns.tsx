@@ -22,6 +22,8 @@ import { LUDO_BOARD_COPY, LUDO_CHAOS_UI } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { LUDO_CHAOS_PIECES, LUDO_PIECES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+import { PlayGames } from '@/utils/constants/play'
+import { usePlayPref } from '@/core/store/play/playPrefs'
 
 // Depth steps per cell, lower pawns in front
 const DEPTH = 2
@@ -205,6 +207,8 @@ export const LudoPawns = ({
   const setAimed = (pawn: number | null) => setAim(pawn === null ? null : { pawn, scope })
   const mine = players.find((player) => player.accountId === viewerId)
   const targets = movable.filter((entry) => entry.pawn === aimed)
+  // Landing choices stay drawn, they are the click targets
+  const hasPath = usePlayPref(PlayGames.Ludo, 'path') || targets.length > 1
   const target = targets[0]
   const glide = { '--glide': `${LUDO_SETTINGS.stepMs}ms` } as CSSProperties
 
@@ -212,6 +216,7 @@ export const LudoPawns = ({
     <>
       {mine &&
         !isBlind &&
+        hasPath &&
         targets.map((entry) => (
           <LudoPath
             key={entry.to}

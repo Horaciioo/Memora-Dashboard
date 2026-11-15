@@ -14,22 +14,9 @@
   display: none;
 }
 
-/* White board, rounded, lifted off the felt */
+/* Board sits straight on the felt, no box around it */
 .ludo-frame {
-  background: var(--play-ludo-board);
-  border-radius: 1.1rem;
-  padding: 2.6%;
-  box-shadow:
-    0 0.35rem 0 color-mix(in srgb, var(--play-ludo-board) 70%, var(--play-ludo-felt)),
-    0 1.4rem 2.8rem rgb(0 0 0 / 0.4);
-}
-
-/* Phones: the board runs edge to edge, square and flat */
-@media (max-width: 1023px) {
-  .ludo-frame {
-    border-radius: 0;
-    padding: 1.5%;
-  }
+  padding: 0;
 }
 
 .ludo-board {
@@ -484,26 +471,6 @@
   }
 }
 
-/* The viewer's turn: the whole frame lights in their colour */
-.ludo-frame-mine {
-  box-shadow:
-    0 0.35rem 0 color-mix(in srgb, var(--play-ludo-board) 70%, var(--play-ludo-felt)),
-    0 0 0 0.3rem var(--pawn-tone),
-    0 0 2.4rem 0.2rem color-mix(in srgb, var(--pawn-tone) 55%, transparent),
-    0 1.4rem 2.8rem rgb(0 0 0 / 0.4);
-  animation: ludo-frame-glow 1.8s ease-in-out infinite;
-}
-
-@keyframes ludo-frame-glow {
-  50% {
-    box-shadow:
-      0 0.35rem 0 color-mix(in srgb, var(--play-ludo-board) 70%, var(--play-ludo-felt)),
-      0 0 0 0.3rem var(--pawn-tone),
-      0 0 1rem 0 color-mix(in srgb, var(--pawn-tone) 35%, transparent),
-      0 1.4rem 2.8rem rgb(0 0 0 / 0.4);
-  }
-}
-
 /* Call over the board as the turn comes, gone by itself */
 .ludo-banner {
   position: absolute;
@@ -578,7 +545,6 @@
   .ludo-pawn-pick .ludo-pawn-art,
   .ludo-die-rolling,
   .ludo-die-ready,
-  .ludo-frame-mine,
   .ludo-turn-tag,
   .ludo-turn-tag::before,
   .ludo-banner-text,
