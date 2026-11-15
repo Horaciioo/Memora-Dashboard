@@ -6,7 +6,8 @@ import { CroquisBoard } from '@/composites/play/croquis/CroquisBoard'
 import type { CroquisBoardView } from '@/composites/play/croquis/types'
 import { EchoBoard } from '@/composites/play/echo/EchoBoard'
 import type { EchoBoardView } from '@/composites/play/echo/types'
-import { StopGoRawBoard } from '@/composites/play/stopgo/StopGoRawBoard'
+import { StopGoBoard } from '@/composites/play/stopgo/board/StopGoBoard'
+import type { StopGoBoardView } from '@/core/lib/play/stopgo'
 import { SuspensBoard } from '@/composites/play/suspens/SuspensBoard'
 import type { SuspensBoardView } from '@/composites/play/suspens/types'
 import { GlitchBoard } from '@/composites/play/glitch/GlitchBoard'
@@ -175,8 +176,17 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
-  // Stand-in until the track is drawn
-  [PlayGames.StopGo]: ({ board }) => ({ board: <StopGoRawBoard board={board} />, feed: null }),
+  [PlayGames.StopGo]: ({ sessionId, board, seats, viewerId }) => ({
+    board: (
+      <StopGoBoard
+        sessionId={sessionId}
+        board={board as StopGoBoardView}
+        faces={seats}
+        viewerId={viewerId}
+      />
+    ),
+    feed: null,
+  }),
   [PlayGames.Echo]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
     const echo = board as EchoBoardView
 

@@ -178,3 +178,10 @@ export const buildBoards = (input: StopGoViewInput) => {
     return { ...board, you: seat ? privateOf(input, seat) : null }
   }
 }
+
+/**
+ * Board of a race as a reader gets it
+ * @typedef {Object} StopGoBoardView
+ */
+
+export type StopGoBoardView = ReturnType<ReturnType<typeof buildBoards>>
