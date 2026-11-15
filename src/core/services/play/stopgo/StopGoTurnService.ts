@@ -6,13 +6,10 @@ import type { StopGoHandCard } from '@/core/lib/play/stopgo'
 import { passTurn, closeRace } from '@/core/services/play/stopgo/StopGoFlowService'
 import { launchAttack } from '@/core/services/play/stopgo/StopGoAttackService'
 import { refuse, requireTurn } from '@/core/services/play/stopgo/StopGoGuards'
-import {
-  racing,
-  saveCars,
-  saveSeat,
-  seatOf,
-  withTable,
-} from '@/core/services/play/stopgo/StopGoTable'
+import { releaseCard } from '@/core/services/play/stopgo/StopGoHand'
+import { openGoodDraw } from '@/core/services/play/stopgo/StopGoDrawService'
+import { sealMystery } from '@/core/services/play/stopgo/StopGoMysteryService'
+import { racing, saveCars, seatOf, withTable } from '@/core/services/play/stopgo/StopGoTable'
 import type { StopGoLockedTable, StopGoMoveInput } from '@/core/services/play/stopgo/StopGoTable'
 import { STOPGO_CARDS, StopGoFamilies } from '@/declarations/play/stopgo/cards'
 import { StopGoRefusals } from '@/declarations/play/stopgo/refusals'
@@ -39,27 +36,6 @@ const cardOfTurn = (
   )
 
   return card ?? refuse(StopGoRefusals.NotInHand)
-}
-
-/**
- * Hand and discard after a card leaves
- * @param {StopGoLockedTable} table - Table
- * @param {string} accountId - Player
- * @param {StopGoHandCard} card - Card leaving
- * @return {Promise<void>} - Written
- */
-
-const releaseCard = async (
-  table: StopGoLockedTable,
-  accountId: string,
-  card: StopGoHandCard
-): Promise<void> => {
-  const seat = seatOf(table, accountId)!
-  table.game.discard = [...table.game.discard, { id: card.id, key: card.key }]
-  await saveSeat(table, accountId, {
-    hand: seat.hand.filter((entry) => entry.id !== card.id),
-    strikes: 0,
-  })
 }
 
 /**
@@ -115,6 +91,10 @@ export const playCard = (
     if (STOPGO_CARDS[card.key].family === StopGoFamilies.Attack) {
       return launchAttack(table, accountId, card, targets, race)
     }
+
+    // Bonus cards
+    if (card.key === 'goodDraw') return openGoodDraw(table, accountId, card)
+    if (card.key === 'mystery') return sealMystery(table, accountId, card, targets)
     const after = applyCard(card.key, accountId, targets, race)
 
     await saveCars(table, race, after)

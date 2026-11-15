@@ -12,6 +12,7 @@ import type {
   StopGoSeatState,
   StopGoTable,
 } from '@/core/lib/play/stopgo/state'
+import { isPicking, sealedOf } from '@/core/lib/play/stopgo/special'
 import { carOf, isOpenCard, raceOf } from '@/core/lib/play/stopgo/turn'
 
 /**
@@ -36,14 +37,21 @@ export interface StopGoViewInput {
  * @return {string[] | null} - Targets, empty for a card without one
  */
 
-const targetsFor = (key: StopGoCardKey, accountId: string, race: StopGoTable): string[] | null => {
+const targetsFor = (
+  key: StopGoCardKey,
+  accountId: string,
+  race: StopGoTable,
+  carrying: ReadonlySet<string>
+): string[] | null => {
   const spec = STOPGO_CARDS[key]
   if (!isOpenCard(key)) return null
   if (spec.target === StopGoTargets.None) return canPlay(key, accountId, [], race) ? null : []
 
-  // Opponents not already hit by this malus
+  // Opponents not already hit, nor carrying a sealed card
   const aimable = opponentsOf(race, accountId).filter(
-    (id) => !spec.hazard || !race.cars[id].hazards.includes(spec.hazard)
+    (id) =>
+      (!spec.hazard || !race.cars[id].hazards.includes(spec.hazard)) &&
+      (key !== 'mystery' || !carrying.has(id))
   )
   if (spec.target === StopGoTargets.One) return aimable.length ? aimable : null
 
@@ -58,6 +66,9 @@ const targetsFor = (key: StopGoCardKey, accountId: string, race: StopGoTable): s
  */
 
 const privateOf = ({ game, seats, settings }: StopGoViewInput, seat: StopGoSeatState) => {
+  const carrying = new Set(
+    seats.filter((entry) => sealedOf(entry.sealed).length).map((entry) => entry.accountId)
+  )
   const isTurn =
     game.phase === StopGoPhases.Playing && game.turnId === seat.accountId && !game.pending
   const racing = seats.filter((entry) => !entry.finishedAt)
@@ -71,13 +82,16 @@ const privateOf = ({ game, seats, settings }: StopGoViewInput, seat: StopGoSeatS
     canImmunize:
       isLive && !!window?.waiting.includes(seat.accountId) && !canUseJoker('immunity', car),
     canCleanup: isTurn && !canUseJoker('cleanup', car),
-    hand: seat.hand.map((card) => ({ id: card.id, key: card.key })),
+    canReveal: isTurn && sealedOf(seat.sealed).length > 0,
+    // Slots taken by sealed cards, nothing of their content
+    sealedCount: sealedOf(seat.sealed).length,
+    hand: seat.hand.map((card) => ({ id: card.id, key: card.key, isPicking: !!card.isPicking })),
     // Card id to the targets it may aim at
     playable: Object.fromEntries(
       isTurn
         ? seat.hand
             .filter((card) => !card.isPicking)
-            .map((card) => [card.id, targetsFor(card.key, seat.accountId, race)] as const)
+            .map((card) => [card.id, targetsFor(card.key, seat.accountId, race, carrying)] as const)
             .filter(([, targets]) => targets)
         : []
     ),
@@ -106,7 +120,10 @@ export const buildBoards = (input: StopGoViewInput) => {
       hazards: seat.hazards,
       isLimited: seat.hazards.includes('limit'),
       jokers: car.jokers,
-      handCount: seat.hand.length,
+      handCount: seat.hand.length + sealedOf(seat.sealed).length,
+      // Shown once the race is over
+      sealedLeft:
+        game.phase === StopGoPhases.Over ? sealedOf(seat.sealed).map((s) => s.card.key) : [],
       strikes: seat.strikes,
       place: seat.place,
       hasLeft: !present.has(seat.accountId),
@@ -136,6 +153,9 @@ export const buildBoards = (input: StopGoViewInput) => {
           endsAt: game.pendingEndsAt,
         }
       : null,
+    // Player choosing a card, others see no card
+    pickerId: isPicking(game.pending) ? game.turnId : null,
+    pickEndsAt: isPicking(game.pending) ? game.pendingEndsAt : null,
     pileCount: game.drawPile.length,
     discardCount: game.discard.length,
     discardTop: top ? top.key : null,

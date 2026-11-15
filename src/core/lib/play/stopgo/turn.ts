@@ -12,11 +12,12 @@ import type {
   StopGoTable,
 } from '@/core/lib/play/stopgo/state'
 
-// Families a card may be played from until attacks and bonuses are opened
+// Families a card may be played from
 const OPEN_FAMILIES: string[] = [
   StopGoFamilies.Distance,
   StopGoFamilies.Remedy,
   StopGoFamilies.Attack,
+  StopGoFamilies.Bonus,
 ]
 
 /**

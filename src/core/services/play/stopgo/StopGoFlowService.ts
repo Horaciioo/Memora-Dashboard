@@ -2,10 +2,12 @@ import 'server-only'
 
 import {
   drawFor,
+  needsDraw,
   nextRacer,
   placesOf,
   raceOf,
   scoreOf,
+  sealedOf,
   secureRandom,
   turnSecondsOf,
 } from '@/core/lib/play/stopgo'
@@ -80,18 +82,24 @@ export const passTurn = async (
   if (!nextId) return closeRace(table, null, lines)
   if (road.length < 2) return closeRace(table, nextId, lines)
 
-  // Pile and discard both spent: the race ends on distance
-  const drawn = drawFor(game.drawPile, game.discard, game.reshuffles, secureRandom)
-  if (!drawn.card) return closeRace(table, null, lines)
-  const isShuffled = drawn.piles.reshuffles > game.reshuffles
+  // A sealed card takes the place of the draw
   const next = seatOf(table, nextId)!
+  const isDrawing = needsDraw(next.hand.length, sealedOf(next.sealed).length)
+  const piles = { pile: game.drawPile, discard: game.discard, reshuffles: game.reshuffles }
+  const drawn = isDrawing
+    ? drawFor(piles.pile, piles.discard, piles.reshuffles, secureRandom)
+    : { card: null, piles }
+
+  // Pile and discard both spent: the race ends on distance
+  if (isDrawing && !drawn.card) return closeRace(table, null, lines)
+  const isShuffled = drawn.piles.reshuffles > game.reshuffles
   game.drawPile = drawn.piles.pile
   game.discard = drawn.piles.discard
   game.reshuffles = drawn.piles.reshuffles
   game.turnId = nextId
   game.turnNo += 1
   game.turnEndsAt = after(table.now, turnSecondsOf(next.strikes, settings.turnSeconds))
-  await saveSeat(table, nextId, { hand: [...next.hand, drawn.card] })
+  if (drawn.card) await saveSeat(table, nextId, { hand: [...next.hand, drawn.card] })
   await writeMoves(table, [
     ...lines,
     ...(isShuffled ? [{ kind: StopGoMoveKinds.Shuffle, accountId: nextId }] : []),

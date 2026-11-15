@@ -1,6 +1,7 @@
 import 'server-only'
 
-import { dropDrawn, windowOf } from '@/core/lib/play/stopgo'
+import { dropDrawn, isPicking, windowOf } from '@/core/lib/play/stopgo'
+import { resolvePick } from '@/core/services/play/stopgo/StopGoDrawService'
 import { resolveWindow } from '@/core/services/play/stopgo/StopGoAttackService'
 import { closeRace, passTurn } from '@/core/services/play/stopgo/StopGoFlowService'
 import { racing, saveSeat, seatOf } from '@/core/services/play/stopgo/StopGoTable'
@@ -39,6 +40,16 @@ export const advance = async (table: StopGoLockedTable): Promise<EngineStep> => 
   // Nobody left to race against
   const road = racing(table)
   if (road.length < 2) return closeRace(table, road[0]?.accountId ?? null)
+
+  // Good draw choice: the first card is kept when time runs out
+  if (isPicking(game.pending)) {
+    const isWaiting = game.pendingEndsAt && now < game.pendingEndsAt
+    const isHere = road.some((seat) => seat.accountId === game.turnId)
+    if (isWaiting && isHere)
+      return { changed: false, finished: false, deadline: game.pendingEndsAt }
+
+    return resolvePick(table)
+  }
 
   // Attack waiting for answers: the window clock rules, not the turn clock
   const window = windowOf(game.pending)

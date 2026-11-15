@@ -52,4 +52,8 @@ export const STOPGO_ERRORS: Record<StopGoRefusal, string> = {
   notYet: 'Cette carte n’est pas encore jouable.',
   waiting: 'Une attaque attend encore une réponse.',
   noWindow: 'Aucune attaque ne te vise.',
+  alreadySealed: 'Cet adversaire porte déjà une carte scellée.',
+  noSealed: 'Aucune carte scellée à révéler.',
+  pileEmpty: 'La pioche est vide.',
+  notPicking: 'Aucune pioche en cours.',
 }
