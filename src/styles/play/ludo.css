@@ -550,7 +550,10 @@
 
 /* Turn clock around the avatar */
 .ludo-ring {
-  background: conic-gradient(var(--pawn-tone) calc(var(--left) * 1turn), transparent 0);
+  background: conic-gradient(
+    var(--pawn-tone) calc(var(--left) * 1turn),
+    color-mix(in srgb, var(--pawn-tone) 28%, transparent) 0
+  );
 }
 
 .ludo-ring-alert {

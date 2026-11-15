@@ -58,6 +58,18 @@
   --hud-shadow: inset 0 1px 0 var(--play-bomb-shine), 0 0.3rem 0 var(--play-bomb-shell-deep);
 }
 
+/* Ludo: varnished wood tokens of a board game box, cream edge, hard wine drop */
+[data-hud='ludo'] {
+  --hud-bg: linear-gradient(160deg, var(--play-ludo-wood), var(--play-ludo-wood-deep));
+  --hud-ink: var(--play-ludo-wood-ink);
+  --hud-value: var(--play-ludo);
+  --hud-faint: rgb(58 42 28 / 0.55);
+  --hud-line: rgb(58 42 28 / 0.2);
+  --hud-chip: var(--play-ludo-wood-edge);
+  --hud-radius: 1.1rem;
+  --hud-shadow: 0 0 0 0.2rem var(--play-ludo-wood-edge), 0 0.45rem 0 0.2rem var(--play-ludo-deep);
+}
+
 /* Bomb fuse burning down */
 .play-bomb-fuse {
   background: repeating-linear-gradient(

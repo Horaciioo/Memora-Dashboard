@@ -21,7 +21,6 @@ import { usePlaySessionLoadStore } from '@/core/store/play/playSessionLoad'
 import { usePlayStageStore } from '@/core/store/play/playStage'
 import { PLAY_GAMES, PLAY_HUB_COPY, PLAY_HUD_GAMES, PLAY_HUD_SKINS } from '@/declarations/play'
 import { BAC_SESSION, PLAY_GAME_BAR, PLAY_ROOM } from '@/declarations/ui/variants'
-import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
 
@@ -88,8 +87,6 @@ export const PlaySessionRoom = ({
   const { ground } = PLAY_GAMES.get(game)
   // Chat open: the keys leave the table for the column
   const isDocked = isChatOpen && !isMobile
-  // Ludo: the board takes the whole screen, no panel around it
-  const isBare = game === PlayGames.Ludo
   const crowdFaces = { players: faces, spectators: crowd.spectators }
 
   return (
@@ -135,11 +132,7 @@ export const PlaySessionRoom = ({
           className={cn(
             'relative',
             BAC_SESSION.boxFull,
-            isHud
-              ? BAC_SESSION.boxFullHud
-              : isBare
-                ? BAC_SESSION.boxFullBare
-                : BAC_SESSION.boxFullPad
+            isHud ? BAC_SESSION.boxFullHud : BAC_SESSION.boxFullPad
           )}
         >
           {children}

@@ -19,6 +19,8 @@ export const PLAY_HUD = {
   playerValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
   playerGone: 'opacity-40 grayscale',
   card: `${BLOCK} pointer-events-auto flex w-[40rem] max-w-full items-center gap-4 px-6 py-3.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:order-2`,
+  // No strip beside it: centred on the screen
+  cardAlone: `${BLOCK} pointer-events-auto flex w-[32rem] max-w-full items-center gap-4 px-6 py-3.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:absolute md:left-1/2 md:-translate-x-1/2`,
   block:
     'flex min-w-0 flex-1 basis-0 items-baseline justify-center gap-2 max-md:flex-col max-md:items-center max-md:gap-1',
   caption: `${CAPTION} max-md:text-[0.65rem] max-md:text-center`,
@@ -26,7 +28,7 @@ export const PLAY_HUD = {
   divider: 'w-px self-stretch bg-[var(--play-line)]',
   rule: 'my-1 h-px bg-[var(--play-line)]',
   // Keys and the settings card hanging under them
-  keys: 'pointer-events-auto relative max-md:ml-auto md:order-3',
+  keys: 'pointer-events-auto relative ml-auto md:order-3',
   keyRow: `${BLOCK} flex items-center gap-1 p-1.5`,
   key: 'grid size-11 place-items-center rounded-full text-[var(--play-ink)] transition-transform hover:-translate-y-0.5 hover:bg-[var(--play-chip)]',
   // Active key tints its glyph, no square behind
@@ -38,7 +40,10 @@ export const PLAY_HUD = {
     'flex items-center justify-start gap-3 px-1 py-1.5 text-left text-base font-extrabold text-[var(--play-ink)]',
   soundRow: 'flex flex-col gap-1 px-1 py-1.5 text-base font-extrabold text-[var(--play-ink)]',
   // Score card bottom left, live lines above the ranking
-  panel: `${BLOCK} pointer-events-auto absolute bottom-3 left-3 flex w-72 max-w-[40%] flex-col overflow-hidden max-md:hidden md:bottom-7 md:left-7`,
+  lead: 'absolute top-1/2 left-3 -translate-y-1/2 max-md:hidden md:left-7',
+  corner:
+    'absolute bottom-3 left-3 flex max-w-[40vw] flex-col items-start gap-3 max-md:hidden md:bottom-7 md:left-7',
+  panel: `${BLOCK} pointer-events-auto flex w-72 max-w-full flex-col overflow-hidden`,
   head: 'flex items-center justify-between gap-2 px-4 py-3',
   title:
     'text-lg leading-none font-black tracking-tight whitespace-nowrap text-[var(--play-ink)] uppercase',

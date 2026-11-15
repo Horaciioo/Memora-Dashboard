@@ -354,8 +354,6 @@ export const BAC_SESSION = {
   boxFullHud: 'size-full overflow-hidden!',
   // Chat laid over a HUD table, last lines in the corner opposite the score card
   hudChat: 'fixed right-3 bottom-3 z-[60] w-80 max-w-[40%] md:right-7 md:bottom-7',
-  // No panel on a phone: the table runs edge to edge, centred as one group
-  boxFullBare: '*:first:mt-auto *:last:mb-auto',
   // Stage keys: in the top bar, then floating over the table, shifted by the open chat
   keys: 'flex items-center gap-2',
   keysFull:

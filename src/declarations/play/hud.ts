@@ -10,6 +10,7 @@ export const PLAY_HUD_GAMES: ReadonlySet<PlayGameName> = new Set([
   PlayGames.Golf,
   PlayGames.Echo,
   PlayGames.Bomb,
+  PlayGames.Ludo,
 ])
 
 /**
@@ -21,6 +22,7 @@ export const PLAY_HUD_SKINS: ReadonlyMap<PlayGameName, string> = new Map([
   [PlayGames.Golf, 'golf-hud-theme golf-block'],
   [PlayGames.Echo, 'play-hud-block'],
   [PlayGames.Bomb, 'play-hud-block'],
+  [PlayGames.Ludo, 'play-hud-block'],
 ])
 
 /**
@@ -61,4 +63,15 @@ export const BOMB_HUD_COPY = {
   prompt: 'Syllabe',
   fuse: 'Mèche',
   lives: 'Vies',
+} as const
+
+/**
+ * Ludo HUD copy
+ * @type {Record<string, string>}
+ */
+
+export const LUDO_HUD_COPY = {
+  turn: 'Tour',
+  home: 'Maison',
+  time: 'Temps',
 } as const

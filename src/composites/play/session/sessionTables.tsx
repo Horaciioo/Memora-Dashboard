@@ -273,7 +273,7 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
-  [PlayGames.Ludo]: ({ sessionId, board, seats, spectators, viewerId }) => {
+  [PlayGames.Ludo]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
     const ludo = board as LudoBoardView
 
     return {
@@ -290,6 +290,7 @@ export const PLAY_SESSION_TABLES: Partial<
             isHost: Boolean(isHost),
           }))}
           viewerId={viewerId}
+          isSeated={me.isSeated}
         />
       ),
       feed: <LudoFeed sessionId={sessionId} board={ludo} players={[...seats, ...spectators]} />,

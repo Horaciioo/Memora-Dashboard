@@ -24,6 +24,10 @@ export interface PlayHudProps {
   blocks: PlayHudBlock[]
   // Players, best first
   rows: PlayHudRow[]
+  // Players strip on top, off when the table already shows them
+  hasStrip?: boolean
+  // Block on the left, level with the table
+  lead?: ReactNode
   // Extra blocks over the table
   children?: ReactNode
 }
@@ -34,24 +38,35 @@ export interface PlayHudProps {
  * @return {JSX.Element}
  */
 
-export const PlayHud = ({ game, sessionId, isSeated, blocks, rows, children }: PlayHudProps) => (
+export const PlayHud = ({
+  game,
+  sessionId,
+  isSeated,
+  blocks,
+  rows,
+  hasStrip = true,
+  lead,
+  children,
+}: PlayHudProps) => (
   <div className={PLAY_HUD.root} data-hud={game.toLowerCase()}>
     <div className={PLAY_HUD.top}>
-      <ul className={PLAY_HUD.strip}>
-        {rows.map((row) => (
-          <li
-            key={row.accountId}
-            className={cn(PLAY_HUD.player, row.isGone && PLAY_HUD.playerGone)}
-            title={row.name}
-          >
-            <span className={PLAY_HUD.playerFace}>
-              <Avatar name={row.name} src={row.avatarUrl} size="sm" />
-            </span>
-            <span className={PLAY_HUD.playerValue}>{row.value}</span>
-          </li>
-        ))}
-      </ul>
-      <div className={PLAY_HUD.card}>
+      {hasStrip && (
+        <ul className={PLAY_HUD.strip}>
+          {rows.map((row) => (
+            <li
+              key={row.accountId}
+              className={cn(PLAY_HUD.player, row.isGone && PLAY_HUD.playerGone)}
+              title={row.name}
+            >
+              <span className={PLAY_HUD.playerFace}>
+                <Avatar name={row.name} src={row.avatarUrl} size="sm" />
+              </span>
+              <span className={PLAY_HUD.playerValue}>{row.value}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className={hasStrip ? PLAY_HUD.card : PLAY_HUD.cardAlone}>
         {blocks.map((block, index) => (
           <div key={block.key} className="contents">
             {index > 0 && <span className={PLAY_HUD.divider} aria-hidden="true" />}
@@ -64,7 +79,10 @@ export const PlayHud = ({ game, sessionId, isSeated, blocks, rows, children }: P
       </div>
       <PlayHudKeys game={game} sessionId={sessionId} isSeated={isSeated} />
     </div>
-    <PlayHudPanel rows={rows} />
+    {lead && <div className={PLAY_HUD.lead}>{lead}</div>}
+    <div className={PLAY_HUD.corner}>
+      <PlayHudPanel rows={rows} />
+    </div>
     {children}
   </div>
 )
