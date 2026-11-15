@@ -2,19 +2,17 @@
 
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
-import { GlitchClock } from '@/composites/play/glitch/GlitchClock'
+import { GlitchHud } from '@/composites/play/glitch/GlitchHud'
 import { GlitchPicture } from '@/composites/play/glitch/GlitchPicture'
 import { GlitchResult } from '@/composites/play/glitch/GlitchResult'
 import { GlitchReveal } from '@/composites/play/glitch/GlitchReveal'
-import { GlitchScores } from '@/composites/play/glitch/GlitchScores'
 import type { GlitchBoardView, GlitchFace } from '@/composites/play/glitch/types'
 import { useGlitchSounds } from '@/composites/play/glitch/useGlitchSounds'
 import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
-import { GLITCH_BOARD_COPY, GLITCH_SETTINGS, fillPlayMessage } from '@/declarations/play'
+import { GLITCH_BOARD_COPY, GLITCH_SETTINGS } from '@/declarations/play'
 import { GLITCH_BOARD } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
 import { PlayGames } from '@/utils/constants/play'
 
 export interface GlitchBoardProps {
@@ -57,7 +55,6 @@ export const GlitchBoard = ({
   const isLocked = new Date(board.mine.lockedUntil ?? 0).getTime() > now
   const isDone = Boolean(me?.rank)
   const canSpot = isSeated && countdown === 0 && !isReveal && !isLocked && !isDone
-  const foundCount = board.mine.found.length
   // Rings left on the pictures after the round
   const missed = (board.marks ?? []).filter(
     (mark) => !board.mine.found.some((entry) => entry.x === mark.x && entry.y === mark.y)
@@ -73,7 +70,7 @@ export const GlitchBoard = ({
   }
 
   return (
-    <div className={GLITCH_BOARD.board}>
+    <div className={GLITCH_BOARD.board} data-hud="glitch">
       {board.round === 1 && countdown > 0 && (
         <PlayCountdown
           game={PlayGames.Glitch}
@@ -83,44 +80,15 @@ export const GlitchBoard = ({
         />
       )}
 
-      <div className={GLITCH_BOARD.head}>
-        <span className={GLITCH_BOARD.round}>
-          {fillPlayMessage(GLITCH_BOARD_COPY.round, { round: board.round, total: board.rounds })}
-        </span>
-        {isReveal ? (
-          <div className={GLITCH_BOARD.clockTrack} />
-        ) : (
-          // New round, new bar
-          <GlitchClock
-            key={board.round}
-            startsAt={board.startsAt}
-            endsAt={board.endsAt}
-            now={now}
-          />
-        )}
-      </div>
-
-      {isSeated && (
-        <div
-          className={GLITCH_BOARD.pips}
-          role="img"
-          aria-label={fillPlayMessage(GLITCH_BOARD_COPY.progress, {
-            found: foundCount,
-            total: board.total,
-          })}
-        >
-          {Array.from({ length: board.total }, (_, index) => (
-            <span
-              // Lighting up replays the pop
-              key={`${index}-${index < foundCount}`}
-              className={cn(GLITCH_BOARD.pip, index < foundCount && GLITCH_BOARD.pipOn)}
-            />
-          ))}
-          <span className={GLITCH_BOARD.pipText}>
-            {fillPlayMessage(GLITCH_BOARD_COPY.progress, { found: foundCount, total: board.total })}
-          </span>
-        </div>
-      )}
+      <GlitchHud
+        sessionId={sessionId}
+        board={board}
+        seats={seats}
+        viewerId={viewerId}
+        isSeated={isSeated}
+        now={now}
+        isReveal={isReveal}
+      />
 
       {/* Pictures stay hidden behind the opening countdown */}
       {countdown === 0 && (
@@ -131,6 +99,7 @@ export const GlitchBoard = ({
             caption={GLITCH_BOARD_COPY.left}
             {...picture}
           />
+          <span className={GLITCH_BOARD.divider} aria-hidden="true" />
           <GlitchPicture
             key={`r${board.round}`}
             items={board.right}
@@ -155,8 +124,6 @@ export const GlitchBoard = ({
           <p className={GLITCH_BOARD.lead}>{GLITCH_BOARD_COPY.lead}</p>
         )}
       </div>
-
-      <GlitchScores seats={seats} total={board.total} round={board.round} />
     </div>
   )
 }

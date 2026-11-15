@@ -265,6 +265,25 @@ export const PAGE_FEATURES: FeatureDefinition[] = [
     routes: ['/moderation/discord'],
   },
   {
+    key: 'unban',
+    label: 'Débannissement',
+    description: 'Les demandes de débannissement Discord et leur traitement.',
+    kind: 'page',
+    section: 'discord',
+    routes: ['/moderation/unban'],
+    api: ['/api/unban'],
+  },
+  {
+    key: 'unban.intake',
+    label: 'Demandes publiques',
+    description:
+      'Le formulaire et le suivi ouverts aux personnes bannies. Couper ferme le formulaire et le suivi publics. Les dossiers restent consultables et traitables.',
+    kind: 'subpage',
+    parent: 'unban',
+    routes: ['/unban/*'],
+    api: ['/api/unban/public'],
+  },
+  {
     key: 'marsha',
     label: 'Marsha Bots',
     description: 'Le suivi des bots de Marsha.',

@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react'
 
-import { apiDelete, apiPost } from '@/core/lib/api/client'
+import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { useSyncedState } from '@/core/hooks/interaction/state/saved/useSyncedState'
 import { entityFeedback } from '@/declarations/ui/copy'
@@ -18,6 +18,7 @@ import type { FieldIssue, FormValues } from '@/types/forms'
  * @property {() => void} clearIssues - Forget the rejections
  * @property {(values: FormValues) => Promise<boolean>} add - Leave a remark
  * @property {(id: string) => Promise<void>} remove - Drop a remark
+ * @property {(id: string, pinned: boolean) => Promise<void>} [pin] - Hold a remark at the top, when the record allows it
  */
 
 export interface CommentsState {
@@ -27,6 +28,7 @@ export interface CommentsState {
   clearIssues: () => void
   add: (values: FormValues) => Promise<boolean>
   remove: (id: string) => Promise<void>
+  pin?: (id: string, pinned: boolean) => Promise<void>
 }
 
 /**
@@ -34,13 +36,15 @@ export interface CommentsState {
  * @param {CommentView[]} initial - Remarks resolved server-side
  * @param {string} addPath - Route a remark is posted to
  * @param {(id: string) => string} removePath - Route a remark is dropped from
+ * @param {boolean} [canPin] - The record keeps pinned remarks, the same route takes the pin
  * @return {CommentsState} - State and mutations
  */
 
 export const useComments = (
   initial: CommentView[],
   addPath: string,
-  removePath: (id: string) => string
+  removePath: (id: string) => string,
+  canPin = false
 ): CommentsState => {
   const [comments, setComments] = useSyncedState(initial)
   const { isSaving, issues, clearIssues, run } = useMutation()
@@ -69,5 +73,13 @@ export const useComments = (
     [run, removePath, setComments]
   )
 
-  return { comments, isSaving, issues, clearIssues, add, remove }
+  const pin = useCallback(
+    async (id: string, pinned: boolean) => {
+      const next = await run(() => apiPatch<CommentView[]>(removePath(id), { pinned }))
+      if (next) setComments(next)
+    },
+    [run, removePath, setComments]
+  )
+
+  return { comments, isSaving, issues, clearIssues, add, remove, ...(canPin ? { pin } : {}) }
 }

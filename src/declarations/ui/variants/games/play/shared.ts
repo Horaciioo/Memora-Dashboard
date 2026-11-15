@@ -9,6 +9,9 @@ export const LIFT = 'shadow-[var(--shadow-sm)]'
 
 export const HEADING = 'text-xl font-extrabold tracking-tight text-[var(--play-ink)] sm:text-2xl'
 
+// Final screen: fills the room, content centred
+export const RESULT = 'flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-6'
+
 export const NOTE = 'text-xs font-semibold tabular-nums text-[var(--play-ink-soft)]'
 
 // Bubble opened by the dock
@@ -36,6 +39,9 @@ export const SETUP_VIOLET =
 
 export const SETUP_WOOD =
   'border-[var(--play-suspens)] bg-[var(--play-suspens)] text-white hover:border-[var(--play-suspens)]'
+
+export const SETUP_ROAD =
+  'border-[var(--play-stopgo)] bg-[var(--play-stopgo)] text-white hover:border-[var(--play-stopgo)]'
 
 export const SETUP_AMBER =
   'border-[var(--play-croquis)] bg-[var(--play-croquis)] text-[var(--play-croquis-night)] hover:border-[var(--play-croquis)]'

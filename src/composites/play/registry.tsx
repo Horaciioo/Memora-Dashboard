@@ -11,6 +11,8 @@ import { CroquisRulesDrawer } from '@/composites/play/croquis/CroquisRulesDrawer
 import { CroquisSetupDrawer } from '@/composites/play/croquis/CroquisSetupDrawer'
 import { EchoRulesDrawer } from '@/composites/play/echo/EchoRulesDrawer'
 import { EchoSetupDrawer } from '@/composites/play/echo/EchoSetupDrawer'
+import { StopGoRulesDrawer } from '@/composites/play/stopgo/StopGoRulesDrawer'
+import { StopGoSetupDrawer } from '@/composites/play/stopgo/StopGoSetupDrawer'
 import { SuspensRulesDrawer } from '@/composites/play/suspens/SuspensRulesDrawer'
 import { SuspensSetupDrawer } from '@/composites/play/suspens/SuspensSetupDrawer'
 import { GlitchRulesDrawer } from '@/composites/play/glitch/GlitchRulesDrawer'
@@ -31,6 +33,7 @@ import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
 import { croquisSettingsOf } from '@/core/lib/play/croquis/settings'
 import { echoSettingsOf } from '@/core/lib/play/echo/settings'
+import { stopGoSettingsOf } from '@/core/lib/play/stopgo/settings'
 import { suspensSettingsOf } from '@/core/lib/play/suspens/settings'
 import { glitchSettingsOf } from '@/core/lib/play/glitch/settings'
 import { golfSettingsOf } from '@/core/lib/play/golf/settings'
@@ -107,6 +110,7 @@ export const PLAY_SETUP_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   [PlayGames.Glitch]: GlitchSetupDrawer,
   [PlayGames.Croquis]: CroquisSetupDrawer,
   [PlayGames.Suspens]: SuspensSetupDrawer,
+  [PlayGames.StopGo]: StopGoSetupDrawer,
 }
 
 /**
@@ -124,6 +128,7 @@ export const PLAY_START_VOTES: Partial<Record<PlayGameName, ComponentType<PlayVo
   [PlayGames.Glitch]: declaredVote(PlayGames.Glitch),
   [PlayGames.Croquis]: declaredVote(PlayGames.Croquis),
   [PlayGames.Suspens]: declaredVote(PlayGames.Suspens),
+  [PlayGames.StopGo]: declaredVote(PlayGames.StopGo),
   [PlayGames.Jumble]: declaredVote(PlayGames.Jumble),
 }
 
@@ -144,6 +149,9 @@ export const PLAY_RULES_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   ),
   [PlayGames.Ludo]: ({ open, onClose, settings }) => (
     <LudoRulesDrawer open={open} onClose={onClose} settings={ludoSettingsOf(settings)} />
+  ),
+  [PlayGames.StopGo]: ({ open, onClose, settings }) => (
+    <StopGoRulesDrawer open={open} onClose={onClose} settings={stopGoSettingsOf(settings)} />
   ),
   [PlayGames.Suspens]: ({ open, onClose, settings }) => (
     <SuspensRulesDrawer open={open} onClose={onClose} settings={suspensSettingsOf(settings)} />

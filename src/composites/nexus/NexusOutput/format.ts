@@ -15,7 +15,11 @@ export const formatValue = (value: unknown, zone: string = DEFAULT_ZONE): string
   if (typeof value === 'string' && ISO_DATE.test(value)) {
     const date = new Date(value)
     if (!Number.isNaN(date.getTime())) {
-      return date.toLocaleString(DATE_LOCALE, { timeZone: zone, dateStyle: 'short', timeStyle: 'medium' })
+      return date.toLocaleString(DATE_LOCALE, {
+        timeZone: zone,
+        dateStyle: 'short',
+        timeStyle: 'medium',
+      })
     }
   }
   if (typeof value === 'object') return JSON.stringify(value)
@@ -50,4 +54,6 @@ export const asRecord = (value: unknown): Record<string, unknown> =>
  */
 
 export const asRows = (value: unknown): Record<string, unknown>[] =>
-  Array.isArray(value) ? value.map((row) => (row && typeof row === 'object' ? asRecord(row) : { valeur: row })) : []
+  Array.isArray(value)
+    ? value.map((row) => (row && typeof row === 'object' ? asRecord(row) : { valeur: row }))
+    : []

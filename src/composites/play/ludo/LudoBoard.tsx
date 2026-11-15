@@ -7,6 +7,7 @@ import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
 import { LudoChaosLayer } from '@/composites/play/ludo/LudoChaosLayer'
 import { LudoDice } from '@/composites/play/ludo/LudoDice'
+import { LudoHud } from '@/composites/play/ludo/LudoHud'
 import { LudoGrid } from '@/composites/play/ludo/LudoGrid'
 import { LudoDuelRoll } from '@/composites/play/ludo/LudoDuelRoll'
 import { LudoJokerOffer } from '@/composites/play/ludo/LudoJokerOffer'
@@ -52,6 +53,7 @@ export interface LudoBoardProps {
   board: LudoBoardView
   faces: LudoFace[]
   viewerId: string
+  isSeated: boolean
 }
 
 /**
@@ -140,12 +142,16 @@ const seatsOf = (
  * @return {JSX.Element}
  */
 
-export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBoardProps) => {
+export const LudoBoard = ({
+  sessionId,
+  board: initial,
+  faces,
+  viewerId,
+  isSeated,
+}: LudoBoardProps) => {
   const board = useLudoBoard(sessionId, initial)
   const now = useServerNow(initial.serverTime)
   const motion = useLudoMotion(board, viewerId, sessionId)
-  const isFullscreen = usePlayStageStore((state) => state.isFullscreen)
-  const isChatOpen = usePlayStageStore((state) => state.isChatOpen)
   const { act, isSaving } = usePlayAct(sessionId)
   // Revision a move was sent on: the board stays shut until a newer one is pushed
   const [sentRev, setSentRev] = useState<number | null>(null)
@@ -186,7 +192,6 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
   const row = {
     map,
     seats,
-    turns,
     viewerId,
     // The die stays with its thrower while the move plays
     turnId: countdown > 0 ? null : motion.isBusy ? motion.rollerId : board.turnId,
@@ -200,107 +205,127 @@ export const LudoBoard = ({ sessionId, board: initial, faces, viewerId }: LudoBo
     looks: motion.looks,
     isChaos,
     stalledId: motion.stalled,
-    die: (
-      <LudoDice
-        face={motion.dice}
-        face2={isRoll && isStill ? null : motion.dice2}
-        isRolling={motion.isRolling}
-        isRolling2={motion.isRolling2}
-        kept={motion.kept}
-        canRoll={board.isMyTurn && isRoll && isStill}
-        canPick={board.isMyTurn && pending?.type === 'pick' && isStill}
-        onRoll={() => void send({ type: 'roll' })}
-        onPick={(die) => void send({ type: 'pick', die })}
-      />
-    ),
   }
+  const die = (
+    <LudoDice
+      face={motion.dice}
+      face2={isRoll && isStill ? null : motion.dice2}
+      isRolling={motion.isRolling}
+      isRolling2={motion.isRolling2}
+      kept={motion.kept}
+      canRoll={board.isMyTurn && isRoll && isStill}
+      canPick={board.isMyTurn && pending?.type === 'pick' && isStill}
+      onRoll={() => void send({ type: 'roll' })}
+      onPick={(die) => void send({ type: 'pick', die })}
+    />
+  )
   const holder = seats.find((seat) => seat.accountId === board.turnId)
 
   return (
-    <div className={map.name === 'star' ? LUDO_BOARD.boardStar : LUDO_BOARD.board}>
-      {countdown > 0 && (
-        <PlayCountdown
-          game={PlayGames.Ludo}
-          seconds={countdown}
-          total={LUDO_SETTINGS.countdownSeconds}
-          lead={LUDO_BOARD_COPY.starting}
-        />
-      )}
-      <LudoPlates {...row} />
-
-      <div
-        className={cn(
-          map.name === 'star' ? LUDO_BOARD.frameStar : LUDO_BOARD.frame,
-          board.isMyTurn && countdown === 0 && LUDO_BOARD.frameMine,
-          isFullscreen && (isChatOpen ? LUDO_BOARD.frameFullChat : LUDO_BOARD.frameFull)
+    <>
+      <LudoHud
+        sessionId={sessionId}
+        map={map}
+        seats={seats}
+        viewerId={viewerId}
+        isSeated={isSeated}
+        turnId={row.turnId}
+        seconds={Math.ceil(msLeft / SECOND_MS)}
+        lead={<LudoPlates {...row} />}
+      />
+      <div className={map.name === 'star' ? LUDO_BOARD.boardStar : LUDO_BOARD.board}>
+        {countdown > 0 && (
+          <PlayCountdown
+            game={PlayGames.Ludo}
+            seconds={countdown}
+            total={LUDO_SETTINGS.countdownSeconds}
+            lead={LUDO_BOARD_COPY.starting}
+          />
         )}
-        style={tone as CSSProperties}
-      >
-        <div
-          className={LUDO_BOARD.surface}
-          style={{ '--cells': map.size } as CSSProperties}
-          data-map={map.name}
-          aria-label={LUDO_BOARD_COPY.board}
-        >
-          <LudoGrid
-            board={map.name}
-            turns={turns}
-            lit={heldStars(map, present, motion.pawns, motion.walking)}
-            palette={palette}
-            isChaos={isChaos}
-          />
-          <LudoPawns
-            map={map}
-            players={present}
-            pawns={motion.pawns}
-            turns={turns}
-            viewerId={viewerId}
-            movable={isStill ? board.movable : []}
-            hop={motion.hop}
-            strike={motion.strike}
-            onPick={(pawn, to) => void send({ type: 'move', pawn, to })}
-            looks={motion.looks}
-            ghosts={motion.ghosts}
-            fading={motion.fading}
-            rewind={motion.rewind}
-            isBlind={(me?.effects.blind ?? 0) > 0}
-            isDisguised={me !== undefined && (motion.looks[viewerId] ?? me.corner) !== me.corner}
-          />
-          <LudoChaosLayer map={map} motion={motion} players={present} names={names} turns={turns} />
-          {isMyRoll && call.count > 0 && (
-            <div key={call.count} className={LUDO_BOARD.banner} aria-hidden="true">
-              <span className={LUDO_BOARD.bannerText}>{LUDO_BOARD_COPY.yourTurn}</span>
-            </div>
-          )}
+        <div data-hud="ludo" className={LUDO_BOARD.phoneRow}>
+          <LudoPlates {...row} />
         </div>
-      </div>
-      {pending?.type === 'duel' &&
-        'waiting' in pending &&
-        pending.waiting.includes(viewerId) &&
-        isStill && <LudoDuelRoll onRoll={() => void send({ type: 'duelRoll' })} />}
-      {pending?.type === 'frenzy' &&
-        'waiting' in pending &&
-        pending.waiting.includes(viewerId) &&
-        isStill && (
-          <LudoDuelRoll
-            label={LUDO_CHAOS_UI.stormRoll}
-            onRoll={() => void send({ type: 'stormRoll' })}
+
+        <div
+          className={cn(
+            map.name === 'star' ? LUDO_BOARD.frameStar : LUDO_BOARD.frame,
+            LUDO_BOARD.frameFull
+          )}
+          style={tone as CSSProperties}
+        >
+          <div
+            className={LUDO_BOARD.surface}
+            style={{ '--cells': map.size } as CSSProperties}
+            data-map={map.name}
+            aria-label={LUDO_BOARD_COPY.board}
+          >
+            <LudoGrid
+              board={map.name}
+              turns={turns}
+              lit={heldStars(map, present, motion.pawns, motion.walking)}
+              palette={palette}
+              isChaos={isChaos}
+            />
+            <LudoPawns
+              map={map}
+              players={present}
+              pawns={motion.pawns}
+              turns={turns}
+              viewerId={viewerId}
+              movable={isStill ? board.movable : []}
+              hop={motion.hop}
+              strike={motion.strike}
+              onPick={(pawn, to) => void send({ type: 'move', pawn, to })}
+              looks={motion.looks}
+              ghosts={motion.ghosts}
+              fading={motion.fading}
+              rewind={motion.rewind}
+              isBlind={(me?.effects.blind ?? 0) > 0}
+              isDisguised={me !== undefined && (motion.looks[viewerId] ?? me.corner) !== me.corner}
+            />
+            <LudoChaosLayer
+              map={map}
+              motion={motion}
+              players={present}
+              names={names}
+              turns={turns}
+            />
+            {isMyRoll && call.count > 0 && (
+              <div key={call.count} className={LUDO_BOARD.banner} aria-hidden="true">
+                <span className={LUDO_BOARD.bannerText}>{LUDO_BOARD_COPY.yourTurn}</span>
+              </div>
+            )}
+          </div>
+        </div>
+        {pending?.type === 'duel' &&
+          'waiting' in pending &&
+          pending.waiting.includes(viewerId) &&
+          isStill && <LudoDuelRoll onRoll={() => void send({ type: 'duelRoll' })} />}
+        {pending?.type === 'frenzy' &&
+          'waiting' in pending &&
+          pending.waiting.includes(viewerId) &&
+          isStill && (
+            <LudoDuelRoll
+              label={LUDO_CHAOS_UI.stormRoll}
+              onRoll={() => void send({ type: 'stormRoll' })}
+            />
+          )}
+        {pending?.type === 'joker' && pending.malus && board.isMyTurn && isStill && (
+          <LudoJokerOffer
+            malus={pending.malus}
+            clock={Math.min(1, msLeft / (board.settings.turnSeconds * SECOND_MS))}
+            isSaving={isSaving}
+            onAnswer={(use) => void send({ type: 'joker', use })}
           />
         )}
-      {pending?.type === 'joker' && pending.malus && board.isMyTurn && isStill && (
-        <LudoJokerOffer
-          malus={pending.malus}
-          clock={Math.min(1, msLeft / (board.settings.turnSeconds * SECOND_MS))}
-          isSaving={isSaving}
-          onAnswer={(use) => void send({ type: 'joker', use })}
-        />
-      )}
-      <p
-        className={cn(LUDO_BOARD.status, board.isMyTurn && LUDO_BOARD.statusCall)}
-        aria-live="polite"
-      >
-        {strikeOf(motion.strike, seats) ?? statusOf(board, holder?.name ?? '', viewerId)}
-      </p>
-    </div>
+        <div className={LUDO_BOARD.dieSlot}>{die}</div>
+        <p
+          className={cn(LUDO_BOARD.status, board.isMyTurn && LUDO_BOARD.statusCall)}
+          aria-live="polite"
+        >
+          {strikeOf(motion.strike, seats) ?? statusOf(board, holder?.name ?? '', viewerId)}
+        </p>
+      </div>
+    </>
   )
 }

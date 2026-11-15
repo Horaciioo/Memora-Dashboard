@@ -33,6 +33,12 @@ interface StringListContext {
   allowed?: readonly string[]
 }
 
+interface IntegerListContext {
+  path: string
+  fallback: number[]
+  min?: number
+}
+
 interface ChoiceContext<TValue extends string> {
   path: string
   fallback: TValue
@@ -219,6 +225,24 @@ export const readStringList = (raw: unknown, context: StringListContext): string
     }
   }
   return value as string[]
+}
+
+/**
+ * Read list of distinct integers, ascending
+ * @param {unknown} value - Value
+ * @param {IntegerListContext} context - Context
+ * @return {number[]}
+ */
+
+export const readIntegerList = (raw: unknown, context: IntegerListContext): number[] => {
+  const floor = context.min ?? Number.MIN_SAFE_INTEGER
+  const isValid =
+    Array.isArray(raw) &&
+    raw.length > 0 &&
+    raw.every((entry) => Number.isInteger(entry) && entry >= floor)
+  if (!isValid) return reject(context.path, 'is not a list of integers', raw, context.fallback)
+
+  return [...new Set(raw as number[])].sort((first, second) => first - second)
 }
 
 /**

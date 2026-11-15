@@ -3,6 +3,7 @@ import 'server-only'
 import { encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
 import { forbidden, notFound } from '@/core/lib/errors'
+import { assertRequestInScope } from '@/core/services/unban/requests/notes'
 import { readText } from '@/core/lib/forms/values'
 import { COMMENT_SHAPE, toComment } from '@/core/services/academy/juniors/CommentService'
 import {
@@ -11,6 +12,7 @@ import {
   assertTaskVisible,
 } from '@/core/services/work/visibility'
 import type { WorkViewer } from '@/core/services/work/visibility'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { WORK_COMMENT_KINDS } from '@/declarations/work/comments'
 import type { WorkCommentKind } from '@/declarations/work/comments'
 import type { NotificationTargetName } from '@/declarations/notifications/targets'
@@ -38,14 +40,17 @@ export const commentKind = (kind: string, access: PermissionHelpers): WorkCommen
  * @param {WorkCommentKind} kind - Record kind
  * @param {string} id - Record identifier
  * @param {WorkViewer} viewer - Who reads
+ * @param {() => Promise<AccessScope>} scope - Creator perimeter, read only when a kind needs it
  * @return {Promise<void>} - Throws when hidden
  */
 
 const assertReachable = async (
   kind: WorkCommentKind,
   id: string,
-  viewer: WorkViewer
+  viewer: WorkViewer,
+  scope: () => Promise<AccessScope>
 ): Promise<void> => {
+  if (kind === 'unban') return assertRequestInScope(id, await scope())
   if (kind === 'project') return assertProjectVisible(id, viewer)
   if (kind === 'task') return assertTaskVisible(id, viewer)
   if (kind === 'meeting') return assertMeetingVisible(id, viewer)
@@ -70,7 +75,8 @@ const readComments = async (kind: WorkCommentKind, id: string): Promise<CommentV
   const rows = await prisma.workComment.findMany({
     where: { [WORK_COMMENT_KINDS[kind].column]: id },
     include: COMMENT_SHAPE,
-    orderBy: { createdAt: 'asc' },
+    // Pinned remarks lead, the rest keeps its order
+    orderBy: [{ pinnedAt: { sort: 'desc', nulls: 'last' } }, { createdAt: 'asc' }],
   })
 
   return rows.map(toComment)
@@ -81,15 +87,17 @@ const readComments = async (kind: WorkCommentKind, id: string): Promise<CommentV
  * @param {WorkCommentKind} kind - Record kind
  * @param {string} id - Record identifier
  * @param {WorkViewer} viewer - Who reads
+ * @param {() => Promise<AccessScope>} scope - Creator perimeter
  * @return {Promise<CommentView[]>} - Remarks
  */
 
 export const listWorkComments = async (
   kind: WorkCommentKind,
   id: string,
-  viewer: WorkViewer
+  viewer: WorkViewer,
+  scope: () => Promise<AccessScope>
 ): Promise<CommentView[]> => {
-  await assertReachable(kind, id, viewer)
+  await assertReachable(kind, id, viewer, scope)
 
   return readComments(kind, id)
 }
@@ -100,6 +108,7 @@ export const listWorkComments = async (
  * @param {string} id - Record identifier
  * @param {WorkViewer} viewer - Who writes
  * @param {FormValues} values - Parsed body
+ * @param {() => Promise<AccessScope>} scope - Creator perimeter
  * @return {Promise<CommentView[]>} - Remarks
  */
 
@@ -107,9 +116,10 @@ export const addWorkComment = async (
   kind: WorkCommentKind,
   id: string,
   viewer: WorkViewer,
-  values: FormValues
+  values: FormValues,
+  scope: () => Promise<AccessScope>
 ): Promise<CommentView[]> => {
-  await assertReachable(kind, id, viewer)
+  await assertReachable(kind, id, viewer, scope)
 
   await prisma.workComment.create({
     data: {
@@ -151,6 +161,12 @@ export const commentMention = async (
     return row && { target: 'meeting', targetId: id, subject: row.title }
   }
 
+  if (kind === 'unban') {
+    const row = await prisma.unbanRequest.findUnique({ where: { id }, select: { reference: true } })
+
+    return row && { target: 'unbanRequest', targetId: id, subject: row.reference }
+  }
+
   // A communication leads to its project
   const row = await prisma.communication.findUnique({
     where: { id },
@@ -168,6 +184,7 @@ export const commentMention = async (
  * @param {string} id - Record identifier
  * @param {string} commentId - Remark identifier
  * @param {WorkViewer} viewer - Who drops
+ * @param {() => Promise<AccessScope>} scope - Creator perimeter
  * @return {Promise<CommentView[]>} - Remarks left
  */
 
@@ -175,9 +192,10 @@ export const removeWorkComment = async (
   kind: WorkCommentKind,
   id: string,
   commentId: string,
-  viewer: WorkViewer
+  viewer: WorkViewer,
+  scope: () => Promise<AccessScope>
 ): Promise<CommentView[]> => {
-  await assertReachable(kind, id, viewer)
+  await assertReachable(kind, id, viewer, scope)
 
   // The remark must sit on this record, own unless admin
   const { count } = await prisma.workComment.deleteMany({
@@ -186,6 +204,36 @@ export const removeWorkComment = async (
       [WORK_COMMENT_KINDS[kind].column]: id,
       ...(viewer.isAdmin ? {} : { authorId: viewer.id }),
     },
+  })
+  if (count === 0) throw notFound()
+
+  return readComments(kind, id)
+}
+
+/**
+ * Pin a remark at the top of its thread, or let it go
+ * @param {WorkCommentKind} kind - Record kind
+ * @param {string} id - Record identifier
+ * @param {string} commentId - Remark identifier
+ * @param {boolean} pinned - Held at the top
+ * @param {WorkViewer} viewer - Who pins
+ * @param {() => Promise<AccessScope>} scope - Creator perimeter
+ * @return {Promise<CommentView[]>} - Remarks
+ */
+
+export const pinWorkComment = async (
+  kind: WorkCommentKind,
+  id: string,
+  commentId: string,
+  pinned: boolean,
+  viewer: WorkViewer,
+  scope: () => Promise<AccessScope>
+): Promise<CommentView[]> => {
+  await assertReachable(kind, id, viewer, scope)
+
+  const { count } = await prisma.workComment.updateMany({
+    where: { id: commentId, [WORK_COMMENT_KINDS[kind].column]: id },
+    data: { pinnedAt: pinned ? new Date() : null },
   })
   if (count === 0) throw notFound()
 

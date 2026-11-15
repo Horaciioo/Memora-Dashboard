@@ -43,9 +43,9 @@ export const PlayStageKeys = ({
   // Sits above the chat column instead of floating
   isDocked?: boolean
 }) => {
-  const { isFullscreen, isChatOpen, toggleFullscreen, toggleChat } = usePlayStageStore()
+  const { isScreen, isChatOpen, toggleScreen, toggleChat } = usePlayStageStore()
   const isMobile = useIsMobileShell()
-  const FullscreenIcon = isFullscreen ? ICONS.playWindowed : ICONS.playFullscreen
+  const FullscreenIcon = isScreen ? ICONS.playWindowed : ICONS.playFullscreen
   const ChatIcon = ICONS.playChat
   // Phone: the gear holds them
   if (isMobile) return null
@@ -56,21 +56,19 @@ export const PlayStageKeys = ({
         BAC_SESSION.keys,
         isDocked
           ? BAC_SESSION.keysDocked
-          : isFullscreen && [BAC_SESSION.keysFull, isChatOpen && BAC_SESSION.keysShifted]
+          : [BAC_SESSION.keysFull, isChatOpen && BAC_SESSION.keysShifted]
       )}
     >
       {game === PlayGames.Golf ? (
         // Golf keeps its own inline exits
-        isFullscreen && (
-          <PlayGameActions
-            sessionId={sessionId}
-            gameSlug={gameSlug}
-            isSeated={isSeated}
-            hasSettings={false}
-            itemClass={BAC_SESSION.exitKey}
-            iconClass={BAC_SESSION.exitIcon}
-          />
-        )
+        <PlayGameActions
+          sessionId={sessionId}
+          gameSlug={gameSlug}
+          isSeated={isSeated}
+          hasSettings={false}
+          itemClass={BAC_SESSION.exitKey}
+          iconClass={BAC_SESSION.exitIcon}
+        />
       ) : (
         <PlayMenuKey
           sessionId={sessionId}
@@ -81,23 +79,21 @@ export const PlayStageKeys = ({
         />
       )}
       <PlayVolumeKey game={game} />
-      {isFullscreen && (
-        <Button
-          variant="arcadeGhost"
-          className={BAC_SESSION.keyButton}
-          aria-label={isChatOpen ? PLAY_HUB_COPY.hideChat : PLAY_HUB_COPY.showChat}
-          aria-pressed={isChatOpen}
-          onClick={toggleChat}
-        >
-          <ChatIcon className={BAC_SESSION.keysIcon} aria-hidden="true" />
-        </Button>
-      )}
       <Button
         variant="arcadeGhost"
         className={BAC_SESSION.keyButton}
-        aria-label={isFullscreen ? PLAY_HUB_COPY.windowed : PLAY_HUB_COPY.fullscreen}
-        aria-pressed={isFullscreen}
-        onClick={toggleFullscreen}
+        aria-label={isChatOpen ? PLAY_HUB_COPY.hideChat : PLAY_HUB_COPY.showChat}
+        aria-pressed={isChatOpen}
+        onClick={toggleChat}
+      >
+        <ChatIcon className={BAC_SESSION.keysIcon} aria-hidden="true" />
+      </Button>
+      <Button
+        variant="arcadeGhost"
+        className={BAC_SESSION.keyButton}
+        aria-label={isScreen ? PLAY_HUB_COPY.windowed : PLAY_HUB_COPY.fullscreen}
+        aria-pressed={isScreen}
+        onClick={toggleScreen}
       >
         <FullscreenIcon className={BAC_SESSION.keysIcon} aria-hidden="true" />
       </Button>

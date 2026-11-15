@@ -50,5 +50,13 @@
   "clientErrors": {
     "windowSeconds": 60,
     "max": 20
+  },
+  "unbanSubmit": {
+    "windowSeconds": 3600,
+    "max": 5
+  },
+  "unbanPublic": {
+    "windowSeconds": 60,
+    "max": 30
   }
 }

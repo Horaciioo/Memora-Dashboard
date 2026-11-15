@@ -47,13 +47,12 @@ export interface NavalArsenalProps {
   orientation: number
   isMyTurn: boolean
   canFire: boolean
-  waitCall: string
   onTurn: (orientation: number) => void
   onFire: () => void
 }
 
 /**
- * The weapon drawn and the one action key, same size whoever's turn it is
+ * The weapon drawn and the fire key, small enough for the HUD bridge
  * @param {NavalArsenalProps} props - Arsenal
  * @return {JSX.Element}
  */
@@ -64,7 +63,6 @@ export const NavalArsenal = ({
   orientation,
   isMyTurn,
   canFire,
-  waitCall,
   onTurn,
   onFire,
 }: NavalArsenalProps) => {
@@ -78,6 +76,7 @@ export const NavalArsenal = ({
         type="button"
         className={cn(NAVAL_ARSENAL.card, (!isMyTurn || turns < 2) && NAVAL_ARSENAL.cardFixed)}
         aria-label={turns > 1 ? NAVAL_BOARD_COPY.turnWeapon : copy.label}
+        title={turns > 1 ? NAVAL_BOARD_COPY.turnHint : copy.note}
         disabled={!isMyTurn || turns < 2}
         aria-keyshortcuts="R"
         onClick={() => onTurn((orientation + 1) % turns)}
@@ -85,22 +84,12 @@ export const NavalArsenal = ({
         <span className={NAVAL_ARSENAL.glyphBox}>
           <WeaponGlyph name={weapon} orientation={orientation} />
         </span>
-        <span className={NAVAL_ARSENAL.text}>
-          <span className={NAVAL_ARSENAL.name}>{copy.label}</span>
-          <span className={NAVAL_ARSENAL.note}>
-            {turns > 1 ? NAVAL_BOARD_COPY.turnHint : copy.note}
-          </span>
-        </span>
+        <span className={NAVAL_ARSENAL.name}>{copy.label}</span>
       </button>
-      <div className={NAVAL_ARSENAL.divider} role="separator" />
-      {isMyTurn ? (
+      {isMyTurn && (
         <button type="button" className={NAVAL_ARSENAL.fire} disabled={!canFire} onClick={onFire}>
           {NAVAL_BOARD_COPY.fire}
         </button>
-      ) : (
-        <p className={NAVAL_ARSENAL.wait} aria-live="polite">
-          {waitCall}
-        </p>
       )}
     </div>
   )

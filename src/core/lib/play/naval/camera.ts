@@ -48,9 +48,14 @@ export const stageCamera = (
   band: Record<'north' | 'east' | 'south' | 'west', number>,
   margin: number
 ): NavalCamera => {
-  const lean = (far: number, near: number) => (far + near ? (((far - near) / (far + near)) * margin) / 2 : 0)
+  const lean = (far: number, near: number) =>
+    far + near ? (((far - near) / (far + near)) * margin) / 2 : 0
 
-  return { x: size / 2 + lean(band.east, band.west), y: size / 2 + lean(band.south, band.north), span: size + margin }
+  return {
+    x: size / 2 + lean(band.east, band.west),
+    y: size / 2 + lean(band.south, band.north),
+    span: size + margin,
+  }
 }
 
 /**

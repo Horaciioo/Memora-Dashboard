@@ -2,12 +2,11 @@
 
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
-import { SuspensClock } from '@/composites/play/suspens/SuspensClock'
 import { SuspensGallows } from '@/composites/play/suspens/SuspensGallows'
+import { SuspensHud } from '@/composites/play/suspens/SuspensHud'
 import { SuspensKeys } from '@/composites/play/suspens/SuspensKeys'
 import { SuspensResult } from '@/composites/play/suspens/SuspensResult'
 import { SuspensReveal } from '@/composites/play/suspens/SuspensReveal'
-import { SuspensScores } from '@/composites/play/suspens/SuspensScores'
 import { SuspensWord } from '@/composites/play/suspens/SuspensWord'
 import { SuspensWordForm } from '@/composites/play/suspens/SuspensWordForm'
 import type { SuspensBoardView, SuspensFace } from '@/composites/play/suspens/types'
@@ -31,7 +30,7 @@ export interface SuspensBoardProps {
 }
 
 /**
- * Suspens screen: the gallows beside the word, the keys or the setter's field, the scores, live
+ * Suspens screen: the gallows beside the word, the keys or the setter's field, live
  * @param {SuspensBoardProps} props - Board and table
  * @return {JSX.Element}
  */
@@ -77,7 +76,7 @@ export const SuspensBoard = ({
         : fillPlayMessage(SUSPENS_BOARD_COPY.theirTurn, { name: turn?.name ?? '' })
 
   return (
-    <div className={SUSPENS_BOARD.board}>
+    <div className={SUSPENS_BOARD.board} data-hud="suspens">
       {board.round === 1 && countdown > 0 && (
         <PlayCountdown
           game={PlayGames.Suspens}
@@ -87,31 +86,31 @@ export const SuspensBoard = ({
         />
       )}
 
-      <div className={SUSPENS_BOARD.head}>
-        <span className={SUSPENS_BOARD.round}>
-          {fillPlayMessage(SUSPENS_BOARD_COPY.round, { round: board.round, total: board.rounds })}
-        </span>
-        {board.reveal ? (
-          <div className={SUSPENS_BOARD.clockTrack} />
-        ) : (
-          <SuspensClock
-            // New turn, new bar
-            key={`clock-${board.round}-${board.turnNo}-${board.phase}`}
-            startsAt={start}
-            endsAt={isPicking ? board.pickEndsAt : (board.turnEndsAt ?? board.pickEndsAt)}
-            now={now}
-          />
-        )}
-        <span
-          className={
-            board.isMyTurn || (isPicking && isSetter)
-              ? SUSPENS_BOARD.leadStrong
-              : SUSPENS_BOARD.lead
-          }
-        >
-          {lead}
-        </span>
-      </div>
+      <SuspensHud
+        sessionId={sessionId}
+        round={board.round}
+        rounds={board.rounds}
+        seats={seats}
+        setterId={board.setterId}
+        viewerId={viewerId}
+        isSeated={isSeated}
+        isReveal={Boolean(board.reveal)}
+        clock={{
+          // New turn, new bar
+          key: `clock-${board.round}-${board.turnNo}-${board.phase}`,
+          startsAt: start,
+          endsAt: isPicking ? board.pickEndsAt : (board.turnEndsAt ?? board.pickEndsAt),
+          now,
+        }}
+      />
+
+      <span
+        className={
+          board.isMyTurn || (isPicking && isSetter) ? SUSPENS_BOARD.leadStrong : SUSPENS_BOARD.lead
+        }
+      >
+        {lead}
+      </span>
 
       <div className={SUSPENS_BOARD.stage}>
         <SuspensGallows errors={board.errors} allowed={board.allowed} />
@@ -193,13 +192,6 @@ export const SuspensBoard = ({
           </>
         )}
       </div>
-
-      <SuspensScores
-        seats={seats}
-        setterId={board.setterId}
-        turnId={board.turnId}
-        isRunning={!board.reveal}
-      />
     </div>
   )
 }

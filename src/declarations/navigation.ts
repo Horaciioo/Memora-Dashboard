@@ -1,6 +1,7 @@
 import type { MaturityName } from '@/declarations/maturity/registries'
 import { MANAGEMENT_BASE, MANAGEMENT_PAGES, managementHref } from '@/declarations/management/pages'
 import { BLOCK_HASH_PREFIX } from '@/declarations/pages/editor'
+import { MAIL_CONSOLE_COPY } from '@/declarations/mail/copy'
 import { PUSH_CONSOLE_COPY } from '@/declarations/pwa/copy'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import type { IconName } from '@/declarations/ui/icons'
@@ -68,6 +69,10 @@ export const ROUTES = {
   sanctions: '/moderation/sanctions',
   discordSanctions: '/moderation/discord',
   marsha: '/moderation/marsha',
+  unban: '/moderation/unban',
+  unbanEdit: '/moderation/unban/edit',
+  unbanRequest: (id: string) => `/moderation/unban/${id}`,
+  unbanPublic: (slug: string) => `/${slug}/contest`,
   notifications: '/notifications',
   administration: '/administration',
   maturity: '/maturity',
@@ -107,6 +112,7 @@ export const ROUTES = {
   journal: '/system/logs',
   queues: '/system/queues',
   push: '/system/push',
+  mail: '/system/mail',
   probes: '/system/probes',
   analytics: '/system/activity',
   health: '/system/health',
@@ -476,6 +482,13 @@ export const NAVIGATION: NavigationGroup[] = [
         maturity: 'new',
       },
       { href: ROUTES.marsha, label: 'Marsha Bots', icon: 'discord' },
+      {
+        href: ROUTES.unban,
+        label: 'Débannissement',
+        icon: 'unlock',
+        permission: Permissions.UnbanRead,
+        maturity: 'new',
+      },
     ],
   },
   {
@@ -545,6 +558,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   sanctions: 'Panel Twitch',
   discord: 'Panel Discord',
   marsha: 'Marsha Bots',
+  unban: 'Débannissement',
   notifications: 'Notifications',
   administration: 'Console admin',
   maturity: 'Maturité',
@@ -559,6 +573,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   queues: 'Files de jobs',
   probes: 'Sondes',
   push: PUSH_CONSOLE_COPY.title,
+  mail: MAIL_CONSOLE_COPY.title,
   activity: 'Activité',
   health: 'Santé',
   employees: 'Employés',

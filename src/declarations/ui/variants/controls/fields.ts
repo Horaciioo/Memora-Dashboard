@@ -79,6 +79,26 @@ export const FIELD_STYLES = {
 } as const
 
 /**
+ * Visible choice list styles
+ * @type {Record<string, string>}
+ */
+
+export const CHOICE_LIST_STYLES = {
+  group: 'flex min-w-0 flex-col gap-1.5',
+  row: 'flex min-h-11 cursor-pointer items-center gap-3 rounded-[var(--radius-md)] px-3 text-sm text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)] has-[:focus-visible]:bg-[var(--color-hover)] has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60',
+  rowInvalid: 'bg-[var(--color-danger-soft)]',
+  // Native input stays for the keyboard
+  input: 'peer sr-only',
+  mark: 'flex size-5 shrink-0 items-center justify-center border border-[var(--color-field-border-strong)] bg-[var(--color-field)] transition-colors peer-checked:border-[var(--color-brand-600)] peer-checked:bg-[var(--color-brand-600)] peer-checked:[&>span]:opacity-100',
+  markRadio: 'rounded-full',
+  markCheck: 'rounded-[var(--radius-sm)]',
+  // Dot of a radio, tick of a box
+  dot: 'size-2 rounded-full bg-[var(--color-on-brand)] opacity-0',
+  tick: 'mb-0.5 h-2.5 w-1.5 rotate-45 border-r-2 border-b-2 border-[var(--color-on-brand)] opacity-0',
+  label: 'min-w-0 flex-1',
+} as const
+
+/**
  * Tag input styles
  * @type {Record<string, string>}
  */

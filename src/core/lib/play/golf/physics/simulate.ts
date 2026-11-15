@@ -39,6 +39,8 @@ const substepsOf = (moving: GolfBody[], dt: number): number => {
  */
 
 const record = (world: GolfWorld): void => {
+  // A probe only needs where balls end
+  if (world.input.isProbe) return
   for (const body of world.bodies) body.path.push(...pathPoint(body.x, body.y, body.z))
   world.frames += 1
 }

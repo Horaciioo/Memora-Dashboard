@@ -5,7 +5,7 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import { GolfResult } from '@/composites/play/golf/GolfResult'
-import { PlayLoadingScreen } from '@/composites/play/loading/PlayLoadingScreen'
+import { PlayLoadHold } from '@/composites/play/loading/PlayLoadHold'
 import { GolfStats } from '@/composites/play/golf/hud/results/GolfStats'
 import { GolfBreak } from '@/composites/play/golf/hud/GolfBreak'
 import { GolfCountdown } from '@/composites/play/golf/hud/GolfCountdown'
@@ -20,7 +20,6 @@ import type { GolfFace } from '@/composites/play/golf/types'
 import { playGolfSound } from '@/composites/play/golf/sound'
 import { useGolfSounds } from '@/composites/play/golf/useGolfSounds'
 import { useGolfTable } from '@/composites/play/golf/useGolfTable'
-import { usePlayStageStore } from '@/core/store/play/playStage'
 import { useGolfBoard } from '@/core/hooks/data/play/useGolfBoard'
 import { useGolfStroke } from '@/core/hooks/data/play/useGolfStroke'
 import { useGolfPowerCue } from '@/core/hooks/interaction/golf/useGolfPowerCue'
@@ -52,7 +51,8 @@ import { cn } from '@/utils/classnames'
 // Three loaded only on a golf table
 const GolfScene = dynamic(() => import('@/composites/play/golf/scene/GolfScene'), {
   ssr: false,
-  loading: () => <PlayLoadingScreen isFill />,
+  // The session screen stays up while the scene loads
+  loading: () => <PlayLoadHold name="golf-scene" />,
 })
 
 export interface GolfBoardProps {
@@ -103,7 +103,6 @@ export const GolfBoard = ({
 }: GolfBoardProps) => {
   const live = useGolfBoard(sessionId, initial)
   const board = useSettledBall(live)
-  const isFullscreen = usePlayStageStore((state) => state.isFullscreen)
   const phase = useGolfPhase(board)
   const layouts = holesOf(board.settings)
   const layout = layouts[Math.min(board.hole, layouts.length - 1)]
@@ -164,9 +163,9 @@ export const GolfBoard = ({
   }
 
   return (
-    <div className={cn(GOLF_BOARD.board, isFullscreen && GOLF_BOARD.boardFull)}>
+    <div className={cn(GOLF_BOARD.board, GOLF_BOARD.boardFull)}>
       <div
-        className={cn(GOLF_BOARD.stage, isFullscreen && GOLF_BOARD.stageFull)}
+        className={cn(GOLF_BOARD.stage, GOLF_BOARD.stageFull)}
         style={golfHudTones(course.paint) as CSSProperties}
       >
         <GolfScene

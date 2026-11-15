@@ -7,7 +7,7 @@ const RAYS = Array.from({ length: 18 }, (_, index) => index * 20)
 
 export interface PlayHubSceneryProps {
   // Set key, also the tone suffix
-  set: 'echo' | 'croquis' | 'glitch' | 'jumble' | 'suspens'
+  set: 'echo' | 'croquis' | 'glitch' | 'jumble' | 'suspens' | 'stopgo'
 }
 
 /**
@@ -18,9 +18,9 @@ export interface PlayHubSceneryProps {
 
 export const PlayHubScenery = ({ set }: PlayHubSceneryProps) => {
   const tone = `--play-${set}`
-  const { far, near } = SCENERY_SETS[set]
+  const { far, near, top, halo = tone } = SCENERY_SETS[set]
 
-  return (
+  const ground = (
     <svg
       viewBox="0 0 1600 900"
       preserveAspectRatio="xMidYMax slice"
@@ -46,12 +46,27 @@ export const PlayHubScenery = ({ set }: PlayHubSceneryProps) => {
           ))}
         </g>
       </g>
-      <ellipse cx="800" cy="920" rx="760" ry="300" {...tint(tone, 0.28)} />
+      <ellipse cx="800" cy="920" rx="760" ry="300" {...tint(halo, 0.28)} />
       <g filter={`url(#play-scenery-far-${set})`} opacity="0.4">
         {far}
       </g>
       <rect y="620" width="1600" height="280" fill={`url(#play-scenery-fog-${set})`} />
       <g filter={`url(#play-scenery-near-${set})`}>{near}</g>
     </svg>
+  )
+  if (!top) return ground
+
+  return (
+    <>
+      {ground}
+      <svg
+        viewBox="0 0 1600 900"
+        preserveAspectRatio="xMidYMin slice"
+        className={PLAY_HUB.scenery}
+        aria-hidden="true"
+      >
+        <g filter={`url(#play-scenery-near-${set})`}>{top}</g>
+      </svg>
+    </>
   )
 }

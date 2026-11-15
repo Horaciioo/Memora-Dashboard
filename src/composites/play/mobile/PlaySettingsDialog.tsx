@@ -29,7 +29,8 @@ export const PlaySettingsDialog = ({
   const host = document.querySelector('[data-play-stage]') ?? document.body
 
   return createPortal(
-    <div className={cn(PLAY_HUB.sheet, 'z-[60]')}>
+    // Portaled out of the menu: a press here never folds it
+    <div className={cn(PLAY_HUB.sheet, 'z-[60]')} data-floating-layer>
       <div className={PLAY_HUB.sheetScrim} onMouseDown={onClose} />
       <div
         ref={trapRef}

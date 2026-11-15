@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, SETUP_TEAL } from '@/declarations/ui/variants/games/play/shared'
+import { NOTE, PANEL, RESULT, SETUP_TEAL } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Echo board
@@ -7,31 +7,40 @@ import { NOTE, PANEL, SETUP_TEAL } from '@/declarations/ui/variants/games/play/s
  */
 
 export const ECHO_BOARD = {
-  board: 'relative flex flex-col items-center gap-6 pb-16 in-[.play-boxfull]:pb-0',
+  board:
+    'relative flex min-h-[min(40rem,100dvh)] flex-1 flex-col items-center justify-center gap-3 px-4 pt-24 pb-[5.5rem] md:gap-4 md:pt-28 md:pb-6',
   figure:
     'play-figure play-figure-echo text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
-  // Round line and clock
-  head: 'flex w-full max-w-3xl flex-col gap-2',
-  round: 'text-center text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
   clockTrack: 'h-3 w-full overflow-hidden rounded-full bg-[var(--play-chip)]',
   clock: 'play-echo-clock h-full w-full rounded-full',
-  lead: 'text-center text-sm text-[var(--play-ink-soft)]',
+  lead: 'text-center text-sm font-bold text-[var(--play-echo-glow)] sm:text-lg',
   // Center card and own card
   table:
-    'flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:items-start sm:gap-10',
-  slot: 'flex w-[min(78vw,21rem)] flex-col items-center gap-2',
-  caption: 'text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
+    'play-echo-stage relative flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:items-start sm:gap-14',
+  slot: 'flex flex-col items-center gap-3',
+  slotMine: 'w-[min(80vw,27rem,36dvh)] md:w-[min(80vw,27rem,40dvh)]',
+  // The center card is the smaller one on a phone
+  slotCenter: 'w-[min(46vw,19dvh)] md:w-[min(80vw,27rem,40dvh)]',
+  caption: 'text-sm font-black tracking-[0.18em] whitespace-nowrap uppercase',
+  captionCenter: 'text-[var(--echo-rim-center)]',
+  captionMine: 'text-[var(--echo-rim-mine)]',
   // Round card and its symbols
   card: 'play-echo-card relative aspect-square w-full rounded-full',
   cardSmall: 'play-echo-card-small',
+  cardCenter: 'play-echo-card-center',
+  cardMine: 'play-echo-card-mine',
   symbol:
-    'play-echo-symbol absolute aspect-square -translate-x-1/2 -translate-y-1/2 rotate-[var(--angle)] cursor-pointer rounded-full transition-transform enabled:hover:scale-110 enabled:active:scale-95 disabled:cursor-not-allowed',
+    'play-echo-symbol absolute aspect-square -translate-x-1/2 -translate-y-1/2 rotate-[var(--angle)] cursor-pointer rounded-full transition-transform enabled:hover:scale-[1.14] enabled:active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed',
   symbolAnswer: 'play-echo-answer',
-  art: 'size-full',
+  art: 'play-echo-art size-full',
   // Other hands
-  hands: 'flex w-full max-w-3xl flex-wrap items-start justify-center gap-4',
-  hand: 'flex w-24 flex-col items-center gap-1 transition-opacity sm:w-28',
+  hands: 'flex w-full max-w-3xl flex-wrap items-start justify-center gap-x-3 gap-y-1 md:gap-4',
+  hand: 'flex w-auto flex-col items-center gap-1 transition-opacity md:w-28',
+  // Other cards show from tablets up, a phone keeps the faces
+  handCard: 'max-md:hidden',
   handDone: 'opacity-60',
+  // Faces only on a phone
+  handLabel: 'max-md:hidden',
   handName:
     'flex w-full items-center justify-center gap-1 text-xs font-bold text-[var(--play-ink)]',
   // Reveal banner
@@ -43,16 +52,7 @@ export const ECHO_BOARD = {
     'rounded-full bg-[var(--play-echo)] px-3 py-1 text-[0.7rem] font-extrabold tracking-widest text-white uppercase',
   timeout: 'text-sm font-bold text-[var(--play-ink-soft)]',
   itWas: NOTE,
-  // Scoreboard
-  scores: `${PANEL} flex w-full max-w-md flex-col gap-1 p-2`,
-  score: 'flex items-center gap-3 rounded-xl px-2 py-1.5 transition-opacity',
-  scoreScored: 'play-echo-scored',
-  scoreLeft: 'opacity-50',
-  scoreRank: 'w-5 text-center text-xs font-extrabold tabular-nums text-[var(--play-ink-faint)]',
-  scoreName: 'min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
-  scoreGain: 'text-xs font-extrabold tabular-nums text-[var(--play-gold)]',
-  scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
-  result: 'flex flex-col items-center gap-5',
+  result: RESULT,
 } as const
 
 /**

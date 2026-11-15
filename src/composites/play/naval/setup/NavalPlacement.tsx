@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 
-import { NavalClock } from '@/composites/play/naval/NavalClock'
-import { NavalDock } from '@/composites/play/naval/NavalDock'
+import { NavalHud } from '@/composites/play/naval/NavalHud'
+import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import { NavalOcean } from '@/composites/play/naval/ocean/NavalOcean'
 import { playNaval } from '@/composites/play/naval/sound'
 import { useNavalPlacement } from '@/composites/play/naval/setup/useNavalPlacement'
@@ -12,7 +12,8 @@ import { marksOf } from '@/core/lib/play/naval/sea'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
-import { NAVAL_PLACE } from '@/declarations/ui/variants/games/naval'
+import { NAVAL_HUD, NAVAL_PLACE } from '@/declarations/ui/variants/games/naval'
+import { cn } from '@/utils/classnames'
 
 /**
  * Placement screen: drag the fleet onto the sea, lock it, wait for the others
@@ -26,10 +27,12 @@ import { NAVAL_PLACE } from '@/declarations/ui/variants/games/naval'
 export const NavalPlacement = ({
   sessionId,
   board,
+  captains,
   viewer,
 }: {
   sessionId: string
   board: NavalBoardState
+  captains: NavalCaptainView[]
   viewer: number
 }) => {
   const { act, isSaving } = usePlayAct(sessionId)
@@ -56,17 +59,57 @@ export const NavalPlacement = ({
 
   return (
     <div className={NAVAL_PLACE.root}>
+      <NavalHud
+        sessionId={sessionId}
+        board={board}
+        captains={captains}
+        viewer={viewer}
+        call={
+          viewer < 0
+            ? NAVAL_BOARD_COPY.spectating
+            : isReady
+              ? NAVAL_BOARD_COPY.waitOthers
+              : NAVAL_BOARD_COPY.placeTitle
+        }
+        tone="calm"
+        clock={{
+          serverTime: board.serverTime,
+          endsAt: board.phaseEndsAt,
+          totalSeconds: board.settings.placementSeconds + NAVAL_SETTINGS.countdownSeconds,
+          alertSeconds: NAVAL_SETTINGS.alertSeconds,
+        }}
+        actions={
+          viewer >= 0 && (
+            <>
+              {isPlacing ? (
+                <>
+                  <button type="button" className={NAVAL_HUD.action} onClick={placement.shuffle}>
+                    {NAVAL_BOARD_COPY.random}
+                  </button>
+                  <button
+                    type="button"
+                    className={cn(NAVAL_HUD.action, NAVAL_HUD.actionMain)}
+                    disabled={!placement.isComplete || isSaving}
+                    onClick={() => void lock()}
+                  >
+                    {NAVAL_BOARD_COPY.validate}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className={NAVAL_HUD.action}
+                  disabled={isSaving}
+                  onClick={() => void act({ type: 'unready' })}
+                >
+                  {NAVAL_BOARD_COPY.edit}
+                </button>
+              )}
+            </>
+          )
+        }
+      />
       <div className={NAVAL_PLACE.stage}>
-        <div className={NAVAL_PLACE.head}>
-          <h2 className={NAVAL_PLACE.heading}>{NAVAL_BOARD_COPY.placeTitle}</h2>
-          <NavalClock
-            serverTime={board.serverTime}
-            endsAt={board.phaseEndsAt}
-            totalSeconds={board.settings.placementSeconds + NAVAL_SETTINGS.countdownSeconds}
-            alertSeconds={NAVAL_SETTINGS.alertSeconds}
-          />
-          {viewer < 0 && <p className={NAVAL_PLACE.sub}>{NAVAL_BOARD_COPY.spectating}</p>}
-        </div>
         <div className={NAVAL_PLACE.body}>
           <div className={NAVAL_PLACE.sea}>
             <NavalOcean
@@ -83,52 +126,6 @@ export const NavalPlacement = ({
                 onDrop: placement.onDrop,
               })}
             />
-          </div>
-          <div className={NAVAL_PLACE.side}>
-            {isPlacing && (
-              <>
-                <NavalDock
-                  fleet={sea.fleet}
-                  placed={placement.ships.map((ship) => ship.id)}
-                  heldId={placement.heldId}
-                  box={box}
-                  size={sea.size}
-                  map={board.settings.map}
-                  onGrab={placement.grabFromDock}
-                  onDrag={placement.onDrag}
-                  onDrop={placement.onDrop}
-                />
-                <div className={NAVAL_PLACE.keys}>
-                  <button type="button" className={NAVAL_PLACE.key} onClick={placement.shuffle}>
-                    {NAVAL_BOARD_COPY.random}
-                  </button>
-                  <button type="button" className={NAVAL_PLACE.key} onClick={placement.clear}>
-                    {NAVAL_BOARD_COPY.clear}
-                  </button>
-                  <button
-                    type="button"
-                    className={NAVAL_PLACE.keyMain}
-                    disabled={!placement.isComplete || isSaving}
-                    onClick={() => void lock()}
-                  >
-                    {NAVAL_BOARD_COPY.validate}
-                  </button>
-                </div>
-              </>
-            )}
-            {isReady && (
-              <>
-                <p className={NAVAL_PLACE.sub}>{NAVAL_BOARD_COPY.waitOthers}</p>
-                <button
-                  type="button"
-                  className={NAVAL_PLACE.key}
-                  disabled={isSaving}
-                  onClick={() => void act({ type: 'unready' })}
-                >
-                  {NAVAL_BOARD_COPY.edit}
-                </button>
-              </>
-            )}
           </div>
         </div>
       </div>

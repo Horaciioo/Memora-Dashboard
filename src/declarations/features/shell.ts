@@ -116,6 +116,15 @@ export const SHELL_FEATURES: FeatureDefinition[] = [
     api: ['/api/system/push'],
   },
   {
+    key: 'system.mail',
+    label: 'Console mail',
+    description: 'Le catalogue et le journal des e-mails envoyés.',
+    kind: 'subpage',
+    parent: 'system',
+    routes: ['/system/mail'],
+    api: ['/api/system/mail'],
+  },
+  {
     key: 'system.probes',
     label: 'Sondes',
     description: 'Les contrôles de santé des services.',

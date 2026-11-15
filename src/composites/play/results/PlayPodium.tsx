@@ -2,7 +2,7 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { PlayConfetti } from '@/composites/play/baccalaureat/PlayConfetti'
 import { PlayMedal } from '@/composites/play/shared/PlayMedal'
 import { ICONS } from '@/declarations/ui/icons'
-import { BAC_BOARD, BAC_PODIUM_BLOCKS } from '@/declarations/ui/variants'
+import { BAC_BOARD, PLAY_PODIUM, PLAY_PODIUM_BLOCKS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 // Places on the podium, the winner in the middle
@@ -41,24 +41,28 @@ export const PlayPodium = ({
   const CrownIcon = ICONS.playCrown
 
   return (
-    <>
+    <div className={PLAY_PODIUM.stage}>
       {hasWinner && <PlayConfetti />}
-      <div className={BAC_BOARD.podium}>
+      <div className={PLAY_PODIUM.row}>
         {PODIUM_ORDER.map((place) => {
           const entry = ranked[place - 1]
           if (!entry) return null
 
           return (
-            <div key={place} className={BAC_BOARD.podiumPlace}>
-              <div className={BAC_BOARD.podiumFace}>
+            <div key={place} className={PLAY_PODIUM.place}>
+              <div className={PLAY_PODIUM.face}>
                 {place === WINNER && hasWinner && (
-                  <CrownIcon className={BAC_BOARD.podiumCrown} aria-hidden="true" />
+                  <CrownIcon className={PLAY_PODIUM.crown} aria-hidden="true" />
                 )}
-                <Avatar name={entry.name} src={entry.avatarUrl} size="lg" />
+                <Avatar
+                  name={entry.name}
+                  src={entry.avatarUrl}
+                  size={place === WINNER ? 'xl' : 'lg'}
+                />
               </div>
-              <span className={BAC_BOARD.podiumName}>{entry.name}</span>
-              <span className={BAC_BOARD.podiumPoints}>{entry.note}</span>
-              <div className={cn(BAC_BOARD.podiumBlock, BAC_PODIUM_BLOCKS[place])}>
+              <span className={PLAY_PODIUM.name}>{entry.name}</span>
+              <span className={PLAY_PODIUM.points}>{entry.note}</span>
+              <div className={cn(PLAY_PODIUM.block, PLAY_PODIUM_BLOCKS[place])}>
                 <PlayMedal place={place as 1 | 2 | 3} size="lg" />
               </div>
             </div>
@@ -77,6 +81,6 @@ export const PlayPodium = ({
           ))}
         </ol>
       )}
-    </>
+    </div>
   )
 }

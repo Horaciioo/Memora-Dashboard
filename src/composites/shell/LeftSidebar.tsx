@@ -32,11 +32,9 @@ import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import {
-  DEADLINE_NUDGE_COPY,
   MENTION_NUDGE_COPY,
   MENTION_NUDGE_SOMEONE,
 } from '@/declarations/work/copy'
-import { OVERDUE_ROUTES } from '@/declarations/work/registries'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
@@ -192,13 +190,10 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
         nav
       )}
 
-      {/* A late item or a mention lights its page */}
+      {/* A mention lights its page */}
       {!courseRail && !calendarRail && !isIntroOpen && (
         <RailDeadlineBubbles
           bubbles={[
-            ...(Object.keys(OVERDUE_ROUTES) as (keyof typeof OVERDUE_ROUTES)[])
-              .filter((flag) => viewContext.overdue[flag])
-              .map((flag) => ({ href: OVERDUE_ROUTES[flag], message: DEADLINE_NUDGE_COPY[flag] })),
             ...viewContext.mentions.map(({ href, actorName }) => ({
               href,
               message: MENTION_NUDGE_COPY.replace('{name}', actorName ?? MENTION_NUDGE_SOMEONE),

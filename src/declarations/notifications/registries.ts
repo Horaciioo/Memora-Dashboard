@@ -386,6 +386,23 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     trail: '',
     addressed: true,
   },
+  UnbanSubmitted: {
+    label: 'Déban.',
+    tone: 'info',
+    icon: 'unlock',
+    lead: 'Une demande de déban',
+    verb: 'vient d’arriver',
+    trail: '',
+    addressed: true,
+  },
+  UnbanAssigned: {
+    label: 'Déban.',
+    tone: 'info',
+    icon: 'unlock',
+    lead: 'te confie',
+    verb: 'une demande de déban',
+    trail: '',
+  },
   PushTrial: {
     label: 'Essai',
     tone: 'success',

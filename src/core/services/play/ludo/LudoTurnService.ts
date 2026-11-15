@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { conflict } from '@/core/lib/errors'
-import { after, countdownEnd } from '@/core/lib/play/clock'
+import { after, openingEnd } from '@/core/lib/play/clock'
 import {
   applyMalus,
   autoMove,
@@ -61,7 +61,7 @@ export const openBoard = async (session: EngineSession): Promise<EngineStep> => 
   const settings = isCrowd ? { ...stored, rules: { ...stored.rules, chaos: true } } : stored
   const map = mapOf(settings.rules.chaos)
   const corners = map.seating[order.length] ?? map.seating[map.corners]
-  const startsAt = countdownEnd(new Date(), LUDO_SETTINGS.countdownSeconds)
+  const startsAt = openingEnd(new Date(), LUDO_SETTINGS.countdownSeconds)
   const turnEndsAt = after(startsAt, settings.turnSeconds)
 
   await prisma.$transaction([

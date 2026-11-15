@@ -64,8 +64,21 @@ export const JOURNAL_SIGNAL: ChangeSignal = {
 }
 
 /**
+ * Unban signal, raised by any write to a request or a link
+ * @type {ChangeSignal}
+ */
+
+export const UNBAN_SIGNAL: ChangeSignal = {
+  topic: 'unban:changed',
+  event: 'unban',
+  settleMs: 400,
+  writes: new Set(WRITES),
+  watched: { UnbanRequest: true },
+}
+
+/**
  * Every signal the database client raises
  * @type {ChangeSignal[]}
  */
 
-export const CHANGE_SIGNALS: ChangeSignal[] = [ACCESS_SIGNAL, JOURNAL_SIGNAL]
+export const CHANGE_SIGNALS: ChangeSignal[] = [ACCESS_SIGNAL, JOURNAL_SIGNAL, UNBAN_SIGNAL]

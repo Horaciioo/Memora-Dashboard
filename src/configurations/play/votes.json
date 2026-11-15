@@ -13,6 +13,9 @@
     "laps": [1, 2, 3],
     "errors": [6, 8, 10]
   },
+  "stopgo": {
+    "turnSeconds": [20, 30, 45]
+  },
   "jumble": {
     "rounds": [5, 10, 15, 20]
   },

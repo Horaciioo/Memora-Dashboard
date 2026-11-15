@@ -51,4 +51,10 @@ export const QUERY_KEYS = {
   pageRevision: (id: string, versionId: string) => ['pages', 'revisions', id, versionId] as const,
   pageSearch: (term: string) => ['pages', 'search', term] as const,
   pageTrash: ['pages', 'trash'] as const,
+  unban: ['unban'] as const,
+  unbanRequests: (filters: Record<string, string>) => ['unban', 'requests', filters] as const,
+  unbanRequest: (id: string) => ['unban', 'request', id] as const,
+  unbanHistory: (id: string) => ['unban', 'history', id] as const,
+  unbanForm: ['unban', 'form'] as const,
+  unbanVersions: ['unban', 'versions'] as const,
 } as const

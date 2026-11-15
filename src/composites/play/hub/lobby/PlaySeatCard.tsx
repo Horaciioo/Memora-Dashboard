@@ -17,6 +17,8 @@ export interface PlaySeatCardProps {
   isLobby: boolean
   isMine: boolean
   isMobile: boolean
+  // Host still choosing the rules
+  isConfiguring: boolean
   // The host may send this player away
   canKick: boolean
   // Own ready key lives on the own card
@@ -38,6 +40,7 @@ export const PlaySeatCard = ({
   isLobby,
   isMine,
   isMobile,
+  isConfiguring,
   canKick,
   onToggleReady,
   isSaving,
@@ -47,15 +50,13 @@ export const PlaySeatCard = ({
   const TickIcon = ICONS.playTick
   const CrownIcon = ICONS.playCrown
   const KickIcon = ICONS.playClose
-  const isReady = isLobby && !seat.hasLeft && seat.isReady
+  const isReady = isLobby && !seat.hasLeft && seat.isReady && !isConfiguring
   const isIdle = isLobby && !seat.hasLeft && !seat.isReady
   const note = seat.hasLeft
     ? PLAY_HUB_COPY.left
     : seat.botKind
       ? botSeatNote(seat.botKind)
-      : seat.isHost
-        ? PLAY_HUB_COPY.host
-        : PLAY_HUB_COPY.player
+      : null
 
   return (
     <div
@@ -69,7 +70,6 @@ export const PlaySeatCard = ({
       style={{ animationDelay: `${index * 50}ms` }}
       onContextMenu={onContextMenu}
     >
-      {isMine && <span className={PLAY_ROOM.seatYou}>{PLAY_HUB_COPY.you}</span>}
       {canKick && (
         <button
           type="button"
@@ -93,15 +93,19 @@ export const PlaySeatCard = ({
       <p className={PLAY_ROOM.seatName} style={{ color: `var(--play-${seat.color})` }}>
         {seat.name}
       </p>
-      {seat.isHost || seat.botKind || seat.hasLeft ? (
+      {note ? (
         <p className={PLAY_ROOM.seatRole}>{note}</p>
       ) : null}
       {isLobby && !seat.hasLeft && (
         <p
-          key={String(seat.isReady)}
-          className={cn(PLAY_ROOM.seatState, !seat.isReady && PLAY_ROOM.seatStateIdle)}
+          key={`${seat.isReady}-${isConfiguring}`}
+          className={cn(PLAY_ROOM.seatState, !isReady && PLAY_ROOM.seatStateIdle)}
         >
-          {seat.isReady ? PLAY_HUB_COPY.ready : PLAY_HUB_COPY.notReady}
+          {isConfiguring
+            ? PLAY_HUB_COPY.configuring
+            : seat.isReady
+              ? PLAY_HUB_COPY.ready
+              : PLAY_HUB_COPY.notReady}
         </p>
       )}
       {onToggleReady && (

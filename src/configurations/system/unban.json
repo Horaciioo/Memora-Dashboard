@@ -1,0 +1,14 @@
+{
+  "requireDiscordIdentity": true,
+  "minFillSeconds": 20,
+  "maxQuestions": 20,
+  "maxPages": 10,
+  "maxOptions": 12,
+  "answerMaxLength": 4000,
+  "shortAnswerMaxLength": 200,
+  "reviewNoteMaxLength": 2000,
+  "ticketMinutes": 120,
+  "statsRecentDays": 7,
+  "statsMonthDays": 30,
+  "notifyMax": 20
+}

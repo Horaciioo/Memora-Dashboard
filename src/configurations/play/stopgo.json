@@ -1,0 +1,71 @@
+{
+  "minPlayers": 2,
+  "maxPlayers": 4,
+  "countdownSeconds": 5,
+  "targets": [500, 1000, 1500, 2000],
+  "target": 1000,
+  "handSize": 6,
+  "deck": {
+    "km25": 10,
+    "km50": 10,
+    "km75": 10,
+    "km100": 12,
+    "km200": 4,
+    "red": 5,
+    "limit": 4,
+    "fuel": 3,
+    "flat": 3,
+    "crash": 3,
+    "green": 14,
+    "unlimit": 6,
+    "petrol": 6,
+    "spare": 6,
+    "repair": 6,
+    "siren": 1,
+    "tank": 1,
+    "tyres": 1,
+    "ace": 1,
+    "goodDraw": 4,
+    "mystery": 3
+  },
+  "turnSeconds": {
+    "default": 30,
+    "min": 15,
+    "max": 60
+  },
+  "turnStep": 5,
+  "strikes": 3,
+  "afkSeconds": 5,
+  "reshuffles": 2,
+  "counter": {
+    "seconds": 5
+  },
+  "goodDraw": {
+    "seconds": 15
+  },
+  "mystery": {
+    "cost": 75
+  },
+  "accident": {
+    "minTargets": 2
+  },
+  "limit": {
+    "maxKm": 50
+  },
+  "remedyNeedsGreen": false,
+  "startsStopped": true,
+  "track": {
+    "mapKm": 250,
+    "signKm": 100
+  },
+  "camera": {
+    "resumeSeconds": 4
+  },
+  "fx": {
+    "flightMs": 650,
+    "markMs": 900,
+    "drawMs": 450
+  },
+  "colors": ["red", "blue", "green", "yellow"],
+  "feedSize": 40
+}

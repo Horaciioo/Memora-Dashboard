@@ -7,6 +7,8 @@ import { ECHO_HUB } from '@/declarations/play/echo/copy'
 import { ECHO_SETTINGS } from '@/declarations/play/echo/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
+import { STOPGO_HUB } from '@/declarations/play/stopgo/art'
 import { SUSPENS_HUB } from '@/declarations/play/suspens/copy'
 import { SUSPENS_SETTINGS } from '@/declarations/play/suspens/settings'
 import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
@@ -20,7 +22,7 @@ import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { APP_ENVIRONMENT } from '@/declarations/system/environments'
 import { PLAY_PAPER } from '@/declarations/play/paper'
 import { BACCALAUREAT_SETTINGS } from '@/declarations/play/settings'
-import { PlayGames } from '@/utils/constants/play'
+import { PlayGames, STOPGO_SLUG } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 /**
@@ -176,6 +178,19 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     minPlayers: NAVAL_SETTINGS.minPlayers,
     maxPlayers: NAVAL_SETTINGS.maxPlayers,
     playable: APP_ENVIRONMENT === 'dev' || APP_ENVIRONMENT === 'staging',
+  },
+  [PlayGames.StopGo]: {
+    label: 'Stop & Go',
+    slug: STOPGO_SLUG,
+    tagline: 'Une course de cartes, des attaques à poser et des parades à garder, arrive pile.',
+    tone: '--play-stopgo',
+    logo: 'playStopGo',
+    backdrop: 'road',
+    ground: STOPGO_HUB.ground,
+    minPlayers: STOPGO_SETTINGS.minPlayers,
+    maxPlayers: STOPGO_SETTINGS.maxPlayers,
+    // Dev only until the final audit
+    playable: APP_ENVIRONMENT === 'dev',
   },
 })
 

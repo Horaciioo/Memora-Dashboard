@@ -107,13 +107,12 @@ const sessionFeed = (
 }
 
 /**
- * Board of a Baccalaureat game
+ * Baccalaureat game read once, then each viewer's board drawn from it
  * @param {EngineSession} session - Game
- * @param {string} viewerId - Reader
- * @return {Promise<object>} - Board
+ * @return {Promise<(viewerId: string) => object>} - Board of a viewer
  */
 
-export const baccalaureatView = async (session: EngineSession, viewerId: string) => {
+export const baccalaureatBoards = async (session: EngineSession) => {
   const settings = baccalaureatSettingsOf(session.settings)
   const [rounds, totals] = await Promise.all([
     prisma.baccalaureatRound.findMany({
@@ -152,18 +151,34 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
 
   // Drafts stay private while writing
   const isOpen = phase === BaccalaureatPhases.Countdown || phase === BaccalaureatPhases.Writing
-  const shown = (round?.answers ?? []).filter((answer) => !isOpen || answer.accountId === viewerId)
+  const all = round?.answers ?? []
 
-  // Dictionary hints once words are out
-  const hinted = shown.filter((answer) => !isOpen && usesDictionary(answer.category))
+  // Dictionary hints once words are out, the same for everyone
+  const hinted = isOpen ? [] : all.filter((answer) => usesDictionary(answer.category))
   const hints = await lookUpWords(hinted.map((answer) => answer.word))
-  const answers = shown.map(({ votes, ...answer }) => ({
-    ...answer,
-    inDictionary: hints.get(answer.word) ?? null,
-    acceptedBy: votes.filter((vote) => vote.accepted).map((vote) => vote.voterId),
-    rejectedBy: votes.filter((vote) => !vote.accepted).map((vote) => vote.voterId),
-    myVote: votes.find((vote) => vote.voterId === viewerId)?.accepted ?? null,
+  const tallied = all.map(({ votes, ...answer }) => ({
+    answer: {
+      ...answer,
+      inDictionary: hints.get(answer.word) ?? null,
+      acceptedBy: votes.filter((vote) => vote.accepted).map((vote) => vote.voterId),
+      rejectedBy: votes.filter((vote) => !vote.accepted).map((vote) => vote.voterId),
+    },
+    votes,
   }))
+
+  /**
+   * Answers one viewer may see, with their own vote
+   * @param {string} viewerId - Reader
+   * @return {object[]} - Answers
+   */
+
+  const answersFor = (viewerId: string) =>
+    tallied
+      .filter(({ answer }) => !isOpen || answer.accountId === viewerId)
+      .map(({ answer, votes }) => ({
+        ...answer,
+        myVote: votes.find((vote) => vote.voterId === viewerId)?.accepted ?? null,
+      }))
 
   // Players done with the latest round
   const done = totals
@@ -172,7 +187,7 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
     )
     .map((total) => total.accountId)
 
-  return {
+  const board = {
     settings,
     done,
     voted: finishedVoters(round?.answers ?? [], session.players),
@@ -208,8 +223,22 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
       reviewEndsAt: round.reviewEndsAt,
       stoppedById: round.stoppedById,
       bonus: round.bonus,
-      answers,
     },
     serverTime: new Date(),
   }
+
+  return (viewerId: string) => ({
+    ...board,
+    round: board.round && { ...board.round, answers: answersFor(viewerId) },
+  })
 }
+
+/**
+ * Board of a Baccalaureat game
+ * @param {EngineSession} session - Game
+ * @param {string} viewerId - Reader
+ * @return {Promise<object>} - Board
+ */
+
+export const baccalaureatView = async (session: EngineSession, viewerId: string) =>
+  (await baccalaureatBoards(session))(viewerId)

@@ -6,6 +6,7 @@ import { pruneSessions } from '@/core/services/auth/SessionService'
 import { purgeChatMessages } from '@/core/services/lives/ChatHistoryService'
 import { purgeModerationLog } from '@/core/services/lives/ModerationLogService'
 import { purgeNexusTraces } from '@/core/services/nexus/NexusAuditService'
+import { purgeDecidedRequests } from '@/core/services/unban/UnbanRequestService'
 import { purgeErrorEvents } from '@/core/services/system/ErrorEventService'
 import { pruneOrphanFiles } from '@/core/services/system/FileService'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
@@ -22,6 +23,7 @@ import { DAY_MS } from '@/utils/constants/time'
  * @property {number} candidates - Rejected candidacies dropped
  * @property {number} bans - Lapsed blacklist entries dropped
  * @property {number} files - Orphan files dropped
+ * @property {number} unbanRequests - Decided Deban. requests dropped
  * @property {number} storedBytes - Weight the binaries add to every backup
  */
 
@@ -35,6 +37,7 @@ export interface MaintenanceReport {
   candidates: number
   bans: number
   files: number
+  unbanRequests: number
   storedBytes: number
 }
 
@@ -146,6 +149,7 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     candidates,
     bans,
     files,
+    unbanRequests,
   ] = await Promise.all([
     pruneSessions(RETENTION_POLICIES.expiredSessions),
     pruneNotifications(),
@@ -157,6 +161,7 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     pruneRejectedCandidates(),
     pruneBans(),
     pruneOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
+    purgeDecidedRequests().catch(() => 0),
   ])
 
   // The console keeps its own window and stays out of the report
@@ -173,6 +178,7 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     candidates,
     bans,
     files,
+    unbanRequests,
     // Weighed after the sweep
     storedBytes: await storedBytes(),
   }

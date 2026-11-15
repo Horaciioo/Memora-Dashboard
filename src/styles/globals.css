@@ -11,7 +11,10 @@
 @import './play/scroll.css';
 @import './play/croquis.css';
 @import './play/suspens.css';
+@import './play/stopgo.css';
 @import './play/echo.css';
+@import './play/hud.css';
+@import './play/baccalaureat.css';
 @import './play/glitch.css';
 @import './play/jumble.css';
 @import './play/ludo.css';

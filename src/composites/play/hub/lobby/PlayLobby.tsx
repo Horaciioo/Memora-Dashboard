@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
@@ -13,10 +13,11 @@ import type { PlayRulesValue } from '@/composites/play/registry'
 import { PlayLobbyExtras } from '@/composites/play/hub/PlayLobbyExtras'
 import { PlayLobbyLink } from '@/composites/play/hub/lobby/PlayLobbyLink'
 import { PlaySeatCard } from '@/composites/play/hub/lobby/PlaySeatCard'
-import { PlayLoadingScreen } from '@/composites/play/loading/PlayLoadingScreen'
+import { PlayLoading } from '@/composites/play/loading/PlayLoading'
 import { PlayInviteSlot } from '@/composites/play/session/PlayInviteSlot'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
+import { usePlayLobbyStore } from '@/core/store/play/playLobby'
 import { usePlayStarting } from '@/core/hooks/data/play/usePlayStarting'
 import { usePlayPeopleMenu } from '@/core/hooks/interaction/state/play/usePlayPeopleMenu'
 import { fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
@@ -63,6 +64,8 @@ export interface PlayLobbyProps {
   me: { isSeated: boolean; isHost: boolean; isSpectator: boolean }
   game: PlayGameName
   rules: PlayRulesValue
+  // Host has chosen the rules
+  isConfigured: boolean
   // Server ms at the page render, clock of the vote
   serverTime: number
   visibility: PlayVisibilityName
@@ -81,12 +84,13 @@ export const PlayLobby = ({
   status,
   minPlayers,
   maxPlayers,
-  seats,
+  seats: rawSeats,
   candidates,
   viewerId,
   me,
   game,
   rules,
+  isConfigured,
   serverTime,
   visibility,
   joinCode,
@@ -94,7 +98,10 @@ export const PlayLobby = ({
   const moves = usePlayMoves()
   // Fresh table lands on the picker
   const isPrivate = visibility === PlayVisibilities.Private
-  const [isRulesOpen, setRulesOpen] = useState(false)
+  const isRulesOpen = usePlayLobbyStore((state) => state.isSetupOpen)
+  const setRulesOpen = usePlayLobbyStore((state) => state.setSetupOpen)
+  // A table never inherits the drawer of the previous one
+  useEffect(() => () => setRulesOpen(false), [setRulesOpen])
   const isMobile = useIsMobileShell()
   const menuOf = usePlayPeopleMenu({
     sessionId: id,
@@ -103,22 +110,36 @@ export const PlayLobby = ({
     viewerId,
     isViewerHost: me.isHost,
   })
+  // Own ready shown at once, the server read confirms it
+  const [readyWish, setReadyWish] = useState<boolean | null>(null)
+  const serverReady = rawSeats.find((seat) => seat.accountId === viewerId)?.isReady
+  if (readyWish !== null && serverReady === readyWish) setReadyWish(null)
+  const toggleReady = () => {
+    const next = !(readyWish ?? serverReady)
+    setReadyWish(next)
+    void moves.ready(id, next).then((done) => !done && setReadyWish(null))
+  }
+  const seats = rawSeats.map((seat) =>
+    seat.accountId === viewerId && readyWish !== null ? { ...seat, isReady: readyWish } : seat
+  )
   const present = seats.filter((seat) => !seat.hasLeft)
   const isLobby = status === PlayStatuses.Lobby
   const waiting = present.filter((seat) => !seat.isReady).length
-  const canStart = present.length >= minPlayers && waiting === 0
+  const Setup = PLAY_SETUP_DRAWERS[game]
+  // Games without choices are configured from the start
+  const hasChosen = isConfigured || !Setup
+  const canStart = hasChosen && present.length >= minPlayers && waiting === 0
   const freeSeats = Math.max(0, Math.min(maxPlayers, EMPTY_SEATS_MAX) - present.length)
   const columns = Math.min(4, Math.max(2, seats.length + (me.isSeated ? freeSeats : 0)))
   const subtitle =
     present.length < minPlayers
-      ? fillPlayMessage(PLAY_HUB_COPY.needPlayers, { min: minPlayers })
+      ? null
       : waiting > 0
         ? me.isHost
           ? fillPlayMessage(PLAY_HUB_COPY.waitingFor, { count: waiting })
           : PLAY_HUB_COPY.lobbyNeedReady
         : PLAY_HUB_COPY.lobbyAllReady
   const Rules = PLAY_RULES_DRAWERS[game]
-  const Setup = PLAY_SETUP_DRAWERS[game]
   const Vote = PLAY_START_VOTES[game]
   // The host edits, the others read
   const canEdit = isLobby && me.isHost && Boolean(Setup)
@@ -132,15 +153,16 @@ export const PlayLobby = ({
   }
 
   return (
-    <div className={PLAY_ROOM.middle} data-play-box>
-      {(isLaunching || isStarting) && isLobby && <PlayLoadingScreen isCover />}
+    <div className={PLAY_ROOM.middle}>
+      {(isLaunching || isStarting) && isLobby && <PlayLoading game={game} hasChat />}
       {isLobby && (
         <header className={PLAY_ROOM.lobbyHead}>
-          <p className={PLAY_ROOM.eyebrow}>{PLAY_HUB_COPY.lobbyEyebrow}</p>
           <h1 className={PLAY_ROOM.lobbyTitle}>{PLAY_HUB_COPY.lobbyWaiting}</h1>
-          <p className={PLAY_ROOM.lobbySub} role="status">
-            {subtitle}
-          </p>
+          {subtitle && (
+            <p className={PLAY_ROOM.lobbySub} role="status">
+              {subtitle}
+            </p>
+          )}
         </header>
       )}
       {isLobby && isPrivate && me.isSeated && <PlayLobbyLink sessionId={id} joinCode={joinCode} />}
@@ -175,6 +197,7 @@ export const PlayLobby = ({
               isLobby={isLobby}
               isMine={seat.accountId === viewerId}
               isMobile={isMobile}
+              isConfiguring={isLobby && seat.isHost && !hasChosen}
               canKick={
                 isLobby && me.isHost && !seat.isHost && !seat.hasLeft && seat.accountId !== viewerId
               }
@@ -182,7 +205,7 @@ export const PlayLobby = ({
               onKick={() => void moves.kick(id, seat.accountId)}
               onToggleReady={
                 isLobby && me.isSeated && !me.isHost && seat.accountId === viewerId
-                  ? () => void moves.ready(id, !seat.isReady)
+                  ? toggleReady
                   : null
               }
               onContextMenu={menuOf(

@@ -1,5 +1,5 @@
-import { PlayLoadingScreen } from '@/composites/play/loading/PlayLoadingScreen'
+import { PlayLoading } from '@/composites/play/loading/PlayLoading'
 
 export default function Loading() {
-  return <PlayLoadingScreen />
+  return <PlayLoading isInstant />
 }

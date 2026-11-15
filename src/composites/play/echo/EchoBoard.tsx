@@ -3,18 +3,18 @@
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
 import { EchoCard } from '@/composites/play/echo/EchoCard'
-import { EchoClock } from '@/composites/play/echo/EchoClock'
 import { EchoHands } from '@/composites/play/echo/EchoHands'
 import { EchoResult } from '@/composites/play/echo/EchoResult'
 import { EchoReveal } from '@/composites/play/echo/EchoReveal'
-import { EchoScores } from '@/composites/play/echo/EchoScores'
+import { EchoHud } from '@/composites/play/echo/EchoHud'
 import type { EchoBoardView, EchoFace } from '@/composites/play/echo/types'
 import { useEchoSounds } from '@/composites/play/echo/useEchoSounds'
 import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
-import { ECHO_BOARD_COPY, ECHO_SETTINGS, fillPlayMessage } from '@/declarations/play'
+import { ECHO_BOARD_COPY, ECHO_SETTINGS } from '@/declarations/play'
 import { ECHO_BOARD } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 import { PlayGames } from '@/utils/constants/play'
 
 export interface EchoBoardProps {
@@ -69,39 +69,46 @@ export const EchoBoard = ({
         />
       )}
 
-      <div className={ECHO_BOARD.head}>
-        <span className={ECHO_BOARD.round}>
-          {fillPlayMessage(ECHO_BOARD_COPY.round, { round: board.round, total: board.rounds })}
-        </span>
-        {isReveal ? (
-          <div className={ECHO_BOARD.clockTrack} />
-        ) : (
-          // New round, new bar
-          <EchoClock key={board.round} startsAt={board.startsAt} endsAt={board.endsAt} now={now} />
-        )}
-      </div>
+      <EchoHud
+        sessionId={sessionId}
+        board={board}
+        seats={seats}
+        viewerId={viewerId}
+        isSeated={isSeated}
+        now={now}
+        isReveal={isReveal}
+      />
 
       <div className={ECHO_BOARD.table}>
-        <figure className={ECHO_BOARD.slot}>
+        <figure className={cn(ECHO_BOARD.slot, ECHO_BOARD.slotCenter)}>
           <EchoCard
             key={`c${board.round}`}
             card={board.center}
+            tone="center"
             seed={board.seed}
             answer={isReveal ? hand?.answer : null}
           />
-          <figcaption className={ECHO_BOARD.caption}>{ECHO_BOARD_COPY.center}</figcaption>
+          <figcaption className={cn(ECHO_BOARD.caption, ECHO_BOARD.captionCenter)}>
+            {ECHO_BOARD_COPY.center}
+          </figcaption>
         </figure>
         {hand && (
-          <figure className={ECHO_BOARD.slot}>
+          <figure className={cn(ECHO_BOARD.slot, ECHO_BOARD.slotMine)}>
             <EchoCard
               key={`m${board.round}`}
               card={hand.card}
+              tone="mine"
               seed={board.seed + 1}
               answer={hand.answer}
               isLocked={isLocked}
               onPick={canPick ? (symbol) => void act({ type: 'pick', symbol }) : undefined}
             />
-            <figcaption className={ECHO_BOARD.caption}>
+            <figcaption
+              className={cn(
+                ECHO_BOARD.caption,
+                isLocked ? 'text-[var(--play-ink-soft)]' : ECHO_BOARD.captionMine
+              )}
+            >
               {isLocked ? ECHO_BOARD_COPY.locked : ECHO_BOARD_COPY.mine}
             </figcaption>
           </figure>
@@ -113,7 +120,6 @@ export const EchoBoard = ({
       {isSeated && !isReveal && <p className={ECHO_BOARD.lead}>{ECHO_BOARD_COPY.lead}</p>}
 
       <EchoHands hands={board.hands} seats={seats} seed={board.seed} viewerId={viewerId} />
-      <EchoScores seats={seats} round={board.round} />
     </div>
   )
 }

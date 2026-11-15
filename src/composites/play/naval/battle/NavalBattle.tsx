@@ -12,7 +12,6 @@ import { callOf } from '@/composites/play/naval/battle/battleCall'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import { NavalArsenal } from '@/composites/play/naval/battle/NavalArsenal'
 import { NavalBracket } from '@/composites/play/naval/NavalBracket'
-import { NavalFeed } from '@/composites/play/naval/battle/NavalFeed'
 import { NavalFoes } from '@/composites/play/naval/battle/NavalFoes'
 import { NavalHud } from '@/composites/play/naval/NavalHud'
 import { NavalResult } from '@/composites/play/naval/NavalResult'
@@ -23,6 +22,7 @@ import { useNavalCues } from '@/composites/play/naval/battle/useNavalCues'
 import { useNavalDirector } from '@/composites/play/naval/fx/useNavalDirector'
 import { NavalCodes } from '@/core/lib/play/naval/state'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
+import { useNavalPlayedStore } from '@/core/store/play/navalPlayed'
 import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import { NAVAL_BOARD } from '@/declarations/ui/variants/games/naval'
 import { NavalModes, NavalPhases, NavalWeapons } from '@/utils/constants/play'
@@ -54,12 +54,12 @@ export const NavalBattle = ({
   const matchIndex = watchedMatch(board, pickedMatch)
   const match = board.matches[matchIndex]
   const { shown, playing, callout } = playback
-  const faces = captains.map(({ accountId, name, avatarUrl }) => ({
-    id: accountId,
-    name,
-    avatarUrl,
-  }))
-  const feed = <NavalFeed board={board} shown={shown} match={matchIndex} players={faces} />
+  // The chat feed tells what has landed
+  const setPlayed = useNavalPlayedStore((state) => state.setPlayed)
+  useEffect(
+    () => setPlayed(sessionId, matchIndex, shown),
+    [setPlayed, sessionId, matchIndex, shown]
+  )
   const fighters = match?.fighters ?? []
   const isFighter = viewer >= 0 && fighters.includes(viewer) && !captains[viewer].isOut
   const foes = fighters.filter((seat) => seat !== viewer)
@@ -97,16 +97,13 @@ export const NavalBattle = ({
       board.shots.filter((shot) => shot[2] === seat && shot[6] === NavalCodes.Sunk).length
 
     return (
-      <>
-        <NavalResult
-          board={board}
-          captains={captains}
-          viewer={viewer}
-          match={matchIndex}
-          sunkBy={sunkBy}
-        />
-        {feed}
-      </>
+      <NavalResult
+        board={board}
+        captains={captains}
+        viewer={viewer}
+        match={matchIndex}
+        sunkBy={sunkBy}
+      />
     )
   }
 
@@ -146,7 +143,28 @@ export const NavalBattle = ({
 
   return (
     <div ref={root} className={NAVAL_BOARD.root}>
-      {feed}
+      <NavalHud
+        sessionId={sessionId}
+        board={board}
+        captains={captains}
+        viewer={viewer}
+        call={call}
+        tone={tone}
+        clock={clock}
+        actions={
+          isFighter && (
+            <NavalArsenal
+              weapon={aim.weapon}
+              drawKey={String(board.rev)}
+              orientation={aim.orientation}
+              isMyTurn={Boolean(isMyTurn)}
+              canFire={aim.isOpen && Boolean(aim.aim)}
+              onTurn={aim.turn}
+              onFire={aim.fire}
+            />
+          )
+        }
+      />
       {match && (
         <NavalStartCountdown
           startsAt={match.startsAt}
@@ -156,7 +174,6 @@ export const NavalBattle = ({
       )}
       <div className={NAVAL_BOARD.battle}>
         <div className={NAVAL_BOARD.stage}>
-          <NavalHud call={call} tone={tone} clock={clock} />
           {sea && (
             <NavalTargetSea
               key={foes.length > 1 ? target : 0}
@@ -174,18 +191,6 @@ export const NavalBattle = ({
                   ? { callout, captains, viewer }
                   : null
               }
-            />
-          )}
-          {isFighter && (
-            <NavalArsenal
-              weapon={aim.weapon}
-              drawKey={String(board.rev)}
-              orientation={aim.orientation}
-              isMyTurn={Boolean(isMyTurn)}
-              canFire={aim.isOpen && Boolean(aim.aim)}
-              waitCall={call}
-              onTurn={aim.turn}
-              onFire={aim.fire}
             />
           )}
         </div>

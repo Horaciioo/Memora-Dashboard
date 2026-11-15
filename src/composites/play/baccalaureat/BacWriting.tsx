@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { Button } from '@/components/elements/actions/Button'
+import { BacBook } from '@/composites/play/baccalaureat/BacBook'
+import { splitPages } from '@/composites/play/baccalaureat/types'
 import type { BacBoardView, BacRoundView } from '@/composites/play/baccalaureat/types'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
-import { BAC_BOARD_COPY, fillPlayMessage } from '@/declarations/play'
+import { BAC_BOARD_COPY, BACCALAUREAT_SETTINGS, fillPlayMessage } from '@/declarations/play'
+import { usePlayPref } from '@/core/store/play/playPrefs'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+import { PlayGames } from '@/utils/constants/play'
 
 // Pause before a draft is saved
 const SAVE_DELAY_MS = 600
@@ -29,6 +32,7 @@ export interface BacWritingProps {
 export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingProps) => {
   const { act, isSaving } = usePlayAct(sessionId)
   const drafts = usePlayAct(sessionId)
+  const hasSpellcheck = usePlayPref(PlayGames.Baccalaureat, 'spellcheck')
   const [words, setWords] = useState<Record<string, string>>(() =>
     Object.fromEntries(round.answers.map((answer) => [answer.category, answer.word]))
   )
@@ -64,7 +68,10 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
   }, [words, isSeated])
 
   const isStopped = Boolean(round.stoppedById)
-  const isFull = settings.categories.every((entry) => words[entry.id]?.trim())
+  // A word counts from its third letter
+  const isValid = (id: string) =>
+    (words[id]?.trim().length ?? 0) >= BACCALAUREAT_SETTINGS.minWordLength
+  const isFull = settings.categories.every((entry) => isValid(entry.id))
   // Button only when the host switched manual stop on
   const hasStopButton = settings.stop && !settings.autoStop
   const DoneIcon = ICONS.playTick
@@ -75,52 +82,70 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
     await act({ type: 'stop' })
   }
 
-  return (
-    <div className={BAC_BOARD.board}>
-      <div className={BAC_BOARD.fields}>
-        {settings.categories.map((entry, index) => {
-          const isFilled = Boolean(words[entry.id]?.trim())
+  /**
+   * One page of fields
+   * @param {BacBoardView['settings']['categories']} list - Categories of the page
+   * @param {number} offset - Fields on the pages before
+   * @return {JSX.Element} - Page
+   */
 
-          return (
-            <label key={entry.id} className={BAC_BOARD.field}>
-              <span className={cn(BAC_BOARD.fieldIndex, isFilled && BAC_BOARD.fieldDone)}>
-                {isFilled ? (
-                  <DoneIcon className={BAC_BOARD.fieldIcon} aria-hidden="true" />
-                ) : (
-                  index + 1
-                )}
-              </span>
-              <span className={BAC_BOARD.fieldBody}>
-                <span className={BAC_BOARD.fieldLabel}>{entry.label}</span>
-                <input
-                  className={BAC_BOARD.input}
-                  value={words[entry.id] ?? ''}
-                  disabled={!isSeated || isStopped}
-                  autoComplete="off"
-                  placeholder={fillPlayMessage(BAC_BOARD_COPY.wordPlaceholder, {
-                    letter: round.letter,
-                  })}
-                  onChange={(event) =>
-                    setWords((current) => ({ ...current, [entry.id]: event.target.value }))
-                  }
-                />
-              </span>
-            </label>
-          )
-        })}
-      </div>
-      {isSeated && hasStopButton && !isStopped && (
-        <div className={BAC_BOARD.actions}>
-          <Button
-            variant="arcade"
-            disabled={!isFull}
-            isLoading={isSaving}
-            onClick={() => void stop()}
-          >
-            {BAC_BOARD_COPY.stop}
-          </Button>
-        </div>
-      )}
+  const page = (list: BacBoardView['settings']['categories'], offset: number) => (
+    <div className={BAC_BOARD.fields}>
+      {list.map((entry, position) => {
+        const index = offset + position
+        const isFilled = isValid(entry.id)
+
+        return (
+          <label key={entry.id} className={BAC_BOARD.field}>
+            <span className={cn(BAC_BOARD.fieldIndex, isFilled && BAC_BOARD.fieldDone)}>
+              {isFilled ? (
+                <DoneIcon className={BAC_BOARD.fieldIcon} aria-hidden="true" />
+              ) : (
+                index + 1
+              )}
+            </span>
+            <span className={BAC_BOARD.fieldBody}>
+              <span className={BAC_BOARD.fieldLabel}>{entry.label}</span>
+              <input
+                className={BAC_BOARD.input}
+                value={words[entry.id] ?? ''}
+                disabled={!isSeated || isStopped}
+                autoComplete="off"
+                spellCheck={hasSpellcheck}
+                placeholder={fillPlayMessage(BAC_BOARD_COPY.wordPlaceholder, {
+                  letter: round.letter,
+                })}
+                onChange={(event) =>
+                  setWords((current) => ({ ...current, [entry.id]: event.target.value }))
+                }
+              />
+            </span>
+          </label>
+        )
+      })}
+    </div>
+  )
+  const [first, second] = splitPages(settings.categories)
+
+  return (
+    <div className={BAC_BOARD.sheet}>
+      <BacBook
+        title={fillPlayMessage(BAC_BOARD_COPY.bookLetter, { letter: round.letter })}
+        left={page(first, 0)}
+        right={page(second, first.length)}
+        foot={
+          isSeated && hasStopButton && !isStopped ? (
+            <button
+              type="button"
+              className={BAC_BOARD.stopButton}
+              disabled={!isFull || isSaving}
+              onClick={() => void stop()}
+            >
+              {BAC_BOARD_COPY.stop}
+            </button>
+          ) : null
+        }
+      />
     </div>
   )
 }

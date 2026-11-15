@@ -162,7 +162,7 @@ export const readRateLimitWindow = (name: string, fallback: RateLimitWindow): Ra
 
 /**
  * How long each family of personal data is kept
- * @type {{ expiredSessionDays: number, readNotificationDays: number, activityLogDays: number, moderationLogDays: number, chatMessageDays: number, rejectedCandidateDays: number, bannedCandidateDays: number, orphanFileHours: number, consentVersion: number }}
+ * @type {{ expiredSessionDays: number, readNotificationDays: number, activityLogDays: number, moderationLogDays: number, chatMessageDays: number, rejectedCandidateDays: number, bannedCandidateDays: number, orphanFileHours: number, consentVersion: number, unbanDecidedDays: number }}
  */
 
 export const RETENTION_SETTINGS = {
@@ -215,6 +215,12 @@ export const RETENTION_SETTINGS = {
     path: 'system/retention.consentVersion',
     fallback: 1,
     min: 1,
+  }),
+  // Decided requests go with their history
+  unbanDecidedDays: readInteger(retention.unbanDecidedDays, {
+    path: 'system/retention.unbanDecidedDays',
+    fallback: 365,
+    min: 30,
   }),
 }
 

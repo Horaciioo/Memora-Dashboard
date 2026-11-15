@@ -26,7 +26,10 @@ import { peopleInScope } from '@/core/services/work/shared/people'
  * @return {Promise<FieldOption[]>} - Options with the seated ones added, locked against a new pick
  */
 
-export const withSeated = async (options: FieldOption[], kept: string[]): Promise<FieldOption[]> => {
+export const withSeated = async (
+  options: FieldOption[],
+  kept: string[]
+): Promise<FieldOption[]> => {
   const known = new Set(options.map((option) => option.value))
   const missing = [...new Set(kept)].filter((id) => !known.has(id))
   if (missing.length === 0) return options
@@ -208,6 +211,7 @@ export const youtuberOptions = async (scope?: AccessScope): Promise<FieldOption[
     label: row.name,
     accent: row.accent ?? undefined,
     image: row.avatarUrl,
+    banner: row.bannerUrl,
   }))
 }
 

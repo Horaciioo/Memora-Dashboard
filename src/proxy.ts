@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { isSessionTokenValid } from '@/core/lib/auth/getSession'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { readPublicOrigin } from '@/core/lib/http/origin'
+import { UNBAN_CONTEST_PATH, UNBAN_PRIVATE_PAGES } from '@/declarations/unban/headers'
 import { buildContentSecurityPolicy } from '@/declarations/system/security/contentSecurityPolicy'
 import { NONCE_HEADER, PATH_HEADER } from '@/declarations/system/security/securityHeaders'
 import { DEMO_EVENT_ID, EVENT_ID_PATTERN } from '@/core/lib/share/sharedEvent'
@@ -28,7 +29,7 @@ const SHARE_PATH = new RegExp(
 )
 
 // Path prefixes
-const PUBLIC_PREFIXES: string[] = ['/integration', '/exercise', ROUTES.welcome]
+const PUBLIC_PREFIXES: string[] = ['/integration', '/exercise', '/unban', ROUTES.welcome]
 
 /**
  * Build the per-request nonce and the policy carrying it
@@ -81,6 +82,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   const isOpenToEveryone =
     PUBLIC_PATHS.includes(pathname) ||
     SHARE_PATH.test(pathname) ||
+    UNBAN_CONTEST_PATH.test(pathname) ||
     PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(`${prefix}/`))
 
   // A stale token fails closed rather than crashing the proxy
@@ -100,6 +102,13 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   if (hasSession && isSignInScreen) return NextResponse.redirect(new URL(ROUTES.dashboard, origin))
 
   const response = withPolicy(request)
+
+  // A Deban. page depends on who opens it
+  if (pathname.startsWith(UNBAN_PRIVATE_PAGES.prefix) || UNBAN_CONTEST_PATH.test(pathname)) {
+    Object.entries(UNBAN_PRIVATE_PAGES.headers).forEach(([name, value]) =>
+      response.headers.set(name, value)
+    )
+  }
 
   // A dead token stops being resent even on open routes
   if (!hasSession && token) response.cookies.delete(SESSION_COOKIE)

@@ -21,6 +21,7 @@ import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/type
  * @property {string} label - Step caption
  * @property {FieldDefinition[]} [fields] - Declarations rendered by the form engine
  * @property {ReactNode} [render] - Body drawn by the caller
+ * @property {(goTo: (id: string) => void) => ReactNode} [renderWith] - Body drawn by the caller, able to send the person back to a step
  * @property {ReactNode} [notice] - Standing message drawn under the body
  * @property {boolean} [blocked] - Holds the step whatever its fields say
  */
@@ -30,6 +31,7 @@ export interface WizardStep {
   label: string
   fields?: FieldDefinition[]
   render?: ReactNode
+  renderWith?: (goTo: (id: string) => void) => ReactNode
   notice?: ReactNode
   blocked?: boolean
 }
@@ -99,6 +101,14 @@ export const FormWizard = ({
   const missing = step.fields ? collectMissingRequired(step.fields, values) : []
   const held = Boolean(step.blocked) || missing.length > 0
 
+  const goTo = (id: string) =>
+    setIndex(
+      Math.max(
+        0,
+        steps.findIndex((entry) => entry.id === id)
+      )
+    )
+
   const stateOf = (position: number): StepState => {
     if (position < current) return 'done'
     return position === current ? 'current' : 'idle'
@@ -133,7 +143,7 @@ export const FormWizard = ({
             idPrefix={`${idPrefix}-${step.id}`}
           />
         ) : (
-          step.render
+          (step.renderWith?.(goTo) ?? step.render)
         )}
         {step.notice}
       </div>

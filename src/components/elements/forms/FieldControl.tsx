@@ -9,6 +9,7 @@ import { EmojiPicker } from '@/components/elements/forms/pickers/EmojiPicker'
 import { FileInput } from '@/components/elements/forms/inputs/FileInput'
 import { Input } from '@/components/elements/forms/inputs/Input'
 import { MarkdownEditor } from '@/components/elements/forms/MarkdownEditor'
+import { ChoiceList } from '@/components/elements/forms/selects/ChoiceList'
 import { MultiSelect } from '@/components/elements/forms/selects/MultiSelect'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { TagsInput } from '@/components/elements/forms/selects/TagsInput'
@@ -106,6 +107,24 @@ export const FieldControl = ({
 }: FieldControlProps) => {
   const { can } = useAuthContext()
 
+  // Visible list instead of a menu
+  if (field.presentation === 'list' && (field.kind === 'select' || field.kind === 'multiselect')) {
+    return (
+      <ChoiceList
+        id={id}
+        label={field.label}
+        options={field.options ?? []}
+        value={Array.isArray(value) ? value : typeof value === 'string' && value ? [value] : []}
+        multiple={field.kind === 'multiselect'}
+        maxItems={field.maxItems}
+        disabled={disabled || field.readOnly}
+        invalid={invalid}
+        describedBy={describedBy}
+        onChange={(next) => onChange(field.kind === 'multiselect' ? next : (next[0] ?? null))}
+      />
+    )
+  }
+
   if (field.kind === 'select') {
     return (
       <SelectMenu
@@ -133,6 +152,8 @@ export const FieldControl = ({
         min={field.min ?? FORM_SETTINGS.scaleMin}
         max={field.max ?? FORM_SETTINGS.scaleMax}
         step={field.step}
+        lowLabel={field.scaleLabels?.[0]}
+        highLabel={field.scaleLabels?.[1]}
         disabled={disabled || field.readOnly}
         onChange={onChange}
       />

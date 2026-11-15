@@ -202,6 +202,7 @@ export const cloneTable = async (
       visibility: session.visibility,
       joinCode: isPrivate ? await freeJoinCode(tx) : null,
       settings: session.settings as Prisma.InputJsonValue,
+      configuredAt: new Date(),
       seats: { create: present.map((seat) => ({ accountId: seat.accountId, color: seat.color })) },
     },
   })

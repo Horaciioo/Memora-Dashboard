@@ -47,4 +47,11 @@ export const BACKGROUND_SERVICES = [
  * @type {readonly string[]}
  */
 
-export const REALTIME_FAMILIES = ['play', 'recruitment', 'page', 'section', 'teamChat'] as const
+export const REALTIME_FAMILIES = [
+  'play',
+  'recruitment',
+  'page',
+  'section',
+  'teamChat',
+  'unban',
+] as const

@@ -8,5 +8,6 @@
   "bannedCandidateDays": 730,
   "orphanFileHours": 24,
   "consentVersion": 1,
-  "chatMessageDays": 180
+  "chatMessageDays": 180,
+  "unbanDecidedDays": 365
 }

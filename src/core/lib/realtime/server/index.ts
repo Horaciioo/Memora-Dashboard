@@ -15,6 +15,7 @@ import {
   PLAY_REALTIME_TOPICS,
 } from '@/core/services/play/live/PlayRealtimeService'
 import { SECTION_REALTIME_TOPICS } from '@/core/services/realtime/SectionRealtimeService'
+import { UNBAN_REALTIME_TOPICS } from '@/core/services/unban/UnbanRealtimeService'
 import { RECRUITMENT_REALTIME_TOPICS } from '@/core/services/recruitment/RecruitmentRealtimeService'
 
 export { issueTicket } from '@/core/lib/realtime/server/tickets'
@@ -37,6 +38,7 @@ export const wireRealtime = (): void => {
       ...PAGE_REALTIME_TOPICS,
       ...SECTION_REALTIME_TOPICS,
       ...TEAM_CHAT_REALTIME_TOPICS,
+      ...UNBAN_REALTIME_TOPICS,
     ],
     requests: {
       ...PLAY_REALTIME_REQUESTS,

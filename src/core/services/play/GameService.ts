@@ -16,7 +16,7 @@ import {
 import { PLAY_ERRORS } from '@/declarations/play'
 import { areBotsAwake } from '@/declarations/play/bots'
 import type { EngineStep } from '@/core/engines/play'
-import { driveBots, isDriven } from '@/core/engines/play/players/BotDriver'
+import { driveBots, forgetBots, isDriven } from '@/core/engines/play/players/BotDriver'
 import { logger } from '@/core/lib/logger'
 import { forgetIdle, noteAction } from '@/core/services/play/PlayIdleService'
 import { tellFollowers } from '@/core/services/play/PlayFollowService'
@@ -52,6 +52,7 @@ const applyStep = async (
 ): Promise<void> => {
   if (step.finished) {
     clearSessionTimers(sessionId)
+    forgetBots(sessionId)
     forgetIdle(sessionId)
     await finishSession(sessionId)
   } else if (step.deadline) {

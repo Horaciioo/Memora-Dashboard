@@ -15,6 +15,7 @@ export const SCOPE_TARGETS = {
   // Never without a creator
   sanctionOffense: 'required',
   recruitmentSession: 'required',
+  unbanRequest: 'required',
   account: 'relation',
 } as const
 

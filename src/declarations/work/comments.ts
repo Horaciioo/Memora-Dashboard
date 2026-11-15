@@ -10,6 +10,7 @@ export const WORK_COMMENT_KINDS = {
   task: { column: 'taskId', permission: Permissions.TaskRead },
   communication: { column: 'communicationId', permission: Permissions.CommunicationRead },
   meeting: { column: 'meetingId', permission: Permissions.MeetingContentRead },
+  unban: { column: 'unbanRequestId', permission: Permissions.UnbanRead },
 } as const
 
 export type WorkCommentKind = keyof typeof WORK_COMMENT_KINDS

@@ -1500,24 +1500,6 @@
   }
 }
 
-/* Room grows or shrinks as one piece, new frame scaled over the old, no cross-fade */
-::view-transition-group(play-room) {
-  animation-duration: 340ms;
-  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-::view-transition-old(play-room),
-::view-transition-new(play-room) {
-  height: 100%;
-  object-fit: cover;
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-::view-transition-old(play-room) {
-  display: none;
-}
-
 /* Phone tab change: the page slides from the tab side */
 @utility play-slide-right {
   --play-slide-from: 30%;
@@ -1653,5 +1635,159 @@
 
   .play-feature-flip {
     transition: none;
+  }
+}
+
+/* Server busy: the brain hops and leans */
+.play-busy-in {
+  animation: play-busy-in 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+.play-busy-logo {
+  animation: play-busy-hop 900ms ease-in-out infinite;
+}
+
+.play-busy-dot {
+  animation: play-busy-dot 1s ease-in-out infinite;
+}
+
+.play-busy-dot:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.play-busy-dot:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+/* Loading screen: drifting glow, hopping logo, step fading in */
+.play-loading-glow {
+  animation: play-loading-drift 7s ease-in-out infinite alternate;
+}
+
+.play-loading-logo {
+  animation: play-busy-hop 1.4s ease-in-out infinite;
+}
+
+.play-loading-step {
+  animation: play-loading-step 360ms var(--motion-ease-out) both;
+}
+
+/* Squares of the loading screen: they pop in at random, then pop out the same way */
+.play-square-in {
+  animation: play-square-in 260ms var(--motion-ease-out) var(--square-delay, 0ms) both;
+}
+
+.play-square-out {
+  animation: play-square-out 260ms ease-in var(--square-delay, 0ms) both;
+}
+
+.play-loading-content {
+  animation: play-loading-step 360ms var(--motion-ease-out) 300ms both;
+}
+
+.play-loading-content-out {
+  animation: play-content-out 280ms ease-in both;
+}
+
+@keyframes play-square-in {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes play-square-out {
+  from {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+@keyframes play-content-out {
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes play-loading-drift {
+  from {
+    transform: translate3d(-4%, -3%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4%, 3%, 0) scale(1.12);
+  }
+}
+
+@keyframes play-loading-step {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-loading-glow,
+  .play-loading-logo,
+  .play-loading-step,
+  .play-square-in,
+  .play-square-out,
+  .play-loading-content,
+  .play-loading-content-out {
+    animation: none;
+  }
+}
+
+@keyframes play-busy-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes play-busy-hop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  30% {
+    transform: translateY(-5px) rotate(-8deg);
+  }
+  60% {
+    transform: translateY(0) rotate(6deg);
+  }
+}
+
+@keyframes play-busy-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-busy-in,
+  .play-busy-logo,
+  .play-busy-dot {
+    animation: none;
   }
 }

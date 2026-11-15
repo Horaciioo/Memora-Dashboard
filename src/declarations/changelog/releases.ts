@@ -127,6 +127,82 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.13.1',
+    date: '2026-11-15',
+    title: 'Play passe en plein écran',
+    intro:
+      'Stop & Go rejoint Memora Play, et chaque partie occupe désormais toute la page avec son chat intégré.',
+    description:
+      'Les parties de Memora Play s’ouvraient dans une page classique, avec un chat à part. Cette version les passe en plein écran, avec une interface de jeu aux couleurs de chaque jeu, et ajoute Stop & Go.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Stop & Go » dans « Memora Play » : une course de voitures où l’on pose des bornes, lance des attaques contre ses rivaux et se protège avec des immunités, contre d’autres joueurs ou des joueurs automatiques de trois niveaux.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de préférences dans les « Réglages » de « Memora Play » pour choisir l’affichage de l’interface en partie.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une notification « en cours » avec le logo Memora qui saute pendant qu’une action se termine.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de tous les jeux de « Memora Play » : la partie remplit toute la page, avec une interface de jeu aux couleurs de chaque jeu et le chat intégré en bas, sur ordinateur comme sur téléphone.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration des votes, du chat et des écrans de chargement de « Memora Play » : ils reprennent la même interface de jeu pour toutes les parties.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du bouton de création de partie de « Memora Play », renommé « Jouer à plusieurs », et du décor de l’accueil avec un logo pour chaque jeu.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du plateau de « Ludo », plus simple à lire, et de l’interface de la « Bataille navale ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de la fenêtre de sortie d’une partie, du bouton « Prêt » qui tardait à réagir et du badge de chargement de « Memora Play ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de l’affichage des jeux de « Memora Play » sur téléphone : plateau de « Ludo », table de « Bomb », cartes d’« Écho », outils de « Croquis », tuiles de « Jumble » et barre de la « Bataille navale » tiennent maintenant à l’écran.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction des parties de « Golf » contre des joueurs automatiques, qui jouaient mal.',
+      },
+    ],
+    comments: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        text: 'Un nouveau jeu et des parties en plein écran : Memora Play se joue comme un vrai jeu.',
+      },
+    ],
+  },
+  {
     version: '0.13.0',
     date: '2026-11-12',
     title: 'Memora Play s’agrandit',

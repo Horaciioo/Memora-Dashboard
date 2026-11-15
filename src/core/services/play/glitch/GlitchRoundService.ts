@@ -4,7 +4,7 @@ import type { GlitchGame, Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
-import { after, countdownEnd } from '@/core/lib/play/clock'
+import { after, openingEnd } from '@/core/lib/play/clock'
 import {
   finishPoints,
   findPoints,
@@ -76,7 +76,7 @@ const withTable = (
 
 export const openTable = async (session: EngineSession): Promise<EngineStep> => {
   const settings = glitchSettingsOf(session.settings)
-  const startsAt = countdownEnd(new Date(), GLITCH_SETTINGS.countdownSeconds)
+  const startsAt = openingEnd(new Date(), GLITCH_SETTINGS.countdownSeconds)
   const game = await prisma.glitchGame.create({
     data: {
       sessionId: session.id,

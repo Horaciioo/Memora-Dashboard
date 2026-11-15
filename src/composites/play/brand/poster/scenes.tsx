@@ -150,6 +150,12 @@ export const SCENES: Record<string, (tone: string) => ReactNode> = {
       <Sparks />
     </>
   ),
+  road: () => (
+    <>
+      <g transform="translate(-122 -128) scale(3.8)">{NEW_MARKS.playStopGo}</g>
+      <Sparks />
+    </>
+  ),
   sketch: () => (
     <>
       <g transform="translate(-122 -128) scale(3.8)">{NEW_MARKS.playCroquis}</g>

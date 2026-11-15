@@ -30,6 +30,7 @@ export {
   PREFERENCE_STYLES,
 } from '@/declarations/ui/variants/surfaces/marks'
 export type { GlyphSize, AvatarSize } from '@/declarations/ui/variants/surfaces/marks'
+export { UNBAN_DESK_STYLES, UNBAN_PUBLIC_STYLES, UNBAN_SHELL_STYLES } from '@/declarations/ui/variants/surfaces/unban'
 export {
   SIGN_IN_STYLES,
   PRIVACY_STYLES,

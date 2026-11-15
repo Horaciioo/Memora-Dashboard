@@ -79,6 +79,10 @@ export const Permissions = {
   AccessManage: 'access:manage',
   PlayAccess: 'play:access',
   PlayManage: 'play:manage',
+  UnbanRead: 'unban:read',
+  UnbanHandle: 'unban:handle',
+  UnbanLinks: 'unban:links',
+  UnbanManage: 'unban:manage',
 } as const
 
 export type PermissionName = (typeof Permissions)[keyof typeof Permissions]
@@ -125,6 +129,7 @@ export const PermissionGroups = {
   Configuration: 'configuration',
   Access: 'access',
   Play: 'play',
+  Unban: 'unban',
 } as const
 
 export type PermissionGroup = (typeof PermissionGroups)[keyof typeof PermissionGroups]
@@ -721,6 +726,38 @@ export const PermissionsList: PermissionMeta[] = [
       'Passer de l’XP, fixer un niveau, remettre à zéro ou sortir un modérateur de sa partie.',
     important: true,
     parent: Permissions.PlayAccess,
+  },
+  {
+    name: Permissions.UnbanRead,
+    group: PermissionGroups.Unban,
+    displayName: 'Voir les demandes de déban',
+    description: 'Ouvrir la page Débannissement et lire les demandes des YouTubeurs de ton périmètre.',
+    important: false,
+  },
+  {
+    name: Permissions.UnbanHandle,
+    group: PermissionGroups.Unban,
+    displayName: 'Traiter les demandes de déban',
+    description: 'Prendre une demande en charge, la noter, la trancher et s’en occuper.',
+    important: false,
+    parent: Permissions.UnbanRead,
+  },
+  {
+    name: Permissions.UnbanLinks,
+    group: PermissionGroups.Unban,
+    displayName: 'Gérer les liens de déban',
+    description: 'Générer, prolonger et révoquer les liens envoyés aux personnes bannies.',
+    important: false,
+    parent: Permissions.UnbanRead,
+  },
+  {
+    name: Permissions.UnbanManage,
+    group: PermissionGroups.Unban,
+    displayName: 'Gérer Débannissement',
+    description:
+      'Confier une demande à quelqu’un, rouvrir une décision, éditer et publier le formulaire.',
+    important: true,
+    parent: Permissions.UnbanRead,
   },
   {
     name: Permissions.TeamRead,

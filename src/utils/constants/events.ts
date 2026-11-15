@@ -100,6 +100,19 @@ export const EVENT_TYPES = createEnumeration({
   SeatRevoked: { id: 91, label: 'Accès de session retiré' },
   SeatRestored: { id: 92, label: 'Accès de session rendu' },
   SeatForgotten: { id: 93, label: 'Archives de session supprimées' },
+  UnbanLinkCreated: { id: 94, label: 'Lien de déban généré' },
+  UnbanLinkExtended: { id: 95, label: 'Lien de déban prolongé' },
+  UnbanLinkRevoked: { id: 96, label: 'Lien de déban révoqué' },
+  UnbanLinkExpired: { id: 97, label: 'Lien de déban expiré' },
+  UnbanSubmitted: { id: 98, label: 'Demande de déban déposée' },
+  UnbanTaken: { id: 99, label: 'Demande de déban prise en charge' },
+  UnbanReleased: { id: 100, label: 'Demande de déban relâchée' },
+  UnbanAssigned: { id: 101, label: 'Demande de déban attribuée' },
+  UnbanStatusChanged: { id: 102, label: 'Statut de déban changé' },
+  UnbanDecided: { id: 103, label: 'Demande de déban tranchée' },
+  UnbanReopened: { id: 104, label: 'Décision de déban rouverte' },
+  UnbanDiscordLifted: { id: 105, label: 'Débannissement Discord confirmé' },
+  UnbanFormPublished: { id: 106, label: 'Formulaire de déban publié' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids
@@ -144,4 +157,5 @@ export const EVENT_LEVELS: Partial<Record<EventTypeName, LogLevelName>> = {
   LoginFailed: 'Warning',
   AccessDenied: 'Warning',
   RateLimited: 'Warning',
+  UnbanReopened: 'Warning',
 }

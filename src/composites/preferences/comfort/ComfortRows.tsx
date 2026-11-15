@@ -32,6 +32,7 @@ export const ComfortRows = ({ keys }: ComfortRowsProps) => {
             icon={setting.icon}
             name={setting.label}
             description={setting.description}
+            maturity={'maturity' in setting ? setting.maturity : undefined}
           >
             <SegmentedControl
               label={setting.label}

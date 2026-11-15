@@ -60,3 +60,15 @@ export const rankPlayers = (history: BacBoardView['history'], players: BacPlayer
       points: history.reduce((sum, round) => sum + (round.points[player.accountId] ?? 0), 0),
     }))
     .sort((left, right) => right.points - left.points)
+
+/**
+ * Two pages of a book: the first gets the extra item
+ * @param {T[]} items - Whole list
+ * @return {[T[], T[]]} - Left page, right page
+ */
+
+export const splitPages = <T>(items: T[]): [T[], T[]] => {
+  const middle = Math.ceil(items.length / 2)
+
+  return [items.slice(0, middle), items.slice(middle)]
+}

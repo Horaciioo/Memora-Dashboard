@@ -24,7 +24,10 @@ import {
   readBaccalaureatSettings,
 } from '@/core/lib/play/baccalaureat/settings'
 import { baccalaureatStats } from '@/core/services/play/baccalaureat/BaccalaureatStatsService'
-import { baccalaureatView } from '@/core/services/play/baccalaureat/BaccalaureatViewService'
+import {
+  baccalaureatBoards,
+  baccalaureatView,
+} from '@/core/services/play/baccalaureat/BaccalaureatViewService'
 
 // Most phases one settle walks through
 const MAX_SETTLE_STEPS = 4
@@ -144,5 +147,6 @@ export const BACCALAUREAT_ENGINE: PlayEngine = {
     return closeIfLast(session, step.changed)
   },
   view: baccalaureatView,
+  viewFor: baccalaureatBoards,
   extraStats: baccalaureatStats,
 }

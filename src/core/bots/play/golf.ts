@@ -46,7 +46,7 @@ interface GolfAim {
  */
 
 const costOf = (input: Omit<GolfShotInput, 'angle' | 'power'>, aim: GolfAim): number => {
-  const outcome = simulateShot({ ...input, ...aim }).outcomes[input.shooterId]
+  const outcome = simulateShot({ ...input, ...aim, isProbe: true }).outcomes[input.shooterId]
   if (!outcome) return FALL_COST
   // Richer holes first on a scoring hole
   if (outcome.isHoled) return -1 - cupPoints(input.hole, outcome.x, outcome.z)
@@ -68,8 +68,80 @@ const targetOf = (hole: GolfHole): [number, number] => {
   return hole.isScoring ? [best.x, best.z] : [hole.cup[0], hole.cup[1]]
 }
 
+// Best aim so far and its cost
+interface GolfPick {
+  aim: GolfAim
+  cost: number
+}
+
 /**
- * Best aim of a grid toward the cup
+ * Aims of a coarse grid toward the cup, the straight line included
+ * @param {number} straight - Angle to the target
+ * @return {GolfAim[][]} - Rows of aims
+ */
+
+const coarseGrid = (straight: number): GolfAim[][] => {
+  const { candidates } = PLAY_BOT_SETTINGS.golf
+  // Odd count, the straight line included
+  const side = Math.max(1, Math.round(Math.sqrt(candidates) / 2))
+  const powers = Math.max(2, Math.round(candidates / (side * 2 + 1)))
+  // Straight row first, the likeliest
+  const rows = Array.from({ length: side * 2 + 1 }, (_, index) => index - side).sort(
+    (left, right) => Math.abs(left) - Math.abs(right)
+  )
+
+  return rows.map((row) =>
+    Array.from({ length: powers }, (_, column) => ({
+      angle: straight + (SPREAD * row) / side,
+      power: (column + 1) / powers,
+    }))
+  )
+}
+
+/**
+ * Finer aims around the best coarse one
+ * @param {GolfAim} aim - Best coarse aim
+ * @return {GolfAim[]} - Aims
+ */
+
+const fineAround = (aim: GolfAim): GolfAim[] => {
+  const { candidates, refine } = PLAY_BOT_SETTINGS.golf
+  const side = Math.max(1, Math.round(Math.sqrt(candidates) / 2))
+  // Half a coarse step each way
+  const angleStep = SPREAD / side / 2
+  const powerStep = 1 / Math.max(2, Math.round(candidates / (side * 2 + 1))) / 2
+
+  return Array.from({ length: refine }, (_, index) => {
+    const turn = (index / Math.max(1, refine)) * 2 * Math.PI
+    const reach = index % 2 === 0 ? 1 : 0.5
+
+    return {
+      angle: aim.angle + Math.cos(turn) * angleStep * reach,
+      power: Math.min(1, Math.max(0.02, aim.power + Math.sin(turn) * powerStep * reach)),
+    }
+  })
+}
+
+/**
+ * Keep the cheaper of an aim and the best so far
+ * @param {Omit<GolfShotInput, 'angle' | 'power'>} input - Shot without aim
+ * @param {GolfPick} best - Best so far
+ * @param {GolfAim} aim - Aim tried
+ * @return {GolfPick} - Best afterwards
+ */
+
+const tryAim = (
+  input: Omit<GolfShotInput, 'angle' | 'power'>,
+  best: GolfPick,
+  aim: GolfAim
+): GolfPick => {
+  const cost = costOf(input, aim)
+
+  return cost < best.cost ? { aim, cost } : best
+}
+
+/**
+ * Best aim toward the cup: a coarse grid, then finer around the best, within a time cap
  * @param {Omit<GolfShotInput, 'angle' | 'power'>} input - Shot without aim
  * @param {[number, number]} from - Ball spot
  * @return {Promise<GolfAim>} - Aim
@@ -79,26 +151,28 @@ const searchAim = async (
   input: Omit<GolfShotInput, 'angle' | 'power'>,
   [x, z]: [number, number]
 ): Promise<GolfAim> => {
-  const { candidates } = PLAY_BOT_SETTINGS.golf
+  const { searchMs } = PLAY_BOT_SETTINGS.golf
   const [targetX, targetZ] = targetOf(input.hole)
   const straight = Math.atan2(targetX - x, targetZ - z)
-  // Odd count, the straight line included
-  const side = Math.max(1, Math.round(Math.sqrt(candidates) / 2))
-  const powers = Math.max(2, Math.round(candidates / (side * 2 + 1)))
+  const stopAt = performance.now() + searchMs
+  // Any cup ends a plain hole
+  const isDone = (pick: GolfPick) => pick.cost < 0 && !input.hole.isScoring
 
-  // Grid of angles and pulls
-  let best = { aim: { angle: straight, power: 0.5 }, cost: Infinity }
-  for (let row = -side; row <= side; row += 1) {
+  let best: GolfPick = { aim: { angle: straight, power: 0.5 }, cost: Infinity }
+  for (const row of coarseGrid(straight)) {
     // Other requests between rows
     await breathe()
-    const angle = straight + (SPREAD * row) / side
-    for (let column = 1; column <= powers; column += 1) {
-      const aim = { angle, power: column / powers }
-      const cost = costOf(input, aim)
-      // Any cup ends a plain hole
-      if (cost < 0 && !input.hole.isScoring) return aim
-      if (cost < best.cost) best = { aim, cost }
+    for (const aim of row) {
+      best = tryAim(input, best, aim)
+      if (isDone(best)) return best.aim
     }
+    if (performance.now() > stopAt) return best.aim
+  }
+
+  await breathe()
+  for (const aim of fineAround(best.aim)) {
+    best = tryAim(input, best, aim)
+    if (isDone(best) || performance.now() > stopAt) break
   }
 
   return best.aim

@@ -96,7 +96,6 @@ export const GOLF_SETTINGS = {
   shotsKeptSeconds: readSeconds(golf.shotsKeptSeconds, 'shotsKeptSeconds', 20),
   lateShotMs: readSeconds(golf.lateShotMs, 'lateShotMs', 1200),
   restToleranceMs: readSeconds(golf.restToleranceMs, 'restToleranceMs', 250),
-  logLines: readInteger(golf.logLines, { path: 'play/golf.logLines', fallback: 4, min: 1 }),
   feedSize: readInteger(golf.feedSize, { path: 'play/golf.feedSize', fallback: 40, min: 1 }),
   clockLowSeconds: readSeconds(golf.clockLowSeconds, 'clockLowSeconds', 15),
   placementGap: readSeconds(golf.placementGap, 'placementGap', 1.2),

@@ -296,6 +296,7 @@ export const FormRenderer = ({
                 id={id}
                 label={field.label}
                 hint={field.hint}
+                rich={field.rich}
                 info={field.info}
                 error={error}
                 notice={busyNotice(raw, field.kind, field.busy, recordId)}

@@ -422,6 +422,8 @@ model Account {
   golfMoves             GolfMove[]
   ludoPlayers           LudoPlayer[]
   ludoMoves             LudoMove[]
+  stopGoPlayers         StopGoPlayer[]
+  stopGoMoves           StopGoMove[]
   playMessages          PlayMessage[]
   navalPlayers          NavalPlayer[]
   playInvitesSent       PlayInvite[]             @relation("PlayInviteFrom")
@@ -456,6 +458,11 @@ model Account {
   pageMedia             PageMedia[]              @relation("PageMediaUploader")
   pageRevisions         PageRevision[]           @relation("PageRevisionAuthor")
   pageComments          PageComment[]            @relation("PageCommentAuthor")
+  unbanFormsPublished   UnbanFormVersion[]       @relation("UnbanFormPublisher")
+  unbanAssigned         UnbanRequest[]           @relation("UnbanAssignee")
+  unbanDecided          UnbanRequest[]           @relation("UnbanDecider")
+  unbanLifted           UnbanRequest[]           @relation("UnbanLifter")
+  unbanVotes            UnbanVote[]
 
   @@index([role])
   @@index([status])
@@ -738,6 +745,7 @@ model Youtuber {
   viewerComments      ViewerComment[]
   sharedWords         ModSharedWord[]
   unbanRule           ModUnbanRule?
+  unbanRequests       UnbanRequest[]
   chatMessages        LiveChatMessage[]
   chatStats           ViewerChatStat[]
   sanctionOffenses    SanctionOffense[]
@@ -2788,26 +2796,157 @@ model RecruitmentAnswer {
 
 // Remark left on a project, a task, a communication or a meeting
 model WorkComment {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   projectId       String?
   taskId          String?
   communicationId String?
   meetingId       String?
+  unbanRequestId  String?
   authorId        String?
   body            String
-  createdAt       DateTime @default(now())
+  // Held at the top of the thread
+  pinnedAt        DateTime?
+  createdAt       DateTime  @default(now())
 
   project       Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   task          Task?          @relation(fields: [taskId], references: [id], onDelete: Cascade)
   communication Communication? @relation(fields: [communicationId], references: [id], onDelete: Cascade)
   meeting       Meeting?       @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  unbanRequest  UnbanRequest?  @relation(fields: [unbanRequestId], references: [id], onDelete: Cascade)
   author        Account?       @relation("WorkCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
   @@index([projectId, createdAt])
   @@index([taskId, createdAt])
   @@index([communicationId, createdAt])
   @@index([meetingId, createdAt])
+  @@index([unbanRequestId, createdAt])
   @@map("work_comments")
+}
+
+// Where a Deban. request stands
+enum UnbanStatus {
+  PENDING
+  IN_REVIEW
+  ACCEPTED
+  REFUSED
+}
+
+// Version of the Deban. form, frozen once published
+model UnbanFormVersion {
+  id            String    @id @default(cuid())
+  number        Int       @unique
+  // Whole snapshot of the questions, readable without any other table
+  fields        Json
+  // Null while it is the draft
+  publishedAt   DateTime?
+  publishedById String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  publishedBy Account?       @relation("UnbanFormPublisher", fields: [publishedById], references: [id], onDelete: SetNull)
+  requests    UnbanRequest[]
+
+  // One draft at most, a partial unique index written by hand in the migration: ON publishedAt IS NULL
+  @@map("unban_form_versions")
+}
+
+// Unban request of one person on one server
+model UnbanRequest {
+  id                String      @id @default(cuid())
+  // Short readable code, never derived from the id
+  reference         String      @unique
+  youtuberId        String
+  formVersionId     String
+  discordId         String
+  discordName       String
+  discordAvatar     String?
+  // Where the mails go, written through the cipher
+  email             String?
+  // JSON of the answers, written through the cipher
+  answers           String
+  status            UnbanStatus @default(PENDING)
+  assigneeId        String?
+  // Answer shown to the requester, written through the cipher
+  reviewNote        String?
+  decidedAt         DateTime?
+  decidedById       String?
+  discordLiftedAt   DateTime?
+  discordLiftedById String?
+  // Optimistic concurrency
+  version           Int         @default(0)
+  // Bumped on every reopening, keys the system tasks
+  cycle             Int         @default(0)
+  submittedAt       DateTime    @default(now())
+  // Moves with the status or the decision only, what the requester sees as the last update
+  statusChangedAt   DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  youtuber    Youtuber         @relation(fields: [youtuberId], references: [id], onDelete: Restrict)
+  formVersion UnbanFormVersion @relation(fields: [formVersionId], references: [id], onDelete: Restrict)
+  assignee    Account?         @relation("UnbanAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  decidedBy   Account?         @relation("UnbanDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  liftedBy    Account?         @relation("UnbanLifter", fields: [discordLiftedById], references: [id], onDelete: SetNull)
+  comments    WorkComment[]
+  votes       UnbanVote[]
+  mails       MailDelivery[]
+
+  // One open request per person and server, a partial unique index written by hand in the migration: (youtuberId, discordId) WHERE status IN (PENDING, IN_REVIEW)
+  @@index([youtuberId, status, submittedAt])
+  @@index([discordId])
+  @@index([assigneeId, status])
+  @@index([status, decidedAt])
+  @@map("unban_requests")
+}
+
+// How one mail ended
+enum MailStatus {
+  SENT
+  FAILED
+  SKIPPED
+}
+
+// One mail handed to the provider, the address is never kept here
+model MailDelivery {
+  id         String     @id @default(cuid())
+  kind       String
+  requestId  String?
+  // Kept apart so the line stays readable once the request is gone
+  reference  String?
+  status     MailStatus
+  providerId String?
+  // Why it failed or was left unsent
+  detail     String?
+  isTest     Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+
+  request UnbanRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([requestId])
+  @@map("mail_deliveries")
+}
+
+// Side a moderator takes on a request
+enum UnbanVoteChoice {
+  FOR
+  AGAINST
+}
+
+// Opinion of one moderator on one request, the decision stays with the Discord lead
+model UnbanVote {
+  id        String          @id @default(cuid())
+  requestId String
+  voterId   String
+  choice    UnbanVoteChoice
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  request UnbanRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  voter   Account      @relation(fields: [voterId], references: [id], onDelete: Cascade)
+
+  // One opinion per moderator and request
+  @@unique([requestId, voterId])
+  @@map("unban_votes")
 }
 
 // Remark left on a candidate while their application is being weighed
@@ -2990,6 +3129,7 @@ enum PlayGame {
   GLITCH
   CROQUIS
   SUSPENS
+  STOP_GO
 }
 
 // Play bot level
@@ -3053,6 +3193,8 @@ model PlaySession {
   joinCode        String?           @unique
   // Choices of the host, shaped by the game
   settings        Json
+  // Set once the host has chosen the rules
+  configuredAt    DateTime?
   startedAt       DateTime?
   finishedAt      DateTime?
   // Set while an Administration pause holds the game
@@ -3083,6 +3225,9 @@ model PlaySession {
   suspensGame    SuspensGame?
   suspensMoves   SuspensMove[]
   suspensRounds  SuspensRound[]
+  stopGoGame     StopGoGame?
+  stopGoPlayers  StopGoPlayer[]
+  stopGoMoves    StopGoMove[]
   golfGame       GolfGame?
   golfPlayers    GolfPlayer[]
   golfMoves      GolfMove[]
@@ -4407,4 +4552,87 @@ model SuspensMove {
 
   @@index([sessionId, round])
   @@map("play_suspens_moves")
+}
+
+// Stop & Go table: the secret pile, the discard and the turn clock
+model StopGoGame {
+  sessionId     String    @id
+  // PLAYING or OVER
+  phase         String
+  turnId        String
+  // Turns played, checked on every move to refuse a stale one
+  turnNo        Int       @default(0)
+  // Bumped on every move, the newest board wins
+  rev           Int       @default(0)
+  startsAt      DateTime
+  turnEndsAt    DateTime
+  // Cards { id, key } in order, whole objects so a settings change mid game changes nothing, never read by a view
+  drawPile      Json
+  // Same objects, face up
+  discard       Json
+  // Times the discard went back into the pile
+  reshuffles    Int       @default(0)
+  // Coup fourré window or Good draw choice the turn waits on, never holds a drawn card
+  pending       Json?
+  // Clock of the pending choice, its own column so the pause shifts it in plain SQL
+  pendingEndsAt DateTime?
+  updatedAt     DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_stopgo_games")
+}
+
+// A car at the table with its hand
+model StopGoPlayer {
+  id             String    @id @default(cuid())
+  sessionId      String
+  accountId      String
+  // Seat colour on the track, red blue green yellow
+  slot           Int
+  km             Int       @default(0)
+  // Cards { id, key, isPicking? }, private to the player
+  hand           Json
+  // Mystery cards { id, card, fromId, at }, read only by the mystery service
+  sealed         Json
+  isGreen        Boolean   @default(false)
+  // Attack keys suffered, one per type, the speed limit included
+  hazards        String[]
+  // Safeties laid down for good, siren tank tyres ace
+  shields        String[]  @default([])
+  // Unused since safeties replaced the jokers
+  immunityUsedAt DateTime?
+  cleanupUsedAt  DateTime?
+  // Turns missed in a row
+  strikes        Int       @default(0)
+  finishedAt     DateTime?
+  place          Int?
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@map("play_stopgo_players")
+}
+
+// Public log of the race, a card only when played face up
+model StopGoMove {
+  id        String   @id @default(cuid())
+  sessionId String
+  accountId String
+  // Board revision it belongs to
+  rev       Int
+  kind      String
+  targetIds String[]
+  // Card key, only for a card played face up
+  card      String?
+  km        Int?
+  value     Int?
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, rev])
+  @@map("play_stopgo_moves")
 }

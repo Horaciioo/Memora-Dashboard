@@ -8,7 +8,12 @@ import { readBans } from '@/core/services/recruitment/BanService'
 import { readPortraits } from '@/core/services/recruitment/CandidatePortraits'
 import { sessionScope } from '@/core/services/recruitment/reach'
 import { RECRUITMENT_SETTINGS } from '@/declarations/configurations/recruitment'
-import type { HistoryOptions, HistoryOrphan, HistoryPage, HistorySession } from '@/types/recruitment'
+import type {
+  HistoryOptions,
+  HistoryOrphan,
+  HistoryPage,
+  HistorySession,
+} from '@/types/recruitment'
 import type { RecruitmentStatusName } from '@/utils/constants/recruitment'
 
 /**
@@ -143,7 +148,14 @@ const readOrphans = async (scope: AccessScope, text: string): Promise<HistoryOrp
     const ban = bans.get(discordId)
 
     return ban
-      ? [{ discordId, name: ban.name ?? discordId, avatarUrl: portraits.get(discordId) ?? null, ban }]
+      ? [
+          {
+            discordId,
+            name: ban.name ?? discordId,
+            avatarUrl: portraits.get(discordId) ?? null,
+            ban,
+          },
+        ]
       : []
   })
 }

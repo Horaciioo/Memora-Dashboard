@@ -26,13 +26,12 @@ const RESULT_CODES = {
 } as const
 
 /**
- * Board of a naval battle as one viewer may see it
+ * Naval battle read once, then each viewer's board drawn from it
  * @param {EngineSession} session - Game
- * @param {string} viewerId - Reader
- * @return {Promise<object>} - Board
+ * @return {Promise<(viewerId: string) => object>} - Board of a viewer
  */
 
-export const navalView = async (session: EngineSession, viewerId: string) => {
+export const navalBoards = async (session: EngineSession) => {
   const where = { sessionId: session.id }
   const [game, rows, matches, shots] = await Promise.all([
     prisma.navalGame.findUnique({ where }),
@@ -56,13 +55,22 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
   // Latest match of each captain
   const latest = (accountId: string) =>
     matches.filter((match) => match.fighters.includes(accountId)).at(-1)
-  const me = rows.find((row) => row.accountId === viewerId)
-  const myMatch = me
-    ? (matches.find((match) => match.status === 'LIVE' && match.fighters.includes(viewerId)) ??
-      latest(viewerId))
-    : undefined
+  /**
+   * Captain's own match
+   * @param {string} viewerId - Reader
+   * @return {number} - Match index, -1 when none
+   */
 
-  return {
+  const myMatchOf = (viewerId: string): number => {
+    const myMatch =
+      matches.find((match) => match.status === 'LIVE' && match.fighters.includes(viewerId)) ??
+      latest(viewerId)
+
+    return myMatch ? (matchIndex.get(myMatch.id) ?? -1) : -1
+  }
+
+  // Shared by every viewer, read once
+  const board = {
     settings,
     sea: { size: sea.size, fleet: sea.fleet, reachScale: sea.reachScale },
     phase,
@@ -86,14 +94,6 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
           : sea.fleet.length,
       }
     }),
-    // Only the viewer's own ships, the rest shows at the end
-    you: me
-      ? {
-          fleet: (me.fleet ?? null) as unknown as NavalShip[] | null,
-          isReady: Boolean(me.readyAt),
-          weapon: readWeaponName(me.weapon),
-        }
-      : null,
     fleets:
       phase === NavalPhases.Over
         ? rows.map((row) => (row.fleet ?? []) as unknown as NavalShip[])
@@ -114,7 +114,6 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
           (settings.turnSeconds + NAVAL_SETTINGS.graceSeconds) * SECOND_MS
       ),
     })),
-    myMatch: myMatch ? (matchIndex.get(myMatch.id) ?? -1) : -1,
     // Rev, match, shooter, target, column, row, result, weapon, orientation
     shots: shots.map((shot) => [
       shot.rev,
@@ -138,4 +137,31 @@ export const navalView = async (session: EngineSession, viewerId: string) => {
       )
     ),
   }
+
+  return (viewerId: string) => {
+    const me = rows.find((row) => row.accountId === viewerId)
+
+    return {
+      ...board,
+      // Only the viewer's own ships, the rest shows at the end
+      you: me
+        ? {
+            fleet: (me.fleet ?? null) as unknown as NavalShip[] | null,
+            isReady: Boolean(me.readyAt),
+            weapon: readWeaponName(me.weapon),
+          }
+        : null,
+      myMatch: me ? myMatchOf(viewerId) : -1,
+    }
+  }
 }
+
+/**
+ * Board of a naval battle as one viewer may see it
+ * @param {EngineSession} session - Game
+ * @param {string} viewerId - Reader
+ * @return {Promise<object>} - Board
+ */
+
+export const navalView = async (session: EngineSession, viewerId: string) =>
+  (await navalBoards(session))(viewerId)

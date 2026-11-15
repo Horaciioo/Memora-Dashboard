@@ -2,9 +2,10 @@
 
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { NavalAutoZoomToggle } from '@/composites/play/naval/NavalAutoZoomToggle'
+import { PlayPrefSwitches } from '@/composites/play/prefs/PlayPrefSwitches'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
 import { usePlayMotionStore } from '@/core/store/play/playMotion'
-import { PLAY_GAMES, PLAY_MOBILE_COPY } from '@/declarations/play'
+import { PLAY_GAMES, PLAY_MOBILE_COPY, playGameOfSlug } from '@/declarations/play'
 import { PLAY_ONLINE } from '@/declarations/ui/variants'
 import { PlayGames } from '@/utils/constants/play'
 
@@ -17,6 +18,7 @@ import { PlayGames } from '@/utils/constants/play'
 
 export const PlaySettingsPanel = ({ gameSlug }: { gameSlug?: string }) => {
   const { isLight, toggle } = usePlayMotionStore()
+  const game = gameSlug ? playGameOfSlug(gameSlug) : null
 
   return (
     <div className={PLAY_ONLINE.settings}>
@@ -28,6 +30,7 @@ export const PlaySettingsPanel = ({ gameSlug }: { gameSlug?: string }) => {
         <Toggle checked={!isLight} onChange={toggle} label={PLAY_MOBILE_COPY.heavyMotion} />
         <p className={PLAY_ONLINE.hint}>{PLAY_MOBILE_COPY.heavyMotionHint}</p>
       </section>
+      {game && <PlayPrefSwitches game={game} />}
       {gameSlug === PLAY_GAMES.get(PlayGames.Naval).slug && <NavalAutoZoomToggle />}
     </div>
   )

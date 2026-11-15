@@ -303,3 +303,26 @@
     animation: none;
   }
 }
+
+/* Loading scene of Jumble: scrambled tiles hopping one after the other */
+.play-scene-tile {
+  animation: play-scene-tile 1.8s cubic-bezier(0.3, 0, 0.4, 1) infinite;
+  animation-delay: calc(var(--tile) * 120ms);
+}
+
+@keyframes play-scene-tile {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0) rotate(var(--tilt));
+  }
+  25% {
+    transform: translateY(-18px) rotate(calc(var(--tilt) * -1.6));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-scene-tile {
+    animation: none;
+  }
+}

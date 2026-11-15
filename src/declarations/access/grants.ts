@@ -5,6 +5,14 @@ import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
+const UNBAN_HANDLING: PermissionName[] = [
+  Permissions.UnbanRead,
+  Permissions.UnbanHandle,
+  Permissions.UnbanLinks,
+]
+
+const UNBAN_ALL: PermissionName[] = [...UNBAN_HANDLING, Permissions.UnbanManage]
+
 /**
  * One batch of permissions landing on an existing database
  * @typedef {Object} GrantAddition
@@ -309,6 +317,18 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       [FunctionNames.JuniorDiscord]: [Permissions.SanctionRead],
       [FunctionNames.Animators]: [Permissions.SanctionRead],
       [FunctionNames.JuniorAnimators]: [Permissions.SanctionRead],
+    },
+  },
+  {
+    key: 'unban-by-function',
+    grants: {
+      [MemberRoles.Admin]: UNBAN_ALL,
+      [MemberRoles.Responsable]: UNBAN_ALL,
+    },
+    // Discord moderators run the requests, their Juniors only read
+    functions: {
+      [FunctionNames.Discord]: UNBAN_HANDLING,
+      [FunctionNames.JuniorDiscord]: [Permissions.UnbanRead],
     },
   },
   {

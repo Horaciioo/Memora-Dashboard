@@ -22,7 +22,10 @@ const Branch = ({ label, value }: { label: string; value: object }) => {
         aria-label={isOpen ? NEXUS_TERMINAL_COPY.collapse : NEXUS_TERMINAL_COPY.expand}
         onClick={() => setOpen(!isOpen)}
       >
-        <ICONS.expand className={cn('size-3', isOpen ? 'rotate-180' : '-rotate-90')} aria-hidden="true" />
+        <ICONS.expand
+          className={cn('size-3', isOpen ? 'rotate-180' : '-rotate-90')}
+          aria-hidden="true"
+        />
         {label}
       </button>
       {isOpen && (

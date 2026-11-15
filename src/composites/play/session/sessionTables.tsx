@@ -6,6 +6,9 @@ import { CroquisBoard } from '@/composites/play/croquis/CroquisBoard'
 import type { CroquisBoardView } from '@/composites/play/croquis/types'
 import { EchoBoard } from '@/composites/play/echo/EchoBoard'
 import type { EchoBoardView } from '@/composites/play/echo/types'
+import { StopGoBoard } from '@/composites/play/stopgo/board/StopGoBoard'
+import { StopGoFeed } from '@/composites/play/stopgo/hud/StopGoFeed'
+import type { StopGoBoardView } from '@/core/lib/play/stopgo'
 import { SuspensBoard } from '@/composites/play/suspens/SuspensBoard'
 import type { SuspensBoardView } from '@/composites/play/suspens/types'
 import { GlitchBoard } from '@/composites/play/glitch/GlitchBoard'
@@ -19,6 +22,7 @@ import { GolfFeed } from '@/composites/play/golf/GolfFeed'
 import { LudoBoard } from '@/composites/play/ludo/LudoBoard'
 import { LudoFeed } from '@/composites/play/ludo/LudoFeed'
 import { NavalBoard } from '@/composites/play/naval/battle/NavalBoard'
+import { NavalFeed } from '@/composites/play/naval/battle/NavalFeed'
 import type { LudoBoardView } from '@/core/lib/play/ludo/state'
 import type { NavalBoardView } from '@/core/lib/play/naval/state'
 import type { GolfBoardView } from '@/core/lib/play/golf'
@@ -173,6 +177,24 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
+  [PlayGames.StopGo]: ({ sessionId, board, seats, spectators, viewerId, me }) => ({
+    board: (
+      <StopGoBoard
+        sessionId={sessionId}
+        board={board as StopGoBoardView}
+        faces={seats}
+        viewerId={viewerId}
+        isSeated={me.isSeated}
+      />
+    ),
+    feed: (
+      <StopGoFeed
+        sessionId={sessionId}
+        board={board as StopGoBoardView}
+        players={[...seats, ...spectators]}
+      />
+    ),
+  }),
   [PlayGames.Echo]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
     const echo = board as EchoBoardView
 
@@ -272,7 +294,7 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
-  [PlayGames.Ludo]: ({ sessionId, board, seats, spectators, viewerId }) => {
+  [PlayGames.Ludo]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
     const ludo = board as LudoBoardView
 
     return {
@@ -289,12 +311,13 @@ export const PLAY_SESSION_TABLES: Partial<
             isHost: Boolean(isHost),
           }))}
           viewerId={viewerId}
+          isSeated={me.isSeated}
         />
       ),
       feed: <LudoFeed sessionId={sessionId} board={ludo} players={[...seats, ...spectators]} />,
     }
   },
-  [PlayGames.Naval]: ({ sessionId, board, seats, viewerId }) => ({
+  [PlayGames.Naval]: ({ sessionId, board, seats, spectators, viewerId }) => ({
     board: (
       <NavalBoard
         sessionId={sessionId}
@@ -308,6 +331,12 @@ export const PLAY_SESSION_TABLES: Partial<
         viewerId={viewerId}
       />
     ),
-    feed: null,
+    feed: (
+      <NavalFeed
+        sessionId={sessionId}
+        board={board as NavalBoardView}
+        players={[...seats, ...spectators]}
+      />
+    ),
   }),
 }

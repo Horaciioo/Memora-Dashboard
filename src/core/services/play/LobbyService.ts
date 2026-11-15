@@ -127,6 +127,8 @@ const openSession = async (accountId: string, raw: Record<string, unknown>, isAd
         game,
         hostId: accountId,
         settings,
+        // Rules sent with the table count as chosen
+        configuredAt: Object.keys(settingsOf(raw)).length > 0 ? new Date() : null,
         visibility: isPrivate ? PlayVisibilities.Private : PlayVisibilities.Public,
         joinCode,
         tournamentId: tournament?.id,
@@ -577,6 +579,7 @@ export const updateSettings = async (
       where: { id: sessionId },
       data: {
         settings: engineOf(session.game).readSettings(settingsOf(raw), session.settings),
+        configuredAt: new Date(),
         ...(await tournamentLink(tx, session, raw)),
       },
     })

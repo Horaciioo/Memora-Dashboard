@@ -1,5 +1,10 @@
 {
-  "maxPerGame": 3,
+  "maxPerGame": 7,
+  "asleep": [],
+  "driver": {
+    "retryMs": 4000,
+    "retries": 2
+  },
   "callsigns": [
     "Alpha",
     "Bravo",
@@ -141,6 +146,8 @@
       "max": 3500
     },
     "candidates": 48,
+    "refine": 12,
+    "searchMs": 150,
     "angleNoise": {
       "EASY": 0.16,
       "MEDIUM": 0.07,
@@ -162,5 +169,23 @@
       "MEDIUM": 0.15,
       "HARD": 0.0
     }
+  },
+  "stopgo": {
+    "thinkMs": {
+      "min": 1200,
+      "max": 3200
+    },
+    "nearFinish": {
+      "EASY": 0.5,
+      "MEDIUM": 0.5,
+      "HARD": 0.35
+    },
+    "revealMargin": {
+      "EASY": 200,
+      "MEDIUM": 100,
+      "HARD": 50
+    },
+    "threatKm": 250,
+    "finishZoneKm": 200
   }
 }

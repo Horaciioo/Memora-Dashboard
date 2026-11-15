@@ -3,6 +3,7 @@
   --play-baccalaureat: #3b6fd8;
   --play-baccalaureat-deep: #1c3b8f;
   --play-baccalaureat-glow: #8fb4ff;
+  --play-baccalaureat-ink: #14275f;
   --play-golf: #3f9d5c;
   --play-golf-deep: #1d5b33;
   --play-golf-glow: #a6e8a0;
@@ -216,10 +217,40 @@
   --suspens-wood: #b98650;
   --suspens-rope: #e9d3a3;
   --suspens-chalk: #fff6e3;
+  --suspens-slate: #2b2622;
+  --suspens-slate-deep: #1f1b18;
   --suspens-hit: #3fae5a;
   --suspens-miss: #e5483f;
   --suspens-key: #f3e4c9;
   --suspens-key-ink: #3a2410;
+  --play-stopgo: #d93c3c;
+  --play-stopgo-deep: #6e1616;
+  --play-stopgo-glow: #ffd9d2;
+  --play-stopgo-night: #163a1a;
+  --play-stopgo-dusk: #2c6e2f;
+  /* Stop & Go circuit: warm asphalt, red and white kerbs, bright grass, day sky */
+  --stopgo-asphalt: #4a4541;
+  --stopgo-asphalt-lit: #625c56;
+  --stopgo-asphalt-deep: #2b2825;
+  --stopgo-kerb-white: #fbf6ef;
+  --stopgo-line: #f7edd6;
+  --stopgo-grass: #4fa341;
+  --stopgo-grass-deep: #2f7a33;
+  --stopgo-sky: #bfe3f4;
+  --stopgo-gold: #f4c64a;
+  --stopgo-car-red: var(--play-ludo-red);
+  --stopgo-car-blue: var(--play-ludo-blue);
+  --stopgo-car-green: var(--play-ludo-green);
+  --stopgo-car-yellow: var(--play-ludo-yellow);
+  /* Stop & Go cards: warm paper face, one family colour on the head */
+  --stopgo-card: #fffaf0;
+  --stopgo-card-ink: #2b2825;
+  --stopgo-card-back: #3b3632;
+  --stopgo-family-distance: #5b5651;
+  --stopgo-family-attack: #d93c3c;
+  --stopgo-family-remedy: #2f8fbf;
+  --stopgo-family-bonus: #d9961f;
+  --stopgo-family-safety: #7a4fc4;
   --play-croquis: #f0a30a;
   --play-croquis-deep: #8a5600;
   --play-croquis-glow: #ffe9b0;
@@ -243,6 +274,12 @@
   /* Echo card: cream face, soft edge */
   --echo-card: #fffaf0;
   --echo-card-edge: #cfe3e6;
+  --echo-card-shade: #efe2c8;
+  /* Rim of the center card (gold) and of the own card (pink) */
+  --echo-rim-center: #f7c85a;
+  --echo-rim-center-deep: #d98a2b;
+  --echo-rim-mine: #ff8cc0;
+  --echo-rim-mine-deep: #d9488f;
   /* Echo symbol paints */
   --echo-ink: #2b2140;
   --echo-white: #ffffff;
@@ -349,6 +386,10 @@
   --play-ludo-star-lit-line: #fff8dc;
   --play-ludo-felt: #343434;
   --play-ludo-felt-deep: #252525;
+  --play-ludo-wood: #f3e3c3;
+  --play-ludo-wood-deep: #e6cf9f;
+  --play-ludo-wood-ink: #3a2a1c;
+  --play-ludo-wood-edge: #fff6e0;
   --play-ludo-call: #7db4ff;
   --play-ludo-pawn: #ffffff;
   --play-ludo-pawn-side: #d6dae0;
@@ -432,6 +473,8 @@
   --play-paper-line: #d6e1f5;
   /* Session side column, open and folded; bar height above it */
   --play-side-open: 22rem;
+  --play-lobby-top: 3.5rem;
+  --play-lobby-h: calc(100dvh - 5rem);
   --play-side-folded: 3.5rem;
   --play-bar-h: 3.5rem;
   /* One square of the notebook */

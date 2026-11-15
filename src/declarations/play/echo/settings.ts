@@ -44,7 +44,7 @@ export const ECHO_SETTINGS = {
   }),
   lockMs: readInteger(echo.lockMs, { path: 'play/echo.lockMs', fallback: 1500, min: 0 }),
   // Size of a symbol against the others on a card
-  scale: readBounds(echo.scale, { path: 'play/echo.scale', fallback: { min: 0.62, max: 1.3 } }),
+  scale: readBounds(echo.scale, { path: 'play/echo.scale', fallback: { min: 0.78, max: 1.2 } }),
   scoring: {
     base: readInteger(scoring.base, { path: 'play/echo.scoring.base', fallback: 10, min: 1 }),
     speedBonus: readInteger(scoring.speedBonus, {

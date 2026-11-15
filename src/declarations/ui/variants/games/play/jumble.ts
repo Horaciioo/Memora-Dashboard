@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, SETUP_VIOLET } from '@/declarations/ui/variants/games/play/shared'
+import { RESULT, SETUP_VIOLET } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Jumble board
@@ -7,51 +7,41 @@ import { NOTE, PANEL, SETUP_VIOLET } from '@/declarations/ui/variants/games/play
  */
 
 export const JUMBLE_BOARD = {
-  board: 'relative flex flex-col items-center gap-6 pb-16 in-[.play-boxfull]:pb-0',
+  board:
+    'relative flex size-full flex-col items-center justify-center gap-[min(2.5dvh,1.5rem)] overflow-hidden px-4 pt-24 pb-28 max-md:pb-20',
   figure:
     'play-figure play-figure-jumble text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
-  // Round line and clock
-  head: 'flex w-full max-w-3xl flex-col gap-2',
-  round: 'text-center text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
   clockTrack: 'h-3 w-full overflow-hidden rounded-full bg-[var(--play-chip)]',
   clock: 'play-jumble-clock h-full w-full rounded-full',
   lead: 'text-center text-sm text-[var(--play-ink-soft)]',
   // Tiles and slots
   tiles: 'flex w-full max-w-3xl flex-wrap items-center justify-center gap-2 sm:gap-3',
-  tile: 'play-jumble-tile w-[clamp(2.4rem,9vw,4.4rem)] text-[clamp(1.4rem,5.6vw,2.7rem)] uppercase',
+  tile: 'play-jumble-tile w-[clamp(2.6rem,min(13vw,9dvh),4.6rem)] text-[clamp(1.5rem,min(6.5vw,5.6dvh),2.8rem)] uppercase',
   tileFlip: 'play-jumble-flip',
   tileWon: 'play-jumble-won',
   tileLost: 'play-jumble-lost',
   slots: 'flex flex-wrap items-end justify-center gap-1.5',
-  slot: 'play-jumble-slot w-[clamp(1.3rem,4.2vw,2.2rem)] text-[clamp(1rem,3vw,1.6rem)] leading-tight',
+  slot: 'play-jumble-slot w-[clamp(1.2rem,min(4.2vw,4.4dvh),2.2rem)] text-[clamp(1rem,min(3vw,3.2dvh),1.6rem)] leading-tight',
   slotHint: 'play-jumble-slot-hint',
   // Fixed height, the board never jumps between phases
-  zone: 'flex min-h-56 w-full flex-col items-center gap-4',
+  zone: 'flex min-h-[min(14rem,22dvh)] w-full flex-col items-center justify-start gap-4',
   // Answer field
   form: 'flex w-full max-w-md items-center gap-2',
   input:
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-4 py-3 text-center text-lg font-extrabold tracking-widest text-[var(--play-ink)] uppercase placeholder:font-normal placeholder:tracking-normal placeholder:normal-case placeholder:text-[var(--play-ink-faint)] focus:bg-[var(--play-panel-strong)] focus:outline-none',
   shake: 'play-jumble-shake',
   // Reveal banner
-  reveal: `${PANEL} flex w-full max-w-md flex-col items-center gap-2 px-5 py-4 text-center`,
+  reveal:
+    'play-hud-block flex max-w-full items-center justify-center gap-4 px-5 py-2 text-center max-md:flex-wrap max-md:gap-2',
   revealName: 'text-sm font-extrabold text-[var(--play-ink)]',
-  gain: 'play-jumble-gain text-5xl font-black tabular-nums text-[var(--play-gold)]',
+  gain: 'play-jumble-gain text-3xl font-black tabular-nums text-[var(--play-ink-soft)]',
   ribbons: 'flex flex-wrap items-center justify-center gap-2',
   ribbon:
     'rounded-full bg-[var(--play-jumble)] px-3 py-1 text-[0.7rem] font-extrabold tracking-widest text-white uppercase',
   ribbonFlash: 'play-jumble-flash bg-[var(--play-gold)] text-[var(--play-jumble-tile-ink)]',
   timeout: 'text-sm font-bold text-[var(--play-ink-soft)]',
-  itWas: NOTE,
-  // Scoreboard
-  scores: `${PANEL} flex w-full max-w-md flex-col gap-1 p-2`,
-  score: 'flex items-center gap-3 rounded-xl px-2 py-1.5 transition-opacity',
-  scoreScored: 'play-jumble-scored',
-  scoreLeft: 'opacity-50',
-  scoreRank: 'w-5 text-center text-xs font-extrabold tabular-nums text-[var(--play-ink-faint)]',
-  scoreName: 'min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
-  scoreStreak: 'text-xs font-extrabold tabular-nums text-[var(--play-bomb)]',
-  scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
-  result: 'flex flex-col items-center gap-5',
+  itWas: 'text-xs text-[var(--play-ink-faint)]',
+  result: RESULT,
 } as const
 
 /**

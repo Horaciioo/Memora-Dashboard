@@ -10,6 +10,9 @@ import { changeSignalExtension } from '@/core/lib/system/changeSignal'
 // Same as the driver's default
 const DEFAULT_POOL_SIZE = 10
 
+// Locked games queue up, a waiting transaction gets room before failing
+const TRANSACTION_OPTIONS = { maxWait: 8000, timeout: 15000 }
+
 /**
  * Connections the app may hold
  * @return {number} - Pool size
@@ -32,6 +35,7 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 const createClient = (): PrismaClient =>
   new PrismaClient({
     adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL, max: poolSize() }),
+    transactionOptions: TRANSACTION_OPTIONS,
   })
     .$extends(nexusQueryExtension)
     .$extends(changeSignalExtension)

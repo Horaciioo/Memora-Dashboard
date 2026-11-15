@@ -1,12 +1,17 @@
 import type { ReactNode } from 'react'
 
 import { tint } from '@/composites/play/brand/poster/stage'
+import { STOPGO_SET } from '@/composites/play/hub/scenery/stopgoSet'
 
 export interface ScenerySet {
   // Blurred layer on the horizon
   far: ReactNode
   // Sharp layer at the screen corners
   near: ReactNode
+  // Layer pinned to the top edge, never cropped by the window ratio
+  top?: ReactNode
+  // Halo token, the tone when absent
+  halo?: string
 }
 
 /**
@@ -99,49 +104,66 @@ const Spot = ({ x, y, r, odd }: { x: number; y: number; r: number; odd: string }
 )
 
 /**
- * Gallows with its rope, the figure left out
- * @param {object} props - Place, angle and scale
+ * Chalk slate in its wooden frame, hung by a rope when it has one
+ * @param {object} props - Place, angle, size, letter and rope length
  * @return {JSX.Element}
  */
 
-const Gallows = ({
+const Plate = ({
   x,
   y,
   r = 0,
-  scale = 1,
+  size,
+  letter,
+  rope = 0,
 }: {
   x: number
   y: number
   r?: number
-  scale?: number
+  size: number
+  letter: string
+  rope?: number
 }) => (
-  <g transform={`translate(${x} ${y}) rotate(${r}) scale(${scale})`}>
-    <g
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="16"
-      style={{ stroke: 'var(--suspens-wood)' }}
+  <g transform={`translate(${x} ${y}) rotate(${r})`}>
+    {rope > 0 && (
+      <path
+        d={`M0 ${-rope}V0`}
+        strokeWidth={size / 12}
+        strokeLinecap="round"
+        style={{ stroke: 'var(--suspens-rope)' }}
+      />
+    )}
+    <rect
+      x={-size / 2}
+      y="0"
+      width={size}
+      height={size * 1.1}
+      rx={size / 6}
+      strokeWidth={size / 14}
+      style={{ fill: 'var(--suspens-slate)', stroke: 'var(--suspens-wood)' }}
+    />
+    <text
+      x="0"
+      y={size * 0.82}
+      textAnchor="middle"
+      fontSize={size * 0.72}
+      fontWeight="900"
+      style={{ fill: 'var(--play-suspens-glow)' }}
     >
-      <path d="M-60 0H220M0 0V-340M0 -340H200M0 -280L60 -340" />
-    </g>
-    <path
-      d="M200 -340V-290"
-      fill="none"
-      strokeWidth="9"
-      strokeLinecap="round"
-      style={{ stroke: 'var(--suspens-rope)' }}
-    />
-    <circle
-      cx="200"
-      cy="-266"
-      r="26"
-      fill="none"
-      strokeWidth="9"
-      style={{ stroke: 'var(--suspens-rope)' }}
-    />
+      {letter}
+    </text>
   </g>
 )
+
+// Small slates hung along the top edge, clear of the logo and the menu
+const HANGING = Array.from({ length: 22 }, (_, index) => ({
+  x: 50 + index * 72 + (index % 3) * 9,
+  y: 12 + ((index * 7) % 5) * 12,
+  r: ((index * 5) % 9) - 4,
+  size: 26 + ((index * 3) % 4) * 4,
+  letter: 'SUSPENDU'[index % 8],
+  rope: 12 + ((index * 7) % 5) * 12,
+}))
 
 /**
  * Drawing sheet with one doodle
@@ -205,6 +227,7 @@ const PILE_RIGHT = [
 
 // Set of each hub ground, on a 1600 × 900 canvas
 export const SCENERY_SETS: Record<string, ScenerySet> = {
+  stopgo: STOPGO_SET,
   echo: {
     far: [200, 520, 820, 1110, 1400].map((x, index) => (
       <Card key={x} x={x} y={830 - (index % 2) * 50} r={110 + (index % 3) * 20} />
@@ -300,11 +323,18 @@ export const SCENERY_SETS: Record<string, ScenerySet> = {
   },
   suspens: {
     far: [220, 620, 1000, 1380].map((x, index) => (
-      <Gallows key={x} x={x} y={820 - (index % 2) * 40} r={(index % 2 ? 1 : -1) * 3} scale={0.5} />
+      <Plate
+        key={x}
+        x={x}
+        y={800 - (index % 2) * 40}
+        r={(index % 2 ? 1 : -1) * 6}
+        size={110}
+        letter={'SUSP'[index]}
+        rope={90}
+      />
     )),
     near: (
       <>
-        <Gallows x={150} y={880} r={-3} scale={1.15} />
         <g className="play-scenery-bob">
           {['A', 'B', 'C'].map((letter, index) => (
             <Tile
@@ -318,6 +348,17 @@ export const SCENERY_SETS: Record<string, ScenerySet> = {
             />
           ))}
         </g>
+      </>
+    ),
+    top: (
+      <>
+        {[0, 1].map((group) => (
+          <g key={group} className="play-scenery-bob">
+            {HANGING.filter((_, index) => index % 2 === group).map((plate) => (
+              <Plate key={plate.x} {...plate} />
+            ))}
+          </g>
+        ))}
       </>
     ),
   },

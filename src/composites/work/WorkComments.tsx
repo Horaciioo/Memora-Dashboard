@@ -15,6 +15,10 @@ export interface WorkCommentsProps {
   kind: WorkCommentKind
   id: string
   label: string
+  // No heading above the thread
+  isCompact?: boolean
+  // Empty state of the thread
+  empty?: { title: string; description?: string; action: string }
 }
 
 // Form of a remark
@@ -26,9 +30,19 @@ const FIELDS = commentFields()
  * @return {JSX.Element}
  */
 
-const Thread = ({ kind, id, label, initial }: WorkCommentsProps & { initial: CommentView[] }) => {
-  const thread = useComments(initial, API_ROUTES.workComments(kind, id), (commentId) =>
-    API_ROUTES.workComment(kind, id, commentId)
+const Thread = ({
+  kind,
+  id,
+  label,
+  isCompact,
+  empty,
+  initial,
+}: WorkCommentsProps & { initial: CommentView[] }) => {
+  const thread = useComments(
+    initial,
+    API_ROUTES.workComments(kind, id),
+    (commentId) => API_ROUTES.workComment(kind, id, commentId),
+    true
   )
 
   return (
@@ -39,9 +53,12 @@ const Thread = ({ kind, id, label, initial }: WorkCommentsProps & { initial: Com
       isSaving={thread.isSaving}
       canWrite
       label={label}
+      isCompact={isCompact}
+      empty={empty}
       onOpen={thread.clearIssues}
       onAdd={thread.add}
       onRemove={thread.remove}
+      onPin={thread.pin}
     />
   )
 }

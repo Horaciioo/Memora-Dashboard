@@ -7,6 +7,7 @@ import { GolfViewKeys } from '@/composites/play/golf/hud/GolfViewKeys'
 import type { GolfFace } from '@/composites/play/golf/types'
 import { seatPaint } from '@/composites/play/golf/types'
 import { useGolfClockSound } from '@/composites/play/golf/useGolfClockSound'
+import { usePlayPrefsStore } from '@/core/store/play/playPrefs'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import type { GolfBoardState } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -57,6 +58,24 @@ export const GolfHud = ({
   const left = phase === GolfPhases.Playing ? (board.endsAt - now) / SECOND_MS : 0
   useGolfClockSound(left)
   const DoneIcon = ICONS.golfFlag
+  const isHidden = usePlayPrefsStore((state) => state.isHudHidden)
+  const keys = (
+    <GolfViewKeys
+      isOverview={isOverview}
+      onOverview={onOverview}
+      sessionId={sessionId}
+      isSeated={isSeated}
+    />
+  )
+
+  // Only the keys stay, to bring the HUD back
+  if (isHidden) {
+    return (
+      <div className={GOLF_BOARD.top}>
+        <div className="ml-auto">{keys}</div>
+      </div>
+    )
+  }
 
   return (
     <div className={GOLF_BOARD.top}>
@@ -130,12 +149,7 @@ export const GolfHud = ({
         })}
       </ul>
 
-      <GolfViewKeys
-        isOverview={isOverview}
-        onOverview={onOverview}
-        sessionId={sessionId}
-        isSeated={isSeated}
-      />
+      {keys}
     </div>
   )
 }

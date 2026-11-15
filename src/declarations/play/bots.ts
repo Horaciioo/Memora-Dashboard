@@ -9,8 +9,12 @@ import type { Bounds } from '@/declarations/configurations/readers'
 import { PlayBotKinds, PlayGames } from '@/utils/constants/play'
 import type { PlayBotKindName, PlayGameName } from '@/utils/constants/play'
 
-// Games whose bots sleep, all for now
-const ASLEEP_GAMES: readonly PlayGameName[] = Object.values(PlayGames)
+// Games whose bots sleep, read from the config
+const ASLEEP_GAMES: readonly string[] = readStringList(bots.asleep, {
+  path: 'play/bots.asleep',
+  fallback: [],
+  allowed: Object.values(PlayGames),
+})
 
 /**
  * Bots of a game are awake
@@ -31,6 +35,8 @@ const jumble = readNode(bots.jumble, 'play/bots.jumble')
 const baccalaureat = readNode(bots.baccalaureat, 'play/bots.baccalaureat')
 const golf = readNode(bots.golf, 'play/bots.golf')
 const naval = readNode(bots.naval, 'play/bots.naval')
+const stopgo = readNode(bots.stopgo, 'play/bots.stopgo')
+const driver = readNode(bots.driver, 'play/bots.driver')
 
 // Levels in menu order
 const LEVELS = Object.values(PlayBotKinds)
@@ -80,6 +86,15 @@ export const PLAY_BOT_SETTINGS = {
   // Bots at one table
   maxPerGame: readNumber(bots.maxPerGame, { path: 'play/bots.maxPerGame', fallback: 3, min: 0 }),
   callsigns: readStringList(bots.callsigns, { path: 'play/bots.callsigns', fallback: ['Alpha'] }),
+  // Refused move tried again, a few times
+  driver: {
+    retryMs: readNumber(driver.retryMs, {
+      path: 'play/bots.driver.retryMs',
+      fallback: 4000,
+      min: 250,
+    }),
+    retries: readNumber(driver.retries, { path: 'play/bots.driver.retries', fallback: 2, min: 0 }),
+  },
   ludo: { thinkMs: delay(ludo.thinkMs, 'play/bots.ludo.thinkMs') },
   naval: {
     thinkMs: delay(naval.thinkMs, 'play/bots.naval.thinkMs'),
@@ -124,12 +139,35 @@ export const PLAY_BOT_SETTINGS = {
     blunderRate: perLevel(baccalaureat.blunderRate, 'play/bots.baccalaureat.blunderRate', 0.02),
     voteMs: delay(baccalaureat.voteMs, 'play/bots.baccalaureat.voteMs'),
   },
+  stopgo: {
+    thinkMs: delay(stopgo.thinkMs, 'play/bots.stopgo.thinkMs'),
+    nearFinish: perLevel(stopgo.nearFinish, 'play/bots.stopgo.nearFinish', 0.5),
+    revealMargin: perLevel(stopgo.revealMargin, 'play/bots.stopgo.revealMargin', 100),
+    threatKm: readNumber(stopgo.threatKm, {
+      path: 'play/bots.stopgo.threatKm',
+      fallback: 250,
+      min: 25,
+    }),
+    finishZoneKm: readNumber(stopgo.finishZoneKm, {
+      path: 'play/bots.stopgo.finishZoneKm',
+      fallback: 200,
+      min: 25,
+    }),
+  },
   golf: {
     thinkMs: delay(golf.thinkMs, 'play/bots.golf.thinkMs'),
     candidates: readNumber(golf.candidates, {
       path: 'play/bots.golf.candidates',
       fallback: 48,
       min: 8,
+    }),
+    // Finer aims around the best one
+    refine: readNumber(golf.refine, { path: 'play/bots.golf.refine', fallback: 12, min: 0 }),
+    // Search time cap of one stroke
+    searchMs: readNumber(golf.searchMs, {
+      path: 'play/bots.golf.searchMs',
+      fallback: 150,
+      min: 20,
     }),
     angleNoise: perLevel(golf.angleNoise, 'play/bots.golf.angleNoise', 0.07),
     powerNoise: perLevel(golf.powerNoise, 'play/bots.golf.powerNoise', 0.12),

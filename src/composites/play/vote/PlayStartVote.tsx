@@ -11,12 +11,14 @@ import type { PlayVoteProps } from '@/composites/play/registry'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { mostPicked, voteOf } from '@/core/lib/play/vote'
 import type { PlayVoteState } from '@/core/lib/play/vote'
-import { playKeysOf } from '@/declarations/play/games'
+import { PLAY_GAMES, playKeysOf } from '@/declarations/play/games'
+import { PLAY_HUD_SKINS, voteSkinOf } from '@/declarations/play/hud'
 import { GOLF_VOTE_COPY } from '@/declarations/play/golf/vote'
 import { PLAY_VOTE_STEPS } from '@/declarations/play/votes'
 import type { PlayVoteStepSpec } from '@/declarations/play/votes'
 import { ICONS } from '@/declarations/ui/icons'
-import { PLAY_VOTE } from '@/declarations/ui/variants'
+import type { VoteLook } from '@/declarations/ui/variants/games/golf'
+import { PLAY_VOTE, PLAY_VOTE_HUD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -26,11 +28,12 @@ export type PlayVoteFace = (step: string, key: string) => ReactNode | null
 /**
  * Cards of a declared step
  * @param {PlayVoteStepSpec} spec - Step
+ * @param {VoteLook} look - Classes of the screen
  * @param {PlayVoteFace} [faceOf] - Game pictures
  * @return {PlayVoteCard[]} - Cards
  */
 
-const cardsOf = (spec: PlayVoteStepSpec, faceOf?: PlayVoteFace): PlayVoteCard[] =>
+const cardsOf = (spec: PlayVoteStepSpec, look: VoteLook, faceOf?: PlayVoteFace): PlayVoteCard[] =>
   spec.choices.map((choice) => {
     const Icon = choice.icon && ICONS[choice.icon]
     const picture = faceOf?.(spec.key, choice.key)
@@ -41,9 +44,16 @@ const cardsOf = (spec: PlayVoteStepSpec, faceOf?: PlayVoteFace): PlayVoteCard[] 
       face: picture ? (
         picture
       ) : Icon ? (
-        <Icon className={PLAY_VOTE.glyph} aria-hidden="true" />
+        <Icon className={look.glyph} aria-hidden="true" />
       ) : (
-        <span className={PLAY_VOTE.number}>{choice.key}</span>
+        <span
+          className={look.number}
+          style={{
+            fontSize: `calc(var(--vote-card) * ${Math.min(0.52, 1.4 / choice.key.length)})`,
+          }}
+        >
+          {choice.key}
+        </span>
       ),
     }
   })
@@ -83,54 +93,68 @@ const VoteScreen = ({
     faces[id] ? [{ id, key, ...faces[id] }] : []
   )
   if (!spec) return <></>
+  // Games with a HUD dress the vote in it, over their own ground
+  const hasHud = PLAY_HUD_SKINS.has(game)
+  const look = hasHud ? PLAY_VOTE_HUD : PLAY_VOTE
+  const { ground } = PLAY_GAMES.get(game)
 
   return (
-    <div className={PLAY_VOTE.root} style={playKeysOf(game)} role="dialog" aria-label={spec.title}>
-      <div className={PLAY_VOTE.stage}>
-        <div key={`head-${vote.step}`} className={PLAY_VOTE.head}>
-          <h2 className={PLAY_VOTE.title}>{spec.title}</h2>
-          <p className={PLAY_VOTE.lead}>{spec.lead}</p>
+    <div
+      className={look.root}
+      style={playKeysOf(game)}
+      data-hud={hasHud ? game.toLowerCase() : undefined}
+      data-hud-skin={voteSkinOf(game, vote, leader)}
+      role="dialog"
+      aria-label={spec.title}
+    >
+      {hasHud && ground && <i className={cn(ground, 'hidden')} aria-hidden="true" />}
+      <div className={look.stage}>
+        <div key={`head-${vote.step}`} className={look.head}>
+          <h2 className={look.title}>{spec.title}</h2>
+          <p className={look.lead}>{spec.lead}</p>
         </div>
         <PlayVoteDeck
           key={vote.step}
-          cards={cardsOf(spec, faceOf)}
+          cards={cardsOf(spec, look, faceOf)}
           value={leader}
           voters={voters}
           isCourse={Boolean(faceOf)}
-          look={PLAY_VOTE}
+          look={look}
           onPick={pick}
         />
-        <p key={`hint-${leader}`} className={PLAY_VOTE.hint}>
-          {spec.choices.find((choice) => choice.key === leader)?.hint}
-        </p>
-        <div className={PLAY_VOTE.actions}>
-          {isHost && (
-            <button
-              type="button"
-              className={PLAY_VOTE.button}
-              onClick={back}
-              disabled={moves.isSaving}
-            >
-              {GOLF_VOTE_COPY.back}
-            </button>
-          )}
-          <PlayVoteTimer
-            key={vote.step}
-            endsAt={vote.endsAt}
-            serverTime={serverTime}
-            onExpire={close}
-            look={PLAY_VOTE}
-          />
-          {isHost && (
-            <button
-              type="button"
-              className={cn(PLAY_VOTE.button, PLAY_VOTE.buttonMain)}
-              onClick={validate}
-              disabled={moves.isSaving}
-            >
-              {GOLF_VOTE_COPY.confirm}
-            </button>
-          )}
+        <div className={look.foot}>
+          <p key={`hint-${leader}`} className={look.hint}>
+            {spec.choices.find((choice) => choice.key === leader)?.hint}
+          </p>
+          <div className={look.actions}>
+            {isHost && (
+              <button
+                type="button"
+                className={look.button}
+                onClick={back}
+                disabled={moves.isSaving}
+              >
+                {GOLF_VOTE_COPY.back}
+              </button>
+            )}
+            <PlayVoteTimer
+              key={vote.step}
+              endsAt={vote.endsAt}
+              serverTime={serverTime}
+              onExpire={close}
+              look={look}
+            />
+            {isHost && (
+              <button
+                type="button"
+                className={cn(look.button, look.buttonMain)}
+                onClick={validate}
+                disabled={moves.isSaving}
+              >
+                {GOLF_VOTE_COPY.confirm}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

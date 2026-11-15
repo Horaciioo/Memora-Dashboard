@@ -53,6 +53,7 @@ export const GlitchPicture = ({
 
   return (
     <figure className={GLITCH_BOARD.slot}>
+      <figcaption className={GLITCH_BOARD.caption}>{caption}</figcaption>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className={cn(
@@ -98,7 +99,6 @@ export const GlitchPicture = ({
           />
         ))}
       </svg>
-      <figcaption className={GLITCH_BOARD.caption}>{caption}</figcaption>
     </figure>
   )
 }

@@ -4,17 +4,19 @@ import { notFound } from 'next/navigation'
 
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
+import { PlayLobbyFeed } from '@/composites/play/hub/lobby/PlayLobbyFeed'
 import { PlayLobby } from '@/composites/play/hub/lobby/PlayLobby'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PlayChatBubble } from '@/composites/play/session/PlayChatBubble'
 import { PlaySessionRoom } from '@/composites/play/session/PlaySessionRoom'
+import { PLAY_SETUP_DRAWERS } from '@/composites/play/registry'
 import { PLAY_SESSION_TABLES } from '@/composites/play/session/sessionTables'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { inviteCandidates, listMessages, listSpectators, readSession } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { nullIfMissing } from '@/core/lib/errors'
 import { ROUTES } from '@/declarations/navigation'
-import { PLAY_GAMES, PLAY_HUB_COPY, playKeysOf } from '@/declarations/play'
+import { PLAY_GAMES, PLAY_HUB_COPY, hudSkinOf, playKeysOf } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION, PLAY_HUB, PLAY_ROOM } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
@@ -71,6 +73,25 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
     },
     invite: canInvite ? { candidates, canSeat: isLobby } : null,
   }
+  // The lobby feed opens with its creator and the way to configure the table
+  const hostSeat = game.seats.find((seat) => seat.isHost)
+  const lobbyFeed =
+    isLobby && hostSeat ? (
+      <PlayLobbyFeed
+        host={{
+          id: hostSeat.accountId,
+          name: hostSeat.name,
+          avatarUrl: hostSeat.avatarUrl,
+          color: hostSeat.color,
+          isHost: true,
+          isBot: false,
+        }}
+        createdAt={new Date(game.createdAt).toISOString()}
+        canConfigure={
+          game.me.isHost && !game.isConfigured && Boolean(PLAY_SETUP_DRAWERS[game.game])
+        }
+      />
+    ) : undefined
 
   // Finished single games can be replayed, tournament ones lead to the next game
   const { tournament } = game
@@ -126,13 +147,15 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
     })
 
     return (
-      <div className={meta.ground ?? undefined} style={playKeysOf(game.game)}>
+      <div
+        className={meta.ground ?? undefined}
+        style={playKeysOf(game.game)}
+        data-hud-skin={hudSkinOf(game.game, game.board)}
+      >
         <PlaySignal topic={PLAY_TOPICS.session(id)} />
         <PlaySessionRoom
           game={game.game}
-          gameLabel={meta.label}
           gameSlug={meta.slug}
-          title={title}
           players={players}
           spectators={spectators}
           me={game.me}
@@ -173,6 +196,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
               viewerId={session.id}
               me={game.me}
               game={game.game}
+              isConfigured={game.isConfigured}
               serverTime={game.serverTime}
               visibility={game.visibility}
               joinCode={game.joinCode}
@@ -185,7 +209,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
         </div>
 
         <PlayChatBubble
-          chat={chat}
+          chat={{ ...chat, feed: lobbyFeed, initialTab: 'feed' }}
           above={
             <AppLink href={ROUTES.playGame(meta.slug)} className={PLAY_ROOM.back}>
               <BackIcon className={PLAY_HUB.backIcon} aria-hidden="true" />

@@ -8,8 +8,9 @@ import { APP_ENVIRONMENT } from '@/declarations/system/environments'
 // Tests only, never on staging or production
 export const SKIPS_DISCORD = APP_ENVIRONMENT === 'dev'
 
-// Digits in a made-up identifier
-const FAKE_ID_DIGITS = 18
+// Smallest 18 digit identifier and the span above it
+const FAKE_ID_FLOOR = BigInt(10) ** BigInt(17)
+const FAKE_ID_SPAN = BigInt(9) * FAKE_ID_FLOOR
 
 /**
  * Identity standing in for Discord while testing a public link
@@ -18,8 +19,10 @@ const FAKE_ID_DIGITS = 18
  */
 
 export const devIdentity = (discordId?: string | null): DiscordIdentity => {
+  // Past 2^53 the integer helper refuses, so the draw is a bigint
   const id =
-    discordId || crypto.randomInt(10 ** (FAKE_ID_DIGITS - 1), 10 ** FAKE_ID_DIGITS).toString()
+    discordId ||
+    (FAKE_ID_FLOOR + (crypto.randomBytes(8).readBigUInt64BE() % FAKE_ID_SPAN)).toString()
 
   return { id, username: `test-${id.slice(-4)}`, avatar: null, banner: null, globalName: null }
 }

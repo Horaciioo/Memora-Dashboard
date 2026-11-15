@@ -293,7 +293,10 @@ export interface FieldNeed {
  * @property {boolean} [excludeOwned] - Options belonging to the picked owners are left out instead of kept
  * @property {boolean} [defaultFromOwner] - Every reachable option is picked once the owner changes
  * @property {boolean} [binary] - A toggle drawn as a plain check/cross
+ * @property {'menu' | 'list'} [presentation] - Choices as a menu or as a visible list
+ * @property {[string, string]} [scaleLabels] - Captions of the two ends of a scale
  * @property {BusySlot[]} [busy] - Events a date field warns about
+ * @property {boolean} [rich] - Label and hint written in markdown
  */
 
 export interface FieldDefinition {
@@ -302,6 +305,8 @@ export interface FieldDefinition {
   label: string
   placeholder?: string
   hint?: string
+  // Label and hint written in markdown
+  rich?: boolean
   info?: string
   preset?: FieldPreset
   initial?: string | boolean
@@ -345,6 +350,8 @@ export interface FieldDefinition {
   dayOnly?: boolean
   defaultTimes?: [string, string]
   binary?: boolean
+  presentation?: 'menu' | 'list'
+  scaleLabels?: [string, string]
   busy?: BusySlot[]
 }
 

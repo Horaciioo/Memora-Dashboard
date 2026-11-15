@@ -16,16 +16,18 @@ export const BombLetters = ({ alphabet, gathered }: { alphabet: string[]; gather
     aria-label={BOMB_BOARD_COPY.letters}
     title={BOMB_BOARD_COPY.lettersHint}
   >
-    {alphabet.map((letter) => (
-      <span
-        key={letter}
-        className={cn(
-          BOMB_BOARD.letter,
-          gathered.includes(letter) ? BOMB_BOARD.letterUsed : BOMB_BOARD.letterFree
-        )}
-      >
-        {letter}
-      </span>
-    ))}
+    <div className={BOMB_BOARD.lettersGrid}>
+      {alphabet.map((letter) => (
+        <span
+          key={letter}
+          className={cn(
+            BOMB_BOARD.letter,
+            gathered.includes(letter) ? BOMB_BOARD.letterUsed : BOMB_BOARD.letterFree
+          )}
+        >
+          {letter}
+        </span>
+      ))}
+    </div>
   </aside>
 )

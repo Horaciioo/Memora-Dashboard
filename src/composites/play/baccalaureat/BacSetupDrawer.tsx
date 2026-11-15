@@ -7,10 +7,17 @@ import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { clockLabel } from '@/composites/play/baccalaureat/clockLabel'
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
-import { SetupChips, SetupLetters, SetupSection } from '@/composites/play/setup/PlaySetupFields'
+import {
+  SetupChips,
+  SetupLetters,
+  SetupPicks,
+  SetupSection,
+} from '@/composites/play/setup/PlaySetupFields'
 import { baccalaureatSettingsOf, isCustomCategory } from '@/core/lib/play/baccalaureat/settings'
 import {
   BAC_SETUP_COPY,
+  BACCALAUREAT_CATEGORIES,
+  BACCALAUREAT_PACKS,
   BACCALAUREAT_SETTINGS,
   BACCALAUREAT_SHARING,
   fillPlayMessage,
@@ -24,6 +31,7 @@ const NO_TOURNAMENT = 0
 
 // Tabs of the drawer
 const TABS = [
+  { value: 'categories', label: BAC_SETUP_COPY.tabCategories, icon: 'playCategories' as const },
   { value: 'letters', label: BAC_SETUP_COPY.tabLetters, icon: 'playLetters' as const },
   { value: 'rounds', label: BAC_SETUP_COPY.tabRounds, icon: 'playRounds' as const },
   { value: 'tournament', label: BAC_SETUP_COPY.tabTournament, icon: 'playBracket' as const },
@@ -33,6 +41,17 @@ const TABS = [
 const SHARING = (Object.keys(BACCALAUREAT_SHARING) as BaccalaureatSharingKey[]).map((key) => ({
   value: key,
   label: BACCALAUREAT_SHARING[key].label,
+}))
+
+// Every catalogue category as a chip
+const CATEGORY_OPTIONS = (Object.keys(BACCALAUREAT_CATEGORIES) as BaccalaureatCategoryKey[]).map(
+  (key) => ({ value: key, label: BACCALAUREAT_CATEGORIES[key].label })
+)
+
+// Ready-made lists that fill the pick
+const CATEGORY_LISTS = (['classic', 'popCulture', 'twitch'] as const).map((key) => ({
+  label: BACCALAUREAT_PACKS[key].label,
+  categories: [...BACCALAUREAT_PACKS[key].categories] as BaccalaureatCategoryKey[],
 }))
 
 // Clock presets as chips
@@ -69,10 +88,18 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
   const { alphabet, tournament } = BACCALAUREAT_SETTINGS
   // Rules on screen, stored ones when editing
   const start = baccalaureatSettingsOf(current?.settings ?? null)
-  // Categories and rounds come from the launch vote
-  const categories = start.categories
-    .filter((entry) => !isCustomCategory(entry.id))
-    .map((entry) => entry.id) as BaccalaureatCategoryKey[]
+  // Host-written ones stay, they count in the limit
+  const customs = start.categories.filter((entry) => isCustomCategory(entry.id)).length
+  const [categories, setCategories] = useState(
+    start.categories
+      .filter((entry) => !isCustomCategory(entry.id))
+      .map((entry) => entry.id) as BaccalaureatCategoryKey[]
+  )
+  const { min, max } = BACCALAUREAT_SETTINGS.categories
+  const total = categories.length + customs
+  // Adding stops at the limit, removing always works
+  const pickCategories = (next: BaccalaureatCategoryKey[]) =>
+    setCategories(next.length < categories.length ? next : next.slice(0, max - customs))
   const [sharedRule, setSharedRule] = useState(start.sharedRule)
   const [letters, setLetters] = useState<string[]>(start.letters)
   const [stop, setStop] = useState(start.stop)
@@ -114,7 +141,7 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
       open={open}
       isSaving={isSaving}
       isEditing={Boolean(current)}
-      canSubmit={!isShort}
+      canSubmit={!isShort && total >= min && total <= max}
       copy={BAC_SETUP_COPY}
       tabs={TABS}
       onClose={onClose}
@@ -122,6 +149,43 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
     >
       {(tab) => (
         <div className={BAC_SETUP.body}>
+          {tab === 'categories' && (
+            <SetupSection
+              styles={BAC_SETUP}
+              title={BAC_SETUP_COPY.categories}
+              hint={BAC_SETUP_COPY.categoriesHint}
+              aside={
+                <span className={BAC_SETUP.count}>
+                  {fillPlayMessage(BAC_SETUP_COPY.lettersCount, { count: total, total: max })}
+                </span>
+              }
+            >
+              <SetupPicks
+                styles={BAC_SETUP}
+                options={CATEGORY_OPTIONS}
+                value={categories}
+                onChange={pickCategories}
+              />
+              <div className={BAC_SETUP.quick}>
+                {CATEGORY_LISTS.map((list) => (
+                  <button
+                    key={list.label}
+                    type="button"
+                    className={BAC_SETUP.quickButton}
+                    onClick={() => setCategories(list.categories)}
+                  >
+                    {list.label}
+                  </button>
+                ))}
+              </div>
+              {total < min && (
+                <p className={FIELD_STYLES.error}>
+                  {fillPlayMessage(BAC_SETUP_COPY.categoriesRange, { min, max })}
+                </p>
+              )}
+            </SetupSection>
+          )}
+
           {tab === 'letters' && (
             <SetupSection
               styles={BAC_SETUP}

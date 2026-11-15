@@ -58,19 +58,63 @@
   --play-key: var(--play-echo);
 }
 
-/* Round card: cream disc with a soft edge */
+/* Round card: cream disc, inner ring, soft depth, coloured rim */
 .play-echo-card {
-  background: radial-gradient(circle at 35% 30%, #ffffff, var(--echo-card) 60%);
+  --rim: var(--echo-card-edge);
+  --rim-deep: #9fbfc4;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 78%, rgb(160 120 60 / 0.1) 100%),
+    radial-gradient(circle at 32% 26%, #ffffff, var(--echo-card) 55%, var(--echo-card-shade));
   box-shadow:
-    0 0 0 0.35rem var(--echo-card-edge),
-    0 1rem 2rem rgb(0 0 0 / 0.4);
-  animation: play-echo-deal 460ms var(--motion-ease-out) backwards;
+    0 0 0 0.3rem var(--echo-card),
+    0 0 0 0.75rem var(--rim),
+    0 0 0 0.85rem var(--rim-deep),
+    0 1.4rem 2.4rem rgb(0 0 0 / 0.45),
+    0 0 4.5rem color-mix(in srgb, var(--rim) 30%, transparent);
+  animation: play-echo-deal 520ms var(--motion-ease-out) backwards;
+}
+
+.play-echo-card-center {
+  --rim: var(--echo-rim-center);
+  --rim-deep: var(--echo-rim-center-deep);
+}
+
+.play-echo-card-mine {
+  --rim: var(--echo-rim-mine);
+  --rim-deep: var(--echo-rim-mine-deep);
+  animation-delay: 90ms;
 }
 
 .play-echo-card-small {
   box-shadow:
-    0 0 0 0.2rem var(--echo-card-edge),
+    0 0 0 0.15rem var(--echo-card),
+    0 0 0 0.35rem var(--rim),
     0 0.5rem 1rem rgb(0 0 0 / 0.35);
+}
+
+/* Soft light behind the two cards */
+.play-echo-stage::before {
+  content: '';
+  position: absolute;
+  inset: -12% 4%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      closest-side at 28% 50%,
+      color-mix(in srgb, var(--echo-rim-center) 16%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      closest-side at 72% 50%,
+      color-mix(in srgb, var(--echo-rim-mine) 16%, transparent),
+      transparent
+    );
+}
+
+/* Sticker depth under each drawing */
+.play-echo-art {
+  filter: drop-shadow(0 0.12rem 0 rgb(43 33 64 / 0.16));
 }
 
 @keyframes play-echo-deal {
@@ -89,6 +133,18 @@
   padding: 0;
   background: none;
   border: 0;
+  animation: play-echo-pop 420ms var(--motion-ease-out) calc(160ms + var(--i, 0) * 55ms) backwards;
+}
+
+@keyframes play-echo-pop {
+  0% {
+    opacity: 0;
+    scale: 0.4;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
 }
 
 /* Answer ringed once the round is over */
@@ -170,10 +226,129 @@
 @media (prefers-reduced-motion: reduce) {
   .play-echo-float,
   .play-echo-card,
+  .play-echo-symbol,
   .play-echo-answer,
   .play-echo-clock,
   .play-echo-gain,
   .play-echo-scored {
+    animation: none;
+  }
+}
+
+/* Echo logo: stars pop in one after another, hold, then fade together */
+.play-echo-ghost,
+.play-echo-star,
+.play-echo-twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation-duration: 3.6s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+.play-echo-ghost:nth-of-type(1) {
+  animation-name: play-echo-first;
+}
+
+.play-echo-ghost:nth-of-type(2) {
+  animation-name: play-echo-second;
+}
+
+.play-echo-star {
+  animation-name: play-echo-gold;
+}
+
+.play-echo-twinkle {
+  animation-name: play-echo-spark;
+}
+
+@keyframes play-echo-first {
+  0%,
+  4% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  16%,
+  88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes play-echo-second {
+  0%,
+  22% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  34%,
+  88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes play-echo-gold {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  54% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+
+  62%,
+  88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes play-echo-spark {
+  0%,
+  58% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+
+  72%,
+  88% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-echo-ghost,
+  .play-echo-star,
+  .play-echo-twinkle {
+    opacity: 1;
     animation: none;
   }
 }

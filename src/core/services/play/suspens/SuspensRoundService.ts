@@ -5,7 +5,7 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { conflict, invalidInput } from '@/core/lib/errors'
 import { readBodyText } from '@/core/lib/play'
-import { after, countdownEnd } from '@/core/lib/play/clock'
+import { after, openingEnd } from '@/core/lib/play/clock'
 import { shuffle } from '@/core/lib/play/croquis'
 import { frenchWords } from '@/core/lib/play/dictionary'
 import {
@@ -51,7 +51,7 @@ const playedWords = async (
 export const openTable = async (session: EngineSession): Promise<EngineStep> => {
   const settings = suspensSettingsOf(session.settings)
   const order = shuffle(session.players)
-  const startsAt = countdownEnd(new Date(), SUSPENS_SETTINGS.countdownSeconds)
+  const startsAt = openingEnd(new Date(), SUSPENS_SETTINGS.countdownSeconds)
   const game = await prisma.suspensGame.create({
     data: {
       sessionId: session.id,

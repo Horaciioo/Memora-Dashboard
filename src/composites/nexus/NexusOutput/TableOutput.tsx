@@ -39,7 +39,9 @@ export const TableOutput = ({ value }: { value: unknown }) => {
                 key={name}
                 scope="col"
                 className={`${NEXUS_STYLES.th} ${NEXUS_STYLES.thSort}`}
-                aria-sort={column === name ? (isDescending ? 'descending' : 'ascending') : undefined}
+                aria-sort={
+                  column === name ? (isDescending ? 'descending' : 'ascending') : undefined
+                }
                 onClick={() => sortBy(name)}
               >
                 {name}

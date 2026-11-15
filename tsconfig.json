@@ -42,7 +42,9 @@
     ".next-nexus/types/**/*.ts",
     ".next-nexus/dev/types/**/*.ts",
     ".next-qa/types/**/*.ts",
-    ".next-qa/dev/types/**/*.ts"
+    ".next-qa/dev/types/**/*.ts",
+    ".next-qa2/types/**/*.ts",
+    ".next-qa2/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

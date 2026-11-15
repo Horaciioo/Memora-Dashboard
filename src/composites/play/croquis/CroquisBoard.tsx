@@ -1,11 +1,10 @@
 'use client'
 
 import { CroquisCanvas } from '@/composites/play/croquis/CroquisCanvas'
-import { CroquisClock } from '@/composites/play/croquis/CroquisClock'
+import { CroquisHud } from '@/composites/play/croquis/CroquisHud'
 import { CroquisInput } from '@/composites/play/croquis/CroquisInput'
 import { CroquisResult } from '@/composites/play/croquis/CroquisResult'
 import { CroquisReveal } from '@/composites/play/croquis/CroquisReveal'
-import { CroquisScores } from '@/composites/play/croquis/CroquisScores'
 import { CroquisStudio } from '@/composites/play/croquis/CroquisStudio'
 import { CroquisWord } from '@/composites/play/croquis/CroquisWord'
 import type { CroquisBoardView, CroquisFace } from '@/composites/play/croquis/types'
@@ -59,7 +58,7 @@ export const CroquisBoard = ({
   const isPlaying = countdown === 0 && !reveal
 
   return (
-    <div className={CROQUIS_BOARD.board}>
+    <div className={CROQUIS_BOARD.board} data-hud="croquis">
       {board.round === 1 && countdown > 0 && (
         <PlayCountdown
           game={PlayGames.Croquis}
@@ -69,27 +68,15 @@ export const CroquisBoard = ({
         />
       )}
 
-      <div className={CROQUIS_BOARD.head}>
-        <span className={CROQUIS_BOARD.round}>
-          {fillPlayMessage(CROQUIS_BOARD_COPY.round, { round: board.round, total: board.rounds })}
-        </span>
-        {reveal ? (
-          <div className={CROQUIS_BOARD.clockTrack} />
-        ) : (
-          <CroquisClock
-            // New round, new bar
-            key={`clock-${board.round}`}
-            startsAt={board.startsAt}
-            endsAt={board.endsAt}
-            now={now}
-          />
-        )}
-        <span className={CROQUIS_BOARD.lead}>
-          {isDrawer
-            ? CROQUIS_BOARD_COPY.youDraw
-            : fillPlayMessage(CROQUIS_BOARD_COPY.drawing, { name: drawer?.name ?? '' })}
-        </span>
-      </div>
+      <CroquisHud
+        sessionId={sessionId}
+        board={board}
+        seats={seats}
+        viewerId={viewerId}
+        isSeated={isSeated}
+        now={now}
+        isReveal={Boolean(reveal)}
+      />
 
       <CroquisWord
         word={reveal?.word ?? board.word}
@@ -126,8 +113,6 @@ export const CroquisBoard = ({
           <CroquisInput key={`input-${board.round}`} sessionId={sessionId} isOpen={isPlaying} />
         )}
       </div>
-
-      <CroquisScores seats={seats} isRunning={!reveal} />
     </div>
   )
 }

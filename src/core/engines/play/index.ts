@@ -4,6 +4,7 @@ import { BACCALAUREAT_ENGINE } from '@/core/engines/play/BaccalaureatEngine'
 import { BOMB_ENGINE } from '@/core/engines/play/BombEngine'
 import { CROQUIS_ENGINE } from '@/core/engines/play/CroquisEngine'
 import { ECHO_ENGINE } from '@/core/engines/play/EchoEngine'
+import { STOPGO_ENGINE } from '@/core/engines/play/StopGoEngine'
 import { SUSPENS_ENGINE } from '@/core/engines/play/SuspensEngine'
 import { GLITCH_ENGINE } from '@/core/engines/play/GlitchEngine'
 import { GOLF_ENGINE } from '@/core/engines/play/GolfEngine'
@@ -30,6 +31,7 @@ export const PLAY_ENGINES: Partial<Record<PlayGameName, PlayEngine>> = {
   [PlayGames.Echo]: ECHO_ENGINE,
   [PlayGames.Croquis]: CROQUIS_ENGINE,
   [PlayGames.Suspens]: SUSPENS_ENGINE,
+  [PlayGames.StopGo]: STOPGO_ENGINE,
 }
 
 export type { EngineSession, EngineStep, PlayEngine } from '@/types/play'

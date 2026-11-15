@@ -358,17 +358,6 @@ export const MENTION_NUDGE_COPY = '{name} t’a mentionné sur un commentaire !'
 export const MENTION_NUDGE_SOMEONE = 'Quelqu’un'
 
 /**
- * Bubble beside a page holding late items of the member
- * @type {Record<string, string>}
- */
-
-export const DEADLINE_NUDGE_COPY = {
-  projects: 'Un de tes projets est hors deadline !',
-  tasks: 'Une de tes tâches est hors deadline !',
-  meetings: 'Une de tes réunions est hors deadline !',
-} as const
-
-/**
  * Singular label and gender of a board selection
  * @type {{ label: string, gender: 'feminine' }}
  */
