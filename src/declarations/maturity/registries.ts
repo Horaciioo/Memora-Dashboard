@@ -35,7 +35,7 @@ const MATURITY_MAP = {
     tone: 'caution',
   },
   deprecated: {
-    label: 'Deprecated',
+    label: 'Déprécié',
     summary: 'Ce visuel, ou ce système là va bientôt disparaître tel qu’il est présenté.',
     tone: 'danger',
   },

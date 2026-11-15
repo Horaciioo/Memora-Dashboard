@@ -1,3 +1,4 @@
+import type { MaturityName } from '@/declarations/maturity/registries'
 import type { IconName } from '@/declarations/ui/icons'
 
 /**
@@ -8,6 +9,7 @@ import type { IconName } from '@/declarations/ui/icons'
  * @property {IconName} icon - Glyph of the setting
  * @property {string} default - Value that leaves the page untouched
  * @property {Record<string, string>} options - Label of each value
+ * @property {MaturityName} [maturity] - Lifecycle tag shown by the name
  */
 
 interface ComfortSetting {
@@ -16,6 +18,7 @@ interface ComfortSetting {
   icon: IconName
   default: string
   options: Record<string, string>
+  maturity?: MaturityName
 }
 
 /**
@@ -51,6 +54,7 @@ export const COMFORT_SETTINGS = {
     icon: 'paragraph',
     default: 'normal',
     options: { normal: 'Normal', relaxed: 'Aéré' },
+    maturity: 'deprecated',
   },
   links: {
     label: 'Liens soulignés',
@@ -72,6 +76,7 @@ export const COMFORT_SETTINGS = {
     icon: 'visible',
     default: 'standard',
     options: { standard: 'Standard', strong: 'Renforcé' },
+    maturity: 'deprecated',
   },
 } as const satisfies Record<string, ComfortSetting>
 
