@@ -103,8 +103,10 @@ export const writeAnswers = async (
       category,
       word: word.trim().slice(0, BACCALAUREAT_SETTINGS.wordLength),
     }))
-  const filled = answers.filter((answer) => answer.word)
-  const cleared = answers.filter((answer) => !answer.word).map((answer) => answer.category)
+  // Words too short do not count yet
+  const isLong = (word: string) => word.length >= BACCALAUREAT_SETTINGS.minWordLength
+  const filled = answers.filter((answer) => isLong(answer.word))
+  const cleared = answers.filter((answer) => !isLong(answer.word)).map((answer) => answer.category)
   const where = { roundId: round.id, accountId }
   const before = await prisma.baccalaureatAnswer.count({ where })
 

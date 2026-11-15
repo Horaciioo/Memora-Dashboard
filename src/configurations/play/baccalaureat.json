@@ -16,11 +16,12 @@
   "categories": {
     "default": 6,
     "min": 3,
-    "max": 12
+    "max": 10
   },
   "customCategories": 4,
   "categoryLength": 32,
   "wordLength": 40,
+  "minWordLength": 3,
   "stop": {
     "enabled": true
   },
