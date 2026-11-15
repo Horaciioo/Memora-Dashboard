@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react'
 
+import { PlayPrefSwitches } from '@/composites/play/prefs/PlayPrefSwitches'
 import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
@@ -87,6 +88,8 @@ export const PlayHudKeys = ({ game, sessionId, isSeated }: PlayHudKeysProps) => 
           <div className={PLAY_HUD.soundRow}>
             <PlayVolume game={game} />
           </div>
+          <div className={PLAY_HUD.rule} role="separator" />
+          <PlayPrefSwitches game={game} isHud />
           <div className={PLAY_HUD.rule} role="separator" />
           <PlayGameActions
             sessionId={sessionId}

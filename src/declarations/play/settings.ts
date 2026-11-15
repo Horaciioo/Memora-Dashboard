@@ -274,7 +274,7 @@ export const BACCALAUREAT_SETTINGS = {
   categories: readRange(baccalaureat.categories, 'play/baccalaureat.categories', {
     initial: 6,
     min: 3,
-    max: 12,
+    max: 10,
   }),
   customCategories: readInteger(baccalaureat.customCategories, {
     path: 'play/baccalaureat.customCategories',
@@ -284,6 +284,11 @@ export const BACCALAUREAT_SETTINGS = {
   categoryLength: readInteger(baccalaureat.categoryLength, {
     path: 'play/baccalaureat.categoryLength',
     fallback: 32,
+    min: 1,
+  }),
+  minWordLength: readInteger(baccalaureat.minWordLength, {
+    path: 'play/baccalaureat.minWordLength',
+    fallback: 3,
     min: 1,
   }),
   wordLength: readInteger(baccalaureat.wordLength, {
