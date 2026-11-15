@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, RESULT, SETUP_PINK } from '@/declarations/ui/variants/games/play/shared'
+import { RESULT, SETUP_PINK } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Glitch board
@@ -7,25 +7,19 @@ import { NOTE, PANEL, RESULT, SETUP_PINK } from '@/declarations/ui/variants/game
  */
 
 export const GLITCH_BOARD = {
-  board: 'relative flex flex-col items-center gap-5 pb-16 in-[.play-boxfull]:pb-0',
+  board:
+    'relative flex size-full flex-col items-center justify-center gap-2 overflow-hidden px-4 pt-24 pb-28 max-md:pb-20',
   figure:
     'play-figure play-figure-glitch text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
-  // Round line and clock
-  head: 'flex w-full max-w-3xl flex-col gap-2',
-  round: 'text-center text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
   clockTrack: 'h-3 w-full overflow-hidden rounded-full bg-[var(--play-chip)]',
   clock: 'play-glitch-clock h-full w-full rounded-full',
   lead: 'text-center text-sm text-[var(--play-ink-soft)]',
-  // Progress of the viewer: one pip per difference
-  pips: 'flex items-center justify-center gap-1.5',
-  pip: 'play-glitch-pip size-3 rounded-full bg-[var(--play-chip)] transition-colors',
-  pipOn: 'bg-[var(--play-gold)]',
-  pipText: 'ml-2 text-xs font-extrabold tabular-nums text-[var(--play-ink-soft)]',
-  // The two pictures, side by side when there is room
-  pictures:
-    'flex w-full max-w-6xl flex-col items-center justify-center gap-4 lg:flex-row lg:items-start lg:gap-6',
-  slot: 'flex w-full max-w-xl flex-col items-center gap-2 lg:flex-1',
-  caption: 'text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
+  // The two pictures, sized on the height left by the HUD
+  pictures: 'mt-10 flex w-full items-center justify-center gap-3 max-lg:flex-col max-lg:gap-12',
+  divider: '-my-[0.3rem] w-1.5 self-stretch rounded-full bg-[var(--play-glitch)] max-lg:hidden',
+  slot: 'relative flex w-[min(38vw,calc((100dvh-23rem)*1.333))] flex-col items-center max-lg:w-[min(80vw,calc((100dvh-27rem)*1.333))]',
+  caption:
+    'absolute inset-x-0 bottom-full mb-3 text-center text-xl font-black tracking-widest text-[var(--play-glitch-glow)] uppercase sm:text-2xl',
   picture: 'play-glitch-picture block w-full touch-manipulation select-none',
   pictureOpen: 'cursor-crosshair',
   pictureLocked: 'play-glitch-locked',
@@ -35,25 +29,16 @@ export const GLITCH_BOARD = {
   ringMissed: 'play-glitch-ring-missed',
   burst: 'play-glitch-burst',
   // Verdict under the pictures
-  zone: 'flex min-h-24 w-full flex-col items-center gap-3',
+  zone: 'flex min-h-14 w-full flex-col items-center justify-center gap-2',
   locked: 'play-glitch-lockedtext text-sm font-extrabold text-[var(--play-glitch-glow)]',
-  reveal: `${PANEL} flex w-full max-w-md flex-col items-center gap-2 px-5 py-4 text-center`,
+  reveal:
+    'play-hud-block flex max-w-full items-center justify-center gap-4 px-5 py-2 text-center max-md:flex-wrap max-md:gap-2',
   revealName: 'text-sm font-extrabold text-[var(--play-ink)]',
-  gain: 'play-glitch-gain text-5xl font-black tabular-nums text-[var(--play-gold)]',
+  gain: 'play-glitch-gain text-3xl font-black tabular-nums text-[var(--play-ink-soft)]',
   ribbon:
     'rounded-full bg-[var(--play-glitch)] px-3 py-1 text-[0.7rem] font-extrabold tracking-widest text-white uppercase',
   timeout: 'text-sm font-bold text-[var(--play-ink-soft)]',
-  itWas: NOTE,
-  // Scoreboard
-  scores: `${PANEL} flex w-full max-w-md flex-col gap-1 p-2`,
-  score: 'flex items-center gap-3 rounded-xl px-2 py-1.5 transition-opacity',
-  scoreScored: 'play-glitch-scored',
-  scoreLeft: 'opacity-50',
-  scoreRank: 'w-5 text-center text-xs font-extrabold tabular-nums text-[var(--play-ink-faint)]',
-  scoreName: 'min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
-  scoreFound: 'text-xs font-extrabold tabular-nums text-[var(--play-ink-soft)]',
-  scoreDone: 'text-xs font-extrabold tabular-nums text-[var(--play-gold)]',
-  scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
+  itWas: 'text-xs text-[var(--play-ink-faint)]',
   result: RESULT,
 } as const
 
