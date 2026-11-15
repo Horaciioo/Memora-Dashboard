@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 import { StopGoCar } from '@/composites/play/stopgo/board/StopGoCar'
 import { StopGoDecor } from '@/composites/play/stopgo/board/StopGoDecor'
 import { StopGoSigns } from '@/composites/play/stopgo/board/StopGoSigns'
+import { StopGoProgress } from '@/composites/play/stopgo/board/StopGoProgress'
 import { StopGoTrack } from '@/composites/play/stopgo/board/StopGoTrack'
+import { useTrackCamera } from '@/composites/play/stopgo/board/useTrackCamera'
 import { pointAt, trackOf } from '@/core/lib/play/stopgo'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
@@ -45,58 +47,81 @@ export const StopGoBoard = ({ sessionId, board, faces, viewerId }: StopGoBoardPr
   const scroller = useRef<HTMLDivElement>(null)
   const height = plan.mapHeight * plan.maps.length + 2 * STOPGO_TRACK.capHeight
 
-  useEffect(() => {
+  const viewTop = -plan.mapHeight * plan.maps.length - STOPGO_TRACK.capHeight
+
+  const getFocusTop = useCallback(() => {
     const box = scroller.current
-    if (!box) return
+    if (!box) return 0
     const { y } = pointAt(plan, focusKm, 0)
-    const ratio = box.clientWidth / plan.width
-    box.scrollTop =
-      (y + plan.mapHeight * plan.maps.length + STOPGO_TRACK.capHeight) * ratio -
-      box.clientHeight / 2
-  }, [plan, focusMap]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    return ((y - viewTop) * box.clientWidth) / plan.width - box.clientHeight / 2
+  }, [plan, focusKm, viewTop])
+
+  useTrackCamera({
+    scroller,
+    getFocusTop,
+    followKey: `${focusKm}:${board.turnNo}`,
+    isActive: true,
+  })
 
   return (
-    <div ref={scroller} className="size-full overflow-x-hidden overflow-y-auto">
-      <svg
-        viewBox={`${plan.minX} ${-plan.mapHeight * plan.maps.length - STOPGO_TRACK.capHeight} ${plan.width} ${height}`}
-        className="block w-full"
-        role="img"
+    <div className="relative size-full">
+      <div
+        ref={scroller}
+        className="size-full touch-pan-y [scrollbar-width:none] overflow-x-hidden overflow-y-auto overscroll-contain"
       >
-        <defs>
-          <pattern id="stopgo-checker" width="28" height="28" patternUnits="userSpaceOnUse">
-            <rect width="28" height="28" style={{ fill: 'var(--stopgo-kerb-white)' }} />
-            <rect width="14" height="14" style={{ fill: 'var(--stopgo-asphalt-deep)' }} />
-            <rect
-              x="14"
-              y="14"
-              width="14"
-              height="14"
-              style={{ fill: 'var(--stopgo-asphalt-deep)' }}
-            />
-          </pattern>
-        </defs>
-        {maps.map((map) => (
-          <StopGoDecor key={map} plan={plan} seed={sessionId} map={map} />
-        ))}
-        <StopGoTrack plan={plan} maps={maps} colors={colors} />
-        <StopGoSigns plan={plan} maps={maps} />
-        {players.map((player, lane) => {
-          const face = faces.find(({ id }) => id === player.accountId)
+        <svg
+          viewBox={`${plan.minX} ${viewTop} ${plan.width} ${height}`}
+          className="block w-full"
+          role="img"
+        >
+          <defs>
+            <pattern id="stopgo-checker" width="28" height="28" patternUnits="userSpaceOnUse">
+              <rect width="28" height="28" style={{ fill: 'var(--stopgo-kerb-white)' }} />
+              <rect width="14" height="14" style={{ fill: 'var(--stopgo-asphalt-deep)' }} />
+              <rect
+                x="14"
+                y="14"
+                width="14"
+                height="14"
+                style={{ fill: 'var(--stopgo-asphalt-deep)' }}
+              />
+            </pattern>
+          </defs>
+          {maps.map((map) => (
+            <StopGoDecor key={map} plan={plan} seed={sessionId} map={map} />
+          ))}
+          <StopGoTrack plan={plan} maps={maps} colors={colors} />
+          <StopGoSigns plan={plan} maps={maps} />
+          {players.map((player, lane) => {
+            const face = faces.find(({ id }) => id === player.accountId)
 
-          return (
-            <StopGoCar
-              key={player.accountId}
-              plan={plan}
-              lane={lane}
-              km={player.km}
-              color={colors[lane]}
-              name={face?.name ?? ''}
-              avatarUrl={face?.avatarUrl ?? null}
-              hasLeft={player.hasLeft}
-            />
-          )
-        })}
-      </svg>
+            return (
+              <StopGoCar
+                key={player.accountId}
+                plan={plan}
+                lane={lane}
+                km={player.km}
+                color={colors[lane]}
+                name={face?.name ?? ''}
+                avatarUrl={face?.avatarUrl ?? null}
+                hasLeft={player.hasLeft}
+              />
+            )
+          })}
+        </svg>
+      </div>
+      <StopGoProgress
+        scroller={scroller}
+        plan={plan}
+        viewTop={viewTop}
+        viewHeight={height}
+        cars={players.map(({ accountId, km }, lane) => ({
+          id: accountId,
+          km,
+          color: colors[lane],
+        }))}
+      />
     </div>
   )
 }

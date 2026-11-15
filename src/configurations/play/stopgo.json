@@ -54,6 +54,9 @@
     "mapKm": 250,
     "signKm": 100
   },
+  "camera": {
+    "resumeSeconds": 4
+  },
   "colors": ["red", "blue", "green", "yellow"],
   "feedSize": 40
 }

@@ -24,6 +24,8 @@ export const STOPGO_TRACK = {
   signClear: 34,
   // Car move over a gap of km
   move: { perKm: 7, minMs: 450, maxMs: 1700 },
+  // Camera glide, key steps and page share
+  camera: { glideMs: 900, step: 120, pageShare: 0.8 },
 } as const
 
 /**
@@ -76,4 +78,6 @@ export const STOPGO_BOARD_COPY = {
   start: 'Départ',
   finish: 'Arrivée',
   left: 'Parti',
+  recenter: 'Recentrer sur ma voiture',
+  progress: 'Progression de la course',
 } as const

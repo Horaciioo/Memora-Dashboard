@@ -436,6 +436,7 @@ export const ICONS = {
   playResume: phosphor(Play, PLAY_FILL),
   playTabLive: phosphor(GameController, PLAY_FILL),
   playOpen: phosphor(ArrowSquareOut, PLAY_BOLD),
+  playRecenter: phosphor(Crosshair, PLAY_BOLD),
   playHeart: phosphor(Heart, { ...PLAY_DUO, weight: 'fill' }),
   golfTornado: phosphor(Tornado, PLAY_DUO),
   golfSticky: phosphor(Magnet, PLAY_DUO),

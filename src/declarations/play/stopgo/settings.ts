@@ -18,6 +18,7 @@ const mystery = readNode(stopgo.mystery, 'play/stopgo.mystery')
 const accident = readNode(stopgo.accident, 'play/stopgo.accident')
 const limit = readNode(stopgo.limit, 'play/stopgo.limit')
 const track = readNode(stopgo.track, 'play/stopgo.track')
+const camera = readNode(stopgo.camera, 'play/stopgo.camera')
 
 // Seat bounds
 const minPlayers = readInteger(stopgo.minPlayers, {
@@ -115,6 +116,11 @@ export const STOPGO_SETTINGS = {
   }),
   mapKm: readInteger(track.mapKm, { path: 'play/stopgo.track.mapKm', fallback: 250, min: 1 }),
   signKm: readInteger(track.signKm, { path: 'play/stopgo.track.signKm', fallback: 100, min: 1 }),
+  cameraResumeSeconds: readInteger(camera.resumeSeconds, {
+    path: 'play/stopgo.camera.resumeSeconds',
+    fallback: 4,
+    min: 0,
+  }),
   colors: readStringList(stopgo.colors, {
     path: 'play/stopgo.colors',
     fallback: ['red', 'blue', 'green', 'yellow'],

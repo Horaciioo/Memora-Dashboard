@@ -5,11 +5,14 @@ import { useCallback, useRef, useState } from 'react'
 import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
+import { useStopGoCameraStore } from '@/core/store/play/stopgoCamera'
 import { usePlayStageStore } from '@/core/store/play/playStage'
 import { PLAY_GAMES, PLAY_HUD_COPY } from '@/declarations/play'
+import { STOPGO_BOARD_COPY } from '@/declarations/play/stopgo/track'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_HUD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 export interface PlayHudKeysProps {
@@ -30,6 +33,8 @@ export const PlayHudKeys = ({ game, sessionId, isSeated }: PlayHudKeysProps) => 
   const SettingsIcon = ICONS.settingsLine
   const FullscreenIcon = isScreen ? ICONS.playWindowed : ICONS.playFullscreen
   const ChatIcon = ICONS.playChat
+  const RecenterIcon = ICONS.playRecenter
+  const recenter = useStopGoCameraStore((state) => state.recenter)
 
   const keysRef = useRef<HTMLDivElement>(null)
   const fold = useCallback(() => setOpen(false), [])
@@ -38,6 +43,17 @@ export const PlayHudKeys = ({ game, sessionId, isSeated }: PlayHudKeysProps) => 
   return (
     <div ref={keysRef} className={PLAY_HUD.keys}>
       <div className={PLAY_HUD.keyRow}>
+        {game === PlayGames.StopGo && (
+          <button
+            type="button"
+            className={PLAY_HUD.key}
+            aria-label={STOPGO_BOARD_COPY.recenter}
+            title={STOPGO_BOARD_COPY.recenter}
+            onClick={recenter}
+          >
+            <RecenterIcon className={PLAY_HUD.keyIcon} aria-hidden="true" />
+          </button>
+        )}
         <button
           type="button"
           className={cn(PLAY_HUD.key, isOpen && PLAY_HUD.keyOn)}
