@@ -216,3 +216,44 @@
     animation: none;
   }
 }
+
+/* Loading scene of Naval: a ship rocking on two sliding waves */
+.play-scene-ship {
+  transform-origin: 80px 82px;
+  animation: play-scene-ship 2.6s ease-in-out infinite;
+}
+
+.play-scene-wave {
+  animation: play-scene-wave 3.2s linear infinite;
+}
+
+.play-scene-wave-front {
+  animation-duration: 2.2s;
+  animation-direction: reverse;
+}
+
+@keyframes play-scene-ship {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(3deg);
+  }
+}
+
+@keyframes play-scene-wave {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-scene-ship,
+  .play-scene-wave {
+    animation: none;
+  }
+}

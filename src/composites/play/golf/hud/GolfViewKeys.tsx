@@ -34,8 +34,8 @@ export const GolfViewKeys = ({
   const [isOpen, setOpen] = useState(false)
   const ViewIcon = isOverview ? ICONS.golfFollow : ICONS.golfOverview
   const SettingsIcon = ICONS.settingsLine
-  const { isFullscreen, isChatOpen, toggleFullscreen, toggleChat } = usePlayStageStore()
-  const FullscreenIcon = isFullscreen ? ICONS.playWindowed : ICONS.playFullscreen
+  const { isScreen, isChatOpen, toggleScreen, toggleChat } = usePlayStageStore()
+  const FullscreenIcon = isScreen ? ICONS.playWindowed : ICONS.playFullscreen
   const ChatIcon = ICONS.playChat
 
   const keysRef = useRef<HTMLDivElement>(null)
@@ -65,24 +65,22 @@ export const GolfViewKeys = ({
         </button>
         <button
           type="button"
-          className={cn(GOLF_BOARD.view, GOLF_BOARD.viewDesktop, isFullscreen && GOLF_BOARD.viewOn)}
-          aria-label={isFullscreen ? GOLF_BOARD_COPY.windowed : GOLF_BOARD_COPY.fullscreen}
-          aria-pressed={isFullscreen}
-          onClick={toggleFullscreen}
+          className={cn(GOLF_BOARD.view, GOLF_BOARD.viewDesktop, isScreen && GOLF_BOARD.viewOn)}
+          aria-label={isScreen ? GOLF_BOARD_COPY.windowed : GOLF_BOARD_COPY.fullscreen}
+          aria-pressed={isScreen}
+          onClick={toggleScreen}
         >
           <FullscreenIcon className={GOLF_BOARD.viewIcon} aria-hidden="true" />
         </button>
-        {isFullscreen && (
-          <button
-            type="button"
-            className={cn(GOLF_BOARD.view, GOLF_BOARD.viewDesktop, isChatOpen && GOLF_BOARD.viewOn)}
-            aria-label={isChatOpen ? GOLF_BOARD_COPY.hideChat : GOLF_BOARD_COPY.showChat}
-            aria-pressed={isChatOpen}
-            onClick={toggleChat}
-          >
-            <ChatIcon className={GOLF_BOARD.viewIcon} aria-hidden="true" />
-          </button>
-        )}
+        <button
+          type="button"
+          className={cn(GOLF_BOARD.view, GOLF_BOARD.viewDesktop, isChatOpen && GOLF_BOARD.viewOn)}
+          aria-label={isChatOpen ? GOLF_BOARD_COPY.hideChat : GOLF_BOARD_COPY.showChat}
+          aria-pressed={isChatOpen}
+          onClick={toggleChat}
+        >
+          <ChatIcon className={GOLF_BOARD.viewIcon} aria-hidden="true" />
+        </button>
       </div>
       {isOpen && <GolfSettings sessionId={sessionId} isSeated={isSeated} />}
     </div>

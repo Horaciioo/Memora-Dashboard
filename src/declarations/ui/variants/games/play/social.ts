@@ -13,7 +13,7 @@ import {
  */
 
 export const PLAY_CHAT_BUBBLE = {
-  open: 'play-side-in mt-4 flex min-h-80 w-full flex-col lg:fixed lg:top-1/2 lg:right-0 lg:z-40 lg:mt-0 lg:w-[var(--play-side-open)] lg:-translate-y-1/2',
+  open: 'play-side-in mt-4 flex min-h-80 w-full flex-col lg:fixed lg:top-[var(--play-lobby-top)] lg:right-0 lg:z-40 lg:mt-0 lg:h-[var(--play-lobby-h)] lg:w-[var(--play-side-open)]',
   folding: 'play-side-out',
   // Centred over the chat box, desktop only
   above: 'absolute bottom-full left-0 mb-3 flex w-full justify-center max-lg:hidden',
@@ -174,10 +174,10 @@ export const PLAY_DOCK = {
 
 export const PLAY_ROOM = {
   // Lobby: header row, then the box centred in what is left
-  main: 'flex min-w-0 flex-col gap-4 lg:min-h-[calc(100dvh-17rem)]',
+  main: 'relative flex min-w-0 flex-col gap-4 lg:fixed lg:top-[var(--play-lobby-top)] lg:left-0 lg:h-[var(--play-lobby-h)] lg:right-[var(--play-side-open)] lg:px-8',
   head: 'flex flex-col items-center gap-3 md:flex-row md:items-start md:justify-between md:gap-4',
-  center: 'my-auto',
-  logo: 'size-28 sm:size-32 md:ml-12 xl:ml-8',
+  center: 'min-h-0 lg:flex lg:flex-1 lg:justify-center',
+  logo: 'size-28 sm:size-32 md:ml-12 xl:ml-8 lg:max-xl:hidden xl:absolute xl:top-0 xl:left-8',
   game: NOTE,
   watch: 'flex flex-wrap items-center gap-3 rounded-2xl bg-[var(--play-chip)] px-4 py-2',
   watchLabel: 'text-xs font-extrabold tracking-wider text-[var(--play-ink)] uppercase',
@@ -186,11 +186,9 @@ export const PLAY_ROOM = {
   lost: 'fixed top-3 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[var(--play-panel-strong)] px-4 py-1.5 text-xs font-bold text-[var(--play-ink-soft)] shadow-lg',
   back: 'inline-flex shrink-0 items-center gap-1.5 text-xs font-extrabold tracking-wider text-[var(--play-ink-soft)] uppercase hover:text-[var(--play-ink)]',
   // Players and gestures, centred
-  middle: 'mx-auto flex w-full max-w-2xl flex-col items-center gap-6',
+  middle: 'mx-auto flex w-full max-w-2xl flex-col items-center gap-6 lg:h-full lg:min-h-0 lg:gap-4',
   // Title block: label, waiting line, one sentence
   lobbyHead: 'flex flex-col items-center gap-2 text-center',
-  eyebrow:
-    'rounded-full bg-[var(--play-ink)] px-4 py-1.5 text-[0.65rem] font-extrabold tracking-[0.25em] text-[var(--play-panel-strong)] uppercase',
   lobbyTitle:
     'text-3xl font-extrabold tracking-tight text-balance text-[var(--play-ink)] sm:text-4xl',
   lobbySub: 'text-sm font-semibold text-balance text-[var(--play-ink-soft)] sm:text-base',
@@ -202,7 +200,7 @@ export const PLAY_ROOM = {
   summaryEnd: 'ml-auto',
   // The table: one card per seat, two across on a phone
   table:
-    'grid w-full grid-cols-2 justify-center gap-3 py-1 sm:grid-cols-[repeat(var(--cols),9rem)] md:gap-4',
+    'grid w-full grid-cols-2 justify-center gap-3 py-1 sm:grid-cols-[repeat(var(--cols),9rem)] md:gap-4 lg:min-h-0 lg:flex-1 lg:auto-rows-fr lg:content-center',
   seat: `play-seat ${PANEL} relative flex min-w-0 flex-col items-center gap-1.5 px-2 pt-6 pb-4 text-center transition-[opacity,box-shadow] duration-300 rounded-3xl`,
   seatReady: 'shadow-[var(--shadow-md)]',
   seatIdle: 'opacity-75',
@@ -218,14 +216,12 @@ export const PLAY_ROOM = {
   seatState:
     'play-rise-item inline-flex items-center gap-1 text-xs font-extrabold tracking-wider text-[var(--play-ink)] uppercase',
   seatStateIdle: 'text-[var(--play-ink-faint)]',
-  seatYou:
-    'absolute top-2 left-2 rounded-full bg-[var(--play-key)] px-2 py-0.5 text-[0.6rem] font-extrabold tracking-wider text-[var(--play-key-ink)] uppercase',
   seatKick:
     'absolute top-1.5 right-1.5 grid size-6 place-items-center rounded-full text-[var(--play-ink-faint)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
   seatKickIcon: 'size-3.5',
   seatAction: 'mt-1.5 w-full',
   // Empty seat, one tap opens the picker
-  slot: 'flex min-h-40 w-full flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-[var(--play-line)] text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
+  slot: 'flex min-h-40 lg:min-h-28 w-full flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-[var(--play-line)] text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
   slotIcon: 'grid size-12 place-items-center rounded-full bg-[var(--play-chip)]',
   slotIconSvg: 'size-5',
   slotLabel: 'text-xs font-extrabold tracking-wider uppercase',
@@ -240,7 +236,7 @@ export const PLAY_ROOM = {
   shareLabel:
     'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
   shareCode: 'text-3xl font-extrabold tracking-[0.35em] text-[var(--play-ink)] sm:text-4xl',
-  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 rounded-[2rem] p-5 sm:p-8`,
+  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 rounded-[2rem] p-5 sm:p-8 lg:min-h-0 lg:flex-1 lg:justify-between lg:gap-3 lg:p-6`,
   // Plain column, flows under the players
   actions: 'flex w-full max-w-sm flex-col gap-3',
   // Quiet way out, under the main key
@@ -256,6 +252,13 @@ export const PLAY_ROOM = {
 export const PLAY_CHAT_UI = {
   headActions: 'flex items-center gap-1',
   panel: `${PANEL} ${LIFT} flex h-full flex-col overflow-hidden lg:rounded-r-none`,
+  // Laid over a table: last lines only, no head, no scroll
+  panelHud: 'flex max-h-80 flex-col justify-end',
+  listHud: 'flex flex-col justify-end gap-0.5 overflow-hidden px-2 py-2',
+  // Same gap on every side, pill inside the rounded block
+  composerHud: 'relative flex items-center gap-2 p-3',
+  inviteHud: 'size-11 rounded-full!',
+  inputHud: 'rounded-full! px-5! py-2.5!',
   // Inside the session side column: takes the room left under the players
   panelSide: `${PANEL} ${LIFT} flex min-h-0 flex-1 flex-col overflow-hidden max-lg:h-[28rem] lg:rounded-r-none`,
   head: 'flex items-center justify-between gap-3 border-b border-[var(--play-line)] px-4 py-3',

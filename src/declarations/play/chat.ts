@@ -7,6 +7,8 @@ export const PLAY_CHAT = {
   // Lines kept on screen
   history: 100,
   maxLength: 500,
+  // Lines kept in the chat laid over a table
+  hudLines: 5,
 } as const
 
 /**

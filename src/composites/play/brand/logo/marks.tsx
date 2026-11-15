@@ -139,8 +139,20 @@ export const NEW_MARKS: Record<string, ReactNode> = {
       <circle cx="46" cy="24" r="8" {...tint('--suspens-chalk')} />
       <circle cx="43" cy="22" r="1.6" {...tint('--suspens-key-ink')} />
       <circle cx="49" cy="22" r="1.6" {...tint('--suspens-key-ink')} />
-      <path d="M42.5 27.5q3.5 3 7 0" stroke="var(--suspens-key-ink)" strokeWidth="1.8" fill="none" strokeLinecap="round" />
-      <path d="M46 32V46M46 38L39 44M46 38L53 44" stroke="var(--suspens-chalk)" strokeWidth="3.4" fill="none" strokeLinecap="round" />
+      <path
+        d="M42.5 27.5q3.5 3 7 0"
+        stroke="var(--suspens-key-ink)"
+        strokeWidth="1.8"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M46 32V46M46 38L39 44M46 38L53 44"
+        stroke="var(--suspens-chalk)"
+        strokeWidth="3.4"
+        fill="none"
+        strokeLinecap="round"
+      />
       <rect x="48" y="49" width="12" height="10" rx="3" {...tint('--play-suspens')} />
     </>
   ),
@@ -184,35 +196,47 @@ export const NEW_MARKS: Record<string, ReactNode> = {
       <Ground x={34} width={18} />
       {/* Echoes trailing the symbol */}
       {ECHOES.map((echo) => (
-        <path
-          key={echo.x}
-          d={STAR}
-          transform={`translate(${echo.x} ${echo.y}) rotate(${echo.angle})`}
-          fill="none"
-          stroke="var(--play-echo-glow)"
-          strokeWidth="3"
-          strokeLinejoin="round"
-          opacity={echo.opacity}
-        />
+        <g key={echo.x} className="play-echo-ghost">
+          <path
+            d={STAR}
+            transform={`translate(${echo.x} ${echo.y}) rotate(${echo.angle})`}
+            fill="none"
+            stroke="var(--play-echo-glow)"
+            strokeWidth="3"
+            strokeLinejoin="round"
+            opacity={echo.opacity}
+          />
+        </g>
       ))}
-      <path
-        d={STAR}
-        transform="translate(38 35) rotate(8)"
-        stroke="var(--play-croquis-deep)"
-        strokeWidth="5"
-        strokeLinejoin="round"
-        {...tint('--play-croquis-deep')}
-      />
-      <path
-        d={STAR}
-        transform="translate(38 32) rotate(8)"
-        stroke="var(--play-gold)"
-        strokeWidth="5"
-        strokeLinejoin="round"
-        {...tint('--play-gold')}
-      />
+      <g className="play-echo-star">
+        <path
+          d={STAR}
+          transform="translate(38 35) rotate(8)"
+          stroke="var(--play-croquis-deep)"
+          strokeWidth="5"
+          strokeLinejoin="round"
+          {...tint('--play-croquis-deep')}
+        />
+        <path
+          d={STAR}
+          transform="translate(38 32) rotate(8)"
+          stroke="var(--play-gold)"
+          strokeWidth="5"
+          strokeLinejoin="round"
+          {...tint('--play-gold')}
+        />
+      </g>
       <path d="M32 22l2.5-5" stroke="white" strokeWidth="2.6" strokeLinecap="round" opacity="0.6" />
-      <path d="m55 9 1.4 3.6 3.6 1.4-3.6 1.4L55 19l-1.4-3.6-3.6-1.4 3.6-1.4z" fill="white" />
+      <path
+        className="play-echo-twinkle"
+        d="m55 9 1.4 3.6 3.6 1.4-3.6 1.4L55 19l-1.4-3.6-3.6-1.4 3.6-1.4z"
+        fill="white"
+      />
+      <path
+        className="play-echo-twinkle"
+        d="m12 12 1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1z"
+        fill="white"
+      />
     </>
   ),
 }

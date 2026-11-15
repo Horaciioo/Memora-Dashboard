@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { ComponentProps, ReactNode } from 'react'
 
 import { PlayGameChatBar } from '@/composites/play/mobile/PlayGameChatBar'
@@ -13,7 +13,7 @@ import { BAC_SESSION_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 
 /**
- * Chat stuck to the right edge, a bubble that opens and closes, as tall as the box in the middle
+ * Chat stuck to the right edge, a bubble that opens and closes, same height as the box in the middle
  * @param {Object} props - Bubble
  * @param {Object} props.chat - Chat props, fold gesture added here
  * @param {ReactNode} props.above - Link centred right above the chat box
@@ -29,19 +29,8 @@ export const PlayChatBubble = ({
 }) => {
   const [isOpen, setOpen] = useState(true)
   const [isFolding, setFolding] = useState(false)
-  const [height, setHeight] = useState<number | null>(null)
   const ChatIcon = ICONS.playChat
   const isMobile = useIsMobileShell()
-
-  // Follow the height of the centred box
-  useEffect(() => {
-    const box = document.querySelector('[data-play-box]')
-    if (!box) return
-    const observer = new ResizeObserver(() => setHeight(box.getBoundingClientRect().height))
-    observer.observe(box)
-
-    return () => observer.disconnect()
-  }, [])
 
   // Phone: bar glued to the bottom
   if (isMobile) {
@@ -56,7 +45,6 @@ export const PlayChatBubble = ({
   return isOpen ? (
     <aside
       className={cn(PLAY_CHAT_BUBBLE.open, isFolding && PLAY_CHAT_BUBBLE.folding)}
-      style={height ? { height } : undefined}
       onAnimationEnd={(event) => {
         if (!isFolding || event.target !== event.currentTarget) return
         setOpen(false)

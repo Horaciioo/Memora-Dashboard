@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, SETUP_TEAL } from '@/declarations/ui/variants/games/play/shared'
+import { NOTE, PANEL, RESULT, SETUP_TEAL } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Echo board
@@ -7,19 +7,17 @@ import { NOTE, PANEL, SETUP_TEAL } from '@/declarations/ui/variants/games/play/s
  */
 
 export const ECHO_BOARD = {
-  board: 'relative flex flex-col items-center gap-6 pb-16 in-[.play-boxfull]:pb-0',
+  board:
+    'relative flex min-h-[min(40rem,100dvh)] flex-1 flex-col items-center justify-center gap-4 px-4 pt-28 pb-6',
   figure:
     'play-figure play-figure-echo text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
-  // Round line and clock
-  head: 'flex w-full max-w-3xl flex-col gap-2',
-  round: 'text-center text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
   clockTrack: 'h-3 w-full overflow-hidden rounded-full bg-[var(--play-chip)]',
   clock: 'play-echo-clock h-full w-full rounded-full',
   lead: 'text-center text-sm text-[var(--play-ink-soft)]',
   // Center card and own card
   table:
     'flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:items-start sm:gap-10',
-  slot: 'flex w-[min(78vw,21rem)] flex-col items-center gap-2',
+  slot: 'flex w-[min(78vw,21rem,34dvh)] flex-col items-center gap-2',
   caption: 'text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
   // Round card and its symbols
   card: 'play-echo-card relative aspect-square w-full rounded-full',
@@ -43,16 +41,7 @@ export const ECHO_BOARD = {
     'rounded-full bg-[var(--play-echo)] px-3 py-1 text-[0.7rem] font-extrabold tracking-widest text-white uppercase',
   timeout: 'text-sm font-bold text-[var(--play-ink-soft)]',
   itWas: NOTE,
-  // Scoreboard
-  scores: `${PANEL} flex w-full max-w-md flex-col gap-1 p-2`,
-  score: 'flex items-center gap-3 rounded-xl px-2 py-1.5 transition-opacity',
-  scoreScored: 'play-echo-scored',
-  scoreLeft: 'opacity-50',
-  scoreRank: 'w-5 text-center text-xs font-extrabold tabular-nums text-[var(--play-ink-faint)]',
-  scoreName: 'min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
-  scoreGain: 'text-xs font-extrabold tabular-nums text-[var(--play-gold)]',
-  scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
-  result: 'flex flex-col items-center gap-5',
+  result: RESULT,
 } as const
 
 /**

@@ -52,6 +52,8 @@ export const toSessionView = (session: LoadedSession, viewerId: string, board: u
     status: session.status,
     hostId: session.hostId,
     settings: session.settings,
+    isConfigured: Boolean(session.configuredAt),
+    createdAt: session.createdAt,
     visibility: session.visibility,
     // Only the table shares the code
     joinCode: seat && isPresent(seat) ? session.joinCode : null,

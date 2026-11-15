@@ -8,6 +8,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { queueRefresh } from '@/core/lib/realtime/refresh'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { usePlayBusyStore } from '@/core/store/play/playBusy'
+import { usePlayLoadingGameStore } from '@/core/store/play/playLoadingGame'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_BOT_COPY } from '@/declarations/play/bots'
 import { PLAY_HUB_COPY } from '@/declarations/play/hub'
@@ -15,7 +16,8 @@ import { PLAY_BUSY } from '@/declarations/play/loading'
 import type { PlayBusyGesture } from '@/declarations/play/loading'
 import { PLAY_FOLLOW_COPY } from '@/declarations/play/invites'
 import { GolfVoteActions } from '@/declarations/play/golf/vote'
-import type { PlayBotKindName, PlayInviteRoleName } from '@/utils/constants/play'
+import { PlayVisibilities } from '@/utils/constants/play'
+import type { PlayBotKindName, PlayGameName, PlayInviteRoleName } from '@/utils/constants/play'
 
 /**
  * Player gestures of the Play pages
@@ -28,6 +30,7 @@ export const usePlayMoves = () => {
   // A second click while one gesture runs is dropped
   const busy = useRef(false)
   const begin = usePlayBusyStore((state) => state.begin)
+  const aim = usePlayLoadingGameStore((state) => state.aim)
 
   // The loading logo shows while the server answers
   const track =
@@ -45,7 +48,8 @@ export const usePlayMoves = () => {
   const go = async <T>(
     action: () => Promise<T>,
     done: string,
-    to: ((result: T) => string) | null
+    to: ((result: T) => string) | null,
+    game: PlayGameName | null = null
   ): Promise<boolean> => {
     if (busy.current) return false
     busy.current = true
@@ -53,19 +57,45 @@ export const usePlayMoves = () => {
       busy.current = false
     })
     if (result === null) return false
-    if (to) router.push(to(result))
-    else queueRefresh(() => router.refresh())
+    if (to) {
+      // The loading screen of the next page wears this game
+      aim(game)
+      router.push(to(result))
+    } else queueRefresh(() => router.refresh())
 
     return true
   }
 
   return {
     isSaving,
-    create: (game: string, setup: Record<string, unknown> = {}) =>
+    create: (game: PlayGameName, setup: Record<string, unknown> = {}) =>
       go(
         track('create', () => apiPost<{ id: string }>(API_ROUTES.playSessions, { ...setup, game })),
         PLAY_HUB_COPY.created,
-        (session) => ROUTES.playSessionInvite(session.id)
+        (session) => ROUTES.playSessionInvite(session.id),
+        game
+      ),
+    // Private table started at once, straight into the game without the invite screen
+    solo: (game: PlayGameName) =>
+      go(
+        track('solo', async () => {
+          const table = await apiPost<{ id: string }>(API_ROUTES.playSessions, {
+            game,
+            visibility: PlayVisibilities.Private,
+          })
+          try {
+            await apiPost(API_ROUTES.playStart(table.id), {})
+          } catch (error) {
+            // A table that never started is closed, not left waiting
+            await apiPost(API_ROUTES.playCancel(table.id), {}).catch(() => null)
+            throw error
+          }
+
+          return table
+        }),
+        PLAY_HUB_COPY.started,
+        (table) => ROUTES.playSession(table.id),
+        game
       ),
     visibility: (id: string, isPrivate: boolean) =>
       go(

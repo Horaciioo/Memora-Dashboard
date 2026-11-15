@@ -6,7 +6,7 @@ import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import { readBodyText } from '@/core/lib/play'
 import { normalizeWord } from '@/core/lib/play/baccalaureat/words'
-import { after, countdownEnd } from '@/core/lib/play/clock'
+import { after, openingEnd } from '@/core/lib/play/clock'
 import { frenchWords } from '@/core/lib/play/dictionary'
 import { drawWord, isSolution, jumbleSettingsOf, pointsOf, scramble } from '@/core/lib/play/jumble'
 import type { JumbleGameSettings } from '@/core/lib/play/jumble'
@@ -101,7 +101,7 @@ const playedWords = async (
 export const openTable = async (session: EngineSession): Promise<EngineStep> => {
   const settings = jumbleSettingsOf(session.settings)
   const { answer, display } = drawWord(1, settings.rounds, new Set(), settings.difficulty)
-  const clock = clockOf(settings, countdownEnd(new Date(), JUMBLE_SETTINGS.countdownSeconds))
+  const clock = clockOf(settings, openingEnd(new Date(), JUMBLE_SETTINGS.countdownSeconds))
   const game = await prisma.jumbleGame.create({
     data: {
       sessionId: session.id,

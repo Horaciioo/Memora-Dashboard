@@ -9,6 +9,9 @@ export const LIFT = 'shadow-[var(--shadow-sm)]'
 
 export const HEADING = 'text-xl font-extrabold tracking-tight text-[var(--play-ink)] sm:text-2xl'
 
+// Final screen: fills the room, content centred
+export const RESULT = 'flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-6'
+
 export const NOTE = 'text-xs font-semibold tabular-nums text-[var(--play-ink-soft)]'
 
 // Bubble opened by the dock

@@ -3,7 +3,7 @@
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
 import { BombInput } from '@/composites/play/bomb/BombInput'
-import { BombLetters } from '@/composites/play/bomb/BombLetters'
+import { BombHud } from '@/composites/play/bomb/BombHud'
 import { BombResult } from '@/composites/play/bomb/BombResult'
 import { BombTable } from '@/composites/play/bomb/BombTable'
 import type { BombBoardView, BombFace } from '@/composites/play/bomb/types'
@@ -11,7 +11,7 @@ import { blastOf, useBombSounds } from '@/composites/play/bomb/useBombSounds'
 import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import { bombHeat } from '@/core/lib/play/bomb/table'
-import { BOMB_BOARD_COPY, BOMB_SETTINGS, fillPlayMessage } from '@/declarations/play'
+import { BOMB_SETTINGS } from '@/declarations/play'
 import { BOMB_BOARD } from '@/declarations/ui/variants'
 import { PlayGames } from '@/utils/constants/play'
 
@@ -35,6 +35,7 @@ export const BombBoard = ({
   board: initial,
   faces,
   viewerId,
+  isSeated,
 }: BombBoardProps) => {
   const board = usePlainBoard(sessionId, initial)
   const now = useServerNow(board.serverTime)
@@ -52,9 +53,6 @@ export const BombBoard = ({
 
   if (board.isOver) return <BombResult seats={seats} />
 
-  const holder = seats.find((seat) => seat.accountId === board.turnId)
-  // Viewer's letters, the holder's when watching
-  const reader = seats.find((seat) => seat.accountId === viewerId) ?? holder
   const isBlasting = board.blast !== null && now - blastOf(board) < BOMB_SETTINGS.blastFlashMs
   const isMyTurn = board.isMyTurn && countdown === 0
 
@@ -70,7 +68,14 @@ export const BombBoard = ({
         />
       )}
 
-      <BombLetters alphabet={board.settings.bonusAlphabet} gathered={reader?.letters ?? []} />
+      <BombHud
+        sessionId={sessionId}
+        board={board}
+        seats={seats}
+        viewerId={viewerId}
+        isSeated={isSeated}
+        heat={heat}
+      />
 
       <div className={BOMB_BOARD.stage}>
         <BombTable
@@ -83,13 +88,6 @@ export const BombBoard = ({
           heat={heat}
           maxLives={board.settings.maxLives}
         />
-
-        <p className={BOMB_BOARD.lead}>
-          {isMyTurn
-            ? BOMB_BOARD_COPY.yourTurn
-            : fillPlayMessage(BOMB_BOARD_COPY.theirTurn, { name: holder?.name ?? '' })}{' '}
-          <span className={BOMB_BOARD.leadPrompt}>{board.prompt}</span>
-        </p>
 
         {isMyTurn && (
           <BombInput

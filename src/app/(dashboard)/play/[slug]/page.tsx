@@ -8,6 +8,7 @@ import { GolfPanorama } from '@/composites/play/golf/panorama/GolfPanorama'
 import { PlayCallouts } from '@/composites/play/hub/notices/PlayCallouts'
 import { PlayConcept } from '@/composites/play/hub/concept/PlayConcept'
 import { PlayCreateButton } from '@/composites/play/hub/lobby/PlayCreateButton'
+import { PlaySoloButton } from '@/composites/play/hub/lobby/PlaySoloButton'
 import { PlayJoinCode } from '@/composites/play/hub/lobby/PlayJoinCode'
 import { PlayHubMenu } from '@/composites/play/hub/PlayHubMenu'
 import { PlayLeaderboard } from '@/composites/play/hub/leaderboard/PlayLeaderboard'
@@ -185,6 +186,12 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
               disabled={isLocked}
               lockedReason={profile.ban ? PLAY_HUB_COPY.banned : null}
               label={PLAY_MOBILE_COPY.hubPlay}
+              className={PLAY_HUB_TABS.playButton}
+            />
+            <PlaySoloButton
+              game={game}
+              disabled={isLocked}
+              lockedReason={profile.ban ? PLAY_HUB_COPY.banned : null}
               className={PLAY_HUB_TABS.playButton}
             />
             {!isLocked && <PlayJoinCode className={PLAY_HUB_TABS.playButton} />}

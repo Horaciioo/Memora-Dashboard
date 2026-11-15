@@ -4,15 +4,16 @@ import { useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
+import { usePlaySessionLoadStore } from '@/core/store/play/playSessionLoad'
 import { usePlayCountdownSound } from '@/composites/play/session/usePlayCountdownSound'
 import { BAC_BOARD } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
 
-// Stage the veil covers, the game room or the page
-const STAGE_SELECTOR = '[data-play-stage]'
+// Game box the count is centred in, the page when absent
+const STAGE_SELECTOR = '[data-play-box]'
 
 /**
- * Element the veil hangs in: outside the table box, whose blur would trap it
+ * Element the count hangs in: the game box
  * @return {Element | null} - Host, none on the server
  */
 
@@ -27,14 +28,14 @@ const stageHost = (): Element | null =>
 const still = () => () => {}
 
 /**
- * Big 3D number in the middle of the page over a blurred room
+ * Big 3D number in the middle of the game box, held until the loading screen has left
  * @param {Object} props - Countdown
  * @param {PlayGameName} props.game - Game counting
  * @param {number} props.seconds - Seconds left
  * @param {string} [props.lead] - Line above
  * @param {ReactNode} [props.children] - Gestures under the number
  * @param {string} [props.figureClassName] - Figure in the game colour
- * @param {string} [props.className] - Frame, the blurred overlay by default
+ * @param {string} [props.className] - Frame, centred in the game box by default
  * @param {number} props.total - Numbers counted, the lead before the first is not shown
  * @param {boolean} [props.isSilent] - Game plays its own sounds
  * @return {JSX.Element}
@@ -60,14 +61,17 @@ export const PlayCountdown = ({
   isSilent?: boolean
 }) => {
   const seconds = Math.min(left, total)
-  usePlayCountdownSound(seconds, isSilent, game)
+  const isCovered = usePlaySessionLoadStore((state) => state.isCovered)
+  // Before its first number, or while the loading screen is on
+  const isHeld = isCovered || left > total
+  usePlayCountdownSound(seconds, isSilent || isHeld, game)
   const host = useSyncExternalStore(still, stageHost, () => null)
-  const isVeil = className === BAC_BOARD.overlay
+  const isOverlay = className === BAC_BOARD.overlay
+  if (isHeld) return null
 
   const count = (
     <div className={className} aria-live="polite">
       <div className={BAC_BOARD.stage}>
-        <span key={`halo-${seconds}`} className={BAC_BOARD.halo} aria-hidden="true" />
         {lead && <span className={BAC_BOARD.stageLead}>{lead}</span>}
         <span key={seconds} className={`play-tick relative ${figureClassName}`}>
           {seconds}
@@ -77,5 +81,5 @@ export const PlayCountdown = ({
     </div>
   )
 
-  return isVeil && host ? createPortal(count, host) : count
+  return isOverlay && host ? createPortal(count, host) : count
 }

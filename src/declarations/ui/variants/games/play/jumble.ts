@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, SETUP_VIOLET } from '@/declarations/ui/variants/games/play/shared'
+import { NOTE, PANEL, RESULT, SETUP_VIOLET } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Jumble board
@@ -51,7 +51,7 @@ export const JUMBLE_BOARD = {
   scoreName: 'min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
   scoreStreak: 'text-xs font-extrabold tabular-nums text-[var(--play-bomb)]',
   scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
-  result: 'flex flex-col items-center gap-5',
+  result: RESULT,
 } as const
 
 /**

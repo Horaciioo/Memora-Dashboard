@@ -1,78 +1,40 @@
 'use client'
 
-import { flushSync } from 'react-dom'
 import { create } from 'zustand'
 
 import { MEDIA } from '@/declarations/ui/responsive'
 
-// Stuck view transition fallback
-const MORPH_FALLBACK_MS = 1000
-
 /**
- * Play stage store, a table taking the whole screen with its chat laid over it
+ * Play stage store, a table always filling the page with its chat laid over it
  * @typedef {Object} PlayStageStore
- * @property {boolean} isFullscreen - Table fills the screen
- * @property {boolean} isChatOpen - Chat column shown while full screen
- * @property {() => void} toggleFullscreen - Enter or leave
+ * @property {boolean} isFullscreen - Table fills the page, always on while a room is mounted
+ * @property {boolean} isScreen - Browser screen taken, window chrome hidden
+ * @property {boolean} isChatOpen - Chat shown over the table
+ * @property {() => void} toggleScreen - Take or hand back the browser screen
  * @property {() => void} toggleChat - Show or hide the chat
- * @property {() => void} enter - Game starts full screen, the chat beside it on wide screens
- * @property {() => void} leave - Back to the page
+ * @property {(isScreen: boolean) => void} setScreen - Follow the browser
+ * @property {() => void} enter - Room opens, chat shown on wide screens
  */
-
-let settled: Promise<unknown> = Promise.resolve()
-
-/**
- * Resolves once the running morph is over, the browser mode waits for it so the viewport stays still
- * @return {Promise<unknown>}
- */
-
-export const stageSettled = () => settled
-
-/**
- * Run a stage change inside a view transition so the room morphs between sizes
- * @param {() => void} change - State change, applied to the DOM at once
- * @return {void}
- */
-
-export const morphStage = (change: () => void) => {
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  // A hidden tab never paints, the browser would time the transition out
-  if (reduced || document.hidden || !document.startViewTransition) return change()
-  let isApplied = false
-  const apply = () => {
-    if (isApplied) return
-    isApplied = true
-    flushSync(change)
-  }
-  const morph = document.startViewTransition(apply)
-  settled = morph.finished.catch(() => {})
-  morph.ready.catch(() => {})
-  morph.updateCallbackDone.catch(() => {})
-  // Callback never ran: change anyway
-  window.setTimeout(apply, MORPH_FALLBACK_MS)
-}
 
 interface PlayStageStore {
   isFullscreen: boolean
+  isScreen: boolean
   isChatOpen: boolean
-  toggleFullscreen: () => void
+  toggleScreen: () => void
   toggleChat: () => void
+  setScreen: (isScreen: boolean) => void
   enter: () => void
-  leave: () => void
 }
 
-export const usePlayStageStore = create<PlayStageStore>()((set, get) => ({
-  isFullscreen: false,
+export const usePlayStageStore = create<PlayStageStore>()((set) => ({
+  isFullscreen: true,
+  isScreen: false,
   isChatOpen: false,
-  toggleFullscreen: () => {
-    // Real screen on: the key hands it back
+  toggleScreen: () => {
     if (document.fullscreenElement) return void document.exitFullscreen()
-    // Already on the stage: take the screen at once, the click is still fresh
-    if (get().isFullscreen)
-      return void document.documentElement.requestFullscreen?.().catch(() => get().leave())
-    morphStage(() => set({ isFullscreen: true, isChatOpen: false }))
+    void document.documentElement.requestFullscreen?.().catch(() => {})
   },
   toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
-  enter: () => set({ isFullscreen: true, isChatOpen: window.matchMedia(MEDIA.lg).matches }),
-  leave: () => set({ isFullscreen: false, isChatOpen: false }),
+  setScreen: (isScreen) => set({ isScreen }),
+  enter: () => set({ isChatOpen: window.matchMedia(MEDIA.lg).matches }),
 }))

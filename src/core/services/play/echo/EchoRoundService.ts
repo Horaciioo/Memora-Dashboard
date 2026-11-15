@@ -5,7 +5,7 @@ import type { EchoGame, Prisma } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import { readBodyInteger } from '@/core/lib/play'
-import { after, countdownEnd } from '@/core/lib/play/clock'
+import { after, openingEnd } from '@/core/lib/play/clock'
 import { answerOf, dealRound, echoSettingsOf, pointsOf } from '@/core/lib/play/echo'
 import type { EchoDeal, EchoGameSettings } from '@/core/lib/play/echo'
 import { IDLE_STEP } from '@/core/engines/play/steps'
@@ -61,7 +61,7 @@ const withTable = (
 
 export const openTable = async (session: EngineSession): Promise<EngineStep> => {
   const settings = echoSettingsOf(session.settings)
-  const startsAt = countdownEnd(new Date(), ECHO_SETTINGS.countdownSeconds)
+  const startsAt = openingEnd(new Date(), ECHO_SETTINGS.countdownSeconds)
   const game = await prisma.echoGame.create({
     data: {
       sessionId: session.id,

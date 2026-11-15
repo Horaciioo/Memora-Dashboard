@@ -5,7 +5,7 @@ const GLASS = 'golf-block'
 const CAPTION = 'text-sm leading-none font-black tracking-wide text-[var(--play-ink)] uppercase'
 const FIGURE = 'text-3xl leading-none font-black tabular-nums text-[var(--play-ink-soft)]'
 const ROUND =
-  'grid size-11 place-items-center text-[var(--play-ink)] transition-transform hover:-translate-y-0.5 hover:bg-[var(--play-chip)]'
+  'grid size-11 place-items-center rounded-full text-[var(--play-ink)] transition-transform hover:-translate-y-0.5 hover:bg-[var(--play-chip)]'
 
 /**
  * Golf course screen: the 3D stage and the cards laid over it
@@ -32,7 +32,7 @@ export const GOLF_BOARD = {
   rule: 'my-1 h-px bg-[var(--play-line)]',
   views: `${GLASS} pointer-events-auto flex items-center gap-1 p-1.5`,
   view: ROUND,
-  viewOn: 'bg-[var(--play-chip)]',
+  viewOn: 'text-[var(--play-accent)]',
   viewIcon: 'size-5',
   // Phone: the gear and the chat bar hold these
   viewDesktop: 'max-md:hidden',
@@ -54,7 +54,7 @@ export const GOLF_BOARD = {
   // Players strip
   players: `${GLASS} pointer-events-auto hidden items-center gap-3 px-3 py-2 md:order-1 md:flex`,
   player: 'relative flex flex-col items-center gap-1',
-  playerFace: 'overflow-hidden ring-[3px]',
+  playerFace: 'overflow-hidden rounded-full ring-[3px]',
   playerStrokes: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
   playerMark:
     'absolute -top-1 -right-1 grid size-5 place-items-center bg-[var(--play-golf-bonus)] text-[var(--play-on-art)] ring-2 ring-[var(--play-golf-hud-deep)]',
@@ -150,11 +150,6 @@ const CARD_CELL = 'border-l-2 border-[var(--play-golf-card-line)] px-2 py-2.5 te
 
 export const GOLF_PANEL = {
   root: 'pointer-events-auto flex w-72 max-w-[40%] flex-col max-md:hidden',
-  log: 'flex flex-col gap-0.5 bg-[var(--play-golf-card-log)] px-3 py-2',
-  logLine:
-    'play-pop truncate text-sm font-extrabold text-white [text-shadow:0_1px_0_rgb(0_0_0/0.45)]',
-  logHole: 'text-[var(--play-golf-card-faint)]',
-  logName: 'text-[var(--play-golf-malus)]',
   head: 'flex items-center justify-between gap-2 bg-[var(--play-golf-card)] px-3 py-2.5',
   title: 'text-xl leading-none font-black tracking-tight whitespace-nowrap text-white uppercase',
   keys: 'flex items-center gap-1.5',
@@ -346,6 +341,8 @@ export const GOLF_VOTE = {
     'golf-plate grid min-w-12 place-items-center px-3 py-1 text-2xl leading-none font-black tabular-nums text-[var(--play-golf-gold-light)] sm:min-w-20 sm:px-5 sm:text-4xl',
   timerLow: 'animate-pulse text-white',
   hint: 'golf-plate max-w-xl px-6 py-2 text-center text-sm font-bold text-white/90 sm:text-base',
+  // Hint and keys, close together
+  foot: 'flex flex-col items-center gap-3',
   actions: 'flex items-center justify-center gap-2 sm:gap-3',
   button:
     'golf-plate min-h-10 px-4 text-sm sm:min-h-12 sm:px-8 sm:text-base font-black tracking-wide text-white uppercase transition-[filter,translate] hover:-translate-y-0.5 hover:brightness-125 disabled:pointer-events-none disabled:opacity-50',

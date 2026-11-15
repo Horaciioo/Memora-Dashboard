@@ -432,6 +432,8 @@
   --play-paper-line: #d6e1f5;
   /* Session side column, open and folded; bar height above it */
   --play-side-open: 22rem;
+  --play-lobby-top: 3.5rem;
+  --play-lobby-h: calc(100dvh - 5rem);
   --play-side-folded: 3.5rem;
   --play-bar-h: 3.5rem;
   /* One square of the notebook */

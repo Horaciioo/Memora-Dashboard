@@ -3,7 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { readBodyMap } from '@/core/lib/play'
-import { after, countdownEnd } from '@/core/lib/play/clock'
+import { after, countdownEnd, openingEnd } from '@/core/lib/play/clock'
 import { BaccalaureatPhases, drawLetter, roundPhase } from '@/core/lib/play/baccalaureat'
 import { BACCALAUREAT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
 import type { EngineSession, EngineStep } from '@/types/play'
@@ -43,7 +43,9 @@ export const openRound = async (session: EngineSession): Promise<EngineStep> => 
   // Last round played
   if (previous.length >= settings.rounds) return { changed: true, finished: true, deadline: null }
 
-  const startsAt = countdownEnd(new Date(), BACCALAUREAT_SETTINGS.countdownSeconds)
+  // The first letter waits for every screen to load
+  const count = previous.length === 0 ? openingEnd : countdownEnd
+  const startsAt = count(new Date(), BACCALAUREAT_SETTINGS.countdownSeconds)
   const round = await prisma.baccalaureatRound.create({
     data: {
       sessionId: session.id,

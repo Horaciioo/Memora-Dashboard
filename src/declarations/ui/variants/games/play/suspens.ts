@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, SETUP_WOOD } from '@/declarations/ui/variants/games/play/shared'
+import { NOTE, PANEL, RESULT, SETUP_WOOD } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Suspens board
@@ -72,7 +72,7 @@ export const SUSPENS_BOARD = {
   scoreState:
     'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-suspens-glow)] uppercase',
   scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
-  result: 'flex flex-col items-center gap-5',
+  result: RESULT,
 } as const
 
 /**

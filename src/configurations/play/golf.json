@@ -18,7 +18,6 @@
   "lateShotMs": 1200,
   "restToleranceMs": 250,
   "feedSize": 40,
-  "logLines": 4,
   "clockLowSeconds": 15,
   "physics": {
     "stepHz": 120,

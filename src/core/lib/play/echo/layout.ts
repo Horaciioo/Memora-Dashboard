@@ -20,14 +20,16 @@ export interface EchoPlacement {
 }
 
 // Edge gap, spacing and tries before the symbols shrink
-const EDGE = 0.04
-const GAP = 0.03
-const TRIES = 400
-const SHRINK = 0.96
-const START_RADIUS = 0.46
+const EDGE = 0.05
+const GAP = 0.035
+const TRIES = 48
+const SHRINK = 0.97
+const START_RADIUS = 0.52
+// Tilt stays readable
+const TILT = 65
 
 /**
- * Try to place the circles without overlap
+ * Place the circles without overlap, each one where the room is widest
  * @param {number[]} radii - Radii, largest first
  * @param {() => number} random - Source in [0, 1)
  * @return {{ x: number, y: number }[] | null} - Centers, null when stuck
@@ -38,20 +40,27 @@ const settle = (radii: number[], random: () => number): { x: number; y: number }
 
   for (const radius of radii) {
     const reach = 1 - EDGE - radius
-    let spot: { x: number; y: number } | undefined
+    let best: { x: number; y: number } | undefined
+    let room = GAP
 
-    for (let attempt = 0; attempt < TRIES && !spot; attempt += 1) {
+    for (let attempt = 0; attempt < TRIES; attempt += 1) {
       const angle = random() * Math.PI * 2
       const distance = Math.sqrt(random()) * reach
       const candidate = { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance }
-      const isFree = centers.every(
-        (other, index) =>
-          Math.hypot(other.x - candidate.x, other.y - candidate.y) >= radius + radii[index] + GAP
+      const clearance = Math.min(
+        reach - distance,
+        ...centers.map(
+          (other, index) =>
+            Math.hypot(other.x - candidate.x, other.y - candidate.y) - radius - radii[index]
+        )
       )
-      if (isFree) spot = candidate
+      if (clearance >= room) {
+        best = candidate
+        room = clearance
+      }
     }
-    if (!spot) return null
-    centers.push(spot)
+    if (!best) return null
+    centers.push(best)
   }
 
   return centers
@@ -68,7 +77,7 @@ export const layoutCard = (symbols: number[], seed: number): EchoPlacement[] => 
   const random = seededRng(`echo:${seed}`)
   const { min, max } = ECHO_SETTINGS.scale
   const sized = symbols
-    .map((symbol) => ({ symbol, scale: min + random() * (max - min), angle: random() * 360 - 180 }))
+    .map((symbol) => ({ symbol, scale: min + random() * (max - min), angle: (random() * 2 - 1) * TILT }))
     .toSorted((left, right) => right.scale - left.scale)
 
   // Shrink everything until the draw fits

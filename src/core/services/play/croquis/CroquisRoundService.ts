@@ -5,7 +5,7 @@ import type { CroquisGame, Prisma } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import { readBodyInteger, readBodyText } from '@/core/lib/play'
-import { after, countdownEnd } from '@/core/lib/play/clock'
+import { after, openingEnd } from '@/core/lib/play/clock'
 import {
   comparable,
   croquisSettingsOf,
@@ -143,7 +143,7 @@ export const openTable = async (session: EngineSession): Promise<EngineStep> => 
       drawerId: order[0],
       word,
       display,
-      ...clockOf(settings, countdownEnd(new Date(), CROQUIS_SETTINGS.countdownSeconds)),
+      ...clockOf(settings, openingEnd(new Date(), CROQUIS_SETTINGS.countdownSeconds)),
     },
   })
 

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-import { GolfLog } from '@/composites/play/golf/hud/GolfLog'
 import { GolfRoundTable } from '@/composites/play/golf/hud/results/GolfRoundTable'
 import type { GolfFace } from '@/composites/play/golf/types'
 import type { GolfBoardState } from '@/core/lib/play/golf'
@@ -32,7 +31,6 @@ export const GolfPanel = ({ board, faces, viewerId, focusId, onStats }: GolfPane
 
   return (
     <aside className={GOLF_PANEL.root} aria-label={GOLF_BOARD_COPY.scorecard}>
-      <GolfLog board={board} faces={faces} />
       <div className={GOLF_PANEL.head}>
         <h2 className={GOLF_PANEL.title}>{GOLF_BOARD_COPY.scorecard}</h2>
         <div className={GOLF_PANEL.keys}>

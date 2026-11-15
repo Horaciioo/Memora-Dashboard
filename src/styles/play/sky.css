@@ -34,59 +34,6 @@
   }
 }
 
-/* Countdown veil: blur and dark edges rising together, the middle left clear */
-.play-count {
-  background: radial-gradient(
-    circle at 50% 50%,
-    color-mix(in srgb, var(--play-key) 22%, transparent) 0,
-    rgb(8 6 24 / 0.5) 55%,
-    rgb(8 6 24 / 0.78) 100%
-  );
-  backdrop-filter: blur(16px) saturate(130%);
-  -webkit-backdrop-filter: blur(16px) saturate(130%);
-  animation: play-count-in 420ms var(--motion-ease-out) both;
-}
-
-@keyframes play-count-in {
-  from {
-    opacity: 0;
-    backdrop-filter: blur(0) saturate(100%);
-    -webkit-backdrop-filter: blur(0) saturate(100%);
-  }
-}
-
-/* Halo behind a number, swelling then fading */
-.play-halo {
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--play-key) 55%, transparent) 0,
-    color-mix(in srgb, var(--play-key) 18%, transparent) 45%,
-    transparent 70%
-  );
-  animation: play-halo 900ms ease-out both;
-}
-
-@keyframes play-halo {
-  0% {
-    opacity: 0;
-    scale: 0.4;
-  }
-  35% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    scale: 1.35;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .play-count,
-  .play-halo {
-    animation: none;
-  }
-}
-
 /* Painted plate, cover-fitted to the screen whatever its ratio */
 .play-scene-banner {
   container-type: size;

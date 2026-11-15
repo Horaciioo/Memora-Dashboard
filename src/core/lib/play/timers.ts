@@ -31,8 +31,7 @@ export const markSettled = (sessionId: string, until: Date | null): void => {
  * @return {boolean} - Up to date
  */
 
-export const isSettled = (sessionId: string): boolean =>
-  (settled.get(sessionId) ?? 0) > Date.now()
+export const isSettled = (sessionId: string): boolean => (settled.get(sessionId) ?? 0) > Date.now()
 
 /**
  * Run a game's next deadline, replacing the previous one

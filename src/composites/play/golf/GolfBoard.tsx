@@ -5,7 +5,7 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import { GolfResult } from '@/composites/play/golf/GolfResult'
-import { PlayLoadingScreen } from '@/composites/play/loading/PlayLoadingScreen'
+import { PlayLoadHold } from '@/composites/play/loading/PlayLoadHold'
 import { GolfStats } from '@/composites/play/golf/hud/results/GolfStats'
 import { GolfBreak } from '@/composites/play/golf/hud/GolfBreak'
 import { GolfCountdown } from '@/composites/play/golf/hud/GolfCountdown'
@@ -52,7 +52,8 @@ import { cn } from '@/utils/classnames'
 // Three loaded only on a golf table
 const GolfScene = dynamic(() => import('@/composites/play/golf/scene/GolfScene'), {
   ssr: false,
-  loading: () => <PlayLoadingScreen isFill />,
+  // The session screen stays up while the scene loads
+  loading: () => <PlayLoadHold name="golf-scene" />,
 })
 
 export interface GolfBoardProps {

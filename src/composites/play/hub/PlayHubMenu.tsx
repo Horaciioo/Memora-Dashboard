@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayCreateButton } from '@/composites/play/hub/lobby/PlayCreateButton'
+import { PlaySoloButton } from '@/composites/play/hub/lobby/PlaySoloButton'
 import { PlayJoinCode } from '@/composites/play/hub/lobby/PlayJoinCode'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HUB_COPY } from '@/declarations/play'
@@ -90,10 +91,18 @@ export const PlayHubMenu = ({
               lockedReason={lockedReason}
               className={PLAY_HUB.hubButton}
             />
+            <PlaySoloButton
+              game={game}
+              disabled={!canCreate}
+              lockedReason={lockedReason}
+              className={PLAY_HUB.hubButton}
+            />
             {canCreate && <PlayJoinCode className={PLAY_HUB.hubButton} />}
-            {GAME_VIEWS.map(viewButton)}
           </div>
-          <div className={PLAY_HUB.hubGroup}>{PLAYER_VIEWS.map(viewButton)}</div>
+          <div className={PLAY_HUB.hubGroup}>
+            {GAME_VIEWS.map(viewButton)}
+            {PLAYER_VIEWS.map(viewButton)}
+          </div>
           <AppLink
             href={ROUTES.play}
             className={cn(BUTTON_STYLES.base, BUTTON_STYLES.arcadeText, PLAY_HUB.hubButton)}

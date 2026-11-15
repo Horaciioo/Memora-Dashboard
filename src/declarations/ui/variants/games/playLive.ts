@@ -67,6 +67,7 @@ export const PLAY_VOTE: VoteLook = {
     'grid min-w-16 place-items-center rounded-full bg-white/12 px-5 py-2 text-3xl leading-none font-black tabular-nums text-white ring-1 ring-white/20',
   timerLow: 'animate-pulse',
   hint: 'golf-vote-title max-w-xl px-6 py-2 text-center text-base font-bold text-white/80',
+  foot: 'flex flex-col items-center gap-3',
   actions: 'flex flex-wrap items-center justify-center gap-3',
   button:
     'min-h-12 rounded-full bg-white/12 px-8 text-base font-extrabold text-white shadow-[0_0.25rem_0_rgb(0_0_0/0.3)] ring-1 ring-white/20 transition-[filter,translate] hover:-translate-y-0.5 hover:brightness-125 disabled:pointer-events-none disabled:opacity-50',
@@ -102,3 +103,28 @@ export const PLAY_CONCEPT_UI = {
   kindMalus: 'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-bomb)] uppercase',
   powerEffect: 'text-xs leading-snug text-[var(--play-ink-soft)]',
 } as const
+
+// Sticker block of the game's own HUD, the skin comes from the data-hud on the root
+const BLOCK = 'play-hud-block'
+
+/**
+ * Launch vote of the games with a HUD: the same sticker blocks over the game ground
+ * @type {VoteLook}
+ */
+
+export const PLAY_VOTE_HUD: VoteLook = {
+  ...PLAY_VOTE,
+  root: 'play-room fixed inset-0 z-[80] overflow-y-auto text-white select-none',
+  title: `${BLOCK} px-10 py-4 text-center text-4xl font-black tracking-tight text-[var(--play-ink)] sm:text-5xl`,
+  lead: 'text-center text-base font-bold text-white/80 sm:text-lg',
+  face: `${BLOCK} relative grid aspect-square w-full place-items-center overflow-hidden transition-[filter,translate] duration-150 group-hover/card:-translate-y-1 group-focus-visible/card:ring-4 group-focus-visible/card:ring-white group-data-[picked=true]/card:bg-[var(--hud-chip)]! group-data-[picked=true]/card:-translate-y-1`,
+  faceOn: '',
+  faceFramed: '',
+  glyph: 'size-[58%] text-[var(--play-ink-soft)]',
+  number: 'text-[calc(var(--vote-card)*0.52)] leading-none font-black text-[var(--play-ink-soft)]',
+  unit: 'absolute inset-x-0 bottom-[8%] text-center text-xs font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
+  avatarRing: '',
+  timer: `${BLOCK} grid min-w-16 place-items-center px-5 py-2 text-3xl leading-none font-black tabular-nums text-[var(--play-ink-soft)]`,
+  button: `${BLOCK} min-h-12 px-8 text-base font-extrabold text-[var(--play-ink)] transition-[filter,translate] hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-50`,
+  buttonMain: 'bg-[var(--hud-chip)]!',
+}

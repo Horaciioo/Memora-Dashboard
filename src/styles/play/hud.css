@@ -1,0 +1,70 @@
+/* Screen HUD block: skin set by the game on the root */
+.play-hud-block {
+  --play-ink: var(--hud-ink);
+  --play-ink-soft: var(--hud-value);
+  --play-ink-faint: var(--hud-faint);
+  --play-line: var(--hud-line);
+  --play-chip: var(--hud-chip);
+  --play-accent: var(--hud-value);
+  --play-panel-strong: var(--hud-chip);
+  background: var(--hud-deco, none), var(--hud-bg);
+  color: var(--hud-ink);
+  border-radius: var(--hud-radius);
+  box-shadow: var(--hud-shadow);
+}
+
+/* Echo: round stickers, thick ring, hard teal drop */
+[data-hud='echo'] {
+  --hud-bg: #fff8ef;
+  --hud-ink: var(--echo-ink);
+  --hud-value: var(--play-echo-deep);
+  --hud-faint: rgb(43 33 64 / 0.55);
+  --hud-line: rgb(43 33 64 / 0.18);
+  --hud-chip: var(--play-echo-glow);
+  --hud-radius: 2rem;
+  --hud-shadow: 0 0 0 0.3rem var(--play-echo), 0 0.55rem 0 0.3rem var(--play-echo-deep);
+}
+
+/* Bomb: riveted steel, hard dark drop */
+[data-hud='bomb'] {
+  --hud-bg: linear-gradient(160deg, var(--play-bomb-cap), var(--play-bomb-cap-deep));
+  --hud-deco:
+    radial-gradient(
+      circle at 0.55rem 0.55rem,
+      var(--play-bomb-shell-deep) 0 0.16rem,
+      transparent 0.18rem
+    ),
+    radial-gradient(
+      circle at calc(100% - 0.55rem) 0.55rem,
+      var(--play-bomb-shell-deep) 0 0.16rem,
+      transparent 0.18rem
+    ),
+    radial-gradient(
+      circle at 0.55rem calc(100% - 0.55rem),
+      var(--play-bomb-shell-deep) 0 0.16rem,
+      transparent 0.18rem
+    ),
+    radial-gradient(
+      circle at calc(100% - 0.55rem) calc(100% - 0.55rem),
+      var(--play-bomb-shell-deep) 0 0.16rem,
+      transparent 0.18rem
+    );
+  --hud-ink: var(--play-bomb-glow);
+  --hud-value: #ffffff;
+  --hud-faint: rgb(255 208 138 / 0.6);
+  --hud-line: rgb(0 0 0 / 0.35);
+  --hud-chip: var(--play-bomb-shell);
+  --hud-radius: 0.4rem;
+  --hud-shadow: inset 0 1px 0 var(--play-bomb-shine), 0 0.3rem 0 var(--play-bomb-shell-deep);
+}
+
+/* Bomb fuse burning down */
+.play-bomb-fuse {
+  background: repeating-linear-gradient(
+    115deg,
+    var(--play-bomb-cord) 0 6px,
+    color-mix(in srgb, var(--play-bomb-cord) 60%, black) 6px 10px
+  );
+  box-shadow: 0.3rem 0 0.6rem var(--play-bomb-glow);
+  transition: width 0.12s linear;
+}

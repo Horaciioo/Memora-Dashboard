@@ -3,6 +3,7 @@ import {
   LIFT,
   NOTE,
   PANEL,
+  RESULT,
   SETUP_BLUE,
   SETUP_FIRE,
   SETUP_TILE,
@@ -49,11 +50,9 @@ export const BAC_BOARD = {
   wait: 'grid min-h-[40vh] place-content-center justify-items-center gap-2 text-center',
   waitLead: 'text-xl font-extrabold text-[var(--play-ink)]',
   waitNote: 'text-sm font-semibold text-[var(--play-ink-soft)]',
-  // Countdown over the whole screen, chat and keys included, the veil fading in
-  overlay: 'play-count fixed inset-0 z-[60] grid place-items-center',
+  // Countdown centred in the game box, nothing tinted behind it
+  overlay: 'pointer-events-none absolute inset-0 z-30 m-0! grid place-items-center',
   stage: 'relative flex flex-col items-center justify-center gap-6 text-center',
-  // Glow ring pulsing behind each number
-  halo: 'play-halo pointer-events-none absolute top-1/2 left-1/2 size-[min(70vw,24rem)] -translate-x-1/2 -translate-y-1/2 rounded-full',
   stageLead:
     'relative rounded-full bg-[rgb(0_0_0/0.35)] px-5 py-2 text-sm font-extrabold tracking-[0.3em] text-white uppercase',
   figure:
@@ -145,20 +144,11 @@ export const BAC_BOARD = {
   scoreDivider: 'h-7 w-0.5 rounded-full bg-[var(--play-ink)] opacity-30',
   scoreTotal: 'relative min-w-12 text-left text-2xl font-black tabular-nums text-[var(--play-ink)]',
   // Final ranking under the podium
-  ranks: 'flex flex-col gap-2',
+  ranks: 'grid w-full max-w-5xl grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-2',
   rank: `${PANEL} flex items-center gap-3 px-3 py-2.5`,
   rankIndex: 'w-6 text-center text-sm font-extrabold tabular-nums text-[var(--play-ink-faint)]',
   rankName: 'min-w-0 flex-1 truncate text-sm font-extrabold',
   rankPoints: 'text-sm font-extrabold tabular-nums text-[var(--play-ink)]',
-  // Podium, first place in the middle
-  podium: 'relative flex items-end justify-center gap-3 pt-10 sm:gap-5',
-  podiumPlace: 'flex w-24 flex-col items-center gap-2 sm:w-32',
-  podiumFace: 'relative flex flex-col items-center gap-1',
-  podiumCrown: 'absolute -top-7 size-7 text-[var(--play-gold-ink)]',
-  podiumName: 'w-full truncate text-center text-sm font-extrabold',
-  podiumPoints: NOTE,
-  podiumBlock:
-    'flex w-full items-start justify-center rounded-t-2xl pt-3 text-3xl font-extrabold tabular-nums text-[var(--play-night)]',
   highlights: 'grid gap-3 sm:grid-cols-2',
   highlight: `${PANEL} flex flex-col gap-1 p-3`,
 } as const
@@ -191,21 +181,26 @@ export const PLAY_HEARTS = {
 }
 
 export const BOMB_BOARD = {
-  board: 'relative grid items-start gap-6 sm:grid-cols-[auto_minmax(0,1fr)]',
+  board:
+    'relative flex min-h-[min(40rem,100dvh)] flex-1 flex-col items-center justify-center gap-3 px-4 pt-28 pb-6',
   figure:
     'play-figure play-figure-fire text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
-  // Bonus letters, a column on the left
-  letters: 'flex gap-1 max-sm:flex-wrap max-sm:justify-center sm:flex-col',
+  // Bonus letters, a plate on the right
+  fuseTrack: 'block h-3 w-36 overflow-hidden rounded-full bg-[var(--play-bomb-shell-deep)]',
+  fuseBar: 'play-bomb-fuse block h-full rounded-full',
+  letters:
+    'play-hud-block pointer-events-auto absolute top-28 right-7 flex flex-col gap-2 p-3 max-md:inset-x-3 max-md:top-auto max-md:bottom-3 max-md:right-3',
+  lettersGrid: 'flex flex-col gap-1 max-md:flex-row max-md:flex-wrap max-md:justify-center',
   letter:
-    'grid size-7 place-items-center rounded-lg bg-[var(--play-chip)] text-xs font-extrabold transition-opacity duration-[var(--motion-duration-fast)]',
+    'grid size-6 place-items-center rounded-md bg-[var(--play-chip)] text-xs font-extrabold transition-opacity duration-[var(--motion-duration-fast)]',
   letterFree: 'text-[var(--play-ink)]',
   // Used: struck through and faded
   letterUsed:
     'text-[var(--play-ink-faint)] line-through decoration-2 decoration-[var(--play-bomb)] opacity-45',
   // Clear of the dock at the bottom
-  stage: 'flex min-w-0 flex-col items-center gap-4 pb-16 in-[.play-boxfull]:pb-0',
+  stage: 'flex min-w-0 flex-col items-center gap-4',
   // Square table, seats on an orbit
-  table: 'play-bomb-table relative aspect-square w-full max-w-[min(34rem,60dvh)]',
+  table: 'play-bomb-table relative aspect-square w-full max-w-[min(34rem,50dvh)]',
   center: 'absolute top-1/2 left-1/2 w-[36%] -translate-x-1/2 -translate-y-1/2',
   bomb: 'play-bomb',
   bombBlast: 'play-bomb-blast',
@@ -233,13 +228,11 @@ export const BOMB_BOARD = {
   lastWord:
     'max-w-36 truncate rounded-lg bg-[var(--play-chip)] px-2 py-0.5 text-sm font-extrabold tracking-wide text-[var(--play-ink-soft)] uppercase',
   missReason: 'text-[0.7rem] font-bold text-[var(--color-danger)]',
-  lead: 'text-center text-sm text-[var(--play-ink-soft)]',
-  leadPrompt: 'font-black tracking-wider text-[var(--play-bomb-glow)] uppercase',
   form: 'flex w-full max-w-md items-center gap-2',
   input:
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-4 py-3 text-center text-lg font-extrabold tracking-wide text-[var(--play-ink)] uppercase placeholder:font-normal placeholder:normal-case placeholder:text-[var(--play-ink-faint)] focus:bg-[var(--play-panel-strong)] focus:outline-none',
   // Final screen
-  result: 'flex flex-col items-center gap-5',
+  result: RESULT,
 } as const
 
 // Idle chip of a difficulty, faded; picked one raised
@@ -287,14 +280,33 @@ export const BOMB_LEVEL_CHIPS = {
 } as const
 
 /**
+ * Final podium, sized from the screen height so it fills the room
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_PODIUM = {
+  stage:
+    'relative flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-[clamp(1rem,4dvh,2.5rem)] px-4 py-6 sm:px-10',
+  row: 'flex w-full max-w-5xl items-end justify-center gap-[clamp(0.5rem,2.5vw,2rem)]',
+  place: 'flex max-w-72 min-w-0 flex-1 basis-0 flex-col items-center gap-2',
+  face: 'relative flex flex-col items-center gap-2 pt-[clamp(1.75rem,5dvh,3rem)]',
+  crown: 'absolute top-0 size-[clamp(1.75rem,5dvh,3rem)] text-[var(--play-gold-ink)]',
+  name: 'w-full truncate text-center text-[clamp(1rem,2.8dvh,1.6rem)] font-extrabold',
+  points:
+    'text-[clamp(0.85rem,2.2dvh,1.2rem)] font-semibold tabular-nums text-[var(--play-ink-soft)]',
+  block:
+    'flex w-full items-start justify-center rounded-t-3xl pt-4 text-3xl font-extrabold tabular-nums text-[var(--play-night)]',
+}
+
+/**
  * Podium block by place
  * @type {Record<number, string>}
  */
 
-export const BAC_PODIUM_BLOCKS: Record<number, string> = {
-  1: 'h-32 bg-[var(--play-medal-first)]',
-  2: 'h-24 bg-[var(--play-medal-second)]',
-  3: 'h-16 bg-[var(--play-medal-third)]',
+export const PLAY_PODIUM_BLOCKS: Record<number, string> = {
+  1: 'h-[min(34dvh,18rem)] bg-[var(--play-medal-first)]',
+  2: 'h-[min(24dvh,13rem)] bg-[var(--play-medal-second)]',
+  3: 'h-[min(16dvh,9rem)] bg-[var(--play-medal-third)]',
 }
 
 /**
@@ -324,31 +336,24 @@ export const PLAY_END = {
  */
 
 export const BAC_SESSION = {
-  page: 'relative w-full pb-6 transition-[padding] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
-  pageOpen: 'lg:pr-[calc(var(--play-side-open)+1.5rem)]',
-  pageFolded: 'lg:pr-[calc(var(--play-side-folded)+1.5rem)]',
+  page: 'relative w-full pb-6',
   // Table alone on the screen, the side column slides over it from the right
-  pageFull: 'play-room fixed inset-0 z-50 overflow-hidden p-0!',
-  main: 'flex min-w-0 flex-col gap-4',
-  mainFull: 'h-full gap-0',
+  pageFull: 'play-room fixed inset-0 z-50 overflow-hidden',
+  mainFull: 'flex h-full min-w-0 flex-col',
   // Empty marker carrying the game ground into the full screen room
   groundMark: 'hidden',
   // Chat open beside the table, never over it on wide screens
   mainBeside:
     'transition-[padding] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] lg:pr-[min(var(--play-side-open),100vw)] motion-reduce:transition-none',
-  // Way out on the left, game identity on the right
-  top: 'flex items-center justify-between gap-3',
-  exits: 'flex flex-wrap items-center gap-2',
-  exit: 'gap-2 px-3.5! py-2! text-sm!',
   exitIcon: 'size-4',
-  identity: 'flex items-center gap-3',
-  titles: 'flex min-w-0 flex-col items-end',
-  title: 'truncate text-lg font-extrabold tracking-tight text-[var(--play-ink)]',
-  logo: 'size-14',
   // Full screen table scrolls when taller than the screen
   boxFull: 'play-boxfull flex min-h-0 flex-1 flex-col overflow-y-auto',
   // Same panel as the page so the ink stays readable, content centred as one group, dock margin dropped
-  boxFullPad: `${PANEL} ${LIFT} m-4 mt-20 gap-5 p-5 sm:m-6 sm:mt-24 sm:p-6 *:first:mt-auto *:last:mb-auto *:pb-0!`,
+  boxFullPad: `${PANEL} ${LIFT} backdrop-blur-none! backdrop-saturate-100! m-4 mt-20 gap-5 p-5 sm:m-6 sm:mt-24 sm:p-6 *:first:mt-auto *:last:mb-auto *:pb-0!`,
+  // Own HUD: the table is the whole page, no panel and no margin
+  boxFullHud: 'size-full overflow-hidden!',
+  // Chat laid over a HUD table, last lines in the corner opposite the score card
+  hudChat: 'fixed right-3 bottom-3 z-[60] w-80 max-w-[40%] md:right-7 md:bottom-7',
   // No panel on a phone: the table runs edge to edge, centred as one group
   boxFullBare: '*:first:mt-auto *:last:mb-auto',
   // Stage keys: in the top bar, then floating over the table, shifted by the open chat
@@ -372,20 +377,13 @@ export const BAC_SESSION = {
     'absolute top-full right-0 z-10 mt-2 flex w-64 max-w-[calc(100vw-1.5rem)] flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--play-panel,var(--color-surface))] p-2 shadow-lg ring-1 ring-[var(--play-line,var(--color-border))]',
   menuRow:
     'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-left text-sm font-bold text-[var(--play-ink)] transition-colors hover:bg-black/5',
-  box: `${PANEL} ${LIFT} flex flex-col gap-5 p-5 sm:p-6`,
   // Column flush against the right edge, under the shell bar
   side: 'mt-4 flex min-w-0 flex-col gap-3 lg:fixed lg:top-[var(--play-bar-h)] lg:right-0 lg:bottom-0 lg:z-40 lg:mt-0 lg:pb-28',
-  sideOpen: 'lg:w-[var(--play-side-open)]',
-  // Level with the table, its height and no dock room
-  sideSpan: 'lg:pb-0!',
-  sideFolded: 'lg:w-[var(--play-side-folded)]',
   // Full screen: flush right over the table, slides in and out
   sideFull:
     'fixed right-0 z-40 mt-0 w-[min(var(--play-side-open),100vw)]! transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
   // Same top and foot as the padded table
   sideFullPad: 'top-4! bottom-4! pb-0! sm:top-6! sm:bottom-6!',
-  // Golf course edge to edge, the column too
-  sideFullBleed: 'top-0! bottom-0! pb-6!',
   sideShown: 'translate-x-0',
   sideHidden: 'pointer-events-none translate-x-full',
   // Crowd window: players, then spectators when there are some
@@ -412,13 +410,15 @@ export const BAC_SESSION = {
   feed: 'flex min-h-0 flex-col gap-1 overflow-y-auto',
   feedLine: 'flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-[var(--play-ink)]',
   feedName: 'font-extrabold',
+  feedAction: 'mt-1.5 flex',
   feedText: 'min-w-0 flex-1 text-[var(--play-ink-soft)]',
   feedTime: 'text-[0.7rem] font-semibold tabular-nums text-[var(--play-ink-faint)]',
   feedMark:
     'grid size-6 shrink-0 place-items-center rounded-full bg-[var(--play-chip)] text-[var(--play-blue-ink)]',
   feedMarkIcon: 'size-3.5',
-  // Folded side: one button on the right edge
-  rail: `${PANEL} ${LIFT} flex items-center justify-center p-2 lg:rounded-r-none`,
+  // Memora's own line: loading of the table
+  feedBrain: 'size-6 shrink-0 object-contain',
+  feedFailed: 'font-bold text-[var(--play-danger,var(--color-danger))]',
 } as const
 
 /**

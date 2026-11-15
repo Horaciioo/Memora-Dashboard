@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, SETUP_PINK } from '@/declarations/ui/variants/games/play/shared'
+import { NOTE, PANEL, RESULT, SETUP_PINK } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Glitch board
@@ -54,7 +54,7 @@ export const GLITCH_BOARD = {
   scoreFound: 'text-xs font-extrabold tabular-nums text-[var(--play-ink-soft)]',
   scoreDone: 'text-xs font-extrabold tabular-nums text-[var(--play-gold)]',
   scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
-  result: 'flex flex-col items-center gap-5',
+  result: RESULT,
 } as const
 
 /**

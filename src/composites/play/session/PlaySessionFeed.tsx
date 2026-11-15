@@ -1,6 +1,7 @@
 'use client'
 
 import { useContext, useEffect } from 'react'
+import type { ReactNode } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
@@ -28,6 +29,8 @@ export interface PlayFeedLine {
   accountId: string | null
   at: Date | string
   values: Record<string, number | string>
+  // Gesture offered under the line
+  action?: ReactNode
 }
 
 /**
@@ -92,6 +95,7 @@ export const PlayFeedRow = ({
         ) : (
           line
         )}
+        {entry.action && <span className={BAC_SESSION.feedAction}>{entry.action}</span>}
       </span>
       <span className={BAC_SESSION.feedTime}>{formatClock(new Date(entry.at).toISOString())}</span>
     </li>

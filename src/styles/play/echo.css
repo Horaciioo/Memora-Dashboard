@@ -177,3 +177,121 @@
     animation: none;
   }
 }
+
+/* Echo logo: stars pop in one after another, hold, then fade together */
+.play-echo-ghost,
+.play-echo-star,
+.play-echo-twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation-duration: 3.6s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+.play-echo-ghost:nth-of-type(1) {
+  animation-name: play-echo-first;
+}
+
+.play-echo-ghost:nth-of-type(2) {
+  animation-name: play-echo-second;
+}
+
+.play-echo-star {
+  animation-name: play-echo-gold;
+}
+
+.play-echo-twinkle {
+  animation-name: play-echo-spark;
+}
+
+@keyframes play-echo-first {
+  0%,
+  4% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  16%,
+  88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes play-echo-second {
+  0%,
+  22% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  34%,
+  88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes play-echo-gold {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  54% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+
+  62%,
+  88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes play-echo-spark {
+  0%,
+  58% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+
+  72%,
+  88% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-echo-ghost,
+  .play-echo-star,
+  .play-echo-twinkle {
+    opacity: 1;
+    animation: none;
+  }
+}

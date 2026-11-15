@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, SETUP_AMBER } from '@/declarations/ui/variants/games/play/shared'
+import { NOTE, PANEL, RESULT, SETUP_AMBER } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Croquis board
@@ -65,7 +65,7 @@ export const CROQUIS_BOARD = {
   scoreName: 'min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
   scoreState: 'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-croquis)] uppercase',
   scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
-  result: 'flex flex-col items-center gap-5',
+  result: RESULT,
 } as const
 
 /**

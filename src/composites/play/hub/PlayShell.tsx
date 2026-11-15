@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 
-import { PlayBusyBadge } from '@/composites/play/loading/PlayBusyBadge'
+import { PlayBusyToast } from '@/composites/play/loading/PlayBusyToast'
 
 import type { PlayDockProps } from '@/composites/play/dock/PlayDock'
 
@@ -70,7 +70,7 @@ export const PlayShell = ({
         <PlayReward reward={reward} />
         <PlayTrophyNotice notice={trophyNotice} />
         <PlayInviteHost isPlay />
-        <PlayBusyBadge />
+        <PlayBusyToast />
       </div>
     </PlayOnlineProvider>
   )
