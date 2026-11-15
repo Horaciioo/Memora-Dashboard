@@ -28,7 +28,8 @@ const SHIFTERS: Record<
     UPDATE play_bomb_games
     SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),
         "explodesAt" = "explodesAt" + (${s}::float8 * interval '1 second'),
-        "blastAt" = "blastAt" + (${s}::float8 * interval '1 second')
+        "blastAt" = "blastAt" + (${s}::float8 * interval '1 second'),
+        "turnAt" = "turnAt" + (${s}::float8 * interval '1 second')
     WHERE "sessionId" = ${id}`,
   GOLF: async (tx, id, s) => {
     await tx.$executeRaw`

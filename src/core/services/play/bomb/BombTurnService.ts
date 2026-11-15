@@ -93,7 +93,7 @@ export const openTable = async (session: EngineSession): Promise<EngineStep> => 
       })),
     }),
     prisma.bombGame.create({
-      data: { sessionId: session.id, prompt, turnId: order[0], startsAt, explodesAt },
+      data: { sessionId: session.id, prompt, turnId: order[0], startsAt, explodesAt, turnAt: startsAt },
     }),
   ])
 
@@ -143,23 +143,20 @@ const passBomb = async (
   const turnId = nextTurn(alive, current) ?? table.table.turnId
   const updated = await table.tx.bombGame.update({
     where: { sessionId: table.session.id },
-    data: { turnId, draft: '', missWord: null, missReason: null, ...data },
+    data: { turnId, draft: '', missWord: null, missReason: null, turnAt: table.now, ...data },
   })
 
   return { changed: true, finished: false, deadline: updated.explodesAt }
 }
 
 /**
- * Fuse kept long enough for the next player
+ * Fresh fuse for the next player, never under the minimum turn
  * @param {BombTable} table - Locked table
  * @return {Date} - Explosion
  */
 
-const fuseForNext = ({ table, settings, now }: BombTable): Date => {
-  const floor = after(now, settings.minTurnSeconds)
-
-  return table.explodesAt > floor ? table.explodesAt : floor
-}
+const fuseForNext = ({ settings, now }: BombTable): Date =>
+  after(now, Math.max(settings.minTurnSeconds, fuseSeconds(BOMB_SETTINGS.fuseSeconds)))
 
 /**
  * The bomb goes off on the player on turn

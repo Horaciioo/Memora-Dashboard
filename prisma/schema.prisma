@@ -3500,6 +3500,8 @@ model BombGame {
   missReason String?
   blastAt    DateTime?
   blastId    String?
+  // Fuse lit for the current turn
+  turnAt     DateTime?
   updatedAt  DateTime  @updatedAt
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
