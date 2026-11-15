@@ -1,10 +1,9 @@
 'use client'
 
-import { JumbleClock } from '@/composites/play/jumble/JumbleClock'
+import { JumbleHud } from '@/composites/play/jumble/JumbleHud'
 import { JumbleInput } from '@/composites/play/jumble/JumbleInput'
 import { JumbleResult } from '@/composites/play/jumble/JumbleResult'
 import { JumbleReveal } from '@/composites/play/jumble/JumbleReveal'
-import { JumbleScores } from '@/composites/play/jumble/JumbleScores'
 import { JumbleSlots, JumbleTiles } from '@/composites/play/jumble/JumbleTiles'
 import type { JumbleBoardView, JumbleFace } from '@/composites/play/jumble/types'
 import { useJumbleSounds } from '@/composites/play/jumble/useJumbleSounds'
@@ -12,7 +11,7 @@ import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
 import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
-import { JUMBLE_BOARD_COPY, JUMBLE_SETTINGS, fillPlayMessage } from '@/declarations/play'
+import { JUMBLE_BOARD_COPY, JUMBLE_SETTINGS } from '@/declarations/play'
 import { JUMBLE_BOARD } from '@/declarations/ui/variants'
 import { PlayGames } from '@/utils/constants/play'
 
@@ -55,7 +54,7 @@ export const JumbleBoard = ({
   const isPlaying = countdown === 0 && !reveal
 
   return (
-    <div className={JUMBLE_BOARD.board}>
+    <div className={JUMBLE_BOARD.board} data-hud="jumble">
       {board.round === 1 && countdown > 0 && (
         <PlayCountdown
           game={PlayGames.Jumble}
@@ -65,22 +64,15 @@ export const JumbleBoard = ({
         />
       )}
 
-      <div className={JUMBLE_BOARD.head}>
-        <span className={JUMBLE_BOARD.round}>
-          {fillPlayMessage(JUMBLE_BOARD_COPY.round, { round: board.round, total: board.rounds })}
-        </span>
-        {reveal ? (
-          <div className={JUMBLE_BOARD.clockTrack} />
-        ) : (
-          <JumbleClock
-            // New round, new bar
-            key={`clock-${board.round}`}
-            startsAt={board.startsAt}
-            endsAt={board.endsAt}
-            now={now}
-          />
-        )}
-      </div>
+      <JumbleHud
+        sessionId={sessionId}
+        board={board}
+        seats={seats}
+        viewerId={viewerId}
+        isSeated={isSeated}
+        now={now}
+        isReveal={Boolean(reveal)}
+      />
 
       <JumbleTiles
         scrambled={board.scrambled}
@@ -103,8 +95,6 @@ export const JumbleBoard = ({
           </>
         )}
       </div>
-
-      <JumbleScores seats={seats} scoredId={reveal?.solverId ?? null} round={board.round} />
     </div>
   )
 }
