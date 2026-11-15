@@ -41,6 +41,8 @@ const rooms = (globalForRooms.playRooms ??= new Map())
 const FORWARDED: string[] = [
   PLAY_STREAM_EVENTS.changed,
   PLAY_STREAM_EVENTS.started,
+  PLAY_STREAM_EVENTS.failed,
+  PLAY_STREAM_EVENTS.vote,
   PLAY_STREAM_EVENTS.chat,
 ]
 

@@ -28,6 +28,10 @@ export const PLAY_STREAM_EVENTS = {
   changed: 'changed',
   // The host started the game, the table is being built
   started: 'started',
+  // The table failed to open, back to the lobby
+  failed: 'failed',
+  // Picks of the launch vote, pushed without reading the page
+  vote: 'vote',
   // Only the board moved, pushed to each reader
   moved: 'moved',
   // Board of the reader, ready to draw

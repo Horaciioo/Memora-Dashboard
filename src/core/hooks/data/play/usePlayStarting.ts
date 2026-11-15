@@ -17,6 +17,7 @@ export const usePlayStarting = (sessionId: string): boolean => {
     () =>
       listenRealtime(PLAY_TOPICS.session(sessionId), (event) => {
         if (event === PLAY_STREAM_EVENTS.started) setStarting(true)
+        if (event === PLAY_STREAM_EVENTS.failed) setStarting(false)
       }),
     [sessionId]
   )

@@ -6,7 +6,7 @@ import { prisma } from '@/core/lib/db'
 import { seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict, notFound, toAppError } from '@/core/lib/errors'
 import { mayEnter, mayOversee } from '@/core/lib/play/access'
-import { signalPlay, signalStarted } from '@/core/lib/play/signal'
+import { signalFailed, signalPlay, signalStarted } from '@/core/lib/play/signal'
 import {
   clearSessionTimers,
   isSettled,
@@ -190,6 +190,7 @@ export const startSession = async (sessionId: string, hostId: string): Promise<v
       data: { status: PlayStatuses.Lobby, startedAt: null },
     })
     await signalPlay(sessionId, false)
+    await signalFailed(sessionId)
     throw error
   }
   noteAction(sessionId)

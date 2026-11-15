@@ -7,7 +7,7 @@ import { seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict } from '@/core/lib/errors'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
-import { signalPlay } from '@/core/lib/play/signal'
+import { signalPlay, signalStarted, signalVote } from '@/core/lib/play/signal'
 import { clearDeadline, scheduleDeadline } from '@/core/lib/play/timers'
 import { voteAt, voteOf, voteRulesOf } from '@/core/lib/play/vote'
 import type { PlayVoteRules, PlayVoteState } from '@/core/lib/play/vote'
@@ -58,7 +58,7 @@ interface VoteContext {
 }
 
 // Settings stored back, the game launched when the last step closed
-type VoteOutcome = { isStarting: boolean }
+type VoteOutcome = { isStarting: boolean; pushed?: PlayVoteState }
 
 /**
  * Store a vote or its end
@@ -106,9 +106,10 @@ const pick = async (context: VoteContext): Promise<VoteOutcome> => {
     throw conflict(PLAY_ERRORS.invalidSettings)
   }
   const picks = { ...vote.picks, [accountId]: String(raw.key) }
-  await store(context, withVote(session.settings, { ...vote, picks }))
+  const pushed = { ...vote, picks }
+  await store(context, withVote(session.settings, pushed))
 
-  return { isStarting: false }
+  return { isStarting: false, pushed }
 }
 
 /**
@@ -249,7 +250,10 @@ const runVote = async (
       hostId: session.hostId,
     }
   })
-  await signalPlay(sessionId)
+  // The loading screen goes up before the table is built, a pick only pushes its vote
+  if (outcome.isStarting) await signalStarted(sessionId)
+  if (outcome.pushed) await signalVote(sessionId, outcome.pushed)
+  else await signalPlay(sessionId)
   // A pick leaves the clock as it is
   if (raw.action !== GolfVoteActions.Pick) await armVote(sessionId)
   if (outcome.isStarting) await startSession(sessionId, hostId)

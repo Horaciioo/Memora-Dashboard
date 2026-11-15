@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { publishLive } from '@/core/lib/lives/bus'
+import type { PlayVoteState } from '@/core/lib/play/vote'
 import { PLAY_STREAM_EVENTS, PLAY_TOPICS } from '@/declarations/play/topics'
 import type { PlayMessageView } from '@/types/play'
 
@@ -33,6 +34,36 @@ export const signalStarted = async (sessionId: string): Promise<void> => {
   await publishLive(PLAY_TOPICS.session(sessionId), {
     type: PLAY_STREAM_EVENTS.started,
     sessionId,
+    at: Date.now(),
+  })
+}
+
+/**
+ * Tell a game's players the table failed to open
+ * @param {string} sessionId - Game
+ * @return {Promise<void>} - Sent
+ */
+
+export const signalFailed = async (sessionId: string): Promise<void> => {
+  await publishLive(PLAY_TOPICS.session(sessionId), {
+    type: PLAY_STREAM_EVENTS.failed,
+    sessionId,
+    at: Date.now(),
+  })
+}
+
+/**
+ * Hand the picks of the launch vote to a game's readers
+ * @param {string} sessionId - Game
+ * @param {PlayVoteState} vote - Vote with its picks
+ * @return {Promise<void>} - Sent
+ */
+
+export const signalVote = async (sessionId: string, vote: PlayVoteState): Promise<void> => {
+  await publishLive(PLAY_TOPICS.session(sessionId), {
+    type: PLAY_STREAM_EVENTS.vote,
+    sessionId,
+    vote,
     at: Date.now(),
   })
 }
