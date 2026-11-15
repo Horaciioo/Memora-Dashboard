@@ -39,10 +39,12 @@ export const EchoHands = ({
             key={hand.accountId}
             className={cn(ECHO_BOARD.hand, seat?.rank && ECHO_BOARD.handDone)}
           >
-            <EchoCard card={hand.card} seed={seed + index + 1} answer={hand.answer} isSmall />
+            <div className={ECHO_BOARD.handCard}>
+              <EchoCard card={hand.card} seed={seed + index + 1} answer={hand.answer} isSmall />
+            </div>
             <figcaption className={ECHO_BOARD.handName}>
               <Avatar name={seat?.name ?? ''} src={seat?.avatarUrl ?? null} size="xs" />
-              <span className="truncate">{seat?.name}</span>
+              <span className={cn(ECHO_BOARD.handLabel, 'truncate')}>{seat?.name}</span>
             </figcaption>
           </figure>
         )

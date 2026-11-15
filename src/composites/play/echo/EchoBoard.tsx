@@ -80,7 +80,7 @@ export const EchoBoard = ({
       />
 
       <div className={ECHO_BOARD.table}>
-        <figure className={ECHO_BOARD.slot}>
+        <figure className={cn(ECHO_BOARD.slot, ECHO_BOARD.slotCenter)}>
           <EchoCard
             key={`c${board.round}`}
             card={board.center}
@@ -93,7 +93,7 @@ export const EchoBoard = ({
           </figcaption>
         </figure>
         {hand && (
-          <figure className={ECHO_BOARD.slot}>
+          <figure className={cn(ECHO_BOARD.slot, ECHO_BOARD.slotMine)}>
             <EchoCard
               key={`m${board.round}`}
               card={hand.card}
