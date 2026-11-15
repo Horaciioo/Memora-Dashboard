@@ -77,7 +77,11 @@ export const layoutCard = (symbols: number[], seed: number): EchoPlacement[] => 
   const random = seededRng(`echo:${seed}`)
   const { min, max } = ECHO_SETTINGS.scale
   const sized = symbols
-    .map((symbol) => ({ symbol, scale: min + random() * (max - min), angle: (random() * 2 - 1) * TILT }))
+    .map((symbol) => ({
+      symbol,
+      scale: min + random() * (max - min),
+      angle: (random() * 2 - 1) * TILT,
+    }))
     .toSorted((left, right) => right.scale - left.scale)
 
   // Shrink everything until the draw fits

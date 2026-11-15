@@ -18,6 +18,8 @@ export interface EchoCardProps {
   onPick?: (symbol: number) => void
   isLocked?: boolean
   isSmall?: boolean
+  // Rim colour: the table center, the viewer, or any other hand
+  tone?: 'center' | 'mine'
 }
 
 /**
@@ -26,18 +28,34 @@ export interface EchoCardProps {
  * @return {JSX.Element}
  */
 
-export const EchoCard = ({ card, seed, answer, onPick, isLocked, isSmall }: EchoCardProps) => {
+export const EchoCard = ({
+  card,
+  seed,
+  answer,
+  onPick,
+  isLocked,
+  isSmall,
+  tone,
+}: EchoCardProps) => {
   const placements = useMemo(() => layoutCard(card, seed), [card, seed])
 
   return (
-    <div className={cn(ECHO_BOARD.card, isSmall && ECHO_BOARD.cardSmall)}>
-      {placements.map(({ symbol, x, y, radius, angle }) => {
+    <div
+      className={cn(
+        ECHO_BOARD.card,
+        isSmall && ECHO_BOARD.cardSmall,
+        tone === 'center' && ECHO_BOARD.cardCenter,
+        tone === 'mine' && ECHO_BOARD.cardMine
+      )}
+    >
+      {placements.map(({ symbol, x, y, radius, angle }, index) => {
         const { key, label } = ECHO_SYMBOLS[symbol]
         const style = {
           left: `${50 + x * 50}%`,
           top: `${50 + y * 50}%`,
           width: `${radius * 100}%`,
           '--angle': `${angle}deg`,
+          '--i': index,
         } as CSSProperties
         const face = (
           <svg viewBox="0 0 64 64" className={ECHO_BOARD.art} aria-hidden="true">
