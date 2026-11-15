@@ -22,6 +22,8 @@ export const StopGoRefusals = {
   NotInHand: 'notInHand',
   RaceOver: 'raceOver',
   NotYet: 'notYet',
+  Waiting: 'waiting',
+  NoWindow: 'noWindow',
 } as const
 
 export type StopGoRefusal = (typeof StopGoRefusals)[keyof typeof StopGoRefusals]

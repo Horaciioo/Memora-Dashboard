@@ -13,7 +13,11 @@ import type {
 } from '@/core/lib/play/stopgo/state'
 
 // Families a card may be played from until attacks and bonuses are opened
-const OPEN_FAMILIES: string[] = [StopGoFamilies.Distance, StopGoFamilies.Remedy]
+const OPEN_FAMILIES: string[] = [
+  StopGoFamilies.Distance,
+  StopGoFamilies.Remedy,
+  StopGoFamilies.Attack,
+]
 
 /**
  * Card can be played at this stage of the game

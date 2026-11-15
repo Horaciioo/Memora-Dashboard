@@ -3,7 +3,8 @@ import type { StopGoCardKey } from '@/declarations/play/stopgo/cards'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { StopGoPhases } from '@/utils/constants/play'
 
-import { canPlay, isMoving, opponentsOf } from '@/core/lib/play/stopgo/rules'
+import { windowOf } from '@/core/lib/play/stopgo/attack'
+import { canPlay, canUseJoker, isMoving, opponentsOf } from '@/core/lib/play/stopgo/rules'
 import type { StopGoGameSettings } from '@/core/lib/play/stopgo/settings'
 import type {
   StopGoGameState,
@@ -61,8 +62,15 @@ const privateOf = ({ game, seats, settings }: StopGoViewInput, seat: StopGoSeatS
     game.phase === StopGoPhases.Playing && game.turnId === seat.accountId && !game.pending
   const racing = seats.filter((entry) => !entry.finishedAt)
   const race = raceOf(racing, settings.target)
+  const car = carOf(seat)
+  const window = windowOf(game.pending)
+  const isLive = game.phase === StopGoPhases.Playing
 
   return {
+    // Answer to an attack aimed at the reader
+    canImmunize:
+      isLive && !!window?.waiting.includes(seat.accountId) && !canUseJoker('immunity', car),
+    canCleanup: isTurn && !canUseJoker('cleanup', car),
     hand: seat.hand.map((card) => ({ id: card.id, key: card.key })),
     // Card id to the targets it may aim at
     playable: Object.fromEntries(
@@ -85,6 +93,7 @@ const privateOf = ({ game, seats, settings }: StopGoViewInput, seat: StopGoSeatS
 export const buildBoards = (input: StopGoViewInput) => {
   const { settings, game, seats, log, present, now } = input
   const top = game.discard.at(-1)
+  const window = windowOf(game.pending)
   const players = seats.map((seat) => {
     const car = carOf(seat)
 
@@ -116,6 +125,17 @@ export const buildBoards = (input: StopGoViewInput) => {
     turnSeconds: settings.turnSeconds,
     mapKm: STOPGO_SETTINGS.mapKm,
     signKm: STOPGO_SETTINGS.signKm,
+    // Attack waiting for answers, nothing of the Jokers beyond what is public
+    window: window
+      ? {
+          card: window.card,
+          fromId: window.fromId,
+          targets: window.targets,
+          waiting: window.waiting,
+          saved: window.saved,
+          endsAt: game.pendingEndsAt,
+        }
+      : null,
     pileCount: game.drawPile.length,
     discardCount: game.discard.length,
     discardTop: top ? top.key : null,

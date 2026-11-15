@@ -7,6 +7,7 @@ import { notFound } from '@/core/lib/errors'
 import { stopGoSettingsOf } from '@/core/lib/play/stopgo'
 import type {
   StopGoCard,
+  StopGoTable,
   StopGoGameSettings,
   StopGoGameState,
   StopGoHandCard,
@@ -160,6 +161,25 @@ export const saveSeat = async (
     },
   })
   table.isDirty = true
+}
+
+/**
+ * Write the cars a play changed
+ * @param {StopGoLockedTable} table - Table
+ * @param {StopGoTable} before - Race before
+ * @param {StopGoTable} after - Race after
+ * @return {Promise<void>} - Written
+ */
+
+export const saveCars = async (
+  table: StopGoLockedTable,
+  before: StopGoTable,
+  after: StopGoTable
+): Promise<void> => {
+  for (const [id, car] of Object.entries(after.cars)) {
+    if (car === before.cars[id]) continue
+    await saveSeat(table, id, { km: car.km, isGreen: car.isGreen, hazards: car.hazards })
+  }
 }
 
 /**

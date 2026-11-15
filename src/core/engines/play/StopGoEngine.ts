@@ -3,7 +3,12 @@ import 'server-only'
 import { conflict } from '@/core/lib/errors'
 import { readStopGoSettings, stopGoDefaults } from '@/core/lib/play/stopgo'
 import { openRace } from '@/core/services/play/stopgo/StopGoDealService'
-import { advance } from '@/core/services/play/stopgo/StopGoFlowService'
+import {
+  declineAttack,
+  useCleanup,
+  useImmunity,
+} from '@/core/services/play/stopgo/StopGoJokerService'
+import { advance } from '@/core/services/play/stopgo/StopGoSettleService'
 import { withTable } from '@/core/services/play/stopgo/StopGoTable'
 import { discardCard, playCard } from '@/core/services/play/stopgo/StopGoTurnService'
 import { stopGoBoards, stopGoView } from '@/core/services/play/stopgo/StopGoViewService'
@@ -17,6 +22,9 @@ const ACTIONS: Record<
 > = {
   play: playCard,
   discard: discardCard,
+  immunity: useImmunity,
+  decline: declineAttack,
+  cleanup: useCleanup,
 }
 
 /**

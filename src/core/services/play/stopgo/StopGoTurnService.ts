@@ -1,28 +1,23 @@
 import 'server-only'
 
-import { conflict } from '@/core/lib/errors'
-import { readBodyInteger, readBodyList } from '@/core/lib/play/parse'
-import { applyCard, canPlay, isOpenCard, isStale, raceOf } from '@/core/lib/play/stopgo'
+import { readBodyList } from '@/core/lib/play/parse'
+import { applyCard, canPlay, isOpenCard, raceOf } from '@/core/lib/play/stopgo'
 import type { StopGoHandCard } from '@/core/lib/play/stopgo'
 import { passTurn, closeRace } from '@/core/services/play/stopgo/StopGoFlowService'
-import { racing, saveSeat, seatOf, withTable } from '@/core/services/play/stopgo/StopGoTable'
+import { launchAttack } from '@/core/services/play/stopgo/StopGoAttackService'
+import { refuse, requireTurn } from '@/core/services/play/stopgo/StopGoGuards'
+import {
+  racing,
+  saveCars,
+  saveSeat,
+  seatOf,
+  withTable,
+} from '@/core/services/play/stopgo/StopGoTable'
 import type { StopGoLockedTable, StopGoMoveInput } from '@/core/services/play/stopgo/StopGoTable'
 import { STOPGO_CARDS, StopGoFamilies } from '@/declarations/play/stopgo/cards'
-import { STOPGO_ERRORS } from '@/declarations/play/stopgo/copy'
 import { StopGoRefusals } from '@/declarations/play/stopgo/refusals'
-import type { StopGoRefusal } from '@/declarations/play/stopgo/refusals'
 import type { EngineSession, EngineStep } from '@/types/play'
-import { StopGoMoveKinds, StopGoPhases } from '@/utils/constants/play'
-
-/**
- * Refuse a move with the message of a refusal
- * @param {StopGoRefusal} refusal - Why
- * @return {never} - Always throws
- */
-
-const refuse = (refusal: StopGoRefusal): never => {
-  throw conflict(STOPGO_ERRORS[refusal])
-}
+import { StopGoMoveKinds } from '@/utils/constants/play'
 
 /**
  * Card of the player's hand the move names, after every guard of a turn
@@ -37,11 +32,7 @@ const cardOfTurn = (
   accountId: string,
   raw: Record<string, unknown>
 ): StopGoHandCard => {
-  const { game } = table
-  if (game.phase !== StopGoPhases.Playing) refuse(StopGoRefusals.RaceOver)
-  if (game.turnId !== accountId) refuse(StopGoRefusals.NotYourTurn)
-  if (isStale(game.turnNo, readBodyInteger(raw, 'turnNo'))) refuse(StopGoRefusals.StaleTurn)
-  if (table.now < game.startsAt) refuse(StopGoRefusals.NotYourTurn)
+  requireTurn(table, accountId, raw)
   const cardId = typeof raw.cardId === 'string' ? raw.cardId : ''
   const card = seatOf(table, accountId)?.hand.find(
     (entry) => entry.id === cardId && !entry.isPicking
@@ -119,13 +110,14 @@ export const playCard = (
     const race = raceOf(racing(table), table.settings.target)
     const verdict = canPlay(card.key, accountId, targets, race)
     if (verdict) refuse(verdict)
+
+    // An attack waits for the answers of its targets
+    if (STOPGO_CARDS[card.key].family === StopGoFamilies.Attack) {
+      return launchAttack(table, accountId, card, targets, race)
+    }
     const after = applyCard(card.key, accountId, targets, race)
 
-    for (const [id, car] of Object.entries(after.cars).filter(
-      ([id, car]) => car !== race.cars[id]
-    )) {
-      await saveSeat(table, id, { km: car.km, isGreen: car.isGreen, hazards: car.hazards })
-    }
+    await saveCars(table, race, after)
     await releaseCard(table, accountId, card)
     const lines = [lineOf(card, accountId, targets)]
 

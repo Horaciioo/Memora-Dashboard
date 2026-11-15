@@ -50,4 +50,6 @@ export const STOPGO_ERRORS: Record<StopGoRefusal, string> = {
   notInHand: 'Cette carte n’est pas dans ta main.',
   raceOver: 'La course est terminée.',
   notYet: 'Cette carte n’est pas encore jouable.',
+  waiting: 'Une attaque attend encore une réponse.',
+  noWindow: 'Aucune attaque ne te vise.',
 }
