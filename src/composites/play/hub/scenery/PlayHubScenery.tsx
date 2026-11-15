@@ -7,7 +7,7 @@ const RAYS = Array.from({ length: 18 }, (_, index) => index * 20)
 
 export interface PlayHubSceneryProps {
   // Set key, also the tone suffix
-  set: 'echo' | 'croquis' | 'glitch' | 'jumble' | 'suspens'
+  set: 'echo' | 'croquis' | 'glitch' | 'jumble' | 'suspens' | 'stopgo'
 }
 
 /**
@@ -18,7 +18,7 @@ export interface PlayHubSceneryProps {
 
 export const PlayHubScenery = ({ set }: PlayHubSceneryProps) => {
   const tone = `--play-${set}`
-  const { far, near, top } = SCENERY_SETS[set]
+  const { far, near, top, halo = tone } = SCENERY_SETS[set]
 
   const ground = (
     <svg
@@ -46,7 +46,7 @@ export const PlayHubScenery = ({ set }: PlayHubSceneryProps) => {
           ))}
         </g>
       </g>
-      <ellipse cx="800" cy="920" rx="760" ry="300" {...tint(tone, 0.28)} />
+      <ellipse cx="800" cy="920" rx="760" ry="300" {...tint(halo, 0.28)} />
       <g filter={`url(#play-scenery-far-${set})`} opacity="0.4">
         {far}
       </g>

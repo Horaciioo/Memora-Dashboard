@@ -8,6 +8,7 @@ import { ECHO_SETTINGS } from '@/declarations/play/echo/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
+import { STOPGO_HUB } from '@/declarations/play/stopgo/art'
 import { SUSPENS_HUB } from '@/declarations/play/suspens/copy'
 import { SUSPENS_SETTINGS } from '@/declarations/play/suspens/settings'
 import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
@@ -185,7 +186,7 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     tone: '--play-stopgo',
     logo: 'playStopGo',
     backdrop: 'road',
-    ground: null,
+    ground: STOPGO_HUB.ground,
     minPlayers: STOPGO_SETTINGS.minPlayers,
     maxPlayers: STOPGO_SETTINGS.maxPlayers,
     // Dev only until the final audit

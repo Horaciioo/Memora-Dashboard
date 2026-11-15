@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
 
+import { StopGoCarShape } from '@/composites/play/stopgo/art/StopGoCarShape'
+import { StopGoRoadStrip } from '@/composites/play/stopgo/art/StopGoRoadStrip'
+
 /**
  * Fill from a colour token
  * @param {string} token - Colour token
@@ -160,6 +163,17 @@ export const NEW_MARKS: Record<string, ReactNode> = {
         >
           S
         </text>
+      </g>
+    </>
+  ),
+  playStopGo: (
+    <>
+      <Ground x={22} width={14} />
+      {/* Tight bend */}
+      <StopGoRoadStrip path="M17 61V36A11 11 0 0 1 28 25H59" width={19} />
+      {/* Single-seater on the straight */}
+      <g transform="translate(17 46) scale(0.36)">
+        <StopGoCarShape color="red" />
       </g>
     </>
   ),

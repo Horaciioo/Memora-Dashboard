@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { tint } from '@/composites/play/brand/poster/stage'
+import { STOPGO_SET } from '@/composites/play/hub/scenery/stopgoSet'
 
 export interface ScenerySet {
   // Blurred layer on the horizon
@@ -9,6 +10,8 @@ export interface ScenerySet {
   near: ReactNode
   // Layer pinned to the top edge, never cropped by the window ratio
   top?: ReactNode
+  // Halo token, the tone when absent
+  halo?: string
 }
 
 /**
@@ -224,6 +227,7 @@ const PILE_RIGHT = [
 
 // Set of each hub ground, on a 1600 × 900 canvas
 export const SCENERY_SETS: Record<string, ScenerySet> = {
+  stopgo: STOPGO_SET,
   echo: {
     far: [200, 520, 820, 1110, 1400].map((x, index) => (
       <Card key={x} x={x} y={830 - (index % 2) * 50} r={110 + (index % 3) * 20} />

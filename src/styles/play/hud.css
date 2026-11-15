@@ -232,3 +232,22 @@
     inset 0 0 0 0.15rem var(--suspens-slate-deep), inset 0 0 0 0.21rem rgb(255 246 227 / 0.38),
     0 0 0 0.2rem var(--suspens-wood), 0.35rem 0.4rem 0 0.2rem var(--play-suspens-deep);
 }
+
+/* Stop & Go: tarmac plate, chequered edge, white ring, hard red drop */
+[data-hud='stopgo'],
+[data-hud='stop_go'] {
+  --hud-bg: linear-gradient(170deg, var(--stopgo-asphalt-lit), var(--stopgo-asphalt));
+  --hud-deco: repeating-conic-gradient(
+      var(--stopgo-kerb-white) 0 25%,
+      var(--stopgo-asphalt-deep) 0 50%
+    )
+    0 100% / 0.4rem 0.4rem repeat-x;
+  --hud-ink: var(--stopgo-line);
+  --hud-value: var(--stopgo-gold);
+  --hud-faint: rgb(247 237 214 / 0.58);
+  --hud-line: rgb(247 237 214 / 0.2);
+  --hud-chip: rgb(255 255 255 / 0.1);
+  --hud-radius: 0.7rem;
+  --hud-shadow:
+    0 0 0 0.16rem var(--stopgo-kerb-white), 0.3rem 0.4rem 0 0.16rem var(--play-stopgo-deep);
+}

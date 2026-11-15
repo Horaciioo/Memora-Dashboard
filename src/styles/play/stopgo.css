@@ -1,0 +1,27 @@
+/* Stop & Go ground: day grass, mown stripes, soft sun from the top */
+.play-room:has(.play-road) {
+  background:
+    radial-gradient(64rem 30rem at 50% -12%, rgb(255 255 255 / 0.26), transparent 70%),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 5rem, transparent 5rem 10rem),
+    linear-gradient(180deg, var(--stopgo-grass) 0%, var(--stopgo-grass-deep) 100%);
+}
+
+.play-room:has(.play-road)::before,
+.play-room:has(.play-road) .play-floor {
+  display: none;
+}
+
+/* Bunting sways on the hub */
+.play-road-bunting {
+  transform-origin: 50% 0;
+  animation: play-road-sway 6s ease-in-out infinite alternate;
+}
+
+@keyframes play-road-sway {
+  from {
+    transform: rotate(-0.4deg);
+  }
+  to {
+    transform: rotate(0.4deg);
+  }
+}

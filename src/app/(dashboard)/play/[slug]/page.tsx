@@ -14,6 +14,7 @@ import { PlayHubMenu } from '@/composites/play/hub/PlayHubMenu'
 import { PlayLeaderboard } from '@/composites/play/hub/leaderboard/PlayLeaderboard'
 import { PlayLiveTables } from '@/composites/play/hub/lobby/PlayLiveTables'
 import { PlayEmbers } from '@/composites/play/hub/PlayEmbers'
+import { PlayStopGoRoad } from '@/composites/play/hub/PlayStopGoRoad'
 import { PlaySuspensLetters } from '@/composites/play/hub/PlaySuspensLetters'
 import { PlayCroquisFloaters } from '@/composites/play/hub/PlayCroquisFloaters'
 import { PlayEchoFloaters } from '@/composites/play/hub/PlayEchoFloaters'
@@ -46,6 +47,7 @@ import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
 import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
 import { LUDO_FELT } from '@/declarations/play/ludo/copy'
 import { NAVAL_SEA } from '@/declarations/play/naval/copy'
+import { STOPGO_HUB } from '@/declarations/play/stopgo/art'
 import {
   BOMB_EMBERS,
   fillPlayMessage,
@@ -72,6 +74,7 @@ const GROUND_LAYERS: Record<string, ComponentType> = {
   [GOLF_TURF.ground]: GolfPanorama,
   [LUDO_FELT.ground]: LudoHopField,
   [NAVAL_SEA.ground]: NavalHubPhoto,
+  [STOPGO_HUB.ground]: PlayStopGoRoad,
 }
 
 interface PlayGamePageProps {

@@ -17,6 +17,7 @@ export const PLAY_HUD_GAMES: ReadonlySet<PlayGameName> = new Set([
   PlayGames.Naval,
   PlayGames.Croquis,
   PlayGames.Suspens,
+  PlayGames.StopGo,
 ])
 
 /**
@@ -35,6 +36,7 @@ export const PLAY_HUD_SKINS: ReadonlyMap<PlayGameName, string> = new Map([
   [PlayGames.Naval, 'play-hud-block'],
   [PlayGames.Croquis, 'play-hud-block'],
   [PlayGames.Suspens, 'play-hud-block'],
+  [PlayGames.StopGo, 'play-hud-block'],
 ])
 
 /**
