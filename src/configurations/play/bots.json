@@ -1,5 +1,10 @@
 {
-  "maxPerGame": 3,
+  "maxPerGame": 7,
+  "asleep": [],
+  "driver": {
+    "retryMs": 4000,
+    "retries": 2
+  },
   "callsigns": [
     "Alpha",
     "Bravo",
@@ -141,6 +146,8 @@
       "max": 3500
     },
     "candidates": 48,
+    "refine": 12,
+    "searchMs": 150,
     "angleNoise": {
       "EASY": 0.16,
       "MEDIUM": 0.07,

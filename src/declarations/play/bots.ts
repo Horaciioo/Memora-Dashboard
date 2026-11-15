@@ -9,10 +9,12 @@ import type { Bounds } from '@/declarations/configurations/readers'
 import { PlayBotKinds, PlayGames } from '@/utils/constants/play'
 import type { PlayBotKindName, PlayGameName } from '@/utils/constants/play'
 
-// Games whose bots sleep, all but Stop & Go
-const ASLEEP_GAMES: readonly PlayGameName[] = Object.values(PlayGames).filter(
-  (game) => game !== PlayGames.StopGo
-)
+// Games whose bots sleep, read from the config
+const ASLEEP_GAMES: readonly string[] = readStringList(bots.asleep, {
+  path: 'play/bots.asleep',
+  fallback: [],
+  allowed: Object.values(PlayGames),
+})
 
 /**
  * Bots of a game are awake
@@ -34,6 +36,7 @@ const baccalaureat = readNode(bots.baccalaureat, 'play/bots.baccalaureat')
 const golf = readNode(bots.golf, 'play/bots.golf')
 const naval = readNode(bots.naval, 'play/bots.naval')
 const stopgo = readNode(bots.stopgo, 'play/bots.stopgo')
+const driver = readNode(bots.driver, 'play/bots.driver')
 
 // Levels in menu order
 const LEVELS = Object.values(PlayBotKinds)
@@ -83,6 +86,15 @@ export const PLAY_BOT_SETTINGS = {
   // Bots at one table
   maxPerGame: readNumber(bots.maxPerGame, { path: 'play/bots.maxPerGame', fallback: 3, min: 0 }),
   callsigns: readStringList(bots.callsigns, { path: 'play/bots.callsigns', fallback: ['Alpha'] }),
+  // Refused move tried again, a few times
+  driver: {
+    retryMs: readNumber(driver.retryMs, {
+      path: 'play/bots.driver.retryMs',
+      fallback: 4000,
+      min: 250,
+    }),
+    retries: readNumber(driver.retries, { path: 'play/bots.driver.retries', fallback: 2, min: 0 }),
+  },
   ludo: { thinkMs: delay(ludo.thinkMs, 'play/bots.ludo.thinkMs') },
   naval: {
     thinkMs: delay(naval.thinkMs, 'play/bots.naval.thinkMs'),
@@ -148,6 +160,14 @@ export const PLAY_BOT_SETTINGS = {
       path: 'play/bots.golf.candidates',
       fallback: 48,
       min: 8,
+    }),
+    // Finer aims around the best one
+    refine: readNumber(golf.refine, { path: 'play/bots.golf.refine', fallback: 12, min: 0 }),
+    // Search time cap of one stroke
+    searchMs: readNumber(golf.searchMs, {
+      path: 'play/bots.golf.searchMs',
+      fallback: 150,
+      min: 20,
     }),
     angleNoise: perLevel(golf.angleNoise, 'play/bots.golf.angleNoise', 0.07),
     powerNoise: perLevel(golf.powerNoise, 'play/bots.golf.powerNoise', 0.12),

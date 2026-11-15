@@ -2,7 +2,7 @@ import 'server-only'
 
 import { botBoards, decideBotMove } from '@/core/engines/play/players/BotPlayer'
 import { playersOf } from '@/core/engines/play/players/PlayPlayer'
-import { areBotsAwake } from '@/declarations/play/bots'
+import { PLAY_BOT_SETTINGS, areBotsAwake } from '@/declarations/play/bots'
 import { toAppError } from '@/core/lib/errors'
 import { logger } from '@/core/lib/logger'
 import { botTimerKey, clearDeadline, scheduleDeadline } from '@/core/lib/play/timers'
@@ -29,6 +29,10 @@ interface BotTable {
   isQueued: boolean
   // Moves played one at a time
   turns: Promise<unknown>
+  // Passes started, a move that raised one skips its own
+  passes: number
+  // Refusals of the planned move per bot
+  refusals: Map<string, number>
 }
 
 // Survives dev hot reloads
@@ -48,6 +52,8 @@ const tableOf = (sessionId: string): BotTable => {
     isDriving: false,
     isQueued: false,
     turns: Promise.resolve(),
+    passes: 0,
+    refusals: new Map(),
   }
   tables.set(sessionId, table)
 
@@ -73,8 +79,36 @@ export const forgetBots = (sessionId: string): void => {
 export const isDriven = (sessionId: string): boolean => tables.has(sessionId)
 
 /**
- * Play a planned move in turn
+ * Try a refused move again later, a few times only
  * @param {string} sessionId - Game
+ * @param {PlayPlayer} bot - Bot seat
+ * @param {PlayGameName} game - Game kind
+ * @param {BotAct} act - Move path
+ * @return {void}
+ */
+
+const retryLater = (sessionId: string, bot: PlayPlayer, game: PlayGameName, act: BotAct): void => {
+  const { retryMs, retries } = PLAY_BOT_SETTINGS.driver
+  const table: BotTable | undefined = tables.get(sessionId)
+  if (!table) return
+  const count = (table.refusals.get(bot.accountId) ?? 0) + 1
+  table.refusals.set(bot.accountId, count)
+  // Past the cap the bot waits for the board to move
+  if (count > retries) return
+
+  scheduleDeadline(
+    botTimerKey(sessionId, bot.accountId),
+    new Date(Date.now() + retryMs * count),
+    async () => {
+      table.plans.delete(bot.accountId)
+      await driveBots(sessionId, game, act)
+    }
+  )
+}
+
+/**
+ * Play a planned move in turn
+ * @param {LoadedSession} session - Game
  * @param {PlayPlayer} bot - Bot seat
  * @param {PlayBotMove} move - Planned move
  * @param {BotAct} act - Move path
@@ -82,24 +116,31 @@ export const isDriven = (sessionId: string): boolean => tables.has(sessionId)
  */
 
 const playTurn = async (
-  sessionId: string,
+  session: LoadedSession,
   bot: PlayPlayer,
   move: PlayBotMove,
   act: BotAct
 ): Promise<void> => {
-  const { plans } = tableOf(sessionId)
+  // Dropped table, a pause or an end
+  const table: BotTable | undefined = tables.get(session.id)
+  if (!table) return
+  const passes = table.passes
   try {
     await act(
-      sessionId,
+      session.id,
       bot.accountId,
       typeof move.raw === 'function' ? await move.raw() : move.raw
     )
-    plans.delete(bot.accountId)
+    table.plans.delete(bot.accountId)
+    table.refusals.delete(bot.accountId)
   } catch (error) {
     logger.debug('[play] bot move refused', error)
-    // A breakdown is retried, a refusal waits
-    if (toAppError(error).code === ErrorCodes.SystemFailure) plans.delete(bot.accountId)
+    // A breakdown is replanned now, a refusal later
+    if (toAppError(error).code === ErrorCodes.SystemFailure) table.plans.delete(bot.accountId)
+    else retryLater(session.id, bot, session.game, act)
   }
+  // The move already woke the table, no second pass
+  if (table.passes === passes) await driveBots(session.id, session.game, act)
 }
 
 /**
@@ -128,11 +169,12 @@ const driveBot = async (
   if (table.plans.get(bot.accountId) === move.key) return
 
   table.plans.set(bot.accountId, move.key)
+  table.refusals.delete(bot.accountId)
   scheduleDeadline(key, move.at, async () => {
-    const turn = table.turns.then(() => playTurn(session.id, bot, move, act))
-    table.turns = turn
+    const turn = table.turns.then(() => playTurn(session, bot, move, act))
+    // A failed turn never blocks the next ones
+    table.turns = turn.catch(() => undefined)
     await turn
-    await driveBots(session.id, session.game, act)
   })
 }
 
@@ -176,6 +218,7 @@ export const driveBots = async (
   // Asleep games stay untouched
   if (!areBotsAwake(game)) return
   const table = tableOf(sessionId)
+  table.passes += 1
   // Burst of moves merged
   if (table.isDriving) {
     table.isQueued = true

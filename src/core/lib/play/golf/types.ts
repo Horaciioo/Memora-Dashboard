@@ -360,6 +360,8 @@ export interface GolfShotInput {
   collisions: boolean
   // Balls rolling on, a replay
   motions?: Record<string, GolfBallMotion>
+  // Outcome only, no frame track, a bot probe
+  isProbe?: boolean
 }
 
 // What a shot can make heard or seen
