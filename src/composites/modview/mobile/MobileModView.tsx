@@ -11,7 +11,11 @@ import { MobileHeader } from '@/composites/modview/mobile/MobileHeader'
 import { MobileLivePage } from '@/composites/modview/mobile/MobileLivePage'
 import { MobileSettingsPage } from '@/composites/modview/mobile/MobileSettingsPage'
 import { TEAM_CHAT_ENABLED } from '@/declarations/lives/teamChat'
-import { MobileRosterPage, MobileTeamOffline, MobileTeamPage } from '@/composites/modview/mobile/MobileTeamPage'
+import {
+  MobileRosterPage,
+  MobileTeamOffline,
+  MobileTeamPage,
+} from '@/composites/modview/mobile/MobileTeamPage'
 import type { MobileTeamPageProps } from '@/composites/modview/mobile/MobileTeamPage'
 import { useSnapPager } from '@/composites/modview/mobile/useSnapPager'
 import type { SuggestionListProps } from '@/composites/modview/SuggestionList'
@@ -157,7 +161,9 @@ export const MobileModView = ({
         <MobileHeader
           title={PAGE_TITLES[current] ?? COPY.pageLive}
           icon={PAGE_ICONS[current] ?? 'stream'}
-          onTeam={team && TEAM_CHAT_ENABLED && current === 'team' ? () => setRosterOpen(true) : undefined}
+          onTeam={
+            team && TEAM_CHAT_ENABLED && current === 'team' ? () => setRosterOpen(true) : undefined
+          }
           teamTone={viewerRole ? TEAM_ROLES[viewerRole].glyph : undefined}
           slotRef={setSlot}
           leaveLiveId={leaveLiveId}

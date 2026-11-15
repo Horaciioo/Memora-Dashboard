@@ -117,7 +117,6 @@ export const LivesBoard = ({
         />
       )}
 
-
       <LiveEndedDialog liveId={canReport ? endedId : null} onClose={dismissEnded} />
     </div>
   )
