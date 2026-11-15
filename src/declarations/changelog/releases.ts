@@ -199,6 +199,22 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Stop & Go » dans « Memora Play » : une course de voitures où l’on pose des bornes, lance des attaques contre ses rivaux et se protège avec des immunités, contre d’autres joueurs ou des joueurs automatiques de trois niveaux.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de préférences dans les « Réglages » de « Memora Play » pour choisir l’affichage de l’interface en partie.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une notification « en cours » avec le logo Memora qui saute pendant qu’une action se termine.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
         text: 'Ajout de trophées dans « Memora Play » : chaque trophée atteint rapporte de l’expérience et s’annonce dans une notification.',
       },
       {
@@ -259,6 +275,30 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
+        text: 'Amélioration de tous les jeux de « Memora Play » : la partie remplit toute la page, avec une interface de jeu aux couleurs de chaque jeu et le chat intégré en bas, sur ordinateur comme sur téléphone.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration des votes, du chat et des écrans de chargement de « Memora Play » : ils reprennent la même interface de jeu pour toutes les parties.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du bouton de création de partie de « Memora Play », renommé « Jouer à plusieurs », et du décor de l’accueil avec un logo pour chaque jeu.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du plateau de « Ludo », plus simple à lire, et de l’interface de la « Bataille navale ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
         text: 'Amélioration de la sortie d’une partie : le retour à l’accueil de « Memora Play » est plus rapide.',
       },
       {
@@ -306,6 +346,24 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
         text: 'Correction de parties de « Memora Play » qui pouvaient rester figées quand un joueur automatique ne jouait plus.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de la fenêtre de sortie d’une partie, du bouton « Prêt » qui tardait à réagir et du badge de chargement de « Memora Play ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de l’affichage des jeux de « Memora Play » sur téléphone : plateau de « Ludo », table de « Bomb », cartes d’« Écho », outils de « Croquis », tuiles de « Jumble » et barre de la « Bataille navale » tiennent maintenant à l’écran.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction des joueurs automatiques de « Golf », qui jouent mieux.',
       },
       {
         tag: ChangelogTags.Fixed,
