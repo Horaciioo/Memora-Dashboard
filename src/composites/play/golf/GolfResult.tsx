@@ -2,7 +2,6 @@ import { GolfScorecard } from '@/composites/play/golf/hud/results/GolfScorecard'
 import type { GolfScorecardProps } from '@/composites/play/golf/hud/results/GolfScorecard'
 import { PlayPodium } from '@/composites/play/results/PlayPodium'
 import { PlayStageKeys } from '@/composites/play/session/PlayStageKeys'
-import { usePlayStageStore } from '@/core/store/play/playStage'
 import { rankCards } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
@@ -21,7 +20,6 @@ export const GolfResult = ({
   isSeated,
   ...props
 }: GolfScorecardProps & { sessionId: string; isSeated: boolean }) => {
-  const isFullscreen = usePlayStageStore((state) => state.isFullscreen)
   const ranked = rankCards(props.players).map((player) => {
     const face = props.faces.find((entry) => entry.accountId === player.accountId)
 
@@ -36,14 +34,12 @@ export const GolfResult = ({
   return (
     <div className={BOMB_BOARD.result}>
       {/* The course keys are gone with the HUD */}
-      {isFullscreen && (
-        <PlayStageKeys
-          game={PlayGames.Golf}
-          sessionId={sessionId}
-          gameSlug={PLAY_GAMES.get(PlayGames.Golf).slug}
-          isSeated={isSeated}
-        />
-      )}
+      <PlayStageKeys
+        game={PlayGames.Golf}
+        sessionId={sessionId}
+        gameSlug={PLAY_GAMES.get(PlayGames.Golf).slug}
+        isSeated={isSeated}
+      />
       <PlayPodium ranked={ranked} hasWinner={props.players.some((player) => !player.hasLeft)} />
       <section className={GOLF_SCORECARD.card}>
         <h2 className={GOLF_SCORECARD.title}>{GOLF_BOARD_COPY.scorecard}</h2>

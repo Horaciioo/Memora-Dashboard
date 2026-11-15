@@ -152,7 +152,6 @@ export const LudoBoard = ({
   const board = useLudoBoard(sessionId, initial)
   const now = useServerNow(initial.serverTime)
   const motion = useLudoMotion(board, viewerId, sessionId)
-  const isFullscreen = usePlayStageStore((state) => state.isFullscreen)
   const { act, isSaving } = usePlayAct(sessionId)
   // Revision a move was sent on: the board stays shut until a newer one is pushed
   const [sentRev, setSentRev] = useState<number | null>(null)
@@ -251,7 +250,7 @@ export const LudoBoard = ({
           className={cn(
             map.name === 'star' ? LUDO_BOARD.frameStar : LUDO_BOARD.frame,
             board.isMyTurn && countdown === 0 && LUDO_BOARD.frameMine,
-            isFullscreen && LUDO_BOARD.frameFull
+            LUDO_BOARD.frameFull
           )}
           style={tone as CSSProperties}
         >

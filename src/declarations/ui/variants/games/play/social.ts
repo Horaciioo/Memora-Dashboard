@@ -254,7 +254,8 @@ export const PLAY_CHAT_UI = {
   panel: `${PANEL} ${LIFT} flex h-full flex-col overflow-hidden lg:rounded-r-none`,
   // Laid over a table: last lines only, no head, no scroll
   panelHud: 'flex max-h-80 flex-col justify-end',
-  listHud: 'flex flex-col justify-end gap-0.5 overflow-hidden px-2 py-2',
+  // Five lines tall from the start, the card never grows
+  listHud: 'flex min-h-[12.75rem] flex-col justify-end gap-0.5 overflow-hidden px-2 py-2',
   // Same gap on every side, pill inside the rounded block
   composerHud: 'relative flex items-center gap-2 p-3',
   // One line per message: author then text, cut with an ellipsis
