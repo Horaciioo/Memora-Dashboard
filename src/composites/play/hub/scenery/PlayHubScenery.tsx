@@ -18,9 +18,9 @@ export interface PlayHubSceneryProps {
 
 export const PlayHubScenery = ({ set }: PlayHubSceneryProps) => {
   const tone = `--play-${set}`
-  const { far, near } = SCENERY_SETS[set]
+  const { far, near, top } = SCENERY_SETS[set]
 
-  return (
+  const ground = (
     <svg
       viewBox="0 0 1600 900"
       preserveAspectRatio="xMidYMax slice"
@@ -53,5 +53,20 @@ export const PlayHubScenery = ({ set }: PlayHubSceneryProps) => {
       <rect y="620" width="1600" height="280" fill={`url(#play-scenery-fog-${set})`} />
       <g filter={`url(#play-scenery-near-${set})`}>{near}</g>
     </svg>
+  )
+  if (!top) return ground
+
+  return (
+    <>
+      {ground}
+      <svg
+        viewBox="0 0 1600 900"
+        preserveAspectRatio="xMidYMin slice"
+        className={PLAY_HUB.scenery}
+        aria-hidden="true"
+      >
+        <g filter={`url(#play-scenery-near-${set})`}>{top}</g>
+      </svg>
+    </>
   )
 }

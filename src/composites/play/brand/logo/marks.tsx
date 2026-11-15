@@ -125,35 +125,42 @@ export const NEW_MARKS: Record<string, ReactNode> = {
   ),
   playSuspens: (
     <>
-      <Ground x={32} width={24} />
-      {/* Gallows with a noose and a face on the figure */}
+      <Ground x={26} width={20} />
+      {/* Gallows: post, beam and brace */}
       <path
-        d="M10 56H40M18 56V8M18 8H46M18 22L32 8"
+        d="M8 57H34M16 57V7H50M16 21L30 7"
         stroke="var(--suspens-wood)"
-        strokeWidth="5"
+        strokeWidth="5.5"
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d="M46 8V16" stroke="var(--suspens-rope)" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="46" cy="24" r="8" {...tint('--suspens-chalk')} />
-      <circle cx="43" cy="22" r="1.6" {...tint('--suspens-key-ink')} />
-      <circle cx="49" cy="22" r="1.6" {...tint('--suspens-key-ink')} />
-      <path
-        d="M42.5 27.5q3.5 3 7 0"
-        stroke="var(--suspens-key-ink)"
-        strokeWidth="1.8"
-        fill="none"
-        strokeLinecap="round"
-      />
-      <path
-        d="M46 32V46M46 38L39 44M46 38L53 44"
-        stroke="var(--suspens-chalk)"
-        strokeWidth="3.4"
-        fill="none"
-        strokeLinecap="round"
-      />
-      <rect x="48" y="49" width="12" height="10" rx="3" {...tint('--play-suspens')} />
+      {/* Plate hanging by its rope, a chalk S on the slate */}
+      <g transform="rotate(-7 44 7)">
+        <path d="M44 8V22" stroke="var(--suspens-rope)" strokeWidth="3" strokeLinecap="round" />
+        <circle cx="44" cy="22" r="2.4" {...tint('--suspens-rope')} />
+        <rect x="29" y="23" width="30" height="34" rx="7" {...tint('--suspens-slate')} />
+        <rect
+          x="29"
+          y="23"
+          width="30"
+          height="34"
+          rx="7"
+          fill="none"
+          stroke="var(--suspens-wood)"
+          strokeWidth="2.6"
+        />
+        <text
+          x="44"
+          y="50"
+          textAnchor="middle"
+          fontSize="30"
+          fontWeight="900"
+          {...tint('--play-suspens-glow')}
+        >
+          S
+        </text>
+      </g>
     </>
   ),
   playCroquis: (
