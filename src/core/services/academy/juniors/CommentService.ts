@@ -25,6 +25,7 @@ export const toComment = (row: {
   id: string
   body: string
   createdAt: Date
+  pinnedAt?: Date | null
   author: { displayName: string; avatarUrl: string | null } | null
 }): CommentView => ({
   id: row.id,
@@ -32,6 +33,7 @@ export const toComment = (row: {
   authorAvatar: row.author?.avatarUrl ?? null,
   body: decryptField(row.body) ?? '',
   createdAt: row.createdAt.toISOString(),
+  ...(row.pinnedAt !== undefined ? { pinned: row.pinnedAt !== null } : {}),
 })
 
 /**

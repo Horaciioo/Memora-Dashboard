@@ -5,6 +5,8 @@ import { useState } from 'react'
 
 import { useHotComments } from '@/core/hooks/interaction/state/moderation/useHotComments'
 import { CommentComposer } from '@/components/structures/data/CommentComposer'
+import { Button } from '@/components/elements/actions/Button'
+import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { AddRow } from '@/components/structures/inline/AddRow'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
@@ -29,6 +31,8 @@ export interface CommentThreadProps {
   label: string
   // No heading, for a thread under a field
   isCompact?: boolean
+  // Drawn figure and first-comment button while the thread is empty
+  empty?: { title: string; description?: string; action: string }
   onOpen: () => void
   onAdd: (values: FormValues) => Promise<boolean>
   onRemove: (id: string) => Promise<void>
@@ -50,6 +54,7 @@ export const CommentThread = ({
   canWrite,
   label,
   isCompact,
+  empty,
   onOpen,
   onAdd,
   onRemove,
@@ -60,10 +65,35 @@ export const CommentThread = ({
   const [isAdding, setAdding] = useState(false)
   const [pending, setPending] = useState<string | null>(null)
   const { hot, calm, names, restore } = useHotComments(comments)
+  const isEmpty = empty !== undefined && comments.length === 0 && !isAdding
 
   return (
-    <Section title={isCompact ? undefined : COMMENT_COPY.title} bare>
-      <div className="flex flex-col gap-3">
+    <Section
+      title={isCompact ? undefined : COMMENT_COPY.title}
+      raised={empty !== undefined && !isEmpty}
+      bare={empty === undefined || isEmpty}
+    >
+      {isEmpty && (
+        <EmptyState
+          figure="notes"
+          title={empty.title}
+          description={empty.description}
+          action={
+            <Button
+              variant="primary"
+              icon="add"
+              disabled={!canWrite}
+              onClick={() => {
+                onOpen()
+                setAdding(true)
+              }}
+            >
+              {empty.action}
+            </Button>
+          }
+        />
+      )}
+      <div className={cn('flex flex-col gap-3', isEmpty && 'hidden')}>
         <div>
           {comments.map((comment) => (
             <article

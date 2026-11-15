@@ -2802,6 +2802,8 @@ model WorkComment {
   unbanRequestId  String?
   authorId        String?
   body            String
+  // Held at the top of the thread
+  pinnedAt        DateTime?
   createdAt       DateTime @default(now())
 
   project       Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -2856,10 +2858,10 @@ model UnbanRequest {
   discordId         String
   discordName       String
   discordAvatar     String?
-  // JSON of the answers, written through the cipher
-  answers           String
   // Where the mails go, written through the cipher
   email             String?
+  // JSON of the answers, written through the cipher
+  answers           String
   status            UnbanStatus @default(PENDING)
   assigneeId        String?
   // Answer shown to the requester, written through the cipher
@@ -2883,10 +2885,10 @@ model UnbanRequest {
   decidedBy   Account?         @relation("UnbanDecider", fields: [decidedById], references: [id], onDelete: SetNull)
   liftedBy    Account?         @relation("UnbanLifter", fields: [discordLiftedById], references: [id], onDelete: SetNull)
   comments    WorkComment[]
-
-  // One open request per person and server, a partial unique index written by hand in the migration: (youtuberId, discordId) WHERE status IN (PENDING, IN_REVIEW)
   votes       UnbanVote[]
   mails       MailDelivery[]
+
+  // One open request per person and server, a partial unique index written by hand in the migration: (youtuberId, discordId) WHERE status IN (PENDING, IN_REVIEW)
   @@index([youtuberId, status, submittedAt])
   @@index([discordId])
   @@index([assigneeId, status])
@@ -2894,8 +2896,6 @@ model UnbanRequest {
   @@map("unban_requests")
 }
 
-// Remark left on a candidate while their application is being weighed
-model RecruitmentComment {
 // How one mail ended
 enum MailStatus {
   SENT
@@ -2947,6 +2947,8 @@ model UnbanVote {
   @@map("unban_votes")
 }
 
+// Remark left on a candidate while their application is being weighed
+model RecruitmentComment {
   id          String    @id @default(cuid())
   // Either an application, or a whole session when none
   candidateId String?
@@ -3188,6 +3190,8 @@ model PlaySession {
   joinCode        String?           @unique
   // Choices of the host, shaped by the game
   settings        Json
+  // Set once the host has chosen the rules
+  configuredAt    DateTime?
   startedAt       DateTime?
   finishedAt      DateTime?
   // Set while an Administration pause holds the game

@@ -75,7 +75,8 @@ const readComments = async (kind: WorkCommentKind, id: string): Promise<CommentV
   const rows = await prisma.workComment.findMany({
     where: { [WORK_COMMENT_KINDS[kind].column]: id },
     include: COMMENT_SHAPE,
-    orderBy: { createdAt: 'asc' },
+    // Pinned remarks lead, the rest keeps its order
+    orderBy: [{ pinnedAt: { sort: 'desc', nulls: 'last' } }, { createdAt: 'asc' }],
   })
 
   return rows.map(toComment)
@@ -203,6 +204,36 @@ export const removeWorkComment = async (
       [WORK_COMMENT_KINDS[kind].column]: id,
       ...(viewer.isAdmin ? {} : { authorId: viewer.id }),
     },
+  })
+  if (count === 0) throw notFound()
+
+  return readComments(kind, id)
+}
+
+/**
+ * Pin a remark at the top of its thread, or let it go
+ * @param {WorkCommentKind} kind - Record kind
+ * @param {string} id - Record identifier
+ * @param {string} commentId - Remark identifier
+ * @param {boolean} pinned - Held at the top
+ * @param {WorkViewer} viewer - Who pins
+ * @param {() => Promise<AccessScope>} scope - Creator perimeter
+ * @return {Promise<CommentView[]>} - Remarks
+ */
+
+export const pinWorkComment = async (
+  kind: WorkCommentKind,
+  id: string,
+  commentId: string,
+  pinned: boolean,
+  viewer: WorkViewer,
+  scope: () => Promise<AccessScope>
+): Promise<CommentView[]> => {
+  await assertReachable(kind, id, viewer, scope)
+
+  const { count } = await prisma.workComment.updateMany({
+    where: { id: commentId, [WORK_COMMENT_KINDS[kind].column]: id },
+    data: { pinnedAt: pinned ? new Date() : null },
   })
   if (count === 0) throw notFound()
 
