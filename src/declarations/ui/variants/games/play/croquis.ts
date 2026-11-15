@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, RESULT, SETUP_AMBER } from '@/declarations/ui/variants/games/play/shared'
+import { NOTE, RESULT, SETUP_AMBER } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Croquis board
@@ -7,12 +7,11 @@ import { NOTE, PANEL, RESULT, SETUP_AMBER } from '@/declarations/ui/variants/gam
  */
 
 export const CROQUIS_BOARD = {
-  board: 'relative flex flex-col items-center gap-5 pb-16 in-[.play-boxfull]:pb-0',
+  board:
+    'relative flex size-full flex-col items-center justify-center gap-[min(2dvh,1rem)] overflow-hidden px-4 pt-24 pb-28 max-md:pb-20',
   figure:
     'play-figure play-figure-croquis text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
-  // Round line and clock
-  head: 'flex w-full max-w-3xl flex-col gap-2',
-  round: 'text-center text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
+  // Clock bar, shown in the HUD
   clockTrack: 'h-3 w-full overflow-hidden rounded-full bg-[var(--play-chip)]',
   clock: 'play-croquis-clock h-full w-full rounded-full',
   lead: 'text-center text-sm text-[var(--play-ink-soft)]',
@@ -26,23 +25,27 @@ export const CROQUIS_BOARD = {
   slot: 'play-croquis-slot w-[clamp(1.3rem,4.2vw,2.2rem)] text-[clamp(1rem,3vw,1.6rem)] leading-tight',
   slotHint: 'play-croquis-slot-hint',
   // Paper and its tools
-  stage: 'flex w-full max-w-3xl flex-col gap-3',
+  // Paper sized on the window height, tools beside it
+  stage: 'relative w-[min(100%,48rem,calc((100dvh-23rem)*4/3))]',
   paper: 'play-croquis-paper relative w-full overflow-hidden rounded-2xl',
   canvas: 'block aspect-[4/3] w-full touch-none select-none',
   canvasDraw: 'cursor-crosshair',
   blank: 'play-croquis-blank absolute inset-0 grid place-items-center text-sm font-bold',
-  tools: `${PANEL} flex flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2`,
-  toolGroup: 'flex items-center gap-1.5',
+  tools:
+    'play-hud-block absolute inset-x-2 bottom-2 z-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2 lg:inset-x-auto lg:top-1/2 lg:right-full lg:bottom-auto lg:mr-4 lg:w-40 lg:-translate-y-1/2 lg:flex-col lg:gap-3 lg:p-3',
+  toolPens: 'grid grid-cols-4 gap-1.5',
+  toolSizes: 'flex items-center gap-1.5',
+  toolActions: 'flex items-center gap-1.5 lg:w-full lg:flex-col lg:items-stretch',
   pen: 'play-croquis-pen size-8 rounded-full',
   penOn: 'play-croquis-pen-on',
   size: 'grid size-9 place-items-center rounded-xl bg-[var(--play-chip)] transition-colors hover:bg-[var(--play-panel-strong)]',
-  sizeOn: 'ring-2 ring-[var(--play-croquis)]',
+  sizeOn: 'ring-2 ring-[var(--play-ink-soft)]',
   sizeDot: 'rounded-full bg-[var(--play-ink)]',
   action:
     'rounded-xl bg-[var(--play-chip)] px-3 py-2 text-xs font-extrabold tracking-wide text-[var(--play-ink)] uppercase transition-colors hover:bg-[var(--play-panel-strong)] disabled:opacity-40',
-  actionOn: 'ring-2 ring-[var(--play-croquis)]',
+  actionOn: 'ring-2 ring-[var(--play-ink-soft)]',
   // Fixed height, the board never jumps between phases
-  zone: 'flex min-h-40 w-full flex-col items-center gap-4',
+  zone: 'flex min-h-16 w-full flex-col items-center justify-center gap-3',
   // Answer field
   form: 'flex w-full max-w-md items-center gap-2',
   input:
@@ -50,21 +53,13 @@ export const CROQUIS_BOARD = {
   shake: 'play-croquis-shake',
   found: 'play-croquis-found text-2xl font-black text-[var(--play-croquis)]',
   // Reveal banner
-  reveal: `${PANEL} flex w-full max-w-md flex-col items-center gap-2 px-5 py-4 text-center`,
+  reveal:
+    'play-hud-block flex w-full max-w-xl flex-wrap items-center justify-center gap-x-4 gap-y-1 px-5 py-3 text-center',
   revealName: 'text-sm font-extrabold text-[var(--play-ink)]',
   revealWord:
-    'play-croquis-gain text-4xl font-black tracking-widest text-[var(--play-croquis)] uppercase',
+    'play-croquis-gain text-3xl font-black tracking-widest text-[var(--play-ink-soft)] uppercase',
   timeout: 'text-sm font-bold text-[var(--play-ink-soft)]',
   itWas: NOTE,
-  // Scoreboard
-  scores: `${PANEL} flex w-full max-w-md flex-col gap-1 p-2`,
-  score: 'flex items-center gap-3 rounded-xl px-2 py-1.5 transition-opacity',
-  scoreScored: 'play-croquis-scored',
-  scoreLeft: 'opacity-50',
-  scoreRank: 'w-5 text-center text-xs font-extrabold tabular-nums text-[var(--play-ink-faint)]',
-  scoreName: 'min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
-  scoreState: 'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-croquis)] uppercase',
-  scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
   result: RESULT,
 } as const
 

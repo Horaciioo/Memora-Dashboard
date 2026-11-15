@@ -67,7 +67,7 @@ export const CroquisStudio = ({
         onStroke={put}
       />
       <div className={CROQUIS_BOARD.tools} role="toolbar" aria-label={CROQUIS_BOARD_COPY.palette}>
-        <div className={CROQUIS_BOARD.toolGroup}>
+        <div className={CROQUIS_BOARD.toolPens}>
           {PENS.map((pen) => (
             <button
               key={pen.key}
@@ -87,7 +87,7 @@ export const CroquisStudio = ({
             />
           ))}
         </div>
-        <div className={CROQUIS_BOARD.toolGroup} role="group" aria-label={CROQUIS_BOARD_COPY.sizes}>
+        <div className={CROQUIS_BOARD.toolSizes} role="group" aria-label={CROQUIS_BOARD_COPY.sizes}>
           {CROQUIS_SIZES.map((nib, index) => (
             <button
               key={nib}
@@ -105,7 +105,7 @@ export const CroquisStudio = ({
             </button>
           ))}
         </div>
-        <div className={CROQUIS_BOARD.toolGroup}>
+        <div className={CROQUIS_BOARD.toolActions}>
           <button
             type="button"
             aria-pressed={isEraser}
