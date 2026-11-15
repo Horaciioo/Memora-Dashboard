@@ -143,6 +143,20 @@ export const PLAY_CONCEPT: Record<PlayGameName, PlayConceptStep[]> = {
       text: 'Le premier qui ramène tous ses pions au centre gagne.',
     },
   ],
+  [PlayGames.StopGo]: [
+    {
+      title: 'Une voiture, une route',
+      text: 'Chacun conduit sa voiture. Il faut un Feu vert pour démarrer, puis des cartes de distance pour avancer.',
+    },
+    {
+      title: 'Attaque et parade',
+      text: 'Pose un malus à un adversaire pour le freiner, répare les tiens. Deux Jokers te protègent une fois chacun.',
+    },
+    {
+      title: 'Arrive pile',
+      text: 'Le premier à atteindre exactement la distance gagne. Un coup qui la dépasse est refusé.',
+    },
+  ],
   [PlayGames.Naval]: [
     {
       title: 'Cache ta flotte',

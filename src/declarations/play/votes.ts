@@ -15,6 +15,7 @@ import type { LudoExitRule } from '@/declarations/play/ludo/settings'
 import { NAVAL_MODE_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_MAPS, NAVAL_RANDOM_MAP, navalMapSize } from '@/declarations/play/naval/maps'
 import { countStep, voteCountsOf } from '@/declarations/play/voteCounts'
+import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { CROQUIS_SETTINGS } from '@/declarations/play/croquis/settings'
 import type { IconName } from '@/declarations/ui/icons'
 import { NavalModes, PlayGames } from '@/utils/constants/play'
@@ -303,6 +304,34 @@ export const PLAY_VOTE_STEPS: Partial<Record<PlayGameName, PlayVoteStepSpec[]>> 
       }
     ),
   ],
+  [PlayGames.StopGo]: [
+    countStep('target', STOPGO_SETTINGS.targets, STOPGO_SETTINGS.target, {
+      title: 'Distance',
+      lead: 'Jusqu’où court la course ?',
+      label: (km) => `${km} km`,
+      hint: (km) => {
+        const maps = Math.round(km / STOPGO_SETTINGS.mapKm)
+
+        return `${maps} ${maps > 1 ? 'cartes' : 'carte'} de route, arrivée pile.`
+      },
+    }),
+    countStep(
+      'turnSeconds',
+      voteCountsOf('stopgo', 'turnSeconds', [20, 30, 45]),
+      STOPGO_SETTINGS.turnSeconds.initial,
+      {
+        title: 'Minuteur',
+        lead: 'Combien de temps pour jouer un tour ?',
+        label: (seconds) => `${seconds} s`,
+        hint: (seconds) =>
+          seconds < STOPGO_SETTINGS.turnSeconds.initial
+            ? 'Une course nerveuse.'
+            : seconds > STOPGO_SETTINGS.turnSeconds.initial
+              ? 'Le temps de réfléchir.'
+              : 'Le rythme habituel.',
+      }
+    ),
+  ],
   [PlayGames.Croquis]: [
     countStep('laps', voteCountsOf('croquis', 'laps', [1, 2, 3]), CROQUIS_SETTINGS.laps.initial, {
       title: 'Tours de table',
@@ -381,6 +410,10 @@ export const PLAY_VOTE_SETTINGS: Partial<
     differences: Number(chosen.differences),
   }),
   [PlayGames.Croquis]: (chosen) => ({ laps: Number(chosen.laps) }),
+  [PlayGames.StopGo]: (chosen) => ({
+    target: Number(chosen.target),
+    turnSeconds: Number(chosen.turnSeconds),
+  }),
   [PlayGames.Suspens]: (chosen) => ({
     laps: Number(chosen.laps),
     errors: Number(chosen.errors),

@@ -13,6 +13,7 @@ import { revealMystery } from '@/core/services/play/stopgo/StopGoMysteryService'
 import { advance } from '@/core/services/play/stopgo/StopGoSettleService'
 import { withTable } from '@/core/services/play/stopgo/StopGoTable'
 import { discardCard, playCard } from '@/core/services/play/stopgo/StopGoTurnService'
+import { stopGoStats } from '@/core/services/play/stopgo/StopGoStatsService'
 import { stopGoBoards, stopGoView } from '@/core/services/play/stopgo/StopGoViewService'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
 import type { EngineSession, EngineStep, PlayEngine } from '@/types/play'
@@ -49,5 +50,5 @@ export const STOPGO_ENGINE: PlayEngine = {
   settle: (session) => withTable(session, advance),
   view: stopGoView,
   viewFor: stopGoBoards,
-  extraStats: async () => new Map(),
+  extraStats: stopGoStats,
 }

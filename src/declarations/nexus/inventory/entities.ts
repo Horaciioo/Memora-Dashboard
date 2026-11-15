@@ -461,6 +461,27 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'id',
     search: [],
   },
+  stopGoGame: {
+    model: 'StopGoGame',
+    exposure: 'full',
+    display: 'sessionId',
+    search: [],
+    hidden: ['drawPile', 'discard', 'pending'],
+  },
+  stopGoPlayer: {
+    model: 'StopGoPlayer',
+    exposure: 'full',
+    display: 'id',
+    search: [],
+    hidden: ['hand', 'sealed'],
+  },
+  stopGoMove: {
+    model: 'StopGoMove',
+    exposure: 'readOnly',
+    reason: 'Historique de coups',
+    display: 'id',
+    search: [],
+  },
   suspensGame: { model: 'SuspensGame', exposure: 'full', display: 'sessionId', search: [] },
   suspensRound: {
     model: 'SuspensRound',

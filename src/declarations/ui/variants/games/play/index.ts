@@ -45,6 +45,7 @@ export {
 export type { PlaySetupStyles } from '@/declarations/ui/variants/games/play/boards'
 export { CROQUIS_BOARD, CROQUIS_SETUP } from '@/declarations/ui/variants/games/play/croquis'
 export { ECHO_BOARD, ECHO_SETUP } from '@/declarations/ui/variants/games/play/echo'
+export { STOPGO_SETUP } from '@/declarations/ui/variants/games/play/stopgo'
 export { SUSPENS_BOARD, SUSPENS_SETUP } from '@/declarations/ui/variants/games/play/suspens'
 export { GLITCH_BOARD, GLITCH_SETUP } from '@/declarations/ui/variants/games/play/glitch'
 export { JUMBLE_BOARD, JUMBLE_SETUP } from '@/declarations/ui/variants/games/play/jumble'

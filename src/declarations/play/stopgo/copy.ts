@@ -57,3 +57,60 @@ export const STOPGO_ERRORS: Record<StopGoRefusal, string> = {
   pileEmpty: 'La pioche est vide.',
   notPicking: 'Aucune pioche en cours.',
 }
+
+/**
+ * Setup drawer of a new Stop & Go race
+ * @type {Record<string, string>}
+ */
+
+export const STOPGO_SETUP_COPY = {
+  title: 'Nouvelle course Stop & Go',
+  tabs: 'Réglages de la course',
+  tabRules: 'Règles',
+  target: 'Distance de la course',
+  targetHint: 'Il faut arriver pile sur la distance choisie.',
+  km: '{km} km',
+  turnSeconds: 'Temps par tour',
+  turnSecondsHint: 'Un tour dépassé défausse la carte piochée.',
+  seconds: '{seconds} s',
+  less: 'Moins',
+  more: 'Plus',
+  create: 'Créer la course',
+  cancel: 'Annuler',
+} as const
+
+/**
+ * Rules drawer of a Stop & Go race
+ * @type {Record<string, string>}
+ */
+
+export const STOPGO_RULES_COPY = {
+  title: 'Règles de la course',
+  target: 'Distance',
+  turnSeconds: 'Temps par tour',
+  start: 'Départ',
+  startStopped: 'Tu démarres à l’arrêt, il te faut un Feu vert.',
+  startRolling: 'Tu démarres déjà en roulant.',
+  distances: 'Cartes de distance',
+  distancesValue: '{list} km. Tu en poses une par tour.',
+  finish: 'Arrivée',
+  finishValue: 'Il faut arriver pile sur la distance, sans la dépasser.',
+  attacks: 'Attaques',
+  attacksValue: '{list}. Chaque adversaire subit un seul malus de chaque type.',
+  limit: 'Limitation',
+  limitValue: 'Tu ne peux plus poser que {km} km par carte.',
+  accident: 'Accident',
+  accidentValue: 'Il vise au moins {count} adversaires, tous ceux de la table s’il y en a moins.',
+  remedies: 'Réparations',
+  remediesValue: '{list}. Chacune lève le malus qui lui correspond.',
+  goodDraw: 'Bonne pioche',
+  goodDrawValue: 'Tu pioches deux cartes, tu en gardes une, {seconds} s pour choisir.',
+  mystery: 'Pioche mystère',
+  mysteryValue: 'Une carte scellée chez un adversaire, qui la révèle contre {cost} km.',
+  immunity: 'Joker Immunité',
+  immunityValue: 'Annule une attaque qui te vise, {seconds} s pour répondre. Une fois par course.',
+  cleanup: 'Joker Grand nettoyage',
+  cleanupValue: 'Lève tous tes malus d’un coup. Une fois par course.',
+  strikes: 'Tours manqués',
+  strikesValue: 'Après {count} tours manqués d’affilée, ton tour ne dure plus que {seconds} s.',
+} as const

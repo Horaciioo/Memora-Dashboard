@@ -40,6 +40,9 @@ export const SETUP_VIOLET =
 export const SETUP_WOOD =
   'border-[var(--play-suspens)] bg-[var(--play-suspens)] text-white hover:border-[var(--play-suspens)]'
 
+export const SETUP_ROAD =
+  'border-[var(--play-stopgo)] bg-[var(--play-stopgo)] text-white hover:border-[var(--play-stopgo)]'
+
 export const SETUP_AMBER =
   'border-[var(--play-croquis)] bg-[var(--play-croquis)] text-[var(--play-croquis-night)] hover:border-[var(--play-croquis)]'
 

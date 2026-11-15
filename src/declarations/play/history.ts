@@ -50,6 +50,11 @@ export const PLAY_HISTORY_FACTS: Record<PlayGameName, Array<{ key: string; label
     { key: 'drawn', label: 'Dessins faits' },
     { key: 'understood', label: 'Dessins compris' },
   ],
+  [PlayGames.StopGo]: [
+    { key: 'km', label: 'Kilomètres parcourus' },
+    { key: 'attacks', label: 'Attaques posées' },
+    { key: 'remedies', label: 'Réparations' },
+  ],
   [PlayGames.Suspens]: [
     { key: 'found', label: 'Lettres trouvées' },
     { key: 'solved', label: 'Mots complétés' },
