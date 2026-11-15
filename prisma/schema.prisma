@@ -457,11 +457,10 @@ model Account {
   pageRevisions         PageRevision[]           @relation("PageRevisionAuthor")
   pageComments          PageComment[]            @relation("PageCommentAuthor")
   unbanFormsPublished   UnbanFormVersion[]       @relation("UnbanFormPublisher")
-  unbanLinksCreated     UnbanLink[]              @relation("UnbanLinkCreator")
-  unbanLinksRevoked     UnbanLink[]              @relation("UnbanLinkRevoker")
   unbanAssigned         UnbanRequest[]           @relation("UnbanAssignee")
   unbanDecided          UnbanRequest[]           @relation("UnbanDecider")
   unbanLifted           UnbanRequest[]           @relation("UnbanLifter")
+  unbanVotes            UnbanVote[]
 
   @@index([role])
   @@index([status])
@@ -744,7 +743,6 @@ model Youtuber {
   viewerComments      ViewerComment[]
   sharedWords         ModSharedWord[]
   unbanRule           ModUnbanRule?
-  unbanLinks          UnbanLink[]
   unbanRequests       UnbanRequest[]
   chatMessages        LiveChatMessage[]
   chatStats           ViewerChatStat[]
@@ -2848,40 +2846,11 @@ model UnbanFormVersion {
   @@map("unban_form_versions")
 }
 
-// Link a banned person opens to file a request, only its hash is stored
-model UnbanLink {
-  id                String    @id @default(cuid())
-  tokenHash         String    @unique
-  youtuberId        String
-  // Only this Discord account may open it
-  expectedDiscordId String?
-  label             String?
-  expiresAt         DateTime
-  usedAt            DateTime?
-  revokedAt         DateTime?
-  revokedById       String?
-  createdById       String?
-  // Set once by the nightly sweep so an expiry is journaled a single time
-  expiredLoggedAt   DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  youtuber  Youtuber      @relation(fields: [youtuberId], references: [id], onDelete: Restrict)
-  createdBy Account?      @relation("UnbanLinkCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  revokedBy Account?      @relation("UnbanLinkRevoker", fields: [revokedById], references: [id], onDelete: SetNull)
-  request   UnbanRequest?
-
-  @@index([youtuberId, createdAt])
-  @@index([expiresAt])
-  @@map("unban_links")
-}
-
 // Unban request of one person on one server
 model UnbanRequest {
   id                String      @id @default(cuid())
   // Short readable code, never derived from the id
   reference         String      @unique
-  linkId            String      @unique
   youtuberId        String
   formVersionId     String
   discordId         String
@@ -2889,6 +2858,8 @@ model UnbanRequest {
   discordAvatar     String?
   // JSON of the answers, written through the cipher
   answers           String
+  // Where the mails go, written through the cipher
+  email             String?
   status            UnbanStatus @default(PENDING)
   assigneeId        String?
   // Answer shown to the requester, written through the cipher
@@ -2906,7 +2877,6 @@ model UnbanRequest {
   statusChangedAt   DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
-  link        UnbanLink        @relation(fields: [linkId], references: [id], onDelete: Restrict)
   youtuber    Youtuber         @relation(fields: [youtuberId], references: [id], onDelete: Restrict)
   formVersion UnbanFormVersion @relation(fields: [formVersionId], references: [id], onDelete: Restrict)
   assignee    Account?         @relation("UnbanAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
@@ -2915,6 +2885,8 @@ model UnbanRequest {
   comments    WorkComment[]
 
   // One open request per person and server, a partial unique index written by hand in the migration: (youtuberId, discordId) WHERE status IN (PENDING, IN_REVIEW)
+  votes       UnbanVote[]
+  mails       MailDelivery[]
   @@index([youtuberId, status, submittedAt])
   @@index([discordId])
   @@index([assigneeId, status])
@@ -2924,6 +2896,57 @@ model UnbanRequest {
 
 // Remark left on a candidate while their application is being weighed
 model RecruitmentComment {
+// How one mail ended
+enum MailStatus {
+  SENT
+  FAILED
+  SKIPPED
+}
+
+// One mail handed to the provider, the address is never kept here
+model MailDelivery {
+  id         String       @id @default(cuid())
+  kind       String
+  requestId  String?
+  // Kept apart so the line stays readable once the request is gone
+  reference  String?
+  status     MailStatus
+  providerId String?
+  // Why it failed or was left unsent
+  detail     String?
+  isTest     Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+
+  request UnbanRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([requestId])
+  @@map("mail_deliveries")
+}
+
+// Side a moderator takes on a request
+enum UnbanVoteChoice {
+  FOR
+  AGAINST
+}
+
+// Opinion of one moderator on one request, the decision stays with the Discord lead
+model UnbanVote {
+  id        String          @id @default(cuid())
+  requestId String
+  voterId   String
+  choice    UnbanVoteChoice
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  request UnbanRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  voter   Account      @relation(fields: [voterId], references: [id], onDelete: Cascade)
+
+  // One opinion per moderator and request
+  @@unique([requestId, voterId])
+  @@map("unban_votes")
+}
+
   id          String    @id @default(cuid())
   // Either an application, or a whole session when none
   candidateId String?
