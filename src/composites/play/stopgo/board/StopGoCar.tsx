@@ -2,6 +2,7 @@ import { StopGoCardGlyph } from '@/composites/play/stopgo/art/StopGoCardGlyph'
 import { StopGoCarShape } from '@/composites/play/stopgo/art/StopGoCarShape'
 import { useAnimatedKm } from '@/composites/play/stopgo/board/useAnimatedKm'
 import type { StopGoMark } from '@/composites/play/stopgo/fx/useStopGoFx'
+import { useStopGoAimStore } from '@/core/store/play/stopgoAim'
 import { pointAt } from '@/core/lib/play/stopgo'
 import type { StopGoTrackPlan } from '@/core/lib/play/stopgo'
 import type { StopGoCarColor } from '@/declarations/play/stopgo/art'
@@ -52,6 +53,9 @@ export const StopGoCar = ({
 }: StopGoCarProps) => {
   const { x, y, heading } = pointAt(plan, useAnimatedKm(km), lane)
   const clip = `stopgo-portrait-${lane}`
+  const tap = useStopGoAimStore((state) => state.tap)
+  const isAimable = useStopGoAimStore((state) => state.aimable.includes(accountId))
+  const isPicked = useStopGoAimStore((state) => state.picked.includes(accountId))
 
   return (
     <g
@@ -114,6 +118,18 @@ export const StopGoCar = ({
           </span>
         </foreignObject>
       ))}
+      {isAimable && tap && (
+        <circle
+          r={RING + 8}
+          role="button"
+          tabIndex={0}
+          aria-label={name}
+          aria-pressed={isPicked}
+          className={isPicked ? 'stopgo-car-aim stopgo-car-aim-on' : 'stopgo-car-aim'}
+          onClick={() => tap(accountId)}
+          onKeyDown={(event) => event.key === 'Enter' && tap(accountId)}
+        />
+      )}
     </g>
   )
 }

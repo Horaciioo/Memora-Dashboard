@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react'
 import { StopGoCard } from '@/composites/play/stopgo/cards/StopGoCard'
 import { reasonOf } from '@/composites/play/stopgo/cards/reasons'
 import type { StopGoHandCardView } from '@/composites/play/stopgo/cards/types'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { STOPGO_HAND } from '@/declarations/ui/variants/games/play/stopgo'
@@ -44,6 +45,7 @@ export const StopGoHand = ({
   onChoose,
   onQuickPlay,
 }: StopGoHandProps) => {
+  const isMobile = useIsMobileShell()
   // Cards held at the last render, the others slide in from the pile
   const ids = cards.map((card) => card.id)
   const [held, setHeld] = useState<ReadonlySet<string>>(() => new Set(ids))
@@ -89,7 +91,7 @@ export const StopGoHand = ({
               isPlayable={!!aims}
               isChosen={chosenId === card.id}
               reason={isTurn ? reasonOf(card.key, me, target) : undefined}
-              onDragStart={() => onChoose(card.id)}
+              onDragStart={isMobile ? undefined : () => onChoose(card.id)}
               onChoose={() => (chosenId === card.id ? onQuickPlay(card.id) : onChoose(card.id))}
             />
           </div>

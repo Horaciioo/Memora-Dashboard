@@ -25,7 +25,7 @@ export const STOPGO_TRACK = {
   // Car move over a gap of km
   move: { perKm: 7, minMs: 450, maxMs: 1700 },
   // Camera glide, key steps and page share
-  camera: { glideMs: 900, step: 120, pageShare: 0.8 },
+  camera: { glideMs: 900, step: 120, pageShare: 0.8, focusShare: 0.5, phoneFocusShare: 0.34 },
 } as const
 
 /**

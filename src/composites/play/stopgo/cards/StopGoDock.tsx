@@ -6,6 +6,7 @@ import { StopGoCarState } from '@/composites/play/stopgo/cards/StopGoCarState'
 import { StopGoHand } from '@/composites/play/stopgo/cards/StopGoHand'
 import { StopGoImmunity } from '@/composites/play/stopgo/cards/StopGoImmunity'
 import { StopGoPick } from '@/composites/play/stopgo/cards/StopGoPick'
+import { StopGoRivalRow } from '@/composites/play/stopgo/cards/StopGoRivalRow'
 import { StopGoPiles } from '@/composites/play/stopgo/cards/StopGoPiles'
 import { StopGoTray } from '@/composites/play/stopgo/cards/StopGoTray'
 import { reasonOf } from '@/composites/play/stopgo/cards/reasons'
@@ -25,6 +26,7 @@ export interface StopGoDockProps {
   board: StopGoBoardView
   viewerId: string
   names: Record<string, string>
+  avatars: Record<string, string | null>
   colors: StopGoOpponent['color'][]
 }
 
@@ -38,7 +40,14 @@ const shareLeft = (endsAt: Date | string | null, now: number, seconds: number): 
  * @return {JSX.Element | null} - Nothing for a spectator
  */
 
-export const StopGoDock = ({ sessionId, board, viewerId, names, colors }: StopGoDockProps) => {
+export const StopGoDock = ({
+  sessionId,
+  board,
+  viewerId,
+  names,
+  avatars,
+  colors,
+}: StopGoDockProps) => {
   const moves = useStopGoPlay(sessionId, board)
   const now = useServerNow(board.serverTime)
   const [chosenId, setChosenId] = useState<string | null>(null)
@@ -91,6 +100,7 @@ export const StopGoDock = ({ sessionId, board, viewerId, names, colors }: StopGo
           ))}
       </div>
       <div className={STOPGO_HAND.dock}>
+        <StopGoRivalRow players={players} rivals={rivals} avatars={avatars} />
         <StopGoCarState
           player={me}
           name={names[viewerId] ?? ''}
@@ -99,7 +109,7 @@ export const StopGoDock = ({ sessionId, board, viewerId, names, colors }: StopGo
           isSaving={moves.isSaving}
           onCleanup={moves.cleanup}
         />
-        <div className="grid min-w-0 gap-2">
+        <div className={STOPGO_HAND.mid}>
           {chosen && (
             <StopGoTray
               key={chosen.id}

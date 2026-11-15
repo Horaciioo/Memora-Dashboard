@@ -13,6 +13,7 @@ import { StopGoSigns } from '@/composites/play/stopgo/board/StopGoSigns'
 import { StopGoProgress } from '@/composites/play/stopgo/board/StopGoProgress'
 import { StopGoTrack } from '@/composites/play/stopgo/board/StopGoTrack'
 import { useTrackCamera } from '@/composites/play/stopgo/board/useTrackCamera'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { pointAt, trackOf } from '@/core/lib/play/stopgo'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
@@ -48,6 +49,7 @@ export const StopGoBoard = ({
   isSeated,
 }: StopGoBoardProps) => {
   const board = usePlainBoard(sessionId, initial)
+  const isMobile = useIsMobileShell()
   const { flights, marks, land } = useStopGoFx(board)
   const { players, target } = board
   const lanes = players.length
@@ -71,8 +73,13 @@ export const StopGoBoard = ({
     if (!box) return 0
     const { y } = pointAt(plan, focusKm, 0)
 
-    return ((y - viewTop) * box.clientWidth) / plan.width - box.clientHeight / 2
-  }, [plan, focusKm, viewTop])
+    const { focusShare, phoneFocusShare } = STOPGO_TRACK.camera
+
+    return (
+      ((y - viewTop) * box.clientWidth) / plan.width -
+      box.clientHeight * (isMobile ? phoneFocusShare : focusShare)
+    )
+  }, [plan, focusKm, viewTop, isMobile])
 
   useTrackCamera({
     scroller,
@@ -138,6 +145,7 @@ export const StopGoBoard = ({
         board={board}
         viewerId={viewerId}
         names={Object.fromEntries(faces.map(({ id, name }) => [id, name]))}
+        avatars={Object.fromEntries(faces.map(({ id, avatarUrl }) => [id, avatarUrl]))}
         colors={colors}
       />
       <StopGoHud

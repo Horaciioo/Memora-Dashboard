@@ -42,7 +42,7 @@ export const StopGoCard = ({
   return (
     <button
       type="button"
-      draggable={isPlayable && !!onChoose}
+      draggable={isPlayable && !!onDragStart}
       onDragStart={onDragStart}
       onClick={onChoose}
       title={isPlayable ? copy.hint : reason}

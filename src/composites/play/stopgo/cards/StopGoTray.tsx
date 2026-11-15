@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 
+import { StopGoCard } from '@/composites/play/stopgo/cards/StopGoCard'
+import { useStopGoAimStore } from '@/core/store/play/stopgoAim'
 import { STOPGO_CARDS, StopGoTargets } from '@/declarations/play/stopgo/cards'
 import { STOPGO_HAND_COPY } from '@/declarations/play/stopgo/copy'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -47,6 +49,22 @@ export const StopGoTray = ({
 
   const toggle = (id: string) =>
     setChosen((list) => (list.includes(id) ? list.filter((entry) => entry !== id) : [...list, id]))
+  const aimKey = isReady && kind !== StopGoTargets.None ? (aims ?? []).join() : ''
+  const aimed = (id: string) => (isMany ? toggle(id) : onPlay([id]))
+  const latest = useRef(aimed)
+  useEffect(() => {
+    latest.current = aimed
+  })
+  const pickedKey = chosen.join()
+
+  // Rivals on the track answer the same touch
+  useEffect(() => {
+    const { open, close } = useStopGoAimStore.getState()
+    if (aimKey)
+      open(aimKey.split(','), pickedKey ? pickedKey.split(',') : [], (id) => latest.current(id))
+
+    return close
+  }, [aimKey, pickedKey])
 
   const lead = !aims
     ? reason
@@ -58,6 +76,9 @@ export const StopGoTray = ({
 
   return (
     <div className={STOPGO_HAND.tray} role="group" aria-label={STOPGO_HAND_COPY.hand}>
+      <div className={STOPGO_HAND.trayCard} inert>
+        <StopGoCard cardKey={card.key} />
+      </div>
       {lead && <span className={STOPGO_HAND.trayText}>{lead}</span>}
       {isReady && aims.length > 0 && (
         <div className={STOPGO_HAND.targets}>
@@ -72,9 +93,9 @@ export const StopGoTray = ({
                   chosen.includes(rival.id) && STOPGO_HAND.targetOn
                 )}
                 style={{ '--car': `var(--stopgo-car-${rival.color})` } as CSSProperties}
-                onClick={() => (isMany ? toggle(rival.id) : onPlay([rival.id]))}
+                onClick={() => aimed(rival.id)}
                 onDragOver={(event) => event.preventDefault()}
-                onDrop={() => (isMany ? toggle(rival.id) : onPlay([rival.id]))}
+                onDrop={() => aimed(rival.id)}
               >
                 {rival.name}
               </button>
