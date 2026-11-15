@@ -40,8 +40,8 @@ export const BacVoteStatus = ({
             })
 
   return (
-    <p className={cn(BAC_BOARD.lead, isMyTurn && BAC_BOARD.leadStrong)} role="status">
+    <span className={cn(isMyTurn && BAC_BOARD.leadStrong)} role="status">
       {text}
-    </p>
+    </span>
   )
 }

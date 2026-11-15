@@ -7,6 +7,7 @@ export const BAC_BOARD_COPY = {
   roundLabel: 'Manche',
   roundTotal: '/ {total}',
   letterHidden: '?',
+  bookLetter: 'Un mot en {letter} par catégorie',
   getReady: 'Prépare-toi',
   letter: 'Lettre',
   stop: 'Stop !',

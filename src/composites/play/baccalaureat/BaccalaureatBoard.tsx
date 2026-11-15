@@ -5,21 +5,22 @@ import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/elements/actions/Button'
 import { BacPodium } from '@/composites/play/baccalaureat/BacPodium'
-import { BacScores } from '@/composites/play/baccalaureat/BacScores'
-import { BacHeader } from '@/composites/play/baccalaureat/BacHeader'
+import { BacHud } from '@/composites/play/baccalaureat/BacHud'
+import { BacRoundLine } from '@/composites/play/baccalaureat/BacRoundLine'
+import { BacStopBanner } from '@/composites/play/baccalaureat/BacStopBanner'
 import { BacReview } from '@/composites/play/baccalaureat/BacReview'
 import { BacVoteStatus } from '@/composites/play/baccalaureat/BacVoteStatus'
 import { BacWriting } from '@/composites/play/baccalaureat/BacWriting'
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
-import { BacSessionProgress } from '@/composites/play/session/BacSessionProgress'
 import { secondsTo, spanSeconds } from '@/composites/play/baccalaureat/types'
 import type { BacBoardView, BacPlayer } from '@/composites/play/baccalaureat/types'
 import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import { BaccalaureatPhases } from '@/core/lib/play/baccalaureat/phase'
-import { BAC_BOARD_COPY, BAC_SESSION_COPY, BACCALAUREAT_SETTINGS } from '@/declarations/play'
+import { BAC_BOARD_COPY, BACCALAUREAT_SETTINGS } from '@/declarations/play'
 import { BAC_BOARD } from '@/declarations/ui/variants'
+import { RESULT } from '@/declarations/ui/variants/games/play/shared'
 import { PlayGames } from '@/utils/constants/play'
 
 // Server settles first
@@ -34,7 +35,7 @@ export interface BaccalaureatBoardProps {
 }
 
 /**
- * Baccalaureat screen: countdown, writing, review, scores, final ranking, moved with each pushed board
+ * Baccalaureat screen on the notebook sheet: countdown, writing, review table, final ranking
  * @param {BaccalaureatBoardProps} props - Board and table
  * @return {JSX.Element | null}
  */
@@ -81,34 +82,36 @@ export const BaccalaureatBoard = ({
       : BACCALAUREAT_SETTINGS.reviewSeconds
   const isClockOn =
     left !== null && (phase === BaccalaureatPhases.Writing || phase === BaccalaureatPhases.Review)
-  const faces = players.map((player) => ({
-    id: player.accountId,
-    name: player.name,
-    avatarUrl: player.avatarUrl,
-  }))
-  const header = (
-    <BacHeader
-      index={round.index}
-      total={board.roundsTotal}
-      letter={phase === BaccalaureatPhases.Countdown ? null : round.letter}
+  const isCounting = phase === BaccalaureatPhases.Countdown
+  const isVoting = phase === BaccalaureatPhases.Review
+  const hud = (
+    <BacHud
+      sessionId={sessionId}
+      board={board}
+      round={round}
+      players={players}
+      viewerId={viewerId}
+      isSeated={me.isSeated}
+      isLetterOut={!isCounting}
       clock={isClockOn ? { left: left ?? 0, total: clockTotal } : null}
-      stopper={phase === BaccalaureatPhases.Writing ? stopper : null}
+      progress={phase === BaccalaureatPhases.Writing ? board.done : isVoting ? board.voted : null}
+      isVoting={isVoting}
     />
   )
 
   if (board.recap) {
     return (
-      <div className={BAC_BOARD.board}>
+      <div className={RESULT}>
         <h2 className={BAC_BOARD.stageLead}>{BAC_BOARD_COPY.final}</h2>
         <BacPodium history={board.history} players={players} />
       </div>
     )
   }
 
-  if (phase === BaccalaureatPhases.Countdown) {
+  if (isCounting) {
     return (
-      <div className={BAC_BOARD.board}>
-        {header}
+      <div className={BAC_BOARD.board} data-hud="baccalaureat">
+        {hud}
         <PlayCountdown
           game={PlayGames.Baccalaureat}
           seconds={left ?? 0}
@@ -122,13 +125,9 @@ export const BaccalaureatBoard = ({
 
   if (phase === BaccalaureatPhases.Writing) {
     return (
-      <div className={BAC_BOARD.board}>
-        {header}
-        <BacSessionProgress
-          players={faces}
-          done={board.done}
-          labels={{ done: BAC_SESSION_COPY.done, pending: BAC_SESSION_COPY.writing }}
-        />
+      <div className={BAC_BOARD.board} data-hud="baccalaureat">
+        {hud}
+        {stopper && <BacStopBanner stopper={stopper} />}
         {!me.isSeated ? (
           <div className={BAC_BOARD.wait}>
             <p className={BAC_BOARD.waitLead}>{BAC_BOARD_COPY.watchWriting}</p>
@@ -158,35 +157,30 @@ export const BaccalaureatBoard = ({
       viewerId={viewerId}
       isScored={isScored}
       canVote={me.isSeated}
-    />
-  )
-
-  return (
-    <div key={phase} className={BAC_BOARD.board}>
-      {header}
-      {isScored ? (
-        <>
-          <BacScores history={board.history} players={players} roundIndex={round.index} />
-          <h3 className={BAC_BOARD.categoryName}>{BAC_BOARD_COPY.words}</h3>
-          {review}
-        </>
-      ) : (
-        <>
-          <BacSessionProgress
-            players={faces}
-            done={board.voted}
-            labels={{ done: BAC_SESSION_COPY.voted, pending: BAC_SESSION_COPY.voting }}
-          />
-          <p className={BAC_BOARD.lead}>{BAC_BOARD_COPY.voteLead}</p>
-          {review}
+      title={
+        isScored ? (
+          <BacRoundLine history={board.history} players={players} roundIndex={round.index} />
+        ) : (
+          BAC_BOARD_COPY.voteLead
+        )
+      }
+      foot={
+        !isScored && (
           <BacVoteStatus
             players={players}
             voted={board.voted}
             viewerId={viewerId}
             isSeated={me.isSeated}
           />
-        </>
-      )}
+        )
+      }
+    />
+  )
+
+  return (
+    <div key={phase} className={BAC_BOARD.board} data-hud="baccalaureat">
+      {hud}
+      {review}
       <div className={BAC_BOARD.actions}>
         {me.isHost && (
           <Button
