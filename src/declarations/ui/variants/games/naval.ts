@@ -14,12 +14,12 @@ const KEY =
  */
 
 export const NAVAL_BOARD = {
-  root: 'relative mx-auto flex min-h-[calc(100dvh-9rem)] w-full max-w-[80rem] flex-col gap-3 px-3 pt-2 pb-28 lg:pb-6 text-[var(--play-naval-ink)] select-none lg:px-6',
+  root: 'relative flex size-full items-center justify-center overflow-y-auto px-3 pt-28 pb-3 text-[var(--play-naval-ink)] select-none lg:overflow-hidden lg:px-[22rem] lg:pt-24',
   // Phones stack, wide screens set the sea beside a slim rail
-  battle: 'my-auto flex flex-col items-center gap-4',
+  battle: 'flex max-h-full flex-col items-center gap-4',
   // Bar, sea and weapon share the width of the sea, as large as the screen allows
-  stage: 'mx-auto flex w-[min(100%,calc(100dvh-17rem))] min-w-[19rem] flex-col gap-2.5',
-  rail: 'flex w-full max-w-[34rem] flex-col gap-3 empty:hidden',
+  stage: 'mx-auto flex w-[min(calc(100dvh-7rem),calc(100vw-1.5rem))] min-w-[19rem] flex-col gap-2.5 lg:w-[min(calc(100dvh-7rem),calc(100vw-44rem))]',
+  rail: 'flex w-full max-w-[34rem] flex-col gap-3 empty:hidden lg:absolute lg:top-24 lg:left-7 lg:max-h-[calc(100dvh-8rem)] lg:w-[19rem] lg:overflow-y-auto',
   target: 'relative mx-auto w-full',
   // Melee: a new sea fades in
   seaIn: 'naval-sea-in',
@@ -36,16 +36,27 @@ export const NAVAL_BOARD = {
  */
 
 export const NAVAL_HUD = {
-  bar: 'flex items-center justify-center',
-  lead: 'flex min-w-0 flex-1 flex-col items-center gap-1 text-center',
-  call: 'naval-call truncate text-lg leading-6 font-black text-[var(--play-naval-ink)] sm:text-xl',
-  callMine: 'text-[var(--play-naval-reticle)]',
+  root: 'pointer-events-none absolute inset-0 z-20 select-none',
+  crew: 'play-hud-block pointer-events-auto absolute top-3 left-3 flex items-center gap-3 rounded-lg! px-3 py-1.5 backdrop-blur-md md:top-6 md:left-7',
+  captain: 'flex items-center gap-1.5',
+  captainOut: 'opacity-40 grayscale',
+  face: 'overflow-hidden rounded-full',
+  sunk: 'text-sm font-black tabular-nums text-[var(--play-ink-faint)]',
+  sunkMine: 'text-[var(--play-ink-soft)]',
+  bridge:
+    'play-hud-block pointer-events-auto absolute top-3 left-1/2 flex h-11 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-5 rounded-lg! px-5 backdrop-blur-md max-md:top-16 md:top-6',
+  call: 'naval-call truncate text-sm font-black tracking-[0.12em] text-[var(--play-ink)] uppercase md:text-base',
+  callMine: 'text-[var(--play-accent)]',
   callDanger: 'text-[var(--play-naval-danger)]',
-  clockRow: 'flex w-full max-w-xs items-center gap-2',
-  clock: 'naval-clock h-1.5 flex-1 overflow-hidden rounded-full bg-white/10',
-  clockFill: 'naval-clock-fill block h-full w-full rounded-full bg-[var(--play-naval-glow)]',
+  keys: 'pointer-events-auto absolute top-3 right-3 md:top-6 md:right-7',
+  actions: 'flex items-center gap-2 border-l border-[var(--play-line)] pl-4',
+  action: 'h-8 rounded-md bg-[var(--play-chip)] px-3 text-sm font-extrabold tracking-wide whitespace-nowrap text-[var(--play-ink)] uppercase transition-transform hover:-translate-y-px active:scale-[0.97] disabled:opacity-50',
+  actionMain: 'bg-[var(--play-accent)] text-[var(--hud-solid)]',
+  clockRow: 'flex w-36 items-center gap-2',
+  clock: 'naval-clock h-2.5 flex-1 overflow-hidden rounded-sm bg-[var(--play-chip)]',
+  clockFill: 'naval-clock-fill block h-full w-full rounded-sm bg-[var(--play-accent)]',
   clockAlert: 'bg-[var(--play-naval-danger)]',
-  seconds: 'min-w-9 text-right text-lg font-black tabular-nums',
+  seconds: 'min-w-7 text-right text-sm font-extrabold tabular-nums text-[var(--play-ink)]',
 } as const
 
 /**
@@ -74,24 +85,10 @@ export const NAVAL_FOES = {
  */
 
 export const NAVAL_PLACE = {
-  root: 'mx-auto flex min-h-[calc(100dvh-9rem)] w-full max-w-[96rem] flex-col items-center gap-3 px-3 pt-2 pb-28 lg:px-8 lg:pb-6 text-[var(--play-naval-ink)] select-none',
-  // Title and timer above, the sea beside its ships and keys
-  stage: 'my-auto flex w-full flex-col items-center gap-4',
-  head: 'flex w-full max-w-md flex-col items-center gap-2 text-center',
-  heading: 'text-2xl font-black',
-  body: 'grid w-full grid-cols-1 items-center gap-6 lg:grid-cols-[min(72rem,calc(100dvh-12rem))_minmax(14rem,20rem)] lg:justify-start',
-  sea: 'mx-auto w-[min(100%,calc(100dvh-24rem))] lg:w-full',
-  side: 'flex flex-col items-center gap-4 lg:items-stretch',
-  dock: 'flex flex-wrap items-center justify-center gap-x-4 gap-y-2 lg:flex-col lg:items-start',
-  ship: 'naval-dock-ship shrink-0 touch-none rounded-lg px-1.5 py-2 transition-[transform,opacity,background-color] duration-150 active:scale-95',
-  sprite: 'block',
-  spriteCell: 30,
-  shipOn: 'bg-white/20',
-  shipDone: 'opacity-45',
-  keys: 'flex w-full flex-wrap gap-2 lg:flex-col [&>button]:flex-auto [&>button]:px-2 [&>button]:text-xs [&>button]:whitespace-nowrap lg:[&>button]:px-4 lg:[&>button]:text-sm',
-  key: `${KEY} bg-white/10 text-[var(--play-naval-ink)] hover:bg-white/20`,
-  keyMain: `${KEY} bg-[var(--play-naval)] text-white hover:bg-[#2b8bbd]`,
-  sub: 'text-sm font-semibold text-[var(--play-naval-ink-soft)]',
+  root: 'relative flex size-full items-center justify-center overflow-y-auto px-3 pt-28 pb-3 text-[var(--play-naval-ink)] select-none lg:overflow-hidden lg:px-[22rem] lg:pt-24',
+  stage: 'flex w-full flex-col items-center',
+  body: 'flex w-full flex-col items-center justify-center',
+  sea: 'mx-auto w-[min(calc(100dvh-7rem),calc(100vw-1.5rem))] lg:w-[min(calc(100dvh-7rem),calc(100vw-44rem))]',
 } as const
 
 /**
@@ -195,19 +192,14 @@ export const NAVAL_OCEAN = {
  */
 
 export const NAVAL_ARSENAL = {
-  root: 'flex flex-col items-stretch gap-2 rounded-2xl border border-white/10 bg-[var(--play-naval-panel)] p-2 backdrop-blur-sm',
-  divider: 'h-px shrink-0 bg-white/10',
+  root: 'flex items-center gap-2',
   idle: 'opacity-70',
-  card: 'naval-draw flex min-w-0 items-center gap-3 rounded-xl bg-white/10 px-2.5 py-1.5 text-left text-[var(--play-naval-ink)] transition-transform active:scale-[0.98]',
+  card: 'naval-draw flex min-w-0 items-center gap-2 rounded-md bg-[var(--play-chip)] py-1 pr-3 pl-1.5 text-left text-[var(--play-ink)] transition-transform active:scale-[0.97]',
   cardFixed: 'cursor-default active:scale-100 disabled:opacity-100',
-  glyphBox:
-    'grid size-12 shrink-0 place-items-center rounded-lg bg-black/25 text-[var(--play-naval-reticle)]',
-  glyph: 'size-9 fill-current',
-  text: 'flex min-w-0 flex-col',
-  name: 'truncate text-lg leading-6 font-black',
-  note: 'truncate text-xs font-semibold text-[var(--play-naval-ink-soft)]',
-  fire: 'min-h-14 w-full rounded-xl bg-[var(--play-naval-hit)] px-5 text-lg font-black text-white transition-transform active:scale-[0.97] disabled:bg-white/10 disabled:text-[var(--play-naval-ink-soft)]',
-  wait: 'grid min-h-14 w-full place-items-center rounded-xl bg-white/5 px-5 text-center text-base font-black text-[var(--play-naval-ink-soft)]',
+  glyphBox: 'grid size-7 shrink-0 place-items-center text-[var(--play-accent)]',
+  glyph: 'size-6 fill-current',
+  name: 'truncate text-sm font-extrabold tracking-wide uppercase',
+  fire: 'h-8 rounded-md bg-[var(--play-naval-hit)] px-4 text-sm font-black tracking-wide text-white uppercase transition-transform active:scale-[0.96] disabled:bg-[var(--play-chip)] disabled:text-[var(--play-ink-faint)]',
 } as const
 
 /**

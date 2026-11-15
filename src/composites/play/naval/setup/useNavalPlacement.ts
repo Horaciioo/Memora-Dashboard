@@ -48,7 +48,7 @@ const shipOf = (drag: NavalDrag, size: number): NavalShip | null => {
 }
 
 /**
- * Placement by drag: from the dock or from the sea, a tap turns, R turns the ship in hand
+ * Placement by drag: from the sea, a tap turns, R turns the ship in hand
  * @param {NavalLayoutSea} sea - Sea
  * @param {NavalShip[]} start - Fleet to start from
  * @return {Object} - Placement and handlers
@@ -89,16 +89,6 @@ export const useNavalPlacement = (sea: NavalLayoutSea, start: NavalShip[]) => {
     heldId: drag?.id ?? null,
     zone,
     isComplete: ships.length === sea.fleet.length,
-    grabFromDock: (id: number) =>
-      setDrag({
-        id,
-        length: sea.fleet[id],
-        isHorizontal: true,
-        cell: null,
-        grip: 0,
-        from: ships.find((s) => s.id === id) ?? null,
-        start: null,
-      }),
     onGrab: (cell: OceanCell): boolean => {
       const found = shipAt(ships, cell.x, cell.y)
       if (!found) return false
@@ -126,6 +116,5 @@ export const useNavalPlacement = (sea: NavalLayoutSea, start: NavalShip[]) => {
       setShips(randomFleet(sea))
       playNaval('place', 0.8)
     },
-    clear: () => setShips([]),
   }
 }

@@ -143,6 +143,28 @@ export const NavalBattle = ({
 
   return (
     <div ref={root} className={NAVAL_BOARD.root}>
+      <NavalHud
+        sessionId={sessionId}
+        board={board}
+        captains={captains}
+        viewer={viewer}
+        call={call}
+        tone={tone}
+        clock={clock}
+        actions={
+          isFighter && (
+            <NavalArsenal
+              weapon={aim.weapon}
+              drawKey={String(board.rev)}
+              orientation={aim.orientation}
+              isMyTurn={Boolean(isMyTurn)}
+              canFire={aim.isOpen && Boolean(aim.aim)}
+              onTurn={aim.turn}
+              onFire={aim.fire}
+            />
+          )
+        }
+      />
       {match && (
         <NavalStartCountdown
           startsAt={match.startsAt}
@@ -152,7 +174,6 @@ export const NavalBattle = ({
       )}
       <div className={NAVAL_BOARD.battle}>
         <div className={NAVAL_BOARD.stage}>
-          <NavalHud call={call} tone={tone} clock={clock} />
           {sea && (
             <NavalTargetSea
               key={foes.length > 1 ? target : 0}
@@ -170,18 +191,6 @@ export const NavalBattle = ({
                   ? { callout, captains, viewer }
                   : null
               }
-            />
-          )}
-          {isFighter && (
-            <NavalArsenal
-              weapon={aim.weapon}
-              drawKey={String(board.rev)}
-              orientation={aim.orientation}
-              isMyTurn={Boolean(isMyTurn)}
-              canFire={aim.isOpen && Boolean(aim.aim)}
-              waitCall={call}
-              onTurn={aim.turn}
-              onFire={aim.fire}
             />
           )}
         </div>

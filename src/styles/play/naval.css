@@ -257,3 +257,42 @@
     animation: none;
   }
 }
+
+/* Loading chart: the sweep turns, ships blink as it passes */
+.naval-sonar-sweep {
+  animation: naval-sonar-turn 3.6s linear infinite;
+}
+
+.naval-sonar-blip {
+  animation: naval-sonar-blip 3.6s ease-out infinite;
+  opacity: 0;
+}
+
+@keyframes naval-sonar-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes naval-sonar-blip {
+  0%,
+  8% {
+    opacity: 1;
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .naval-sonar-sweep {
+    animation: none;
+  }
+
+  .naval-sonar-blip {
+    animation: none;
+    opacity: 0.8;
+  }
+}
