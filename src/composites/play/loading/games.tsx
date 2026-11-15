@@ -1,11 +1,14 @@
 import type { ReactElement } from 'react'
 
+import { CroquisLoading } from '@/composites/play/croquis/loading/CroquisLoading'
 import { EchoLoading } from '@/composites/play/echo/loading/EchoLoading'
+import { GlitchLoading } from '@/composites/play/glitch/loading/GlitchLoading'
 import { GolfLoading } from '@/composites/play/golf/loading/GolfLoading'
 import { JumbleLoading } from '@/composites/play/jumble/loading/JumbleLoading'
 import type { PlayLoadingProps } from '@/composites/play/loading/PlayLoadingScreen'
 import { LudoLoading } from '@/composites/play/ludo/loading/LudoLoading'
 import { NavalLoading } from '@/composites/play/naval/loading/NavalLoading'
+import { SuspensLoading } from '@/composites/play/suspens/loading/SuspensLoading'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -18,4 +21,7 @@ export const PLAY_LOADINGS: Partial<
   [PlayGames.Naval]: (props) => <NavalLoading {...props} />,
   [PlayGames.Jumble]: (props) => <JumbleLoading {...props} />,
   [PlayGames.Ludo]: (props) => <LudoLoading {...props} />,
+  [PlayGames.Glitch]: (props) => <GlitchLoading {...props} />,
+  [PlayGames.Croquis]: (props) => <CroquisLoading {...props} />,
+  [PlayGames.Suspens]: (props) => <SuspensLoading {...props} />,
 }

@@ -80,3 +80,155 @@
   box-shadow: 0.3rem 0 0.6rem var(--play-bomb-glow);
   transition: width 0.12s linear;
 }
+
+/* Glitch: scrambled CRT, scanlines, neon text, split pink and cyan drop */
+[data-hud='glitch'] {
+  --hud-bg: linear-gradient(180deg, var(--play-glitch-night), var(--play-glitch-dusk));
+  --hud-deco: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 4px);
+  --hud-ink: var(--play-glitch-glow);
+  --hud-value: #ffffff;
+  --hud-faint: rgb(255 211 236 / 0.6);
+  --hud-line: rgb(255 211 236 / 0.2);
+  --hud-chip: var(--play-glitch-deep);
+  --hud-radius: 0.5rem;
+  --hud-shadow:
+    0 0 0 0.125rem var(--play-glitch), 0.3rem 0.3rem 0 0.125rem #2ad4e8,
+    -0.2rem -0.2rem 0 0.125rem var(--play-glitch-deep);
+}
+
+/* Baccalaureat: clean paper sheet, blue ink outline, hard ink drop */
+[data-hud='baccalaureat'] {
+  --hud-bg: #fffefa;
+  --hud-ink: var(--play-baccalaureat-ink);
+  --hud-value: var(--play-baccalaureat-deep);
+  --hud-faint: rgb(28 59 143 / 0.55);
+  --hud-line: rgb(28 59 143 / 0.2);
+  --hud-chip: #e6eefc;
+  --hud-radius: 0.5rem;
+  --hud-shadow:
+    0 0 0 0.14rem var(--play-baccalaureat-deep), 0.3rem 0.3rem 0 0.14rem var(--play-baccalaureat);
+}
+
+/* Jumble: letter tiles, cream face, hard violet drop */
+[data-hud='jumble'] {
+  --hud-bg: linear-gradient(180deg, #fffaf0, var(--play-jumble-tile));
+  --hud-ink: var(--play-jumble-tile-ink);
+  --hud-value: var(--play-jumble-deep);
+  --hud-faint: rgb(42 20 102 / 0.55);
+  --hud-line: rgb(42 20 102 / 0.18);
+  --hud-chip: color-mix(in srgb, var(--play-jumble-tile-deep) 45%, var(--play-jumble-tile));
+  --hud-radius: 0.9rem;
+  --hud-shadow: 0 0.3rem 0 var(--play-jumble-tile-deep), 0 0.6rem 0 var(--play-jumble-deep);
+}
+
+/* Naval: chart-table plates, a fine chart grid under a framed edge, dark by default, a soft tint per map */
+[data-hud='naval'] {
+  --hud-solid: #0f2a33;
+  --hud-bg: rgb(15 42 51 / 0.84);
+  --hud-deco:
+    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px) 0 0 / 0.85rem 0.85rem,
+    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px) 0 0 / 0.85rem 0.85rem;
+  --hud-ink: #e8f1f1;
+  --hud-value: #9fd2cb;
+  --hud-faint: rgb(232 241 241 / 0.55);
+  --hud-line: rgb(255 255 255 / 0.14);
+  --hud-chip: rgb(255 255 255 / 0.09);
+  --hud-radius: 0.6rem;
+  --hud-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.12), inset 0 0 0 3px rgb(0 0 0 / 0.18),
+    inset 0 0 0 4px rgb(255 255 255 / 0.1), 0 0.6rem 1.6rem rgb(0 0 0 / 0.28);
+}
+
+[data-hud='naval'].play-hud-block,
+[data-hud='naval'] .play-hud-block {
+  backdrop-filter: blur(10px);
+}
+
+/* Clock track graduated like a ruler */
+[data-hud='naval'] .naval-clock {
+  position: relative;
+}
+
+[data-hud='naval'] .naval-clock::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 0.4rem,
+    rgb(0 0 0 / 0.4) 0.4rem 0.5rem
+  );
+}
+
+[data-hud-skin='coral'] [data-hud='naval'],
+[data-hud-skin='coral'][data-hud='naval'] {
+  --hud-solid: #2a1e26;
+  --hud-bg: rgb(42 30 38 / 0.84);
+  --hud-value: #e0a9a2;
+}
+
+[data-hud-skin='pirate'] [data-hud='naval'],
+[data-hud-skin='pirate'][data-hud='naval'] {
+  --hud-solid: #2b2118;
+  --hud-bg: rgb(43 33 24 / 0.86);
+  --hud-value: #d4b27a;
+}
+
+[data-hud-skin='mediterranean'] [data-hud='naval'],
+[data-hud-skin='mediterranean'][data-hud='naval'] {
+  --hud-solid: #172536;
+  --hud-bg: rgb(23 37 54 / 0.84);
+  --hud-value: #d6a98d;
+}
+
+[data-hud-skin='cliffs'] [data-hud='naval'],
+[data-hud-skin='cliffs'][data-hud='naval'] {
+  --hud-solid: #1d2c30;
+  --hud-bg: rgb(29 44 48 / 0.86);
+  --hud-value: #a9c4bb;
+}
+
+[data-hud-skin='strait'] [data-hud='naval'],
+[data-hud-skin='strait'][data-hud='naval'] {
+  --hud-solid: #1a2631;
+  --hud-bg: rgb(26 38 49 / 0.86);
+  --hud-value: #d2a574;
+}
+
+[data-hud-skin='volcanic'] [data-hud='naval'],
+[data-hud-skin='volcanic'][data-hud='naval'] {
+  --hud-solid: #221a18;
+  --hud-bg: rgb(34 26 24 / 0.88);
+  --hud-value: #d4906a;
+}
+
+/* Croquis: amber sticky notes, soft drop, folded corner */
+[data-hud='croquis'] {
+  --hud-bg: linear-gradient(180deg, #ffe58a, #ffd25a);
+  --hud-deco: linear-gradient(135deg, transparent calc(100% - 0.8rem), rgb(138 86 0 / 0.22) 0);
+  --hud-ink: #3a2503;
+  --hud-value: var(--play-croquis-deep);
+  --hud-faint: rgb(58 37 3 / 0.55);
+  --hud-line: rgb(58 37 3 / 0.18);
+  --hud-chip: rgb(138 86 0 / 0.16);
+  --hud-radius: 0.4rem;
+  --hud-shadow: 0 0.15rem 0 rgb(138 86 0 / 0.45), 0 0.7rem 1.1rem rgb(0 0 0 / 0.38);
+}
+
+/* Suspens: chalk slate in a wooden frame, chalk line inside, hard wood drop */
+[data-hud='suspens'] {
+  --hud-bg: linear-gradient(170deg, var(--suspens-slate), var(--suspens-slate-deep));
+  --hud-deco:
+    radial-gradient(circle at 18% 28%, rgb(255 246 227 / 0.07) 0 0.1rem, transparent 0.12rem),
+    radial-gradient(circle at 74% 66%, rgb(255 246 227 / 0.06) 0 0.14rem, transparent 0.16rem),
+    radial-gradient(circle at 46% 84%, rgb(255 246 227 / 0.05) 0 0.1rem, transparent 0.12rem);
+  --hud-ink: var(--suspens-chalk);
+  --hud-value: var(--play-suspens-glow);
+  --hud-faint: rgb(255 246 227 / 0.55);
+  --hud-line: rgb(255 246 227 / 0.22);
+  --hud-chip: rgb(255 246 227 / 0.12);
+  --hud-radius: 0.7rem;
+  --hud-shadow:
+    inset 0 0 0 0.15rem var(--suspens-slate-deep), inset 0 0 0 0.21rem rgb(255 246 227 / 0.38),
+    0 0 0 0.2rem var(--suspens-wood), 0.35rem 0.4rem 0 0.2rem var(--play-suspens-deep);
+}

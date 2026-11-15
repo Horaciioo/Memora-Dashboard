@@ -3,6 +3,7 @@
   --play-baccalaureat: #3b6fd8;
   --play-baccalaureat-deep: #1c3b8f;
   --play-baccalaureat-glow: #8fb4ff;
+  --play-baccalaureat-ink: #14275f;
   --play-golf: #3f9d5c;
   --play-golf-deep: #1d5b33;
   --play-golf-glow: #a6e8a0;
@@ -216,6 +217,8 @@
   --suspens-wood: #b98650;
   --suspens-rope: #e9d3a3;
   --suspens-chalk: #fff6e3;
+  --suspens-slate: #2b2622;
+  --suspens-slate-deep: #1f1b18;
   --suspens-hit: #3fae5a;
   --suspens-miss: #e5483f;
   --suspens-key: #f3e4c9;
@@ -243,6 +246,12 @@
   /* Echo card: cream face, soft edge */
   --echo-card: #fffaf0;
   --echo-card-edge: #cfe3e6;
+  --echo-card-shade: #efe2c8;
+  /* Rim of the center card (gold) and of the own card (pink) */
+  --echo-rim-center: #f7c85a;
+  --echo-rim-center-deep: #d98a2b;
+  --echo-rim-mine: #ff8cc0;
+  --echo-rim-mine-deep: #d9488f;
   /* Echo symbol paints */
   --echo-ink: #2b2140;
   --echo-white: #ffffff;

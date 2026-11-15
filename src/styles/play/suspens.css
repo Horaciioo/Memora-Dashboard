@@ -125,7 +125,7 @@
 
 /* Cell of the word: a line under the letter */
 .play-suspens-cell {
-  height: 2.6rem;
+  height: clamp(2rem, 5.5dvh, 2.6rem);
   border-bottom: 0.2rem solid var(--suspens-chalk);
   color: var(--suspens-chalk);
 }
@@ -233,7 +233,24 @@
   background: color-mix(in srgb, var(--play-suspens) 35%, transparent);
 }
 
+/* Loading scene: chalk plates swinging from the beam */
+.play-suspens-hang {
+  transform-origin: 50% 0;
+  animation: play-suspens-hang 1.6s ease-in-out infinite alternate;
+  animation-delay: calc(var(--tile) * -230ms);
+}
+
+@keyframes play-suspens-hang {
+  from {
+    transform: rotate(-9deg);
+  }
+  to {
+    transform: rotate(9deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .play-suspens-hang,
   .play-suspens-float,
   .play-suspens-part-in,
   .play-suspens-eyes,

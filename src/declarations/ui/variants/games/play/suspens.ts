@@ -1,5 +1,5 @@
 import { setupStyles } from '@/declarations/ui/variants/games/play/boards'
-import { NOTE, PANEL, RESULT, SETUP_WOOD } from '@/declarations/ui/variants/games/play/shared'
+import { NOTE, RESULT, SETUP_WOOD } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Suspens board
@@ -7,19 +7,18 @@ import { NOTE, PANEL, RESULT, SETUP_WOOD } from '@/declarations/ui/variants/game
  */
 
 export const SUSPENS_BOARD = {
-  board: 'relative flex flex-col items-center gap-5 pb-16 in-[.play-boxfull]:pb-0',
+  board:
+    'relative flex size-full flex-col items-center justify-center gap-[min(2.5dvh,1.5rem)] overflow-hidden px-4 pt-24 pb-28 max-md:pb-20',
   figure:
     'play-figure play-figure-suspens text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
-  // Round line and clock
-  head: 'flex w-full max-w-3xl flex-col gap-2',
-  round: 'text-center text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
   clockTrack: 'h-3 w-full overflow-hidden rounded-full bg-[var(--play-chip)]',
   clock: 'play-suspens-clock h-full w-full rounded-full',
   lead: 'text-center text-sm text-[var(--play-ink-soft)]',
   leadStrong: 'text-center text-base font-extrabold text-[var(--play-ink)]',
   // Gallows beside the word
-  stage: `${PANEL} flex w-full max-w-3xl flex-col items-center gap-4 p-4 sm:flex-row sm:items-center sm:gap-8 sm:px-8`,
-  gallows: 'play-suspens-gallows h-auto w-40 shrink-0 sm:w-52',
+  stage:
+    'play-hud-block flex w-full max-w-3xl flex-col items-center gap-[min(2dvh,1rem)] p-4 sm:flex-row sm:items-center sm:gap-8 sm:px-8',
+  gallows: 'play-suspens-gallows h-auto w-[clamp(6rem,min(18vw,24dvh),13rem)] shrink-0',
   partWood: 'play-suspens-wood',
   partRope: 'play-suspens-rope',
   partBody: 'play-suspens-body',
@@ -38,10 +37,10 @@ export const SUSPENS_BOARD = {
   wrongLetter:
     'play-suspens-wrong grid size-8 place-items-center rounded-lg text-sm font-black text-white',
   // Fixed height, the board never jumps between phases
-  zone: 'flex min-h-48 w-full max-w-3xl flex-col items-center gap-4',
+  zone: 'flex min-h-[min(12rem,22dvh)] w-full max-w-3xl flex-col items-center gap-[min(2dvh,1rem)]',
   // Letter keys
-  keys: 'grid w-full max-w-xl grid-cols-[repeat(auto-fit,minmax(2.5rem,1fr))] gap-1.5',
-  key: 'play-suspens-key grid h-11 place-items-center rounded-xl text-base font-black transition-transform enabled:active:scale-95 disabled:cursor-not-allowed',
+  keys: 'grid w-full max-w-2xl grid-cols-[repeat(auto-fit,minmax(2.5rem,1fr))] gap-1.5',
+  key: 'play-suspens-key grid h-[clamp(2.1rem,5dvh,2.75rem)] place-items-center rounded-xl text-base font-black transition-transform enabled:active:scale-95 disabled:cursor-not-allowed',
   keyIdle: 'play-suspens-key-idle',
   keyHit: 'play-suspens-key-hit',
   keyMiss: 'play-suspens-key-miss',
@@ -49,7 +48,7 @@ export const SUSPENS_BOARD = {
   form: 'flex w-full max-w-md items-center gap-2',
   input:
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-4 py-3 text-center text-lg font-extrabold tracking-widest text-[var(--play-ink)] uppercase placeholder:font-normal placeholder:tracking-normal placeholder:normal-case placeholder:text-[var(--play-ink-faint)] focus:bg-[var(--play-panel-strong)] focus:outline-none',
-  pick: `${PANEL} flex w-full max-w-md flex-col items-center gap-3 p-4`,
+  pick: 'play-hud-block flex w-full max-w-md flex-col items-center gap-3 p-4',
   pickActions: 'flex w-full items-center gap-2',
   secret:
     'play-suspens-secret text-3xl font-black tracking-widest text-[var(--play-suspens-glow)] uppercase',
@@ -57,21 +56,12 @@ export const SUSPENS_BOARD = {
   guess: 'flex w-full max-w-md flex-col items-center gap-1',
   guessHint: NOTE,
   // Reveal banner
-  reveal: `${PANEL} flex w-full max-w-md flex-col items-center gap-2 px-5 py-4 text-center`,
+  reveal:
+    'play-hud-block flex w-full max-w-md flex-col items-center gap-1 px-5 py-[min(1.5dvh,1rem)] text-center',
   revealName: 'text-sm font-extrabold text-[var(--play-ink)]',
   revealWord:
     'play-suspens-gain text-4xl font-black tracking-widest text-[var(--play-suspens-glow)] uppercase',
   itWas: NOTE,
-  // Scoreboard
-  scores: `${PANEL} flex w-full max-w-md flex-col gap-1 p-2`,
-  score: 'flex items-center gap-3 rounded-xl px-2 py-1.5 transition-opacity',
-  scoreOn: 'play-suspens-on',
-  scoreLeft: 'opacity-50',
-  scoreRank: 'w-5 text-center text-xs font-extrabold tabular-nums text-[var(--play-ink-faint)]',
-  scoreName: 'min-w-0 flex-1 truncate text-sm font-extrabold text-[var(--play-ink)]',
-  scoreState:
-    'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-suspens-glow)] uppercase',
-  scoreValue: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
   result: RESULT,
 } as const
 
