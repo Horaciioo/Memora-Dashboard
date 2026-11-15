@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef } from 'react'
 
+import { StopGoDock } from '@/composites/play/stopgo/cards/StopGoDock'
 import { StopGoCar } from '@/composites/play/stopgo/board/StopGoCar'
 import { StopGoDecor } from '@/composites/play/stopgo/board/StopGoDecor'
 import { StopGoSigns } from '@/composites/play/stopgo/board/StopGoSigns'
@@ -111,6 +112,13 @@ export const StopGoBoard = ({ sessionId, board, faces, viewerId }: StopGoBoardPr
           })}
         </svg>
       </div>
+      <StopGoDock
+        sessionId={sessionId}
+        board={board}
+        viewerId={viewerId}
+        names={Object.fromEntries(faces.map(({ id, name }) => [id, name]))}
+        colors={colors}
+      />
       <StopGoProgress
         scroller={scroller}
         plan={plan}

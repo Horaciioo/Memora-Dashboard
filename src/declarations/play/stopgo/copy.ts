@@ -114,3 +114,51 @@ export const STOPGO_RULES_COPY = {
   strikes: 'Tours manqués',
   strikesValue: 'Après {count} tours manqués d’affilée, ton tour ne dure plus que {seconds} s.',
 } as const
+
+/**
+ * Hand, targets and answers
+ * @type {Record<string, string>}
+ */
+
+export const STOPGO_HAND_COPY = {
+  hand: 'Ta main',
+  play: 'Jouer',
+  discard: 'Défausser',
+  cancel: 'Annuler',
+  launch: 'Lancer',
+  pickTarget: 'Choisis ta cible',
+  pickTargets: 'Choisis au moins {count} cibles',
+  notYet: 'Pas jouable maintenant.',
+  waitTurn: 'Au tour de {name}.',
+  yourTurn: 'À toi de jouer.',
+  pile: 'Pioche',
+  discardPile: 'Défausse',
+  empty: 'Vide',
+  sealed: 'Carte scellée',
+  sealedHint: 'Une carte piégée. La révéler te coûte {cost} km.',
+  reveal: 'Révéler (−{cost} km)',
+  revealAfter: 'Tu reculeras à {km} km.',
+  pickLead: 'Bonne pioche',
+  pickHint: 'Garde une carte, l’autre part à la défausse.',
+  pickOther: '{name} choisit une carte.',
+  keep: 'Garder',
+  immunityLead: 'Attaque sur toi',
+  immunityText: '{name} te vise avec {card}.',
+  immunity: 'Immunité',
+  letPass: 'Laisser passer',
+  cleanup: 'Grand nettoyage',
+  cleanupHint: 'Lève tous tes malus.',
+  jokerReady: 'Prêt',
+  jokerSpent: 'Utilisé',
+  myCar: 'Ma voiture',
+  rolling: 'Tu roules',
+  stopped: 'Tu es à l’arrêt',
+  rivalRolling: 'Il roule',
+  rivalStopped: 'À l’arrêt',
+  limited: 'Limité à {km} km par carte',
+  noHazard: 'Aucun malus',
+  fixedBy: 'Réparé par {card}',
+  jokers: 'Jokers',
+  you: 'Toi',
+  count: '{count} cartes',
+} as const

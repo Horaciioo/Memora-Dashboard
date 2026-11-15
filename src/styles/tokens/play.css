@@ -242,6 +242,14 @@
   --stopgo-car-blue: var(--play-ludo-blue);
   --stopgo-car-green: var(--play-ludo-green);
   --stopgo-car-yellow: var(--play-ludo-yellow);
+  /* Stop & Go cards: warm paper face, one family colour on the head */
+  --stopgo-card: #fffaf0;
+  --stopgo-card-ink: #2b2825;
+  --stopgo-card-back: #3b3632;
+  --stopgo-family-distance: #5b5651;
+  --stopgo-family-attack: #d93c3c;
+  --stopgo-family-remedy: #2f8fbf;
+  --stopgo-family-bonus: #d9961f;
   --play-croquis: #f0a30a;
   --play-croquis-deep: #8a5600;
   --play-croquis-glow: #ffe9b0;
