@@ -4,7 +4,7 @@ import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { StopGoPhases } from '@/utils/constants/play'
 
 import { hazardOf, windowOf } from '@/core/lib/play/stopgo/attack'
-import { canPlay, counterOf, isMoving, isShielded, opponentsOf } from '@/core/lib/play/stopgo/rules'
+import { aimableOf, canPlay, counterOf, isMoving } from '@/core/lib/play/stopgo/rules'
 import type { StopGoGameSettings } from '@/core/lib/play/stopgo/settings'
 import type {
   StopGoGameState,
@@ -47,14 +47,9 @@ const targetsFor = (
   if (!isOpenCard(key)) return null
   if (spec.target === StopGoTargets.None) return canPlay(key, accountId, [], race) ? null : []
 
-  // Opponents not already hit, nor carrying a sealed card
-  const aimable = opponentsOf(race, accountId).filter(
-    (id) =>
-      (!spec.hazard ||
-        (!race.cars[id].hazards.includes(spec.hazard) &&
-          race.cars[id].lastHazard !== spec.hazard &&
-          !isShielded(race.cars[id], spec.hazard))) &&
-      (key !== 'mystery' || !carrying.has(id))
+  // Opponents who can take the malus, none carrying a sealed card for a mystery
+  const aimable = aimableOf(spec, race, accountId).filter(
+    (id) => key !== 'mystery' || !carrying.has(id)
   )
   if (spec.target === StopGoTargets.One) return aimable.length ? aimable : null
 

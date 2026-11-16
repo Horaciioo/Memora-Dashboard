@@ -33,7 +33,12 @@ export const openRace = async (session: EngineSession): Promise<EngineStep> => {
 
   const hands = dealt.hands
   const startsAt = openingEnd(new Date(), STOPGO_SETTINGS.countdownSeconds)
-  const turnEndsAt = after(startsAt, settings.turnSeconds)
+  // The first player's clock waits for the opening deal animation
+  const dealMs =
+    STOPGO_SETTINGS.handSize * STOPGO_SETTINGS.dealGapMs +
+    STOPGO_SETTINGS.revealMs +
+    STOPGO_SETTINGS.drawMs
+  const turnEndsAt = after(startsAt, settings.turnSeconds + Math.ceil(dealMs / 1000))
   const car = freshCar()
 
   await prisma.$transaction([

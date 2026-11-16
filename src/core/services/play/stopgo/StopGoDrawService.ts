@@ -5,8 +5,10 @@ import {
   drawCards,
   drawFor,
   isPicking,
+  carOf,
   keepPicked,
   needsDraw,
+  needsOf,
   PICK_PENDING,
   sealedOf,
   secureRandom,
@@ -146,7 +148,11 @@ export const takeCard = (
     if (!needsDraw(seat.hand.length, sealedOf(seat.sealed).length)) {
       refuse(StopGoRefusals.AlreadyDrawn)
     }
-    const found = drawFor(game.drawPile, game.discard, game.reshuffles, secureRandom)
+    const needs = needsOf(
+      carOf(seat),
+      seat.hand.map((entry) => entry.key)
+    )
+    const found = drawFor(game.drawPile, game.discard, game.reshuffles, secureRandom, needs)
 
     // Pile and discard both spent: the race ends on distance
     if (!found.card) return closeRace(table, null)

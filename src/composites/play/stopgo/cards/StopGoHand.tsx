@@ -9,6 +9,7 @@ import { reasonOf } from '@/composites/play/stopgo/cards/reasons'
 import type { StopGoHandCardView } from '@/composites/play/stopgo/cards/types'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
+import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { STOPGO_HAND } from '@/declarations/ui/variants/games/play/stopgo'
 import { cn } from '@/utils/classnames'
 
@@ -19,6 +20,7 @@ export interface StopGoHandProps {
   playable: Record<string, string[] | null>
   me: Player
   target: number
+  rivals: Player[]
   chosenId: string | null
   isTurn: boolean
   // First turn: the hand is dealt card by card from the pile
@@ -42,6 +44,7 @@ export const StopGoHand = ({
   playable,
   me,
   target,
+  rivals,
   chosenId,
   isTurn,
   isOpening,
@@ -89,7 +92,8 @@ export const StopGoHand = ({
                 cardKey={card.key}
                 slotId={card.id}
                 delayMs={
-                  cards.filter((other, at) => at < index && !held.has(other.id)).length * 1400
+                  cards.filter((other, at) => at < index && !held.has(other.id)).length *
+                  STOPGO_SETTINGS.dealGapMs
                 }
                 onDone={() => land(card.id)}
               />
@@ -99,7 +103,7 @@ export const StopGoHand = ({
               index={index}
               isPlayable={!!aims}
               isChosen={chosenId === card.id}
-              reason={isTurn ? reasonOf(card.key, me, target) : undefined}
+              reason={isTurn ? reasonOf(card.key, me, target, rivals) : undefined}
               onDragStart={isMobile ? undefined : () => onChoose(card.id)}
               onChoose={() => (chosenId === card.id ? onQuickPlay(card.id) : onChoose(card.id))}
             />

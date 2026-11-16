@@ -55,6 +55,12 @@ export const StopGoRulesDrawer = ({ open, onClose, settings }: StopGoRulesDrawer
       label: copy.draw,
       value: fillPlayMessage(copy.drawValue, { share: Math.round(STOPGO_SETTINGS.kmShare * 100) }),
     },
+    {
+      label: copy.pity,
+      value: fillPlayMessage(copy.pityValue, {
+        share: Math.round(STOPGO_SETTINGS.pityShare * 100),
+      }),
+    },
     { label: copy.distances, value: fillPlayMessage(copy.distancesValue, { list: distances }) },
     { label: copy.finish, value: copy.finishValue },
     {

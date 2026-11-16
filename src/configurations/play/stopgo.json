@@ -38,6 +38,7 @@
   "afkSeconds": 5,
   "reshuffles": 2,
   "kmShare": 0.7,
+  "pityShare": 0.5,
   "counter": {
     "seconds": 5
   },
@@ -66,7 +67,8 @@
     "flightMs": 650,
     "markMs": 900,
     "drawMs": 450,
-    "revealMs": 1000
+    "revealMs": 1000,
+    "dealGapMs": 1400
   },
   "colors": ["red", "blue", "green", "yellow"],
   "feedSize": 40

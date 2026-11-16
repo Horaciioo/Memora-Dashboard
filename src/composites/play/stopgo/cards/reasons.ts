@@ -3,19 +3,50 @@ import type { StopGoCardKey } from '@/declarations/play/stopgo/cards'
 import { STOPGO_HAND_COPY } from '@/declarations/play/stopgo/copy'
 import { STOPGO_ERRORS } from '@/declarations/play/stopgo/copy'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
+import { aimVerdict } from '@/core/lib/play/stopgo'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
 
 type Player = StopGoBoardView['players'][number]
+
+/**
+ * Words telling why an attack has nobody to aim at
+ * @param {StopGoCardKey} key - Attack or mystery card
+ * @param {Player[]} rivals - Other cars of the race
+ * @return {string} - Reason, the common one when every rival is blocked alike
+ */
+
+const aimReason = (key: StopGoCardKey, rivals: Player[]): string => {
+  const hazard = STOPGO_CARDS[key].hazard
+  if (!rivals.length) return STOPGO_ERRORS.noOpponent
+  if (!hazard) return STOPGO_ERRORS.alreadySealed
+
+  // One refusal per rival, shared or not
+  const reasons = new Set(
+    rivals.map((rival) => {
+      const verdict = aimVerdict(hazard, rival)
+
+      return verdict ? STOPGO_ERRORS[verdict] : STOPGO_HAND_COPY.noTarget
+    })
+  )
+
+  return reasons.size === 1 ? [...reasons][0] : STOPGO_HAND_COPY.noTarget
+}
 
 /**
  * Words telling why a card waits, the server stays the only judge
  * @param {StopGoCardKey} key - Card
  * @param {Player} me - Player's own car
  * @param {number} target - Race distance
+ * @param {Player[]} rivals - Other cars of the race
  * @return {string} - Reason
  */
 
-export const reasonOf = (key: StopGoCardKey, me: Player, target: number): string => {
+export const reasonOf = (
+  key: StopGoCardKey,
+  me: Player,
+  target: number,
+  rivals: Player[] = []
+): string => {
   const spec = STOPGO_CARDS[key]
 
   const km = spec.km
@@ -29,7 +60,7 @@ export const reasonOf = (key: StopGoCardKey, me: Player, target: number): string
     return STOPGO_ERRORS.noHazard
   }
   if (spec.family === 'safety') return STOPGO_ERRORS.alreadyLaid
-  if (spec.family === 'attack' || key === 'mystery') return STOPGO_ERRORS.noOpponent
+  if (spec.family === 'attack' || key === 'mystery') return aimReason(key, rivals)
 
   return STOPGO_HAND_COPY.notYet
 }
