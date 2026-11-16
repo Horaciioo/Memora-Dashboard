@@ -49,6 +49,7 @@ export const carOf = (seat: StopGoSeatState): StopGoCar => ({
   isGreen: seat.isGreen,
   hazards: seat.hazards,
   shields: seat.shields,
+  lastHazard: seat.lastHazard,
 })
 
 /**
@@ -158,4 +159,4 @@ export const drawFor = (
   reshuffles: number,
   random: Random
 ): ReturnType<typeof draw> =>
-  draw({ pile, discard, reshuffles }, STOPGO_SETTINGS.reshuffles, random)
+  draw({ pile, discard, reshuffles }, STOPGO_SETTINGS.reshuffles, random, STOPGO_SETTINGS.kmShare)

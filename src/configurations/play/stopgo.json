@@ -37,6 +37,7 @@
   "strikes": 3,
   "afkSeconds": 5,
   "reshuffles": 2,
+  "kmShare": 0.7,
   "counter": {
     "seconds": 5
   },

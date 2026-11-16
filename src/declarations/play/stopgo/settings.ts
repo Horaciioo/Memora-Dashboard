@@ -86,6 +86,7 @@ export const STOPGO_SETTINGS = {
     fallback: 2,
     min: 0,
   }),
+  kmShare: Math.min(1, Math.max(0, Number(stopgo.kmShare) || 0)),
   counterSeconds: readInteger(counter.seconds, {
     path: 'play/stopgo.counter.seconds',
     fallback: 5,

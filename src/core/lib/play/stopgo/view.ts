@@ -12,7 +12,7 @@ import type {
   StopGoSeatState,
   StopGoTable,
 } from '@/core/lib/play/stopgo/state'
-import { isPicking, sealedOf } from '@/core/lib/play/stopgo/special'
+import { isPicking, needsDraw, sealedOf } from '@/core/lib/play/stopgo/special'
 import { carOf, isOpenCard, raceOf } from '@/core/lib/play/stopgo/turn'
 
 /**
@@ -52,6 +52,7 @@ const targetsFor = (
     (id) =>
       (!spec.hazard ||
         (!race.cars[id].hazards.includes(spec.hazard) &&
+          race.cars[id].lastHazard !== spec.hazard &&
           !isShielded(race.cars[id], spec.hazard))) &&
       (key !== 'mystery' || !carrying.has(id))
   )
@@ -77,6 +78,7 @@ const privateOf = ({ game, seats, settings }: StopGoViewInput, seat: StopGoSeatS
   const race = raceOf(racing, settings.target)
   const window = windowOf(game.pending)
   const isLive = game.phase === StopGoPhases.Playing
+  const mustDraw = needsDraw(seat.hand.length, sealedOf(seat.sealed).length)
 
   return {
     // Safety of the hand that stops the attack aimed at the reader, null without one
@@ -86,13 +88,15 @@ const privateOf = ({ game, seats, settings }: StopGoViewInput, seat: StopGoSeatS
         : null,
     // Attack aimed at the reader, whatever the hand holds
     isAimed: isLive && !!window?.targets.includes(seat.accountId),
+    // The card of the turn waits on the pile until the player takes it
+    canDraw: isTurn && mustDraw,
     canReveal: isTurn && sealedOf(seat.sealed).length > 0,
     // Slots taken by sealed cards, nothing of their content
     sealedCount: sealedOf(seat.sealed).length,
     hand: seat.hand.map((card) => ({ id: card.id, key: card.key, isPicking: !!card.isPicking })),
     // Card id to the targets it may aim at
     playable: Object.fromEntries(
-      isTurn
+      isTurn && !mustDraw
         ? seat.hand
             .filter((card) => !card.isPicking)
             .map((card) => [card.id, targetsFor(card.key, seat.accountId, race, carrying)] as const)
@@ -124,6 +128,7 @@ export const buildBoards = (input: StopGoViewInput) => {
       hazards: seat.hazards,
       isLimited: seat.hazards.includes('limit'),
       shields: seat.shields,
+      lastHazard: seat.lastHazard,
       handCount: seat.hand.length + sealedOf(seat.sealed).length,
       // Shown once the race is over
       sealedLeft:

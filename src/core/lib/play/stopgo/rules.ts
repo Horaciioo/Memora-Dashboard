@@ -147,7 +147,12 @@ const targetVerdict = (
   }
   const isHit = hazard && targets.some((id) => table.cars[id].hazards.includes(hazard))
 
-  return isHit ? StopGoRefusals.AlreadyHit : null
+  if (isHit) return StopGoRefusals.AlreadyHit
+
+  // The malus a car just suffered cannot come twice in a row
+  return hazard && targets.some((id) => table.cars[id].lastHazard === hazard)
+    ? StopGoRefusals.SameMalus
+    : null
 }
 
 /**

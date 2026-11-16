@@ -1,16 +1,6 @@
 import 'server-only'
 
-import {
-  drawFor,
-  needsDraw,
-  nextRacer,
-  placesOf,
-  raceOf,
-  scoreOf,
-  sealedOf,
-  secureRandom,
-  turnSecondsOf,
-} from '@/core/lib/play/stopgo'
+import { nextRacer, placesOf, raceOf, scoreOf, turnSecondsOf } from '@/core/lib/play/stopgo'
 import { after } from '@/core/lib/play/clock'
 import {
   movedStep,
@@ -58,7 +48,7 @@ export const closeRace = async (
 }
 
 /**
- * Hand the turn to the next racer and draw for them
+ * Hand the turn to the next racer
  * @param {StopGoLockedTable} table - Table
  * @param {string} fromId - Player whose turn ends
  * @param {StopGoMoveInput[]} lines - Lines of the move that ended it
@@ -85,7 +75,7 @@ export const passTurn = async (
 }
 
 /**
- * Give the turn to a racer and draw for them, the same one again after a safety
+ * Give the turn to a racer, who takes their card from the pile, the same one again after a safety
  * @param {StopGoLockedTable} table - Table
  * @param {string} nextId - Player who plays next
  * @param {StopGoMoveInput[]} lines - Lines of the move that ended the last turn
@@ -98,29 +88,11 @@ export const giveTurn = async (
   lines: StopGoMoveInput[]
 ): Promise<EngineStep> => {
   const { game, settings } = table
-
-  // A sealed card takes the place of the draw
   const next = seatOf(table, nextId)!
-  const isDrawing = needsDraw(next.hand.length, sealedOf(next.sealed).length)
-  const piles = { pile: game.drawPile, discard: game.discard, reshuffles: game.reshuffles }
-  const drawn = isDrawing
-    ? drawFor(piles.pile, piles.discard, piles.reshuffles, secureRandom)
-    : { card: null, piles }
-
-  // Pile and discard both spent: the race ends on distance
-  if (isDrawing && !drawn.card) return closeRace(table, null, lines)
-  const isShuffled = drawn.piles.reshuffles > game.reshuffles
-  game.drawPile = drawn.piles.pile
-  game.discard = drawn.piles.discard
-  game.reshuffles = drawn.piles.reshuffles
   game.turnId = nextId
   game.turnNo += 1
   game.turnEndsAt = after(table.now, turnSecondsOf(next.strikes, settings.turnSeconds))
-  if (drawn.card) await saveSeat(table, nextId, { hand: [...next.hand, drawn.card] })
-  await writeMoves(table, [
-    ...lines,
-    ...(isShuffled ? [{ kind: StopGoMoveKinds.Shuffle, accountId: nextId }] : []),
-  ])
+  await writeMoves(table, lines)
 
   return movedStep(table)
 }

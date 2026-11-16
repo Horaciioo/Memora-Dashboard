@@ -2,7 +2,7 @@ import 'server-only'
 
 import { conflict } from '@/core/lib/errors'
 import { readStopGoSettings, stopGoDefaults } from '@/core/lib/play/stopgo'
-import { pickCard } from '@/core/services/play/stopgo/StopGoDrawService'
+import { pickCard, takeCard } from '@/core/services/play/stopgo/StopGoDrawService'
 import { openRace } from '@/core/services/play/stopgo/StopGoDealService'
 import { declineAttack, useCounter } from '@/core/services/play/stopgo/StopGoCounterService'
 import { revealMystery } from '@/core/services/play/stopgo/StopGoMysteryService'
@@ -24,6 +24,7 @@ const ACTIONS: Record<
   counter: useCounter,
   decline: declineAttack,
   pick: pickCard,
+  draw: takeCard,
   reveal: revealMystery,
 }
 

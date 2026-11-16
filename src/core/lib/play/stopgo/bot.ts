@@ -310,5 +310,8 @@ export const decideStopGo = (input: StopGoBotInput): StopGoBotMove | null => {
   if (board.pickerId === botId) return pickMove(input, me, you)
   if (board.turnId !== botId || board.window || board.pickerId) return null
 
+  // The card of the turn is taken before anything else
+  if (you.canDraw) return move(board, 'draw', {})
+
   return turnMove(input, me, you)
 }

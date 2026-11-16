@@ -20,6 +20,7 @@ export interface StopGoCard {
  * @property {boolean} isGreen - Cleared to go
  * @property {StopGoHazard[]} hazards - Suffered, one per type
  * @property {StopGoSafety[]} shields - Safeties laid down for good
+ * @property {StopGoHazard | null} lastHazard - Last malus suffered, it cannot hit again at once
  */
 
 export interface StopGoCar {
@@ -27,6 +28,7 @@ export interface StopGoCar {
   isGreen: boolean
   hazards: StopGoHazard[]
   shields: StopGoSafety[]
+  lastHazard?: StopGoHazard | null
 }
 
 /**
@@ -51,6 +53,7 @@ export const freshCar = (): StopGoCar => ({
   isGreen: !STOPGO_SETTINGS.startsStopped,
   hazards: [],
   shields: [],
+  lastHazard: null,
 })
 
 /**
@@ -79,6 +82,7 @@ export interface StopGoSeatState {
   isGreen: boolean
   hazards: StopGoHazard[]
   shields: StopGoSafety[]
+  lastHazard?: StopGoHazard | null
   strikes: number
   finishedAt: Date | null
   place: number | null

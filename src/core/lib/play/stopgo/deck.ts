@@ -1,4 +1,4 @@
-import { STOPGO_CARD_KEYS } from '@/declarations/play/stopgo/cards'
+import { STOPGO_CARD_KEYS, STOPGO_CARDS, StopGoFamilies } from '@/declarations/play/stopgo/cards'
 import type { StopGoCardKey } from '@/declarations/play/stopgo/cards'
 
 import type { StopGoCard } from '@/core/lib/play/stopgo/state'
@@ -70,14 +70,41 @@ export interface StopGoDraw {
 }
 
 /**
+ * Place of the card to take in the pile, a distance card comes up for the share asked
+ * @param {StopGoCard[]} pile - Draw pile, top last
+ * @param {number | undefined} kmShare - Share of distance cards, 0 to 1, none to take the top
+ * @param {Random} random - Random source
+ * @return {number} - Index in the pile
+ */
+
+const pickIndex = (pile: StopGoCard[], kmShare: number | undefined, random: Random): number => {
+  const top = pile.length - 1
+  if (kmShare === undefined) return top
+  const wantsKm = random() < kmShare
+
+  // Nearest card of the kind wanted from the top, the top itself when none is left
+  for (let index = top; index >= 0; index--) {
+    if ((STOPGO_CARDS[pile[index].key].family === StopGoFamilies.Distance) === wantsKm) return index
+  }
+
+  return top
+}
+
+/**
  * Draw one card
  * @param {StopGoPiles} piles - Current piles
  * @param {number} maxReshuffles - Reshuffle cap
  * @param {Random} random - Random source
+ * @param {number} [kmShare] - Share of distance cards among the cards drawn, 0 to 1
  * @return {StopGoDraw} - Card and piles
  */
 
-export const draw = (piles: StopGoPiles, maxReshuffles: number, random: Random): StopGoDraw => {
+export const draw = (
+  piles: StopGoPiles,
+  maxReshuffles: number,
+  random: Random,
+  kmShare?: number
+): StopGoDraw => {
   let { pile, discard, reshuffles } = piles
 
   // Reshuffle discard under its top
@@ -88,6 +115,10 @@ export const draw = (piles: StopGoPiles, maxReshuffles: number, random: Random):
     discard = discard.slice(-1)
     reshuffles += 1
   }
+  const index = pickIndex(pile, kmShare, random)
 
-  return { card: pile.at(-1) ?? null, piles: { pile: pile.slice(0, -1), discard, reshuffles } }
+  return {
+    card: pile[index] ?? null,
+    piles: { pile: pile.filter((_, at) => at !== index), discard, reshuffles },
+  }
 }

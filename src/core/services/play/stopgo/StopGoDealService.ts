@@ -7,7 +7,6 @@ import { after, openingEnd } from '@/core/lib/play/clock'
 import {
   buildDeck,
   deal,
-  drawFor,
   freshCar,
   secureRandom,
   shuffle,
@@ -18,7 +17,7 @@ import type { EngineSession, EngineStep } from '@/types/play'
 import { StopGoPhases } from '@/utils/constants/play'
 
 /**
- * Open a race: places drawn, deck shuffled, hands dealt, first card drawn
+ * Open a race: places drawn, deck shuffled, hands dealt
  * @param {EngineSession} session - Game
  * @return {Promise<EngineStep>} - Step with the first deadline
  */
@@ -32,10 +31,7 @@ export const openRace = async (session: EngineSession): Promise<EngineStep> => {
     STOPGO_SETTINGS.handSize
   )
 
-  // The first player draws before the count ends
-  const first = drawFor(dealt.pile, [], 0, secureRandom)
-  const hands = { ...dealt.hands }
-  if (first.card) hands[order[0]] = [...hands[order[0]], first.card]
+  const hands = dealt.hands
   const startsAt = openingEnd(new Date(), STOPGO_SETTINGS.countdownSeconds)
   const turnEndsAt = after(startsAt, settings.turnSeconds)
   const car = freshCar()
@@ -59,7 +55,7 @@ export const openRace = async (session: EngineSession): Promise<EngineStep> => {
         turnNo: 1,
         startsAt,
         turnEndsAt,
-        drawPile: first.piles.pile as unknown as Prisma.InputJsonValue,
+        drawPile: dealt.pile as unknown as Prisma.InputJsonValue,
         discard: [],
         reshuffles: 0,
       },
