@@ -6,6 +6,7 @@ import { PlayPrefSwitches } from '@/composites/play/prefs/PlayPrefSwitches'
 import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { PlayVolume } from '@/composites/play/session/PlayVolume'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
+import { useConcordatMeterStore } from '@/core/store/play/concordatMeter'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
 import { useStopGoCameraStore } from '@/core/store/play/stopgoCamera'
 import { usePlayScoreStore } from '@/core/store/play/playScore'
@@ -40,6 +41,9 @@ export const PlayHudKeys = ({ game, sessionId, isSeated }: PlayHudKeysProps) => 
   const ChatIcon = ICONS.playChat
   const ScoreIcon = ICONS.trophy
   const RecenterIcon = ICONS.playRecenter
+  const MeterIcon = ICONS.gauge
+  const isMeterOn = useConcordatMeterStore((state) => state.isOpen)
+  const toggleMeter = useConcordatMeterStore((state) => state.toggle)
   const isScoreOn = usePlayScoreStore((state) => state.isOpen)
   const toggleScore = usePlayScoreStore((state) => state.toggle)
   const recenter = useStopGoCameraStore((state) => state.recenter)
@@ -61,6 +65,18 @@ export const PlayHudKeys = ({ game, sessionId, isSeated }: PlayHudKeysProps) => 
             onClick={recenterConcordat}
           >
             <RecenterIcon className={PLAY_HUD.keyIcon} aria-hidden="true" />
+          </button>
+        )}
+        {game === PlayGames.Concordat && (
+          <button
+            type="button"
+            className={cn(PLAY_HUD.key, isMeterOn && PLAY_HUD.keyOn)}
+            aria-label={CONCORDAT_HUD_COPY.meter}
+            title={CONCORDAT_HUD_COPY.meter}
+            aria-pressed={isMeterOn}
+            onClick={toggleMeter}
+          >
+            <MeterIcon className={PLAY_HUD.keyIcon} aria-hidden="true" />
           </button>
         )}
         {game === PlayGames.StopGo && (

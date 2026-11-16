@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 
 import { ConcordatPanels } from '@/composites/play/concordat/hud/ConcordatPanels'
+import { ConcordatMeter } from '@/composites/play/concordat/hud/ConcordatMeter'
 import { ConcordatZones } from '@/composites/play/concordat/hud/ConcordatZones'
 import { ConcordatPill } from '@/composites/play/concordat/hud/ConcordatPill'
 import { ConcordatNotices } from '@/composites/play/concordat/hud/ConcordatNotices'
@@ -88,6 +89,7 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
       isCompact
     >
       <ConcordatNotices client={client} isSeated={isSeated} />
+      <ConcordatMeter client={client} />
       <ConcordatZones client={client} />
       <ConcordatPanels client={client} names={names} land={land} />
       {isPlaying && (

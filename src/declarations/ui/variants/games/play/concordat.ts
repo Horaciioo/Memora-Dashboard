@@ -99,6 +99,12 @@ export const CONCORDAT_HUD = {
     'pointer-events-none fixed top-0 left-0 z-40 flex size-12 items-center justify-center rounded-[0.2rem] bg-[var(--play-accent)] text-[var(--concordat-plate)] opacity-90 shadow-lg',
   armNote: 'text-[0.6rem] leading-none font-bold tabular-nums opacity-70',
   toolBar: `${BLOCK} pointer-events-auto flex items-center gap-3 px-4 py-2 text-sm font-bold text-[var(--play-ink)]`,
+  // Under the keys, top right
+  meter: `${BLOCK} pointer-events-none absolute top-[4.25rem] right-5 z-[5] flex w-44 flex-col gap-1 px-3 py-2 max-md:top-[calc(4.5rem+env(safe-area-inset-top))] max-md:right-3`,
+  meterRow: 'flex items-baseline justify-between gap-3',
+  meterFigure: 'text-sm leading-none font-bold tabular-nums text-[var(--play-ink)]',
+  meterSlow: 'text-[var(--play-accent)]',
+  meterNote: 'text-[0.65rem] leading-tight font-bold text-[var(--play-ink-soft)]',
   // Under the info card, centred
   notice:
     'pointer-events-none absolute top-[5.75rem] left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 max-md:top-[5.5rem]',
