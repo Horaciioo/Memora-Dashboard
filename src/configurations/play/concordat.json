@@ -241,7 +241,7 @@
   },
   "victory": {
     "dominationShare": 0.8,
-    "dominationSeconds": 10,
+    "dominationSeconds": 0,
     "weights": { "territory": 50, "economy": 25, "achievements": 25 },
     "achievements": { "capital": 10, "alliance": 8, "route": 6, "rare": 5 },
     "rare": ["spices", "metals"]

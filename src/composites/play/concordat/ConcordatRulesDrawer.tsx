@@ -46,7 +46,6 @@ export const ConcordatRulesDrawer = ({ open, onClose, settings }: ConcordatRules
       label: copy.win,
       value: fillPlayMessage(copy.winValue, {
         share: Math.round(CONCORDAT.victory.dominationShare * 100),
-        seconds: CONCORDAT.victory.dominationSeconds,
       }),
     },
   ]

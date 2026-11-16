@@ -68,7 +68,7 @@ export const CONCORDAT_RULES_COPY = {
   mode: 'Format',
   win: 'Victoire',
   winValue:
-    'Tiens {share} % des terres pendant {seconds} secondes, ou aie le meilleur score au bout du temps : territoire, économie, accomplissements.',
+    'Le premier à tenir {share} % des terres gagne, ou le meilleur score au bout du temps : territoire, économie, accomplissements.',
 } as const
 
 /**
