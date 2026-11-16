@@ -151,7 +151,7 @@ export const LEFT_SIDEBAR = {
     'rail-fold ml-auto flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-danger)] text-xs font-bold text-[var(--color-on-solid)]',
   liveBubbleAnchor: 'fixed z-50 size-0',
   // Account footer
-  footer: 'flex shrink-0 px-4 pt-3',
+  footer: 'flex shrink-0 flex-col gap-2 px-4 pt-3',
   // Bare glyph row above the search
   toolbar: 'flex shrink-0 items-center gap-1 px-4 pb-3',
   toolbarButton:
@@ -419,6 +419,20 @@ export const CREATOR_MENU = {
   head: 'flex shrink-0 flex-col items-center gap-1 border-b border-[var(--color-border)] px-4 py-3 text-center',
   body: 'flex flex-col gap-1 p-2',
   divider: 'h-px bg-[var(--color-border)]',
+} as const
+
+/**
+ * Update button above the account box, same width, sunset glass
+ * @type {Record<string, string>}
+ */
+
+export const UPDATE_BUTTON = {
+  wrapper: 'flex min-w-0 flex-col gap-1.5',
+  button:
+    'glass-sunset rail-fold w-full rounded-[var(--radius-xl)] border px-3 py-2 text-center text-sm font-semibold text-[var(--color-on-sunset)] transition-transform hover:brightness-105 active:scale-[0.98] motion-reduce:transition-none',
+  note: 'glass-panel flex flex-col gap-2 rounded-[var(--radius-lg)] border px-3 py-2 text-xs text-[var(--color-ink-muted)]',
+  actions: 'flex items-center justify-end gap-3',
+  link: 'font-semibold text-[var(--color-ink)] transition-colors hover:text-[var(--color-ink-subtle)]',
 } as const
 
 /**

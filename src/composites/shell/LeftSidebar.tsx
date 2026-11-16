@@ -6,6 +6,7 @@ import { CourseRail } from '@/composites/academy/course/player/CourseRail'
 import { CalendarRailPanel, CalendarSearchBar } from '@/composites/calendar/CalendarSidebar'
 import { CalendarRailSwitch } from '@/composites/calendar/CalendarRailSwitch'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
+import { UpdateButton } from '@/composites/shell/UpdateButton'
 import { CreatorAccountMenu } from '@/composites/shell/creator/CreatorAccountMenu'
 import { CreatorPickerButton, CreatorViewPanel } from '@/composites/shell/creator/CreatorSelect'
 import { CreatorSwitch } from '@/composites/shell/creator/CreatorSwitch'
@@ -201,6 +202,7 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
 
       {session && (
         <div className={LEFT_SIDEBAR.footer}>
+          {!isCompact && <UpdateButton />}
           <div className={isCompact ? LEFT_SIDEBAR.footerBare : LEFT_SIDEBAR.footerBox}>
             {viewContext.switchable && !isCompact && (
               <div className={LEFT_SIDEBAR.footerSwitch}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { AccountActions } from '@/composites/shell/account/AccountActions'
 import { LevelFrame } from '@/composites/play/skin/LevelFrame'
@@ -35,6 +36,7 @@ export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMen
   const boundary = useRef<HTMLDivElement>(null)
   const Chevron = ICONS.expand
   const level = usePlayLevel()
+  const isPlay = usePathname().startsWith('/play')
   const unread = useNotificationsStore((state) => state.feed.unread)
 
   const shut = useCallback(() => setOpen(false), [])
@@ -65,7 +67,7 @@ export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMen
         className={cn(CREATOR_MENU.trigger, isCompact && CREATOR_MENU.triggerBare)}
       >
         <span className={CREATOR_MENU.portrait}>
-          {level !== null && !isCompact ? (
+          {level !== null && isPlay && !isCompact ? (
             <LevelFrame
               level={level}
               name={session.displayName}
