@@ -63,12 +63,15 @@ export const PlayFeedRow = ({
 }) => {
   const MarkIcon = ICONS.playClock
   const face = players.find((player) => player.id === entry.accountId)
-  const values = { ...entry.values, victim: nameOf(players, entry.values.victimId) }
+  const values = {
+    ...entry.values,
+    victim: nameOf(players, entry.values.victimId) || String(entry.values.victim ?? ''),
+  }
   const marked = MARKED_VERB.exec(copy[entry.kind])
   const [before, after] = copy[entry.kind].split(MARKED_VERB).filter((_, i) => i !== 1)
   const line = fillPlayMessage(copy[entry.kind].replace(MARKED_VERB, '$1'), values)
   const head = copy[entry.kind].split('{')[0].replace(TRAILING_WORD, '')
-  const verb = face && PLAY_FEED_VERBS[entry.kind] && line.startsWith(head)
+  const verb = (face || entry.values.actor) && PLAY_FEED_VERBS[entry.kind] && line.startsWith(head)
 
   return (
     <li className={BAC_SESSION.feedLine}>
@@ -80,8 +83,10 @@ export const PlayFeedRow = ({
         </span>
       )}
       <span className={BAC_SESSION.feedText}>
-        {face && <span className={BAC_SESSION.feedName}>{face.name} </span>}
-        {face && marked ? (
+        {(face || entry.values.actor) && (
+          <span className={BAC_SESSION.feedName}>{face?.name ?? entry.values.actor} </span>
+        )}
+        {(face || entry.values.actor) && marked ? (
           <>
             {fillPlayMessage(before, values)}
             <span className={cn('font-bold', PLAY_FEED_VERBS[entry.kind])}>{marked[1]}</span>
