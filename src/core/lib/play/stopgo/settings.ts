@@ -8,11 +8,13 @@ import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
  * @typedef {Object} StopGoGameSettings
  * @property {number} target - Distance to reach
  * @property {number} turnSeconds - Clock of a turn
+ * @property {boolean} safeties - Safeties shuffled in the deck
  */
 
 export interface StopGoGameSettings {
   target: number
   turnSeconds: number
+  safeties: boolean
 }
 
 /**
@@ -23,6 +25,7 @@ export interface StopGoGameSettings {
 export const stopGoDefaults = (): StopGoGameSettings => ({
   target: STOPGO_SETTINGS.target,
   turnSeconds: STOPGO_SETTINGS.turnSeconds.initial,
+  safeties: STOPGO_SETTINGS.safeties,
 })
 
 /**
@@ -56,6 +59,7 @@ export const readStopGoSettings = (
       current.turnSeconds,
       STOPGO_SETTINGS.turnSeconds
     ),
+    safeties: typeof raw.safeties === 'boolean' ? raw.safeties : current.safeties,
   }
 
   return settings as unknown as Prisma.InputJsonObject

@@ -10,6 +10,7 @@ import {
   freshCar,
   secureRandom,
   shuffle,
+  deckOf,
   stopGoSettingsOf,
 } from '@/core/lib/play/stopgo'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
@@ -26,7 +27,7 @@ export const openRace = async (session: EngineSession): Promise<EngineStep> => {
   const settings = stopGoSettingsOf(session.settings)
   const order = shuffle(session.players, secureRandom)
   const dealt = deal(
-    shuffle(buildDeck(STOPGO_SETTINGS.deck), secureRandom),
+    shuffle(buildDeck(deckOf(settings.safeties)), secureRandom),
     order,
     STOPGO_SETTINGS.handSize
   )

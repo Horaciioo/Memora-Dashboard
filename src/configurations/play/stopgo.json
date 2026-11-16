@@ -33,12 +33,12 @@
     "min": 15,
     "max": 60
   },
+  "safeties": true,
   "turnStep": 5,
   "strikes": 3,
   "afkSeconds": 5,
   "reshuffles": 2,
   "kmShare": 0.7,
-  "pityShare": 0.5,
   "counter": {
     "seconds": 5
   },

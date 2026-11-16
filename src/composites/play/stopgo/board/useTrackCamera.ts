@@ -11,6 +11,8 @@ export interface TrackCameraOptions {
   getFocusTop: () => number
   // Changes when the car moves or the turn opens
   followKey: string
+  // Changes when another car takes the turn, the camera follows at once
+  turnKey: number
   isActive: boolean
 }
 
@@ -26,11 +28,13 @@ export const useTrackCamera = ({
   scroller,
   getFocusTop,
   followKey,
+  turnKey,
   isActive,
 }: TrackCameraOptions) => {
   const frame = useRef(0)
   const userAt = useRef(0)
   const isFirst = useRef(true)
+  const lastTurn = useRef(turnKey)
   const focus = useRef(getFocusTop)
   useEffect(() => {
     focus.current = getFocusTop
@@ -83,10 +87,14 @@ export const useTrackCamera = ({
     if (!isActive) return
     const isFirstPlacement = isFirst.current
     isFirst.current = false
+    const isNewTurn = lastTurn.current !== turnKey
+    lastTurn.current = turnKey
     const waited = performance.now() - userAt.current
-    if (!isFirstPlacement && waited < STOPGO_SETTINGS.cameraResumeSeconds * 1000) return
+    if (!isFirstPlacement && !isNewTurn && waited < STOPGO_SETTINGS.cameraResumeSeconds * 1000) {
+      return
+    }
     glideTo(focus.current(), isFirstPlacement)
-  }, [followKey, isActive, glideTo])
+  }, [followKey, turnKey, isActive, glideTo])
 
   // HUD key
   useEffect(() => {

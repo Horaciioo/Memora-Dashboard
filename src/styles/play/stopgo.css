@@ -189,6 +189,29 @@
   border: 0.3rem solid var(--stopgo-card);
 }
 
+.stopgo-card-mystery {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.2rem;
+  color: var(--stopgo-gold);
+  font-weight: 900;
+  box-shadow: 0 0 0 0.18rem var(--stopgo-gold);
+  cursor: default;
+}
+.stopgo-card-mystery b {
+  font-size: calc(var(--size, 4.6rem) * 0.5);
+  line-height: 1;
+  text-shadow: 0 0.15rem 0.4rem rgb(0 0 0 / 0.6);
+}
+.stopgo-card-mystery small {
+  font-size: 0.6rem;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.7);
+}
+.stopgo-card-mystery:not(:disabled) {
+  cursor: pointer;
+}
+
 .stopgo-card-empty {
   display: grid;
   place-items: center;
@@ -422,8 +445,8 @@
 /* Deck to take from, collection sheet */
 .stopgo-deck {
   position: absolute;
-  top: 6.5rem;
-  right: 1.75rem;
+  bottom: calc(var(--stopgo-dock-h, 10rem) + 0.8rem);
+  left: 1.75rem;
   z-index: 20;
   display: grid;
   justify-items: center;
@@ -526,6 +549,58 @@
   .stopgo-deck small {
     font-size: 0.7rem;
     text-shadow: 0 1px 3px rgb(0 0 0 / 0.7);
+  }
+}
+
+/* Drivers column, one under the other, where the deck used to rest */
+.stopgo-roster {
+  position: absolute;
+  top: 6.5rem;
+  right: 1.75rem;
+  z-index: 20;
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+.stopgo-roster-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 10rem;
+  padding: 0.35rem 0.8rem 0.35rem 0.35rem;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.45);
+  box-shadow: 0 0 0 0.15rem var(--car);
+}
+.stopgo-roster-row[data-mine] {
+  background: rgb(0 0 0 / 0.65);
+}
+.stopgo-roster-info {
+  display: grid;
+  gap: 0.1rem;
+}
+.stopgo-roster-malus {
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 0.85;
+}
+.stopgo-light[data-light='broken'] {
+  --lamp: var(--stopgo-gold);
+}
+@media (max-width: 767px) {
+  /* Phone: the rival row and the deck light already say it */
+  .stopgo-roster {
+    display: none;
+  }
+}
+@media (min-width: 768px) {
+  /* Desktop: the light lives in the column */
+  .stopgo-deck .stopgo-light {
+    display: none;
   }
 }
 
@@ -894,4 +969,196 @@
     animation: none;
     offset-distance: 45%;
   }
+}
+
+/* Turn call: asphalt road sign with a dashed line, gold on the step to do */
+.stopgo-cue-splash {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  z-index: 40;
+  padding: 0.9rem 2.2rem;
+  border: 0.22rem solid var(--stopgo-line);
+  border-radius: 1rem;
+  background: var(--stopgo-asphalt-deep);
+  color: var(--stopgo-gold);
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 0.3rem var(--stopgo-gold),
+    0 1.2rem 2.4rem rgb(0 0 0 / 0.45);
+  animation: stopgo-cue-sign 1.9s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.stopgo-cue-splash::after {
+  content: '';
+  position: absolute;
+  inset: auto 1.2rem 0.35rem;
+  border-top: 0.2rem dashed rgb(255 255 255 / 0.45);
+}
+@keyframes stopgo-cue-sign {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 1.5rem) scale(0.6) rotate(-4deg);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.08) rotate(1.5deg);
+  }
+  28%,
+  78% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -1rem) scale(0.9);
+  }
+}
+
+/* Steps above the hand */
+.stopgo-cue {
+  position: absolute;
+  bottom: calc(var(--stopgo-dock-h, 12rem) + 0.7rem);
+  left: 50%;
+  z-index: 25;
+  transform: translateX(-50%);
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: var(--stopgo-line);
+}
+.stopgo-cue-hit {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  z-index: 45;
+  display: grid;
+  gap: 0.25rem;
+  max-width: min(90vw, 24rem);
+  padding: 0.8rem 1.4rem;
+  border: 0.22rem solid var(--stopgo-line);
+  border-radius: 1rem;
+  background: var(--stopgo-asphalt-deep);
+  color: var(--stopgo-line);
+  text-align: center;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 0.3rem #e5484d,
+    0 1.2rem 2.4rem rgb(0 0 0 / 0.45);
+  animation: stopgo-cue-sign 4.2s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.stopgo-cue-hit b {
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+.stopgo-cue-hit span {
+  font-size: 0.85rem;
+}
+.stopgo-cue-steps {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.stopgo-cue-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem 0.35rem 0.4rem;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.5);
+  opacity: 0.55;
+}
+.stopgo-cue-step b {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.18);
+}
+.stopgo-cue-step-on {
+  background: var(--stopgo-gold);
+  color: var(--stopgo-asphalt-deep);
+  opacity: 1;
+  animation: stopgo-cue-beat 1.1s ease-in-out infinite;
+}
+.stopgo-cue-step-on b {
+  background: var(--stopgo-asphalt-deep);
+  color: var(--stopgo-gold);
+}
+.stopgo-cue-step-done b {
+  background: var(--stopgo-car-green);
+  color: #fff;
+}
+.stopgo-cue-wait {
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.45);
+  opacity: 0.85;
+}
+@keyframes stopgo-cue-beat {
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Hand waits for the card of the turn */
+.stopgo-hand-await .stopgo-hand {
+  opacity: 0.5;
+  filter: saturate(0.6);
+}
+.stopgo-deck-ready .stopgo-deck-info small {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--stopgo-gold);
+  color: var(--stopgo-asphalt-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stopgo-cue-splash {
+    animation-duration: 0.01s;
+    animation-delay: 1.9s;
+  }
+  .stopgo-cue-step-on {
+    animation: none;
+  }
+}
+
+/* Card of the turn to take: the deck comes to the middle of the screen, under the turn sign */
+.stopgo-deck.stopgo-deck-ready {
+  top: 46%;
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  translate: -50% 0;
+  scale: 1.35;
+  transform-origin: 50% 0;
+  grid-auto-flow: row;
+  justify-items: center;
+  animation: stopgo-deck-float 4s ease-in-out infinite;
+}
+.stopgo-deck.stopgo-deck-ready .stopgo-deck-stack {
+  width: 4.6rem;
+  height: 6.4rem;
+}
+.stopgo-deck.stopgo-deck-ready .stopgo-deck-card .stopgo-card {
+  --size: 4.6rem;
+}
+.stopgo-deck.stopgo-deck-ready .stopgo-deck-info {
+  justify-items: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stopgo-deck.stopgo-deck-ready {
+    animation: none;
+  }
+}
+
+/* Broken down: the light stays on, amber */
+.stopgo-light[data-light='broken'] {
+  --lamp: var(--stopgo-gold);
 }

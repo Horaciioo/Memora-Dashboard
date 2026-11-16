@@ -68,7 +68,9 @@ export const StopGoBoard = ({
     [slotKey]
   )
   const mine = players.find(({ accountId }) => accountId === viewerId)
-  const focusKm = mine?.km ?? Math.max(...players.map(({ km }) => km))
+  // The camera rides the car on turn, the own one while nobody plays
+  const holder = players.find(({ accountId }) => accountId === board.turnId) ?? mine
+  const focusKm = holder?.km ?? Math.max(...players.map(({ km }) => km))
   const focusMap = Math.min(plan.maps.length - 1, Math.floor(focusKm / STOPGO_SETTINGS.mapKm))
   // Road and signs are cheap, scenery only near the car
   const allMaps = useMemo(() => plan.maps.map((_, index) => index), [plan])
@@ -98,6 +100,7 @@ export const StopGoBoard = ({
     scroller,
     getFocusTop,
     followKey: `${focusKm}:${board.turnNo}`,
+    turnKey: board.turnNo,
     isActive: true,
   })
 

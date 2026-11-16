@@ -151,7 +151,6 @@ export const dropDrawn = (
  * @param {StopGoCard[]} discard - Discard
  * @param {number} reshuffles - Reshuffles done
  * @param {Random} random - Random source
- * @param {StopGoCardKey[]} [needs] - Remedies the player needs to roll again
  * @return {ReturnType<typeof draw>} - Card and piles
  */
 
@@ -159,10 +158,6 @@ export const drawFor = (
   pile: StopGoCard[],
   discard: StopGoCard[],
   reshuffles: number,
-  random: Random,
-  needs: StopGoCardKey[] = []
+  random: Random
 ): ReturnType<typeof draw> =>
-  draw({ pile, discard, reshuffles }, STOPGO_SETTINGS.reshuffles, random, STOPGO_SETTINGS.kmShare, {
-    keys: needs,
-    share: STOPGO_SETTINGS.pityShare,
-  })
+  draw({ pile, discard, reshuffles }, STOPGO_SETTINGS.reshuffles, random, STOPGO_SETTINGS.kmShare)

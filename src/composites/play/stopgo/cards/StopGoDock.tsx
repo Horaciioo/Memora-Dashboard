@@ -7,8 +7,12 @@ import { StopGoHand } from '@/composites/play/stopgo/cards/StopGoHand'
 import { StopGoCounter } from '@/composites/play/stopgo/cards/StopGoCounter'
 import { useFoldSlide } from '@/composites/play/stopgo/cards/useFoldSlide'
 import { StopGoPick } from '@/composites/play/stopgo/cards/StopGoPick'
+import { lightOf } from '@/composites/play/stopgo/cards/lights'
+import { StopGoRoster } from '@/composites/play/stopgo/cards/StopGoRoster'
 import { StopGoRivalRow } from '@/composites/play/stopgo/cards/StopGoRivalRow'
 import { StopGoPiles } from '@/composites/play/stopgo/cards/StopGoPiles'
+import { StopGoHitCue } from '@/composites/play/stopgo/cards/StopGoHitCue'
+import { StopGoTurnCue } from '@/composites/play/stopgo/cards/StopGoTurnCue'
 import { StopGoTray } from '@/composites/play/stopgo/cards/StopGoTray'
 import { reasonOf } from '@/composites/play/stopgo/cards/reasons'
 import { useDockHeight } from '@/composites/play/stopgo/cards/useDockHeight'
@@ -126,12 +130,31 @@ export const StopGoDock = ({
         pileCount={board.pileCount}
         isWaiting={isWaiting}
         isSaving={moves.isSaving}
-        isGreen={me.isMoving}
+        light={lightOf(me)}
         onDraw={() => void moves.draw()}
+      />
+      <StopGoRoster
+        viewerId={viewerId}
+        entries={players.map((player, lane) => ({
+          id: player.accountId,
+          name: names[player.accountId] ?? '',
+          avatar: avatars[player.accountId] ?? null,
+          color: colors[lane],
+          light: lightOf(player),
+          hazards: player.hazards,
+        }))}
+      />
+      <StopGoHitCue hazards={me.hazards} />
+      <StopGoTurnCue
+        isTurn={isTurn}
+        isWaiting={isWaiting}
+        turnNo={board.turnNo}
+        holderName={names[board.turnId ?? ''] ?? ''}
+        isLive={isLive && !window && !board.pickerId}
       />
       <div ref={dockRef} className={cn(STOPGO_HAND.dock, isFolded && STOPGO_HAND.dockFolded)}>
         <StopGoRivalRow rivals={rivals} avatars={avatars} />
-        <div className={STOPGO_HAND.handBox}>
+        <div className={cn(STOPGO_HAND.handBox, isWaiting && STOPGO_HAND.handAwait)}>
           <button
             type="button"
             className={cn(STOPGO_HAND.fold, isFolded && STOPGO_HAND.foldShut)}
@@ -197,6 +220,9 @@ export const StopGoDock = ({
                 chosenId={chosenId}
                 isTurn={isPlaying}
                 isOpening={board.turnNo === 1}
+                sealedCount={you.sealedCount}
+                canReveal={you.canReveal && isTurn}
+                onReveal={moves.reveal}
                 onChoose={isFolded ? noop : setChosenId}
                 onQuickPlay={isFolded ? noop : quickPlay}
               />
