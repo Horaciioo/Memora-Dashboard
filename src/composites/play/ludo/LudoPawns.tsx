@@ -155,7 +155,7 @@ const blindSpot = (
 
 export interface LudoPawnsProps {
   map: LudoMap
-  players: { accountId: string; corner: number }[]
+  players: { accountId: string; corner: number; avatarUrl?: string | null }[]
   pawns: Record<string, number[]>
   turns: number
   viewerId: string
@@ -269,6 +269,11 @@ export const LudoPawns = ({
           <LudoPawn
             key={isHopping ? hop.key : 'still'}
             colour={colour}
+            avatarUrl={
+              looks[spot.accountId] === undefined
+                ? players.find((player) => player.accountId === spot.accountId)?.avatarUrl
+                : null
+            }
             className={cn(
               isHopping && LUDO_PIECES.pawnHop,
               isGhost && LUDO_CHAOS_PIECES.pawnGhost,
