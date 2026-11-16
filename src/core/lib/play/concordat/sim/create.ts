@@ -10,6 +10,7 @@ import { transferTile } from '@/core/lib/play/concordat/sim/tiles'
 import { CONCORDAT, CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
 import type { ConcordatMap, ConcordatPlayerState, ConcordatState } from '@/types/concordat'
 import {
+  CONCORDAT_WEAPONS,
   ConcordatModes,
   ConcordatPhases,
   ConcordatPowers,
@@ -19,6 +20,7 @@ import type {
   ConcordatDifficultyName,
   ConcordatModeName,
   ConcordatSizeName,
+  ConcordatWeaponName,
 } from '@/utils/constants/concordat'
 
 /**
@@ -37,6 +39,8 @@ export interface ConcordatGameRequest {
   protectionSeconds?: number
   // Format, free for all by default
   mode?: ConcordatModeName
+  // Weapons allowed, all by default
+  weapons?: ConcordatWeaponName[]
   // Teams of a team format
   teams?: number
   // Fill the map with countries and tribes
@@ -129,6 +133,7 @@ export const createGame = (request: ConcordatGameRequest): ConcordatState => {
     speed: request.speed,
     pickEnd: toTicks(CONCORDAT.pickSeconds),
     endTick: 0,
+    weapons: [],
     protectionTicks: toTicks(
       Math.max(
         request.protectionSeconds ?? CONCORDAT.protectionSeconds,
@@ -146,9 +151,13 @@ export const createGame = (request: ConcordatGameRequest): ConcordatState => {
     ...freshSystems(total),
   }
   state.mode = mode
+  state.weapons = request.weapons ?? [...CONCORDAT_WEAPONS]
   state.temper = request.populate?.difficulty
   state.teamCount = request.teams ?? rules.teams
-  state.endTick = state.pickEnd + toTicks(request.durationMinutes * rules.durationFactor * 60)
+  // Zero length, no end by time
+  state.endTick = request.durationMinutes
+    ? state.pickEnd + toTicks(request.durationMinutes * rules.durationFactor * 60)
+    : 0
 
   // Shuffled starts, one per seat
   const starts = crowd ? crowd.humanStarts : [...map.starts]

@@ -47,8 +47,12 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
     [client.map.terrain]
   )
   const isPicking = client.phase === ConcordatPhases.Picking
+  // No time limit, the clock counts up from the start
+  const isCountingUp = !isPicking && client.endTick === 0
   const lastTick = isPicking ? client.pickEnd : client.endTick
-  const seconds = (lastTick - client.tick) / CONCORDAT_TICKS_PER_SECOND
+  const seconds =
+    (isCountingUp ? client.tick - client.pickEnd : lastTick - client.tick) /
+    CONCORDAT_TICKS_PER_SECOND
 
   const blocks = [{ key: 'clock', caption: CONCORDAT_HUD_COPY.time, figure: clockText(seconds) }]
   const figures = me

@@ -129,6 +129,11 @@ export const ConcordatStyles = {
 
 export type ConcordatStyleName = (typeof ConcordatStyles)[keyof typeof ConcordatStyles]
 
+// Region drawn at launch
+export const CONCORDAT_RANDOM_STYLE = 'random'
+
+export type ConcordatStyleChoice = ConcordatStyleName | typeof CONCORDAT_RANDOM_STYLE
+
 // Strategic spots
 export const ConcordatChokes = {
   Strait: 'strait',
@@ -311,6 +316,15 @@ export type ConcordatStrikeKind = (typeof ConcordatStrikeKinds)[keyof typeof Con
 
 export const CONCORDAT_STRIKE_ORDER: readonly ConcordatStrikeKind[] =
   Object.values(ConcordatStrikeKinds)
+
+/**
+ * Weapons a host can switch off, in arsenal order
+ * @type {readonly string[]}
+ */
+
+export const CONCORDAT_WEAPONS = ['missile', 'heavy', 'shell', 'rocket', 'heli', 'fighter'] as const
+
+export type ConcordatWeaponName = (typeof CONCORDAT_WEAPONS)[number]
 
 // Aircraft a base sends up
 export const ConcordatAirKinds = {

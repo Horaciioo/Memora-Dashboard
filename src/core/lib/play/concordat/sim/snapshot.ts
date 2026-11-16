@@ -1,5 +1,5 @@
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
-import { ConcordatModes, ConcordatPowers } from '@/utils/constants/concordat'
+import { CONCORDAT_WEAPONS, ConcordatModes, ConcordatPowers } from '@/utils/constants/concordat'
 import { rebuildDerived } from '@/core/lib/play/concordat/sim/tiles'
 import { emptyArms, emptyEffects, emptyTech } from '@/core/lib/play/concordat/sim/fresh'
 import type {
@@ -64,6 +64,7 @@ export interface ConcordatSnapshot {
   history?: ConcordatSample[]
   log?: ConcordatEvent[]
   mode?: ConcordatState['mode']
+  weapons?: ConcordatState['weapons']
   temper?: ConcordatState['temper']
   teamCount?: number
   teams?: number[]
@@ -112,6 +113,7 @@ export const exportState = (state: ConcordatState): ConcordatSnapshot => ({
   history: structuredClone(state.history),
   log: structuredClone(state.log),
   mode: state.mode,
+  weapons: [...state.weapons],
   temper: state.temper,
   teamCount: state.teamCount,
   teams: [...state.teams],
@@ -172,6 +174,7 @@ export const importState = (map: ConcordatMap, snapshot: ConcordatSnapshot): Con
     history: snapshot.history ?? [],
     log: snapshot.log ?? [],
     mode: snapshot.mode ?? ConcordatModes.Free,
+    weapons: snapshot.weapons ?? [...CONCORDAT_WEAPONS],
     temper: snapshot.temper,
     teamCount: snapshot.teamCount ?? 0,
     teams: snapshot.teams ?? snapshot.players.map(() => 0),

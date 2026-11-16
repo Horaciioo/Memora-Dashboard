@@ -1,4 +1,5 @@
 import {
+  CONCORDAT_RANDOM_STYLE,
   ConcordatDifficulties,
   ConcordatModes,
   ConcordatSizes,
@@ -7,6 +8,7 @@ import {
 } from '@/utils/constants/concordat'
 import type {
   ConcordatDifficultyName,
+  ConcordatStyleChoice,
   ConcordatModeName,
   ConcordatSizeName,
   ConcordatSpeedName,
@@ -21,7 +23,14 @@ import type {
 export const CONCORDAT_SETUP_COPY = {
   title: 'Nouvelle partie de Concordat',
   tabs: 'Réglages de la partie',
-  tabRules: 'Règles',
+  tabGame: 'Partie',
+  tabMap: 'Carte',
+  tabPace: 'Rythme',
+  tabWeapons: 'Armes',
+  weapons: 'Armes autorisées',
+  weaponsHint: 'Les armes décochées sont interdites pour tous les joueurs de la partie.',
+  allWeapons: 'Toutes',
+  noWeapons: 'Aucune',
   size: 'Taille de la carte',
   sizeHint: 'Une grande carte laisse plus de place, mais la partie dure plus longtemps.',
   style: 'Région du monde',
@@ -32,7 +41,11 @@ export const CONCORDAT_SETUP_COPY = {
   speed: 'Vitesse',
   speedHint: 'Toute la partie, troupes et conquêtes, tourne plus ou moins vite.',
   duration: 'Durée',
-  durationHint: 'Au bout du temps, le meilleur score gagne.',
+  durationHint:
+    'Au bout du temps, le meilleur score gagne. Illimitée, la partie dure jusqu’à une victoire.',
+  unlimited: 'Illimitée',
+  randomMark: '?',
+  limited: 'Limitée',
   mode: 'Format',
   modeHint: 'Chacun pour soi, en équipes, en équipes qui changent, classé ou détendu.',
   teams: 'Équipes',
@@ -56,6 +69,7 @@ export const CONCORDAT_SETUP_COPY = {
 export const CONCORDAT_RULES_COPY = {
   title: 'Règles de la partie',
   map: 'Carte',
+  weapons: 'Armes',
   speed: 'Vitesse',
   duration: 'Durée',
   protection: 'Protection de départ',
@@ -95,6 +109,16 @@ export const CONCORDAT_STYLE_LABELS: Record<ConcordatStyleName, string> = {
   [ConcordatStyles.Americas]: 'Amériques',
   [ConcordatStyles.Mediterranean]: 'Méditerranée',
   [ConcordatStyles.Oceania]: 'Océanie',
+}
+
+/**
+ * Region labels with the random draw
+ * @type {Record<ConcordatStyleChoice, string>}
+ */
+
+export const CONCORDAT_STYLE_CHOICE_LABELS: Record<ConcordatStyleChoice, string> = {
+  ...CONCORDAT_STYLE_LABELS,
+  [CONCORDAT_RANDOM_STYLE]: 'Aléatoire',
 }
 
 /**
@@ -162,6 +186,7 @@ export const CONCORDAT_REFUSALS: Record<string, string> = {
   notYours: 'Un hélicoptère garde une de tes terres.',
   heliMax: 'Tu as déjà tes hélicoptères en l’air.',
   noMissile: 'Aucun missile en stock.',
+  weaponOff: 'Cette arme est interdite dans cette partie.',
   heavyOff: 'L’arme lourde est interdite dans ce format.',
   siloLevel: 'Il faut un silo de niveau 3.',
   heavySpent: 'Ton arme lourde est déjà partie.',

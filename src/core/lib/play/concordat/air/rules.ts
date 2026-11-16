@@ -59,6 +59,7 @@ export const sortieRefusal = (
   intent: Extract<ConcordatIntent, { kind: 'sortie' }>
 ): string | null => {
   if (!weaponsOn(state)) return 'featureOff'
+  if (!state.weapons.includes(intent.air)) return 'weaponOff'
   if (state.tick < state.pickEnd + ticksOf(air.unlockMinutes * 60)) return 'tooEarly'
   if (!Number.isInteger(intent.tile) || intent.tile < 0 || intent.tile >= state.owner.length)
     return 'badTile'

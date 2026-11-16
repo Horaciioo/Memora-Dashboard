@@ -19,6 +19,8 @@ import {
   CONCORDAT_BUILDING_TITLES,
   CONCORDAT_HUD_COPY,
 } from '@/declarations/play/concordat/hudCopy'
+import { CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
+import type { ConcordatWeaponName } from '@/utils/constants/concordat'
 import { CONCORDAT, CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
@@ -65,7 +67,7 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
     time: clockText(waitTicks / CONCORDAT_TICKS_PER_SECOND),
   })
 
-  const slots: Slot[] = [
+  const allSlots: Slot[] = [
     ...CONCORDAT_BUILDING_ORDER.map((kind): Slot => {
       const cost = buildCostOf(client, kind)
 
@@ -111,6 +113,13 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
       tool: { kind: 'sortie', air: kind },
     })),
   ]
+
+  // Buildings stay, a weapon the host banned goes
+  const slots = allSlots.filter(
+    (slot) =>
+      !CONCORDAT_WEAPONS.some((weapon) => weapon === slot.key) ||
+      client.weapons.includes(slot.key as ConcordatWeaponName)
+  )
 
   // Digit keys arm a slot, the same key or Escape puts it back
   useEffect(() => {

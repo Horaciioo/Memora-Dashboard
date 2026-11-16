@@ -19,7 +19,12 @@ import type {
   ConcordatSample,
   ConcordatState,
 } from '@/types/concordat'
-import type { ConcordatPhaseName, ConcordatPowerName } from '@/utils/constants/concordat'
+import { CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
+import type {
+  ConcordatPhaseName,
+  ConcordatPowerName,
+  ConcordatWeaponName,
+} from '@/utils/constants/concordat'
 
 // Protocol version of a board
 export const BOARD_VERSION = 2
@@ -51,6 +56,8 @@ export interface ConcordatBoard {
   endTick: number
   pickEnd: number
   speed: number
+  // Weapons allowed, missing on an old board
+  weapons?: ConcordatWeaponName[]
   // Nation of the reader, zero for a spectator
   me: number
   // Base64 of the encoded map
@@ -140,6 +147,7 @@ export const sharedBoardOf = (
     endTick: state.endTick,
     pickEnd: state.pickEnd,
     speed: state.speed,
+    weapons: state.weapons,
     map,
     owner: toBase64(encodeOwner(state.owner)),
     players: state.players.map((player) => ({
@@ -187,6 +195,7 @@ export interface ConcordatClientState {
   endTick: number
   pickEnd: number
   speed: number
+  weapons: ConcordatWeaponName[]
   me: number
   map: ConcordatMap
   owner: Uint8Array
@@ -230,6 +239,7 @@ export const clientFromBoard = (board: ConcordatBoard): ConcordatClientState => 
     endTick: board.endTick,
     pickEnd: board.pickEnd,
     speed: board.speed,
+    weapons: board.weapons ?? [...CONCORDAT_WEAPONS],
     me: board.me,
     map,
     owner: decodeOwner(fromBase64(board.owner), map.terrain.length),

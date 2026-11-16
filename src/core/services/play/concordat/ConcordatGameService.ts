@@ -36,9 +36,10 @@ import {
 } from '@/core/services/play/concordat/ConcordatStore'
 import { CONCORDAT, CONCORDAT_ERRORS, CONCORDAT_REFUSALS } from '@/declarations/play'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
+import { CONCORDAT_SETTINGS } from '@/declarations/play/concordat/settings'
 import type { EngineSession, EngineStep } from '@/types/play'
 import type { ConcordatMap, ConcordatState } from '@/types/concordat'
-import { ConcordatPhases } from '@/utils/constants/concordat'
+import { CONCORDAT_RANDOM_STYLE, ConcordatPhases } from '@/utils/constants/concordat'
 import type { ConcordatBotLevelName } from '@/utils/constants/concordat'
 import { SECOND_MS } from '@/utils/constants/time'
 
@@ -75,11 +76,16 @@ const mapFor = (session: EngineSession): { map: ConcordatMap; seed: number } => 
   const firstSeed = settings.seed ?? randomInt(0, 2_000_000_000)
 
   for (let attempt = 0; attempt < MAP_ATTEMPTS; attempt++) {
+    // A random region is drawn again on every attempt
+    const style =
+      settings.style === CONCORDAT_RANDOM_STYLE
+        ? CONCORDAT_SETTINGS.styles[randomInt(0, CONCORDAT_SETTINGS.styles.length)]
+        : settings.style
     const seed = (firstSeed + attempt) % 2_000_000_000
     const map = generateMap({
       seed,
       size: settings.size,
-      style: settings.style,
+      style,
       actors: session.players.length + EXTRA_STARTS,
     })
     if (map.starts.length >= session.players.length) return { map, seed }
@@ -106,6 +112,7 @@ export const openGame = async (session: EngineSession): Promise<EngineStep> => {
     protectionSeconds: settings.protectionMinutes * 60,
     mode: settings.mode,
     teams: settings.teams,
+    weapons: settings.weapons,
     populate: { size: settings.size, difficulty: settings.difficulty },
   })
 
@@ -114,7 +121,7 @@ export const openGame = async (session: EngineSession): Promise<EngineStep> => {
       sessionId: session.id,
       seed,
       size: settings.size,
-      style: settings.style,
+      style: map.style,
       speed: settings.speed,
       durationMinutes: settings.durationMinutes,
       map: encodeMap(map),

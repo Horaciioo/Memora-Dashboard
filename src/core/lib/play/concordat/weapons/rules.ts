@@ -137,6 +137,8 @@ export const launchRefusal = (
   intent: Extract<ConcordatIntent, { kind: 'launch' }>
 ): string | null => {
   if (!weaponsOn(state)) return 'featureOff'
+  const weapon = intent.weapon ?? (intent.heavy ? 'heavy' : 'missile')
+  if (!state.weapons.includes(weapon)) return 'weaponOff'
   const isGun = intent.weapon === 'shell' || intent.weapon === 'rocket'
   const unlock = isGun ? air.unlockMinutes : weapons.unlockMinutes
   if (state.tick < state.pickEnd + ticksOf(unlock * 60)) return 'tooEarly'

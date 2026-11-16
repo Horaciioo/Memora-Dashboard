@@ -6,12 +6,14 @@ import {
   CONCORDAT_SETTINGS,
   CONCORDAT_TEAMS,
 } from '@/declarations/play/concordat/settings'
+import { CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
 import type {
   ConcordatDifficultyName,
   ConcordatModeName,
   ConcordatSizeName,
   ConcordatSpeedName,
-  ConcordatStyleName,
+  ConcordatStyleChoice,
+  ConcordatWeaponName,
 } from '@/utils/constants/concordat'
 
 /**
@@ -22,13 +24,14 @@ import type {
 
 export interface ConcordatGameSettings {
   size: ConcordatSizeName
-  style: ConcordatStyleName
+  style: ConcordatStyleChoice
   speed: ConcordatSpeedName
   difficulty: ConcordatDifficultyName
   durationMinutes: number
   protectionMinutes: number
   mode: ConcordatModeName
   teams: number
+  weapons: ConcordatWeaponName[]
   seed: number | null
 }
 
@@ -45,10 +48,11 @@ export const concordatDefaults = (): ConcordatGameSettings => ({
   style: CONCORDAT_SETTINGS.initialStyle,
   speed: CONCORDAT_SETTINGS.initialSpeed,
   difficulty: CONCORDAT_SETTINGS.initialDifficulty,
-  durationMinutes: CONCORDAT_SETTINGS.duration.initial,
+  durationMinutes: CONCORDAT_SETTINGS.unlimited,
   protectionMinutes: CONCORDAT_PROTECTION.initial,
   mode: CONCORDAT_SETTINGS.initialMode,
   teams: CONCORDAT_TEAMS.initial,
+  weapons: [...CONCORDAT_WEAPONS],
   seed: null,
 })
 
@@ -67,6 +71,16 @@ export const concordatSettingsOf = (stored: Prisma.JsonValue): ConcordatGameSett
 const pickOne = <T extends string>(asked: unknown, allowed: readonly T[], current: T): T =>
   allowed.includes(asked as T) ? (asked as T) : current
 
+// Unlimited, else a length within the range
+const readDuration = (asked: number | undefined, current: number): number =>
+  asked === CONCORDAT_SETTINGS.unlimited
+    ? asked
+    : clampToRange(
+        asked,
+        current || CONCORDAT_SETTINGS.duration.initial,
+        CONCORDAT_SETTINGS.duration
+      )
+
 /**
  * Settings asked by the host
  * @param {Record<string, unknown>} raw - Body
@@ -82,14 +96,10 @@ export const readConcordatSettings = (
   const seed = 'seed' in raw ? readBodyInteger(raw, 'seed') : undefined
   const settings: ConcordatGameSettings = {
     size: pickOne(raw.size, CONCORDAT_SETTINGS.sizes, current.size),
-    style: pickOne(raw.style, CONCORDAT_SETTINGS.styles, current.style),
+    style: pickOne(raw.style, CONCORDAT_SETTINGS.styleChoices, current.style),
     speed: pickOne(raw.speed, CONCORDAT_SETTINGS.speeds, current.speed),
     difficulty: pickOne(raw.difficulty, CONCORDAT_SETTINGS.difficulties, current.difficulty),
-    durationMinutes: clampToRange(
-      readBodyInteger(raw, 'durationMinutes'),
-      current.durationMinutes,
-      CONCORDAT_SETTINGS.duration
-    ),
+    durationMinutes: readDuration(readBodyInteger(raw, 'durationMinutes'), current.durationMinutes),
     protectionMinutes: clampToRange(
       readBodyInteger(raw, 'protectionMinutes'),
       current.protectionMinutes,
@@ -97,6 +107,9 @@ export const readConcordatSettings = (
     ),
     mode: pickOne(raw.mode, CONCORDAT_SETTINGS.modes, current.mode),
     teams: clampToRange(readBodyInteger(raw, 'teams'), current.teams, CONCORDAT_TEAMS),
+    weapons: Array.isArray(raw.weapons)
+      ? CONCORDAT_WEAPONS.filter((weapon) => (raw.weapons as unknown[]).includes(weapon))
+      : current.weapons,
     // An empty seed asks for a draw
     seed:
       'seed' in raw

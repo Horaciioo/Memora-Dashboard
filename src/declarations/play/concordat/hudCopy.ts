@@ -23,8 +23,7 @@ export const CONCORDAT_HUD_COPY = {
     'Clique sur une terre libre pour poser ta nation. Tu peux le déplacer jusqu’à la fin du compte à rebours.',
   pickSpectator: 'Les nations choisissent leur départ.',
   landLockedTitle: 'Plus de voisin par terre',
-  landLockedHint:
-    'Construis un port, puis envoie tes troupes par la mer vers une autre terre.',
+  landLockedHint: 'Construis un port, puis envoie tes troupes par la mer vers une autre terre.',
   pickClock: 'Départ dans {seconds} s',
   engage: 'Engagement',
   engageHint: 'Part de tes troupes envoyée à chaque clic.',

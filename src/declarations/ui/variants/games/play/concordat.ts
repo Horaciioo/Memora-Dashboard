@@ -8,6 +8,21 @@ import { SETUP_INDIGO } from '@/declarations/ui/variants/games/play/shared'
 
 export const CONCORDAT_SETUP = setupStyles(SETUP_INDIGO)
 
+/**
+ * Pictures of the setup tiles: region silhouette and size dots
+ * @type {Record<string, string>}
+ */
+
+export const CONCORDAT_SETUP_ART = {
+  region:
+    'block h-full w-full bg-current [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]',
+  blurred: 'blur-[3px] opacity-70',
+  random: 'relative grid size-full place-items-center',
+  mark: 'absolute text-4xl leading-none font-black text-white [text-shadow:0_1px_8px_rgb(0_0_0/0.6)]',
+  dots: 'grid gap-1',
+  dot: 'size-1.5 rounded-full bg-current',
+} as const
+
 const BLOCK = 'play-hud-block'
 const CAPTION =
   'text-[0.65rem] leading-none font-bold tracking-[0.2em] text-[var(--play-ink)] uppercase'

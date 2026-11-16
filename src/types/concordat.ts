@@ -20,6 +20,7 @@ import type {
   ConcordatPhaseName,
   ConcordatResourceName,
   ConcordatStyleName,
+  ConcordatWeaponName,
 } from '@/utils/constants/concordat'
 
 /**
@@ -477,6 +478,8 @@ export interface ConcordatState {
   history: ConcordatSample[]
   log: ConcordatEvent[]
   mode: ConcordatModeName
+  // Weapons allowed in this game
+  weapons: ConcordatWeaponName[]
   // Temper of the AI powers, normal when missing
   temper?: ConcordatDifficultyName
   // Teams drawn at the start, zero when none
