@@ -61,6 +61,9 @@ export const STOPGO_ERRORS: Record<StopGoRefusal, string> = {
   noSealed: 'Aucune carte scellée à révéler.',
   pileEmpty: 'La pioche est vide.',
   notPicking: 'Aucune pioche en cours.',
+  sameMalus: 'Cet adversaire vient déjà de subir ce malus.',
+  alreadyDrawn: 'Tu as déjà pioché ce tour.',
+  mustDraw: 'Pioche d’abord ta carte du tour.',
 }
 
 /**
@@ -96,12 +99,18 @@ export const STOPGO_RULES_COPY = {
   start: 'Départ',
   startStopped: 'Tu démarres à l’arrêt, il te faut un Feu vert.',
   startRolling: 'Tu démarres déjà en roulant.',
+  draw: 'Pioche',
+  drawValue:
+    'À ton tour, tu prends toi-même ta carte sur la pioche avant de jouer. {share} % des cartes tirées sont des cartes de distance.',
   distances: 'Cartes de distance',
   distancesValue: '{list} km. Tu en poses une par tour.',
   finish: 'Arrivée',
   finishValue: 'Il faut arriver pile sur la distance, sans la dépasser.',
   attacks: 'Attaques',
   attacksValue: '{list}. Chaque adversaire subit un seul malus de chaque type.',
+  sameMalus: 'Même malus',
+  sameMalusValue:
+    'Un adversaire ne subit jamais deux fois d’affilée le même malus, même réparé entre-temps.',
   limit: 'Limitation',
   limitValue: 'Tu ne peux plus poser que {km} km par carte.',
   accident: 'Accident',
@@ -117,7 +126,7 @@ export const STOPGO_RULES_COPY = {
     '{list}. Elles se piochent comme les autres cartes, toujours une seule de chaque. Posée à ton tour, une protection lève le malus qu’elle bloque, te protège pour toute la course et te fait repiocher puis rejouer.',
   counter: 'Parade éclair',
   counterValue:
-    'Si on t’attaque alors que tu gardes en main la protection qui correspond, tu as {seconds} s pour la poser : l’attaque tombe, tu repioches aussitôt et tu joues juste après. Rien n’indique qui en détient une.',
+    'Si on t’attaque alors que tu gardes en main la protection qui correspond, tu as {seconds} s pour la poser : l’attaque tombe, tu joues juste après et tu pioches en premier. Rien n’indique qui en détient une.',
   strikes: 'Tours manqués',
   strikesValue: 'Après {count} tours manqués d’affilée, ton tour ne dure plus que {seconds} s.',
 } as const
@@ -141,6 +150,9 @@ export const STOPGO_HAND_COPY = {
   pile: 'Pioche',
   draw: 'Piocher',
   drawHint: 'Prends ta carte du tour.',
+  drawFirst: 'Pioche d’abord ta carte du tour.',
+  lightGreen: 'Feu vert',
+  lightRed: 'Feu rouge',
   fold: 'Plier',
   unfold: 'Déplier',
   close: 'Fermer',

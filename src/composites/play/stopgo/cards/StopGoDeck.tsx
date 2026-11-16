@@ -10,23 +10,32 @@ const STACK = [0, 1, 2, 3]
 
 export interface StopGoDeckProps {
   pileCount: number
-  // A card dealt this turn waits on the deck
+  // The player owes a card, the deck waits for the click
   isWaiting: boolean
+  isSaving: boolean
+  // Own car may roll
+  isGreen: boolean
   onDraw: () => void
 }
 
 /**
- * Loose deck floating top right, the top card is taken when one is waiting
+ * Loose deck floating top right with the light of the own car under it, a click takes the card
  * @param {StopGoDeckProps} props - Deck
- * @return {JSX.Element | null} - Nothing once the pile is spent
+ * @return {JSX.Element}
  */
 
-export const StopGoDeck = ({ pileCount, isWaiting, onDraw }: StopGoDeckProps) => (
+export const StopGoDeck = ({
+  pileCount,
+  isWaiting,
+  isSaving,
+  isGreen,
+  onDraw,
+}: StopGoDeckProps) => (
   <div className={cn(STOPGO_HAND.deck, isWaiting && STOPGO_HAND.deckReady)}>
     <button
       type="button"
       className={STOPGO_HAND.deckStack}
-      disabled={!isWaiting}
+      disabled={!isWaiting || isSaving}
       aria-label={isWaiting ? STOPGO_HAND_COPY.draw : STOPGO_HAND_COPY.pile}
       title={isWaiting ? STOPGO_HAND_COPY.drawHint : undefined}
       onClick={onDraw}
@@ -41,8 +50,14 @@ export const StopGoDeck = ({ pileCount, isWaiting, onDraw }: StopGoDeckProps) =>
         </span>
       ))}
     </button>
-    <small>
-      {isWaiting ? STOPGO_HAND_COPY.draw : STOPGO_HAND_COPY.pile} {pileCount}
-    </small>
+    <div className={STOPGO_HAND.deckInfo}>
+      <small>
+        {isWaiting ? STOPGO_HAND_COPY.draw : STOPGO_HAND_COPY.pile} {pileCount}
+      </small>
+      <span className={STOPGO_HAND.light} data-light={isGreen ? 'green' : 'red'}>
+        <i aria-hidden />
+        {isGreen ? STOPGO_HAND_COPY.lightGreen : STOPGO_HAND_COPY.lightRed}
+      </span>
+    </div>
   </div>
 )

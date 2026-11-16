@@ -25,12 +25,19 @@ export interface StopGoDrawnProps {
 
 export const StopGoDrawn = ({ cardKey, slotId, delayMs, onDone }: StopGoDrawnProps) => {
   const ref = useRef<HTMLDivElement>(null)
+  const doneRef = useRef(onDone)
+  // Delay read once so a card landing before does not restart this flight
+  const delayRef = useRef(delayMs)
+
+  useEffect(() => {
+    doneRef.current = onDone
+  })
 
   useEffect(() => {
     const node = ref.current
     const box = document.querySelector(`[data-stopgo-slot="${slotId}"]`)?.getBoundingClientRect()
     const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!node || !box || isReduced) return onDone()
+    if (!node || !box || isReduced) return doneRef.current()
 
     const at = (x: number, y: number, scale: number, turn: number) =>
       `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${scale}) rotate(${turn}deg)`
@@ -46,12 +53,17 @@ export const StopGoDrawn = ({ cardKey, slotId, delayMs, onDone }: StopGoDrawnPro
         { transform: at(mid.x, mid.y, 1.7, 0), opacity: 1, offset: hold / total },
         { transform: at(end.x, end.y, 1, 0), opacity: 1 },
       ],
-      { duration: total, delay: delayMs, easing: 'cubic-bezier(0.3, 0.7, 0.3, 1)', fill: 'both' }
+      {
+        duration: total,
+        delay: delayRef.current,
+        easing: 'cubic-bezier(0.3, 0.7, 0.3, 1)',
+        fill: 'both',
+      }
     )
-    run.onfinish = onDone
+    run.onfinish = () => doneRef.current()
 
     return () => run.cancel()
-  }, [slotId, delayMs, onDone])
+  }, [slotId])
 
   return createPortal(
     <div ref={ref} className={STOPGO_HAND.drawn} aria-hidden>

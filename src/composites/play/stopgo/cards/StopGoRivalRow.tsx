@@ -25,7 +25,7 @@ export const StopGoRivalRow = ({ rivals, avatars }: StopGoRivalRowProps) => {
   const tap = useStopGoAimStore((state) => state.tap)
 
   return (
-    <div className={STOPGO_HAND.rivalRow}>
+    <div className={STOPGO_HAND.rivalRow} data-aiming={aimable.length ? '' : undefined}>
       {rivals.map((rival) => {
         const isAimable = aimable.includes(rival.id)
 

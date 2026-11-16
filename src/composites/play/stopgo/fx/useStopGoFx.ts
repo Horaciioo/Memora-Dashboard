@@ -70,10 +70,11 @@ const flightsOf = (batch: StopGoFx[], batchNo: number): StopGoFlight[] =>
 /**
  * Animations and sounds of a race, drawn from the difference between two boards so a board seen twice plays nothing
  * @param {StopGoBoardView} board - Newest board
+ * @param {boolean} [isFlying] - Flights are shown, none is kept otherwise so none piles up
  * @return {Object} - Flights, marks per car and the landing of a flight
  */
 
-export const useStopGoFx = (board: StopGoBoardView) => {
+export const useStopGoFx = (board: StopGoBoardView, isFlying = true) => {
   const [state, setState] = useState<FxState>(() => ({
     snapshot: snapshotOf(board),
     batch: [],
@@ -93,7 +94,7 @@ export const useStopGoFx = (board: StopGoBoardView) => {
       snapshot: next,
       batch,
       batchNo,
-      flights: [...state.flights, ...flightsOf(batch, batchNo)],
+      flights: isFlying ? [...state.flights, ...flightsOf(batch, batchNo)] : [],
     })
   }
 
@@ -107,17 +108,22 @@ export const useStopGoFx = (board: StopGoBoardView) => {
       const key = ++counter.current
       const delayMs = fx.isThrown ? STOPGO_SETTINGS.flightMs : 0
       const mark: StopGoMark = { kind: spec.mark, key, hazard: fx.hazard, delayMs }
-      timers.current.push(
-        window.setTimeout(() => setMarks((held) => ({ ...held, [fx.accountId]: mark })), 0),
-        window.setTimeout(
-          () =>
-            setMarks((held) => {
-              if (held[fx.accountId]?.key !== key) return held
+      const later = (work: () => void, wait: number) => {
+        const timer = window.setTimeout(() => {
+          timers.current = timers.current.filter((entry) => entry !== timer)
+          work()
+        }, wait)
+        timers.current.push(timer)
+      }
+      later(() => setMarks((held) => ({ ...held, [fx.accountId]: mark })), 0)
+      later(
+        () =>
+          setMarks((held) => {
+            if (held[fx.accountId]?.key !== key) return held
 
-              return Object.fromEntries(Object.entries(held).filter(([id]) => id !== fx.accountId))
-            }),
-          delayMs + STOPGO_SETTINGS.markMs
-        )
+            return Object.fromEntries(Object.entries(held).filter(([id]) => id !== fx.accountId))
+          }),
+        delayMs + STOPGO_SETTINGS.markMs
       )
     }
   }, [state.batch])

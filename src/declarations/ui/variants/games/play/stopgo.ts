@@ -66,6 +66,8 @@ export const STOPGO_HAND = {
   deckStack: 'stopgo-deck-stack',
   deckCard: 'stopgo-deck-card',
   deckReady: 'stopgo-deck-ready',
+  deckInfo: 'stopgo-deck-info',
+  light: 'stopgo-light',
   pile: 'stopgo-pile',
   pileOver: 'stopgo-pile-over',
   sealed: 'stopgo-sealed',

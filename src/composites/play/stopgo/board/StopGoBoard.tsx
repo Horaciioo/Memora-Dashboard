@@ -52,19 +52,26 @@ export const StopGoBoard = ({
 }: StopGoBoardProps) => {
   const board = usePlainBoard(sessionId, initial)
   const isMobile = useIsMobileShell()
-  const { flights, marks, land } = useStopGoFx(board)
   const hasFlights = usePlayPref(PlayGames.StopGo, 'flights')
+  const { flights, marks, land } = useStopGoFx(board, hasFlights)
   const { players, target } = board
   const lanes = players.length
   const plan = useMemo(() => trackOf(target, lanes), [target, lanes])
-  const colors = players.map(
-    ({ slot }) => STOPGO_SETTINGS.colors[slot % STOPGO_SETTINGS.colors.length] as StopGoCarColor
+  // Same arrays between two boards so the road and the signs are not drawn again
+  const slotKey = players.map(({ slot }) => slot).join()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const colors = useMemo(
+    () =>
+      players.map(
+        ({ slot }) => STOPGO_SETTINGS.colors[slot % STOPGO_SETTINGS.colors.length] as StopGoCarColor
+      ),
+    [slotKey]
   )
   const mine = players.find(({ accountId }) => accountId === viewerId)
   const focusKm = mine?.km ?? Math.max(...players.map(({ km }) => km))
   const focusMap = Math.min(plan.maps.length - 1, Math.floor(focusKm / STOPGO_SETTINGS.mapKm))
   // Road and signs are cheap, scenery only near the car
-  const allMaps = plan.maps.map((_, index) => index)
+  const allMaps = useMemo(() => plan.maps.map((_, index) => index), [plan])
   const maps = allMaps.filter((index) => Math.abs(index - focusMap) <= NEIGHBOURS)
   const scroller = useRef<HTMLDivElement>(null)
   const drawing = useRef<SVGSVGElement>(null)
