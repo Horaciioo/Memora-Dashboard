@@ -202,6 +202,17 @@ export interface ConcordatClientState {
   touched: number[]
 }
 
+// Last map decoded, the map never changes so a new board of the same game reuses it
+let lastMap: { text: string; map: ConcordatMap } | null = null
+
+const mapOf = (text: string): ConcordatMap => {
+  if (lastMap?.text === text) return lastMap.map
+
+  lastMap = { text, map: decodeMap(fromBase64(text)) }
+
+  return lastMap.map
+}
+
 /**
  * Client state from a board
  * @param {ConcordatBoard} board - Board
@@ -210,7 +221,7 @@ export interface ConcordatClientState {
 
 export const clientFromBoard = (board: ConcordatBoard): ConcordatClientState => {
   if (board.v !== BOARD_VERSION) throw new Error('Unknown protocol version')
-  const map = decodeMap(fromBase64(board.map))
+  const map = mapOf(board.map)
 
   return {
     rev: board.rev,
@@ -257,8 +268,10 @@ export const applyDiff = (client: ConcordatClientState, diff: ConcordatDiff): 'o
   client.corps = diff.corps
   client.ships = diff.ships
   if (diff.systems) client.systems = diff.systems
-  client.log = [...client.log, ...diff.events]
-  client.feed = [...client.feed, ...diff.events].slice(-60)
+  if (diff.events.length) {
+    client.log = [...client.log, ...diff.events]
+    client.feed = [...client.feed, ...diff.events].slice(-60)
+  }
   client.rev = diff.rev
   client.tick = diff.tick
   client.phase = diff.phase

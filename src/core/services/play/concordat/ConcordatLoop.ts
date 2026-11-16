@@ -25,6 +25,8 @@ const DIFF_EVERY = Math.max(1, Math.round(CONCORDAT.diffMs / CONCORDAT.tickMs))
 // Ticks run at once after a stall, beyond it the clock restarts
 const MAX_CATCH_UP = 5
 const BEAT_MS = 5000
+// Least gap between two board refreshes caused by offers, every reader rebuilds its board
+const OFFERS_MS = 1500
 // Diffs between two full sends of the slow parts
 const SYSTEMS_EVERY = 25
 const MAJOR_EVENTS: ConcordatEvent['kind'][] = ['capitalTaken', 'eliminated', 'ended']
@@ -65,6 +67,7 @@ export interface ConcordatLoop {
   nextAt: number
   lastSnapshotAt: number
   lastBeatAt: number
+  lastOffersAt: number
   isSaving: boolean
   events: ConcordatEvent[]
   // Highest tile count per nation
@@ -109,7 +112,7 @@ export const queueIntent = (
 }
 
 // Public diff of the changes so far
-const flushDiff = (loop: ConcordatLoop): void => {
+const flushDiff = (loop: ConcordatLoop, now: number): void => {
   const { state } = loop
   const baseRev = loop.rev
   loop.rev++
@@ -123,8 +126,10 @@ const flushDiff = (loop: ConcordatLoop): void => {
     baseRev,
     withSystems,
   })
-  if (state.isOffersDirty) {
+  // Still dirty after a skip, the next diff tries again
+  if (state.isOffersDirty && now - loop.lastOffersAt >= OFFERS_MS) {
     state.isOffersDirty = false
+    loop.lastOffersAt = now
     void loop.host.signalOffers().catch((error: unknown) => {
       logger.warn('[concordat] offers not signalled', error)
     })
@@ -223,7 +228,7 @@ export const runTick = (loop: ConcordatLoop, now: number): void => {
       .saveEvents(events)
       .catch((error: unknown) => logger.warn('[concordat] events lost', error))
 
-  if (state.tick % DIFF_EVERY === 0 || state.phase === ConcordatPhases.Ended) flushDiff(loop)
+  if (state.tick % DIFF_EVERY === 0 || state.phase === ConcordatPhases.Ended) flushDiff(loop, now)
   const isMajor = events.some((event) => MAJOR_EVENTS.includes(event.kind))
   if (isMajor || now - loop.lastSnapshotAt >= CONCORDAT.snapshotSeconds * 1000)
     saveSnapshot(loop, now)
@@ -287,6 +292,7 @@ export const startLoop = (input: {
     nextAt: now + CONCORDAT.tickMs,
     lastSnapshotAt: now,
     lastBeatAt: now,
+    lastOffersAt: 0,
     isSaving: false,
     events: [],
     peak: [],

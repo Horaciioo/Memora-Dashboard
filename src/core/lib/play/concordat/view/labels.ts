@@ -21,34 +21,37 @@ export interface ConcordatPlace {
  */
 
 export const placesOf = (owner: Uint8Array, width: number, count: number): ConcordatPlace[] => {
-  const sums = Array.from({ length: count }, () => ({
-    x: 0,
-    y: 0,
-    tiles: 0,
-    minX: Infinity,
-    maxX: -Infinity,
-    minY: Infinity,
-    maxY: -Infinity,
-  }))
+  // Typed sums, a row at a time: the map holds millions of tiles
+  const tiles = new Float64Array(count + 1)
+  const sumX = new Float64Array(count + 1)
+  const sumY = new Float64Array(count + 1)
+  const minX = new Int32Array(count + 1).fill(width)
+  const maxX = new Int32Array(count + 1).fill(-1)
+  const minY = new Int32Array(count + 1).fill(0x7fffffff)
+  const maxY = new Int32Array(count + 1).fill(-1)
 
-  for (let tile = 0; tile < owner.length; tile++) {
-    const sum = sums[owner[tile] - 1]
-    if (!sum) continue
-    const column = tile % width
-    const row = (tile - column) / width
-    sum.x += column
-    sum.y += row
-    sum.tiles++
-    sum.minX = Math.min(sum.minX, column)
-    sum.maxX = Math.max(sum.maxX, column)
-    sum.minY = Math.min(sum.minY, row)
-    sum.maxY = Math.max(sum.maxY, row)
+  for (let start = 0, row = 0; start < owner.length; start += width, row++) {
+    for (let column = 0; column < width; column++) {
+      const holder = owner[start + column]
+      if (!holder || holder > count) continue
+      tiles[holder]++
+      sumX[holder] += column
+      sumY[holder] += row
+      if (column < minX[holder]) minX[holder] = column
+      if (column > maxX[holder]) maxX[holder] = column
+      if (row < minY[holder]) minY[holder] = row
+      maxY[holder] = row
+    }
   }
 
-  return sums.map((sum) => ({
-    x: sum.tiles ? sum.x / sum.tiles + 0.5 : 0,
-    y: sum.tiles ? sum.y / sum.tiles + 0.5 : 0,
-    tiles: sum.tiles,
-    span: sum.tiles ? Math.max(sum.maxX - sum.minX, sum.maxY - sum.minY) + 1 : 0,
-  }))
+  return Array.from({ length: count }, (_, index) => {
+    const id = index + 1
+
+    return {
+      x: tiles[id] ? sumX[id] / tiles[id] + 0.5 : 0,
+      y: tiles[id] ? sumY[id] / tiles[id] + 0.5 : 0,
+      tiles: tiles[id],
+      span: tiles[id] ? Math.max(maxX[id] - minX[id], maxY[id] - minY[id]) + 1 : 0,
+    }
+  })
 }

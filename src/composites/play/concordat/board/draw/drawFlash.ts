@@ -21,6 +21,8 @@ export const drawFlash = (
   const { camera, client, width, height, colors, now } = scene
   const { scale } = camera
   let kept = 0
+  // Lifted colour per nation, worked out once per frame
+  const lifted = new Map<number, number[]>()
 
   for (const wave of waves) {
     const age = now - wave.at
@@ -30,9 +32,12 @@ export const drawFlash = (
     const x = camera.x + (wave.tile % client.map.width) * scale
     const y = camera.y + Math.floor(wave.tile / client.map.width) * scale
     if (x < -scale || y < -scale || x > width || y > height) continue
-    const rgb = (colors[client.owner[wave.tile]] ?? [255, 255, 255]).map(
-      (value) => value + (255 - value) * flash.lift
-    )
+    const holder = client.owner[wave.tile]
+    let rgb = lifted.get(holder)
+    if (!rgb) {
+      rgb = (colors[holder] ?? [255, 255, 255]).map((value) => value + (255 - value) * flash.lift)
+      lifted.set(holder, rgb)
+    }
     context.fillStyle = rgbText(rgb, flash.alpha * (1 - age / flash.ms) ** 2)
     context.fillRect(x, y, scale, scale)
   }

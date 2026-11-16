@@ -14,6 +14,9 @@ const outlined = (context: CanvasRenderingContext2D, text: string, x: number, y:
   context.fillText(text, x, y)
 }
 
+// Parsed on first use, the server has no Path2D
+let handshake: Path2D | null = null
+
 // Handshake glyph centred on a point, haloed like the names
 const drawHandshake = (
   context: CanvasRenderingContext2D,
@@ -21,16 +24,16 @@ const drawHandshake = (
   y: number,
   size: number
 ): void => {
-  const path = new Path2D(CONCORDAT_ALLIANCE_GLYPH)
+  handshake ??= new Path2D(CONCORDAT_ALLIANCE_GLYPH)
   context.save()
   context.translate(x - size / 2, y - size / 2)
   context.scale(size / 24, size / 24)
   context.lineJoin = 'round'
   context.lineWidth = (label.stroke * 24) / size
   context.strokeStyle = rgbText(label.halo, 0.85)
-  context.stroke(path)
+  context.stroke(handshake)
   context.fillStyle = rgbText(label.ink)
-  context.fill(path)
+  context.fill(handshake)
   context.restore()
 }
 
