@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayGameArt } from '@/composites/play/brand/PlayGameArt'
 import { usePlayGroup } from '@/core/hooks/data/play/usePlayGroup'
@@ -66,7 +66,12 @@ export const PlayGroupChat = ({ group, onPlay }: { group: PlayGroupView; onPlay?
 
           return (
             <div key={message.id} className={PLAY_CHAT_UI.message}>
-              <Avatar name={message.author.name} src={message.author.avatarUrl} size="xs" />
+              <PlayAvatar
+                accountId={message.author.accountId}
+                name={message.author.name}
+                src={message.author.avatarUrl}
+                size="xs"
+              />
               <div className={PLAY_CHAT_UI.body}>
                 <span className={PLAY_CHAT_UI.meta}>
                   <span className={PLAY_CHAT_UI.author}>{message.author.name}</span>

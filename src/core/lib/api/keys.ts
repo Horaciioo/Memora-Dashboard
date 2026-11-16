@@ -32,6 +32,7 @@ export const QUERY_KEYS = {
   academyHistory: (filters: Record<string, string>) => ['academy', 'history', filters] as const,
   workComments: (kind: string, id: string) => ['work', 'comments', kind, id] as const,
   playProfile: ['play', 'profile'] as const,
+  playLevels: ['play', 'levels'] as const,
   liveBan: (liveId: string, viewerId: string) => ['lives', 'ban', liveId, viewerId] as const,
   liveViewer: (liveId: string, viewerId: string) => ['lives', 'viewer', liveId, viewerId] as const,
   liveViewerComments: (liveId: string, viewerId: string) =>

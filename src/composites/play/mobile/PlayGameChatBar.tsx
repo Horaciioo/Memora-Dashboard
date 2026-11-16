@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { ComponentProps, ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { BottomSheet } from '@/components/structures/overlays/BottomSheet'
 import { PlayChat } from '@/composites/play/session/PlayChat'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
@@ -44,7 +44,12 @@ export const PlayGameChatBar = ({ chat, crowd, feed }: PlayGameChatBarProps) => 
           <ul className={PLAY_GAME_BAR.bubbles} aria-live="polite">
             {bubbles.map((line) => (
               <li key={line.id} className={PLAY_GAME_BAR.bubble}>
-                <Avatar name={line.author.name} src={line.author.avatarUrl} size="xs" />
+                <PlayAvatar
+                  accountId={line.author.id}
+                  name={line.author.name}
+                  src={line.author.avatarUrl}
+                  size="xs"
+                />
                 <span>
                   <span className={PLAY_GAME_BAR.bubbleName}>{line.author.name}</span> {line.body}
                 </span>

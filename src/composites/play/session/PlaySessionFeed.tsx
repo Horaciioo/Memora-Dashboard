@@ -3,7 +3,7 @@
 import { useContext, useEffect } from 'react'
 import type { ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlayFeedBridge } from '@/composites/play/session/chat/feedBridge'
 import { BAC_SESSION_COPY, fillPlayMessage } from '@/declarations/play'
@@ -76,7 +76,7 @@ export const PlayFeedRow = ({
   return (
     <li className={BAC_SESSION.feedLine}>
       {face ? (
-        <Avatar name={face.name} src={face.avatarUrl} size="xs" />
+        <PlayAvatar accountId={face.id} name={face.name} src={face.avatarUrl} size="xs" />
       ) : (
         <span className={BAC_SESSION.feedMark}>
           <MarkIcon className={BAC_SESSION.feedMarkIcon} aria-hidden="true" />

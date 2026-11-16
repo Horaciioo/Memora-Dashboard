@@ -14,7 +14,7 @@ const IVORY = { face: '#f7f2e8', lip: '#c8bca7' }
 const VIOLET = { face: '#9b7fe8', lip: '#6a4cc9' }
 const GOLD = { face: '#f7c54f', lip: '#c98f1c' }
 
-export type PlayTabGlyphName = 'group' | 'feed' | 'home' | 'lounge' | 'ranking' | 'stats'
+export type PlayTabGlyphName = 'group' | 'feed' | 'home' | 'live' | 'online' | 'ranking' | 'stats'
 
 // Header keys, same style
 export type PlayKeyGlyphName = 'online' | 'live' | 'settings'
@@ -126,8 +126,20 @@ const Pad = ({ face, lip }: { face: string; lip: string }) => (
 
 const Home = () => <Pad {...IVORY} />
 
-// Tables being played
-const Live = () => <Pad {...IVORY} />
+// Board pawn in violet on an ivory base
+const Live = () => (
+  <>
+    <Chunk d="M12 42v-3c0-3 2-5 5-5h14c3 0 5 2 5 5v3z" {...IVORY} />
+    <Chunk d="M18 34c0-6 3-10 4-14h4c1 4 4 8 4 14z" {...VIOLET} />
+    <Chunk
+      d="M18 21h12a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H18a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"
+      {...IVORY}
+      border={2.6}
+    />
+    <Chunk d={dot(24, 12, 7)} {...VIOLET} />
+    <Gleam d="M20.500 9.500a4.500 4.500 0 0 1 3-2" />
+  </>
+)
 
 // Three players, the front one in violet
 const Online = () => (
@@ -196,7 +208,6 @@ const ART: Record<PlayTabGlyphName | PlayKeyGlyphName, () => ReactNode> = {
   group: Group,
   feed: Feed,
   home: Home,
-  lounge: Online,
   ranking: Ranking,
   stats: Stats,
   online: Online,

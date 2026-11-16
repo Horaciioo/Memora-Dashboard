@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { CroquisBoardView, CroquisFace } from '@/composites/play/croquis/types'
 import { CROQUIS_BOARD_COPY, fillPlayMessage } from '@/declarations/play'
 import { CROQUIS_BOARD } from '@/declarations/ui/variants'
@@ -24,7 +24,12 @@ export const CroquisReveal = ({
     ) : (
       drawer && (
         <>
-          <Avatar name={drawer.name} src={drawer.avatarUrl} size="lg" />
+          <PlayAvatar
+            accountId={drawer.accountId}
+            name={drawer.name}
+            src={drawer.avatarUrl}
+            size="lg"
+          />
           <span className={CROQUIS_BOARD.revealName}>
             {fillPlayMessage(CROQUIS_BOARD_COPY.drawerGain, {
               name: drawer.name,

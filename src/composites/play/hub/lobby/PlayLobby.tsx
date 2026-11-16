@@ -173,7 +173,9 @@ export const PlayLobby = ({
           )}
         </header>
       )}
-      {isLobby && isPrivate && me.isSeated && <PlayLobbyLink sessionId={id} joinCode={joinCode} skin={skin} />}
+      {isLobby && isPrivate && me.isSeated && (
+        <PlayLobbyLink sessionId={id} joinCode={joinCode} skin={skin} />
+      )}
       <section className={cn(skin ? PLAY_ROOM.boxSkinned : PLAY_ROOM.box, skin)}>
         <div className={PLAY_ROOM.summary}>
           <button

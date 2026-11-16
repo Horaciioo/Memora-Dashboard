@@ -43,4 +43,3 @@ export const GROUND_LAYERS: Record<string, ComponentType> = {
   [STOPGO_HUB.ground]: PlayStopGoRoad,
   [CONCORDAT_HUB.ground]: PlayConcordatMap,
 }
-

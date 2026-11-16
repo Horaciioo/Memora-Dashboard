@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { ROUTES } from '@/declarations/navigation'
@@ -25,6 +25,8 @@ export interface PlayLiveTablesProps {
   isLocked: boolean
   // Game hubs leave the game name out
   hasGame?: boolean
+  // Inside a scroll box, no box nor title of its own
+  isFlat?: boolean
   className?: string
 }
 
@@ -41,17 +43,19 @@ export const PlayLiveTables = ({
   mineId,
   isLocked,
   hasGame,
+  isFlat,
   className,
 }: PlayLiveTablesProps) => {
   const router = useRouter()
   const moves = usePlayMoves()
 
   return (
-    <section className={cn(PLAY_LIVE.box, className)} aria-label={title}>
-      <header className={PLAY_LIVE.head}>
-        <span className={PLAY_LIVE.pulse} aria-hidden="true" />
-        <h2 className={PLAY_LIVE.title}>{title}</h2>
-      </header>
+    <section className={cn(isFlat ? PLAY_LIVE.flat : PLAY_LIVE.box, className)} aria-label={title}>
+      {!isFlat && (
+        <header className={PLAY_LIVE.head}>
+          <h2 className={PLAY_LIVE.title}>{title}</h2>
+        </header>
+      )}
 
       {tables.length === 0 && <p className={PLAY_LIVE.empty}>{empty}</p>}
       <div className={PLAY_LIVE.list}>
@@ -86,7 +90,8 @@ export const PlayLiveTables = ({
               <div className={PLAY_LIVE.bottom}>
                 <div className={PLAY_LIVE.faces}>
                   {table.faces.slice(0, SHOWN_FACES).map((face) => (
-                    <Avatar
+                    <PlayAvatar
+                      accountId={face.id}
                       key={face.id}
                       name={face.name}
                       src={face.avatarUrl}

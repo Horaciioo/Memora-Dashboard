@@ -52,6 +52,27 @@ const veteransOf = async (
 }
 
 /**
+ * Players who already won this game
+ * @param {Prisma.TransactionClient} tx - Transaction
+ * @param {LoadedSession['game']} game - Game
+ * @param {string[]} accountIds - Players
+ * @return {Promise<Set<string>>} - Past winners
+ */
+
+const winnersOf = async (
+  tx: Prisma.TransactionClient,
+  game: LoadedSession['game'],
+  accountIds: string[]
+): Promise<Set<string>> => {
+  const stats = await tx.playGameStat.findMany({
+    where: { game, wins: { gt: 0 }, accountId: { in: accountIds } },
+    select: { accountId: true },
+  })
+
+  return new Set(stats.map((stat) => stat.accountId))
+}
+
+/**
  * Write ranks, outcomes, XP and totals of a finished game
  * @param {Prisma.TransactionClient} tx - Transaction
  * @param {LoadedSession} session - Game
@@ -81,6 +102,12 @@ const writeResults = async (
     session.game,
     standings.map((entry) => entry.accountId)
   )
+  // A first win on this game pays more still
+  const winners = await winnersOf(
+    tx,
+    session.game,
+    standings.map((entry) => entry.accountId)
+  )
   // Some games pay their winner more
   const winnerFactor = engineOf(session.game).winnerMultiplier?.(session.settings) ?? 1
   const ranked = standings.map((standing) => ({
@@ -90,7 +117,10 @@ const writeResults = async (
         ? Math.round(
             outcomeXp(standing.outcome) *
               (veterans.has(standing.accountId) ? 1 : PLAY_SETTINGS.xp.firstGameMultiplier) *
-              (standing.outcome === PlayOutcomes.Win ? winnerFactor : 1)
+              (standing.outcome === PlayOutcomes.Win ? winnerFactor : 1) *
+              (standing.outcome === PlayOutcomes.Win && !winners.has(standing.accountId)
+                ? 1 + PLAY_SETTINGS.xp.firstWinBonus
+                : 1)
           )
         : 0,
   }))

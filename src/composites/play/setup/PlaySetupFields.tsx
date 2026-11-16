@@ -247,3 +247,40 @@ export const SetupPicks = <T extends string>({
     })}
   </div>
 )
+
+/**
+ * One choice among a few, as picture tiles
+ * @param {Object} props - Tiles
+ * @param {PlaySetupStyles} props.styles - Game classes
+ * @param {{ value: T, label: string, art: ReactNode }[]} props.options - Choices
+ * @param {T} props.value - Picked
+ * @param {(value: T) => void} props.onChange - New pick
+ * @return {JSX.Element}
+ */
+
+export const SetupArtCards = <T extends string>({
+  styles,
+  options,
+  value,
+  onChange,
+}: {
+  styles: PlaySetupStyles
+  options: { value: T; label: string; art: ReactNode }[]
+  value: T
+  onChange: (value: T) => void
+}) => (
+  <div className={styles.art}>
+    {options.map((option) => (
+      <button
+        key={option.value}
+        type="button"
+        aria-pressed={option.value === value}
+        className={cn(styles.artCard, option.value === value && styles.artCardOn)}
+        onClick={() => onChange(option.value)}
+      >
+        <span className={styles.artFrame}>{option.art}</span>
+        <span className={styles.artLabel}>{option.label}</span>
+      </button>
+    ))}
+  </div>
+)

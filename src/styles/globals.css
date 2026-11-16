@@ -7,6 +7,7 @@
 @import './tokens/external.css';
 @import './tokens/vision.css';
 @import './tokens/play.css';
+@import './tokens/skins.css';
 @import './play/arcade.css';
 @import './play/scroll.css';
 @import './play/croquis.css';

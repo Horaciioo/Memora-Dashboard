@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { presenceSentence } from '@/composites/play/mobile/presenceSentence'
@@ -43,7 +43,12 @@ export const PlayOnlineList = ({ tables }: { tables: PlayLobbyCard[] }) => {
               className={PLAY_ONLINE.head}
               onClick={() => setOpenId(isOpen ? null : member.accountId)}
             >
-              <Avatar name={member.name} src={member.image} size="md" />
+              <PlayAvatar
+                accountId={member.accountId}
+                name={member.name}
+                src={member.image}
+                size="md"
+              />
               <span className={PLAY_ONLINE.who}>
                 <span className={PLAY_ONLINE.name}>{member.name}</span>
                 <span className={place ? PLAY_ONLINE.playing : PLAY_ONLINE.idle}>

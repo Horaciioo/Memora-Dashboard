@@ -29,7 +29,7 @@ export const PlayGameGrid = ({ games }: PlayGameGridProps) => {
     .sort(
       (a, b) =>
         Number(b.playable) - Number(a.playable) ||
-        PLAY_GAMES.get(a.game).label.localeCompare(PLAY_GAMES.get(b.game).label, 'fr'),
+        PLAY_GAMES.get(a.game).label.localeCompare(PLAY_GAMES.get(b.game).label, 'fr')
     )
 
   return (

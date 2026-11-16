@@ -60,24 +60,6 @@
   display: none;
 }
 
-/* Live dot of the tables being played */
-.play-live-dot {
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--play-live) 60%, transparent);
-  animation: play-live-pulse 1.6s ease-out infinite;
-}
-
-@keyframes play-live-pulse {
-  to {
-    box-shadow: 0 0 0 0.5rem transparent;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .play-live-dot {
-    animation: none;
-  }
-}
-
 /* Painted plate, cover-fitted to the screen whatever its ratio */
 .play-scene-banner {
   container-type: size;

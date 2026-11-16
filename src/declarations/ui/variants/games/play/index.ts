@@ -51,6 +51,7 @@ export {
   CONCORDAT_HUD,
   CONCORDAT_RESULT,
   CONCORDAT_SETUP,
+  CONCORDAT_SETUP_ART,
 } from '@/declarations/ui/variants/games/play/concordat'
 export { STOPGO_SETUP } from '@/declarations/ui/variants/games/play/stopgo'
 export { SUSPENS_BOARD, SUSPENS_SETUP } from '@/declarations/ui/variants/games/play/suspens'

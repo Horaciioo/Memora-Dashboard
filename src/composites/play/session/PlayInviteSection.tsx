@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
@@ -44,7 +44,8 @@ export const PlayInviteSection = ({ title, people, sent, onSend }: PlayInviteSec
               onClick={() => onSend(entry.id)}
             >
               <span className={PLAY_INVITE.faceAvatar}>
-                <Avatar
+                <PlayAvatar
+                  accountId={entry.id}
                   name={entry.displayName}
                   src={entry.avatarUrl}
                   size={isMobile ? 'xs' : 'md'}

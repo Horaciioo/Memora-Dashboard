@@ -8,7 +8,8 @@ export const PLAY_MOBILE_COPY = {
   tabGroup: 'Groupe',
   tabFeed: 'Feed',
   tabHome: 'Jeux',
-  tabLounge: 'Salon',
+  tabLive: 'En partie',
+  tabOnline: 'En ligne',
   tabMe: 'Mon compte',
   meSettings: 'Paramètres Memora Play',
   tabRanking: 'Classement',
@@ -81,16 +82,12 @@ export const PLAY_MOBILE_COPY = {
 export const PLAY_BUBBLES = { max: 3, ttlMs: 7000 } as const
 
 /**
- * Copy of the profile sidebar
+ * Copy of the portrait menu in the tab bar
  * @type {Record<string, string>}
  */
 
 export const PLAY_ME_COPY = {
-  open: 'Voir mon profil',
-  allStats: 'Mes stats',
-  settings: 'Réglages',
-  // Record columns: wins, draws, losses
-  recordWins: 'Vict.',
-  recordDraws: 'Ega.',
-  recordLosses: 'Déf.',
+  open: 'Mon profil',
+  stats: 'Afficher mes stats',
+  leave: 'Quitter Memora Play',
 } as const

@@ -1,4 +1,8 @@
-import type { NavalFleet, NavalFleetColours, NavalHull } from '@/declarations/play/naval/fleets/types'
+import type {
+  NavalFleet,
+  NavalFleetColours,
+  NavalHull,
+} from '@/declarations/play/naval/fleets/types'
 
 /**
  * Look of the ships of one sea, built by navalSkinOf

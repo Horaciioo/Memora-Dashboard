@@ -102,17 +102,8 @@ export const NEW_MARKS: Record<string, ReactNode> = {
             style={{ stroke: 'var(--play-concordat-sea-light)' }}
             opacity="0.5"
           />
-          <path
-            d={CONCORDAT_LAND}
-            fill="url(#concordat-land)"
-          />
-          <path
-            d={CONCORDAT_LAND}
-            fill="none"
-            stroke="black"
-            strokeWidth="0.6"
-            opacity="0.25"
-          />
+          <path d={CONCORDAT_LAND} fill="url(#concordat-land)" />
+          <path d={CONCORDAT_LAND} fill="none" stroke="black" strokeWidth="0.6" opacity="0.25" />
         </g>
         <ellipse cx="32" cy="4.5" rx="13" ry="5" fill="white" opacity="0.85" />
         <circle cx="32" cy="28" r="23" fill="url(#concordat-shade)" />

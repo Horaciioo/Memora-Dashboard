@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { usePlayGroup } from '@/core/hooks/data/play/usePlayGroup'
 import { PLAY_GROUP_COPY } from '@/declarations/play'
@@ -25,7 +25,12 @@ export const PlayGroupMembers = ({ group }: { group: PlayGroupView }) => {
       <ul className={PLAY_GROUP.memberList}>
         {group.members.map((member) => (
           <li key={member.accountId} className={PLAY_GROUP.row}>
-            <Avatar name={member.name} src={member.avatarUrl} size="lg" />
+            <PlayAvatar
+              accountId={member.accountId}
+              name={member.name}
+              src={member.avatarUrl}
+              size="lg"
+            />
             <span className={PLAY_GROUP.rowText}>
               <span className={PLAY_GROUP.rowName}>
                 {member.name}
@@ -56,7 +61,12 @@ export const PlayGroupMembers = ({ group }: { group: PlayGroupView }) => {
         ))}
         {group.invited.map((person) => (
           <li key={person.accountId} className={PLAY_GROUP.row}>
-            <Avatar name={person.name} src={person.avatarUrl} size="lg" />
+            <PlayAvatar
+              accountId={person.accountId}
+              name={person.name}
+              src={person.avatarUrl}
+              size="lg"
+            />
             <span className={PLAY_GROUP.rowText}>
               <span className={PLAY_GROUP.rowName}>{person.name}</span>
               <span className={PLAY_GROUP.rowNote}>{PLAY_GROUP_COPY.pending}</span>

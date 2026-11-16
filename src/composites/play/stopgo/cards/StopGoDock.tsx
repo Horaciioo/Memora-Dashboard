@@ -156,11 +156,11 @@ export const StopGoDock = ({
                       ? STOPGO_HAND_COPY.drawFirst
                       : isTurn
                         ? reasonOf(
-                          chosen.key,
-                          me,
-                          board.target,
-                          players.filter((player) => player.accountId !== viewerId)
-                        )
+                            chosen.key,
+                            me,
+                            board.target,
+                            players.filter((player) => player.accountId !== viewerId)
+                          )
                         : fillPlayMessage(STOPGO_HAND_COPY.waitTurn, {
                             name: names[board.turnId ?? ''] ?? '',
                           })

@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { GOLF_VOTE } from '@/declarations/ui/variants'
 import type { VoteLook } from '@/declarations/ui/variants/games/golf'
 
@@ -39,7 +39,13 @@ export const PlayVoteAvatar = ({
       style={{ '--lift': Math.min(Math.abs(hops), MAX_LIFT) } as CSSProperties}
     >
       <span className="golf-vote-float block">
-        <Avatar name={voter.name} src={voter.avatarUrl} size="md" className={look.avatarRing} />
+        <PlayAvatar
+          accountId={voter.id}
+          name={voter.name}
+          src={voter.avatarUrl}
+          size="md"
+          className={look.avatarRing}
+        />
       </span>
     </span>
   </span>

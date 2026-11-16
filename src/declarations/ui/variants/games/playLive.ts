@@ -10,8 +10,9 @@ const GLASS = 'play-glass rounded-3xl'
 
 export const PLAY_LIVE = {
   box: `${GLASS} flex min-h-0 flex-col gap-4 p-5`,
+  // Content already inside a scroll box
+  flat: 'flex min-h-0 flex-col gap-4',
   head: 'flex items-center gap-2 px-1',
-  pulse: 'play-live-dot size-2.5 shrink-0 rounded-full bg-[var(--play-live)]',
   title: 'text-sm font-extrabold tracking-wide text-[var(--play-ink)] uppercase',
   list: 'flex min-h-0 flex-col gap-2 overflow-y-auto',
   empty: 'px-1 py-6 text-center text-sm italic text-[var(--play-ink-faint)]',

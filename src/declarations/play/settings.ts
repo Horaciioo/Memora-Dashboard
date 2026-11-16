@@ -85,6 +85,12 @@ export const PLAY_SETTINGS = {
       fallback: 2,
       min: 1,
     }),
+    // Extra share on a game's first win
+    firstWinBonus: readNumber(xp.firstWinBonus, {
+      path: 'play/play.xp.firstWinBonus',
+      fallback: 0.2,
+      min: 0,
+    }),
   },
   levels: {
     max: readInteger(levels.max, { path: 'play/play.levels.max', fallback: 150000, min: 1 }),

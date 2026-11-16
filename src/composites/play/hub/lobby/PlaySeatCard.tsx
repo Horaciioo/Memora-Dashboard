@@ -3,7 +3,7 @@
 import type { MouseEventHandler } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { botSeatNote, PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_ROOM } from '@/declarations/ui/variants'
@@ -52,11 +52,7 @@ export const PlaySeatCard = ({
   const KickIcon = ICONS.playClose
   const isReady = isLobby && !seat.hasLeft && seat.isReady && !isConfiguring
   const isIdle = isLobby && !seat.hasLeft && !seat.isReady
-  const note = seat.hasLeft
-    ? PLAY_HUB_COPY.left
-    : seat.botKind
-      ? botSeatNote(seat.botKind)
-      : null
+  const note = seat.hasLeft ? PLAY_HUB_COPY.left : seat.botKind ? botSeatNote(seat.botKind) : null
 
   return (
     <div
@@ -83,7 +79,12 @@ export const PlaySeatCard = ({
       )}
       <div className={PLAY_ROOM.seatAvatar}>
         {seat.isHost && <CrownIcon className={PLAY_ROOM.seatCrown} aria-hidden="true" />}
-        <Avatar name={seat.name} src={seat.avatarUrl} size={isMobile ? 'md' : 'lg'} />
+        <PlayAvatar
+          accountId={seat.accountId}
+          name={seat.name}
+          src={seat.avatarUrl}
+          size={isMobile ? 'md' : 'lg'}
+        />
         {isReady && (
           <span key="tick" className={PLAY_ROOM.seatBadge}>
             <TickIcon className={PLAY_ROOM.seatBadgeIcon} aria-hidden="true" />
@@ -93,9 +94,7 @@ export const PlaySeatCard = ({
       <p className={PLAY_ROOM.seatName} style={{ color: `var(--play-${seat.color})` }}>
         {seat.name}
       </p>
-      {note ? (
-        <p className={PLAY_ROOM.seatRole}>{note}</p>
-      ) : null}
+      {note ? <p className={PLAY_ROOM.seatRole}>{note}</p> : null}
       {isLobby && !seat.hasLeft && (
         <p
           key={`${seat.isReady}-${isConfiguring}`}

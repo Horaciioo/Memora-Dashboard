@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayHudKeys } from '@/composites/play/hud/PlayHudKeys'
 import { PlayHudPanel } from '@/composites/play/hud/PlayHudPanel'
 import type { PlayHudRow } from '@/composites/play/hud/PlayHudPanel'
@@ -86,7 +86,12 @@ export const PlayHud = ({
                 title={row.name}
               >
                 <span className={PLAY_HUD.playerFace}>
-                  <Avatar name={row.name} src={row.avatarUrl} size="sm" />
+                  <PlayAvatar
+                    accountId={row.accountId}
+                    name={row.name}
+                    src={row.avatarUrl}
+                    size="sm"
+                  />
                 </span>
                 <span className={PLAY_HUD.playerValue}>{row.value}</span>
               </li>

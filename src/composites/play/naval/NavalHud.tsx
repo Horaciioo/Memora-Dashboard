@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { NavalClock } from '@/composites/play/naval/NavalClock'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import { usePlayScoreStore } from '@/core/store/play/playScore'
@@ -59,7 +59,12 @@ export const NavalHud = ({
               title={captain.name}
             >
               <span className={NAVAL_HUD.face}>
-                <Avatar name={captain.name} src={captain.avatarUrl} size="xs" />
+                <PlayAvatar
+                  accountId={captain.accountId}
+                  name={captain.name}
+                  src={captain.avatarUrl}
+                  size="xs"
+                />
               </span>
               <span
                 className={cn(NAVAL_HUD.sunk, captain.index === viewer && NAVAL_HUD.sunkMine)}

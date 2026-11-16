@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { StopGoOpponent } from '@/composites/play/stopgo/cards/types'
 import { useStopGoAimStore } from '@/core/store/play/stopgoAim'
 import { STOPGO_HAND } from '@/declarations/ui/variants/games/play/stopgo'
@@ -44,7 +44,7 @@ export const StopGoRivalRow = ({ rivals, avatars }: StopGoRivalRowProps) => {
             style={{ '--car': `var(--stopgo-car-${rival.color})` } as CSSProperties}
             onClick={() => isAimable && tap && tap(rival.id)}
           >
-            <Avatar name={rival.name} src={avatars[rival.id]} size="md" />
+            <PlayAvatar accountId={rival.id} name={rival.name} src={avatars[rival.id]} size="md" />
           </button>
         )
       })}

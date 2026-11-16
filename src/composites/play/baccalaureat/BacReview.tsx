@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { BacBook } from '@/composites/play/baccalaureat/BacBook'
 import { splitPages } from '@/composites/play/baccalaureat/types'
 import { BacAnswerCard } from '@/composites/play/baccalaureat/BacAnswerCard'
@@ -57,7 +57,12 @@ export const BacReview = ({
       <span aria-hidden="true" />
       {players.map((player) => (
         <span key={player.accountId} className={BAC_BOARD.tableHead}>
-          <Avatar name={player.name} src={player.avatarUrl} size="xs" />
+          <PlayAvatar
+            accountId={player.accountId}
+            name={player.name}
+            src={player.avatarUrl}
+            size="xs"
+          />
           <span className={BAC_BOARD.tableName}>{player.name}</span>
         </span>
       ))}

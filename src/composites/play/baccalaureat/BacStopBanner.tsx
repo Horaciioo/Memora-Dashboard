@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { BacPlayer } from '@/composites/play/baccalaureat/types'
 import { BAC_BOARD_COPY, fillPlayMessage } from '@/declarations/play'
 import { BAC_BOARD } from '@/declarations/ui/variants'
@@ -16,7 +16,12 @@ export const BacStopBanner = ({ stopper }: { stopper: BacPlayer }) => (
     role="status"
     aria-label={fillPlayMessage(BAC_BOARD_COPY.stopped, { name: stopper.name })}
   >
-    <Avatar name={stopper.name} src={stopper.avatarUrl} size="lg" />
+    <PlayAvatar
+      accountId={stopper.accountId}
+      name={stopper.name}
+      src={stopper.avatarUrl}
+      size="lg"
+    />
     <span className={BAC_BOARD.stopWord} aria-hidden="true">
       {BAC_BOARD_COPY.stopShout}
     </span>

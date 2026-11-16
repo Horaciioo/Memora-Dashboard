@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { ROUTES } from '@/declarations/navigation'
 import { fillPlayMessage, PLAY_HISTORY_COPY } from '@/declarations/play'
@@ -29,7 +29,7 @@ export const PlayHistoryTable = ({
           className={cn(PLAY_HISTORY.seat, seat.isMe && PLAY_HISTORY.seatMe)}
         >
           <span className={PLAY_HISTORY.place}>{seat.rank ?? '-'}</span>
-          <Avatar name={seat.name} src={seat.avatarUrl} size="xs" />
+          <PlayAvatar accountId={seat.accountId} name={seat.name} src={seat.avatarUrl} size="xs" />
           <span className={PLAY_HISTORY.seatName}>
             {seat.isMe && isOwn ? PLAY_HISTORY_COPY.you : seat.name}
             {seat.isBot && <span className={PLAY_HISTORY.botTag}>{PLAY_HISTORY_COPY.bot}</span>}

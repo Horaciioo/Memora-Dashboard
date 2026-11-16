@@ -30,6 +30,7 @@ export { readPlaySheet } from '@/core/services/play/SheetService'
 export {
   readLeaderboards,
   readPlayPlayer,
+  readPlayLevels,
   readPlayPresence,
   readPlayProfile,
 } from '@/core/services/play/ProfileService'

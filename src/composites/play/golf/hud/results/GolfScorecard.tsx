@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { GolfFace } from '@/composites/play/golf/types'
 import { cardCell, cardVersusPar, parName, rankCards } from '@/core/lib/play/golf'
 import type { GolfPlayerState } from '@/core/lib/play/golf'
@@ -93,7 +93,12 @@ export const GolfScorecard = ({
                 )}
               >
                 <td className={GOLF_SCORECARD.name}>
-                  <Avatar name={face?.name ?? ''} src={face?.avatarUrl ?? null} size="xs" />
+                  <PlayAvatar
+                    accountId={player.accountId}
+                    name={face?.name ?? ''}
+                    src={face?.avatarUrl ?? null}
+                    size="xs"
+                  />
                   {face?.name}
                 </td>
                 {columns.map((index) => {
