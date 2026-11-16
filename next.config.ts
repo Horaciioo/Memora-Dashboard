@@ -20,10 +20,6 @@ const { version } = JSON.parse(
 // Branch decides the stage
 const deployedBranch = process.env.APP_ENV || ''
 
-// Fake Twitch consent page, served on the app's own address while testing
-const mockOrigin =
-  deployedBranch === 'dev' ? process.env.TWITCH_MOCK_URL?.replace(/\/+$/, '') : undefined
-
 const nextConfig: NextConfig = {
   // No framework banner
   poweredByHeader: false,
@@ -36,7 +32,6 @@ const nextConfig: NextConfig = {
   rewrites: async () => [
     // The permanent Deban. address of a creator
     { source: '/:creator/contest', destination: '/unban/:creator' },
-    ...(mockOrigin ? [{ source: '/faux-twitch/:path*', destination: `${mockOrigin}/:path*` }] : []),
   ],
   // The content security policy carries a per-request nonce
   headers: async () => [
