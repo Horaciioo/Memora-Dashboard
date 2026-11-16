@@ -37,7 +37,7 @@ export const PLAY_HUD_SKINS: ReadonlyMap<PlayGameName, string> = new Map([
   [PlayGames.Naval, 'play-hud-block'],
   [PlayGames.Croquis, 'play-hud-block'],
   [PlayGames.Suspens, 'play-hud-block'],
-  [PlayGames.StopGo, 'play-hud-block'],
+  [PlayGames.StopGo, 'play-hud-block stopgo-chat'],
   [PlayGames.Concordat, 'play-hud-block'],
 ])
 

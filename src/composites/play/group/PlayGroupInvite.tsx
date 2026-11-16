@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { usePlayGroup } from '@/core/hooks/data/play/usePlayGroup'
 import { fillPlayMessage, PLAY_GROUP_COPY } from '@/declarations/play'
@@ -74,7 +74,12 @@ export const PlayGroupInvite = ({ groupId, candidates }: PlayGroupInviteProps) =
                   setPicked(isOn ? picked.filter((id) => id !== person.id) : [...picked, person.id])
                 }
               >
-                <Avatar name={person.displayName} src={person.avatarUrl} size="sm" />
+                <PlayAvatar
+                  accountId={person.id}
+                  name={person.displayName}
+                  src={person.avatarUrl}
+                  size="sm"
+                />
                 <span className={PLAY_GROUP.rowText}>{person.displayName}</span>
                 {onlineIds.has(person.id) && (
                   <span className={PLAY_GROUP.rowOnline} aria-hidden="true" />

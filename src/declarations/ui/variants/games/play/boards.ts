@@ -250,14 +250,14 @@ export const PLAY_PODIUM = {
   stage:
     'relative flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-[clamp(1rem,4dvh,2.5rem)] px-4 py-6 sm:px-10',
   row: 'flex w-full max-w-5xl items-end justify-center gap-[clamp(0.5rem,2.5vw,2rem)]',
-  place: 'flex max-w-72 min-w-0 flex-1 basis-0 flex-col items-center gap-2',
+  place: 'play-podium-place flex max-w-72 min-w-0 flex-1 basis-0 flex-col items-center gap-2',
   face: 'relative flex flex-col items-center gap-2 pt-[clamp(1.75rem,5dvh,3rem)]',
   crown: 'absolute top-0 size-[clamp(1.75rem,5dvh,3rem)] text-[var(--play-gold-ink)]',
   name: 'w-full truncate text-center text-[clamp(1rem,2.8dvh,1.6rem)] font-extrabold',
   points:
     'text-[clamp(0.85rem,2.2dvh,1.2rem)] font-semibold tabular-nums text-[var(--play-ink-soft)]',
   block:
-    'flex w-full items-start justify-center rounded-t-3xl pt-4 text-3xl font-extrabold tabular-nums text-[var(--play-night)]',
+    'play-podium-block flex w-full items-start justify-center rounded-t-3xl pt-4 text-3xl font-extrabold tabular-nums text-[var(--play-night)]',
 }
 
 /**
@@ -287,7 +287,7 @@ export const PLAY_CONFETTI_UI = {
  */
 
 export const PLAY_END = {
-  bar: 'flex flex-wrap items-center justify-center gap-2 px-4 pb-4',
+  bar: 'play-end-rise flex flex-wrap items-center justify-center gap-2 px-4 pb-4',
   count: 'w-full text-center text-sm font-semibold text-[var(--play-ink-soft,inherit)] opacity-80',
   action: 'gap-2 px-4! py-2.5! text-sm!',
 } as const

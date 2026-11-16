@@ -15,7 +15,7 @@ export const PLAY_LOADING_STYLES = {
   squareOn: '',
   squareOut: 'play-square-out',
   content:
-    'play-loading-content relative flex h-full flex-col items-center justify-between overflow-hidden px-6 pt-10 pb-24 md:py-10',
+    'play-loading-content relative flex h-full flex-col items-center justify-between overflow-hidden px-6 pt-10 pb-[calc(9rem+env(safe-area-inset-bottom))] md:py-10',
   contentOut: 'play-loading-content-out',
   glow: 'play-loading-glow pointer-events-none absolute -top-1/4 left-1/2 size-[70vmax] -translate-x-1/2 rounded-full opacity-40 blur-3xl',
   brand: 'relative flex items-center gap-2 self-start text-sm font-extrabold tracking-wide',

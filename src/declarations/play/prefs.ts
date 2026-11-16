@@ -64,6 +64,12 @@ export const PLAY_PREFS: Partial<Record<PlayGameName, PlayPrefSpec[]>> = {
   ],
   [PlayGames.StopGo]: [
     {
+      key: 'follow',
+      label: 'Centrer la caméra sur le joueur actuel',
+      hint: 'Coché, la caméra se place seule sur la voiture dont c’est le tour. Décoché, elle reste où tu l’as laissée.',
+      initial: true,
+    },
+    {
       key: 'flights',
       label: 'Effets de course',
       hint: 'Les bonus et malus qui volent vers les voitures.',

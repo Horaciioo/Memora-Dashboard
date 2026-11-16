@@ -118,9 +118,9 @@ export const PLAY_HUB = {
   cardLink:
     'absolute inset-0 z-10 rounded-[2rem] max-md:rounded-3xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
   cardBody:
-    'relative flex flex-col items-center gap-2 p-7 text-center max-md:items-start max-md:gap-1 max-md:p-3.5 max-md:text-left md:mx-2 md:mb-2 md:gap-0.5 md:rounded-xl md:bg-[var(--play-night)]/80 md:p-2',
+    'relative flex flex-col items-center gap-2 p-7 text-center max-md:items-start max-md:gap-0.5 max-md:p-2 max-md:text-left md:mx-2 md:mb-2 md:gap-0.5 md:rounded-xl md:bg-[var(--play-night)]/80 md:p-2',
   cardName:
-    'truncate text-3xl font-extrabold tracking-tight uppercase max-md:max-w-full max-md:text-lg max-md:leading-tight max-md:whitespace-normal md:text-sm',
+    'truncate text-3xl font-extrabold tracking-tight uppercase max-md:max-w-full max-md:text-[0.7rem] max-md:leading-tight max-md:whitespace-normal md:text-sm',
   // Seat count, the card's one figure
   cardSeats: 'text-xs font-extrabold tabular-nums text-[var(--game)] max-md:hidden',
   skeleton:
