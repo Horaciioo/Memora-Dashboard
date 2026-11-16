@@ -3,6 +3,8 @@ import 'server-only'
 import { PlayNoticeKind } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
+import { readEndReport } from '@/core/services/play/EndReportService'
+import { readReward } from '@/core/services/play/RewardViewService'
 import { seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict, notFound, toAppError } from '@/core/lib/errors'
 import { mayEnter, mayOversee } from '@/core/lib/play/access'
@@ -136,14 +138,21 @@ export const readSession = async (sessionId: string, viewerId: string, canManage
   const isStarted = session.status !== PlayStatuses.Lobby
   const engine = engineOf(session.game)
 
-  const [board, standings, nextId] = await Promise.all([
+  const [board, standings, nextId, reward, report] = await Promise.all([
     isStarted ? engine.view(toEngineSession(session), viewerId) : null,
     session.tournamentId ? tournamentStandings(session.tournamentId) : null,
     nextGameId(session),
+    readReward(session, viewerId),
+    readEndReport(session, viewerId),
   ])
   const view = toSessionView(session, viewerId, board)
 
-  return { ...view, tournament: view.tournament && { ...view.tournament, standings, nextId } }
+  return {
+    ...view,
+    reward,
+    report,
+    tournament: view.tournament && { ...view.tournament, standings, nextId },
+  }
 }
 
 /**

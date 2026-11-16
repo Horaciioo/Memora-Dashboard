@@ -10,7 +10,7 @@ import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { usePlayBusyStore } from '@/core/store/play/playBusy'
 import { usePlayLoadingGameStore } from '@/core/store/play/playLoadingGame'
 import { ROUTES } from '@/declarations/navigation'
-import { PLAY_BOT_COPY } from '@/declarations/play/bots'
+import { areBotsAwake, PLAY_BOT_COPY } from '@/declarations/play/bots'
 import { PLAY_GAMES } from '@/declarations/play/games'
 import { PLAY_HUB_COPY } from '@/declarations/play/hub'
 import { PLAY_BUSY } from '@/declarations/play/loading'
@@ -86,8 +86,8 @@ export const usePlayMoves = () => {
             visibility: PlayVisibilities.Private,
           })
           try {
-            // A strategy game on one's own gets its nations from bots
-            if (PLAY_GAMES.get(game).soloBots) {
+            // Bots fill the table only while they are awake, native nations play on regardless
+            if (PLAY_GAMES.get(game).soloBots && areBotsAwake(game)) {
               await apiPost(API_ROUTES.playBots(table.id), { level: PlayBotKinds.Medium, fill: true })
             }
             await apiPost(API_ROUTES.playStart(table.id), {})

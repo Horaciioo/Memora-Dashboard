@@ -5,8 +5,8 @@ import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { isFeatureOn } from '@/core/services/features'
-import { outcomeXp, rankScores } from '@/core/lib/play'
-import { PLAY_JOURNAL, PLAY_OUTCOME_LABELS, PLAY_SETTINGS } from '@/declarations/play'
+import { rankScores, xpPartsOf } from '@/core/lib/play'
+import { PLAY_JOURNAL, PLAY_OUTCOME_LABELS, PLAY_SETTINGS, PlayXpParts } from '@/declarations/play'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
 import type { PlayJournalInput } from '@/core/services/play/PlayJournalService'
 import { humanResults } from '@/core/services/play/bots/BotRewardService'
@@ -16,7 +16,7 @@ import { tellFollowers } from '@/core/services/play/PlayFollowService'
 import { engineOf, loadSession } from '@/core/services/play/PlaySessionService'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
-import { PlayOutcomes, PlayStatuses } from '@/utils/constants/play'
+import { PlayStatuses } from '@/utils/constants/play'
 import { SECOND_MS } from '@/utils/constants/time'
 
 /**
@@ -110,29 +110,42 @@ const writeResults = async (
   )
   // Some games pay their winner more
   const winnerFactor = engineOf(session.game).winnerMultiplier?.(session.settings) ?? 1
+  const bots = new Set(seats.filter((seat) => seat.account.botKind).map((seat) => seat.accountId))
+  const botRatio = bots.size ? PLAY_SETTINGS.rewards.botXpRatio : 1
+  const partsOf = new Map(
+    standings.map((standing) => [
+      standing.accountId,
+      pays && !gone.has(standing.accountId)
+        ? xpPartsOf({
+            outcome: standing.outcome,
+            isFirstGame: !veterans.has(standing.accountId),
+            isFirstWin: !winners.has(standing.accountId),
+            winnerFactor,
+            botRatio,
+          })
+        : [],
+    ])
+  )
   const ranked = standings.map((standing) => ({
     ...standing,
-    xp:
-      pays && !gone.has(standing.accountId)
-        ? Math.round(
-            outcomeXp(standing.outcome) *
-              (veterans.has(standing.accountId) ? 1 : PLAY_SETTINGS.xp.firstGameMultiplier) *
-              (standing.outcome === PlayOutcomes.Win ? winnerFactor : 1) *
-              (standing.outcome === PlayOutcomes.Win && !winners.has(standing.accountId)
-                ? 1 + PLAY_SETTINGS.xp.firstWinBonus
-                : 1)
-          )
-        : 0,
+    xp: (partsOf.get(standing.accountId) ?? []).reduce(
+      (sum, part) => sum + (part.key === PlayXpParts.Bots ? 0 : part.xp),
+      0
+    ),
   }))
   // Bots ranked, never paid
-  const bots = new Set(seats.filter((seat) => seat.account.botKind).map((seat) => seat.accountId))
   const results = humanResults(ranked, bots)
   const paid = new Map(results.map((result) => [result.accountId, result.xp]))
 
   for (const result of ranked) {
     await tx.playSeat.update({
       where: { sessionId_accountId: { sessionId: session.id, accountId: result.accountId } },
-      data: { rank: result.rank, outcome: result.outcome, xp: paid.get(result.accountId) ?? 0 },
+      data: {
+        rank: result.rank,
+        outcome: result.outcome,
+        xp: paid.get(result.accountId) ?? 0,
+        xpParts: (partsOf.get(result.accountId) ?? []) as unknown as Prisma.InputJsonValue,
+      },
     })
   }
 

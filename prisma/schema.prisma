@@ -3263,6 +3263,8 @@ model PlaySeat {
   rank      Int?
   outcome   PlayOutcome?
   xp        Int          @default(0)
+  // What made up the XP, shown at the end of the game
+  xpParts   Json         @default("[]")
   joinedAt  DateTime     @default(now())
   leftAt    DateTime?
   kickedAt  DateTime?

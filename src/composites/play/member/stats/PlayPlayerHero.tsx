@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { LevelFrame } from '@/composites/play/skin/LevelFrame'
 import { figuresOf } from '@/composites/play/member/stats/PlayStatTiles'
 import { levelShare } from '@/core/lib/play'
 import { fillPlayMessage, PLAY_HUB_COPY, tierOf } from '@/declarations/play'
@@ -30,12 +30,7 @@ export const PlayPlayerHero = ({ totals, player, subtitle }: PlayPlayerHeroProps
       style={{ '--tier': `var(${tier.tone})` } as CSSProperties}
     >
       <div className={PLAY_PLAYER.top}>
-        <Avatar
-          name={player.name}
-          src={player.avatarUrl}
-          size="xl"
-          className={PLAY_PLAYER.avatar}
-        />
+        <LevelFrame level={level.level} name={player.name} src={player.avatarUrl} size="xl" />
         <div className={PLAY_PLAYER.who}>
           <h1 className={PLAY_PLAYER.name}>{player.name}</h1>
           <p className={PLAY_PLAYER.tier}>

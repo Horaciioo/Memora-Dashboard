@@ -17,13 +17,7 @@ import { inviteCandidates, listMessages, listSpectators, readSession } from '@/c
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { nullIfMissing } from '@/core/lib/errors'
 import { ROUTES } from '@/declarations/navigation'
-import {
-  PLAY_GAMES,
-  PLAY_HUB_COPY,
-  hudSkinOf,
-  lobbySkinOf,
-  playKeysOf,
-} from '@/declarations/play'
+import { PLAY_GAMES, PLAY_HUB_COPY, hudSkinOf, lobbySkinOf, playKeysOf } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION, PLAY_HUB, PLAY_ROOM } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
@@ -169,6 +163,8 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
           chat={chat}
           feed={table.feed}
           replay={replay}
+          reward={game.reward}
+          report={game.report}
         >
           {table.board}
         </PlaySessionRoom>

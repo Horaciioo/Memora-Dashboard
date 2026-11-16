@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 
 import { PlayGameChatBar } from '@/composites/play/mobile/PlayGameChatBar'
 import { PlayGameMenu } from '@/composites/play/mobile/PlayGameMenu'
@@ -11,8 +11,14 @@ import { PlayStageKeys } from '@/composites/play/session/PlayStageKeys'
 import { PlayLoading } from '@/composites/play/loading/PlayLoading'
 import { PlayChat } from '@/composites/play/session/PlayChat'
 import type { PlayChatProps } from '@/composites/play/session/PlayChat'
+import { PlayEndBackdrop } from '@/composites/play/results/end/PlayEndBackdrop'
+import { PlayEndFacts } from '@/composites/play/results/end/PlayEndFacts'
+import { PlayEndHeader } from '@/composites/play/results/end/PlayEndHeader'
+import { PlayEndMe } from '@/composites/play/results/end/PlayEndMe'
+import { PlayEndIntro } from '@/composites/play/results/end/PlayEndIntro'
 import { PlayEndActions } from '@/composites/play/session/PlayEndActions'
 import type { PlayRematchState, PlayTournamentStep } from '@/composites/play/session/PlayEndActions'
+import type { PlayEndReport, PlayRewardView } from '@/types/play'
 import { usePlayCrowd } from '@/core/hooks/data/play/usePlayCrowd'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlaySessionLoad } from '@/core/hooks/interaction/state/play/usePlaySessionLoad'
@@ -20,8 +26,14 @@ import { usePlayFullscreen } from '@/core/hooks/interaction/state/play/usePlayFu
 import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { usePlaySessionLoadStore } from '@/core/store/play/playSessionLoad'
 import { usePlayStageStore } from '@/core/store/play/playStage'
-import { PLAY_GAMES, PLAY_HUB_COPY, PLAY_HUD_GAMES, PLAY_HUD_SKINS } from '@/declarations/play'
-import { BAC_SESSION, PLAY_GAME_BAR, PLAY_ROOM } from '@/declarations/ui/variants'
+import {
+  PLAY_END_TIMING,
+  PLAY_GAMES,
+  PLAY_HUB_COPY,
+  PLAY_HUD_GAMES,
+  PLAY_HUD_SKINS,
+} from '@/declarations/play'
+import { BAC_SESSION, PLAY_END_PAGE, PLAY_GAME_BAR, PLAY_ROOM } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
 
@@ -40,6 +52,10 @@ export interface PlaySessionRoomProps {
     rematch: PlayRematchState | null
     tournament?: PlayTournamentStep | null
   } | null
+  // XP the game paid the reader
+  reward?: PlayRewardView | null
+  // Figures of the finished game
+  report?: PlayEndReport | null
   // The game table
   children: ReactNode
 }
@@ -59,6 +75,8 @@ export const PlaySessionRoom = ({
   chat,
   feed,
   replay,
+  reward = null,
+  report = null,
   children,
 }: PlaySessionRoomProps) => {
   const isMobile = useIsMobileShell()
@@ -87,7 +105,7 @@ export const PlaySessionRoom = ({
   // These games keep their keys and chat in their own HUD
   const isHud = PLAY_HUD_GAMES.has(game)
   const hasKeys = !isHud
-  const { ground } = PLAY_GAMES.get(game)
+  const { ground, tone } = PLAY_GAMES.get(game)
   const crowdFaces = { players: faces, spectators: crowd.spectators }
 
   return (
@@ -128,24 +146,59 @@ export const PlaySessionRoom = ({
             isOver={replay !== null}
           />
         )}
-        <section
-          data-play-box
-          className={cn(
-            'relative',
-            BAC_SESSION.boxFull,
-            isHud ? BAC_SESSION.boxFullHud : BAC_SESSION.boxFullPad
-          )}
+        <div
+          className={replay ? PLAY_END_PAGE.root : 'contents'}
+          style={
+            replay
+              ? ({
+                  '--end-tone': `var(${tone})`,
+                  '--end-intro': `${PLAY_END_TIMING.intro}ms`,
+                } as CSSProperties)
+              : undefined
+          }
         >
-          {children}
-        </section>
+          {replay && (
+            <>
+              <PlayEndBackdrop />
+              <PlayEndIntro winner={report?.winner ?? null} />
+              <PlayEndHeader game={game} />
+            </>
+          )}
+          <div className={replay ? PLAY_END_PAGE.body : 'contents'}>
+            {replay && (
+              <PlayEndMe
+                game={game}
+                reward={reward}
+                place={report?.place ?? null}
+                career={report?.career ?? null}
+              />
+            )}
+            <section
+              data-play-box
+              className={cn(
+                'relative',
+                BAC_SESSION.boxFull,
+                isHud ? BAC_SESSION.boxFullHud : BAC_SESSION.boxFullPad,
+                replay && PLAY_END_PAGE.result
+              )}
+            >
+              {children}
+            </section>
+            {replay && (
+              <PlayEndFacts game={game} stats={report?.stats ?? []} awards={report?.awards ?? []} />
+            )}
+          </div>
+        </div>
         {replay && (
-          <PlayEndActions
-            game={game}
-            gameSlug={gameSlug}
-            sessionId={chat.sessionId}
-            isSeated={me.isSeated}
-            {...replay}
-          />
+          <div className="play-end-rise" style={{ animationDelay: `${PLAY_END_TIMING.actions}ms` }}>
+            <PlayEndActions
+              game={game}
+              gameSlug={gameSlug}
+              sessionId={chat.sessionId}
+              isSeated={me.isSeated}
+              {...replay}
+            />
+          </div>
         )}
       </div>
 
