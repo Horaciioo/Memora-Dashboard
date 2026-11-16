@@ -71,8 +71,7 @@ export const landTilesOf = (terrain: Uint8Array, seaId: number): number => {
  * @return {string} - Text such as 25 K
  */
 
-export const troopFigure = (value: number): string =>
-  compactFigure(value * CONCORDAT.sim.troopUnit)
+export const troopFigure = (value: number): string => compactFigure(value * CONCORDAT.sim.troopUnit)
 
 /**
  * Big figure in K or M, one decimal under 100 K

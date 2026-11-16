@@ -76,7 +76,10 @@ export const ActivityTimeline = ({ entries }: ActivityTimelineProps) => {
                   {subject && (
                     <p className={JOURNAL_STYLES.subject}>
                       {subject.network && (
-                        <NetworkLogo network={subject.network} className={JOURNAL_STYLES.subjectLogo} />
+                        <NetworkLogo
+                          network={subject.network}
+                          className={JOURNAL_STYLES.subjectLogo}
+                        />
                       )}
                       <Dotted items={subject.parts} />
                     </p>

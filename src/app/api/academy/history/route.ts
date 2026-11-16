@@ -8,7 +8,10 @@ const SEARCH_MAX_LENGTH = 100
 
 export const GET = createProtectedRoute({
   permission: Permissions.AcademyManage,
-  descriptor: { summary: 'Read the juniors of every session, session by session', tags: ['academy'] },
+  descriptor: {
+    summary: 'Read the juniors of every session, session by session',
+    tags: ['academy'],
+  },
   handler: async ({ query, session, access }) =>
     readAcademyHistory(academyScope(session, access), {
       search: (query.get('q') ?? '').slice(0, SEARCH_MAX_LENGTH),

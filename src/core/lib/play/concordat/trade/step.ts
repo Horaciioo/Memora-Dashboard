@@ -16,8 +16,7 @@ const isStanding = (state: ConcordatState, route: ConcordatRoute): boolean => {
   const first = buildingById(state, route.buildingA)
   const second = buildingById(state, route.buildingB)
 
-  const isKept =
-    !route.isAlliance || tieKindOf(state, route.a, route.b) === ConcordatTies.Alliance
+  const isKept = !route.isAlliance || tieKindOf(state, route.a, route.b) === ConcordatTies.Alliance
 
   return Boolean(
     isKept &&

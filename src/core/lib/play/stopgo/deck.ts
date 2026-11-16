@@ -94,11 +94,7 @@ export interface StopGoDraw {
  * @return {number} - Index in the pile
  */
 
-const pickIndex = (
-  pile: StopGoCard[],
-  kmShare: number | undefined,
-  random: Random
-): number => {
+const pickIndex = (pile: StopGoCard[], kmShare: number | undefined, random: Random): number => {
   const top = pile.length - 1
 
   if (kmShare === undefined) return top

@@ -1,4 +1,10 @@
-import { aidRefusal, alliesOf, isCondemned, proposeRefusal, tieKindOf } from '@/core/lib/play/concordat/diplomacy'
+import {
+  aidRefusal,
+  alliesOf,
+  isCondemned,
+  proposeRefusal,
+  tieKindOf,
+} from '@/core/lib/play/concordat/diplomacy'
 import { troopCap } from '@/core/lib/play/concordat/sim/economy'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import type { ConcordatBotContext } from '@/core/lib/play/concordat/bots/view'

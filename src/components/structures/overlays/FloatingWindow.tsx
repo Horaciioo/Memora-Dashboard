@@ -71,13 +71,23 @@ export const FloatingWindow = ({
         <h2 className={NEXUS_STYLES.title}>{title}</h2>
         {status}
         <span className={NEXUS_STYLES.controls}>
-          <button type="button" className={NEXUS_STYLES.control} aria-label={foldLabel} onClick={onFold}>
+          <button
+            type="button"
+            className={NEXUS_STYLES.control}
+            aria-label={foldLabel}
+            onClick={onFold}
+          >
             <ICONS.expand
               className={cn(NEXUS_STYLES.controlIcon, !isFolded && 'rotate-180')}
               aria-hidden="true"
             />
           </button>
-          <button type="button" className={NEXUS_STYLES.control} aria-label={closeLabel} onClick={onClose}>
+          <button
+            type="button"
+            className={NEXUS_STYLES.control}
+            aria-label={closeLabel}
+            onClick={onClose}
+          >
             <ICONS.close className={NEXUS_STYLES.controlIcon} aria-hidden="true" />
           </button>
         </span>

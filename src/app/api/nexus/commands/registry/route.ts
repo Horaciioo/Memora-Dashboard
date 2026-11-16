@@ -9,6 +9,9 @@ export const GET = createProtectedRoute({
   handler: async (context) => {
     await requireNexus(context)
 
-    return { commands: NEXUS_REGISTRY.project(), values: { ...NEXUS_VARIABLE_VALUES, ...NEXUS_MODULE_VALUES } }
+    return {
+      commands: NEXUS_REGISTRY.project(),
+      values: { ...NEXUS_VARIABLE_VALUES, ...NEXUS_MODULE_VALUES },
+    }
   },
 })

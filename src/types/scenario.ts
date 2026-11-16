@@ -4,13 +4,7 @@
  */
 
 export type ScenarioId =
-  | 'absence'
-  | 'recruitment'
-  | 'candidate'
-  | 'task'
-  | 'junior'
-  | 'identity'
-  | 'live'
+  'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity' | 'live'
 
 /**
  * One answer Memora offers

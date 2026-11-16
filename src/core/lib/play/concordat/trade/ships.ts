@@ -7,7 +7,11 @@ import { nextRandom } from '@/core/lib/play/concordat/sim/rng'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatBuilding, ConcordatShip, ConcordatState } from '@/types/concordat'
-import { ConcordatBuildingKinds, ConcordatShipKinds, ConcordatTies } from '@/utils/constants/concordat'
+import {
+  ConcordatBuildingKinds,
+  ConcordatShipKinds,
+  ConcordatTies,
+} from '@/utils/constants/concordat'
 
 const { ships: cargo } = CONCORDAT.trade
 
@@ -103,7 +107,11 @@ const sailingFrom = (state: ConcordatState, port: ConcordatBuilding): number =>
     .length
 
 // Launch one ship from a port toward a random partner port
-const launch = (state: ConcordatState, port: ConcordatBuilding, ports: ConcordatBuilding[]): void => {
+const launch = (
+  state: ConcordatState,
+  port: ConcordatBuilding,
+  ports: ConcordatBuilding[]
+): void => {
   const partners = ports.filter(
     (other) =>
       other.id !== port.id &&
@@ -113,7 +121,11 @@ const launch = (state: ConcordatState, port: ConcordatBuilding, ports: Concordat
   if (!partners.length) return
 
   const target = partners[Math.floor(nextRandom(state) * partners.length)]
-  const path = seaPath(state.map, seaAround(state.map, port.tile), seaAround(state.map, target.tile))
+  const path = seaPath(
+    state.map,
+    seaAround(state.map, port.tile),
+    seaAround(state.map, target.tile)
+  )
   if (!path?.length) return
 
   state.ships.push({

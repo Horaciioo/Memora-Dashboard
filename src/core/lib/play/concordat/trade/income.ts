@@ -77,8 +77,6 @@ export const tradeIncomesOf = (state: ConcordatState, cut: Set<number>): number[
   return sums.map((sum, index) => {
     const player = state.players[index]
 
-    return player.alive
-      ? Math.min(sum, trade.capShare * grossOf(player) + trade.capFloor)
-      : 0
+    return player.alive ? Math.min(sum, trade.capShare * grossOf(player) + trade.capFloor) : 0
   })
 }

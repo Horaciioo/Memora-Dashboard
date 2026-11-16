@@ -4,7 +4,11 @@ import { distanceBetween } from '@/core/lib/play/concordat/map'
 import { seaAround, seaPath } from '@/core/lib/play/concordat/navy/path'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatBuilding, ConcordatRoute, ConcordatState } from '@/types/concordat'
-import { ConcordatBuildingKinds, ConcordatRouteKinds, ConcordatTies } from '@/utils/constants/concordat'
+import {
+  ConcordatBuildingKinds,
+  ConcordatRouteKinds,
+  ConcordatTies,
+} from '@/utils/constants/concordat'
 import type { ConcordatRouteKind } from '@/utils/constants/concordat'
 
 const { trade } = CONCORDAT

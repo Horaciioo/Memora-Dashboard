@@ -83,7 +83,7 @@ export const drawRoutes = (context: CanvasRenderingContext2D, scene: ConcordatSc
     context.setLineDash([])
     const period = look.pulseMs + length * look.pulseSlow
     for (const [index, color] of [first, second].entries()) {
-      const phase = ((now / period + route.id * 0.37 + index * 0.5) % 1 + 1) % 1
+      const phase = (((now / period + route.id * 0.37 + index * 0.5) % 1) + 1) % 1
       const [x, y] = curveAt(from, bend, to, index ? 1 - phase : phase)
       context.fillStyle = rgbText(color)
       context.strokeStyle = rgbText(frame.rgb)
