@@ -5,11 +5,12 @@ import { createPortal } from 'react-dom'
 
 import { PlayVoteDeck } from '@/composites/play/vote/PlayVoteDeck'
 import type { PlayVoteCard } from '@/composites/play/vote/PlayVoteDeck'
+import { PlayVoteProgress } from '@/composites/play/vote/PlayVoteProgress'
 import { PlayVoteTimer } from '@/composites/play/vote/PlayVoteTimer'
 import { usePlayVote } from '@/composites/play/vote/usePlayVote'
 import type { PlayVoteProps } from '@/composites/play/registry'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
-import { mostPicked, voteOf } from '@/core/lib/play/vote'
+import { mostPicked, voteOf, voteRulesOf } from '@/core/lib/play/vote'
 import type { PlayVoteState } from '@/core/lib/play/vote'
 import { PLAY_GAMES, playKeysOf } from '@/declarations/play/games'
 import { PLAY_HUD_SKINS, voteSkinOf } from '@/declarations/play/hud'
@@ -93,6 +94,7 @@ const VoteScreen = ({
     faces[id] ? [{ id, key, ...faces[id] }] : []
   )
   if (!spec) return <></>
+  const steps = voteRulesOf(game)?.steps(vote.chosen, Object.keys(faces).length) ?? []
   // Games with a HUD dress the vote in it, over their own ground
   const hasHud = PLAY_HUD_SKINS.has(game)
   const look = hasHud ? PLAY_VOTE_HUD : PLAY_VOTE
@@ -109,6 +111,7 @@ const VoteScreen = ({
     >
       {hasHud && ground && <i className={cn(ground, 'hidden')} aria-hidden="true" />}
       <div className={look.stage}>
+        <PlayVoteProgress steps={steps} step={vote.step} />
         <div key={`head-${vote.step}`} className={look.head}>
           <h2 className={look.title}>{spec.title}</h2>
           <p className={look.lead}>{spec.lead}</p>
