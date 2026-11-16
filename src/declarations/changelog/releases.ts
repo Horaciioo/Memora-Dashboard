@@ -178,6 +178,42 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Ajout d’une barre « Étape n sur total » dans les votes de lancement pour voir où l’on en est.',
       },
       {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un cadre et d’un badge « Niv. » autour de ton portrait dans « Memora Play » : leur couleur change tous les dix niveaux, du gris au rouge royal.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une page « Joueurs en ligne » dans « Memora Play » pour voir qui est présent.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un bonus d’expérience à ta première victoire sur chaque jeu de « Memora Play ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité d’interdire certaines armes, de choisir une partie illimitée ou une région au hasard dans le lancement de « Concordat », réparti en onglets « Partie », « Carte », « Rythme » et « Armes ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du menu de ton portrait dans la barre du bas de « Memora Play » sur téléphone : « Mon profil », « Afficher mes stats » et « Quitter Memora Play ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de la page « Salon » de « Memora Play », renommée « En partie » : elle montre les parties ouvertes ou en cours.',
+      },
+      {
         tag: ChangelogTags.Improved,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
