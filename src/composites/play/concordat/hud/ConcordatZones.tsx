@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
+import { ConcordatGold } from '@/composites/play/concordat/hud/ConcordatGold'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
@@ -57,9 +58,7 @@ export const ConcordatZones = ({ client }: { client: ConcordatClientState }) => 
           <span className={CONCORDAT_HUD.zoneTitle}>
             {fillPlayMessage(CONCORDAT_HUD_COPY.zoneWon, { zone: banner.zone })}
           </span>
-          <span className={CONCORDAT_HUD.zoneGold}>
-            {fillPlayMessage(CONCORDAT_HUD_COPY.zoneGold, { gold: banner.gold })}
-          </span>
+          <ConcordatGold amount={banner.gold} prefix="+" className={CONCORDAT_HUD.zoneGold} />
         </div>
       ))}
     </div>

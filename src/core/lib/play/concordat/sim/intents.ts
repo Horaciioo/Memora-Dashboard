@@ -29,6 +29,7 @@ import {
 import { areTeamMates } from '@/core/lib/play/concordat/modes/rules'
 import { disband } from '@/core/lib/play/concordat/sim/attack'
 import { researchRefusal, sendFeint, startResearch } from '@/core/lib/play/concordat/tech'
+import { launchSortie, sortieRefusal } from '@/core/lib/play/concordat/air'
 import { launchRefusal, launchStrike } from '@/core/lib/play/concordat/weapons'
 import { isTileBlocked } from '@/core/lib/play/concordat/zones'
 import { closeTrade } from '@/core/lib/play/concordat/trade'
@@ -182,6 +183,8 @@ const systemRefusal = (state: ConcordatState, intent: ConcordatIntent): string |
       return researchRefusal(state, intent.playerId, intent.path)
     case 'launch':
       return launchRefusal(state, intent)
+    case 'sortie':
+      return sortieRefusal(state, intent)
     case 'propose':
       return proposeRefusal(state, intent)
     case 'accept':
@@ -225,6 +228,8 @@ const applySystem = (state: ConcordatState, intent: ConcordatIntent): void => {
       return startResearch(state, intent.playerId, intent.path)
     case 'launch':
       return launchStrike(state, intent)
+    case 'sortie':
+      return launchSortie(state, intent)
     case 'closeTrade':
       closeTrade(state, intent.playerId, intent.with)
   }

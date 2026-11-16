@@ -41,7 +41,13 @@ export const ConcordatToolGhost = () => {
   return (
     <div ref={node} className={CONCORDAT_HUD.ghost} aria-hidden="true">
       <ConcordatGlyph
-        kind={tool.kind === 'build' ? tool.building : tool.isHeavy ? 'heavy' : 'missile'}
+        kind={
+          tool.kind === 'build'
+            ? tool.building
+            : tool.kind === 'sortie'
+              ? tool.air
+              : (tool.weapon ?? (tool.isHeavy ? 'heavy' : 'missile'))
+        }
         size={32}
       />
     </div>

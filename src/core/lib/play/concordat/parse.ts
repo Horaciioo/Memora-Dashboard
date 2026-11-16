@@ -57,9 +57,20 @@ const systemIntent = (playerId: number, raw: Record<string, unknown>): Concordat
     const tile = id('tile')
 
     // A strike is only fired with the second confirmation
+    const weapon = raw.weapon === 'shell' || raw.weapon === 'rocket' ? raw.weapon : undefined
+
     return silo === null || tile === null || raw.confirm !== true
       ? null
-      : { kind: 'launch', playerId, silo, tile, heavy: raw.heavy === true }
+      : { kind: 'launch', playerId, silo, tile, heavy: raw.heavy === true, weapon }
+  }
+  if (type === ConcordatIntents.Sortie) {
+    const base = id('id')
+    const tile = id('tile')
+    const kind = raw.air === 'heli' || raw.air === 'fighter' ? raw.air : null
+
+    return base === null || tile === null || !kind || raw.confirm !== true
+      ? null
+      : { kind: 'sortie', playerId, base, tile, air: kind }
   }
   if (type === ConcordatIntents.Sail) {
     const port = id('port')

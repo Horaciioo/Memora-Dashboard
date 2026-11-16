@@ -1,17 +1,22 @@
 import { writeVarint } from '@/core/lib/play/concordat/bytes'
 import type { ByteReader } from '@/core/lib/play/concordat/bytes'
+import { calmFactor, grossOf, troopCap, upkeepOf } from '@/core/lib/play/concordat/sim/economy'
 import type { ConcordatState } from '@/types/concordat'
 import {
   CONCORDAT_BUILDING_ORDER,
   CONCORDAT_TIE_ORDER,
   ConcordatRouteKinds,
   ConcordatShipKinds,
-  ConcordatStrikeKinds,
+  CONCORDAT_STRIKE_ORDER,
+  ConcordatAirKinds,
+  ConcordatScarKinds,
   ConcordatZoneKinds,
 } from '@/utils/constants/concordat'
 import type {
   ConcordatBuildingKind,
   ConcordatRouteKind,
+  ConcordatAirKind,
+  ConcordatScarKind,
   ConcordatStrikeKind,
   ConcordatZoneKind,
   ConcordatShipKind,
@@ -87,6 +92,56 @@ export interface ConcordatStrikeRow {
   from: number
   launchedAt: number
   impactAt: number
+  // Battery tile of the last interceptor, minus one when none
+  by: number
+  shotAt: number
+  // Tick it is shot down, zero when it flies on
+  killAt: number
+}
+
+/**
+ * Aircraft as drawn
+ * @typedef {Object} ConcordatAircraftRow
+ */
+
+export interface ConcordatAircraftRow {
+  id: number
+  owner: number
+  kind: ConcordatAirKind
+  base: number
+  tile: number
+  launchedAt: number
+  until: number
+  hp: number
+  shotAt: number
+  // Tile the last shot came from, minus one when none
+  shotFrom: number
+}
+
+/**
+ * Scar of the ground as drawn
+ * @typedef {Object} ConcordatScarRow
+ */
+
+export interface ConcordatScarRow {
+  tile: number
+  radius: number
+  at: number
+  kind: ConcordatScarKind
+}
+
+/**
+ * Economy figures of a nation, index is the id minus one
+ * @typedef {Object} ConcordatFigureRow
+ */
+
+export interface ConcordatFigureRow {
+  // Troop ceiling
+  maxTroops: number
+  // Net gold per minute, may be negative
+  income: number
+  // Part of the gold per minute that comes from trade
+  trade: number
 }
 
 /**
@@ -112,6 +167,9 @@ export interface ConcordatArmsRow {
   heavy: number
 }
 
+// Scar kinds in wire order
+const SCAR_ORDER: readonly ConcordatScarKind[] = Object.values(ConcordatScarKinds)
+
 // Zone kinds in wire order
 const ZONE_ORDER: readonly ConcordatZoneKind[] = Object.values(ConcordatZoneKinds)
 
@@ -128,8 +186,11 @@ export interface ConcordatSystemsRows {
   routes: ConcordatRouteRow[]
   coalitions: ConcordatCoalitionRow[]
   strikes: ConcordatStrikeRow[]
+  aircraft: ConcordatAircraftRow[]
+  scars: ConcordatScarRow[]
   zones: ConcordatZoneRow[]
   arms: ConcordatArmsRow[]
+  figures: ConcordatFigureRow[]
 }
 
 /**
@@ -163,6 +224,25 @@ export interface ConcordatOfferRow {
   expiresAt: number
 }
 
+// Troop ceiling, net income and trade income of every nation
+const figuresOf = (state: ConcordatState): ConcordatFigureRow[] =>
+  state.players.map((player) => {
+    if (!player.alive) return { maxTroops: 0, income: 0, trade: 0 }
+
+    const effects = state.effects[player.id - 1]
+    const calm = calmFactor(player)
+    const factor = calm * Math.max(0, effects.income) * player.goldShare
+    const earned = (grossOf(player) + effects.gold + effects.trade) * factor - effects.malus
+    const spent = upkeepOf(player, effects.upkeepCut) + effects.upkeep
+    const minute = 60 * state.speed
+
+    return {
+      maxTroops: Math.round(troopCap(player, effects.cap)),
+      income: Math.round((earned - spent) * minute),
+      trade: Math.round(effects.trade * factor * minute),
+    }
+  })
+
 /**
  * Slow rows of a game
  * @param {ConcordatState} state - Game
@@ -190,15 +270,35 @@ export const systemsOf = (state: ConcordatState): ConcordatSystemsRows => ({
     isCut,
   })),
   coalitions: state.coalitions.map(({ target, members }) => ({ target, members: [...members] })),
-  strikes: state.strikes.map(({ id, owner, kind, tile, from, launchedAt, impactAt }) => ({
-    id,
-    owner,
-    kind,
-    tile,
-    from: from ?? -1,
-    launchedAt,
-    impactAt,
-  })),
+  strikes: state.strikes.map(
+    ({ id, owner, kind, tile, from, launchedAt, impactAt, by, shotAt, killAt }) => ({
+      id,
+      owner,
+      kind,
+      tile,
+      from: from ?? -1,
+      launchedAt,
+      impactAt,
+      by: by ?? -1,
+      shotAt: shotAt ?? 0,
+      killAt: killAt ?? 0,
+    })
+  ),
+  aircraft: state.aircraft.map(
+    ({ id, owner, kind, base, tile, launchedAt, until, hp, shotAt, shotFrom }) => ({
+      id,
+      owner,
+      kind,
+      base,
+      tile,
+      launchedAt,
+      until,
+      hp,
+      shotAt,
+      shotFrom,
+    })
+  ),
+  scars: state.scars.map(({ tile, radius, at, kind }) => ({ tile, radius, at, kind })),
   zones: state.zones.map(({ id, kind, tile, radius, until }) => ({
     id,
     kind,
@@ -207,6 +307,7 @@ export const systemsOf = (state: ConcordatState): ConcordatSystemsRows => ({
     until,
   })),
   arms: state.arms.map(({ missiles, heavy }) => ({ missiles, heavy })),
+  figures: figuresOf(state),
 })
 
 /**
@@ -324,11 +425,37 @@ export const writeSystems = (bytes: number[], rows: ConcordatSystemsRows): void 
   writeVarint(bytes, rows.strikes.length)
   for (const strike of rows.strikes) {
     writeVarint(bytes, strike.id)
-    bytes.push(strike.owner, strike.kind === ConcordatStrikeKinds.Heavy ? 1 : 0)
+    bytes.push(strike.owner, CONCORDAT_STRIKE_ORDER.indexOf(strike.kind))
     writeVarint(bytes, strike.tile)
     writeVarint(bytes, strike.from + 1)
     writeVarint(bytes, strike.launchedAt)
     writeVarint(bytes, strike.impactAt)
+    writeVarint(bytes, strike.by + 1)
+    writeVarint(bytes, strike.shotAt)
+    writeVarint(bytes, strike.killAt)
+  }
+
+  writeVarint(bytes, rows.aircraft.length)
+  for (const aircraft of rows.aircraft) {
+    writeVarint(bytes, aircraft.id)
+    bytes.push(
+      aircraft.owner,
+      aircraft.kind === ConcordatAirKinds.Fighter ? 1 : 0,
+      Math.max(0, aircraft.hp)
+    )
+    writeVarint(bytes, aircraft.base)
+    writeVarint(bytes, aircraft.tile)
+    writeVarint(bytes, aircraft.launchedAt)
+    writeVarint(bytes, aircraft.until)
+    writeVarint(bytes, aircraft.shotAt)
+    writeVarint(bytes, aircraft.shotFrom + 1)
+  }
+
+  writeVarint(bytes, rows.scars.length)
+  for (const scar of rows.scars) {
+    bytes.push(SCAR_ORDER.indexOf(scar.kind), scar.radius)
+    writeVarint(bytes, scar.tile)
+    writeVarint(bytes, scar.at)
   }
 
   writeVarint(bytes, rows.zones.length)
@@ -342,6 +469,14 @@ export const writeSystems = (bytes: number[], rows: ConcordatSystemsRows): void 
   bytes.push(rows.arms.length)
   for (const stock of rows.arms)
     bytes.push(Math.min(255, stock.missiles), Math.min(255, stock.heavy))
+
+  // Income may be negative, folded to an unsigned number
+  bytes.push(rows.figures.length)
+  for (const figure of rows.figures) {
+    writeVarint(bytes, figure.maxTroops)
+    writeVarint(bytes, figure.income < 0 ? -figure.income * 2 - 1 : figure.income * 2)
+    writeVarint(bytes, figure.trade)
+  }
 }
 
 /**
@@ -404,7 +539,7 @@ export const readSystems = (reader: ByteReader): ConcordatSystemsRows => {
   for (let count = reader.varint(); count > 0; count--) {
     const id = reader.varint()
     const owner = reader.byte()
-    const kind = reader.byte() ? ConcordatStrikeKinds.Heavy : ConcordatStrikeKinds.Missile
+    const kind = CONCORDAT_STRIKE_ORDER[reader.byte()]
     strikes.push({
       id,
       owner,
@@ -413,7 +548,37 @@ export const readSystems = (reader: ByteReader): ConcordatSystemsRows => {
       from: reader.varint() - 1,
       launchedAt: reader.varint(),
       impactAt: reader.varint(),
+      by: reader.varint() - 1,
+      shotAt: reader.varint(),
+      killAt: reader.varint(),
     })
+  }
+
+  const aircraft: ConcordatAircraftRow[] = []
+  for (let count = reader.varint(); count > 0; count--) {
+    const id = reader.varint()
+    const owner = reader.byte()
+    const kind = reader.byte() ? ConcordatAirKinds.Fighter : ConcordatAirKinds.Heli
+    const hp = reader.byte()
+    aircraft.push({
+      id,
+      owner,
+      kind,
+      hp,
+      base: reader.varint(),
+      tile: reader.varint(),
+      launchedAt: reader.varint(),
+      until: reader.varint(),
+      shotAt: reader.varint(),
+      shotFrom: reader.varint() - 1,
+    })
+  }
+
+  const scars: ConcordatScarRow[] = []
+  for (let count = reader.varint(); count > 0; count--) {
+    const kind = SCAR_ORDER[reader.byte()]
+    const radius = reader.byte()
+    scars.push({ kind, radius, tile: reader.varint(), at: reader.varint() })
   }
 
   const zones: ConcordatZoneRow[] = []
@@ -429,5 +594,28 @@ export const readSystems = (reader: ByteReader): ConcordatSystemsRows => {
     arms.push({ missiles: reader.byte(), heavy: reader.byte() })
   }
 
-  return { buildings, ties, trust, routes, coalitions, strikes, zones, arms }
+  const figures: ConcordatFigureRow[] = []
+  for (let count = reader.byte(); count > 0; count--) {
+    const maxTroops = reader.varint()
+    const folded = reader.varint()
+    figures.push({
+      maxTroops,
+      income: folded % 2 ? -(folded + 1) / 2 : folded / 2,
+      trade: reader.varint(),
+    })
+  }
+
+  return {
+    buildings,
+    ties,
+    trust,
+    routes,
+    coalitions,
+    strikes,
+    aircraft,
+    scars,
+    zones,
+    arms,
+    figures,
+  }
 }

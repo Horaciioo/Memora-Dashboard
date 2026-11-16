@@ -87,9 +87,9 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
       hasStrip={false}
       isCompact
     >
-      <ConcordatNotices client={client} names={names} isSeated={isSeated} act={act} />
+      <ConcordatNotices client={client} isSeated={isSeated} />
       <ConcordatZones client={client} />
-      <ConcordatPanels rows={rows} />
+      <ConcordatPanels client={client} names={names} land={land} />
       {isPlaying && (
         <div className={CONCORDAT_HUD.dock}>
           <ConcordatPill figures={figures} client={client} names={names} act={act} />

@@ -1,4 +1,4 @@
-import { isWorking } from '@/core/lib/play/concordat/buildings/rules'
+import { buildingById, isWorking } from '@/core/lib/play/concordat/buildings/rules'
 import { modeRules } from '@/core/lib/play/concordat/modes/rules'
 import { reachOf } from '@/core/lib/play/concordat/sim/area'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
@@ -12,7 +12,7 @@ import {
 } from '@/utils/constants/concordat'
 import type { ConcordatStrikeKind } from '@/utils/constants/concordat'
 
-const { weapons } = CONCORDAT
+const { weapons, air } = CONCORDAT
 
 /**
  * Weapons are on in this game
@@ -52,7 +52,7 @@ export const stockCap = (state: ConcordatState, playerId: number): number =>
  * Seconds a missile flies, longer for a far target and for a heavy one
  * @param {ConcordatState} state - Game
  * @param {ConcordatStrikeKind} kind - Kind
- * @param {number} distance - Tiles from the silo
+ * @param {number} distance - Tiles from the source
  * @return {number} - Ticks
  */
 
@@ -61,10 +61,68 @@ export const flightTicks = (
   kind: ConcordatStrikeKind,
   distance: number
 ): number => {
+  // Guns are quick and flat
+  if (kind === 'shell' || kind === 'rocket') {
+    const base = kind === 'shell' ? air.battery.shellFlight : air.battery.rocketFlight
+
+    return ticksOf(base + distance * 0.04)
+  }
   const reach = Math.min(1, distance / weapons.range)
   const seconds = weapons.flightMin + (weapons.flightMax - weapons.flightMin) * reach
 
   return ticksOf(seconds + (kind === 'heavy' ? weapons.heavyExtra : 0))
+}
+
+/**
+ * Reach of a battery of this level
+ * @param {number} level - Level
+ * @return {number} - Tiles
+ */
+
+export const batteryRange = (level: number): number =>
+  air.battery.range[Math.min(level, air.battery.range.length) - 1]
+
+// Tile checks shared by every strike
+const tileRefusal = (state: ConcordatState, tile: number): string | null => {
+  if (!Number.isInteger(tile) || tile < 0 || tile >= state.owner.length) return 'badTile'
+  if (state.map.terrain[tile] === ConcordatTerrains.Sea) return 'badTerrain'
+
+  return null
+}
+
+// Holder checks shared by every strike
+const holderRefusal = (state: ConcordatState, playerId: number, tile: number): string | null => {
+  const holder = state.owner[tile]
+  const target = holder ? state.players[holder - 1] : null
+  if (holder === playerId) return 'self'
+  if (target && state.tick < target.protectedUntil) return 'protected'
+  if (target && tieKindOf(state, playerId, holder) === ConcordatTies.Peace) return 'treaty'
+
+  return null
+}
+
+// Shell or rocket from a battery
+const gunRefusal = (
+  state: ConcordatState,
+  intent: Extract<ConcordatIntent, { kind: 'launch' }>
+): string | null => {
+  const battery = buildingById(state, intent.silo)
+  if (
+    !battery ||
+    battery.owner !== intent.playerId ||
+    battery.kind !== ConcordatBuildingKinds.Battery ||
+    !isWorking(battery, state.tick)
+  )
+    return 'noBattery'
+  if ((battery.coolAt ?? 0) > state.tick) return 'cooling'
+  if (reachOf(battery.tile, intent.tile, state.map.width) > batteryRange(battery.level))
+    return 'outOfRange'
+
+  const refusal = holderRefusal(state, intent.playerId, intent.tile)
+  if (refusal) return refusal
+  const cost = intent.weapon === 'shell' ? air.battery.shellCost : air.battery.rocketCost
+
+  return state.players[intent.playerId - 1].gold < cost ? 'noGold' : null
 }
 
 /**
@@ -79,26 +137,26 @@ export const launchRefusal = (
   intent: Extract<ConcordatIntent, { kind: 'launch' }>
 ): string | null => {
   if (!weaponsOn(state)) return 'featureOff'
-  if (state.tick < state.pickEnd + ticksOf(weapons.unlockMinutes * 60)) return 'tooEarly'
-  if (!Number.isInteger(intent.tile) || intent.tile < 0 || intent.tile >= state.owner.length)
-    return 'badTile'
-  if (state.map.terrain[intent.tile] === ConcordatTerrains.Sea) return 'badTerrain'
+  const isGun = intent.weapon === 'shell' || intent.weapon === 'rocket'
+  const unlock = isGun ? air.unlockMinutes : weapons.unlockMinutes
+  if (state.tick < state.pickEnd + ticksOf(unlock * 60)) return 'tooEarly'
+  const badTile = tileRefusal(state, intent.tile)
+  if (badTile) return badTile
+  if (isGun) return gunRefusal(state, intent)
 
   const silo = silosOf(state, intent.playerId).find((building) => building.id === intent.silo)
   if (!silo) return 'noSilo'
   if (reachOf(silo.tile, intent.tile, state.map.width) > weapons.range) return 'outOfRange'
 
-  const holder = state.owner[intent.tile]
-  const target = holder ? state.players[holder - 1] : null
-  if (holder === intent.playerId) return 'self'
-  if (target && state.tick < target.protectedUntil) return 'protected'
-  if (target && tieKindOf(state, intent.playerId, holder) === ConcordatTies.Peace) return 'treaty'
+  const refusal = holderRefusal(state, intent.playerId, intent.tile)
+  if (refusal) return refusal
 
   const arms = state.arms[intent.playerId - 1]
   if (intent.heavy) {
     if (!modeRules(state.mode).heavy) return 'heavyOff'
     if (silo.level < weapons.heavyLevel) return 'siloLevel'
-    if (state.players[intent.playerId - 1].provincesHeld < CONCORDAT.merit.heavy) return 'needsZones'
+    if (state.players[intent.playerId - 1].provincesHeld < CONCORDAT.merit.heavy)
+      return 'needsZones'
     if (arms.heavy >= weapons.heavyMax) return 'heavySpent'
 
     return state.players[intent.playerId - 1].gold < weapons.heavyCost ? 'noGold' : null

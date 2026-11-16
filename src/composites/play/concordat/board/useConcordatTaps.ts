@@ -5,6 +5,7 @@ import type { Dispatch, RefObject, SetStateAction } from 'react'
 
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
 import { reachOf } from '@/core/lib/play/concordat/sim/area'
+import { baseFor, batteryFor } from '@/core/lib/play/concordat/view/arsenal'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import { ConcordatBuildingKinds } from '@/utils/constants/concordat'
@@ -14,6 +15,8 @@ export interface ConcordatStrike {
   tile: number
   silo: number
   isHeavy: boolean
+  weapon?: 'shell' | 'rocket'
+  air?: 'heli' | 'fighter'
   x: number
   y: number
 }
@@ -94,6 +97,19 @@ export const useConcordatTaps = ({
       })
 
       return
+    }
+    if (tool.kind === 'sortie') {
+      const base = baseFor(client, tile)
+      const isMine = client.owner[tile] === client.me
+      if (!base || (tool.air === 'heli' && !isMine)) return mark(tile, 'refused')
+
+      return setStrike({ tile, silo: base.id, isHeavy: false, air: tool.air, x, y })
+    }
+    if (tool.weapon) {
+      const battery = batteryFor(client, tile)
+      if (!battery || client.owner[tile] === client.me) return mark(tile, 'refused')
+
+      return setStrike({ tile, silo: battery.id, isHeavy: false, weapon: tool.weapon, x, y })
     }
     const silo = client.systems.buildings
       .filter(

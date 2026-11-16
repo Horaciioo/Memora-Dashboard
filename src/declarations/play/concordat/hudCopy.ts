@@ -1,11 +1,6 @@
-import {
-  ConcordatOfferKinds,
-  ConcordatTargetActions,
-  ConcordatTies,
-} from '@/utils/constants/concordat'
+import { ConcordatTargetActions, ConcordatTies } from '@/utils/constants/concordat'
 import type {
   ConcordatBuildingKind,
-  ConcordatOfferKind,
   ConcordatTargetAction,
   ConcordatTieKind,
 } from '@/utils/constants/concordat'
@@ -36,7 +31,6 @@ export const CONCORDAT_HUD_COPY = {
   free: 'Terre libre',
   freeCorps: 'Terre libre',
   retreat: 'Rappeler',
-  threat: 'Attaque de {name}',
   offers: 'Propositions',
   accept: 'Accepter',
   refuse: 'Refuser',
@@ -54,11 +48,19 @@ export const CONCORDAT_HUD_COPY = {
   weapons: 'Armes',
   missile: 'Missile',
   heavy: 'Missile lourd',
+  shell: 'Obus',
+  rocket: 'Roquettes',
+  heli: 'Hélicoptère',
+  fighter: 'Chasseur',
+  noBattery: 'Aucune batterie à portée',
+  noBase: 'Aucune base aérienne libre',
+  toolSortie: 'Choisis où envoyer le {name}',
+  toolGuard: 'Choisis une de tes terres à garder',
+  confirmSortie: 'Envoyer',
   stock: '{count} en stock',
   heavyOnce: 'Un seul tir',
   goldCost: '{gold} or',
   zoneWon: '{zone} conquis !',
-  zoneGold: '+{gold} or',
   toolBuild: 'Pose {name} sur une de tes terres',
   toolLaunch: 'Choisis une cible pour le {name}',
   toolCancel: 'Échap pour annuler',
@@ -86,6 +88,10 @@ export const CONCORDAT_BUILDING_LABELS: Record<ConcordatBuildingKind, string> = 
   port: 'un port',
   silo: 'un silo',
   observatory: 'un observatoire',
+  post: 'un poste de défense',
+  sam: 'une batterie antiaérienne',
+  airbase: 'une base aérienne',
+  battery: 'une batterie d’artillerie',
 }
 
 /**
@@ -100,6 +106,10 @@ export const CONCORDAT_BUILDING_TITLES: Record<ConcordatBuildingKind, string> = 
   port: 'Port',
   silo: 'Silo',
   observatory: 'Observatoire',
+  post: 'Poste de défense',
+  sam: 'Antiaérienne',
+  airbase: 'Base aérienne',
+  battery: 'Artillerie',
 }
 
 /**
@@ -110,12 +120,25 @@ export const CONCORDAT_BUILDING_TITLES: Record<ConcordatBuildingKind, string> = 
 export const CONCORDAT_ARM_HINTS: Record<string, string> = {
   market: 'Rapporte de l’or en continu. Améliorable jusqu’au niveau 3.',
   barracks: 'Augmente le plafond de troupes et leur croissance.',
-  fortress: 'Renforce la défense des terres voisines et intercepte les missiles.',
+  fortress: 'Renforce la défense des terres voisines.',
   port: 'Permet d’envoyer des navires de guerre. Sur la côte uniquement.',
   silo: 'Nécessaire pour tirer des missiles à portée. Stocke des munitions.',
   observatory: 'Calme les tensions et la méfiance autour de toi.',
+  post: 'Petit poste bon marché : renforce la défense d’une petite zone et tire sur les appareils proches.',
+  sam: 'Antiaérienne et antimissile : abat les missiles et les roquettes avant l’impact, et tire sur les appareils ennemis. Un tir à la fois, puis il recharge.',
+  airbase:
+    'Envoie des hélicoptères et des chasseurs. Chaque niveau ajoute un appareil dans le ciel.',
+  battery:
+    'Tire obus et roquettes à moyenne portée, sans silo. Recharge entre deux tirs. Les antiaériennes arrêtent les roquettes, pas les obus.',
+  shell:
+    'Obus d’artillerie : petite zone, tir rapide et bon marché. Il faut une batterie à portée.',
+  rocket:
+    'Salve de roquettes : zone moyenne, plus coûteuse. Une antiaérienne peut les intercepter.',
+  heli: 'Hélicoptère de combat défensif : tourne au-dessus d’une de tes terres et ralentit l’avance ennemie dans la zone. Vulnérable aux chasseurs et à la défense.',
+  fighter:
+    'Chasseur : fonce sur une cible, mitraille les troupes et attaque les appareils croisés. Revient seul à sa base.',
   missile:
-    'Frappe une zone : tue des troupes, secoue la stabilité et laisse des retombées. Il faut un silo à portée. Les forteresses peuvent l’intercepter.',
+    'Frappe une zone : tue des troupes, secoue la stabilité et laisse des retombées. Il faut un silo à portée.',
   heavy:
     'Frappe une très grande zone, bien plus destructrice. Un seul tir par partie, silo niveau 3 requis. Plus lent, mais difficile à intercepter.',
 } as const
@@ -145,19 +168,6 @@ export const CONCORDAT_TIE_LABELS: Record<ConcordatTieKind, string> = {
 }
 
 /**
- * Offer labels
- * @type {Record<ConcordatOfferKind, string>}
- */
-
-export const CONCORDAT_OFFER_LABELS: Record<ConcordatOfferKind, string> = {
-  [ConcordatOfferKinds.Peace]: 'propose la paix',
-  [ConcordatOfferKinds.Alliance]: 'propose une alliance',
-  [ConcordatOfferKinds.Trade]: 'propose du commerce',
-  [ConcordatOfferKinds.Request]: 'fait une demande',
-  [ConcordatOfferKinds.Coalition]: 'propose une coalition',
-}
-
-/**
  * Concordat feed lines, the nation's name comes first
  * @type {Record<string, string>}
  */
@@ -172,6 +182,8 @@ export const CONCORDAT_FEED_COPY = {
   landed: '*a débarqué* chez {victim}',
   launched: '*a lancé* un missile sur {victim}',
   impact: '*a frappé* {victim}',
+  sortie: '*a envoyé* un chasseur sur {victim}',
+  shotDown: '*a abattu* un appareil de {victim}',
   researched: '*a terminé* une recherche',
   built: '*a bâti* un édifice',
   domination: '*domine* la carte',
@@ -181,6 +193,17 @@ export const CONCORDAT_FEED_COPY = {
   collapse: '{victim} s’effondre',
   revolt: 'Révolte chez {victim}',
   teamsDrawn: 'Les équipes sont tirées',
+  sunk: 'Un transport de {victim} est coulé',
+  intercepted: 'Un missile est intercepté',
+  warning: '{victim} vacille',
+  worldAnnounce: 'Un événement mondial approche',
+  worldEnd: 'L’événement mondial prend fin',
+  threat: '*attaque* {victim}',
+  offerPeace: '*propose* la paix à {victim}',
+  offerAlliance: '*propose* une alliance à {victim}',
+  offerTrade: '*propose* du commerce à {victim}',
+  offerRequest: '*fait* une demande à {victim}',
+  offerCoalition: '*propose* une coalition à {victim}',
 } as const
 
 /**
@@ -215,3 +238,69 @@ export const CONCORDAT_LOADING_TIPS: readonly string[] = [
   'Les touches 1 à 9 règlent la part de troupes envoyée.',
   'La molette zoome, glisser déplace la carte.',
 ]
+
+/**
+ * Standings table words, short headers with a longer hint
+ * @type {Record<string, string>}
+ */
+
+export const CONCORDAT_STANDINGS_COPY = {
+  title: 'Classement',
+  rank: '#',
+  name: 'Nation',
+  columns: 'Colonnes',
+  hide: 'Replier le classement',
+  show: 'Déplier le classement',
+  kind: 'Type',
+  tiles: 'Terres',
+  gold: 'Or',
+  troops: 'Troupes',
+  income: 'Revenu',
+  trade: 'Commerce',
+  maxTroops: 'Max',
+  betrayals: 'Trahisons',
+  markets: 'Marchés',
+  barracks: 'Casernes',
+  forts: 'Forts',
+  ports: 'Ports',
+  ships: 'Navires',
+  zones: 'Zones',
+  stability: 'Stabilité',
+  allies: 'Alliés',
+  silos: 'Silos',
+  sams: 'Antiaér.',
+  bases: 'Bases',
+  kindHuman: 'Joueur',
+  kindCountry: 'Pays',
+  hintTiles: 'Part de la carte tenue',
+  hintGold: 'Or en réserve',
+  hintIncome: 'Or gagné par minute, charges déduites',
+  hintTrade: 'Or par minute venu du commerce',
+  hintTroops: 'Troupes actuelles',
+  hintMaxTroops: 'Plafond de troupes',
+  hintBetrayals: 'Traités ou alliances trahis',
+  hintMarkets: 'Marchés tenus',
+  hintBarracks: 'Casernes tenues',
+  hintForts: 'Forteresses et postes de défense',
+  hintPorts: 'Ports tenus',
+  hintShips: 'Navires de guerre',
+  hintSilos: 'Silos tenus',
+  hintZones: 'Zones conquises',
+  hintSams: 'Batteries antiaériennes',
+  hintBases: 'Bases aériennes',
+  goTo: 'Aller sur {name}',
+} as const
+
+/**
+ * Card of the nation under the pointer
+ * @type {Record<string, string>}
+ */
+
+export const CONCORDAT_HOVER_COPY = {
+  human: 'Joueur',
+  country: 'Pays',
+  tribe: 'Tribu',
+  ships: 'Navires de guerre',
+  sending: 'Troupes envoyées à l’attaque',
+  troopsOf: '{troops} troupes sur {max}',
+} as const

@@ -1,6 +1,7 @@
 import type { ConcordatCamera, ConcordatPlace } from '@/core/lib/play/concordat'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
 import type { ConcordatMark } from '@/core/store/play/concordatView'
+import type { ConcordatWarFx } from '@/composites/play/concordat/board/draw/warState'
 
 /**
  * Offscreen layers of the map, one pixel per tile
@@ -42,10 +43,14 @@ export interface ConcordatScene {
   hoverTile: number
   // Nation washed, zero for none
   washed: number
-  // Missile armed on the pointer
-  aim: { isHeavy: boolean } | null
+  // Weapon armed on the pointer, its radius in tiles
+  aim: { radius: number; isGuard: boolean } | null
   // Clicks still echoing
   marks: ConcordatMark[]
+  // War state: bursts, mood and the smoothed clock
+  war: ConcordatWarFx
+  // Tick of the frame, fractional so that flights glide
+  tick: number
   // Font family of the page
   font: string
   // Clock of the frame in milliseconds

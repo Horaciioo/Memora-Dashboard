@@ -47,6 +47,7 @@ export { CROQUIS_BOARD, CROQUIS_SETUP } from '@/declarations/ui/variants/games/p
 export { ECHO_BOARD, ECHO_SETUP } from '@/declarations/ui/variants/games/play/echo'
 export {
   CONCORDAT_BOARD,
+  CONCORDAT_HOVER,
   CONCORDAT_HUD,
   CONCORDAT_RESULT,
   CONCORDAT_SETUP,

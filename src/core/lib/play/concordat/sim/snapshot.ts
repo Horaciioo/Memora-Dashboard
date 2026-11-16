@@ -17,6 +17,8 @@ import type {
   ConcordatState,
   ConcordatArms,
   ConcordatDomination,
+  ConcordatAircraft,
+  ConcordatScar,
   ConcordatStrike,
   ConcordatTech,
   ConcordatWorld,
@@ -67,6 +69,8 @@ export interface ConcordatSnapshot {
   nextDrawAt?: number
   techs?: ConcordatTech[]
   strikes?: ConcordatStrike[]
+  aircraft?: ConcordatAircraft[]
+  scars?: ConcordatScar[]
   zones?: ConcordatZone[]
   arms?: ConcordatArms[]
   world?: ConcordatWorld
@@ -112,6 +116,8 @@ export const exportState = (state: ConcordatState): ConcordatSnapshot => ({
   nextDrawAt: state.nextDrawAt,
   techs: structuredClone(state.techs),
   strikes: structuredClone(state.strikes),
+  aircraft: structuredClone(state.aircraft),
+  scars: structuredClone(state.scars),
   zones: structuredClone(state.zones),
   arms: structuredClone(state.arms),
   world: structuredClone(state.world),
@@ -169,6 +175,8 @@ export const importState = (map: ConcordatMap, snapshot: ConcordatSnapshot): Con
     nextDrawAt: snapshot.nextDrawAt ?? 0,
     techs: snapshot.techs ?? snapshot.players.map(emptyTech),
     strikes: snapshot.strikes ?? [],
+    aircraft: snapshot.aircraft ?? [],
+    scars: snapshot.scars ?? [],
     zones: snapshot.zones ?? [],
     arms: snapshot.arms ?? snapshot.players.map(emptyArms),
     world: snapshot.world ?? { nextAt: 0, active: null, warned: [] },

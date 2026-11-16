@@ -1,12 +1,39 @@
 import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
 
 /**
- * Missile pictograms on the same grid, drawn upright and turned in the button
- * @type {Record<'missile' | 'heavy', { path: string; turn: number }>}
+ * Weapons and aircraft with a pictogram of their own
+ * @typedef {'missile' | 'heavy' | 'shell' | 'rocket' | 'heli' | 'fighter'} ConcordatWeaponGlyph
  */
 
-export const CONCORDAT_WEAPON_GLYPHS: Record<'missile' | 'heavy', { path: string; turn: number }> =
+export type ConcordatWeaponGlyph = 'missile' | 'heavy' | 'shell' | 'rocket' | 'heli' | 'fighter'
+
+// Aircraft seen from above, nose up
+const PLANE_PATH =
+  'M12 2 C13 2 13.6 3 13.6 4.5 V9 L21 13.5 V15.5 L13.6 13.2 V18 L16 20 V21.5 L12 20.5 L8 21.5 V20 L10.4 18 V13.2 L3 15.5 V13.5 L10.4 9 V4.5 C10.4 3 11 2 12 2 Z'
+
+/**
+ * Weapon and aircraft pictograms on the same grid, drawn upright and turned in the button
+ * @type {Record<ConcordatWeaponGlyph, { path: string; turn: number }>}
+ */
+
+export const CONCORDAT_WEAPON_GLYPHS: Record<ConcordatWeaponGlyph, { path: string; turn: number }> =
   {
+    // Squat shell with a driving band
+    shell: {
+      turn: 0,
+      path: 'M12 2 C15.5 5 16.5 9 16.5 13 V19 H7.5 V13 C7.5 9 8.5 5 12 2 Z M7.5 20.5 H16.5 V22 H7.5 Z',
+    },
+    // Three small rockets side by side
+    rocket: {
+      turn: 0,
+      path: 'M6 3 C7.2 4.5 7.6 6.5 7.6 9 V14 H4.4 V9 C4.4 6.5 4.8 4.5 6 3 Z M12 6 C13.2 7.5 13.6 9.5 13.6 12 V17 H10.4 V12 C10.4 9.5 10.8 7.5 12 6 Z M18 3 C19.2 4.5 19.6 6.5 19.6 9 V14 H16.4 V9 C16.4 6.5 16.8 4.5 18 3 Z M4.4 15.5 H7.6 V19 H4.4 Z M10.4 18.5 H13.6 V22 H10.4 Z M16.4 15.5 H19.6 V19 H16.4 Z',
+    },
+    // Helicopter: rotor, cabin, tail boom and skid
+    heli: {
+      turn: 0,
+      path: 'M2 4.5 H22 V6.3 H13 V8.6 C16.6 8.6 19 10.8 19 13.6 V14.4 H22 V16.6 H17.6 C16.8 16.6 16.1 16.2 15.8 15.6 H9 C6 15.6 3.5 13.6 3.5 11.8 C3.5 10 6 8.6 11 8.6 V6.3 H2 Z M4 19.5 H18 V21.3 H4 Z M8 16.5 H9.6 V19.5 H8 Z M13 16.5 H14.6 V19.5 H13 Z',
+    },
+    fighter: { turn: 0, path: PLANE_PATH },
     // Slim rocket flying up and right
     missile: {
       turn: 45,
@@ -56,6 +83,26 @@ export const CONCORDAT_GLYPHS: Record<ConcordatBuildingKind, { path: string; isS
       isStroke: false,
       path: 'M3.5 21 V14 A8.5 8.5 0 0 1 20.5 14 V21 Z M11 5.5 H13 V13 H11 Z',
     },
+    // Shield with a cross cut out
+    post: {
+      isStroke: false,
+      path: 'M12 2.5 L20 5.5 V11.5 C20 16.5 16.5 20 12 21.5 C7.5 20 4 16.5 4 11.5 V5.5 Z M11 8 H13 V11 H16 V13 H13 V16.5 H11 V13 H8 V11 H11 Z',
+    },
+    // Radar dish on a mast
+    sam: {
+      isStroke: false,
+      path: 'M3 14 A10 10 0 0 1 13 4 Z M13 7 L21 2.5 L22 4.3 L14.5 9 Z M10.5 11 H12.5 V17 H10.5 Z M6.5 18 H16.5 V21 H6.5 Z',
+    },
+    // Aircraft over a runway
+    airbase: {
+      isStroke: false,
+      path: 'M12 1.5 C12.8 1.5 13.3 2.3 13.3 3.5 V7 L19 10.5 V12.2 L13.3 10.4 V14 L15.2 15.5 V16.7 L12 15.9 L8.8 16.7 V15.5 L10.7 14 V10.4 L5 12.2 V10.5 L10.7 7 V3.5 C10.7 2.3 11.2 1.5 12 1.5 Z M3 19 H21 V21.5 H3 Z',
+    },
+    // Field gun on a wheel
+    battery: {
+      isStroke: false,
+      path: 'M5 12.5 L17 4 L19.2 7 L7.2 15.5 Z M3 14 L7.2 11 L9.5 14.3 L5.3 17.3 Z M14 17 a4.2 4.2 0 1 0 8.4 0 a4.2 4.2 0 1 0 -8.4 0 M16.2 17 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0',
+    },
   }
 
 /**
@@ -64,9 +111,9 @@ export const CONCORDAT_GLYPHS: Record<ConcordatBuildingKind, { path: string; isS
  */
 
 export const CONCORDAT_STAT_GLYPHS: Record<'troops' | 'gold', string> = {
-  // Soldier helmet: dome with a crest, brim below
+  // Soldier bust: helmet with brim, face, shoulders
   troops:
-    'M11 1.5 H13 V4 H11 Z M4 14.5 C4 8.5 7.4 5 12 5 C16.6 5 20 8.5 20 14.5 Z M2.5 16.5 H21.5 V19 H2.5 Z M6 20.5 H18 V22 H6 Z',
+    'M6 9 C6 5.5 8.5 3 12 3 C15.5 3 18 5.5 18 9 V10 H6 Z M4.5 10.8 H19.5 V12.6 H4.5 Z M8 13.8 H16 V15.6 C16 17.4 14.2 18.8 12 18.8 C9.8 18.8 8 17.4 8 15.6 Z M3 22 C3 19.8 5.5 19 8.6 18.5 C9.4 19.8 10.6 20.5 12 20.5 C13.4 20.5 14.6 19.8 15.4 18.5 C18.5 19 21 19.8 21 22 Z',
   // Stack of three coins
   gold: 'M4 4 C4 2.6 7.6 1.5 12 1.5 C16.4 1.5 20 2.6 20 4 V6.5 C20 7.9 16.4 8.7 12 8.7 C7.6 8.7 4 7.9 4 6.5 Z M4 11.2 C4 9.8 7.6 8.7 12 8.7 C16.4 8.7 20 9.8 20 11.2 V13.7 C20 15.1 16.4 15.9 12 15.9 C7.6 15.9 4 15.1 4 13.7 Z M4 18.4 C4 17 7.6 15.9 12 15.9 C16.4 15.9 20 17 20 18.4 V20.9 C20 22.3 16.4 23.1 12 23.1 C7.6 23.1 4 22.3 4 20.9 Z',
 }

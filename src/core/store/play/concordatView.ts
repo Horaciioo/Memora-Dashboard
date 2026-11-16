@@ -3,6 +3,8 @@
 import { create } from 'zustand'
 
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
+import { CONCORDAT_STANDING_DEFAULTS } from '@/core/lib/play/concordat/view/standings'
+import type { ConcordatStandingColumn } from '@/core/lib/play/concordat/view/standings'
 import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
 
 /**
@@ -11,7 +13,9 @@ import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
  */
 
 export type ConcordatTool =
-  { kind: 'build'; building: ConcordatBuildingKind } | { kind: 'launch'; isHeavy: boolean }
+  | { kind: 'build'; building: ConcordatBuildingKind }
+  | { kind: 'launch'; isHeavy: boolean; weapon?: 'shell' | 'rocket' }
+  | { kind: 'sortie'; air: 'heli' | 'fighter' }
 
 /**
  * Click echo on the map: a ripple, and for an expansion the tile it heads for
@@ -38,6 +42,11 @@ interface ConcordatViewStore {
   percent: number
   tool: ConcordatTool | null
   marks: ConcordatMark[]
+  standSort: ConcordatStandingColumn
+  standDesc: boolean
+  standColumns: ConcordatStandingColumn[]
+  sortStandings: (column: ConcordatStandingColumn) => void
+  toggleColumn: (column: ConcordatStandingColumn) => void
   mark: (tile: number, kind: ConcordatMark['kind']) => void
   setTool: (tool: ConcordatTool | null) => void
   recenterTick: number
@@ -51,6 +60,22 @@ export const useConcordatViewStore = create<ConcordatViewStore>()((set) => ({
   percent: CONCORDAT_ART.engage.initial,
   tool: null,
   marks: [],
+  standSort: 'tiles',
+  standDesc: true,
+  standColumns: CONCORDAT_STANDING_DEFAULTS,
+  // Same column twice flips the order, a new one starts biggest first
+  sortStandings: (column) =>
+    set((state) =>
+      state.standSort === column
+        ? { standDesc: !state.standDesc }
+        : { standSort: column, standDesc: true }
+    ),
+  toggleColumn: (column) =>
+    set((state) => ({
+      standColumns: state.standColumns.includes(column)
+        ? state.standColumns.filter((item) => item !== column)
+        : [...state.standColumns, column],
+    })),
   mark: (tile, kind) =>
     set((state) => {
       const now = performance.now()

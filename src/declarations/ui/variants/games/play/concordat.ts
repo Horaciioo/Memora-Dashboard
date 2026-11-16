@@ -44,7 +44,7 @@ export const CONCORDAT_BOARD = {
 export const CONCORDAT_HUD = {
   // Bottom centre: one pill with figures, engagement and corps
   dock: 'pointer-events-none absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 max-md:bottom-[5.5rem]',
-  pill: `${BLOCK} pointer-events-auto relative flex w-[min(32rem,calc(100vw-1.5rem))] flex-col gap-3 px-5 py-3.5 opacity-90 transition-opacity hover:opacity-100`,
+  pill: `${BLOCK} pointer-events-auto relative flex w-[min(40rem,calc(100vw-1.5rem))] flex-col gap-3 px-5 py-3.5 opacity-90 transition-opacity hover:opacity-100`,
   stats: 'flex items-baseline justify-between gap-3',
   stat: 'flex items-baseline gap-1.5',
   statFigure: 'text-sm leading-none font-bold tabular-nums text-[var(--play-ink)]',
@@ -53,7 +53,26 @@ export const CONCORDAT_HUD = {
   row: 'flex items-center gap-3',
   minimap: `${BLOCK} pointer-events-auto relative overflow-hidden p-1.5`,
   minimapCanvas: 'block cursor-pointer rounded-[0.1rem]',
-  ranking: 'pointer-events-none absolute top-20 right-7 z-20 w-72 max-md:hidden',
+  // Top left: standings sidebar, keys row then the table
+  standings:
+    'pointer-events-none absolute top-4 left-5 z-20 flex max-w-[calc(100vw-2.5rem)] flex-col gap-1.5 max-md:hidden',
+  standKeys: 'pointer-events-auto flex items-center gap-1',
+  standKey: `${BLOCK} grid size-9 place-items-center text-[var(--play-ink)] transition-transform hover:-translate-y-0.5`,
+  standKeyOn: `${BLOCK} grid size-9 place-items-center text-[var(--play-accent)]`,
+  standPicker: `${BLOCK} pointer-events-auto flex w-44 flex-col gap-0.5 p-1.5`,
+  standPick:
+    'flex items-center justify-between gap-2 rounded-[0.15rem] px-2 py-1 text-left text-xs font-bold text-[var(--play-ink)] hover:bg-[var(--play-chip)]',
+  standTable: `${BLOCK} pointer-events-auto flex flex-col overflow-hidden`,
+  standScroll: 'max-h-[11rem] overflow-y-auto overscroll-contain',
+  standRow:
+    'grid cursor-pointer items-center gap-x-2.5 px-2.5 py-1 text-xs tabular-nums text-[var(--play-ink)] transition-colors hover:bg-[var(--play-chip)]',
+  standHead:
+    'grid items-center gap-x-2.5 border-b border-[var(--play-line)] px-2.5 py-1.5 text-[0.6rem] font-black tracking-[0.12em] uppercase text-[var(--play-ink-faint)]',
+  standSortKey: 'cursor-pointer text-right hover:text-[var(--play-ink)]',
+  standMine: 'font-black',
+  standPinned: 'border-t border-[var(--play-line)] bg-[var(--play-chip)]',
+  standName: 'flex min-w-0 items-center gap-1.5 font-bold',
+  standCell: 'text-right',
   caption: CAPTION,
   percent: 'w-10 shrink-0 text-sm leading-none font-bold tabular-nums text-[var(--play-ink-soft)]',
   slider: 'concordat-slider min-w-0 flex-1 cursor-pointer',
@@ -71,7 +90,9 @@ export const CONCORDAT_HUD = {
     'relative flex size-9 shrink-0 flex-col items-center justify-center gap-px rounded-[0.15rem] bg-[var(--play-accent)] text-[var(--concordat-plate)]',
   armTip:
     'pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 hidden w-56 -translate-x-1/2 flex-col gap-1 rounded-[0.15rem] bg-[var(--concordat-plate)] px-3 py-2 text-xs font-bold text-[var(--concordat-khaki)] shadow-lg group-hover/arm:flex',
+  armTipHead: 'flex items-center justify-between gap-3',
   armTipTitle: 'text-sm font-bold',
+  armTipCost: 'inline-flex shrink-0 items-center gap-1 text-sm font-bold tabular-nums',
   armKey:
     'pointer-events-none absolute top-0.5 left-1 text-[0.55rem] leading-none font-extrabold tabular-nums opacity-60',
   ghost:
@@ -86,14 +107,11 @@ export const CONCORDAT_HUD = {
     'pointer-events-none absolute top-[32%] left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2',
   zone: `${BLOCK} concordat-zone-pop flex flex-col items-center gap-0.5 px-6 py-3 text-center`,
   zoneTitle: 'text-xl font-bold tracking-wide uppercase text-[var(--play-ink)]',
-  zoneGold: 'text-sm font-bold tabular-nums text-[var(--play-value)]',
-  threat: `${BLOCK} px-4 py-2 text-sm font-bold text-[var(--play-ink)]`,
+  zoneGold:
+    'inline-flex items-center gap-1 text-sm font-bold tabular-nums text-[var(--play-value)]',
   pick: `${BLOCK} flex max-w-[28rem] flex-col items-center gap-1 px-5 py-3 text-center`,
   pickTitle: 'text-lg font-bold text-[var(--play-ink)]',
   pickHint: 'text-sm font-bold text-[var(--play-ink-faint)]',
-  offers: `${BLOCK} pointer-events-auto flex max-w-[26rem] flex-col gap-1.5 p-3`,
-  offer: 'flex items-center gap-2 text-sm font-extrabold text-[var(--play-ink)]',
-  offerText: 'min-w-0 flex-1',
   accept: `${BUTTON} bg-[var(--play-accent)] py-1 text-xs ${ON_BRASS}`,
   refuse: `${BUTTON} bg-[var(--play-chip)] py-1 text-xs text-[var(--play-ink)]`,
 } as const
@@ -111,4 +129,32 @@ export const CONCORDAT_RESULT = {
   hint: 'text-xs font-bold text-[var(--play-ink-faint)]',
   timeline: `${BLOCK} h-[clamp(7rem,20dvh,13rem)] w-full p-3`,
   svg: 'size-full overflow-visible',
+} as const
+
+/**
+ * Card of the nation under the pointer, centred under the clock
+ * @type {Record<string, string>}
+ */
+
+export const CONCORDAT_HOVER = {
+  card: `${BLOCK} pointer-events-none absolute top-14 left-1/2 z-20 flex w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2 items-stretch gap-4 px-4 py-2.5 max-md:hidden`,
+  left: 'flex w-44 shrink-0 flex-col justify-center gap-1.5',
+  right: 'flex min-w-0 flex-1 flex-col justify-center gap-1',
+  gold: 'inline-flex items-center gap-1.5 text-sm font-black tabular-nums text-[var(--play-value)]',
+  sending: 'text-xs font-bold tabular-nums text-[var(--play-accent)]',
+  bar: 'relative h-5 w-full overflow-hidden rounded-[0.15rem] bg-[var(--play-chip)]',
+  barFill: 'absolute inset-y-0 left-0 bg-[var(--play-accent)] opacity-80',
+  barPush: 'absolute inset-y-0 bg-[var(--play-ink)] opacity-35',
+  barText:
+    'relative flex h-full items-center justify-center gap-1 text-[0.7rem] font-black tabular-nums text-[var(--play-ink)]',
+  nameRow: 'flex min-w-0 items-center gap-1.5',
+  swatch: 'size-3 shrink-0 rounded-[0.1rem]',
+  name: 'min-w-0 truncate text-base font-black text-[var(--play-ink)]',
+  faint: 'truncate text-xs font-bold text-[var(--play-ink-faint)]',
+  tieWar: 'text-xs font-bold text-[var(--play-ink-faint)]',
+  tiePeace: 'text-xs font-bold text-[var(--play-ink-soft)]',
+  tieAlly: 'text-xs font-black text-[var(--play-accent)]',
+  badges: 'flex flex-wrap gap-x-2 gap-y-0.5',
+  badge:
+    'inline-flex items-center gap-0.5 text-xs font-bold tabular-nums text-[var(--play-ink-soft)]',
 } as const

@@ -16,6 +16,8 @@ type SystemsFields = Pick<
   | 'nextDrawAt'
   | 'techs'
   | 'strikes'
+  | 'aircraft'
+  | 'scars'
   | 'zones'
   | 'arms'
   | 'world'
@@ -92,6 +94,8 @@ export const freshSystems = (players: number): SystemsFields => ({
   nextDrawAt: 0,
   techs: Array.from({ length: players }, emptyTech),
   strikes: [],
+  aircraft: [],
+  scars: [],
   zones: [],
   arms: Array.from({ length: players }, emptyArms),
   world: { nextAt: 0, active: null, warned: [] },
