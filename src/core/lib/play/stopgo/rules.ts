@@ -231,5 +231,11 @@ export const canPlay = (
   }
   if (spec.target === StopGoTargets.None) return null
 
-  return targetVerdict(spec, targets, table, accountId)
+  const verdict = targetVerdict(spec, targets, table, accountId)
+  if (verdict || key !== 'mystery') return verdict
+
+  // The reveal is paid in km, a car without them cannot be sealed
+  return targets.some((id) => table.cars[id].km < STOPGO_SETTINGS.mysteryCost)
+    ? StopGoRefusals.TooShort
+    : null
 }

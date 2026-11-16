@@ -18,7 +18,11 @@ type Player = StopGoBoardView['players'][number]
 const aimReason = (key: StopGoCardKey, rivals: Player[]): string => {
   const hazard = STOPGO_CARDS[key].hazard
   if (!rivals.length) return STOPGO_ERRORS.noOpponent
-  if (!hazard) return STOPGO_ERRORS.alreadySealed
+  if (!hazard) {
+    const isShort = rivals.every((rival) => rival.km < STOPGO_SETTINGS.mysteryCost)
+
+    return isShort ? STOPGO_ERRORS.tooShort : STOPGO_ERRORS.alreadySealed
+  }
 
   // One refusal per rival, shared or not
   const reasons = new Set(

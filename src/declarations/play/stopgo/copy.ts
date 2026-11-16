@@ -30,7 +30,10 @@ export const STOPGO_CARD_COPY: Record<StopGoCardKey, { name: string; hint: strin
   tank: { name: 'Réservoir blindé', hint: 'Bloque les Pannes d’essence.' },
   tyres: { name: 'Pneus renforcés', hint: 'Bloque les Crevaisons.' },
   ace: { name: 'Pilote d’élite', hint: 'Bloque les Accidents.' },
-  mystery: { name: 'Pioche mystère', hint: 'Glisse une carte scellée chez un adversaire.' },
+  mystery: {
+    name: 'Pioche mystère',
+    hint: 'Scelle une carte chez un adversaire qui a de quoi la révéler.',
+  },
 }
 
 /**
@@ -67,6 +70,7 @@ export const STOPGO_ERRORS: Record<StopGoRefusal, string> = {
   sameMalus: 'Cet adversaire vient déjà de subir ce malus.',
   alreadyDrawn: 'Tu as déjà pioché ce tour.',
   mustDraw: 'Pioche d’abord ta carte du tour.',
+  tooShort: 'Cet adversaire n’a pas assez de km pour payer la révélation.',
 }
 
 /**
@@ -126,7 +130,8 @@ export const STOPGO_RULES_COPY = {
   goodDraw: 'Bonne pioche',
   goodDrawValue: 'Tu pioches deux cartes, tu en gardes une, {seconds} s pour choisir.',
   mystery: 'Pioche mystère',
-  mysteryValue: 'Une carte scellée chez un adversaire, qui la révèle contre {cost} km.',
+  mysteryValue:
+    'Une carte scellée chez un adversaire qui a au moins {cost} km. Elle prend une place de sa main jusqu’à ce qu’il la révèle contre {cost} km.',
   safeties: 'Protections',
   safetiesValue:
     '{list}. Elles se piochent comme les autres cartes, toujours une seule de chaque. Posée à ton tour, une protection lève le malus qu’elle bloque, te protège pour toute la course et te fait repiocher puis rejouer.',
@@ -168,7 +173,8 @@ export const STOPGO_HAND_COPY = {
   discardPile: 'Cartes jouées',
   empty: 'Vide',
   sealed: 'Carte scellée',
-  sealedHint: 'Une carte piégée. La révéler te coûte {cost} km.',
+  sealedHint:
+    'Une carte piégée : elle prend une place de ta main tant qu’elle est scellée. La révéler te coûte {cost} km.',
   reveal: 'Révéler (−{cost} km)',
   revealAfter: 'Tu reculeras à {km} km.',
   pickLead: 'Bonne pioche',

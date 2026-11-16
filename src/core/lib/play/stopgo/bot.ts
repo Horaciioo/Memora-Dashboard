@@ -177,8 +177,8 @@ const scoreOf = (
     const stopped: readonly string[] = STOPGO_SAFETIES[option.key as StopGoSafety]
     const isHit = me.hazards.some((hazard) => stopped.includes(hazard))
 
-    // Kept in hand for a coup fourré unless it frees the car now (easy plays it at once)
-    return isHit ? 1100 : level === PlayBotKinds.Easy ? 600 : 30
+    // Only the hard level keeps it in hand for a coup fourré, the others take the extra turn
+    return isHit ? 1100 : isHard ? 30 : 800
   }
   if (spec.family === StopGoFamilies.Distance) {
     const gap = board.target - me.km - km

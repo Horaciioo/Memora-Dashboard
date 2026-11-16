@@ -32,6 +32,7 @@ export const StopGoRefusals = {
   SameMalus: 'sameMalus',
   AlreadyDrawn: 'alreadyDrawn',
   MustDraw: 'mustDraw',
+  TooShort: 'tooShort',
 } as const
 
 export type StopGoRefusal = (typeof StopGoRefusals)[keyof typeof StopGoRefusals]

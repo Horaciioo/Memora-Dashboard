@@ -49,7 +49,8 @@ const targetsFor = (
 
   // Opponents who can take the malus, none carrying a sealed card for a mystery
   const aimable = aimableOf(spec, race, accountId).filter(
-    (id) => key !== 'mystery' || !carrying.has(id)
+    (id) =>
+      key !== 'mystery' || (!carrying.has(id) && race.cars[id].km >= STOPGO_SETTINGS.mysteryCost)
   )
   if (spec.target === StopGoTargets.One) return aimable.length ? aimable : null
 

@@ -18,6 +18,7 @@ const OPEN_FAMILIES: string[] = [
   StopGoFamilies.Remedy,
   StopGoFamilies.Attack,
   StopGoFamilies.Bonus,
+  StopGoFamilies.Safety,
 ]
 
 /**

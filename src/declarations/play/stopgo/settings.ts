@@ -128,7 +128,11 @@ export const STOPGO_SETTINGS = {
   markMs: readInteger(fx.markMs, { path: 'play/stopgo.fx.markMs', fallback: 900, min: 100 }),
   drawMs: readInteger(fx.drawMs, { path: 'play/stopgo.fx.drawMs', fallback: 450, min: 100 }),
   revealMs: readInteger(fx.revealMs, { path: 'play/stopgo.fx.revealMs', fallback: 1000, min: 200 }),
-  dealGapMs: readInteger(fx.dealGapMs, { path: 'play/stopgo.fx.dealGapMs', fallback: 1400, min: 0 }),
+  dealGapMs: readInteger(fx.dealGapMs, {
+    path: 'play/stopgo.fx.dealGapMs',
+    fallback: 1400,
+    min: 0,
+  }),
   colors: readStringList(stopgo.colors, {
     path: 'play/stopgo.colors',
     fallback: ['red', 'blue', 'green', 'yellow'],
