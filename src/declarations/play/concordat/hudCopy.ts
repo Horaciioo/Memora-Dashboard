@@ -26,13 +26,18 @@ export const CONCORDAT_HUD_COPY = {
   landLockedHint: 'Construis un port, puis envoie tes troupes par la mer vers une autre terre.',
   pickClock: 'Départ dans {seconds} s',
   engage: 'Engagement',
-  engageHint: 'Part de tes troupes envoyée à chaque clic.',
+  engageHint:
+    'Part de tes troupes envoyée à chaque clic, rappuie pour en renvoyer autant. Clic droit : diplomatie.',
   engageValue: '{percent} %',
   corps: 'Mes corps',
   noCorps: 'Aucun corps engagé.',
   free: 'Terre libre',
   freeCorps: 'Terre libre',
   retreat: 'Rappeler',
+  defend: 'Défendre {troops}',
+  defendHint:
+    'Met ce pourcentage de tes troupes face à cette attaque : plus elle est forte face aux assaillants, plus le front ralentit.',
+  attacked: 'Attaque subie',
   offers: 'Propositions',
   accept: 'Accepter',
   refuse: 'Refuser',
@@ -225,12 +230,6 @@ export const CONCORDAT_RESULT_COPY = {
   first: 'Vainqueur · {percent} % des terres',
   place: '{place}e · {percent} % des terres',
   fallen: 'Éliminée',
-  timeline: 'Histoire de la partie',
-  timelineHint:
-    'Terres tenues par chaque nation. Les repères marquent les traités et les trahisons.',
-  treaty: 'Traité',
-  betrayal: 'Trahison',
-  minute: '{minutes} min',
 } as const
 
 /**

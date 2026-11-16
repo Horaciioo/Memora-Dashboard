@@ -3,9 +3,11 @@
 import { useState } from 'react'
 
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
-import { playerRgb, rgbText } from '@/core/lib/play/concordat'
+import { playerRgb, rgbText, troopFigure } from '@/core/lib/play/concordat'
+import { useConcordatViewStore } from '@/core/store/play/concordatView'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
+import { fillPlayMessage } from '@/declarations/play/copy'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 import { ConcordatIntents } from '@/utils/constants/concordat'
 
@@ -23,8 +25,11 @@ export interface ConcordatCorpsProps {
 
 export const ConcordatCorps = ({ client, names, act }: ConcordatCorpsProps) => {
   const [isOpen, setOpen] = useState(false)
+  const percent = useConcordatViewStore((state) => state.percent)
   const mine = client.corps.filter((corps) => corps.owner === client.me)
-  if (!mine.length) return null
+  const incoming = client.corps.filter((corps) => corps.target === client.me && corps.owner)
+  const reserve = client.players[client.me - 1]?.troops ?? 0
+  if (!mine.length && !incoming.length) return null
 
   return (
     <>
@@ -39,6 +44,34 @@ export const ConcordatCorps = ({ client, names, act }: ConcordatCorpsProps) => {
       {isOpen && (
         <div className={CONCORDAT_HUD.corpsList}>
           <ul className={CONCORDAT_HUD.corps}>
+            {incoming.map((corps) => (
+              <li key={`in-${corps.owner}`} className={CONCORDAT_HUD.corpsRow}>
+                <span
+                  className={CONCORDAT_HUD.swatch}
+                  style={{
+                    background: rgbText(
+                      playerRgb(client.players[corps.owner - 1], CONCORDAT_ART.nation)
+                    ),
+                  }}
+                />
+                <span className={CONCORDAT_HUD.corpsName}>
+                  {names[corps.owner]} · {CONCORDAT_HUD_COPY.attacked}
+                </span>
+                <span className={CONCORDAT_HUD.corpsTroops}>{troopFigure(corps.troops)}</span>
+                <button
+                  type="button"
+                  className={CONCORDAT_HUD.retreat}
+                  title={CONCORDAT_HUD_COPY.defendHint}
+                  onClick={() =>
+                    void act({ type: ConcordatIntents.Defend, target: corps.owner, percent })
+                  }
+                >
+                  {fillPlayMessage(CONCORDAT_HUD_COPY.defend, {
+                    troops: troopFigure(Math.floor((reserve * percent) / 100)),
+                  })}
+                </button>
+              </li>
+            ))}
             {mine.map((corps) => (
               <li key={corps.target} className={CONCORDAT_HUD.corpsRow}>
                 <span
@@ -52,7 +85,7 @@ export const ConcordatCorps = ({ client, names, act }: ConcordatCorpsProps) => {
                 <span className={CONCORDAT_HUD.corpsName}>
                   {corps.target ? names[corps.target] : CONCORDAT_HUD_COPY.free}
                 </span>
-                <span className={CONCORDAT_HUD.corpsTroops}>{corps.troops}</span>
+                <span className={CONCORDAT_HUD.corpsTroops}>{troopFigure(corps.troops)}</span>
                 <button
                   type="button"
                   className={CONCORDAT_HUD.retreat}

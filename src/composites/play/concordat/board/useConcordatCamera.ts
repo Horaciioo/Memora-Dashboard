@@ -38,6 +38,7 @@ export interface ConcordatCameraProps {
   invalidate: () => void
   onTap: (tile: number, x: number, y: number) => void
   onHover: (tile: number, x: number, y: number) => void
+  onMenu: (tile: number, x: number, y: number) => void
 }
 
 /**
@@ -55,6 +56,7 @@ export const useConcordatCamera = ({
   invalidate,
   onTap,
   onHover,
+  onMenu,
 }: ConcordatCameraProps) => {
   const camera = useRef<ConcordatCamera>({ x: 0, y: 0, scale: 1 })
   const size = useRef({ width: 0, height: 0 })
@@ -62,9 +64,9 @@ export const useConcordatCamera = ({
   // Stays on the whole map until the player moves it
   const isFitted = useRef(true)
   const isLanded = useRef(false)
-  const taps = useRef({ onTap, onHover })
+  const taps = useRef({ onTap, onHover, onMenu })
   useEffect(() => {
-    taps.current = { onTap, onHover }
+    taps.current = { onTap, onHover, onMenu }
   })
 
   const frameOf = useCallback(
@@ -149,11 +151,20 @@ export const useConcordatCamera = ({
       const ratio = Math.min(maxDpr, window.devicePixelRatio || 1)
       size.current = { width: box.clientWidth, height: box.clientHeight }
       setView(size.current)
+      // Hidden box, nothing to frame yet
+      if (!size.current.width || !size.current.height) return
+
       target.width = Math.round(box.clientWidth * ratio)
       target.height = Math.round(box.clientHeight * ratio)
       const frame = frameOf()
       if (!isLanded.current && focusTile >= 0) {
         isLanded.current = true
+        // A camera the player already placed stays where it is
+        if (!isFitted.current) {
+          place(camera.current)
+
+          return
+        }
         isFitted.current = false
         place(
           centerOnTile(
@@ -199,8 +210,11 @@ export const useConcordatCamera = ({
       place(zoomCamera(camera.current, 1 / (1 + delta / zoom.divisor), x, y, limitsOf()))
     }
     const onDown = (event: PointerEvent) => {
+      if (event.button > 0) return
       const [x, y] = local(event)
       stopGlide()
+      // A lost release must not leave a ghost finger
+      if (event.pointerType === 'mouse') pointers.clear()
       pointers.set(event.pointerId, { x, y })
       box.setPointerCapture(event.pointerId)
       drag = { moved: 0 }
@@ -245,20 +259,32 @@ export const useConcordatCamera = ({
       if (event.pointerType === 'mouse' && !pointers.size) taps.current.onHover(-1, 0, 0)
     }
 
+    const onContext = (event: MouseEvent) => {
+      event.preventDefault()
+      const rect = box.getBoundingClientRect()
+      const [x, y] = [event.clientX - rect.left, event.clientY - rect.top]
+      pointers.clear()
+      taps.current.onMenu(tileAtPoint(camera.current, frameOf(), x, y), x, y)
+    }
+
+    box.addEventListener('contextmenu', onContext)
     box.addEventListener('wheel', onWheel, { passive: false })
     box.addEventListener('pointerdown', onDown)
     box.addEventListener('pointermove', onMove)
     box.addEventListener('pointerup', onUp)
     box.addEventListener('pointercancel', onUp)
     box.addEventListener('pointerleave', onLeave)
+    box.addEventListener('lostpointercapture', onUp)
 
     return () => {
+      box.removeEventListener('contextmenu', onContext)
       box.removeEventListener('wheel', onWheel)
       box.removeEventListener('pointerdown', onDown)
       box.removeEventListener('pointermove', onMove)
       box.removeEventListener('pointerup', onUp)
       box.removeEventListener('pointercancel', onUp)
       box.removeEventListener('pointerleave', onLeave)
+      box.removeEventListener('lostpointercapture', onUp)
     }
   }, [wrap, frameOf, limitsOf, place, stopGlide])
 

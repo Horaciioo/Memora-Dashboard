@@ -1,5 +1,6 @@
 import type { ConcordatBoardPlayer } from '@/core/lib/play/concordat/wire/board'
 import { ConcordatPowers } from '@/utils/constants/concordat'
+import { CONCORDAT } from '@/declarations/play/concordat/rules'
 
 /**
  * Nations, living first then by land then by id
@@ -65,13 +66,27 @@ export const landTilesOf = (terrain: Uint8Array, seaId: number): number => {
 }
 
 /**
- * Big figure in K, one decimal under 100 K
+ * Troops as shown to players, the sim count times the display unit
+ * @param {number} value - Sim troops
+ * @return {string} - Text such as 25 K
+ */
+
+export const troopFigure = (value: number): string =>
+  compactFigure(value * CONCORDAT.sim.troopUnit)
+
+/**
+ * Big figure in K or M, one decimal under 100 K
  * @param {number} value - Figure
  * @return {string} - Text such as 37,5 K
  */
 
 export const compactFigure = (value: number): string => {
   if (value < 1000) return String(Math.round(value))
+  if (value >= 1_000_000) {
+    const millions = value / 1_000_000
+
+    return `${millions.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M`
+  }
   const thousands = value / 1000
   const digits = thousands < 100 ? 1 : 0
 

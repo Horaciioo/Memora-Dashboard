@@ -13,6 +13,7 @@ import {
   clockText,
   featuredPlayers,
   compactFigure,
+  troopFigure,
   landShareText,
   landTilesOf,
 } from '@/core/lib/play/concordat'
@@ -64,7 +65,7 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
             percent: landShareText(me.tiles, land),
           }),
         },
-        { key: 'troops', caption: CONCORDAT_HUD_COPY.troops, figure: compactFigure(me.troops) },
+        { key: 'troops', caption: CONCORDAT_HUD_COPY.troops, figure: troopFigure(me.troops) },
         { key: 'gold', caption: CONCORDAT_HUD_COPY.gold, figure: compactFigure(me.gold) },
       ]
     : []

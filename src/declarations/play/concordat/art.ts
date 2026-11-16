@@ -27,7 +27,7 @@ export const CONCORDAT_ART = {
     glide: 110,
   },
   // Zoom steps that unlock details
-  detail: { crossings: 0.8, provinces: 1, provinceNames: 2.4, buildings: 0.7 },
+  detail: { crossings: 0.8, provinces: 1, provinceNames: 2.4, buildings: 1.1 },
   // Boat on a river crossing, in tiles then pixels
   boat: {
     size: 2.4,
@@ -45,7 +45,7 @@ export const CONCORDAT_ART = {
     glide: 1,
   },
   // Building token, in pixels, then its ring and level pips
-  token: { base: 1.9, min: 15, max: 38, ring: 2.2, glyph: 0.62, pip: 0.09, badge: 0.27 },
+  token: { base: 1.2, min: 8, max: 26, ring: 1.4, glyph: 0.62, pip: 0.09, badge: 0.27 },
   // Missiles: trail, reticle and the fallout ground
   strike: {
     arc: 0.28,
@@ -126,7 +126,8 @@ export const CONCORDAT_ART = {
   // Pawn over a capital, in pixels at the current zoom
   pawn: { base: 1.7, min: 8, max: 20, ring: 2.4, aiScale: 4 },
   // Smallest boat on screen, in pixels
-  ship: { min: 12 },
+  // Round tag over it: radius and lift from the hull length, white rim
+  ship: { min: 22, badge: { radius: 0.4, lift: 0.85, rim: 1.5 } },
   // Trade lines: width from zoom, arc, casing, cut grey, pulse size and speed
   routes: {
     min: 1.5,
@@ -162,9 +163,9 @@ export const CONCORDAT_ART = {
   // Tiles changed above this share trigger a whole repaint
   repaintShare: 0.15,
   // Label recompute rhythm
-  labelMs: 1000,
+  labelMs: 2500,
   // Engagement slider, in percent
-  engage: { min: 10, max: 100, step: 5, initial: 20 },
+  engage: { min: 1, max: 100, step: 1, initial: 20 },
   // Floating boxes over the map, in pixels
   menu: { width: 240, height: 220, gap: 12 },
   strikeMenu: { width: 240, height: 140 },

@@ -6,6 +6,7 @@ import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOu
 import {
   CONCORDAT_STANDING_COLUMNS,
   compactFigure,
+  troopFigure,
   landShareText,
   playerRgb,
   rgbText,
@@ -47,8 +48,8 @@ const figureText = (column: ConcordatStandingColumn, value: number): string => {
   if (column === 'tiles') return `${landShareText(value, 100)} %`
   if (column === 'income')
     return `${value > 0 ? '+' : value < 0 ? '-' : ''}${compactFigure(Math.abs(value))}`
-  if (column === 'gold' || column === 'trade' || column === 'troops' || column === 'maxTroops')
-    return compactFigure(value)
+  if (column === 'troops' || column === 'maxTroops') return troopFigure(value)
+  if (column === 'gold' || column === 'trade') return compactFigure(value)
   if (column === 'kind')
     return value === 0 ? CONCORDAT_STANDINGS_COPY.kindHuman : CONCORDAT_STANDINGS_COPY.kindCountry
 

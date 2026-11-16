@@ -59,7 +59,7 @@ export const CONCORDAT_BOARD = {
 export const CONCORDAT_HUD = {
   // Bottom centre: one pill with figures, engagement and corps
   dock: 'pointer-events-none absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 max-md:bottom-[5.5rem]',
-  pill: `${BLOCK} pointer-events-auto relative flex w-[min(40rem,calc(100vw-1.5rem))] flex-col gap-3 px-5 py-3.5 opacity-90 transition-opacity hover:opacity-100`,
+  pill: `${BLOCK} pointer-events-auto relative flex w-[min(50rem,calc(100vw-1.5rem))] flex-col gap-3 px-5 py-3.5 opacity-90 transition-opacity hover:opacity-100`,
   stats: 'flex items-baseline justify-between gap-3',
   stat: 'flex items-baseline gap-1.5',
   statFigure: 'text-sm leading-none font-bold tabular-nums text-[var(--play-ink)]',
@@ -90,6 +90,9 @@ export const CONCORDAT_HUD = {
   standCell: 'text-right',
   caption: CAPTION,
   percent: 'w-10 shrink-0 text-sm leading-none font-bold tabular-nums text-[var(--play-ink-soft)]',
+  percentField:
+    'flex shrink-0 items-center rounded-md bg-[var(--play-chip)] px-1.5 py-0.5 text-sm leading-none font-bold tabular-nums text-[var(--play-ink)]',
+  percentInput: 'concordat-percent w-7 bg-transparent text-right',
   slider: 'concordat-slider min-w-0 flex-1 cursor-pointer',
   corpsKey: `${BUTTON} bg-[var(--play-chip)] py-1 text-xs text-[var(--play-ink)]`,
   corpsList: `${BLOCK} pointer-events-auto absolute right-0 bottom-full mb-2 flex w-full flex-col gap-1 p-3`,
@@ -112,6 +115,8 @@ export const CONCORDAT_HUD = {
     'pointer-events-none absolute top-0.5 left-1 text-[0.55rem] leading-none font-extrabold tabular-nums opacity-60',
   ghost:
     'pointer-events-none fixed top-0 left-0 z-40 flex size-12 items-center justify-center rounded-[0.2rem] bg-[var(--play-accent)] text-[var(--concordat-plate)] opacity-90 shadow-lg',
+  armCount:
+    'pointer-events-none absolute top-0.5 right-1 text-[0.6rem] leading-none font-extrabold tabular-nums',
   armNote: 'text-[0.6rem] leading-none font-bold tabular-nums opacity-70',
   toolBar: `${BLOCK} pointer-events-auto flex items-center gap-3 px-4 py-2 text-sm font-bold text-[var(--play-ink)]`,
   // Under the keys, top right
@@ -138,18 +143,12 @@ export const CONCORDAT_HUD = {
 } as const
 
 /**
- * Concordat result: podium then the history of the game
+ * Concordat result: podium
  * @type {Record<string, string>}
  */
 
 export const CONCORDAT_RESULT = {
   root: 'flex min-h-0 w-full flex-1 flex-col items-center justify-center',
-  under:
-    'flex w-full max-w-4xl shrink-0 flex-col items-center gap-[clamp(0.3rem,1dvh,0.6rem)] px-4 pb-[clamp(0.5rem,2dvh,1.25rem)]',
-  caption: 'text-xs font-extrabold tracking-wide text-[var(--play-ink-faint)] uppercase',
-  hint: 'text-xs font-bold text-[var(--play-ink-faint)]',
-  timeline: `${BLOCK} h-[clamp(7rem,20dvh,13rem)] w-full p-3`,
-  svg: 'size-full overflow-visible',
 } as const
 
 /**
@@ -158,24 +157,23 @@ export const CONCORDAT_RESULT = {
  */
 
 export const CONCORDAT_HOVER = {
-  card: `${BLOCK} pointer-events-none absolute top-14 left-1/2 z-20 flex w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2 items-stretch gap-4 px-4 py-2.5 max-md:hidden`,
-  left: 'flex w-44 shrink-0 flex-col justify-center gap-1.5',
-  right: 'flex min-w-0 flex-1 flex-col justify-center gap-1',
-  gold: 'inline-flex items-center gap-1.5 text-sm font-black tabular-nums text-[var(--play-value)]',
-  sending: 'text-xs font-bold tabular-nums text-[var(--play-accent)]',
-  bar: 'relative h-5 w-full overflow-hidden rounded-[0.15rem] bg-[var(--play-chip)]',
+  card: `${BLOCK} pointer-events-none absolute top-3 left-1/2 z-20 flex w-[min(64rem,calc(100vw-2rem))] -translate-x-1/2 items-center gap-3 px-3 py-2 max-md:hidden`,
+  right: 'flex min-w-0 flex-1 flex-col justify-center gap-0.5',
+  gold: 'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[0.3rem] border border-[var(--play-value)] px-3 text-base font-black tabular-nums text-[var(--play-value)]',
+  sending: 'shrink-0 text-sm font-black tabular-nums text-[var(--play-ink-soft)]',
+  bar: 'relative h-9 w-48 shrink-0 overflow-hidden rounded-[0.3rem] bg-[var(--play-chip)]',
   barFill: 'absolute inset-y-0 left-0 bg-[var(--play-accent)] opacity-80',
   barPush: 'absolute inset-y-0 bg-[var(--play-ink)] opacity-35',
   barText:
-    'relative flex h-full items-center justify-center gap-1 text-[0.7rem] font-black tabular-nums text-[var(--play-ink)]',
-  nameRow: 'flex min-w-0 items-center gap-1.5',
-  swatch: 'size-3 shrink-0 rounded-[0.1rem]',
-  name: 'min-w-0 truncate text-base font-black text-[var(--play-ink)]',
+    'relative flex h-full items-center justify-center gap-1.5 text-sm font-black tabular-nums text-[var(--play-ink)]',
+  nameRow: 'flex min-w-0 items-baseline gap-2',
+  swatch: 'size-3 shrink-0 self-center rounded-[0.1rem]',
+  name: 'min-w-0 truncate text-xl font-black text-[var(--play-ink)]',
   faint: 'truncate text-xs font-bold text-[var(--play-ink-faint)]',
   tieWar: 'text-xs font-bold text-[var(--play-ink-faint)]',
   tiePeace: 'text-xs font-bold text-[var(--play-ink-soft)]',
   tieAlly: 'text-xs font-black text-[var(--play-accent)]',
-  badges: 'flex flex-wrap gap-x-2 gap-y-0.5',
+  badges: 'flex shrink-0 gap-1.5',
   badge:
-    'inline-flex items-center gap-0.5 text-xs font-bold tabular-nums text-[var(--play-ink-soft)]',
+    'inline-flex h-9 min-w-14 items-center justify-center gap-1.5 rounded-[0.3rem] border border-[var(--play-ink-faint)] px-2.5 text-sm font-bold tabular-nums text-[var(--play-ink-soft)]',
 } as const

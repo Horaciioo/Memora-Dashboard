@@ -1,11 +1,10 @@
-import { isWorking } from '@/core/lib/play/concordat/buildings'
 import { sailRefusal } from '@/core/lib/play/concordat/navy'
 import { tileNoise } from '@/core/lib/play/concordat/sim/rng'
 import { isOpenTarget } from '@/core/lib/play/concordat/bots/view'
 import type { ConcordatBotContext } from '@/core/lib/play/concordat/bots/view'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent } from '@/types/concordat'
-import { ConcordatBuildingKinds, ConcordatTerrains } from '@/utils/constants/concordat'
+import { ConcordatTerrains } from '@/utils/constants/concordat'
 
 const { bots, navy } = CONCORDAT
 
@@ -13,7 +12,7 @@ const { bots, navy } = CONCORDAT
 const LANDING_PERCENT = 40
 
 /**
- * A landing for a nation with no land to take: free shore or an open rival
+ * A landing for a nation with no land to take: free shore or an open rival, from any own coast
  * @param {ConcordatBotContext} context - Decision
  * @return {ConcordatIntent[]} - Commands
  */
@@ -23,17 +22,12 @@ export const seaMoves = (context: ConcordatBotContext): ConcordatIntent[] => {
   if (isCaretaker || !profile.sails || view.freeContact || view.neighbours.length) return []
 
   const playerId = view.me.id
-  const port = state.buildings.find(
-    (building) =>
-      building.owner === playerId &&
-      building.kind === ConcordatBuildingKinds.Port &&
-      isWorking(building, state.tick)
-  )
-  if (!port) return []
+  const [home] = state.players[playerId - 1].front
+  if (home === undefined) return []
 
   const { width, height, terrain } = state.map
-  const cx = port.tile % width
-  const cy = Math.floor(port.tile / width)
+  const cx = home % width
+  const cy = Math.floor(home / width)
   const range = navy.sailRange
 
   for (let sample = 0; sample < bots.samples; sample++) {
@@ -54,7 +48,6 @@ export const seaMoves = (context: ConcordatBotContext): ConcordatIntent[] => {
     const move: ConcordatIntent = {
       kind: 'sail',
       playerId,
-      port: port.id,
       tile,
       percent: LANDING_PERCENT,
     }

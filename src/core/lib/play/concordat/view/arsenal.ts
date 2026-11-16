@@ -1,3 +1,4 @@
+import { priceOf, raisePriceOf } from '@/core/lib/play/concordat/buildings/price'
 import { reachOf } from '@/core/lib/play/concordat/sim/area'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import type { ConcordatClientState } from '@/core/lib/play/concordat/wire/board'
@@ -9,6 +10,18 @@ import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
 const { buildings, weapons, air } = CONCORDAT
 
 /**
+ * Buildings of a kind the player holds
+ * @param {ConcordatClientState} client - Game
+ * @param {ConcordatBuildingKind} kind - Kind
+ * @return {number} - Count
+ */
+
+export const builtCountOf = (client: ConcordatClientState, kind: ConcordatBuildingKind): number =>
+  client.systems.buildings.filter(
+    (building) => building.owner === client.me && building.kind === kind
+  ).length
+
+/**
  * Gold of a new building, each one held makes it dearer
  * @param {ConcordatClientState} client - Game
  * @param {ConcordatBuildingKind} kind - Kind
@@ -16,11 +29,9 @@ const { buildings, weapons, air } = CONCORDAT
  */
 
 export const buildCostOf = (client: ConcordatClientState, kind: ConcordatBuildingKind): number => {
-  const held = client.systems.buildings.filter(
-    (building) => building.owner === client.me && building.kind === kind
-  ).length
+  const held = builtCountOf(client, kind)
 
-  return Math.round(buildings.kinds[kind].cost * (1 + buildings.kinds[kind].step * held))
+  return priceOf(kind, held)
 }
 
 /**
@@ -32,7 +43,7 @@ export const buildCostOf = (client: ConcordatClientState, kind: ConcordatBuildin
 export const upgradeCostOf = (building: ConcordatBuildingRow): number =>
   building.level >= buildings.kinds[building.kind].levels.length
     ? 0
-    : Math.round(buildings.kinds[building.kind].cost * buildings.upgradeFactor * building.level)
+    : raisePriceOf(building.kind, building.level)
 
 /**
  * Own building near a tile, the weakest of a stack

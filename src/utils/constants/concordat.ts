@@ -74,6 +74,7 @@ export const ConcordatIntents = {
   CloseTrade: 'closeTrade',
   Research: 'research',
   Feint: 'feint',
+  Defend: 'defend',
   Launch: 'launch',
   Sortie: 'sortie',
 } as const

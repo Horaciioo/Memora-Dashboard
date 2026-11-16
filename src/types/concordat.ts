@@ -125,6 +125,8 @@ export interface ConcordatCorps {
   aim?: number
   // Province the push works on, it stops once whole
   zone?: number
+  // Troops the target put against this push
+  guard?: number
 }
 
 /**
@@ -516,6 +518,7 @@ export interface ConcordatState {
 export type ConcordatIntent =
   | { kind: 'engage'; playerId: number; target: number; percent: number; tile?: number }
   | { kind: 'feint'; playerId: number; target: number; percent: number }
+  | { kind: 'defend'; playerId: number; target: number; percent: number }
   | { kind: 'research'; playerId: number; path: ConcordatTechPath }
   | {
       kind: 'launch'
@@ -533,7 +536,7 @@ export type ConcordatIntent =
   | { kind: 'upgrade'; playerId: number; id: number }
   | { kind: 'buildShip'; playerId: number; port: number }
   | { kind: 'moveShip'; playerId: number; ship: number; tile: number }
-  | { kind: 'sail'; playerId: number; port: number; tile: number; percent: number }
+  | { kind: 'sail'; playerId: number; tile: number; percent: number }
   | {
       kind: 'propose'
       playerId: number

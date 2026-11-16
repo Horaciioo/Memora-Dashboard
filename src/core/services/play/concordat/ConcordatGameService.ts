@@ -214,6 +214,16 @@ export const actInGame = async (
   return { changed: false, finished: false, deadline: null, isCosmetic: true }
 }
 
+// Last board of a finished game, kept in its final snapshot
+const endedGameOf = async (
+  sessionId: string
+): Promise<{ state: ConcordatState; rev: number } | null> => {
+  const row = await loadGameRow(sessionId)
+  if (!row?.snapshot || row.phase !== ConcordatPhases.Ended) return null
+
+  return { state: importState(decodeMap(row.map), unpackSnapshot(row.snapshot)), rev: row.rev }
+}
+
 /**
  * Boards of every reader from one read
  * @param {EngineSession} session - Game
@@ -224,16 +234,14 @@ export const concordatBoards = async (
   session: EngineSession
 ): Promise<(viewerId: string) => ConcordatBoard | null> => {
   const loop = loopOf(session.id)
-  if (!loop) return () => null
+  const source = loop ?? (await endedGameOf(session.id))
+  if (!source) return () => null
 
-  const shared = sharedBoardOf(loop.state, loop.rev)
+  const { state, rev } = source
+  const shared = sharedBoardOf(state, rev)
 
   return (viewerId) =>
-    boardFor(
-      loop.state,
-      shared,
-      loop.state.players.find((player) => player.accountId === viewerId)?.id ?? 0
-    )
+    boardFor(state, shared, state.players.find((player) => player.accountId === viewerId)?.id ?? 0)
 }
 
 /**

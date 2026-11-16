@@ -2,7 +2,7 @@ import { buildingById, isWorking } from '@/core/lib/play/concordat/buildings/rul
 import { tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
 import { linkAllies } from '@/core/lib/play/concordat/trade/open'
 import { spawnCargo } from '@/core/lib/play/concordat/trade/ships'
-import { tradeIncomeOf } from '@/core/lib/play/concordat/trade/income'
+import { tradeIncomesOf } from '@/core/lib/play/concordat/trade/income'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatRoute, ConcordatState } from '@/types/concordat'
 import { ConcordatRouteKinds, ConcordatShipKinds, ConcordatTies } from '@/utils/constants/concordat'
@@ -92,7 +92,6 @@ export const runTrade = (state: ConcordatState): void => {
       state.isSystemsDirty = true
     }
   }
-  for (const player of state.players) {
-    state.effects[player.id - 1].trade = player.alive ? tradeIncomeOf(state, player.id, cut) : 0
-  }
+  const incomes = tradeIncomesOf(state, cut)
+  for (const player of state.players) state.effects[player.id - 1].trade = incomes[player.id - 1]
 }

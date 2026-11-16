@@ -107,15 +107,25 @@ export const CONCORDAT_GLYPHS: Record<ConcordatBuildingKind, { path: string; isS
 
 /**
  * Stat pictograms of the figures box, same 24 grid
- * @type {Record<'troops' | 'gold', string>}
+ * @type {Record<'troops', string>}
  */
 
-export const CONCORDAT_STAT_GLYPHS: Record<'troops' | 'gold', string> = {
+export const CONCORDAT_STAT_GLYPHS: Record<'troops', string> = {
   // Soldier bust: helmet with brim, face, shoulders
   troops:
     'M6 9 C6 5.5 8.5 3 12 3 C15.5 3 18 5.5 18 9 V10 H6 Z M4.5 10.8 H19.5 V12.6 H4.5 Z M8 13.8 H16 V15.6 C16 17.4 14.2 18.8 12 18.8 C9.8 18.8 8 17.4 8 15.6 Z M3 22 C3 19.8 5.5 19 8.6 18.5 C9.4 19.8 10.6 20.5 12 20.5 C13.4 20.5 14.6 19.8 15.4 18.5 C18.5 19 21 19.8 21 22 Z',
-  // Stack of three coins
-  gold: 'M4 4 C4 2.6 7.6 1.5 12 1.5 C16.4 1.5 20 2.6 20 4 V6.5 C20 7.9 16.4 8.7 12 8.7 C7.6 8.7 4 7.9 4 6.5 Z M4 11.2 C4 9.8 7.6 8.7 12 8.7 C16.4 8.7 20 9.8 20 11.2 V13.7 C20 15.1 16.4 15.9 12 15.9 C7.6 15.9 4 15.1 4 13.7 Z M4 18.4 C4 17 7.6 15.9 12 15.9 C16.4 15.9 20 17 20 18.4 V20.9 C20 22.3 16.4 23.1 12 23.1 C7.6 23.1 4 22.3 4 20.9 Z',
+}
+
+/**
+ * Single gold coin, fill and rim colours with the embossed mark
+ * @type {{ fill: string; rim: string; shine: string; mark: string }}
+ */
+
+export const CONCORDAT_COIN = {
+  fill: '#F6C443',
+  rim: '#C98A12',
+  shine: '#FFE9A0',
+  mark: 'M12 6.5 L13.4 10.6 L17.7 10.7 L14.3 13.3 L15.5 17.4 L12 15 L8.5 17.4 L9.7 13.3 L6.3 10.7 L10.6 10.6 Z',
 }
 
 /**

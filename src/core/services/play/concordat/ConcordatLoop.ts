@@ -29,6 +29,9 @@ const BEAT_MS = 5000
 const OFFERS_MS = 1500
 // Diffs between two full sends of the slow parts
 const SYSTEMS_EVERY = 25
+// Least gap between two saves caused by major events
+const MAJOR_SNAPSHOT_GAP_MS = 3000
+
 const MAJOR_EVENTS: ConcordatEvent['kind'][] = ['capitalTaken', 'eliminated', 'ended']
 
 /**
@@ -230,7 +233,11 @@ export const runTick = (loop: ConcordatLoop, now: number): void => {
 
   if (state.tick % DIFF_EVERY === 0 || state.phase === ConcordatPhases.Ended) flushDiff(loop, now)
   const isMajor = events.some((event) => MAJOR_EVENTS.includes(event.kind))
-  if (isMajor || now - loop.lastSnapshotAt >= CONCORDAT.snapshotSeconds * 1000)
+  const sinceSave = now - loop.lastSnapshotAt
+  if (
+    (isMajor && sinceSave >= MAJOR_SNAPSHOT_GAP_MS) ||
+    sinceSave >= CONCORDAT.snapshotSeconds * 1000
+  )
     saveSnapshot(loop, now)
   if (now - loop.lastBeatAt >= BEAT_MS) {
     loop.lastBeatAt = now

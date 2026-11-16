@@ -91,7 +91,7 @@ export const ConcordatTable = ({
     [client.players, faces]
   )
   const me = client.players[client.me - 1]
-  const { hover, onHover, onTap } = useConcordatTaps({
+  const { hover, onHover, onTap, onMenu } = useConcordatTaps({
     client,
     act,
     isSeated,
@@ -111,6 +111,7 @@ export const ConcordatTable = ({
     invalidate,
     onTap,
     onHover,
+    onMenu,
   })
 
   useEffect(() => {
@@ -172,16 +173,6 @@ export const ConcordatTable = ({
       if (jump.tile >= 0) recenter(jump.tile, camera.current.scale)
     }
   }, [recenterTick, jump, me, recenter, size, camera])
-
-  // Glide home when picking ends
-  const lastPhase = useRef(client.phase)
-  useEffect(() => {
-    const wasPicking = lastPhase.current === ConcordatPhases.Picking
-    lastPhase.current = client.phase
-    if (wasPicking && client.phase === ConcordatPhases.Playing && me) {
-      recenter(Math.max(me.capital, me.start), size.current.height / CONCORDAT_ART.focusTiles)
-    }
-  }, [client.phase, me, recenter, size])
 
   // Escape leaves the menu
   useEffect(() => {

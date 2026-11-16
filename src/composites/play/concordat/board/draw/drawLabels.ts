@@ -1,5 +1,5 @@
 import type { ConcordatScene } from '@/composites/play/concordat/board/draw/types'
-import { rgbText, tieOfRows } from '@/core/lib/play/concordat'
+import { rgbText, tieOfRows, troopFigure } from '@/core/lib/play/concordat'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
 import { CONCORDAT_ALLIANCE_GLYPH } from '@/declarations/play/concordat/glyphs'
 
@@ -95,6 +95,6 @@ export const drawNationNames = (context: CanvasRenderingContext2D, scene: Concor
     // Troops available, under the name
     const troops = Math.round(size * label.troopSize)
     context.font = `700 ${troops}px ${scene.font}`
-    outlined(context, String(client.players[index].troops), x, y + size * label.troopGap)
+    outlined(context, troopFigure(client.players[index].troops), x, y + size * label.troopGap)
   })
 }

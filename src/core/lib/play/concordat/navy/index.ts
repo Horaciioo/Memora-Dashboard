@@ -1,4 +1,5 @@
 export * from '@/core/lib/play/concordat/navy/actions'
 export * from '@/core/lib/play/concordat/navy/path'
+export * from '@/core/lib/play/concordat/navy/route'
 export * from '@/core/lib/play/concordat/navy/rules'
 export * from '@/core/lib/play/concordat/navy/step'

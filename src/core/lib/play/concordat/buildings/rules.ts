@@ -1,3 +1,4 @@
+import { priceOf, raisePriceOf } from '@/core/lib/play/concordat/buildings/price'
 import { isTileBlocked } from '@/core/lib/play/concordat/zones/rules'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatBuilding, ConcordatState } from '@/types/concordat'
@@ -79,7 +80,7 @@ export const buildCost = (
     (building) => building.owner === playerId && building.kind === kind
   ).length
 
-  return Math.round(kindOf(kind).cost * (1 + kindOf(kind).step * held))
+  return priceOf(kind, held)
 }
 
 /**
@@ -89,7 +90,7 @@ export const buildCost = (
  */
 
 export const upgradeCost = (building: ConcordatBuilding): number =>
-  Math.round(kindOf(building.kind).cost * buildings.upgradeFactor * building.level)
+  raisePriceOf(building.kind, building.level)
 
 // Tiles near another building of the same kind
 const isCrowded = (state: ConcordatState, kind: ConcordatBuildingKind, tile: number): boolean => {
@@ -103,19 +104,6 @@ const isCrowded = (state: ConcordatState, kind: ConcordatBuildingKind, tile: num
       other.tile !== tile &&
       Math.max(Math.abs((other.tile % width) - x), Math.abs(Math.floor(other.tile / width) - y)) <
         buildings.minGap
-  )
-}
-
-// Spots held in the province of a tile, a stack is one spot
-const inProvince = (state: ConcordatState, playerId: number, tile: number): Set<number> => {
-  const province = state.map.province[tile]
-
-  return new Set(
-    state.buildings
-      .filter(
-        (building) => building.owner === playerId && state.map.province[building.tile] === province
-      )
-      .map((building) => building.tile)
   )
 }
 
@@ -144,15 +132,8 @@ export const placeRefusal = (
   if (kindOf(kind).needsCoast && terrain !== ConcordatTerrains.Coast) return 'needsCoast'
   const stack = buildingsAt(state, tile)
   if (stack.some((other) => other.kind !== kind)) return 'occupied'
-  if (stack.length >= buildings.maxStack) return 'stackFull'
   if (isTileBlocked(state, tile, 'blocksBuilding')) return 'fallout'
   if (state.players[playerId - 1].provincesHeld < CONCORDAT.merit.zones[kind]) return 'needsZones'
-  if (
-    state.buildings.filter((building) => building.owner === playerId).length >= buildings.maxTotal
-  )
-    return 'tooMany'
-  const spots = inProvince(state, playerId, tile)
-  if (!spots.has(tile) && spots.size >= buildings.maxPerProvince) return 'provinceFull'
   if (isCrowded(state, kind, tile)) return 'tooClose'
 
   return state.players[playerId - 1].gold < buildCost(state, playerId, kind) ? 'noGold' : null
