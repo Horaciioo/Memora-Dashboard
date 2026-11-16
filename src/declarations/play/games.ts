@@ -207,8 +207,8 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     minPlayers: CONCORDAT_SETTINGS.minPlayers,
     maxPlayers: CONCORDAT_SETTINGS.maxPlayers,
     soloBots: true,
-    // Dev only until the first playable milestone
-    playable: APP_ENVIRONMENT === 'dev',
+    // Dev and staging until the final audit
+    playable: APP_ENVIRONMENT === 'dev' || APP_ENVIRONMENT === 'staging',
   },
 })
 
