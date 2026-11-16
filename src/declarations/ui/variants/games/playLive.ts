@@ -75,6 +75,19 @@ export const PLAY_VOTE: VoteLook = {
 }
 
 /**
+ * Session progress of a launch vote, over any vote screen
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_VOTE_PROGRESS = {
+  root: 'flex w-full max-w-sm flex-col items-center gap-2 px-4',
+  bar: 'flex w-full gap-1.5',
+  segment: 'h-1.5 flex-1 rounded-full bg-white/25 transition-colors duration-300',
+  done: 'bg-white',
+  text: 'text-xs font-extrabold tracking-widest text-white/80 uppercase',
+} as const
+
+/**
  * Concept window of a game hub: its steps, the golf powers
  * @type {Record<string, string>}
  */

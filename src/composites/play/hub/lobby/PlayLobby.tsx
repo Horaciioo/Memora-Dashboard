@@ -71,6 +71,8 @@ export interface PlayLobbyProps {
   serverTime: number
   visibility: PlayVisibilityName
   joinCode: string | null
+  // Block skin of the game, the arcade look when empty
+  skin?: string
 }
 
 /**
@@ -95,6 +97,7 @@ export const PlayLobby = ({
   serverTime,
   visibility,
   joinCode,
+  skin,
 }: PlayLobbyProps) => {
   const moves = usePlayMoves()
   // Fresh table lands on the picker
@@ -170,8 +173,8 @@ export const PlayLobby = ({
           )}
         </header>
       )}
-      {isLobby && isPrivate && me.isSeated && <PlayLobbyLink sessionId={id} joinCode={joinCode} />}
-      <section className={PLAY_ROOM.box}>
+      {isLobby && isPrivate && me.isSeated && <PlayLobbyLink sessionId={id} joinCode={joinCode} skin={skin} />}
+      <section className={cn(skin ? PLAY_ROOM.boxSkinned : PLAY_ROOM.box, skin)}>
         <div className={PLAY_ROOM.summary}>
           <button
             type="button"
@@ -238,7 +241,7 @@ export const PlayLobby = ({
         </div>
 
         {isLobby && !isPrivate && me.isSeated && (
-          <PlayLobbyLink sessionId={id} joinCode={joinCode} />
+          <PlayLobbyLink sessionId={id} joinCode={joinCode} skin={skin} />
         )}
 
         <div className={PLAY_ROOM.actions}>

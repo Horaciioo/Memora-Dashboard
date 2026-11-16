@@ -6,21 +6,25 @@ import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_ROOM } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 /**
  * One tap copies the way into the game: a share card with the code when private, a quiet row when public
  * @param {Object} props - Game
  * @param {string} props.sessionId - Game
  * @param {string | null} props.joinCode - Code of a private game
+ * @param {string} props.skin - Block skin of the game
  * @return {JSX.Element}
  */
 
 export const PlayLobbyLink = ({
   sessionId,
   joinCode,
+  skin,
 }: {
   sessionId: string
   joinCode: string | null
+  skin?: string
 }) => {
   const copyLink = useCopy(PLAY_HUB_COPY.linkCopied)
   const CopyIcon = ICONS.copy
@@ -37,7 +41,7 @@ export const PlayLobbyLink = ({
   }
 
   return (
-    <div className={PLAY_ROOM.share}>
+    <div className={cn(skin ? PLAY_ROOM.shareSkinned : PLAY_ROOM.share, skin)}>
       <div className={PLAY_ROOM.shareText}>
         <p className={PLAY_ROOM.shareLabel}>{PLAY_HUB_COPY.shareCode}</p>
         <p className={PLAY_ROOM.shareCode} aria-label={`${PLAY_HUB_COPY.codeLabel} ${joinCode}`}>

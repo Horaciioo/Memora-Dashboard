@@ -1,17 +1,6 @@
-/* Echo ground: deep teal night, symbols rising like bubbles */
+/* Echo ground: vivid teal gradient, symbols rising like bubbles */
 .play-room:has(.play-echo) {
-  background:
-    radial-gradient(
-      70rem 34rem at 50% 115%,
-      color-mix(in srgb, var(--play-echo) 50%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      40rem 24rem at 12% -8%,
-      color-mix(in srgb, var(--play-echo-glow) 16%, transparent),
-      transparent 70%
-    ),
-    linear-gradient(180deg, var(--play-echo-night) 0%, var(--play-echo-dusk) 100%);
+  background: linear-gradient(165deg, var(--play-echo) 0%, var(--play-echo-deep) 100%);
 }
 
 .play-room:has(.play-echo) .play-floor {
