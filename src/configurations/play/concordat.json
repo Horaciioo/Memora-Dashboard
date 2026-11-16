@@ -92,9 +92,9 @@
   },
   "powers": {
     "difficulties": {
-      "easy": { "troops": 75, "cap": 0.5, "growth": 0.9, "level": "recruit" },
-      "normal": { "troops": 112, "cap": 0.75, "growth": 0.95, "level": "strategist" },
-      "hard": { "troops": 150, "cap": 1, "growth": 1, "level": "raptor" }
+      "easy": { "troops": 90, "cap": 0.6, "growth": 0.95, "level": "strategist", "tempo": 1.2, "push": 1 },
+      "normal": { "troops": 112, "cap": 0.75, "growth": 0.95, "level": "strategist", "tempo": 1, "push": 1.2 },
+      "hard": { "troops": 150, "cap": 1, "growth": 1, "level": "raptor", "tempo": 0.5, "push": 1.8 }
     },
     "country": { "tiles": 60, "gap": 14, "snapRadius": 40, "gold": 1 },
     "tribe": {

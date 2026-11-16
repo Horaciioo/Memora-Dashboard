@@ -64,6 +64,7 @@ export interface ConcordatSnapshot {
   history?: ConcordatSample[]
   log?: ConcordatEvent[]
   mode?: ConcordatState['mode']
+  temper?: ConcordatState['temper']
   teamCount?: number
   teams?: number[]
   nextDrawAt?: number
@@ -111,6 +112,7 @@ export const exportState = (state: ConcordatState): ConcordatSnapshot => ({
   history: structuredClone(state.history),
   log: structuredClone(state.log),
   mode: state.mode,
+  temper: state.temper,
   teamCount: state.teamCount,
   teams: [...state.teams],
   nextDrawAt: state.nextDrawAt,
@@ -170,6 +172,7 @@ export const importState = (map: ConcordatMap, snapshot: ConcordatSnapshot): Con
     history: snapshot.history ?? [],
     log: snapshot.log ?? [],
     mode: snapshot.mode ?? ConcordatModes.Free,
+    temper: snapshot.temper,
     teamCount: snapshot.teamCount ?? 0,
     teams: snapshot.teams ?? snapshot.players.map(() => 0),
     nextDrawAt: snapshot.nextDrawAt ?? 0,

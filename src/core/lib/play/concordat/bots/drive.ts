@@ -7,7 +7,7 @@ import { betrayalMove, militaryMoves } from '@/core/lib/play/concordat/bots/mili
 import { botProfileOf } from '@/core/lib/play/concordat/bots/profile'
 import { seaMoves } from '@/core/lib/play/concordat/bots/sea'
 import { answerMoves, proposeMoves } from '@/core/lib/play/concordat/bots/talks'
-import { tribeMemoryOf, tribeMoves } from '@/core/lib/play/concordat/bots/tribe'
+import { temperOf, tribeMemoryOf, tribeMoves } from '@/core/lib/play/concordat/bots/tribe'
 import type { ConcordatTribeMemory } from '@/core/lib/play/concordat/bots/tribe'
 import { botViewOf } from '@/core/lib/play/concordat/bots/view'
 import type { ConcordatBotContext } from '@/core/lib/play/concordat/bots/view'
@@ -105,7 +105,9 @@ const driveTribe = (
 
   // Next thought comes later
   const [min, max] = CONCORDAT.powers.tribe.thinkTicks
-  memory.nextAt = state.tick + min + Math.floor(tileNoise(playerId, state.tick) * (max - min))
+  const { tempo } = temperOf(state)
+  memory.nextAt =
+    state.tick + Math.floor((min + tileNoise(playerId, state.tick) * (max - min)) * tempo)
   for (const intent of tribeMoves(state, playerId, memory)) {
     if (offerIntent(queue, intent, now)) break
   }

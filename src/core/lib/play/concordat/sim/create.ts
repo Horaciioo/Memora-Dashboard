@@ -146,6 +146,7 @@ export const createGame = (request: ConcordatGameRequest): ConcordatState => {
     ...freshSystems(total),
   }
   state.mode = mode
+  state.temper = request.populate?.difficulty
   state.teamCount = request.teams ?? rules.teams
   state.endTick = state.pickEnd + toTicks(request.durationMinutes * rules.durationFactor * 60)
 

@@ -6,7 +6,8 @@ import { isPushing, zoneTileOf } from '@/core/lib/play/concordat/bots/zone'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatPlayerState, ConcordatState } from '@/types/concordat'
 
-const { tribe } = CONCORDAT.powers
+const { tribe: tribeRules, difficulties } = CONCORDAT.powers
+const tribe = { ...tribeRules, difficulties }
 
 /**
  * What a tribe remembers between two decisions, never saved
@@ -22,6 +23,15 @@ export interface ConcordatTribeMemory {
   expand: number
 }
 
+/**
+ * Pace and push of the powers, from the temper chosen at the setup
+ * @param {ConcordatState} state - Game
+ * @return {{ tempo: number; push: number }} - Delay factor and engagement factor
+ */
+
+export const temperOf = (state: ConcordatState): { tempo: number; push: number } =>
+  tribe.difficulties[state.temper ?? 'normal']
+
 // Value between two bounds, stable for a tribe and a salt
 const between = (range: readonly number[], playerId: number, salt: number): number =>
   range[0] + (range[1] - range[0]) * tileNoise(playerId * 7919 + salt, 17)
@@ -34,10 +44,10 @@ const between = (range: readonly number[], playerId: number, salt: number): numb
  */
 
 export const tribeMemoryOf = (state: ConcordatState, playerId: number): ConcordatTribeMemory => ({
-  nextAt: state.tick + Math.floor(between(tribe.thinkTicks, playerId, 1)),
+  nextAt: state.tick + Math.floor(between(tribe.thinkTicks, playerId, 1) * temperOf(state).tempo),
   trigger: between(tribe.trigger, playerId, 2),
   reserve: between(tribe.reserve, playerId, 3),
-  expand: Math.round(between(tribe.expand, playerId, 4)),
+  expand: Math.min(60, Math.round(between(tribe.expand, playerId, 4) * temperOf(state).push)),
 })
 
 // Neighbour worth a fight: the one that hit it, else a random open one, humans half the time

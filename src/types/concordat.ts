@@ -7,6 +7,7 @@ import type {
   ConcordatBuildingKind,
   ConcordatChokeKind,
   ConcordatEventKind,
+  ConcordatDifficultyName,
   ConcordatModeName,
   ConcordatStrikeKind,
   ConcordatTechPath,
@@ -476,6 +477,8 @@ export interface ConcordatState {
   history: ConcordatSample[]
   log: ConcordatEvent[]
   mode: ConcordatModeName
+  // Temper of the AI powers, normal when missing
+  temper?: ConcordatDifficultyName
   // Teams drawn at the start, zero when none
   teamCount: number
   // Team of each nation, zero for none, index is the id minus one

@@ -26,9 +26,9 @@ export const CONCORDAT_SETUP_COPY = {
   sizeHint: 'Une grande carte laisse plus de place, mais la partie dure plus longtemps.',
   style: 'Région du monde',
   styleHint: 'La région décide des voisins, des détroits et des îles.',
-  difficulty: 'Difficulté des pays',
+  difficulty: 'Comportement de l’IA',
   difficultyHint:
-    'Les vrais pays jouent seuls : plus ils sont forts, plus ils partent nombreux et réfléchissent vite.',
+    'Passive : les pays et les tribus avancent lentement. Agressive : ils attaquent vite et fort. Équilibrée : entre les deux.',
   speed: 'Vitesse',
   speedHint: 'Toute la partie, troupes et conquêtes, tourne plus ou moins vite.',
   duration: 'Durée',
@@ -103,9 +103,9 @@ export const CONCORDAT_STYLE_LABELS: Record<ConcordatStyleName, string> = {
  */
 
 export const CONCORDAT_DIFFICULTY_LABELS: Record<ConcordatDifficultyName, string> = {
-  [ConcordatDifficulties.Easy]: 'Facile',
-  [ConcordatDifficulties.Normal]: 'Normal',
-  [ConcordatDifficulties.Hard]: 'Difficile',
+  [ConcordatDifficulties.Easy]: 'Passive',
+  [ConcordatDifficulties.Normal]: 'Équilibrée',
+  [ConcordatDifficulties.Hard]: 'Agressive',
 }
 
 /**
