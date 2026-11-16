@@ -86,6 +86,7 @@ export const withTable = <T>(
         hand: seat.hand as unknown as StopGoHandCard[],
         hazards: seat.hazards as StopGoHazard[],
         shields: seat.shields as StopGoSafety[],
+        lastHazard: seat.lastHazard as StopGoHazard | null,
       })),
       now: new Date(),
       isDirty: false,
@@ -184,6 +185,7 @@ export const saveCars = async (
       isGreen: car.isGreen,
       hazards: car.hazards,
       shields: car.shields,
+      lastHazard: car.lastHazard,
     })
   }
 }

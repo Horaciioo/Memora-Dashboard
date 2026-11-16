@@ -81,13 +81,13 @@ export const PLAY_FEATURE = {
  */
 
 export const PLAY_CROSS = {
-  stage: 'mx-auto flex w-full max-w-6xl flex-col gap-4 pb-28',
+  stage: 'mx-auto flex w-full max-w-[120rem] flex-col gap-4 pb-28',
   games: 'flex min-w-0 flex-col items-center gap-6',
   heading: `${HEADING} text-center max-md:sr-only sm:text-3xl`,
   // Featured game on top, then every game as a poster
   wall: 'flex w-full flex-col gap-3',
   wallTitle: 'text-sm font-extrabold tracking-[0.2em] text-[var(--play-ink-soft)] uppercase',
-  tiles: 'grid w-full grid-cols-3 gap-2 sm:grid-cols-5 md:gap-3 lg:grid-cols-6 xl:grid-cols-7',
+  tiles: 'grid w-full grid-cols-3 gap-2 sm:grid-cols-5 md:gap-3 lg:grid-flow-col lg:auto-cols-fr lg:grid-cols-none',
   tile: 'w-full',
   live: 'min-h-0 shrink',
   online: 'min-h-0 shrink-0',

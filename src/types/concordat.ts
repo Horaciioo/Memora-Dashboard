@@ -1,10 +1,13 @@
 import type {
+  ConcordatAirKind,
+  ConcordatScarKind,
   ConcordatBotLevelName,
   ConcordatPowerName,
   ConcordatBotPersonalityName,
   ConcordatBuildingKind,
   ConcordatChokeKind,
   ConcordatEventKind,
+  ConcordatDifficultyName,
   ConcordatModeName,
   ConcordatStrikeKind,
   ConcordatTechPath,
@@ -17,6 +20,7 @@ import type {
   ConcordatPhaseName,
   ConcordatResourceName,
   ConcordatStyleName,
+  ConcordatWeaponName,
 } from '@/utils/constants/concordat'
 
 /**
@@ -150,6 +154,8 @@ export interface ConcordatBuilding {
   tile: number
   // Tick when it works, later than now while built or repaired
   readyAt: number
+  // Tick a battery is ready to fire again
+  coolAt?: number
 }
 
 /**
@@ -309,6 +315,48 @@ export interface ConcordatStrike {
   from?: number
   launchedAt: number
   impactAt: number
+  // Battery tile of the last interceptor fired, minus one when none
+  by?: number
+  // Tick the last interceptor left
+  shotAt?: number
+  // Tick the strike is shot down, zero when it flies on
+  killAt?: number
+}
+
+/**
+ * Aircraft of a nation: a helicopter on guard or a fighter on a sortie
+ * @typedef {Object} ConcordatAircraft
+ */
+
+export interface ConcordatAircraft {
+  id: number
+  owner: number
+  kind: ConcordatAirKind
+  // Airbase tile
+  base: number
+  // Guard tile or target tile
+  tile: number
+  launchedAt: number
+  // Tick it is back on the ground
+  until: number
+  hp: number
+  // Last shot taken and the tile it came from, minus one when none
+  shotAt: number
+  shotFrom: number
+  // Fighter strafed already
+  isDone?: boolean
+}
+
+/**
+ * Scar left on the ground by a fight
+ * @typedef {Object} ConcordatScar
+ */
+
+export interface ConcordatScar {
+  tile: number
+  radius: number
+  at: number
+  kind: ConcordatScarKind
 }
 
 /**
@@ -430,6 +478,10 @@ export interface ConcordatState {
   history: ConcordatSample[]
   log: ConcordatEvent[]
   mode: ConcordatModeName
+  // Weapons allowed in this game
+  weapons: ConcordatWeaponName[]
+  // Temper of the AI powers, normal when missing
+  temper?: ConcordatDifficultyName
   // Teams drawn at the start, zero when none
   teamCount: number
   // Team of each nation, zero for none, index is the id minus one
@@ -438,6 +490,8 @@ export interface ConcordatState {
   nextDrawAt: number
   techs: ConcordatTech[]
   strikes: ConcordatStrike[]
+  aircraft: ConcordatAircraft[]
+  scars: ConcordatScar[]
   zones: ConcordatZone[]
   arms: ConcordatArms[]
   world: ConcordatWorld
@@ -456,7 +510,16 @@ export type ConcordatIntent =
   | { kind: 'engage'; playerId: number; target: number; percent: number; tile?: number }
   | { kind: 'feint'; playerId: number; target: number; percent: number }
   | { kind: 'research'; playerId: number; path: ConcordatTechPath }
-  | { kind: 'launch'; playerId: number; silo: number; tile: number; heavy: boolean }
+  | {
+      kind: 'launch'
+      playerId: number
+      silo: number
+      tile: number
+      heavy: boolean
+      // Shell or rocket from a battery, missing for a silo missile
+      weapon?: 'shell' | 'rocket'
+    }
+  | { kind: 'sortie'; playerId: number; base: number; tile: number; air: ConcordatAirKind }
   | { kind: 'retreat'; playerId: number; target: number }
   | { kind: 'placeStart'; playerId: number; tile: number }
   | { kind: 'build'; playerId: number; building: ConcordatBuildingKind; tile: number }

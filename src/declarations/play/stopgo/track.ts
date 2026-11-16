@@ -15,7 +15,7 @@ export const STOPGO_TRACK = {
   // Length added to each long straight of a map
   stretch: 500,
   // Grass kept beside the outer kerb
-  pad: 200,
+  pad: 120,
   // Grass above the finish and below the start
   capHeight: 260,
   // Kerb width over the road width
@@ -27,7 +27,7 @@ export const STOPGO_TRACK = {
   // Car move over a gap of km
   move: { perKm: 24, minMs: 1500, maxMs: 5500 },
   // Screen pixels per board unit at most, the track never grows past it
-  zoom: 0.7,
+  zoom: 1.9,
   // Camera glide, key steps and page share
   camera: { glideMs: 3000, step: 120, pageShare: 0.8, focusShare: 0.5, phoneFocusShare: 0.5 },
 } as const
@@ -91,7 +91,9 @@ export const STOPGO_CIRCUITS: Record<
  */
 
 export const circuitOf = (target: number) => {
-  const keys = Object.keys(STOPGO_CIRCUITS).map(Number).sort((a, b) => a - b)
+  const keys = Object.keys(STOPGO_CIRCUITS)
+    .map(Number)
+    .sort((a, b) => a - b)
   const key = [...keys].reverse().find((km) => km <= target) ?? keys[0]
 
   return STOPGO_CIRCUITS[key]

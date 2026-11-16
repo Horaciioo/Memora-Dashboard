@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { AccountActions } from '@/composites/shell/account/AccountActions'
+import { LevelFrame } from '@/composites/play/skin/LevelFrame'
+import { LevelBadge } from '@/composites/play/skin/LevelBadge'
 import { AccountNotifications } from '@/composites/shell/account/AccountNotifications'
+import { usePlayLevel } from '@/core/hooks/data/play/usePlayLevel'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { CREATOR_MENU, RAIL_POPOVER } from '@/declarations/ui/blocks'
@@ -31,6 +34,7 @@ export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMen
   const [isOpen, setOpen] = useState(false)
   const boundary = useRef<HTMLDivElement>(null)
   const Chevron = ICONS.expand
+  const level = usePlayLevel()
   const unread = useNotificationsStore((state) => state.feed.unread)
 
   const shut = useCallback(() => setOpen(false), [])
@@ -61,11 +65,21 @@ export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMen
         className={cn(CREATOR_MENU.trigger, isCompact && CREATOR_MENU.triggerBare)}
       >
         <span className={CREATOR_MENU.portrait}>
-          <Avatar
-            name={session.displayName}
-            src={session.avatarUrl}
-            size={isCompact ? 'xs' : 'sm'}
-          />
+          {level !== null && !isCompact ? (
+            <LevelFrame
+              level={level}
+              name={session.displayName}
+              src={session.avatarUrl}
+              size="sm"
+              className="-m-3.5"
+            />
+          ) : (
+            <Avatar
+              name={session.displayName}
+              src={session.avatarUrl}
+              size={isCompact ? 'xs' : 'sm'}
+            />
+          )}
           {unread > 0 && <span className={CREATOR_MENU.dot} aria-hidden="true" />}
         </span>
         <span className={CREATOR_MENU.name}>{session.displayName}</span>
@@ -84,6 +98,7 @@ export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMen
             <Avatar name={session.displayName} src={session.avatarUrl} size="md" />
             <p className={cn(RAIL_POPOVER.headTitle, 'truncate text-lg')}>{session.displayName}</p>
             <p className={RAIL_POPOVER.headMeta}>{ROLE_REGISTRY.label(session.role)}</p>
+            {level !== null && <LevelBadge level={level} />}
           </div>
 
           <div className={cn(RAIL_POPOVER.body, CREATOR_MENU.body)}>

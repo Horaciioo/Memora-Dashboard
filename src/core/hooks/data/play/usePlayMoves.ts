@@ -77,10 +77,11 @@ export const usePlayMoves = () => {
         game
       ),
     // Private table started at once, straight into the game without the invite screen
-    solo: (game: PlayGameName) =>
+    solo: (game: PlayGameName, setup: Record<string, unknown> = {}) =>
       go(
         track('solo', async () => {
           const table = await apiPost<{ id: string }>(API_ROUTES.playSessions, {
+            ...setup,
             game,
             visibility: PlayVisibilities.Private,
           })

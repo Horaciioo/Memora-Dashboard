@@ -121,5 +121,5 @@ export const endReason = (state: ConcordatState): ConcordatEndName | null => {
   if (isSeatsOver(state)) return ConcordatEnds.Last
   if (dominantWinner(state)) return ConcordatEnds.Domination
 
-  return state.tick >= state.endTick ? ConcordatEnds.Time : null
+  return state.endTick > 0 && state.tick >= state.endTick ? ConcordatEnds.Time : null
 }

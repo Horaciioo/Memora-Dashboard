@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { PlayHistoryTable } from '@/composites/play/mobile/PlayHistoryTable'
 import { ICONS } from '@/declarations/ui/icons'
@@ -65,7 +65,8 @@ export const PlayHistory = ({
                   </span>
                   <span className={PLAY_HISTORY.faces}>
                     {others.slice(0, AVATARS_SHOWN).map((seat) => (
-                      <Avatar
+                      <PlayAvatar
+                        accountId={seat.accountId}
                         key={seat.accountId}
                         name={seat.name}
                         src={seat.avatarUrl}

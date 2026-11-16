@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { NAVAL_BOARD_COPY } from '@/declarations/play/naval/copy'
@@ -59,7 +59,12 @@ export const NavalFoes = ({
         )}
         onClick={() => onPick(captain.index)}
       >
-        <Avatar name={captain.name} src={captain.avatarUrl} size="sm" />
+        <PlayAvatar
+          accountId={captain.accountId}
+          name={captain.name}
+          src={captain.avatarUrl}
+          size="sm"
+        />
         <span className={NAVAL_FOES.text}>
           <span className={NAVAL_FOES.name}>{captain.name}</span>
           <span className={NAVAL_FOES.note}>

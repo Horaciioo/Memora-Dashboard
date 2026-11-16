@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { readBodyList } from '@/core/lib/play/parse'
-import { applyCard, canPlay, isOpenCard, raceOf } from '@/core/lib/play/stopgo'
+import { applyCard, canPlay, isOpenCard, needsDraw, raceOf, sealedOf } from '@/core/lib/play/stopgo'
 import type { StopGoHandCard } from '@/core/lib/play/stopgo'
 import { closeRace, giveTurn, passTurn } from '@/core/services/play/stopgo/StopGoFlowService'
 import { launchAttack } from '@/core/services/play/stopgo/StopGoAttackService'
@@ -30,6 +30,10 @@ const cardOfTurn = (
   raw: Record<string, unknown>
 ): StopGoHandCard => {
   requireTurn(table, accountId, raw)
+  const seat = seatOf(table, accountId)
+  if (seat && needsDraw(seat.hand.length, sealedOf(seat.sealed).length)) {
+    refuse(StopGoRefusals.MustDraw)
+  }
   const cardId = typeof raw.cardId === 'string' ? raw.cardId : ''
   const card = seatOf(table, accountId)?.hand.find(
     (entry) => entry.id === cardId && !entry.isPicking

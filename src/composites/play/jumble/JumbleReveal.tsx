@@ -2,7 +2,7 @@ import { JUMBLE_BOARD_COPY, fillPlayMessage } from '@/declarations/play'
 import { JUMBLE_BOARD } from '@/declarations/ui/variants'
 import { ICONS } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { secondsLabel } from '@/core/lib/play/jumble'
 import type { JumbleBoardView, JumbleFace } from '@/composites/play/jumble/types'
 
@@ -39,7 +39,14 @@ export const JumbleReveal = ({
 
   return (
     <div className={JUMBLE_BOARD.reveal} aria-live="polite">
-      {solver && <Avatar name={solver.name} src={solver.avatarUrl} size="lg" />}
+      {solver && (
+        <PlayAvatar
+          accountId={solver.accountId}
+          name={solver.name}
+          src={solver.avatarUrl}
+          size="lg"
+        />
+      )}
       <span className={JUMBLE_BOARD.revealName}>
         {isMine
           ? JUMBLE_BOARD_COPY.mine

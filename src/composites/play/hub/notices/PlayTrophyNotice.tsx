@@ -51,8 +51,7 @@ export const PlayTrophyNotice = ({ notice }: { notice: TrophyNotice | null }) =>
         className={cn(PLAY_HUB.sheetWindow, PLAY_TROPHY_UI.window)}
       >
         <div className={PLAY_TROPHY_UI.banner} aria-hidden="true">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/play/scene/desktop.webp" alt="" className={PLAY_TROPHY_UI.art} />
+          <div className={PLAY_TROPHY_UI.art} />
           <div className={PLAY_TROPHY_UI.shade} />
           <span className={PLAY_TROPHY_UI.medal}>
             <TrophyIcon className={PLAY_TROPHY_UI.medalIcon} />

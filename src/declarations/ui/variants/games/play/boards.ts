@@ -414,6 +414,12 @@ export const setupStyles = (picked: string) =>
     cardOn: picked,
     cardTitle: 'text-sm font-semibold',
     cardNote: 'text-xs opacity-70',
+    // Picture tiles, a drawing over its name
+    art: 'grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4',
+    artCard: `${SETUP_TILE} flex flex-col items-center gap-2 p-2.5 text-sm font-semibold`,
+    artCardOn: picked,
+    artFrame: 'grid h-20 w-full place-items-center',
+    artLabel: 'truncate',
   }) as const
 
 export type PlaySetupStyles = ReturnType<typeof setupStyles>

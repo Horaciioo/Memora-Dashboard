@@ -1,5 +1,6 @@
 const BLOCK = 'play-hud-block'
-const CAPTION = 'text-[0.65rem] leading-none font-black tracking-widest text-[var(--play-ink)] uppercase'
+const CAPTION =
+  'text-[0.65rem] leading-none font-black tracking-widest text-[var(--play-ink)] uppercase'
 const FIGURE = 'text-2xl leading-none font-black tabular-nums text-[var(--play-ink-soft)]'
 
 /**

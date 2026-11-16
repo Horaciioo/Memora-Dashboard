@@ -1,5 +1,10 @@
 import naval from '@/configurations/play/naval.json'
-import { readBoolean, readChoice, readInteger, readNode } from '@/declarations/configurations/readers'
+import {
+  readBoolean,
+  readChoice,
+  readInteger,
+  readNode,
+} from '@/declarations/configurations/readers'
 import { NavalShapes, NavalWeapons } from '@/utils/constants/play'
 import type { NavalShapeName, NavalWeaponName } from '@/utils/constants/play'
 

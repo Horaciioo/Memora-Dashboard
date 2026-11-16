@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PLAY_HUD_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_HUD } from '@/declarations/ui/variants'
@@ -44,7 +44,12 @@ export const PlayHudPanel = ({ rows }: { rows: PlayHudRow[] }) => {
                 )}
               >
                 <span className={PLAY_HUD.rowRank}>{index + 1}</span>
-                <Avatar name={row.name} src={row.avatarUrl} size="xs" />
+                <PlayAvatar
+                  accountId={row.accountId}
+                  name={row.name}
+                  src={row.avatarUrl}
+                  size="xs"
+                />
                 <span className={PLAY_HUD.rowName}>{row.name}</span>
                 <span className={PLAY_HUD.rowValue}>{row.value}</span>
               </li>

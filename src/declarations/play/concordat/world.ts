@@ -1,5 +1,5 @@
-import { ConcordatStyles } from '@/utils/constants/concordat'
-import type { ConcordatStyleName } from '@/utils/constants/concordat'
+import { ConcordatSizes, ConcordatStyles } from '@/utils/constants/concordat'
+import type { ConcordatSizeName, ConcordatStyleName } from '@/utils/constants/concordat'
 
 /**
  * View window on the world, in degrees
@@ -308,3 +308,23 @@ export const CONCORDAT_PATCHES: ConcordatPatch[] = [
   { lon: 48, lat: -18, rx: 3, ry: 6, bias: 0.5 },
   { lon: -73, lat: -42, rx: 2, ry: 6, bias: 0.8 },
 ]
+
+/**
+ * Silhouette picture of a map style
+ * @param {ConcordatStyleName} style - Style
+ * @return {string} - Public path
+ */
+
+export const concordatRegionArt = (style: ConcordatStyleName): string =>
+  `/play/concordat/regions/${style}.svg`
+
+/**
+ * Dots per side drawn for each map size
+ * @type {Record<ConcordatSizeName, number>}
+ */
+
+export const CONCORDAT_SIZE_DOTS: Record<ConcordatSizeName, number> = {
+  [ConcordatSizes.Small]: 3,
+  [ConcordatSizes.Medium]: 5,
+  [ConcordatSizes.Large]: 7,
+}

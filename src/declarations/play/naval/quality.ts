@@ -1,6 +1,11 @@
 import naval from '@/configurations/play/naval.json'
 import type { NavalDeviceRules, NavalTier } from '@/core/lib/play/naval/quality'
-import { readBoolean, readInteger, readNode, readNumber } from '@/declarations/configurations/readers'
+import {
+  readBoolean,
+  readInteger,
+  readNode,
+  readNumber,
+} from '@/declarations/configurations/readers'
 import { NavalQualities } from '@/utils/constants/play'
 import type { NavalTierName } from '@/utils/constants/play'
 
@@ -20,7 +25,12 @@ const tierOf = (name: NavalTierName): NavalTier => {
   const raw = readNode(tiers[name], path)
 
   return {
-    pixelRatio: readNumber(raw.pixelRatio, { path: `${path}.pixelRatio`, fallback: 1, min: 1, max: 3 }),
+    pixelRatio: readNumber(raw.pixelRatio, {
+      path: `${path}.pixelRatio`,
+      fallback: 1,
+      min: 1,
+      max: 3,
+    }),
     particles: readInteger(raw.particles, { path: `${path}.particles`, fallback: 80, min: 0 }),
     life: readNumber(raw.life, { path: `${path}.life`, fallback: 0, min: 0, max: 1 }),
     follow: readBoolean(raw.follow, { path: `${path}.follow`, fallback: false }),

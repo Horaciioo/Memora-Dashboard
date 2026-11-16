@@ -1,0 +1,68 @@
+/* Level skins, set by data-skin and read by the badge and the rail petals */
+[data-skin='grey'] {
+  --skin-from: #b9bcc4;
+  --skin-to: #8b8f9a;
+  --skin-ink: #1f2230;
+}
+[data-skin='bronze'] {
+  --skin-from: #e0a070;
+  --skin-to: #a8622f;
+  --skin-ink: #2d1606;
+}
+[data-skin='silver'] {
+  --skin-from: #f1f3f8;
+  --skin-to: #aab2c2;
+  --skin-ink: #202533;
+}
+[data-skin='gold'] {
+  --skin-from: #ffe48a;
+  --skin-to: #e0a91f;
+  --skin-ink: #3a2700;
+}
+[data-skin='diamond'] {
+  --skin-from: #d9f6ff;
+  --skin-to: #6fd0f0;
+  --skin-ink: #08354a;
+}
+[data-skin='emerald'] {
+  --skin-from: #6fe3a4;
+  --skin-to: #17a05d;
+  --skin-ink: #042b17;
+}
+[data-skin='royalBlue'] {
+  --skin-from: #6f8dff;
+  --skin-to: #2740c4;
+  --skin-ink: #ffffff;
+}
+[data-skin='royalRed'] {
+  --skin-from: #ff6b78;
+  --skin-to: #b3122b;
+  --skin-ink: #ffffff;
+}
+
+.skin-badge {
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--skin-from), var(--skin-to));
+  color: var(--skin-ink);
+}
+
+/* Sparkle crossing the top skin, on its own */
+.skin-badge[data-skin='royalRed']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.7) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: skin-sparkle 2.6s ease-in-out infinite;
+}
+
+@keyframes skin-sparkle {
+  to {
+    transform: translateX(120%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skin-badge[data-skin='royalRed']::after {
+    animation: none;
+  }
+}

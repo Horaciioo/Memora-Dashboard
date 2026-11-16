@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { Tip } from '@/components/elements/feedback/Tip'
 import { BAC_SESSION_COPY, fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
 import { BAC_SESSION } from '@/declarations/ui/variants'
@@ -36,7 +36,8 @@ const FaceStack = ({ faces }: { faces: PlayFace[] }) => (
         label={face.isAway ? fillPlayMessage(PLAY_HUB_COPY.away, { name: face.name }) : face.name}
         floating
       >
-        <Avatar
+        <PlayAvatar
+          accountId={face.id}
           name={face.name}
           src={face.avatarUrl}
           size="sm"

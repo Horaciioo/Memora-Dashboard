@@ -3,7 +3,8 @@
     "win": 80,
     "draw": 40,
     "loss": 20,
-    "firstGameMultiplier": 2
+    "firstGameMultiplier": 2,
+    "firstWinBonus": 0.2
   },
   "levels": {
     "max": 150000,

@@ -3,7 +3,7 @@
 import { useContext, useEffect } from 'react'
 import type { ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlayFeedBridge } from '@/composites/play/session/chat/feedBridge'
 import { BAC_SESSION_COPY, fillPlayMessage } from '@/declarations/play'
@@ -63,25 +63,30 @@ export const PlayFeedRow = ({
 }) => {
   const MarkIcon = ICONS.playClock
   const face = players.find((player) => player.id === entry.accountId)
-  const values = { ...entry.values, victim: nameOf(players, entry.values.victimId) }
+  const values = {
+    ...entry.values,
+    victim: nameOf(players, entry.values.victimId) || String(entry.values.victim ?? ''),
+  }
   const marked = MARKED_VERB.exec(copy[entry.kind])
   const [before, after] = copy[entry.kind].split(MARKED_VERB).filter((_, i) => i !== 1)
   const line = fillPlayMessage(copy[entry.kind].replace(MARKED_VERB, '$1'), values)
   const head = copy[entry.kind].split('{')[0].replace(TRAILING_WORD, '')
-  const verb = face && PLAY_FEED_VERBS[entry.kind] && line.startsWith(head)
+  const verb = (face || entry.values.actor) && PLAY_FEED_VERBS[entry.kind] && line.startsWith(head)
 
   return (
     <li className={BAC_SESSION.feedLine}>
       {face ? (
-        <Avatar name={face.name} src={face.avatarUrl} size="xs" />
+        <PlayAvatar accountId={face.id} name={face.name} src={face.avatarUrl} size="xs" />
       ) : (
         <span className={BAC_SESSION.feedMark}>
           <MarkIcon className={BAC_SESSION.feedMarkIcon} aria-hidden="true" />
         </span>
       )}
       <span className={BAC_SESSION.feedText}>
-        {face && <span className={BAC_SESSION.feedName}>{face.name} </span>}
-        {face && marked ? (
+        {(face || entry.values.actor) && (
+          <span className={BAC_SESSION.feedName}>{face?.name ?? entry.values.actor} </span>
+        )}
+        {(face || entry.values.actor) && marked ? (
           <>
             {fillPlayMessage(before, values)}
             <span className={cn('font-bold', PLAY_FEED_VERBS[entry.kind])}>{marked[1]}</span>

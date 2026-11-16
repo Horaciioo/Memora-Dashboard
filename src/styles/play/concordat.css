@@ -33,42 +33,14 @@
   cursor: grab;
 }
 
-/* Loading: the border of an island draws itself, pawns drop onto the board */
-.concordat-load-coast {
-  stroke-dasharray: 420;
-  stroke-dashoffset: 420;
-  animation: concordat-load-draw 3.2s ease-in-out infinite;
+/* Loading: the globe spins on its axis, continents wrap around */
+.concordat-load-spin {
+  animation: concordat-load-spin 6s linear infinite;
 }
 
-.concordat-load-pawn {
-  animation: concordat-load-drop 2.4s cubic-bezier(0.3, 1.4, 0.5, 1) infinite;
-  transform-box: fill-box;
-  transform-origin: center bottom;
-}
-
-@keyframes concordat-load-draw {
-  0% {
-    stroke-dashoffset: 420;
-  }
-  70%,
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes concordat-load-drop {
-  0% {
-    opacity: 0;
-    transform: translateY(-1.2rem);
-  }
-  30%,
-  85% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(0);
+@keyframes concordat-load-spin {
+  to {
+    transform: translateX(-56px);
   }
 }
 
@@ -102,10 +74,7 @@
     animation: none;
   }
 
-  .concordat-load-coast,
-  .concordat-load-pawn {
+  .concordat-load-spin {
     animation: none;
-    stroke-dashoffset: 0;
-    opacity: 1;
   }
 }

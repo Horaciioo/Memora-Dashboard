@@ -51,12 +51,23 @@ export const StopGoRulesDrawer = ({ open, onClose, settings }: StopGoRulesDrawer
       label: copy.start,
       value: STOPGO_SETTINGS.startsStopped ? copy.startStopped : copy.startRolling,
     },
+    {
+      label: copy.draw,
+      value: fillPlayMessage(copy.drawValue, { share: Math.round(STOPGO_SETTINGS.kmShare * 100) }),
+    },
+    {
+      label: copy.pity,
+      value: fillPlayMessage(copy.pityValue, {
+        share: Math.round(STOPGO_SETTINGS.pityShare * 100),
+      }),
+    },
     { label: copy.distances, value: fillPlayMessage(copy.distancesValue, { list: distances }) },
     { label: copy.finish, value: copy.finishValue },
     {
       label: copy.attacks,
       value: fillPlayMessage(copy.attacksValue, { list: namesOf(StopGoFamilies.Attack) }),
     },
+    { label: copy.sameMalus, value: copy.sameMalusValue },
     {
       label: copy.limit,
       value: fillPlayMessage(copy.limitValue, { km: STOPGO_SETTINGS.limitMaxKm }),

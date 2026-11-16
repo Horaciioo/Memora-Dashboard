@@ -1,6 +1,7 @@
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import { readRange } from '@/declarations/play/settings'
 import {
+  CONCORDAT_RANDOM_STYLE,
   ConcordatDifficulties,
   ConcordatModes,
   ConcordatSizes,
@@ -9,6 +10,7 @@ import {
 } from '@/utils/constants/concordat'
 import type {
   ConcordatDifficultyName,
+  ConcordatStyleChoice,
   ConcordatModeName,
   ConcordatSizeName,
   ConcordatSpeedName,
@@ -25,6 +27,10 @@ export const CONCORDAT_SETTINGS = {
   maxPlayers: CONCORDAT.maxPlayers,
   sizes: Object.values(ConcordatSizes) as ConcordatSizeName[],
   styles: Object.values(ConcordatStyles) as ConcordatStyleName[],
+  styleChoices: [
+    ...Object.values(ConcordatStyles),
+    CONCORDAT_RANDOM_STYLE,
+  ] as ConcordatStyleChoice[],
   speeds: Object.values(ConcordatSpeeds) as ConcordatSpeedName[],
   difficulties: Object.values(ConcordatDifficulties) as ConcordatDifficultyName[],
   initialDifficulty: ConcordatDifficulties.Normal as ConcordatDifficultyName,
@@ -33,6 +39,8 @@ export const CONCORDAT_SETTINGS = {
   initialSize: ConcordatSizes.Medium as ConcordatSizeName,
   initialStyle: ConcordatStyles.World as ConcordatStyleName,
   initialSpeed: ConcordatSpeeds.Normal as ConcordatSpeedName,
+  // Zero minutes means no time limit
+  unlimited: 0,
   duration: readRange(CONCORDAT.durationMinutes, 'play/concordat.durationMinutes', {
     initial: 30,
     min: 10,

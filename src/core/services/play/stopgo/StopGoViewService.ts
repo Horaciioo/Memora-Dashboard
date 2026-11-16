@@ -43,6 +43,7 @@ export const stopGoBoards = async (session: EngineSession) => {
     hand: seat.hand as unknown as StopGoHandCard[],
     hazards: seat.hazards as StopGoHazard[],
     shields: seat.shields as StopGoSafety[],
+    lastHazard: seat.lastHazard as StopGoHazard | null,
   }))
   const log: StopGoLogLine[] = moves.toReversed().map((move) => ({
     ...move,

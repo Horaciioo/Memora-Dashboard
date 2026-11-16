@@ -31,10 +31,7 @@ import { beaconProps } from '@/declarations/ui/beacons'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import {
-  MENTION_NUDGE_COPY,
-  MENTION_NUDGE_SOMEONE,
-} from '@/declarations/work/copy'
+import { MENTION_NUDGE_COPY, MENTION_NUDGE_SOMEONE } from '@/declarations/work/copy'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'

@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayMedal } from '@/composites/play/shared/PlayMedal'
 import { fillPlayMessage, PLAY_LEADER_METRICS } from '@/declarations/play'
 import type { PlayLeaderMetric } from '@/declarations/play'
@@ -25,7 +25,7 @@ export const PlayLeaderRow = ({ leader, metric, meId }: PlayLeaderRowProps) => (
     ) : (
       <span className={PLAY_BOARD.rank}>{leader.rank}</span>
     )}
-    <Avatar name={leader.name} src={leader.avatarUrl} />
+    <PlayAvatar accountId={leader.accountId} name={leader.name} src={leader.avatarUrl} />
     <span className={PLAY_BOARD.name}>{leader.name}</span>
     <span className={PLAY_BOARD.value}>
       {fillPlayMessage(PLAY_LEADER_METRICS[metric].note, {

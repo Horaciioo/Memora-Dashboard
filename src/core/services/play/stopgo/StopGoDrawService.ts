@@ -3,16 +3,27 @@ import 'server-only'
 import { after } from '@/core/lib/play/clock'
 import {
   drawCards,
+  drawFor,
   isPicking,
+  carOf,
   keepPicked,
+  needsDraw,
+  needsOf,
   PICK_PENDING,
+  sealedOf,
   secureRandom,
 } from '@/core/lib/play/stopgo'
 import type { StopGoHandCard } from '@/core/lib/play/stopgo'
-import { passTurn } from '@/core/services/play/stopgo/StopGoFlowService'
-import { refuse, requireLive } from '@/core/services/play/stopgo/StopGoGuards'
+import { closeRace, passTurn } from '@/core/services/play/stopgo/StopGoFlowService'
+import { refuse, requireLive, requireTurn } from '@/core/services/play/stopgo/StopGoGuards'
 import { releaseCard } from '@/core/services/play/stopgo/StopGoHand'
-import { saveSeat, seatOf, withTable, writeMoves } from '@/core/services/play/stopgo/StopGoTable'
+import {
+  movedStep,
+  saveSeat,
+  seatOf,
+  withTable,
+  writeMoves,
+} from '@/core/services/play/stopgo/StopGoTable'
 import type { StopGoLockedTable, StopGoMoveInput } from '@/core/services/play/stopgo/StopGoTable'
 import { StopGoRefusals } from '@/declarations/play/stopgo/refusals'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
@@ -115,4 +126,43 @@ export const pickCard = (
     )
 
     return isOffered ? resolvePick(table, cardId) : refuse(StopGoRefusals.NotInHand)
+  })
+
+/**
+ * Take the card of the turn from the pile, on the player's own click
+ * @param {EngineSession} session - Game
+ * @param {string} accountId - Player on turn
+ * @param {Record<string, unknown>} raw - Body with turnNo
+ * @return {Promise<EngineStep>} - Step
+ */
+
+export const takeCard = (
+  session: EngineSession,
+  accountId: string,
+  raw: Record<string, unknown>
+): Promise<EngineStep> =>
+  withTable(session, async (table) => {
+    requireTurn(table, accountId, raw)
+    const { game } = table
+    const seat = seatOf(table, accountId)!
+    if (!needsDraw(seat.hand.length, sealedOf(seat.sealed).length)) {
+      refuse(StopGoRefusals.AlreadyDrawn)
+    }
+    const needs = needsOf(
+      carOf(seat),
+      seat.hand.map((entry) => entry.key)
+    )
+    const found = drawFor(game.drawPile, game.discard, game.reshuffles, secureRandom, needs)
+
+    // Pile and discard both spent: the race ends on distance
+    if (!found.card) return closeRace(table, null)
+    const isShuffled = found.piles.reshuffles > game.reshuffles
+    game.drawPile = found.piles.pile
+    game.discard = found.piles.discard
+    game.reshuffles = found.piles.reshuffles
+    await saveSeat(table, accountId, { hand: [...seat.hand, found.card] })
+    if (isShuffled) await writeMoves(table, [{ kind: StopGoMoveKinds.Shuffle, accountId }])
+    table.isDirty = true
+
+    return movedStep(table)
   })

@@ -65,7 +65,7 @@ export const drawCards = (
 
   // One card at a time
   for (let index = 0; index < count; index++) {
-    const taken = draw(current, maxReshuffles, random)
+    const taken = draw(current, maxReshuffles, random, STOPGO_SETTINGS.kmShare)
     if (!taken.card) break
     cards.push(taken.card)
     current = taken.piles

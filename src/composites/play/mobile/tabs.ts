@@ -12,15 +12,18 @@ export interface PlayTab {
   href: string
   // Left out of the phone bar
   isDesktopOnly?: boolean
+  // Left out of the phone bar, reached through the portrait menu
+  isHidden?: boolean
 }
 
 export const PLAY_TAB_ORDER: PlayTab[] = [
   { key: 'group', href: ROUTES.playGroup },
   { key: 'feed', href: ROUTES.playFeed },
+  { key: 'online', href: ROUTES.playOnline, isDesktopOnly: true },
+  { key: 'live', href: ROUTES.playLive, isDesktopOnly: true },
   { key: 'home', href: ROUTES.play },
-  { key: 'lounge', href: ROUTES.playLounge, isDesktopOnly: true },
   { key: 'ranking', href: ROUTES.playRanking() },
-  { key: 'stats', href: ROUTES.playStats },
+  { key: 'stats', href: ROUTES.playStats, isHidden: true },
 ]
 
 // Tabs of the phone bar
@@ -31,7 +34,8 @@ export const PLAY_TAB_LABELS: Record<PlayTabGlyphName, string> = {
   group: PLAY_MOBILE_COPY.tabGroup,
   feed: PLAY_MOBILE_COPY.tabFeed,
   home: PLAY_MOBILE_COPY.tabHome,
-  lounge: PLAY_MOBILE_COPY.tabLounge,
+  live: PLAY_MOBILE_COPY.tabLive,
+  online: PLAY_MOBILE_COPY.tabOnline,
   ranking: PLAY_MOBILE_COPY.tabRanking,
   stats: PLAY_MOBILE_COPY.tabStats,
 }

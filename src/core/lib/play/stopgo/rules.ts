@@ -43,6 +43,25 @@ export const isShielded = (car: StopGoCar, hazard: StopGoHazard): boolean =>
   car.shields.some((shield) => (STOPGO_SAFETIES[shield] as readonly string[]).includes(hazard))
 
 /**
+ * Remedies a stopped car still lacks to roll again
+ * @param {StopGoCar} car - Car
+ * @param {StopGoCardKey[]} held - Cards already in hand
+ * @return {StopGoCardKey[]} - Remedies to find, none for a car that rolls
+ */
+
+export const needsOf = (car: StopGoCar, held: StopGoCardKey[] = []): StopGoCardKey[] => {
+  if (isMoving(car)) return []
+  const keys = car.hazards
+    .filter((hazard) => STOPGO_HAZARDS[hazard].kind !== StopGoHazardKinds.Limit)
+    .map((hazard) => STOPGO_HAZARDS[hazard].remedy as StopGoCardKey)
+
+  // A car that never got the light also needs green
+  if (!car.isGreen && !keys.includes('green')) keys.push('green')
+
+  return keys.filter((key) => !held.includes(key))
+}
+
+/**
  * Card of a hand that stops a hazard right away
  * @param {{ id: string, key: StopGoCardKey }[]} hand - Hand
  * @param {StopGoHazard} hazard - Attack key
@@ -113,6 +132,34 @@ const remedyVerdict = (spec: StopGoCardSpec, car: StopGoCar): Verdict => {
 }
 
 /**
+ * Why a malus cannot land on a car
+ * @param {StopGoHazard} hazard - Malus
+ * @param {StopGoCar} car - Opponent car
+ * @return {Verdict} - Refusal or null
+ */
+
+export const aimVerdict = (hazard: StopGoHazard, car: StopGoCar): Verdict => {
+  if (isShielded(car, hazard)) return StopGoRefusals.Shielded
+  if (car.hazards.includes(hazard)) return StopGoRefusals.AlreadyHit
+
+  // The malus a car just suffered cannot come twice in a row
+  return car.lastHazard === hazard ? StopGoRefusals.SameMalus : null
+}
+
+/**
+ * Opponents a card can aim at
+ * @param {StopGoCardSpec} spec - Card
+ * @param {StopGoTable} table - Race
+ * @param {string} accountId - Player
+ * @return {string[]} - Opponent ids that can take the malus
+ */
+
+export const aimableOf = (spec: StopGoCardSpec, table: StopGoTable, accountId: string): string[] =>
+  opponentsOf(table, accountId).filter(
+    (id) => !spec.hazard || !aimVerdict(spec.hazard, table.cars[id])
+  )
+
+/**
  * Targeted card check
  * @param {StopGoCardSpec} spec - Card
  * @param {string[]} targets - Chosen ids
@@ -128,8 +175,13 @@ const targetVerdict = (
   accountId: string
 ): Verdict => {
   const opponents = opponentsOf(table, accountId)
-  const needed = minTargetsOf(spec, opponents.length)
   if (!opponents.length) return StopGoRefusals.NoOpponent
+
+  // A wide attack needs only as many as can take it
+  const needed = Math.min(
+    minTargetsOf(spec, opponents.length),
+    Math.max(1, aimableOf(spec, table, accountId).length)
+  )
   if (spec.target === StopGoTargets.One && targets.length !== 1) {
     return StopGoRefusals.WrongTargetCount
   }
@@ -140,14 +192,16 @@ const targetVerdict = (
     new Set(targets).size === targets.length && targets.every((id) => opponents.includes(id))
   if (!isValid) return StopGoRefusals.BadTarget
 
-  // One malus per type
   const hazard = spec.hazard
-  if (hazard && targets.some((id) => isShielded(table.cars[id], hazard))) {
-    return StopGoRefusals.Shielded
-  }
-  const isHit = hazard && targets.some((id) => table.cars[id].hazards.includes(hazard))
+  if (!hazard) return null
 
-  return isHit ? StopGoRefusals.AlreadyHit : null
+  // First refusal among the targets
+  for (const id of targets) {
+    const verdict = aimVerdict(hazard, table.cars[id])
+    if (verdict) return verdict
+  }
+
+  return null
 }
 
 /**
@@ -177,5 +231,11 @@ export const canPlay = (
   }
   if (spec.target === StopGoTargets.None) return null
 
-  return targetVerdict(spec, targets, table, accountId)
+  const verdict = targetVerdict(spec, targets, table, accountId)
+  if (verdict || key !== 'mystery') return verdict
+
+  // The reveal is paid in km, a car without them cannot be sealed
+  return targets.some((id) => table.cars[id].km < STOPGO_SETTINGS.mysteryCost)
+    ? StopGoRefusals.TooShort
+    : null
 }

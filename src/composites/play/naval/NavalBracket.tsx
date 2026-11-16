@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
 import type { NavalBoardState } from '@/core/lib/play/naval/state'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -84,7 +84,12 @@ export const NavalBracket = ({
                         match.status === 'DONE' && match.winner !== seat && NAVAL_BRACKET.sideLost
                       )}
                     >
-                      <Avatar name={captain.name} src={captain.avatarUrl} size="xs" />
+                      <PlayAvatar
+                        accountId={captain.accountId}
+                        name={captain.name}
+                        src={captain.avatarUrl}
+                        size="xs"
+                      />
                       <span className={NAVAL_BRACKET.name}>{captain.name}</span>
                     </span>
                   )

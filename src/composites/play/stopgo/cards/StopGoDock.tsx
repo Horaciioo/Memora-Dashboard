@@ -63,8 +63,6 @@ export const StopGoDock = ({
   const dockRef = useDockHeight()
   const now = useServerNow(board.serverTime)
   const [chosenId, setChosenId] = useState<string | null>(null)
-  // Turn whose drawn card was taken from the deck
-  const [drawnTurn, setDrawnTurn] = useState<number | null>(null)
   const [isFolded, setIsFolded] = useState(false)
   const { you, players } = board
   const me = players.find(({ accountId }) => accountId === viewerId)
@@ -72,9 +70,10 @@ export const StopGoDock = ({
   const isLive = board.phase === StopGoPhases.Playing
   const isTurn = isLive && board.turnId === viewerId && !board.window && !board.pickerId
   const held = (you?.hand ?? []).filter((card) => !card.isPicking)
-  // The card dealt at the start of the turn waits on the deck until it is taken
-  const isWaiting = isTurn && held.length > STOPGO_SETTINGS.handSize && drawnTurn !== board.turnNo
-  const cards = isWaiting ? held.slice(0, -1) : held
+  // The card of the turn stays on the pile until the player takes it
+  const isWaiting = isTurn && !!you?.canDraw
+  const isPlaying = isTurn && !isWaiting
+  const cards = held
   const chosen = cards.find((card) => card.id === chosenId)
   const rivals: StopGoOpponent[] = players
     .map((player, lane) => ({
@@ -96,7 +95,7 @@ export const StopGoDock = ({
   // A card with no target goes on a second click, the others wait for their targets
   const quickPlay = (id: string) => {
     const aims = you?.playable[id]
-    if (isTurn && aims && aims.length === 0) void play(id)
+    if (isPlaying && aims && aims.length === 0) void play(id)
   }
 
   // One card sound per card, in the order the hand moves
@@ -126,7 +125,9 @@ export const StopGoDock = ({
       <StopGoDeck
         pileCount={board.pileCount}
         isWaiting={isWaiting}
-        onDraw={() => setDrawnTurn(board.turnNo)}
+        isSaving={moves.isSaving}
+        isGreen={me.isMoving}
+        onDraw={() => void moves.draw()}
       />
       <div ref={dockRef} className={cn(STOPGO_HAND.dock, isFolded && STOPGO_HAND.dockFolded)}>
         <StopGoRivalRow rivals={rivals} avatars={avatars} />
@@ -149,16 +150,23 @@ export const StopGoDock = ({
                 <StopGoTray
                   key={chosen.id}
                   card={chosen}
-                  aims={isTurn ? (aims ?? undefined) : undefined}
+                  aims={isPlaying ? (aims ?? undefined) : undefined}
                   reason={
-                    isTurn
-                      ? reasonOf(chosen.key, me, board.target)
-                      : fillPlayMessage(STOPGO_HAND_COPY.waitTurn, {
-                          name: names[board.turnId ?? ''] ?? '',
-                        })
+                    isWaiting
+                      ? STOPGO_HAND_COPY.drawFirst
+                      : isTurn
+                        ? reasonOf(
+                            chosen.key,
+                            me,
+                            board.target,
+                            players.filter((player) => player.accountId !== viewerId)
+                          )
+                        : fillPlayMessage(STOPGO_HAND_COPY.waitTurn, {
+                            name: names[board.turnId ?? ''] ?? '',
+                          })
                   }
                   opponents={rivals}
-                  isTurn={isTurn}
+                  isTurn={isPlaying}
                   isSaving={moves.isSaving}
                   onPlay={(targets) => void play(chosen.id, targets)}
                   onDiscard={() => void discard(chosen.id)}
@@ -185,8 +193,9 @@ export const StopGoDock = ({
                 playable={you.playable}
                 me={me}
                 target={board.target}
+                rivals={players.filter((player) => player.accountId !== viewerId)}
                 chosenId={chosenId}
-                isTurn={isTurn}
+                isTurn={isPlaying}
                 isOpening={board.turnNo === 1}
                 onChoose={isFolded ? noop : setChosenId}
                 onQuickPlay={isFolded ? noop : quickPlay}
@@ -196,7 +205,7 @@ export const StopGoDock = ({
         </div>
         <StopGoPiles
           discardTop={board.discardTop}
-          isDropTarget={isTurn && !!chosen}
+          isDropTarget={isPlaying && !!chosen}
           onDiscardDrop={() => chosen && void discard(chosen.id)}
         />
       </div>

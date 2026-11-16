@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { SuspensBoardView, SuspensFace } from '@/composites/play/suspens/types'
 import { fillPlayMessage, SUSPENS_BOARD_COPY } from '@/declarations/play'
 import { SUSPENS_BOARD } from '@/declarations/ui/variants'
@@ -24,7 +24,14 @@ export const SuspensReveal = ({
 
   return (
     <div className={SUSPENS_BOARD.reveal} aria-live="polite">
-      {winner && <Avatar name={winner.name} src={winner.avatarUrl} size="lg" />}
+      {winner && (
+        <PlayAvatar
+          accountId={winner.accountId}
+          name={winner.name}
+          src={winner.avatarUrl}
+          size="lg"
+        />
+      )}
       <span className={SUSPENS_BOARD.revealName}>
         {reveal.isSolved
           ? fillPlayMessage(SUSPENS_BOARD_COPY.solved, { name: solver?.name ?? '' })

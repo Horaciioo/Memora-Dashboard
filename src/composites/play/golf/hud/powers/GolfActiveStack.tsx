@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { GolfPowerOrb } from '@/composites/play/golf/GolfPowerOrb'
 import type { GolfFace } from '@/composites/play/golf/types'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
@@ -73,7 +73,8 @@ const ActiveItem = ({
         <span className={GOLF_BOARD.activeRing} style={{ '--left': left } as CSSProperties} />
       )}
       {caster && (
-        <Avatar
+        <PlayAvatar
+          accountId={caster.accountId}
           name={caster.name}
           src={caster.avatarUrl}
           size="xs"

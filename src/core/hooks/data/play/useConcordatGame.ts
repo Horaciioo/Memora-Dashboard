@@ -20,9 +20,14 @@ interface ConcordatSlot {
   version: number
   listeners: Set<() => void>
   isQueued: boolean
+  // Last board asked after a missed diff
+  resyncAt: number
 }
 
 const slots = new Map<string, ConcordatSlot>()
+
+// Least gap between two board requests, the server refuses faster ones anyway
+const RESYNC_GAP_MS = 3000
 
 const slotOf = (sessionId: string): ConcordatSlot => {
   const slot = slots.get(sessionId) ?? {
@@ -30,6 +35,7 @@ const slotOf = (sessionId: string): ConcordatSlot => {
     version: 0,
     listeners: new Set(),
     isQueued: false,
+    resyncAt: 0,
   }
   slots.set(sessionId, slot)
 
@@ -80,7 +86,12 @@ export const useConcordatGame = (sessionId: string, initial: ConcordatBoard | nu
 
         // A missed diff asks for a fresh board
         if (applyDiff(slot.client, decodeDiff(fromBase64(text))) === 'gap') {
-          void act({ type: CONCORDAT_RESYNC })
+          // Every diff after a gap is a gap too, ask once
+          if (Date.now() - slot.resyncAt >= RESYNC_GAP_MS) {
+            slot.resyncAt = Date.now()
+            void act({ type: CONCORDAT_RESYNC })
+          }
+          return
         }
         touch(slot)
       }),

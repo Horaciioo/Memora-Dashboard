@@ -2,16 +2,18 @@
 
 import { usePathname } from 'next/navigation'
 
+import { skinOf } from '@/core/lib/play/skins'
+import { usePlayLevel } from '@/core/hooks/data/play/usePlayLevel'
+import { PlayMeButton } from '@/composites/play/mobile/PlayMeButton'
 import { PlayNote } from '@/composites/play/hub/notices/PlayNote'
 import { usePlayNote } from '@/core/hooks/interaction/state/play/usePlayNote'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayTabGlyph } from '@/composites/play/mobile/PlayTabGlyphs'
 import { PLAY_TAB_LABELS, PLAY_TAB_ORDER, playTabIndexOf } from '@/composites/play/mobile/tabs'
 import type { PlayTab } from '@/composites/play/mobile/tabs'
-import { PLAY_HUB_COPY, PLAY_MOBILE_COPY } from '@/declarations/play'
+import { PLAY_MOBILE_COPY } from '@/declarations/play'
 import { PLAY_TABS } from '@/declarations/ui/variants'
 import { ROUTES } from '@/declarations/navigation'
-import { ICONS } from '@/declarations/ui/icons'
 import type { PlayNoticeView, PlayPresence } from '@/types/play'
 import { cn } from '@/utils/classnames'
 
@@ -25,7 +27,7 @@ export interface PlayTabBarProps {
 }
 
 /**
- * Phone tab bar: the open tab widens and lifts
+ * Phone tab bar: the open glyph lifts, the member portrait in the middle
  * @param {PlayTabBarProps} props - Feed data
  * @return {JSX.Element | null}
  */
@@ -33,6 +35,7 @@ export interface PlayTabBarProps {
 export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) => {
   const path = usePathname()
   const { note } = usePlayNote()
+  const level = usePlayLevel()
   if (path.startsWith(SESSION_PREFIX)) return null
 
   const current = playTabIndexOf(path)
@@ -41,8 +44,6 @@ export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) =
     feed: isCalling,
     group: groupCalls > 0,
   }
-
-  const ExitIcon = ICONS.playLeave
 
   const body = (tab: PlayTab, isOn: boolean) => (
     <>
@@ -71,7 +72,7 @@ export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) =
         className={cn(
           PLAY_TABS.tab,
           isOn && PLAY_TABS.tabOn,
-          tab.isDesktopOnly && PLAY_TABS.tabDesktop
+          (tab.isDesktopOnly || tab.isHidden) && PLAY_TABS.tabDesktop
         )}
       >
         {body(tab, isOn)}
@@ -79,19 +80,27 @@ export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) =
     )
   }
 
+  // Tabs of the bar, as many each side of the portrait
+  const shown = PLAY_TAB_ORDER.map((tab, index) => ({ tab, index })).filter(
+    ({ tab }) => !tab.isHidden
+  )
+  const middle = Math.ceil(shown.length / 2)
+
   return (
     <>
-      <nav aria-label={PLAY_MOBILE_COPY.tabs} className={PLAY_TABS.bar}>
-        {PLAY_TAB_ORDER.map(link)}
-      </nav>
-      <AppLink
-        href={ROUTES.dashboard}
-        aria-label={PLAY_HUB_COPY.backToDashboard}
-        title={PLAY_HUB_COPY.backToDashboard}
-        className={PLAY_TABS.exit}
+      <nav
+        aria-label={PLAY_MOBILE_COPY.tabs}
+        data-skin={skinOf(level ?? 0).key}
+        className={PLAY_TABS.bar}
       >
-        <ExitIcon className={PLAY_TABS.exitIcon} />
-      </AppLink>
+        <div className={PLAY_TABS.half}>
+          {shown.slice(0, middle).map(({ tab, index }) => link(tab, index))}
+        </div>
+        <PlayMeButton />
+        <div className={PLAY_TABS.half}>
+          {shown.slice(middle).map(({ tab, index }) => link(tab, index))}
+        </div>
+      </nav>
       <PlayNote text={note} />
     </>
   )

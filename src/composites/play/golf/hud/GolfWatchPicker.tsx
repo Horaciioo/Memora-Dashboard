@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { GolfFace } from '@/composites/play/golf/types'
 import type { GolfWatch } from '@/core/hooks/interaction/golf/useGolfWatch'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -116,7 +116,7 @@ export const GolfWatchPicker = ({ faces, watch, isFree, onFree, onRise }: GolfWa
           aria-pressed={face.accountId === watch.focusId}
           onClick={() => watch.select(face.accountId)}
         >
-          <Avatar name={face.name} src={face.avatarUrl} size="md" />
+          <PlayAvatar accountId={face.accountId} name={face.name} src={face.avatarUrl} size="md" />
         </button>
       ))}
       <button

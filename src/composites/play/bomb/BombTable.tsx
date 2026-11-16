@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { BombDrawing } from '@/composites/play/bomb/BombDrawing'
 import { BombHearts } from '@/composites/play/bomb/BombHearts'
 import type { BombFace } from '@/composites/play/bomb/types'
@@ -87,7 +87,12 @@ export const BombTable = ({
             ) : (
               <BombHearts lives={seat.lives} max={maxLives} />
             )}
-            <Avatar name={seat.name} src={seat.avatarUrl} size="md" />
+            <PlayAvatar
+              accountId={seat.accountId}
+              name={seat.name}
+              src={seat.avatarUrl}
+              size="md"
+            />
             {hasWords && !(isTurn && (draft || miss)) && seat.lastWord && (
               <span className={BOMB_BOARD.lastWord}>{seat.lastWord}</span>
             )}

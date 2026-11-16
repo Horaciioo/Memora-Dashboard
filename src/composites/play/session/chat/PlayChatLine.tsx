@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PLAY_CHAT_EVENTS } from '@/declarations/play'
 import { PLAY_CHAT_UI, PLAY_CHAT_VERBS } from '@/declarations/ui/variants'
 import type { PlayMessageView } from '@/types/play'
@@ -52,7 +52,12 @@ export const PlayChatLine = ({
   if (message.kind !== PlayMessageKinds.Text) {
     return (
       <div className={cn(PLAY_CHAT_UI.event, isHud && PLAY_CHAT_UI.lineHud)} onContextMenu={onMenu}>
-        <Avatar name={message.author.name} src={message.author.avatarUrl} size="xs" />
+        <PlayAvatar
+          accountId={message.author.id}
+          name={message.author.name}
+          src={message.author.avatarUrl}
+          size="xs"
+        />
         <span className={cn(isHud && 'truncate')}>
           <span className={PLAY_CHAT_UI.eventName}>{message.author.name}</span>{' '}
           <span className={cn(PLAY_CHAT_UI.eventVerb, PLAY_CHAT_VERBS[message.kind])}>
@@ -73,7 +78,12 @@ export const PlayChatLine = ({
     </p>
   ) : (
     <div className={cn(PLAY_CHAT_UI.message, isHud && PLAY_CHAT_UI.lineHud)} onContextMenu={onMenu}>
-      <Avatar name={message.author.name} src={message.author.avatarUrl} size="xs" />
+      <PlayAvatar
+        accountId={message.author.id}
+        name={message.author.name}
+        src={message.author.avatarUrl}
+        size="xs"
+      />
       <div className={cn(PLAY_CHAT_UI.body, isHud && PLAY_CHAT_UI.bodyHud)}>
         <span className={PLAY_CHAT_UI.meta}>
           <span className={PLAY_CHAT_UI.author}>{message.author.name}</span>

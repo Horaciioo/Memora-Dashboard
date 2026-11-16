@@ -1,6 +1,7 @@
 import 'server-only'
 
-import { deflateSync, inflateSync } from 'node:zlib'
+import { deflate, deflateSync, inflateSync } from 'node:zlib'
+import { promisify } from 'node:util'
 
 import { prisma } from '@/core/lib/db'
 import type { ConcordatSnapshot } from '@/core/lib/play/concordat'
@@ -16,6 +17,8 @@ const LEVEL_OF_KIND: Record<PlayBotKindName, ConcordatBotLevelName> = {
   [PlayBotKinds.Medium]: ConcordatBotLevels.Strategist,
   [PlayBotKinds.Hard]: ConcordatBotLevels.Raptor,
 }
+
+const deflateLater = promisify(deflate)
 
 // Heartbeat older than this means the owner is gone
 const OWNER_TIMEOUT_MS = 30_000
@@ -45,6 +48,17 @@ export interface ConcordatNewGame {
 
 export const packSnapshot = (snapshot: ConcordatSnapshot): Uint8Array<ArrayBuffer> =>
   new Uint8Array(deflateSync(Buffer.from(JSON.stringify(snapshot))))
+
+/**
+ * Snapshot bytes deflated off the event loop, so a tick never waits for it
+ * @param {ConcordatSnapshot} snapshot - Snapshot
+ * @return {Promise<Uint8Array<ArrayBuffer>>} - Bytes
+ */
+
+export const packSnapshotLater = async (
+  snapshot: ConcordatSnapshot
+): Promise<Uint8Array<ArrayBuffer>> =>
+  new Uint8Array(await deflateLater(Buffer.from(JSON.stringify(snapshot))))
 
 /**
  * Snapshot from its bytes
@@ -157,10 +171,11 @@ export const saveSnapshotRow = async (input: {
   nations: { nation: number; tiles: number; peak: number; provinces: number }[]
 }): Promise<void> => {
   const { sessionId, snapshot } = input
+  const packed = await packSnapshotLater(snapshot)
   const { count } = await prisma.concordatGame.updateMany({
     where: { sessionId, ownerId: input.ownerId },
     data: {
-      snapshot: packSnapshot(snapshot),
+      snapshot: packed,
       snapshotTick: snapshot.tick,
       rev: input.rev,
       phase: snapshot.phase,

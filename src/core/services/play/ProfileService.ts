@@ -97,6 +97,29 @@ export const readPlayProfile = cache(async (accountId: string) => {
 })
 
 /**
+ * Global level of every human player, read by the frames around portraits
+ * @return {Promise<Record<string, number>>} - Level by account
+ */
+
+export const readPlayLevels = async (): Promise<Record<string, number>> => {
+  const [accounts, stats, profiles, trophies] = await Promise.all([
+    prisma.account.findMany({ where: { botKind: null }, select: { id: true } }),
+    prisma.playGameStat.groupBy({ by: ['accountId'], _sum: { xp: true } }),
+    prisma.playProfile.findMany({ select: { accountId: true, bonusXp: true } }),
+    prisma.playTrophyWin.groupBy({ by: ['accountId'], _sum: { xp: true } }),
+  ])
+  const xp = new Map<string, number>()
+  const add = (accountId: string, amount: number | null) =>
+    xp.set(accountId, (xp.get(accountId) ?? 0) + (amount ?? 0))
+
+  stats.forEach((entry) => add(entry.accountId, entry._sum.xp))
+  profiles.forEach((entry) => add(entry.accountId, entry.bonusXp))
+  trophies.forEach((entry) => add(entry.accountId, entry._sum.xp))
+
+  return Object.fromEntries(accounts.map(({ id }) => [id, levelOf(xp.get(id) ?? 0).level]))
+}
+
+/**
  * Best players over every game by one measure, counters summed
  * @param {PlayLeaderMetric} metric - Ranking measure
  * @return {Promise<PlayLeader[]>} - Leaders

@@ -49,6 +49,7 @@ export const API_ROUTES = {
   memberAdmin: (id: string) => `/api/members/${id}/admin`,
   realtimeTicket: '/api/realtime/ticket',
   playProfile: '/api/play/profile',
+  playLevels: '/api/play/levels',
   playSessions: '/api/play/sessions',
   playSession: (id: string) => `/api/play/sessions/${id}`,
   playJoinCode: '/api/play/join-code',

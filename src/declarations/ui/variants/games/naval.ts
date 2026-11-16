@@ -18,7 +18,8 @@ export const NAVAL_BOARD = {
   // Phones stack, wide screens set the sea beside a slim rail
   battle: 'flex max-h-full flex-col items-center gap-4',
   // Bar, sea and weapon share the width of the sea, as large as the screen allows
-  stage: 'mx-auto flex w-[min(calc(100dvh-7rem),calc(100vw-1.5rem))] min-w-[19rem] flex-col gap-2.5 lg:w-[min(calc(100dvh-7rem),calc(100vw-44rem))]',
+  stage:
+    'mx-auto flex w-[min(calc(100dvh-7rem),calc(100vw-1.5rem))] min-w-[19rem] flex-col gap-2.5 lg:w-[min(calc(100dvh-7rem),calc(100vw-44rem))]',
   rail: 'flex w-full max-w-[34rem] flex-col gap-3 empty:hidden lg:absolute lg:top-24 lg:left-7 lg:max-h-[calc(100dvh-8rem)] lg:w-[19rem] lg:overflow-y-auto',
   target: 'relative mx-auto w-full',
   // Melee: a new sea fades in
@@ -50,7 +51,8 @@ export const NAVAL_HUD = {
   callDanger: 'text-[var(--play-naval-danger)]',
   keys: 'pointer-events-auto absolute top-3 right-3 md:top-4 md:right-5',
   actions: 'flex items-center gap-2 border-l border-[var(--play-line)] pl-2 md:pl-4',
-  action: 'h-8 rounded-md bg-[var(--play-chip)] px-3 text-sm font-extrabold tracking-wide whitespace-nowrap text-[var(--play-ink)] uppercase transition-transform hover:-translate-y-px active:scale-[0.97] disabled:opacity-50',
+  action:
+    'h-8 rounded-md bg-[var(--play-chip)] px-3 text-sm font-extrabold tracking-wide whitespace-nowrap text-[var(--play-ink)] uppercase transition-transform hover:-translate-y-px active:scale-[0.97] disabled:opacity-50',
   actionMain: 'bg-[var(--play-accent)] text-[var(--hud-solid)]',
   clockRow: 'flex shrink-0 items-center gap-2 md:w-36',
   clock: 'naval-clock h-2.5 flex-1 max-md:hidden overflow-hidden rounded-sm bg-[var(--play-chip)]',

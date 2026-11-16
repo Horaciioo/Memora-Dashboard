@@ -6,7 +6,7 @@ import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import { ConcordatBuildingKinds } from '@/utils/constants/concordat'
 import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
 
-const { buildings, weapons } = CONCORDAT
+const { buildings, weapons, air } = CONCORDAT
 
 /**
  * Gold of a new building, each one held makes it dearer
@@ -113,4 +113,69 @@ export const siloFor = (
   }
 
   return best
+}
+
+/**
+ * Tick from which batteries and aircraft may work
+ * @param {ConcordatClientState} client - Game
+ * @return {number} - Tick
+ */
+
+export const airOpenAt = (client: ConcordatClientState): number =>
+  client.pickEnd + ticksOf(air.unlockMinutes * 60)
+
+/**
+ * Nearest battery of mine that is loaded and reaches a tile
+ * @param {ConcordatClientState} client - Game
+ * @param {number} tile - Target
+ * @return {ConcordatBuildingRow | null} - Battery
+ */
+
+export const batteryFor = (
+  client: ConcordatClientState,
+  tile: number
+): ConcordatBuildingRow | null => {
+  let best: ConcordatBuildingRow | null = null
+  let bestReach = Infinity
+
+  for (const building of client.systems.buildings) {
+    if (
+      building.owner !== client.me ||
+      building.kind !== ConcordatBuildingKinds.Battery ||
+      building.readyAt > client.tick
+    )
+      continue
+    const reach = reachOf(building.tile, tile, client.map.width)
+    const range = air.battery.range[Math.min(building.level, air.battery.range.length) - 1]
+    if (reach <= range && reach < bestReach) {
+      best = building
+      bestReach = reach
+    }
+  }
+
+  return best
+}
+
+/**
+ * Airbase of mine that can send one more aircraft, null when the sky is full
+ * @param {ConcordatClientState} client - Game
+ * @param {number} tile - Target
+ * @return {ConcordatBuildingRow | null} - Base
+ */
+
+export const baseFor = (
+  client: ConcordatClientState,
+  tile: number
+): ConcordatBuildingRow | null => {
+  const bases = client.systems.buildings.filter(
+    (building) =>
+      building.owner === client.me &&
+      building.kind === ConcordatBuildingKinds.Airbase &&
+      building.readyAt <= client.tick &&
+      reachOf(building.tile, tile, client.map.width) <= air.range
+  )
+  const slots = bases.reduce((sum, base) => sum + base.level * air.slotsPerLevel, 0)
+  const flying = client.systems.aircraft.filter((aircraft) => aircraft.owner === client.me).length
+
+  return flying < slots ? (bases[0] ?? null) : null
 }

@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_ROOM } from '@/declarations/ui/variants'
@@ -17,7 +17,7 @@ export const PlaySpectatorBar = ({ players }: { players: PlayFace[] }) => (
     <ul className={PLAY_ROOM.watchFaces}>
       {players.map((player) => (
         <li key={player.id} className={cn(player.isAway && PLAY_ROOM.watchAway)}>
-          <Avatar name={player.name} src={player.avatarUrl} size="sm" />
+          <PlayAvatar accountId={player.id} name={player.name} src={player.avatarUrl} size="sm" />
         </li>
       ))}
     </ul>

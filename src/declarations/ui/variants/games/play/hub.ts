@@ -18,8 +18,8 @@ export const PLAY_MEMBER = {
   // Global card then one card per game
   cards: 'flex flex-col gap-3 p-4',
   grid: 'grid gap-3 sm:grid-cols-2',
-  card: 'flex w-full flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-left',
-  hero: 'flex w-full flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-sunken)] p-5 text-left',
+  card: 'flex w-full flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-surface)_58%,transparent)] backdrop-blur-xl backdrop-saturate-150 p-4 text-left',
+  hero: 'flex w-full flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-surface-sunken)_58%,transparent)] backdrop-blur-xl backdrop-saturate-150 p-5 text-left',
   off: 'opacity-60',
   clickable:
     'transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand)]',
@@ -71,18 +71,14 @@ export const PLAY_SHELL = {
 } as const
 
 /**
- * Painted backdrop of the room, plate plus drifting mist
+ * Plain gradient backdrop of the room
  * @type {Readonly<Record<string, string>>}
  */
 
 export const PLAY_SCENE_BANNER = {
   root: 'play-scene-banner pointer-events-none fixed inset-0 z-0 overflow-hidden',
-  plate: 'play-scene-plate',
-  art: 'absolute inset-0 size-full',
-  mists: 'play-scene-mists',
-  mist: 'play-scene-mist',
-  mistFar: 'play-scene-mist-far',
-  mistNear: 'play-scene-mist-near',
+  // Plain grey, lighter at the top
+  art: 'absolute inset-0 bg-[linear-gradient(to_bottom,#3a3d45,#1c1e23)]',
 } as const
 
 /**
@@ -110,7 +106,7 @@ export const PLAY_HUB = {
   // Same title as the Dashboard navigation sheet
   title: `${BOTTOM_SHEET.figureTitle} w-full text-center text-[var(--color-on-media)]`,
   headRow: 'flex flex-wrap items-end justify-between gap-3',
-  callout: `${PANEL} flex flex-wrap items-center justify-between gap-3 bg-[var(--play-panel-strong)] px-5 py-4 text-sm font-semibold text-[var(--play-ink)]`,
+  callout: `${PANEL} flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-sm font-semibold text-[var(--play-ink)]`,
   // Game cards
   games: 'grid gap-5 sm:grid-cols-2 2xl:grid-cols-4',
   main: 'flex min-w-0 flex-col gap-10',
@@ -438,7 +434,7 @@ export const PLAY_LEAVE_UI = {
 export const PLAY_TROPHY_UI = {
   window: 'max-w-md gap-0 rounded-3xl p-0',
   banner: 'relative h-36 shrink-0 overflow-hidden',
-  art: 'absolute inset-0 size-full object-cover',
+  art: 'absolute inset-0 bg-[linear-gradient(to_bottom,#3a3d45,#1c1e23)]',
   shade: 'absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,var(--play-glass-solid))]',
   medal: `${PLAY_GOLD_TILE} absolute bottom-0 left-1/2 grid size-20 -translate-x-1/2 translate-y-1/2 place-items-center rounded-full`,
   medalIcon: 'size-10',

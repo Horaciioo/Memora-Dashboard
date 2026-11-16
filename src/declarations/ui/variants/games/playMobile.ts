@@ -1,8 +1,3 @@
-import { LIFT, PANEL } from '@/declarations/ui/variants/games/play/shared'
-
-// Silver of the tab bar, shared by the header keys
-const SILVER = 'bg-[linear-gradient(180deg,#f4f4f6,#c9cbd1)]'
-
 // Open and close share one slow spring
 const EASE = 'duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
 
@@ -12,23 +7,32 @@ const EASE = 'duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
  */
 
 export const PLAY_TABS = {
-  bar: `fixed inset-x-0 bottom-0 z-50 flex items-stretch gap-1 border-t border-white/70 ${SILVER} px-1.5 pt-1 pb-[max(0.75rem,calc(env(safe-area-inset-bottom)*0.8))] shadow-[0_-0.25rem_1rem_rgb(0_0_0/0.18)] md:inset-x-auto md:bottom-4 md:left-1/2 md:w-[min(28rem,calc(100%-9.5rem))] md:-translate-x-1/2 md:rounded-3xl md:border md:pb-1.5`,
-  // Open tab takes more width, the others share the rest, a divider between each
-  tab: `group relative flex min-h-[3rem] min-w-0 flex-1 flex-col items-center justify-end pb-1 rounded-2xl transition-[flex-grow] ${EASE} before:absolute before:inset-0 before:rounded-2xl before:opacity-0 before:transition-opacity before:duration-500 before:ease-[cubic-bezier(0.22,1,0.36,1)] before:bg-[linear-gradient(180deg,var(--play-key),color-mix(in_srgb,var(--play-key)_70%,var(--play-night)))] before:shadow-[inset_0_2px_0_rgb(255_255_255/0.35),0_0.2rem_0_rgb(0_0_0/0.4)] after:absolute after:top-3 after:-right-0.5 after:bottom-3 after:w-px after:bg-black/15 last:after:hidden has-[+[aria-current=page]]:after:hidden has-[+[aria-expanded=true]]:after:hidden active:scale-95 disabled:opacity-50`,
-  tabOn: 'grow-[1.7] before:opacity-100 after:hidden',
-  lift: `relative z-10 -mt-2 transition-transform ${EASE} group-aria-[current=page]:-translate-y-2 group-aria-expanded:-translate-y-2`,
+  bar: `fixed inset-x-0 bottom-0 z-50 flex items-center gap-1 border-t border-[color-mix(in_srgb,var(--skin-from)_60%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--skin-from)_32%,transparent),color-mix(in_srgb,var(--skin-to)_38%,transparent))] backdrop-blur-xl backdrop-saturate-150 px-1.5 pt-1 pb-[max(0.5rem,calc(env(safe-area-inset-bottom)*0.8))] shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_-0.25rem_1.25rem_color-mix(in_srgb,var(--skin-to)_35%,transparent)] md:inset-x-auto md:bottom-4 md:left-1/2 md:w-[min(48rem,calc(100%-3rem))] md:-translate-x-1/2 md:rounded-3xl md:border md:pb-0.5`,
+  // Open tab keeps its box, only the glyph rises
+  tab: `group relative flex min-h-[2.5rem] min-w-0 flex-1 flex-col md:w-24 md:flex-none items-center justify-end pb-1 rounded-2xl after:absolute after:top-1/2 after:right-0 after:h-8 after:w-px after:-translate-y-1/2 after:bg-[color-mix(in_srgb,var(--skin-from)_55%,transparent)] last:after:hidden active:scale-95 disabled:opacity-50`,
+  tabOn: '',
+  lift: `relative z-10 transition-transform ${EASE} group-aria-[current=page]:-translate-y-1 group-aria-expanded:-translate-y-1`,
   icon: `size-10 transition-[scale,filter] ${EASE} group-hover:scale-115 group-active:scale-90`,
   // Open: full colour and glow. Rest: smaller, muted
   iconOn: 'scale-110',
-  iconRest: 'scale-90 saturate-[0.6] brightness-[0.85]',
+  iconRest: 'scale-90 saturate-[0.6]',
   badge:
-    'absolute -top-0.5 -right-0.5 size-3 rounded-full bg-[var(--play-alert)] ring-2 ring-white',
-  label: `relative z-10 max-h-4 text-[0.65rem] leading-none font-extrabold tracking-wide text-white uppercase transition-[max-height,opacity,translate] ${EASE}`,
-  labelRest: `relative z-10 max-h-0 tracking-wide text-white uppercase translate-y-1 overflow-hidden text-[0.65rem] leading-none font-extrabold opacity-0 transition-[max-height,opacity,translate] ${EASE}`,
+    'absolute -top-0.5 -right-0.5 size-3 rounded-full bg-[var(--play-alert)] ring-2 ring-[var(--color-surface-raised)]',
+  // Member portrait standing in the middle tab
+  portrait: 'relative block shrink-0',
+  label: `relative z-10 max-h-4 text-[0.65rem] leading-none font-extrabold tracking-wide text-[var(--color-ink)] uppercase transition-[max-height,opacity,translate] ${EASE}`,
+  labelRest: `relative z-10 max-h-0 tracking-wide text-[var(--color-ink)] uppercase translate-y-1 overflow-hidden text-[0.65rem] leading-none font-extrabold opacity-0 transition-[max-height,opacity,translate] ${EASE}`,
   tabDesktop: 'max-md:hidden',
-  // Bare red glyph outside the bar, centred on its height, desktop only
-  exit: 'group fixed bottom-4 left-[calc(50%+min(14rem,50%-4.75rem)+0.75rem)] z-50 flex h-[3.6rem] w-10 items-center justify-center text-[var(--color-danger)] transition-transform duration-300 hover:scale-110 active:scale-95 max-md:hidden',
-  exitIcon: 'size-6 drop-shadow-[0_0.15rem_0_rgb(0_0_0/0.25)]',
+  // Halves around the portrait, so it sits dead centre
+  half: 'flex min-w-0 flex-1 items-center justify-center gap-1',
+  // Portrait button in the middle, its frame rising over the bar
+  meHost: 'relative z-10 -mt-14 -mb-6 flex shrink-0',
+  me: 'relative flex w-28 shrink-0 items-center justify-center rounded-full transition-transform active:scale-95',
+  menu: 'absolute bottom-full left-1/2 z-50 mb-3 flex w-56 -translate-x-1/2 flex-col gap-1 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 shadow-[var(--shadow-lg)]',
+  menuItem:
+    'flex min-h-11 items-center gap-3 rounded-xl px-3 text-left text-sm font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
+  menuLeave: 'text-[var(--color-danger)]',
+  menuIcon: 'size-6 shrink-0',
   // Page swap, slid from the tab side
   slide: 'flex min-h-full w-full flex-col gap-8',
   slideRight: 'max-md:play-slide-right',
@@ -226,51 +230,4 @@ export const PLAY_FOLD = {
   chevron: 'size-5 shrink-0 -rotate-90 text-[var(--play-ink-soft)] transition-transform',
   chevronOpen: 'rotate-0',
   body: 'play-rise flex flex-col gap-3',
-} as const
-
-/**
- * Profile sidebar of the Play hub, the player card unfolding the stats
- * @type {Record<string, string>}
- */
-
-export const PLAY_ME = {
-  // Bottom right, level with the tab bar from xl, above it before, growing upward
-  aside:
-    'fixed right-4 bottom-[5.25rem] z-50 hidden w-52 flex-col md:flex xl:bottom-4 2xl:w-60',
-  // Card and invitation stacked, the invitation hanging over the card
-  row: 'flex flex-col gap-3',
-  // Folds by height, the content fading in a beat after, never squashed
-  fold: 'grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] data-[open=true]:grid-rows-[1fr] data-[open=true]:opacity-100 data-[open=true]:delay-0 motion-reduce:transition-none',
-  foldInner: 'min-h-0 overflow-hidden',
-  foldGap: 'pb-3',
-  invite: 'w-72 self-end',
-  // Rank card in the tier colour, as on the stats page
-  card: `${LIFT} relative isolate flex flex-col overflow-hidden rounded-[1.75rem] bg-[color-mix(in_oklab,var(--tier)_22%,var(--play-night))] text-white [--ring-gap:color-mix(in_oklab,var(--tier)_22%,var(--play-night))] [--ring-track:rgb(255_255_255/0.18)]`,
-  head: 'group flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-white/6',
-  headText: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  name: 'min-w-0 truncate text-base font-extrabold tracking-tight',
-  caret: 'size-5 shrink-0 text-white/70 transition-transform group-aria-expanded:rotate-180',
-  // Level, under the head
-  level: 'flex flex-col gap-2.5 px-4 pt-1 pb-5',
-  levelBar: 'h-2.5 w-full overflow-hidden rounded-full bg-white/15',
-  levelFill: 'block h-full rounded-full bg-[var(--tier)] transition-[width] duration-700',
-  levelNext: 'text-sm text-white/75',
-  body: 'flex flex-col gap-4',
-  // Figures as separate tiles, the record spanning the foot
-  figures: 'grid grid-cols-2 gap-2',
-  figure: `${PANEL} ${LIFT} flex flex-col gap-1 px-4 py-3.5`,
-  figureValue: 'truncate text-2xl leading-none font-extrabold tracking-tight tabular-nums',
-  figureLabel: 'truncate text-xs font-bold text-[var(--play-ink-faint)]',
-  // Record and best game, side by side and compact
-  pair: 'grid grid-cols-2 gap-2',
-  tile: `${PANEL} ${LIFT} flex min-w-0 items-stretch px-1 py-3 text-center`,
-  // Columns split by a vertical divider
-  recordColumn:
-    'flex min-w-0 flex-1 flex-col items-center gap-0 border-l border-[var(--play-line)] first:border-l-0',
-  best: `${PANEL} ${LIFT} flex min-w-0 items-center gap-2.5 px-3 py-3`,
-  bestLogo: 'size-9 shrink-0',
-  bestText: 'flex min-w-0 flex-col',
-  bestName: 'truncate text-sm leading-tight font-extrabold',
-  record: 'flex items-baseline justify-center text-xl leading-none font-extrabold tabular-nums',
-  links: 'flex flex-wrap items-center justify-between gap-x-4 gap-y-1',
 } as const

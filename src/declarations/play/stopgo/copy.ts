@@ -12,11 +12,14 @@ export const STOPGO_CARD_COPY: Record<StopGoCardKey, { name: string; hint: strin
   km75: { name: '75 km', hint: 'Avance de 75 km.' },
   km100: { name: '100 km', hint: 'Avance de 100 km.' },
   km200: { name: '200 km', hint: 'Avance de 200 km.' },
-  red: { name: 'Feu rouge', hint: 'Arrête la voiture d’un adversaire.' },
-  limit: { name: 'Limitation', hint: 'Bride un adversaire à 50 km par carte.' },
-  fuel: { name: 'Panne d’essence', hint: 'Cloue un adversaire sur place.' },
-  flat: { name: 'Crevaison', hint: 'Cloue un adversaire sur place.' },
-  crash: { name: 'Accident', hint: 'Cloue plusieurs adversaires à la fois.' },
+  red: { name: 'Feu rouge', hint: 'Arrête un adversaire jusqu’à un Feu vert.' },
+  limit: {
+    name: 'Limitation',
+    hint: 'Bride un adversaire à 50 km par carte jusqu’à une Fin de limitation.',
+  },
+  fuel: { name: 'Panne d’essence', hint: 'Cloue un adversaire jusqu’à une Essence.' },
+  flat: { name: 'Crevaison', hint: 'Cloue un adversaire jusqu’à une Roue de secours.' },
+  crash: { name: 'Accident', hint: 'Cloue plusieurs adversaires jusqu’à une Réparation.' },
   green: { name: 'Feu vert', hint: 'Démarre, ou lève un Feu rouge.' },
   unlimit: { name: 'Fin de limitation', hint: 'Lève la Limitation.' },
   petrol: { name: 'Essence', hint: 'Répare une Panne d’essence.' },
@@ -27,7 +30,10 @@ export const STOPGO_CARD_COPY: Record<StopGoCardKey, { name: string; hint: strin
   tank: { name: 'Réservoir blindé', hint: 'Bloque les Pannes d’essence.' },
   tyres: { name: 'Pneus renforcés', hint: 'Bloque les Crevaisons.' },
   ace: { name: 'Pilote d’élite', hint: 'Bloque les Accidents.' },
-  mystery: { name: 'Pioche mystère', hint: 'Glisse une carte scellée chez un adversaire.' },
+  mystery: {
+    name: 'Pioche mystère',
+    hint: 'Scelle une carte chez un adversaire qui a de quoi la révéler.',
+  },
 }
 
 /**
@@ -61,6 +67,10 @@ export const STOPGO_ERRORS: Record<StopGoRefusal, string> = {
   noSealed: 'Aucune carte scellée à révéler.',
   pileEmpty: 'La pioche est vide.',
   notPicking: 'Aucune pioche en cours.',
+  sameMalus: 'Cet adversaire vient déjà de subir ce malus.',
+  alreadyDrawn: 'Tu as déjà pioché ce tour.',
+  mustDraw: 'Pioche d’abord ta carte du tour.',
+  tooShort: 'Cet adversaire n’a pas assez de km pour payer la révélation.',
 }
 
 /**
@@ -96,12 +106,21 @@ export const STOPGO_RULES_COPY = {
   start: 'Départ',
   startStopped: 'Tu démarres à l’arrêt, il te faut un Feu vert.',
   startRolling: 'Tu démarres déjà en roulant.',
+  draw: 'Pioche',
+  drawValue:
+    'À ton tour, tu prends toi-même ta carte sur la pioche avant de jouer. {share} % des cartes tirées sont des cartes de distance.',
+  pity: 'Coup de pouce',
+  pityValue:
+    'Quand ta voiture est à l’arrêt, {share} % de tes pioches vont vers la carte qui te relance.',
   distances: 'Cartes de distance',
   distancesValue: '{list} km. Tu en poses une par tour.',
   finish: 'Arrivée',
   finishValue: 'Il faut arriver pile sur la distance, sans la dépasser.',
   attacks: 'Attaques',
   attacksValue: '{list}. Chaque adversaire subit un seul malus de chaque type.',
+  sameMalus: 'Même malus',
+  sameMalusValue:
+    'Un adversaire ne subit jamais deux fois d’affilée le même malus, même réparé entre-temps.',
   limit: 'Limitation',
   limitValue: 'Tu ne peux plus poser que {km} km par carte.',
   accident: 'Accident',
@@ -111,13 +130,14 @@ export const STOPGO_RULES_COPY = {
   goodDraw: 'Bonne pioche',
   goodDrawValue: 'Tu pioches deux cartes, tu en gardes une, {seconds} s pour choisir.',
   mystery: 'Pioche mystère',
-  mysteryValue: 'Une carte scellée chez un adversaire, qui la révèle contre {cost} km.',
+  mysteryValue:
+    'Une carte scellée chez un adversaire qui a au moins {cost} km. Elle prend une place de sa main jusqu’à ce qu’il la révèle contre {cost} km.',
   safeties: 'Protections',
   safetiesValue:
     '{list}. Elles se piochent comme les autres cartes, toujours une seule de chaque. Posée à ton tour, une protection lève le malus qu’elle bloque, te protège pour toute la course et te fait repiocher puis rejouer.',
   counter: 'Parade éclair',
   counterValue:
-    'Si on t’attaque alors que tu gardes en main la protection qui correspond, tu as {seconds} s pour la poser : l’attaque tombe, tu repioches aussitôt et tu joues juste après. Rien n’indique qui en détient une.',
+    'Si on t’attaque alors que tu gardes en main la protection qui correspond, tu as {seconds} s pour la poser : l’attaque tombe, tu joues juste après et tu pioches en premier. Rien n’indique qui en détient une.',
   strikes: 'Tours manqués',
   strikesValue: 'Après {count} tours manqués d’affilée, ton tour ne dure plus que {seconds} s.',
 } as const
@@ -136,11 +156,15 @@ export const STOPGO_HAND_COPY = {
   pickTarget: 'Choisis ta cible',
   pickTargets: 'Choisis au moins {count} cibles',
   notYet: 'Pas jouable maintenant.',
+  noTarget: 'Aucun adversaire ne peut la subir maintenant.',
   waitTurn: 'Au tour de {name}.',
   yourTurn: 'À toi de jouer.',
   pile: 'Pioche',
   draw: 'Piocher',
-  drawHint: 'Prends ta carte du tour.',
+  drawHint: 'Prends ta carte du tour (Espace).',
+  drawFirst: 'Pioche d’abord ta carte du tour.',
+  lightGreen: 'Feu vert',
+  lightRed: 'Feu rouge',
   fold: 'Plier',
   unfold: 'Déplier',
   close: 'Fermer',
@@ -149,7 +173,8 @@ export const STOPGO_HAND_COPY = {
   discardPile: 'Cartes jouées',
   empty: 'Vide',
   sealed: 'Carte scellée',
-  sealedHint: 'Une carte piégée. La révéler te coûte {cost} km.',
+  sealedHint:
+    'Une carte piégée : elle prend une place de ta main tant qu’elle est scellée. La révéler te coûte {cost} km.',
   reveal: 'Révéler (−{cost} km)',
   revealAfter: 'Tu reculeras à {km} km.',
   pickLead: 'Bonne pioche',

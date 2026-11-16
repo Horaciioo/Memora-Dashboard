@@ -1,4 +1,5 @@
 import {
+  CONCORDAT_RANDOM_STYLE,
   ConcordatDifficulties,
   ConcordatModes,
   ConcordatSizes,
@@ -7,6 +8,7 @@ import {
 } from '@/utils/constants/concordat'
 import type {
   ConcordatDifficultyName,
+  ConcordatStyleChoice,
   ConcordatModeName,
   ConcordatSizeName,
   ConcordatSpeedName,
@@ -21,18 +23,29 @@ import type {
 export const CONCORDAT_SETUP_COPY = {
   title: 'Nouvelle partie de Concordat',
   tabs: 'Réglages de la partie',
-  tabRules: 'Règles',
+  tabGame: 'Partie',
+  tabMap: 'Carte',
+  tabPace: 'Rythme',
+  tabWeapons: 'Armes',
+  weapons: 'Armes autorisées',
+  weaponsHint: 'Les armes décochées sont interdites pour tous les joueurs de la partie.',
+  allWeapons: 'Toutes',
+  noWeapons: 'Aucune',
   size: 'Taille de la carte',
   sizeHint: 'Une grande carte laisse plus de place, mais la partie dure plus longtemps.',
   style: 'Région du monde',
   styleHint: 'La région décide des voisins, des détroits et des îles.',
-  difficulty: 'Difficulté des pays',
+  difficulty: 'Comportement de l’IA',
   difficultyHint:
-    'Les vrais pays jouent seuls : plus ils sont forts, plus ils partent nombreux et réfléchissent vite.',
+    'Passive : les pays et les tribus avancent lentement. Agressive : ils attaquent vite et fort. Équilibrée : entre les deux.',
   speed: 'Vitesse',
   speedHint: 'Toute la partie, troupes et conquêtes, tourne plus ou moins vite.',
   duration: 'Durée',
-  durationHint: 'Au bout du temps, le meilleur score gagne.',
+  durationHint:
+    'Au bout du temps, le meilleur score gagne. Illimitée, la partie dure jusqu’à une victoire.',
+  unlimited: 'Illimitée',
+  randomMark: '?',
+  limited: 'Limitée',
   mode: 'Format',
   modeHint: 'Chacun pour soi, en équipes, en équipes qui changent, classé ou détendu.',
   teams: 'Équipes',
@@ -56,6 +69,7 @@ export const CONCORDAT_SETUP_COPY = {
 export const CONCORDAT_RULES_COPY = {
   title: 'Règles de la partie',
   map: 'Carte',
+  weapons: 'Armes',
   speed: 'Vitesse',
   duration: 'Durée',
   protection: 'Protection de départ',
@@ -68,7 +82,7 @@ export const CONCORDAT_RULES_COPY = {
   mode: 'Format',
   win: 'Victoire',
   winValue:
-    'Tiens {share} % des terres pendant {seconds} secondes, ou aie le meilleur score au bout du temps : territoire, économie, accomplissements.',
+    'Le premier à tenir {share} % des terres gagne, ou le meilleur score au bout du temps : territoire, économie, accomplissements.',
 } as const
 
 /**
@@ -98,14 +112,24 @@ export const CONCORDAT_STYLE_LABELS: Record<ConcordatStyleName, string> = {
 }
 
 /**
+ * Region labels with the random draw
+ * @type {Record<ConcordatStyleChoice, string>}
+ */
+
+export const CONCORDAT_STYLE_CHOICE_LABELS: Record<ConcordatStyleChoice, string> = {
+  ...CONCORDAT_STYLE_LABELS,
+  [CONCORDAT_RANDOM_STYLE]: 'Aléatoire',
+}
+
+/**
  * Difficulty labels
  * @type {Record<ConcordatDifficultyName, string>}
  */
 
 export const CONCORDAT_DIFFICULTY_LABELS: Record<ConcordatDifficultyName, string> = {
-  [ConcordatDifficulties.Easy]: 'Facile',
-  [ConcordatDifficulties.Normal]: 'Normal',
-  [ConcordatDifficulties.Hard]: 'Difficile',
+  [ConcordatDifficulties.Easy]: 'Passive',
+  [ConcordatDifficulties.Normal]: 'Équilibrée',
+  [ConcordatDifficulties.Hard]: 'Agressive',
 }
 
 /**
@@ -154,14 +178,29 @@ export const CONCORDAT_REFUSALS: Record<string, string> = {
   needsZones: 'Conquiers d’abord plus de zones.',
   tooEarly: 'Les armes stratégiques ne sont pas encore disponibles.',
   noSilo: 'Il faut un silo en service.',
-  outOfRange: 'La cible est hors de portée du silo.',
+  outOfRange: 'La cible est hors de portée.',
+  noBattery: 'Il faut une batterie d’artillerie en service.',
+  cooling: 'La batterie recharge.',
+  noBase: 'Il faut une base aérienne en service.',
+  noSlot: 'Ton ciel est plein : attends qu’un appareil rentre.',
+  notYours: 'Un hélicoptère garde une de tes terres.',
+  heliMax: 'Tu as déjà tes hélicoptères en l’air.',
   noMissile: 'Aucun missile en stock.',
+  weaponOff: 'Cette arme est interdite dans cette partie.',
   heavyOff: 'L’arme lourde est interdite dans ce format.',
   siloLevel: 'Il faut un silo de niveau 3.',
   heavySpent: 'Ton arme lourde est déjà partie.',
   treaty: 'Un traité te lie à cette nation.',
   storm: 'Une tempête bloque cette zone.',
   fallout: 'Les retombées interdisent de bâtir ici.',
+  badKind: 'Ce bâtiment n’existe pas.',
+  needsCoast: 'Ce bâtiment se pose sur la côte.',
+  tooMany: 'Tu as atteint le nombre maximum de bâtiments.',
+  provinceFull: 'Cette zone ne peut plus accueillir de bâtiment.',
+  notReady: 'Ce bâtiment est encore en chantier.',
+  maxLevel: 'Ce bâtiment est au niveau maximum.',
+  farZone: 'Cette zone n’est pas à ta portée.',
+  unknown: 'Cette commande n’est pas disponible.',
 }
 
 /**

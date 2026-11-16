@@ -4,6 +4,7 @@ import { runWorld, applyWorldEffects } from '@/core/lib/play/concordat/events'
 import { runRotation } from '@/core/lib/play/concordat/modes'
 import { applyTechEffects, endFeints, finishResearch } from '@/core/lib/play/concordat/tech'
 import { endReason, runDomination } from '@/core/lib/play/concordat/victory'
+import { applyAirGuards, runAir } from '@/core/lib/play/concordat/air'
 import { applyWeaponUpkeep, runWeapons } from '@/core/lib/play/concordat/weapons'
 import { runDiplomacy } from '@/core/lib/play/concordat/diplomacy/step'
 import { runNavy } from '@/core/lib/play/concordat/navy/step'
@@ -13,7 +14,7 @@ import { beginPlay } from '@/core/lib/play/concordat/sim/create'
 import { runEconomy } from '@/core/lib/play/concordat/sim/economy'
 import { applyIntent } from '@/core/lib/play/concordat/sim/intents'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
-import { CONCORDAT } from '@/declarations/play/concordat/rules'
+import { CONCORDAT, CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
 import { ConcordatPhases } from '@/utils/constants/concordat'
 
 // Samples kept before the oldest are thinned
@@ -87,6 +88,7 @@ export const stepTick = (
   }
 
   refreshEffects(state)
+  applyAirGuards(state)
   applyTechEffects(state)
   applyWeaponUpkeep(state)
   applyWorldEffects(state)
@@ -94,6 +96,7 @@ export const stepTick = (
   endFeints(state)
   runRotation(state)
   runWeapons(state)
+  runAir(state)
   runWorld(state)
   runDiplomacy(state)
   runNavy(state)
@@ -104,6 +107,8 @@ export const stepTick = (
   runDomination(state)
   checkEnd(state)
   sampleHistory(state)
+  // Economy figures drift all the time, the screens get them every few seconds
+  if (state.tick % (CONCORDAT_TICKS_PER_SECOND * 5) === 0) state.isSystemsDirty = true
 
   return refused
 }

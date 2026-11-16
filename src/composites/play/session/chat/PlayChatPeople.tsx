@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { Tip } from '@/components/elements/feedback/Tip'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { BAC_SESSION_COPY, fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
@@ -23,7 +23,8 @@ const FaceGroup = ({ label, faces }: { label: string; faces: PlayFace[] }) => (
           label={face.isAway ? fillPlayMessage(PLAY_HUB_COPY.away, { name: face.name }) : face.name}
           floating
         >
-          <Avatar
+          <PlayAvatar
+            accountId={face.id}
             name={face.name}
             src={face.avatarUrl}
             size="xs"

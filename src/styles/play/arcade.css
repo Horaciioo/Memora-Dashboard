@@ -178,9 +178,9 @@
   --play-ink: var(--color-ink);
   --play-ink-soft: var(--color-ink-subtle);
   --play-ink-faint: var(--color-ink-subtle);
-  --play-panel: var(--color-surface);
-  --play-panel-strong: var(--color-surface);
-  --play-line: var(--color-border);
+  --play-panel: color-mix(in srgb, var(--color-surface) 58%, transparent);
+  --play-panel-strong: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  --play-line: color-mix(in srgb, white 55%, transparent);
   --play-core: var(--color-surface-sunken);
   --play-track: var(--color-track-off);
   --play-chip: var(--color-surface-sunken);

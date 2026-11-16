@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { GolfViewKeys } from '@/composites/play/golf/hud/GolfViewKeys'
 import type { GolfFace } from '@/composites/play/golf/types'
 import { seatPaint } from '@/composites/play/golf/types'
@@ -136,7 +136,12 @@ export const GolfHud = ({
                 className={GOLF_BOARD.playerFace}
                 style={{ '--tw-ring-color': seatPaint(face.color) } as CSSProperties}
               >
-                <Avatar name={face.name} src={face.avatarUrl} size="sm" />
+                <PlayAvatar
+                  accountId={face.accountId}
+                  name={face.name}
+                  src={face.avatarUrl}
+                  size="sm"
+                />
               </span>
               {player.isHoled && (
                 <span className={GOLF_BOARD.playerMark}>

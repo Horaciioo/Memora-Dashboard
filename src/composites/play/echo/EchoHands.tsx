@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { EchoCard } from '@/composites/play/echo/EchoCard'
 import type { EchoBoardView, EchoFace } from '@/composites/play/echo/types'
 import { ECHO_BOARD_COPY } from '@/declarations/play'
@@ -43,7 +43,12 @@ export const EchoHands = ({
               <EchoCard card={hand.card} seed={seed + index + 1} answer={hand.answer} isSmall />
             </div>
             <figcaption className={ECHO_BOARD.handName}>
-              <Avatar name={seat?.name ?? ''} src={seat?.avatarUrl ?? null} size="xs" />
+              <PlayAvatar
+                accountId={hand.accountId}
+                name={seat?.name ?? ''}
+                src={seat?.avatarUrl ?? null}
+                size="xs"
+              />
               <span className={cn(ECHO_BOARD.handLabel, 'truncate')}>{seat?.name}</span>
             </figcaption>
           </figure>

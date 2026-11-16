@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayConfetti } from '@/composites/play/baccalaureat/PlayConfetti'
 import { PlayMedal } from '@/composites/play/shared/PlayMedal'
 import { ICONS } from '@/declarations/ui/icons'
@@ -54,7 +54,8 @@ export const PlayPodium = ({
                 {place === WINNER && hasWinner && (
                   <CrownIcon className={PLAY_PODIUM.crown} aria-hidden="true" />
                 )}
-                <Avatar
+                <PlayAvatar
+                  accountId={entry.accountId}
                   name={entry.name}
                   src={entry.avatarUrl}
                   size={place === WINNER ? 'xl' : 'lg'}
@@ -74,7 +75,12 @@ export const PlayPodium = ({
           {ranked.slice(PODIUM_SIZE).map((entry, index) => (
             <li key={entry.accountId} className={BAC_BOARD.rank}>
               <span className={BAC_BOARD.rankIndex}>{index + PODIUM_SIZE + 1}</span>
-              <Avatar name={entry.name} src={entry.avatarUrl} size="sm" />
+              <PlayAvatar
+                accountId={entry.accountId}
+                name={entry.name}
+                src={entry.avatarUrl}
+                size="sm"
+              />
               <span className={BAC_BOARD.rankName}>{entry.name}</span>
               <span className={BAC_BOARD.rankPoints}>{entry.note}</span>
             </li>

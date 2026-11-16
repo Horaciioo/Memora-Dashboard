@@ -13,6 +13,8 @@ export interface ConcordatTerritoryLook {
 
 // Neighbour buffer shared by every call
 const near = new Int32Array(NEIGHBOR_SLOTS)
+// Apart from near: the tile painter fills near while this ring is walked
+const ringOf = new Int32Array(NEIGHBOR_SLOTS)
 
 /**
  * Paint one tile of the owner layer: tinted inside, darker on its border
@@ -75,10 +77,9 @@ export const paintOwners = (
   }
   for (const tile of tiles) {
     paintOwnerTile(image, owner, tile, colors, look)
-    const count = neighborsOf(tile, image.width, image.height, near)
-    // Copy: the painter reuses the buffer
-    const ring = Array.from(near.subarray(0, count))
-    for (const neighbour of ring) paintOwnerTile(image, owner, neighbour, colors, look)
+    const count = neighborsOf(tile, image.width, image.height, ringOf)
+    for (let slot = 0; slot < count; slot++)
+      paintOwnerTile(image, owner, ringOf[slot], colors, look)
   }
 }
 
@@ -105,4 +106,22 @@ export const paintMask = (
     image.data[at + 2] = rgb[2]
     image.data[at + 3] = isHeld ? 255 : 0
   }
+}
+
+/**
+ * Mask of one nation updated on the tiles that changed
+ * @param {ImageData} image - Mask kept in step
+ * @param {Uint8Array} owner - Owners
+ * @param {number[]} tiles - Changed tiles
+ * @param {number} holder - Nation washed
+ * @return {void}
+ */
+
+export const paintMaskTiles = (
+  image: ImageData,
+  owner: Uint8Array,
+  tiles: number[],
+  holder: number
+): void => {
+  for (const tile of tiles) image.data[tile * 4 + 3] = owner[tile] === holder ? 255 : 0
 }

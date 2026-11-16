@@ -110,6 +110,12 @@ export const drawStructures = (context: CanvasRenderingContext2D, scene: Concord
   const { camera, client, colors } = scene
   const size = Math.max(look.min, camera.scale * 0.8)
 
+  // A sunk ship forgets its voyage
+  if (voyages.size > client.ships.length) {
+    const alive = new Set(client.ships.map((ship) => ship.id))
+    for (const id of voyages.keys()) if (!alive.has(id)) voyages.delete(id)
+  }
+
   for (const ship of client.ships) {
     const [x, y] = centerOf(scene, ship.tile)
     const isWar = ship.kind === ConcordatShipKinds.War

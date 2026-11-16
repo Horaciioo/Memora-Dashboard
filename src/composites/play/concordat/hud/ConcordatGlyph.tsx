@@ -1,8 +1,9 @@
 import { CONCORDAT_GLYPHS, CONCORDAT_WEAPON_GLYPHS } from '@/declarations/play/concordat/glyphs'
+import type { ConcordatWeaponGlyph } from '@/declarations/play/concordat/glyphs'
 import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
 
 export interface ConcordatGlyphProps {
-  kind: ConcordatBuildingKind | 'missile' | 'heavy'
+  kind: ConcordatBuildingKind | ConcordatWeaponGlyph
   size?: number
 }
 
@@ -13,7 +14,8 @@ export interface ConcordatGlyphProps {
  */
 
 export const ConcordatGlyph = ({ kind, size = 22 }: ConcordatGlyphProps) => {
-  const weapon = kind === 'missile' || kind === 'heavy' ? CONCORDAT_WEAPON_GLYPHS[kind] : null
+  const weapon =
+    kind in CONCORDAT_WEAPON_GLYPHS ? CONCORDAT_WEAPON_GLYPHS[kind as ConcordatWeaponGlyph] : null
   const building = weapon ? null : CONCORDAT_GLYPHS[kind as ConcordatBuildingKind]
   const path = weapon?.path ?? building?.path ?? ''
 

@@ -8,6 +8,7 @@ import {
   landTilesOf,
   playerRgb,
   paintMask,
+  paintMaskTiles,
   paintOwners,
   paintTerrain,
   placesOf,
@@ -41,29 +42,59 @@ export interface Held {
   waves: ConcordatWave[]
 }
 
-// Layers of a fresh map, terrain painted once
-const build = (client: ConcordatClientState): Held => {
+// Layers of a map, the ones of the same map held before are kept
+const build = (client: ConcordatClientState, previous: Held | null): Held => {
   const { width, height } = client.map
-  const layers = {
-    terrain: layerOf(width, height),
-    owner: layerOf(width, height),
-    mask: layerOf(width, height),
+  const isSameMap = previous?.client.map === client.map
+  const layers = isSameMap
+    ? previous.layers
+    : {
+        terrain: layerOf(width, height),
+        owner: layerOf(width, height),
+        mask: layerOf(width, height),
+      }
+  if (!isSameMap) {
+    layers.terrain.getContext('2d')?.putImageData(paintTerrain(client.map, CONCORDAT_HUB), 0, 0)
   }
-  layers.terrain.getContext('2d')?.putImageData(paintTerrain(client.map, CONCORDAT_HUB), 0, 0)
   const colors: [number, number, number][] = [[0, 0, 0]]
   for (const player of client.players) colors[player.id] = playerRgb(player, nation)
 
   return {
     client,
     layers,
-    owner: new ImageData(width, height),
-    mask: new ImageData(width, height),
+    owner: isSameMap ? previous.owner : new ImageData(width, height),
+    mask: isSameMap ? previous.mask : new ImageData(width, height),
     colors,
     places: [],
     placesAt: 0,
     washed: 0,
-    land: landTilesOf(client.map.terrain, ConcordatTerrains.Sea),
+    land: isSameMap ? previous.land : landTilesOf(client.map.terrain, ConcordatTerrains.Sea),
     waves: [],
+  }
+}
+
+// Box around touched tiles and their ring, so only that part is uploaded
+const boxOf = (tiles: number[], width: number, height: number) => {
+  let left = width
+  let right = 0
+  let top = height
+  let bottom = 0
+  for (const tile of tiles) {
+    const column = tile % width
+    const row = (tile - column) / width
+    if (column < left) left = column
+    if (column > right) right = column
+    if (row < top) top = row
+    if (row > bottom) bottom = row
+  }
+  left = Math.max(0, left - 1)
+  top = Math.max(0, top - 1)
+
+  return {
+    x: left,
+    y: top,
+    width: Math.min(width, right + 2) - left,
+    height: Math.min(height, bottom + 2) - top,
   }
 }
 
@@ -92,7 +123,7 @@ export const useConcordatLayers = (
   useEffect(() => {
     if (!client) return
     const isFresh = held.current?.client !== client
-    const current = isFresh || !held.current ? build(client) : held.current
+    const current = isFresh || !held.current ? build(client, held.current) : held.current
     held.current = current
     const touched = drainTouched(client)
     const isBulk = isFresh || touched.length > client.owner.length * repaintShare
@@ -106,14 +137,26 @@ export const useConcordatLayers = (
         current.waves.splice(0, current.waves.length - flash.cap)
     }
     paintOwners(current.owner, client.owner, isBulk ? null : touched, current.colors, territory)
-    current.layers.owner.getContext('2d')?.putImageData(current.owner, 0, 0)
+    const ownerContext = current.layers.owner.getContext('2d')
+    if (isBulk) ownerContext?.putImageData(current.owner, 0, 0)
+    else if (touched.length) {
+      const box = boxOf(touched, client.map.width, client.map.height)
+      ownerContext?.putImageData(current.owner, 0, 0, box.x, box.y, box.width, box.height)
+    }
     // Names follow the land a little late
     if (isFresh || performance.now() - current.placesAt > labelMs) {
       current.places = placesOf(client.owner, client.map.width, client.players.length)
       current.placesAt = performance.now()
     }
     // A wash outlives the tiles under it
-    if (current.washed) washLayer(current, current.washed)
+    if (current.washed && isBulk) washLayer(current, current.washed)
+    else if (current.washed && touched.length) {
+      paintMaskTiles(current.mask, client.owner, touched, current.washed)
+      const box = boxOf(touched, client.map.width, client.map.height)
+      current.layers.mask
+        .getContext('2d')
+        ?.putImageData(current.mask, 0, 0, box.x, box.y, box.width, box.height)
+    }
     invalidate()
   }, [client, version, invalidate])
 

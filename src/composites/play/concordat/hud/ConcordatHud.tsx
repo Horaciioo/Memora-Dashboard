@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 
 import { ConcordatPanels } from '@/composites/play/concordat/hud/ConcordatPanels'
+import { ConcordatMeter } from '@/composites/play/concordat/hud/ConcordatMeter'
 import { ConcordatZones } from '@/composites/play/concordat/hud/ConcordatZones'
 import { ConcordatPill } from '@/composites/play/concordat/hud/ConcordatPill'
 import { ConcordatNotices } from '@/composites/play/concordat/hud/ConcordatNotices'
@@ -46,8 +47,12 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
     [client.map.terrain]
   )
   const isPicking = client.phase === ConcordatPhases.Picking
+  // No time limit, the clock counts up from the start
+  const isCountingUp = !isPicking && client.endTick === 0
   const lastTick = isPicking ? client.pickEnd : client.endTick
-  const seconds = (lastTick - client.tick) / CONCORDAT_TICKS_PER_SECOND
+  const seconds =
+    (isCountingUp ? client.tick - client.pickEnd : lastTick - client.tick) /
+    CONCORDAT_TICKS_PER_SECOND
 
   const blocks = [{ key: 'clock', caption: CONCORDAT_HUD_COPY.time, figure: clockText(seconds) }]
   const figures = me
@@ -87,9 +92,10 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
       hasStrip={false}
       isCompact
     >
-      <ConcordatNotices client={client} names={names} isSeated={isSeated} act={act} />
+      <ConcordatNotices client={client} isSeated={isSeated} />
+      <ConcordatMeter client={client} />
       <ConcordatZones client={client} />
-      <ConcordatPanels rows={rows} />
+      <ConcordatPanels client={client} names={names} land={land} />
       {isPlaying && (
         <div className={CONCORDAT_HUD.dock}>
           <ConcordatPill figures={figures} client={client} names={names} act={act} />

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { NavalFinalSea } from '@/composites/play/naval/NavalFinalSea'
 import { playNaval } from '@/composites/play/naval/sound'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
@@ -130,7 +130,12 @@ export const NavalResult = ({
             className={cn(NAVAL_RESULT.row, captain.index === viewer && NAVAL_RESULT.rowMine)}
           >
             <span className={NAVAL_RESULT.rank}>{placeLabel(captain.place)}</span>
-            <Avatar name={captain.name} src={captain.avatarUrl} size="xs" />
+            <PlayAvatar
+              accountId={captain.accountId}
+              name={captain.name}
+              src={captain.avatarUrl}
+              size="xs"
+            />
             <span className={NAVAL_RESULT.name}>{captain.name}</span>
             <span className={NAVAL_RESULT.note}>
               {captain.hasLeft

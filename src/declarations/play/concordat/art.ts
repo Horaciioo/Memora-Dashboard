@@ -55,6 +55,62 @@ export const CONCORDAT_ART = {
     dark: [58, 34, 40],
     fallout: 0.22,
   },
+  // War on the map: bursts per kind (milliseconds, share of the blast radius, smoke puffs, sparks, shake in pixels)
+  war: {
+    bursts: {
+      heavy: { ms: 3200, reach: 0.95, puffs: 14, sparks: 22, shake: 12, flash: 0.55 },
+      missile: { ms: 2200, reach: 0.9, puffs: 9, sparks: 14, shake: 6, flash: 0.3 },
+      rocket: { ms: 1500, reach: 0.85, puffs: 5, sparks: 9, shake: 3, flash: 0.12 },
+      shell: { ms: 1100, reach: 0.8, puffs: 3, sparks: 6, shake: 1.6, flash: 0 },
+      flak: { ms: 800, reach: 1, puffs: 2, sparks: 7, shake: 0, flash: 0 },
+      wreck: { ms: 2400, reach: 1, puffs: 5, sparks: 8, shake: 1.5, flash: 0 },
+    },
+    // Smallest burst on screen, in pixels, and its size for an air burst
+    minBurst: 12,
+    flakSize: 20,
+    shakeMs: 550,
+    fire: { core: [255, 246, 200], mid: [255, 178, 40], edge: [226, 74, 20], smoke: [46, 40, 40] },
+    // Missile on screen: body length and flame in pixels, smoke puffs behind it
+    missile: {
+      length: 15,
+      heavyLength: 22,
+      flame: 11,
+      puffs: 16,
+      puffStep: 0.014,
+      interceptTicks: 20,
+    },
+    // Aircraft on screen, tile share of the sprite then pixel bounds
+    plane: { size: 2.8, min: 16, max: 36, trail: 10, trailStep: 2.4, shadow: 0.22, rotor: 0.045 },
+    // Shot lines last this many ticks
+    tracerTicks: 9,
+    tracer: [255, 232, 140],
+    interceptor: [255, 255, 255],
+    // Scars: sprite pixels, size over the blast radius, burn time in ticks and fire pulse
+    scar: { sprite: 96, grow: 1.15, burnTicks: 900, alpha: 0.78, pulseMs: 380 },
+    // Mood: how the tension builds, from the clock, the land taken, scars, shots in the air and fallout
+    mood: {
+      rise: 4500,
+      fall: 12000,
+      clock: { minutes: 24, weight: 0.22 },
+      claimed: 0.22,
+      scars: { count: 70, weight: 0.4 },
+      live: { count: 8, weight: 0.2 },
+      fallout: { count: 8, weight: 0.14 },
+      min: 0.02,
+    },
+    // Atmosphere at full tension
+    air: {
+      dim: [138, 118, 112],
+      dimAlpha: 0.5,
+      grey: [118, 112, 110],
+      greyAlpha: 0.42,
+      vignette: [20, 10, 10],
+      vignetteAlpha: 0.62,
+      smoke: { max: 14, size: 0.55, speed: 0.012, alpha: 0.16 },
+      embers: { max: 70, speed: 0.03, alpha: 0.8 },
+      flash: { everyMs: 2600, minTension: 0.2, ms: 420, size: 0.07 },
+    },
+  },
   // Nation names, size share of the territory span and pixel bounds
   label: {
     share: 0.2,

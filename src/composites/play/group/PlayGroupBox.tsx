@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayBoxSummary } from '@/composites/play/box/PlayBoxSummary'
 import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { ROUTES } from '@/declarations/navigation'
@@ -39,7 +39,13 @@ export const PlayGroupBox = ({ group }: { group: PlayGroupView }) => {
       aside={
         <span className={PLAY_GROUP.faces}>
           {group.members.map((member) => (
-            <Avatar key={member.accountId} name={member.name} src={member.avatarUrl} size="sm" />
+            <PlayAvatar
+              accountId={member.accountId}
+              key={member.accountId}
+              name={member.name}
+              src={member.avatarUrl}
+              size="sm"
+            />
           ))}
         </span>
       }

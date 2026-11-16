@@ -83,7 +83,8 @@ export const ROUTES = {
   playGroup: '/play/group',
   playGroupRoom: (groupId: string) => `/play/group/${groupId}`,
   playFeed: '/play/feed',
-  playLounge: '/play/lounge',
+  playLive: '/play/live',
+  playOnline: '/play/online',
   playStats: '/play/stats',
   playStatsGame: (slug: string) => `/play/stats?game=${slug}`,
   playHistory: (game?: string, cursor?: string) => {

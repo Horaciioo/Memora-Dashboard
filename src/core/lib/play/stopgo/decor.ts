@@ -1,7 +1,12 @@
 import { seededRng } from '@/core/lib/play/seeded'
 import type { SeededRng } from '@/core/lib/play/seeded'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
-import { STOPGO_DECOR, STOPGO_MEADOW, STOPGO_TRACK, circuitOf } from '@/declarations/play/stopgo/track'
+import {
+  STOPGO_DECOR,
+  STOPGO_MEADOW,
+  STOPGO_TRACK,
+  circuitOf,
+} from '@/declarations/play/stopgo/track'
 import type { StopGoDecorKind } from '@/declarations/play/stopgo/track'
 
 import { edgeAt, pointAt, signsOf } from '@/core/lib/play/stopgo/track'

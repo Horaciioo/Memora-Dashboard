@@ -74,6 +74,7 @@ export const ConcordatIntents = {
   Research: 'research',
   Feint: 'feint',
   Launch: 'launch',
+  Sortie: 'sortie',
 } as const
 
 export type ConcordatIntentKind = (typeof ConcordatIntents)[keyof typeof ConcordatIntents]
@@ -128,6 +129,11 @@ export const ConcordatStyles = {
 
 export type ConcordatStyleName = (typeof ConcordatStyles)[keyof typeof ConcordatStyles]
 
+// Region drawn at launch
+export const CONCORDAT_RANDOM_STYLE = 'random'
+
+export type ConcordatStyleChoice = ConcordatStyleName | typeof CONCORDAT_RANDOM_STYLE
+
 // Strategic spots
 export const ConcordatChokes = {
   Strait: 'strait',
@@ -145,6 +151,10 @@ export const ConcordatBuildingKinds = {
   Port: 'port',
   Silo: 'silo',
   Observatory: 'observatory',
+  Post: 'post',
+  Sam: 'sam',
+  Airbase: 'airbase',
+  Battery: 'battery',
 } as const
 
 export type ConcordatBuildingKind =
@@ -162,6 +172,10 @@ export const CONCORDAT_BUILDING_ORDER: readonly ConcordatBuildingKind[] = [
   'port',
   'silo',
   'observatory',
+  'post',
+  'sam',
+  'airbase',
+  'battery',
 ]
 
 // Ships of a port
@@ -255,6 +269,8 @@ export const ConcordatEventKinds = [
   'dominationLost',
   'teamsDrawn',
   'zoneWon',
+  'sortie',
+  'shotDown',
 ] as const
 
 export type ConcordatEventKind = (typeof ConcordatEventKinds)[number]
@@ -287,9 +303,46 @@ export const CONCORDAT_TECH_ORDER: readonly ConcordatTechPath[] = [
 export const ConcordatStrikeKinds = {
   Missile: 'missile',
   Heavy: 'heavy',
+  Shell: 'shell',
+  Rocket: 'rocket',
 } as const
 
 export type ConcordatStrikeKind = (typeof ConcordatStrikeKinds)[keyof typeof ConcordatStrikeKinds]
+
+/**
+ * Strike kinds in wire order
+ * @type {readonly ConcordatStrikeKind[]}
+ */
+
+export const CONCORDAT_STRIKE_ORDER: readonly ConcordatStrikeKind[] =
+  Object.values(ConcordatStrikeKinds)
+
+/**
+ * Weapons a host can switch off, in arsenal order
+ * @type {readonly string[]}
+ */
+
+export const CONCORDAT_WEAPONS = ['missile', 'heavy', 'shell', 'rocket', 'heli', 'fighter'] as const
+
+export type ConcordatWeaponName = (typeof CONCORDAT_WEAPONS)[number]
+
+// Aircraft a base sends up
+export const ConcordatAirKinds = {
+  Heli: 'heli',
+  Fighter: 'fighter',
+} as const
+
+export type ConcordatAirKind = (typeof ConcordatAirKinds)[keyof typeof ConcordatAirKinds]
+
+// Scars the fights leave on the ground
+export const ConcordatScarKinds = {
+  Blast: 'blast',
+  Flak: 'flak',
+  Wreck: 'wreck',
+  Strafe: 'strafe',
+} as const
+
+export type ConcordatScarKind = (typeof ConcordatScarKinds)[keyof typeof ConcordatScarKinds]
 
 // Marked ground
 export const ConcordatZoneKinds = {

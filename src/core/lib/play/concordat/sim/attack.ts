@@ -12,6 +12,8 @@ import { ConcordatPowers, ConcordatTerrains } from '@/utils/constants/concordat'
 
 const { sim, front } = CONCORDAT
 const near = new Int32Array(NEIGHBOR_SLOTS)
+// Apart from near: ownAround reads it while the walk still holds this one
+const around = new Int32Array(NEIGHBOR_SLOTS)
 
 /**
  * Corps troops back to the reserve
@@ -52,9 +54,9 @@ const gatherContact = (
   let position = 0
   for (const edge of edges) {
     if (position++ % stride !== shift) continue
-    const count = neighborsOf(edge, width, height, near)
-    const around = Array.from(near.subarray(0, count))
-    for (const next of around) {
+    const count = neighborsOf(edge, width, height, around)
+    for (let slot = 0; slot < count; slot++) {
+      const next = around[slot]
       if (
         state.owner[next] !== corps.target ||
         state.map.terrain[next] === ConcordatTerrains.Sea ||

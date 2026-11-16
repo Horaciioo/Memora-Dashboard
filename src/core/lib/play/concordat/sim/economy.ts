@@ -40,16 +40,22 @@ export const upkeepOf = (player: ConcordatPlayerState, cut = 0): number =>
 export const grossOf = (player: ConcordatPlayerState): number =>
   player.income / INCOME_SCALE + player.provincesHeld * sim.provinceGold
 
-// One nation for one tick
-const grow = (player: ConcordatPlayerState, effects: ConcordatEffects, dt: number): void => {
+// One nation for one tick, troops out in the field count against the ceiling
+const grow = (
+  player: ConcordatPlayerState,
+  effects: ConcordatEffects,
+  dt: number,
+  committed: number
+): void => {
   const cap = troopCap(player, effects.cap)
   const calm = calmFactor(player)
 
   // Troops climb to the ceiling, then melt back
-  if (player.troops > cap) {
-    player.troops -= player.troops * sim.overCapDecay * dt
+  const total = player.troops + committed
+  if (total > cap) {
+    player.troops -= Math.min(player.troops, total * sim.overCapDecay * dt)
   } else {
-    const slack = 1 - player.troops / cap
+    const slack = 1 - total / cap
     const rate =
       (sim.growthBase + sim.growthRate * player.troops) * (1 + effects.growth) * player.growthShare
     player.troops += rate * slack * calm * dt
@@ -75,7 +81,9 @@ const grow = (player: ConcordatPlayerState, effects: ConcordatEffects, dt: numbe
 
 export const runEconomy = (state: ConcordatState): void => {
   const dt = TICK_SECONDS * state.speed
+  const out = new Float64Array(state.players.length + 1)
+  for (const corps of state.corps) out[corps.owner] += corps.troops
   for (const player of state.players) {
-    if (player.alive) grow(player, state.effects[player.id - 1], dt)
+    if (player.alive) grow(player, state.effects[player.id - 1], dt, out[player.id])
   }
 }

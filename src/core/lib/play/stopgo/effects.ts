@@ -82,7 +82,9 @@ export const applyCard = (
       (STOPGO_SAFETIES[shield] as readonly string[]).includes(hazard)
     )
 
-    return isSafe ? next : patchCar(next, id, { hazards: [...target.hazards, hazard] })
+    return isSafe
+      ? next
+      : patchCar(next, id, { hazards: [...target.hazards, hazard], lastHazard: hazard })
   }, table)
 }
 
