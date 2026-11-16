@@ -71,7 +71,6 @@ export const STOPGO_HAND = {
   light: 'stopgo-light',
   roster: 'stopgo-roster',
   rosterRow: 'stopgo-roster-row',
-  rosterInfo: 'stopgo-roster-info',
   rosterMalus: 'stopgo-roster-malus',
   pile: 'stopgo-pile',
   pileOver: 'stopgo-pile-over',

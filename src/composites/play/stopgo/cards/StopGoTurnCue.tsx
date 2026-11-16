@@ -1,3 +1,6 @@
+import { useEffect } from 'react'
+
+import { playStopGoSound } from '@/composites/play/stopgo/sound'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { STOPGO_HAND_COPY } from '@/declarations/play/stopgo/copy'
 import { STOPGO_HAND } from '@/declarations/ui/variants/games/play/stopgo'
@@ -25,6 +28,11 @@ export const StopGoTurnCue = ({
   holderName,
   isLive,
 }: StopGoTurnCueProps) => {
+  // Chime once when the turn opens
+  useEffect(() => {
+    if (isTurn) playStopGoSound('turn')
+  }, [isTurn, turnNo])
+
   if (!isLive && !isTurn) return null
 
   if (!isTurn) {

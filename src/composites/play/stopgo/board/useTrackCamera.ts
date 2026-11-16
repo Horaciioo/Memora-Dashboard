@@ -14,6 +14,8 @@ export interface TrackCameraOptions {
   // Changes when another car takes the turn, the camera follows at once
   turnKey: number
   isActive: boolean
+  // Off: no automatic move, only the keys and the HUD key
+  isFollowing?: boolean
 }
 
 const TYPING = /^(INPUT|TEXTAREA|SELECT)$/
@@ -30,6 +32,7 @@ export const useTrackCamera = ({
   followKey,
   turnKey,
   isActive,
+  isFollowing = true,
 }: TrackCameraOptions) => {
   const frame = useRef(0)
   const userAt = useRef(0)
@@ -84,7 +87,7 @@ export const useTrackCamera = ({
 
   // Follow, first placement is instant
   useEffect(() => {
-    if (!isActive) return
+    if (!isActive || !isFollowing) return
     const isFirstPlacement = isFirst.current
     isFirst.current = false
     const isNewTurn = lastTurn.current !== turnKey
@@ -94,7 +97,7 @@ export const useTrackCamera = ({
       return
     }
     glideTo(focus.current(), isFirstPlacement)
-  }, [followKey, turnKey, isActive, glideTo])
+  }, [followKey, turnKey, isActive, isFollowing, glideTo])
 
   // HUD key
   useEffect(() => {

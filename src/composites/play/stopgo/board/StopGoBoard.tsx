@@ -53,6 +53,7 @@ export const StopGoBoard = ({
   const board = usePlainBoard(sessionId, initial)
   const isMobile = useIsMobileShell()
   const hasFlights = usePlayPref(PlayGames.StopGo, 'flights')
+  const isFollowing = usePlayPref(PlayGames.StopGo, 'follow')
   const { flights, marks, land } = useStopGoFx(board, hasFlights)
   const { players, target } = board
   const lanes = players.length
@@ -102,6 +103,7 @@ export const StopGoBoard = ({
     followKey: `${focusKm}:${board.turnNo}`,
     turnKey: board.turnNo,
     isActive: true,
+    isFollowing,
   })
 
   if (board.phase === StopGoPhases.Over) return <StopGoResult board={board} faces={faces} />

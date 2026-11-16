@@ -13,6 +13,7 @@ export const STOPGO_SOUNDS = {
   remedy: `${STOPGO}/reparation.mp3`,
   joker: `${STOPGO}/joker.mp3`,
   engine: `${STOPGO}/moteur.mp3`,
+  turn: `${STOPGO}/tour.mp3`,
   finish: `${STOPGO}/arrivee.mp3`,
 } as const
 

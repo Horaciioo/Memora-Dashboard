@@ -130,11 +130,13 @@ export const StopGoDock = ({
         pileCount={board.pileCount}
         isWaiting={isWaiting}
         isSaving={moves.isSaving}
+        isTurn={board.turnId === viewerId}
         light={lightOf(me)}
         onDraw={() => void moves.draw()}
       />
       <StopGoRoster
         viewerId={viewerId}
+        turnId={board.turnId ?? null}
         entries={players.map((player, lane) => ({
           id: player.accountId,
           name: names[player.accountId] ?? '',

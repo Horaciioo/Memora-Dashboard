@@ -515,14 +515,32 @@
 .stopgo-light[data-light='green'] {
   --lamp: var(--stopgo-car-green);
 }
-.stopgo-light i {
-  width: 0.85rem;
-  height: 0.85rem;
-  border-radius: 999px;
-  background: var(--lamp);
-  box-shadow:
-    inset 0 0.12rem 0.12rem rgb(255 255 255 / 0.5),
-    0 0 0.7rem var(--lamp);
+.stopgo-lamp {
+  width: 0.9rem;
+  height: 1.8rem;
+  flex: none;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.5));
+}
+.stopgo-lamp-body {
+  fill: #1c1c22;
+}
+.stopgo-lamp-dot {
+  fill: rgb(255 255 255 / 0.14);
+}
+.stopgo-lamp-dot[data-lit] {
+  fill: var(--lamp);
+  filter: drop-shadow(0 0 0.35rem var(--lamp));
+  animation: stopgo-lamp-blink 1.1s ease-in-out infinite;
+}
+@keyframes stopgo-lamp-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stopgo-lamp-dot[data-lit] {
+    animation: none;
+  }
 }
 @media (max-width: 767px) {
   /* Phone: deck and light sit together above the dock, the pile of played cards is left out */
@@ -556,7 +574,7 @@
 .stopgo-roster {
   position: absolute;
   top: 6.5rem;
-  right: 1.75rem;
+  right: 3.5rem;
   z-index: 20;
   display: grid;
   gap: 0.6rem;
@@ -568,25 +586,42 @@
 .stopgo-roster-row {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  min-width: 10rem;
-  padding: 0.35rem 0.8rem 0.35rem 0.35rem;
+  gap: 0.55rem;
+  min-width: 7rem;
+  padding: 0.3rem 0.9rem 0.3rem 0.3rem;
   border-radius: 999px;
-  background: rgb(0 0 0 / 0.45);
-  box-shadow: 0 0 0 0.15rem var(--car);
+  background: rgb(0 0 0 / 0.4);
+  box-shadow: 0 0 0 0.12rem color-mix(in srgb, var(--car) 55%, transparent);
+  opacity: 0.6;
+  transform: scale(0.94);
+  transform-origin: right center;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
-.stopgo-roster-row[data-mine] {
-  background: rgb(0 0 0 / 0.65);
+.stopgo-roster-row[data-turn] {
+  min-width: 10rem;
+  padding: 0.45rem 1.1rem 0.45rem 0.45rem;
+  background: rgb(0 0 0 / 0.72);
+  box-shadow:
+    0 0 0 0.22rem var(--car),
+    0 0 1.4rem color-mix(in srgb, var(--car) 70%, transparent);
+  opacity: 1;
+  transform: scale(1.08) translateX(-0.4rem);
 }
-.stopgo-roster-info {
-  display: grid;
-  gap: 0.1rem;
+.stopgo-roster-row[data-turn] .stopgo-roster-malus {
+  font-size: 0.8rem;
 }
 .stopgo-roster-malus {
   color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  opacity: 0.85;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.6);
+}
+.stopgo-roster-malus[data-empty] {
+  font-style: italic;
+  opacity: 0.6;
 }
 .stopgo-light[data-light='broken'] {
   --lamp: var(--stopgo-gold);
@@ -1161,4 +1196,14 @@
 /* Broken down: the light stays on, amber */
 .stopgo-light[data-light='broken'] {
   --lamp: var(--stopgo-gold);
+}
+
+/* Boxes sit left of the distance track on the right edge */
+@media (min-width: 768px) {
+  [data-hud='stopgo'] .play-hud-top {
+    right: 3.5rem;
+  }
+  .stopgo-chat.fixed {
+    right: 3.5rem;
+  }
 }

@@ -125,6 +125,13 @@ export const aimVerdict = (hazard: StopGoHazard, car: StopGoCar): Verdict => {
   if (isShielded(car, hazard)) return StopGoRefusals.Shielded
   if (car.hazards.includes(hazard)) return StopGoRefusals.AlreadyHit
 
+  // A stopped car takes no second stop, only the speed limit stacks on it
+  const isStop = STOPGO_HAZARDS[hazard].kind !== StopGoHazardKinds.Limit
+  const isStopped = car.hazards.some(
+    (held) => STOPGO_HAZARDS[held].kind !== StopGoHazardKinds.Limit
+  )
+  if (isStop && isStopped) return StopGoRefusals.AlreadyStopped
+
   // The malus a car just suffered cannot come twice in a row
   return car.lastHazard === hazard ? StopGoRefusals.SameMalus : null
 }

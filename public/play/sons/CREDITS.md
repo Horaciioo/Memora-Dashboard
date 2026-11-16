@@ -75,6 +75,6 @@ Fond du hub (`/play/naval/mer-crepuscule.jpg`) : photo Unsplash
 
 ## Stop & Go (`stopgo/`)
 
-Sept effets synthétisés pour Memora avec FFmpeg (bruit filtré, sinus, glissandos), sans échantillon
+Huit effets synthétisés pour Memora avec FFmpeg (bruit filtré, sinus, glissandos), sans échantillon
 extérieur, versés au domaine public (CC0 1.0) : `pioche`, `carte`, `attaque`, `reparation`, `joker`,
-`moteur` (départ) et `arrivee`.
+`moteur` (départ), `tour` (carillon de début de tour) et `arrivee`.
