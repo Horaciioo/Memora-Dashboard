@@ -46,8 +46,12 @@ export const BombBoard = ({
   })
 
   const countdown = secondsTo(board.startsAt, now)
-  // Lit at the start, again at each blast
-  const litAt = Math.max(new Date(board.startsAt).getTime(), blastOf(board))
+  // Fuse lit again at every turn
+  const litAt = Math.max(
+    new Date(board.startsAt).getTime(),
+    blastOf(board),
+    board.turnAt ? new Date(board.turnAt).getTime() : 0
+  )
   const heat = countdown === 0 ? bombHeat(now - litAt, BOMB_SETTINGS.fuseSeconds.max) : 0
   useBombSounds(board, countdown, heat)
 

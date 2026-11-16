@@ -4,6 +4,7 @@ import { Button } from '@/components/elements/actions/Button'
 import { GolfAimGauge } from '@/composites/play/golf/hud/GolfAimGauge'
 import { GolfPanel } from '@/composites/play/golf/hud/GolfPanel'
 import type { GolfPanelProps } from '@/composites/play/golf/hud/GolfPanel'
+import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { GolfPowerSlot } from '@/composites/play/golf/hud/powers/GolfPowerSlot'
 import type { GolfPowerSlotProps } from '@/composites/play/golf/hud/powers/GolfPowerSlot'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -27,22 +28,26 @@ export interface GolfFooterProps {
  * @return {JSX.Element}
  */
 
-export const GolfFooter = ({ slot, status, panel, placing, onCancelPlace }: GolfFooterProps) => (
-  <>
-    {placing && (
-      <div className={GOLF_BOARD.placing}>
-        {fillPlayMessage(GOLF_BOARD_COPY.place, { power: GOLF_POWERS.label(placing) })}
-        <Button variant="arcadeGhostSmall" onClick={onCancelPlace}>
-          {GOLF_BOARD_COPY.cancel}
-        </Button>
+export const GolfFooter = ({ slot, status, panel, placing, onCancelPlace }: GolfFooterProps) => {
+  const isScoreOpen = usePlayScoreStore((state) => state.isOpen)
+
+  return (
+    <>
+      {placing && (
+        <div className={GOLF_BOARD.placing}>
+          {fillPlayMessage(GOLF_BOARD_COPY.place, { power: GOLF_POWERS.label(placing) })}
+          <Button variant="arcadeGhostSmall" onClick={onCancelPlace}>
+            {GOLF_BOARD_COPY.cancel}
+          </Button>
+        </div>
+      )}
+      <div className={GOLF_BOARD.bottom}>
+        {isScoreOpen ? <GolfPanel {...panel} /> : <span />}
+        <div className={GOLF_BOARD.middle}>
+          <GolfAimGauge>{status && <p className={GOLF_BOARD.status}>{status}</p>}</GolfAimGauge>
+        </div>
+        {slot ? <GolfPowerSlot {...slot} /> : <span />}
       </div>
-    )}
-    <div className={GOLF_BOARD.bottom}>
-      <GolfPanel {...panel} />
-      <div className={GOLF_BOARD.middle}>
-        <GolfAimGauge>{status && <p className={GOLF_BOARD.status}>{status}</p>}</GolfAimGauge>
-      </div>
-      {slot ? <GolfPowerSlot {...slot} /> : <span />}
-    </div>
-  </>
-)
+    </>
+  )
+}

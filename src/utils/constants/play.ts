@@ -15,6 +15,7 @@ export const PlayGames = {
   Croquis: 'CROQUIS',
   Suspens: 'SUSPENS',
   StopGo: 'STOP_GO',
+  Concordat: 'CONCORDAT',
 } as const
 
 export type PlayGameName = (typeof PlayGames)[keyof typeof PlayGames]

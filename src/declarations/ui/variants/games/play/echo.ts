@@ -8,7 +8,7 @@ import { NOTE, PANEL, RESULT, SETUP_TEAL } from '@/declarations/ui/variants/game
 
 export const ECHO_BOARD = {
   board:
-    'relative flex min-h-[min(40rem,100dvh)] flex-1 flex-col items-center justify-center gap-3 px-4 pt-24 pb-[5.5rem] md:gap-4 md:pt-28 md:pb-6',
+    'relative flex min-h-[min(40rem,100dvh)] flex-1 flex-col items-center justify-center gap-3 px-4 pt-24 pb-[5.5rem] md:gap-4 md:pt-28 md:pr-[23rem] md:pb-6',
   figure:
     'play-figure play-figure-echo text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
   clockTrack: 'h-3 w-full overflow-hidden rounded-full bg-[var(--play-chip)]',
@@ -18,9 +18,9 @@ export const ECHO_BOARD = {
   table:
     'play-echo-stage relative flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:items-start sm:gap-14',
   slot: 'flex flex-col items-center gap-3',
-  slotMine: 'w-[min(80vw,27rem,36dvh)] md:w-[min(80vw,27rem,40dvh)]',
+  slotMine: 'w-[min(80vw,27rem,36dvh)] md:w-[min(27rem,40dvh,calc((100vw-28rem)/2))]',
   // The center card is the smaller one on a phone
-  slotCenter: 'w-[min(46vw,19dvh)] md:w-[min(80vw,27rem,40dvh)]',
+  slotCenter: 'w-[min(46vw,19dvh)] md:w-[min(27rem,40dvh,calc((100vw-28rem)/2))]',
   caption: 'text-sm font-black tracking-[0.18em] whitespace-nowrap uppercase',
   captionCenter: 'text-[var(--echo-rim-center)]',
   captionMine: 'text-[var(--echo-rim-mine)]',

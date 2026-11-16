@@ -41,7 +41,10 @@ const rooms = (globalForRooms.playRooms ??= new Map())
 const FORWARDED: string[] = [
   PLAY_STREAM_EVENTS.changed,
   PLAY_STREAM_EVENTS.started,
+  PLAY_STREAM_EVENTS.failed,
+  PLAY_STREAM_EVENTS.vote,
   PLAY_STREAM_EVENTS.chat,
+  PLAY_STREAM_EVENTS.diff,
 ]
 
 /**
@@ -133,12 +136,24 @@ const openRoom = (sessionId: string): PlayRoom => {
       const frame = signalFrame(topic, payload)
       for (const member of room.members) member.send(frame)
     }
-    if (event !== PLAY_STREAM_EVENTS.chat) void pushBoards(sessionId, room)
+    // Chat and diffs never redraw the board
+    if (event !== PLAY_STREAM_EVENTS.chat && event !== PLAY_STREAM_EVENTS.diff) {
+      void pushBoards(sessionId, room)
+    }
   })
   rooms.set(sessionId, room)
 
   return room
 }
+
+/**
+ * Accounts with a socket in the room of a game
+ * @param {string} sessionId - Game
+ * @return {Set<string>} - Connected accounts
+ */
+
+export const connectedAccountIds = (sessionId: string): Set<string> =>
+  new Set([...(rooms.get(sessionId)?.members ?? [])].map((member) => member.session.id))
 
 /**
  * Stop a running game once no player is connected for a while

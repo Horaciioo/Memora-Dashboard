@@ -52,7 +52,7 @@ export default async function PlayPage() {
 
       <div className={PLAY_CROSS.stage}>
         <section className={PLAY_CROSS.games} aria-labelledby="play-games">
-          <h1 id="play-games" className={PLAY_CROSS.heading}>
+          <h1 id="play-games" className="sr-only">
             {PLAY_HUB_COPY.sectionGames}
           </h1>
           <PlayGameGrid games={games} />

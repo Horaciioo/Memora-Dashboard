@@ -461,6 +461,21 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'id',
     search: [],
   },
+  concordatGame: {
+    model: 'ConcordatGame',
+    exposure: 'full',
+    display: 'sessionId',
+    search: [],
+    hidden: ['map', 'snapshot'],
+  },
+  concordatPlayer: { model: 'ConcordatPlayer', exposure: 'full', display: 'id', search: [] },
+  concordatEvent: {
+    model: 'ConcordatEvent',
+    exposure: 'readOnly',
+    reason: 'Journal de parties',
+    display: 'id',
+    search: [],
+  },
   stopGoGame: {
     model: 'StopGoGame',
     exposure: 'full',

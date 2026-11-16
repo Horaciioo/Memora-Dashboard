@@ -43,6 +43,8 @@ export interface PlayChatProps {
   isSide?: boolean
   // Laid over a table: the last lines and the composer, nothing else
   isHud?: boolean
+  // Block skin of the game over the side panel
+  skin?: string
   // Null when the reader cannot invite
   invite: { candidates: PlayInviteCandidate[]; canSeat: boolean } | null
   // Session page folds it away
@@ -89,6 +91,7 @@ export const PlayChat = ({
   table,
   isSide,
   isHud,
+  skin,
   invite,
   onFold,
   crowd,
@@ -160,9 +163,10 @@ export const PlayChat = ({
 
   return (
     <aside
-      className={
-        isHud ? PLAY_CHAT_UI.panelHud : isSide ? PLAY_CHAT_UI.panelSide : PLAY_CHAT_UI.panel
-      }
+      className={cn(
+        isHud ? PLAY_CHAT_UI.panelHud : isSide ? PLAY_CHAT_UI.panelSide : PLAY_CHAT_UI.panel,
+        skin
+      )}
     >
       {!isHud && (
         <header className={PLAY_CHAT_UI.head}>

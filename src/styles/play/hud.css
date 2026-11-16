@@ -6,11 +6,32 @@
   --play-line: var(--hud-line);
   --play-chip: var(--hud-chip);
   --play-accent: var(--hud-value);
-  --play-panel-strong: var(--hud-chip);
+  --play-panel-strong: var(--hud-solid, var(--hud-chip));
   background: var(--hud-deco, none), var(--hud-bg);
   color: var(--hud-ink);
   border-radius: var(--hud-radius);
   box-shadow: var(--hud-shadow);
+}
+
+/* Lobby seats lie flat on the skinned box, the viewer's own one lit by the accent */
+.play-hud-block .play-seat,
+.golf-block .play-seat {
+  background: var(--hud-chip);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.play-hud-block .play-seat.ring-2,
+.golf-block .play-seat.ring-2 {
+  box-shadow: 0 0 0 0.16rem var(--hud-value);
+}
+
+/* Golf lobby: the pixel slab would clip the invitation picker, so it keeps square corners and a hard drop */
+.golf-block.play-lobby-skin {
+  --play-panel-strong: var(--play-golf-hud-deep);
+  clip-path: none;
+  border-radius: 0.4rem;
+  box-shadow: 0.3rem 0.3rem 0 var(--play-golf-hud-shadow);
 }
 
 /* Echo: round stickers, thick ring, hard teal drop */
@@ -211,6 +232,7 @@
   --hud-faint: rgb(58 37 3 / 0.55);
   --hud-line: rgb(58 37 3 / 0.18);
   --hud-chip: rgb(138 86 0 / 0.16);
+  --hud-solid: #ffeaa5;
   --hud-radius: 0.4rem;
   --hud-shadow: 0 0.15rem 0 rgb(138 86 0 / 0.45), 0 0.7rem 1.1rem rgb(0 0 0 / 0.38);
 }
@@ -227,6 +249,7 @@
   --hud-faint: rgb(255 246 227 / 0.55);
   --hud-line: rgb(255 246 227 / 0.22);
   --hud-chip: rgb(255 246 227 / 0.12);
+  --hud-solid: color-mix(in srgb, var(--suspens-slate) 86%, white);
   --hud-radius: 0.7rem;
   --hud-shadow:
     inset 0 0 0 0.15rem var(--suspens-slate-deep), inset 0 0 0 0.21rem rgb(255 246 227 / 0.38),
@@ -247,7 +270,29 @@
   --hud-faint: rgb(247 237 214 / 0.58);
   --hud-line: rgb(247 237 214 / 0.2);
   --hud-chip: rgb(255 255 255 / 0.1);
+  --hud-solid: color-mix(in srgb, var(--stopgo-asphalt-lit) 88%, white);
   --hud-radius: 0.7rem;
   --hud-shadow:
     0 0 0 0.16rem var(--stopgo-kerb-white), 0.3rem 0.4rem 0 0.16rem var(--play-stopgo-deep);
+}
+
+/* Concordat: dark staff-map plate, squared and hairline, quiet over the board */
+[data-hud='concordat'] {
+  --hud-bg: linear-gradient(180deg, rgb(31 43 44 / 0.86), rgb(24 33 34 / 0.9));
+  --hud-ink: var(--concordat-khaki);
+  --hud-value: var(--concordat-brass);
+  --hud-faint: var(--concordat-khaki-faint);
+  --hud-line: var(--concordat-hairline);
+  --hud-chip: rgb(220 213 182 / 0.08);
+  --hud-solid: var(--concordat-plate-lit);
+  --hud-radius: 0.2rem;
+  --hud-shadow:
+    0 0 0 0.07rem var(--concordat-hairline), inset 0 0.07rem 0 rgb(255 255 255 / 0.06),
+    0 0.3rem 0.8rem rgb(8 16 18 / 0.4);
+}
+
+[data-hud='concordat'].play-hud-block,
+[data-hud='concordat'] .play-hud-block {
+  backdrop-filter: blur(6px);
+  font-family: var(--font-mono, ui-monospace, monospace);
 }

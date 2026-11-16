@@ -17,6 +17,7 @@ import { usePlayCrowd } from '@/core/hooks/data/play/usePlayCrowd'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlaySessionLoad } from '@/core/hooks/interaction/state/play/usePlaySessionLoad'
 import { usePlayFullscreen } from '@/core/hooks/interaction/state/play/usePlayFullscreen'
+import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { usePlaySessionLoadStore } from '@/core/store/play/playSessionLoad'
 import { usePlayStageStore } from '@/core/store/play/playStage'
 import { PLAY_GAMES, PLAY_HUB_COPY, PLAY_HUD_GAMES, PLAY_HUD_SKINS } from '@/declarations/play'
@@ -81,12 +82,12 @@ export const PlaySessionRoom = ({
   usePlayFullscreen()
   // Every game opens on the whole page
   useEffect(() => usePlayStageStore.getState().enter(), [])
+  // Score boxes start hidden at each table
+  useEffect(() => usePlayScoreStore.getState().close, [])
   // These games keep their keys and chat in their own HUD
   const isHud = PLAY_HUD_GAMES.has(game)
   const hasKeys = !isHud
   const { ground } = PLAY_GAMES.get(game)
-  // Chat open: the keys leave the table for the column
-  const isDocked = isChatOpen && !isMobile
   const crowdFaces = { players: faces, spectators: crowd.spectators }
 
   return (
@@ -117,7 +118,7 @@ export const PlaySessionRoom = ({
           </p>
         )}
         {!me.isSeated && <PlaySpectatorBar players={faces} />}
-        {hasKeys && !isDocked && (
+        {hasKeys && (
           <PlayStageKeys
             game={game}
             sessionId={chat.sessionId}
@@ -179,17 +180,6 @@ export const PlaySessionRoom = ({
           )}
           inert={!isChatOpen}
         >
-          {hasKeys && isDocked && (
-            <PlayStageKeys
-              game={game}
-              sessionId={chat.sessionId}
-              gameSlug={gameSlug}
-              isSeated={me.isSeated}
-              isHost={me.isHost}
-              isOver={replay !== null}
-              isDocked
-            />
-          )}
           <PlayChat
             {...chat}
             load={load}

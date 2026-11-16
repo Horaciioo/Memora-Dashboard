@@ -43,6 +43,9 @@ export const SETUP_WOOD =
 export const SETUP_ROAD =
   'border-[var(--play-stopgo)] bg-[var(--play-stopgo)] text-white hover:border-[var(--play-stopgo)]'
 
+export const SETUP_INDIGO =
+  'border-[var(--play-concordat)] bg-[var(--play-concordat)] text-white hover:border-[var(--play-concordat)]'
+
 export const SETUP_AMBER =
   'border-[var(--play-croquis)] bg-[var(--play-croquis)] text-[var(--play-croquis-night)] hover:border-[var(--play-croquis)]'
 

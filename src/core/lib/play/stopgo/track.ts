@@ -1,5 +1,6 @@
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
-import { STOPGO_TRACK } from '@/declarations/play/stopgo/track'
+import { STOPGO_TRACK, circuitOf } from '@/declarations/play/stopgo/track'
+import type { StopGoFeature } from '@/declarations/play/stopgo/track'
 
 /**
  * Piece of road, a straight or a quarter turn
@@ -98,24 +99,101 @@ const lengthOf = (piece: StopGoPiece) =>
   piece.kind === 'line' ? piece.length : (piece.radius * Math.PI) / 2
 
 /**
- * Pieces of the four portions, an odd map is mirrored so the road comes back
+ * Pieces of one feature, `way` is the side the road moves toward
+ * @param {StopGoFeature} feature - Feature
  * @param {number} radius - Bend radius
- * @param {1 | -1} side - First bend side
+ * @param {1 | -1} way - Side to move toward
+ * @return {{ pieces: StopGoPiece[], flips: boolean, height: number }} - Pieces, side change, climb
+ */
+
+const featureOf = (feature: StopGoFeature, radius: number, way: 1 | -1) => {
+  const { lead, run } = STOPGO_TRACK
+  const back = way === RIGHT ? LEFT : RIGHT
+  const line = (length: number): StopGoPiece => ({ kind: 'line', length })
+  const arc = (turn: 1 | -1): StopGoPiece => ({ kind: 'arc', turn, radius })
+  const esse = [arc(way), line(2 * run), arc(back)]
+
+  if (feature === 'esse') {
+    return { pieces: [line(lead), ...esse, line(lead)], flips: true, height: 2 * lead + 2 * radius }
+  }
+  if (feature === 'kink') {
+    return {
+      pieces: [line(lead), arc(way), arc(back), line(lead), arc(back), arc(way), line(lead)],
+      flips: false,
+      height: 3 * lead + 4 * radius,
+    }
+  }
+
+  return {
+    pieces: [line(lead), ...esse, arc(back), line(2 * run), arc(way), line(lead)],
+    flips: false,
+    height: 2 * lead + 4 * radius,
+  }
+}
+
+/**
+ * Cuts the pieces of a map into portions of the same length, a bend stays whole
+ * @param {StopGoPiece[]} pieces - Pieces of the map
  * @return {StopGoPiece[][]} - Portions
  */
 
-const portionsOf = (radius: number, side: 1 | -1): StopGoPiece[][] => {
-  const { lead, run } = STOPGO_TRACK
-  const straight = lead + run + (radius * Math.PI) / 2
-  const line = (length: number): StopGoPiece => ({ kind: 'line', length })
-  const arc = (turn: 1 | -1): StopGoPiece => ({ kind: 'arc', turn, radius })
+const portionsOf = (pieces: StopGoPiece[]): StopGoPiece[][] => {
+  const count = STOPGO_TRACK.portions
+  const quarter = pieces.reduce((sum, piece) => sum + lengthOf(piece), 0) / count
+  const portions: StopGoPiece[][] = Array.from({ length: count }, () => [])
+  let walked = 0
 
-  return [
-    [line(straight)],
-    [line(lead), arc(side), line(run)],
-    [line(run), arc(side === RIGHT ? LEFT : RIGHT), line(lead)],
-    [line(straight)],
-  ]
+  for (const piece of pieces) {
+    const length = lengthOf(piece)
+    if (piece.kind === 'arc') {
+      portions[Math.min(count - 1, Math.floor((walked + length / 2) / quarter))].push(piece)
+      walked += length
+      continue
+    }
+
+    let left = length
+    while (left > 0.001) {
+      const index = Math.min(count - 1, Math.floor((walked + 0.001) / quarter))
+      const take = index === count - 1 ? left : Math.min(left, (index + 1) * quarter - walked)
+      portions[index].push({ kind: 'line', length: take })
+      walked += take
+      left -= take
+    }
+  }
+
+  return portions.map((portion) => (portion.length ? portion : [{ kind: 'line', length: 0.001 }]))
+}
+
+/**
+ * Pieces of one map, the features spread over a straight road that always ends upright
+ * @param {StopGoFeature[]} features - Features, in order
+ * @param {number} radius - Bend radius
+ * @param {1 | -1} start - Side the map starts on, RIGHT means moving right first
+ * @return {{ portions: StopGoPiece[][], end: 1 | -1 }} - Portions and the side the map ends on
+ */
+
+const mapOf = (features: StopGoFeature[], radius: number, start: 1 | -1) => {
+  const { lead, run, stretch } = STOPGO_TRACK
+  const total = 2 * (lead + run + (radius * Math.PI) / 2 + stretch) + 2 * lead + 2 * radius
+  const pieces: StopGoPiece[] = []
+  const built: ReturnType<typeof featureOf>[] = []
+  let way = start
+  let climb = 0
+
+  for (const feature of features) {
+    const made = featureOf(feature, radius, way)
+    if (climb + made.height > total) break
+    built.push(made)
+    climb += made.height
+    if (made.flips) way = way === RIGHT ? LEFT : RIGHT
+  }
+
+  const gap = (total - climb) / (built.length + 1)
+  const line = (length: number): StopGoPiece => ({ kind: 'line', length })
+  for (const made of built) pieces.push(line(gap), ...made.pieces)
+  pieces.push(line(gap))
+
+  return { portions: portionsOf(pieces), end: way }
 }
 
 /**
@@ -143,12 +221,15 @@ export const trackOf = (target: number, lanes: number): StopGoTrackPlan => {
   const maxOffset = offsetOf(lanes - 1, lanes)
   const bendRadius = STOPGO_TRACK.innerRadius + maxOffset
   const maps: StopGoPortion[][] = []
+  const circuit = circuitOf(target)
   let pose: StopGoPose = { x: 0, y: 0, heading: 0 }
+  let side: 1 | -1 = RIGHT
 
   for (let index = 0; index < Math.ceil(target / STOPGO_SETTINGS.mapKm); index++) {
-    const pieces = portionsOf(bendRadius, index % 2 ? LEFT : RIGHT)
+    const { portions, end } = mapOf(circuit.maps[index % circuit.maps.length], bendRadius, side)
+    side = end
     maps.push(
-      pieces.map((portion) => {
+      portions.map((portion) => {
         const start = pose
         pose = portion.reduce((at, piece) => advance(at, piece, 1), start)
 

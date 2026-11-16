@@ -12,12 +12,12 @@ const EASE = 'duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
  */
 
 export const PLAY_TABS = {
-  bar: `fixed inset-x-0 bottom-0 z-50 flex items-stretch gap-1 border-t border-white/70 ${SILVER} px-1.5 pt-1 pb-[max(0.75rem,calc(env(safe-area-inset-bottom)*0.8))] shadow-[0_-0.25rem_1rem_rgb(0_0_0/0.18)] md:inset-x-auto md:bottom-4 md:left-1/2 md:w-[min(40rem,calc(100%-9.5rem))] md:-translate-x-1/2 md:rounded-3xl md:border md:pb-1.5`,
+  bar: `fixed inset-x-0 bottom-0 z-50 flex items-stretch gap-1 border-t border-white/70 ${SILVER} px-1.5 pt-1 pb-[max(0.75rem,calc(env(safe-area-inset-bottom)*0.8))] shadow-[0_-0.25rem_1rem_rgb(0_0_0/0.18)] md:inset-x-auto md:bottom-4 md:left-1/2 md:w-[min(28rem,calc(100%-9.5rem))] md:-translate-x-1/2 md:rounded-3xl md:border md:pb-1.5`,
   // Open tab takes more width, the others share the rest, a divider between each
-  tab: `group relative flex min-h-[3.75rem] min-w-0 flex-1 flex-col items-center justify-end pb-1 rounded-2xl transition-[flex-grow] ${EASE} before:absolute before:inset-0 before:rounded-2xl before:opacity-0 before:transition-opacity before:duration-500 before:ease-[cubic-bezier(0.22,1,0.36,1)] before:bg-[linear-gradient(180deg,var(--play-key),color-mix(in_srgb,var(--play-key)_70%,var(--play-night)))] before:shadow-[inset_0_2px_0_rgb(255_255_255/0.35),0_0.2rem_0_rgb(0_0_0/0.4)] after:absolute after:top-3 after:-right-0.5 after:bottom-3 after:w-px after:bg-black/15 last:after:hidden has-[+[aria-current=page]]:after:hidden has-[+[aria-expanded=true]]:after:hidden active:scale-95 disabled:opacity-50`,
+  tab: `group relative flex min-h-[3rem] min-w-0 flex-1 flex-col items-center justify-end pb-1 rounded-2xl transition-[flex-grow] ${EASE} before:absolute before:inset-0 before:rounded-2xl before:opacity-0 before:transition-opacity before:duration-500 before:ease-[cubic-bezier(0.22,1,0.36,1)] before:bg-[linear-gradient(180deg,var(--play-key),color-mix(in_srgb,var(--play-key)_70%,var(--play-night)))] before:shadow-[inset_0_2px_0_rgb(255_255_255/0.35),0_0.2rem_0_rgb(0_0_0/0.4)] after:absolute after:top-3 after:-right-0.5 after:bottom-3 after:w-px after:bg-black/15 last:after:hidden has-[+[aria-current=page]]:after:hidden has-[+[aria-expanded=true]]:after:hidden active:scale-95 disabled:opacity-50`,
   tabOn: 'grow-[1.7] before:opacity-100 after:hidden',
-  lift: `relative z-10 -mt-3 transition-transform ${EASE} group-aria-[current=page]:-translate-y-3 group-aria-expanded:-translate-y-3`,
-  icon: `size-14 transition-[scale,filter] ${EASE} group-hover:scale-115 group-active:scale-90`,
+  lift: `relative z-10 -mt-2 transition-transform ${EASE} group-aria-[current=page]:-translate-y-2 group-aria-expanded:-translate-y-2`,
+  icon: `size-10 transition-[scale,filter] ${EASE} group-hover:scale-115 group-active:scale-90`,
   // Open: full colour and glow. Rest: smaller, muted
   iconOn: 'scale-110',
   iconRest: 'scale-90 saturate-[0.6] brightness-[0.85]',
@@ -27,7 +27,7 @@ export const PLAY_TABS = {
   labelRest: `relative z-10 max-h-0 tracking-wide text-white uppercase translate-y-1 overflow-hidden text-[0.65rem] leading-none font-extrabold opacity-0 transition-[max-height,opacity,translate] ${EASE}`,
   tabDesktop: 'max-md:hidden',
   // Bare red glyph outside the bar, centred on its height, desktop only
-  exit: 'group fixed bottom-4 left-[calc(50%+min(20rem,50%-4.75rem)+0.75rem)] z-50 flex h-[4.8rem] w-10 items-center justify-center text-[var(--color-danger)] transition-transform duration-300 hover:scale-110 active:scale-95 max-md:hidden',
+  exit: 'group fixed bottom-4 left-[calc(50%+min(14rem,50%-4.75rem)+0.75rem)] z-50 flex h-[3.6rem] w-10 items-center justify-center text-[var(--color-danger)] transition-transform duration-300 hover:scale-110 active:scale-95 max-md:hidden',
   exitIcon: 'size-6 drop-shadow-[0_0.15rem_0_rgb(0_0_0/0.25)]',
   // Page swap, slid from the tab side
   slide: 'flex min-h-full w-full flex-col gap-8',
@@ -234,19 +234,24 @@ export const PLAY_FOLD = {
  */
 
 export const PLAY_ME = {
-  // Over the page, off its scrollbar, which keeps the screen's right edge
-  aside: 'absolute top-8 right-8 z-10 hidden w-80 flex-col gap-3 md:flex xl:right-12 xl:w-[22rem]',
-  // Card and invitation side by side, the invitation hanging on the card's left
-  row: 'relative',
-  invite: 'absolute top-0 right-full mr-3 w-72',
+  // Bottom right, level with the tab bar from xl, above it before, growing upward
+  aside:
+    'fixed right-4 bottom-[5.25rem] z-50 hidden w-52 flex-col md:flex xl:bottom-4 2xl:w-60',
+  // Card and invitation stacked, the invitation hanging over the card
+  row: 'flex flex-col gap-3',
+  // Folds by height, the content fading in a beat after, never squashed
+  fold: 'grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] data-[open=true]:grid-rows-[1fr] data-[open=true]:opacity-100 data-[open=true]:delay-0 motion-reduce:transition-none',
+  foldInner: 'min-h-0 overflow-hidden',
+  foldGap: 'pb-3',
+  invite: 'w-72 self-end',
   // Rank card in the tier colour, as on the stats page
   card: `${LIFT} relative isolate flex flex-col overflow-hidden rounded-[1.75rem] bg-[color-mix(in_oklab,var(--tier)_22%,var(--play-night))] text-white [--ring-gap:color-mix(in_oklab,var(--tier)_22%,var(--play-night))] [--ring-track:rgb(255_255_255/0.18)]`,
-  head: 'group flex w-full items-center gap-4 p-4 pb-5 text-left transition-colors hover:bg-white/6',
+  head: 'group flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-white/6',
   headText: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  name: 'min-w-0 truncate text-xl font-extrabold tracking-tight',
+  name: 'min-w-0 truncate text-base font-extrabold tracking-tight',
   caret: 'size-5 shrink-0 text-white/70 transition-transform group-aria-expanded:rotate-180',
   // Level, under the head
-  level: 'play-rise flex flex-col gap-2.5 px-4 pt-1 pb-5',
+  level: 'flex flex-col gap-2.5 px-4 pt-1 pb-5',
   levelBar: 'h-2.5 w-full overflow-hidden rounded-full bg-white/15',
   levelFill: 'block h-full rounded-full bg-[var(--tier)] transition-[width] duration-700',
   levelNext: 'text-sm text-white/75',

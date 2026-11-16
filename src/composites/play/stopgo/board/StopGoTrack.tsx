@@ -68,6 +68,7 @@ export const StopGoTrack = memo(({ plan, maps, colors }: StopGoTrackProps) => (
         <StopGoRoadStrip
           path={lanePath(plan, maps[0], maps[maps.length - 1], lane)}
           width={STOPGO_TRACK.roadWidth}
+          color={`var(--stopgo-car-${color})`}
         />
         {maps.flatMap((map) =>
           Array.from({ length: STOPGO_SETTINGS.mapKm / ARROW_STEP }, (_, step) => {

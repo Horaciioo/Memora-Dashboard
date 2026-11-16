@@ -1,0 +1,97 @@
+import { isWorking } from '@/core/lib/play/concordat/buildings/rules'
+import { escortsOf, foesOf, landShip } from '@/core/lib/play/concordat/navy/land'
+import { emit } from '@/core/lib/play/concordat/sim/emit'
+import { ticksOf, TICK_SECONDS } from '@/core/lib/play/concordat/sim/tables'
+import { CONCORDAT } from '@/declarations/play/concordat/rules'
+import type { ConcordatShip, ConcordatState } from '@/types/concordat'
+import { ConcordatBuildingKinds, ConcordatShipKinds } from '@/utils/constants/concordat'
+
+const { navy } = CONCORDAT
+
+// Distance on the grid
+const reach = (state: ConcordatState, first: number, second: number): number => {
+  const { width } = state.map
+
+  return Math.hypot(
+    (first % width) - (second % width),
+    Math.floor(first / width) - Math.floor(second / width)
+  )
+}
+
+// Advance along the path
+const sailOn = (state: ConcordatState, ship: ConcordatShip): void => {
+  if (!ship.path.length) return
+
+  const speed = ship.kind === ConcordatShipKinds.War ? navy.warSpeed : navy.transportSpeed
+  const boost = 1 + state.effects[ship.owner - 1].shipSpeed
+  ship.progress += speed * boost * TICK_SECONDS * state.speed
+  while (ship.progress >= 1 && ship.path.length) {
+    ship.tile = ship.path.shift() as number
+    ship.progress -= 1
+  }
+}
+
+// A transport near a foe warship without an escort is lost
+const isIntercepted = (state: ConcordatState, ship: ConcordatShip): boolean => {
+  const foes = foesOf(state, ship)
+  const guards = escortsOf(state, ship.owner)
+  const warships = state.ships.filter((other) => other.kind === ConcordatShipKinds.War)
+
+  const isGuarded = warships.some(
+    (other) =>
+      guards.includes(other.owner) && reach(state, other.tile, ship.tile) <= navy.escortRadius
+  )
+  if (isGuarded) return false
+
+  return warships.some(
+    (other) =>
+      foes.includes(other.owner) && reach(state, other.tile, ship.tile) <= navy.interceptRadius
+  )
+}
+
+// Warships without a port wear away
+const wearOrphans = (state: ConcordatState): void => {
+  for (const ship of state.ships) {
+    if (ship.kind !== ConcordatShipKinds.War) continue
+
+    const hasPort = state.buildings.some(
+      (building) =>
+        building.owner === ship.owner &&
+        building.kind === ConcordatBuildingKinds.Port &&
+        isWorking(building, state.tick)
+    )
+    ship.ttl = hasPort ? ticksOf(navy.orphanSeconds) : ship.ttl - 1
+  }
+  const kept = state.ships.filter((ship) => ship.kind !== ConcordatShipKinds.War || ship.ttl > 0)
+  if (kept.length !== state.ships.length) {
+    state.ships = kept
+    state.isSystemsDirty = true
+  }
+}
+
+/**
+ * Navy phase of a tick: sail, intercept, land
+ * @param {ConcordatState} state - Game
+ * @return {void}
+ */
+
+export const runNavy = (state: ConcordatState): void => {
+  if (!state.ships.length) return
+
+  for (const ship of [...state.ships]) {
+    sailOn(state, ship)
+    if (ship.kind !== ConcordatShipKinds.Transport) continue
+
+    if (isIntercepted(state, ship)) {
+      state.players[ship.owner - 1].troops += ship.troops * (1 - navy.interceptLoss)
+      emit(state, { tick: state.tick, kind: 'sunk', actor: 0, victim: ship.owner, tile: ship.tile })
+      state.ships = state.ships.filter((other) => other !== ship)
+      state.isSystemsDirty = true
+    } else if (!ship.path.length) {
+      landShip(state, ship)
+      state.ships = state.ships.filter((other) => other !== ship)
+      state.isSystemsDirty = true
+    }
+  }
+  wearOrphans(state)
+}

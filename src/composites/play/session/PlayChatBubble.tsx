@@ -17,15 +17,19 @@ import { ICONS } from '@/declarations/ui/icons'
  * @param {Object} props - Bubble
  * @param {Object} props.chat - Chat props, fold gesture added here
  * @param {ReactNode} props.above - Link centred right above the chat box
+ * @param {string} props.skin - Block skin of the game
  * @return {JSX.Element}
  */
 
 export const PlayChatBubble = ({
   chat,
   above,
+  skin,
 }: {
   chat: Omit<ComponentProps<typeof PlayChat>, 'isSide' | 'onFold'>
   above?: ReactNode
+  // Block skin of the game, the arcade look when empty
+  skin?: string
 }) => {
   const [isOpen, setOpen] = useState(true)
   const [isFolding, setFolding] = useState(false)
@@ -52,7 +56,7 @@ export const PlayChatBubble = ({
       }}
     >
       {above && <div className={PLAY_CHAT_BUBBLE.above}>{above}</div>}
-      <PlayChat {...chat} isSide onFold={() => setFolding(true)} />
+      <PlayChat {...chat} isSide skin={skin} onFold={() => setFolding(true)} />
     </aside>
   ) : (
     <button

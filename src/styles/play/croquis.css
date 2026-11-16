@@ -1,17 +1,10 @@
-/* Croquis ground: warm amber night, scribbles rising like bubbles */
+/* Croquis ground: vivid amber gradient, scribbles rising like bubbles */
 .play-room:has(.play-croquis) {
-  background:
-    radial-gradient(
-      70rem 34rem at 50% 115%,
-      color-mix(in srgb, var(--play-croquis) 46%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      40rem 24rem at 12% -8%,
-      color-mix(in srgb, var(--play-croquis-glow) 16%, transparent),
-      transparent 70%
-    ),
-    linear-gradient(180deg, var(--play-croquis-night) 0%, var(--play-croquis-dusk) 100%);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--play-croquis) 78%, var(--play-croquis-deep)) 0%,
+    var(--play-croquis-deep) 100%
+  );
 }
 
 .play-room:has(.play-croquis) .play-floor {

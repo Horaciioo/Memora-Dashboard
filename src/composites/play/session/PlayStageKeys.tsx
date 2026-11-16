@@ -1,7 +1,6 @@
 'use client'
 
 import { Button } from '@/components/elements/actions/Button'
-import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { PlayMenuKey } from '@/composites/play/session/PlayMenuKey'
 import { PlayVolumeKey } from '@/composites/play/session/PlayVolumeKey'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
@@ -9,7 +8,6 @@ import { usePlayStageStore } from '@/core/store/play/playStage'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION } from '@/declarations/ui/variants'
-import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
 
@@ -32,7 +30,6 @@ export const PlayStageKeys = ({
   isSeated,
   isHost = false,
   isOver = false,
-  isDocked = false,
 }: {
   game: PlayGameName
   sessionId: string
@@ -40,8 +37,6 @@ export const PlayStageKeys = ({
   isSeated: boolean
   isHost?: boolean
   isOver?: boolean
-  // Sits above the chat column instead of floating
-  isDocked?: boolean
 }) => {
   const { isScreen, isChatOpen, toggleScreen, toggleChat } = usePlayStageStore()
   const isMobile = useIsMobileShell()
@@ -51,33 +46,15 @@ export const PlayStageKeys = ({
   if (isMobile) return null
 
   return (
-    <div
-      className={cn(
-        BAC_SESSION.keys,
-        isDocked
-          ? BAC_SESSION.keysDocked
-          : [BAC_SESSION.keysFull, isChatOpen && BAC_SESSION.keysShifted]
-      )}
-    >
-      {game === PlayGames.Golf ? (
-        // Golf keeps its own inline exits
-        <PlayGameActions
-          sessionId={sessionId}
-          gameSlug={gameSlug}
-          isSeated={isSeated}
-          hasSettings={false}
-          itemClass={BAC_SESSION.exitKey}
-          iconClass={BAC_SESSION.exitIcon}
-        />
-      ) : (
-        <PlayMenuKey
-          sessionId={sessionId}
-          gameSlug={gameSlug}
-          isSeated={isSeated}
-          isHost={isHost}
-          isOver={isOver}
-        />
-      )}
+    <div className={cn(BAC_SESSION.keys, BAC_SESSION.keysFull)}>
+      <PlayMenuKey
+        sessionId={sessionId}
+        gameSlug={gameSlug}
+        isSeated={isSeated}
+        isHost={isHost}
+        isOver={isOver}
+        hasSettings={false}
+      />
       <PlayVolumeKey game={game} />
       <Button
         variant="arcadeGhost"

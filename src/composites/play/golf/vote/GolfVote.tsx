@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { GolfPanorama } from '@/composites/play/golf/panorama/GolfPanorama'
 import { GolfTournamentDeck } from '@/composites/play/golf/vote/GolfTournamentDeck'
 import { PlayVoteDeck } from '@/composites/play/vote/PlayVoteDeck'
+import { PlayVoteProgress } from '@/composites/play/vote/PlayVoteProgress'
 import { PlayVoteTimer } from '@/composites/play/vote/PlayVoteTimer'
 import {
   courseCards,
@@ -15,7 +16,7 @@ import {
   roundCards,
 } from '@/composites/play/golf/vote/voteCards'
 import { usePlayVote } from '@/composites/play/vote/usePlayVote'
-import { winningCard } from '@/core/lib/play/golf'
+import { golfVoteSteps, winningCard } from '@/core/lib/play/golf'
 import type { GolfGameSettings, GolfVoteState } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_SETUP_COPY } from '@/declarations/play/golf/copy'
@@ -146,6 +147,7 @@ export const GolfVote = ({
         </div>
       ) : (
         <div className={GOLF_VOTE.stage}>
+          <PlayVoteProgress steps={golfVoteSteps(vote.chosen.mode)} step={step} />
           <div key={`head-${step}`} className={GOLF_VOTE.head}>
             <h2 className={GOLF_VOTE.title}>{screen.title}</h2>
             <p className={GOLF_VOTE.lead}>{screen.lead}</p>

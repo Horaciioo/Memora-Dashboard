@@ -315,16 +315,11 @@ export const BAC_SESSION = {
   // Own HUD: the table is the whole page, no panel and no margin
   boxFullHud: 'size-full overflow-hidden!',
   // Chat laid over a HUD table, last lines in the corner opposite the score card
-  hudChat: 'fixed right-3 bottom-3 z-[60] w-80 max-w-[40%] md:right-7 md:bottom-7',
-  // Stage keys: in the top bar, then floating over the table, shifted by the open chat
+  hudChat: 'fixed right-3 bottom-3 z-[60] w-72 max-w-[40%] md:right-5 md:bottom-5',
+  // Stage keys: floating in the top corner, the chat column starts under them
   keys: 'flex items-center gap-2',
   keysFull:
     'fixed top-8 right-8 z-50 sm:top-10 sm:right-10 transition-[right] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
-  // Inside the table's top corner, left of the open chat
-  keysShifted:
-    'right-[calc(min(var(--play-side-open),100vw)+2rem)] sm:right-[calc(min(var(--play-side-open),100vw)+2.5rem)]',
-  // Full screen, chat open: the keys top the chat column
-  keysDocked: 'shrink-0 justify-center px-4 pt-1 pb-3',
   keysIcon: 'size-5',
   exitKey: 'play-key play-key-ghost inline-flex items-center gap-2 px-3 py-2 text-sm font-bold',
   keyButton: 'px-3! py-2!',
@@ -342,8 +337,8 @@ export const BAC_SESSION = {
   // Full screen: flush right over the table, slides in and out
   sideFull:
     'fixed right-0 z-40 mt-0 w-[min(var(--play-side-open),100vw)]! transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
-  // Same top and foot as the padded table
-  sideFullPad: 'top-4! bottom-4! pb-0! sm:top-6! sm:bottom-6!',
+  // Starts under the keys, same foot as the padded table
+  sideFullPad: 'top-20! bottom-4! pb-0! sm:top-24! sm:bottom-6!',
   sideShown: 'translate-x-0',
   sideHidden: 'pointer-events-none translate-x-full',
   // Crowd window: players, then spectators when there are some

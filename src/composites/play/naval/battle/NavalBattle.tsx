@@ -112,15 +112,19 @@ export const NavalBattle = ({
   const isIncoming = playing.some(
     ({ strike }) => strike.match === matchIndex && strike.target === viewer
   )
+  // Sea another captain is firing at, followed while it plays
+  const struck = playing.find(({ strike }) => strike.match === matchIndex)?.strike.target ?? -1
   const isOwnShown =
-    isFighter && match?.status === 'LIVE' && (isIncoming || (!isMyTurn && !playing.length))
+    isFighter && match?.status === 'LIVE' && (isIncoming || (!isMyTurn && struck < 0))
+  const foeShown = struck >= 0 && struck !== viewer && foes.includes(struck) ? struck : target
+  const seatShown = isOwnShown ? viewer : foeShown
   const sea =
-    target >= 0
+    seatShown >= 0
       ? seaShown({
           board,
           playback,
           match: matchIndex,
-          seat: isOwnShown ? viewer : target,
+          seat: seatShown,
           isMine: isOwnShown,
         })
       : null
@@ -176,11 +180,11 @@ export const NavalBattle = ({
         <div className={NAVAL_BOARD.stage}>
           {sea && (
             <NavalTargetSea
-              key={foes.length > 1 ? target : 0}
+              key={isOwnShown ? 'mine' : seatShown}
               isFading={foes.length > 1}
               size={board.sea.size}
               map={board.settings.map}
-              target={captains[isOwnShown ? viewer : target]}
+              target={captains[seatShown]}
               isMine={isOwnShown}
               marks={sea.marks}
               ships={sea.ships}
@@ -199,7 +203,7 @@ export const NavalBattle = ({
             <NavalFoes
               chips={chips}
               total={board.sea.fleet.length}
-              selected={target}
+              selected={isOwnShown ? target : foeShown}
               canPick
               onPick={setPickedFoe}
             />

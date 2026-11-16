@@ -59,6 +59,10 @@ export const GAME_INVENTORY: Record<PlayGameName, GameEntry> = {
     moves: ['StopGoMove'],
     capabilities: ['pause', 'resume', 'kick', 'setScore'],
   },
+  [PlayGames.Concordat]: {
+    moves: ['ConcordatEvent'],
+    capabilities: ['pause', 'resume', 'kick', 'setScore'],
+  },
   [PlayGames.Suspens]: {
     moves: ['SuspensMove', 'SuspensRound'],
     capabilities: ['pause', 'resume', 'kick', 'setScore'],

@@ -2,10 +2,10 @@ import { setupStyles } from '@/declarations/ui/variants/games/play'
 
 // Putt Party pixel slab over the course
 const GLASS = 'golf-block'
-const CAPTION = 'text-sm leading-none font-black tracking-wide text-[var(--play-ink)] uppercase'
-const FIGURE = 'text-3xl leading-none font-black tabular-nums text-[var(--play-ink-soft)]'
+const CAPTION = 'text-xs leading-none font-black tracking-wide text-[var(--play-ink)] uppercase'
+const FIGURE = 'text-2xl leading-none font-black tabular-nums text-[var(--play-ink-soft)]'
 const ROUND =
-  'grid size-11 place-items-center rounded-full text-[var(--play-ink)] transition-transform hover:-translate-y-0.5 hover:bg-[var(--play-chip)]'
+  'grid size-9 place-items-center rounded-full text-[var(--play-ink)] transition-transform hover:-translate-y-0.5 hover:bg-[var(--play-chip)]'
 
 /**
  * Golf course screen: the 3D stage and the cards laid over it
@@ -20,8 +20,8 @@ export const GOLF_BOARD = {
   stageFull: 'h-auto! min-h-0! flex-1 rounded-none! border-b-0! ring-0!',
   boardFull: 'min-h-0 flex-1 pb-0!',
   // Top row: hole card, players, view keys
-  top: 'golf-block-drop pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-3 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:pr-[3.75rem]',
-  hole: `${GLASS} pointer-events-auto flex w-[40rem] max-w-full items-center gap-4 px-6 py-3.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:order-2`,
+  top: 'golf-block-drop pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-3 md:inset-x-5 md:top-4 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:pr-[3.75rem]',
+  hole: `${GLASS} pointer-events-auto flex w-[32rem] max-w-full items-center gap-3 px-5 py-2.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:order-2`,
   holeBlock:
     'flex min-w-0 flex-1 basis-0 items-baseline justify-center gap-2 max-md:flex-col max-md:items-center max-md:gap-1',
   caption: `${CAPTION} max-md:text-[0.65rem] max-md:text-center`,
@@ -30,15 +30,15 @@ export const GOLF_BOARD = {
   clockLow: 'animate-pulse text-[var(--play-golf-hud-ink)]',
   divider: 'w-px self-stretch bg-[var(--play-line)]',
   rule: 'my-1 h-px bg-[var(--play-line)]',
-  views: `${GLASS} pointer-events-auto flex items-center gap-1 p-1.5`,
+  views: `${GLASS} pointer-events-auto flex items-center gap-0.5 p-1`,
   view: ROUND,
   viewOn: 'text-[var(--play-accent)]',
-  viewIcon: 'size-5',
+  viewIcon: 'size-4',
   // Phone: the gear and the chat bar hold these
   viewDesktop: 'max-md:hidden',
   // Keys and the settings card hanging under them
   keys: 'pointer-events-auto relative max-md:ml-auto md:order-3',
-  settings: `${GLASS} absolute top-full right-0 z-10 mt-3 flex w-72 max-w-[calc(100vw-1.5rem)] flex-col gap-1 p-3`,
+  settings: `${GLASS} absolute top-full right-0 z-10 mt-2 flex w-64 max-w-[calc(100vw-1.5rem)] flex-col gap-0.5 p-2.5`,
   setting:
     'flex items-center justify-between gap-3 px-1 py-1.5 text-left text-base font-extrabold text-[var(--play-ink)]',
   soundRow: 'flex flex-col gap-1 px-1 py-1.5 text-base font-extrabold text-[var(--play-ink)]',
@@ -52,7 +52,7 @@ export const GOLF_BOARD = {
   // Admin read of the ground spot looked at
   probe: `${GLASS} pointer-events-none absolute top-24 left-1/2 -translate-x-1/2 px-3 py-1 font-mono text-sm font-bold text-[var(--play-ink)] tabular-nums`,
   // Players strip
-  players: `${GLASS} pointer-events-auto hidden items-center gap-3 px-3 py-2 md:order-1 md:flex`,
+  players: `${GLASS} pointer-events-auto hidden items-center gap-2.5 px-2.5 py-1.5 md:order-1 md:flex`,
   player: 'relative flex flex-col items-center gap-1',
   playerFace: 'overflow-hidden rounded-full ring-[3px]',
   playerStrokes: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
@@ -62,7 +62,7 @@ export const GOLF_BOARD = {
   playerGone: 'opacity-40 grayscale',
   // Bottom row: power slot, status and gauge, strokes
   bottom:
-    'golf-block-drop pointer-events-none absolute inset-x-3 bottom-3 flex flex-wrap items-end justify-between gap-3 md:inset-x-7 md:bottom-7 md:gap-4',
+    'golf-block-drop pointer-events-none absolute inset-x-3 bottom-3 flex flex-wrap items-end justify-between gap-3 md:inset-x-5 md:bottom-5 md:gap-3',
   // Hand: rounded cases, bottom right
   handBox: 'pointer-events-auto flex flex-col items-end gap-2',
   hand: 'flex items-end gap-2 md:gap-3',
@@ -149,9 +149,9 @@ const CARD_CELL = 'border-l-2 border-[var(--play-golf-card-line)] px-2 py-2.5 te
  */
 
 export const GOLF_PANEL = {
-  root: 'pointer-events-auto flex w-72 max-w-[40%] flex-col max-md:hidden',
-  head: 'flex items-center justify-between gap-2 bg-[var(--play-golf-card)] px-3 py-2.5',
-  title: 'text-xl leading-none font-black tracking-tight whitespace-nowrap text-white uppercase',
+  root: 'pointer-events-auto flex w-60 max-w-[40%] flex-col max-md:hidden',
+  head: 'flex items-center justify-between gap-2 bg-[var(--play-golf-card)] px-3 py-2',
+  title: 'text-base leading-none font-black tracking-tight whitespace-nowrap text-white uppercase',
   keys: 'flex items-center gap-1.5',
   key: 'grid size-9 place-items-center bg-white text-[var(--play-golf-card)] transition-transform hover:-translate-y-0.5',
   keyIcon:

@@ -1791,3 +1791,21 @@
     animation: none;
   }
 }
+
+/* Soft rainbow sash of a featured game, slow drift plus a light sweep */
+.play-feature-badge {
+  background:
+    linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.7) 50%, transparent 65%) 0 0 / 250%
+      100%,
+    linear-gradient(90deg, #ff8fb0, #ffb26b, #ffe066, #7fe3a0, #6cc6ff, #a893ff, #ff8fb0) 0 0 / 100%
+      100%;
+  animation: play-feature-rainbow 4s linear infinite;
+}
+
+@keyframes play-feature-rainbow {
+  to {
+    background-position:
+      -250% 0,
+      -100% 0;
+  }
+}

@@ -1,9 +1,9 @@
 import type { ScenerySet } from '@/composites/play/hub/scenery/sets'
-import { StopGoCarShape } from '@/composites/play/stopgo/art/StopGoCarShape'
-import { StopGoRoadStrip } from '@/composites/play/stopgo/art/StopGoRoadStrip'
-
-// Hairpin centre line, outer and inner edges both rounded
-const HAIRPIN = 'M-80 610H400A110 110 0 0 1 510 720V980'
+import {
+  NEAR_CIRCUITS,
+  StopGoCircuits,
+  TOP_CIRCUITS,
+} from '@/composites/play/hub/scenery/stopgoCircuits'
 
 // Flag colours along the bunting
 const FLAGS = ['--play-stopgo', '--stopgo-kerb-white', '--stopgo-gold']
@@ -72,33 +72,30 @@ export const STOPGO_SET: ScenerySet = {
   )),
   near: (
     <>
-      {/* Road tilted back a touch, the car on the bend */}
-      <g transform="translate(0 150) scale(1 0.88)">
-        <StopGoRoadStrip path={HAIRPIN} width={120} />
-        <g transform="translate(478 642) rotate(135) scale(1.35)">
-          <StopGoCarShape color="red" />
-        </g>
-      </g>
+      <StopGoCircuits circuits={NEAR_CIRCUITS} />
       <g className="play-scenery-bob">
-        <Sign x={1420} y={760} />
+        <Sign x={1420} y={560} />
       </g>
     </>
   ),
   top: (
-    <g className="play-road-bunting">
-      <path
-        d={`M0 8Q800 62 1600 8`}
-        strokeWidth="3"
-        fill="none"
-        style={{ stroke: 'var(--stopgo-asphalt-deep)' }}
-      />
-      {BUNTING.map((flag) => (
+    <>
+      <StopGoCircuits circuits={TOP_CIRCUITS} />
+      <g className="play-road-bunting">
         <path
-          key={flag.x}
-          d={`M${flag.x} ${10 + flag.sag}h44l-22 40z`}
-          style={{ fill: `var(${flag.fill})` }}
+          d={`M0 8Q800 62 1600 8`}
+          strokeWidth="3"
+          fill="none"
+          style={{ stroke: 'var(--stopgo-asphalt-deep)' }}
         />
-      ))}
-    </g>
+        {BUNTING.map((flag) => (
+          <path
+            key={flag.x}
+            d={`M${flag.x} ${10 + flag.sag}h44l-22 40z`}
+            style={{ fill: `var(${flag.fill})` }}
+          />
+        ))}
+      </g>
+    </>
   ),
 }

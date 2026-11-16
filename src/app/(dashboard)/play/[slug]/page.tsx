@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
-import type { ComponentType } from 'react'
 import { notFound } from 'next/navigation'
 
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { GolfFlyButton } from '@/composites/play/golf/fly/GolfFlyButton'
-import { GolfPanorama } from '@/composites/play/golf/panorama/GolfPanorama'
+import { GROUND_LAYERS } from '@/composites/play/hub/groundLayers'
 import { PlayCallouts } from '@/composites/play/hub/notices/PlayCallouts'
 import { PlayConcept } from '@/composites/play/hub/concept/PlayConcept'
 import { PlayCreateButton } from '@/composites/play/hub/lobby/PlayCreateButton'
@@ -13,16 +12,6 @@ import { PlayJoinCode } from '@/composites/play/hub/lobby/PlayJoinCode'
 import { PlayHubMenu } from '@/composites/play/hub/PlayHubMenu'
 import { PlayLeaderboard } from '@/composites/play/hub/leaderboard/PlayLeaderboard'
 import { PlayLiveTables } from '@/composites/play/hub/lobby/PlayLiveTables'
-import { PlayEmbers } from '@/composites/play/hub/PlayEmbers'
-import { PlayStopGoRoad } from '@/composites/play/hub/PlayStopGoRoad'
-import { PlaySuspensLetters } from '@/composites/play/hub/PlaySuspensLetters'
-import { PlayCroquisFloaters } from '@/composites/play/hub/PlayCroquisFloaters'
-import { PlayEchoFloaters } from '@/composites/play/hub/PlayEchoFloaters'
-import { PlayGlitchFloaters } from '@/composites/play/hub/PlayGlitchFloaters'
-import { PlayJumbleLetters } from '@/composites/play/hub/PlayJumbleLetters'
-import { NavalHubPhoto } from '@/composites/play/naval/NavalHubPhoto'
-import { LudoHopField } from '@/composites/play/ludo/LudoHopField'
-import { PlayPaperWords } from '@/composites/play/hub/PlayPaperWords'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PlayHubTabs } from '@/composites/play/mobile/PlayHubTabs'
 import { PlayTopBar } from '@/composites/play/mobile/PlayTopBar'
@@ -39,43 +28,17 @@ import {
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_CONCEPT_COPY } from '@/declarations/play/concept'
-import { GOLF_TURF } from '@/declarations/play/golf/copy'
-import { CROQUIS_HUB } from '@/declarations/play/croquis/copy'
-import { SUSPENS_HUB } from '@/declarations/play/suspens/copy'
-import { ECHO_HUB } from '@/declarations/play/echo/copy'
-import { GLITCH_HUB } from '@/declarations/play/glitch/copy'
-import { JUMBLE_HUB } from '@/declarations/play/jumble/copy'
-import { LUDO_FELT } from '@/declarations/play/ludo/copy'
-import { NAVAL_SEA } from '@/declarations/play/naval/copy'
-import { STOPGO_HUB } from '@/declarations/play/stopgo/art'
 import {
-  BOMB_EMBERS,
   fillPlayMessage,
   PLAY_MOBILE_COPY,
   PLAY_GAMES,
   PLAY_HUB_COPY,
-  PLAY_PAPER,
   playKeysOf,
 } from '@/declarations/play'
 import { PLAY_HUB, PLAY_HUB_TABS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { Permissions } from '@/utils/constants/permissions'
 import { PlayGames } from '@/utils/constants/play'
-
-// Animated layer of each hub ground
-const GROUND_LAYERS: Record<string, ComponentType> = {
-  [PLAY_PAPER.ground]: PlayPaperWords,
-  [BOMB_EMBERS.ground]: PlayEmbers,
-  [JUMBLE_HUB.ground]: PlayJumbleLetters,
-  [ECHO_HUB.ground]: PlayEchoFloaters,
-  [CROQUIS_HUB.ground]: PlayCroquisFloaters,
-  [SUSPENS_HUB.ground]: PlaySuspensLetters,
-  [GLITCH_HUB.ground]: PlayGlitchFloaters,
-  [GOLF_TURF.ground]: GolfPanorama,
-  [LUDO_FELT.ground]: LudoHopField,
-  [NAVAL_SEA.ground]: NavalHubPhoto,
-  [STOPGO_HUB.ground]: PlayStopGoRoad,
-}
 
 interface PlayGamePageProps {
   params: Promise<{ slug: string }>

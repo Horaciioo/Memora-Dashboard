@@ -2,6 +2,7 @@ import 'server-only'
 
 import { BACCALAUREAT_BOT } from '@/core/bots/play/baccalaureat'
 import { BOMB_BOT } from '@/core/bots/play/bomb'
+import { CONCORDAT_BOT } from '@/core/bots/play/concordat'
 import { CROQUIS_BOT } from '@/core/bots/play/croquis'
 import { ECHO_BOT } from '@/core/bots/play/echo'
 import { STOPGO_BOT } from '@/core/bots/play/stopgo'
@@ -32,4 +33,5 @@ export const PLAY_BOTS: Record<PlayGameName, PlayBotStrategy> = {
   [PlayGames.Croquis]: CROQUIS_BOT,
   [PlayGames.Suspens]: SUSPENS_BOT,
   [PlayGames.StopGo]: STOPGO_BOT,
+  [PlayGames.Concordat]: CONCORDAT_BOT,
 }

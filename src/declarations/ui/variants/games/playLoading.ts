@@ -26,7 +26,6 @@ export const PLAY_LOADING_STYLES = {
   mystery: 'play-busy-logo size-28 object-contain sm:size-36',
   name: 'text-4xl font-black tracking-tight sm:text-5xl',
   footer: 'relative flex w-full max-w-md flex-col items-center gap-4',
-  memora: 'play-busy-logo size-10 object-contain',
   meter: 'flex w-full items-center gap-3',
   track: 'h-3 flex-1 overflow-hidden rounded-full bg-white/20',
   bar: 'h-full rounded-full bg-white transition-[width] duration-200 ease-out',

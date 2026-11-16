@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
 
+import { ConcordatLoading } from '@/composites/play/concordat/loading/ConcordatLoading'
 import { CroquisLoading } from '@/composites/play/croquis/loading/CroquisLoading'
 import { EchoLoading } from '@/composites/play/echo/loading/EchoLoading'
 import { GlitchLoading } from '@/composites/play/glitch/loading/GlitchLoading'
@@ -26,4 +27,5 @@ export const PLAY_LOADINGS: Partial<
   [PlayGames.Croquis]: (props) => <CroquisLoading {...props} />,
   [PlayGames.Suspens]: (props) => <SuspensLoading {...props} />,
   [PlayGames.StopGo]: (props) => <StopGoLoading {...props} />,
+  [PlayGames.Concordat]: (props) => <ConcordatLoading {...props} />,
 }

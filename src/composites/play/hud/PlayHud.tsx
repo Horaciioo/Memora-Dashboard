@@ -7,6 +7,7 @@ import { PlayHudKeys } from '@/composites/play/hud/PlayHudKeys'
 import { PlayHudPanel } from '@/composites/play/hud/PlayHudPanel'
 import type { PlayHudRow } from '@/composites/play/hud/PlayHudPanel'
 import { usePlayPref, usePlayPrefsStore } from '@/core/store/play/playPrefs'
+import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { PLAY_HUD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -27,6 +28,10 @@ export interface PlayHudProps {
   rows: PlayHudRow[]
   // Players strip on top, off when the table already shows them
   hasStrip?: boolean
+  // Clock alone on top and no score card, the game folds the rest away
+  isCompact?: boolean
+  // Wider info card when the game has room for it
+  isWide?: boolean
   // Block on the left, level with the table
   lead?: ReactNode
   // Extra blocks over the table
@@ -46,11 +51,15 @@ export const PlayHud = ({
   blocks,
   rows,
   hasStrip = true,
+  isCompact = false,
+  isWide = false,
   lead,
   children,
 }: PlayHudProps) => {
   const isHidden = usePlayPrefsStore((state) => state.isHudHidden)
   const hasClock = usePlayPref(game, 'clock')
+  // Score card hidden by default, the trophy key beside the settings opens it
+  const isScoreOpen = usePlayScoreStore((state) => state.isOpen)
 
   // Only the keys stay, to bring the HUD back
   if (isHidden) {
@@ -62,6 +71,8 @@ export const PlayHud = ({
       </div>
     )
   }
+
+  const shown = blocks.filter((block) => hasClock || block.key !== 'clock')
 
   return (
     <div className={PLAY_HUD.root} data-hud={game.toLowerCase()}>
@@ -82,10 +93,19 @@ export const PlayHud = ({
             ))}
           </ul>
         )}
-        <div className={hasStrip ? PLAY_HUD.card : PLAY_HUD.cardAlone}>
-          {blocks
-            .filter((block) => hasClock || block.key !== 'clock')
-            .map((block, index) => (
+        {shown.length > 0 && (
+          <div
+            className={
+              isCompact
+                ? PLAY_HUD.cardSlim
+                : hasStrip
+                  ? PLAY_HUD.card
+                  : isWide
+                    ? PLAY_HUD.cardWide
+                    : PLAY_HUD.cardAlone
+            }
+          >
+            {shown.map((block, index) => (
               <div key={block.key} className="contents">
                 {index > 0 && <span className={PLAY_HUD.divider} aria-hidden="true" />}
                 <div className={PLAY_HUD.block}>
@@ -94,13 +114,16 @@ export const PlayHud = ({
                 </div>
               </div>
             ))}
-        </div>
+          </div>
+        )}
         <PlayHudKeys game={game} sessionId={sessionId} isSeated={isSeated} />
       </div>
       {lead && <div className={PLAY_HUD.lead}>{lead}</div>}
-      <div className={PLAY_HUD.corner}>
-        <PlayHudPanel rows={rows} />
-      </div>
+      {!isCompact && isScoreOpen && (
+        <div className={PLAY_HUD.corner}>
+          <PlayHudPanel rows={rows} />
+        </div>
+      )}
       {children}
     </div>
   )

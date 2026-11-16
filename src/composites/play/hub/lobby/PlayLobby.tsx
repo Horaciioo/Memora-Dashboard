@@ -18,6 +18,7 @@ import { PlayInviteSlot } from '@/composites/play/session/PlayInviteSlot'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { usePlayLobbyStore } from '@/core/store/play/playLobby'
+import { usePlayLiveVote } from '@/core/hooks/data/play/usePlayLiveVote'
 import { usePlayStarting } from '@/core/hooks/data/play/usePlayStarting'
 import { usePlayPeopleMenu } from '@/core/hooks/interaction/state/play/usePlayPeopleMenu'
 import { fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
@@ -70,6 +71,8 @@ export interface PlayLobbyProps {
   serverTime: number
   visibility: PlayVisibilityName
   joinCode: string | null
+  // Block skin of the game, the arcade look when empty
+  skin?: string
 }
 
 /**
@@ -94,6 +97,7 @@ export const PlayLobby = ({
   serverTime,
   visibility,
   joinCode,
+  skin,
 }: PlayLobbyProps) => {
   const moves = usePlayMoves()
   // Fresh table lands on the picker
@@ -146,6 +150,7 @@ export const PlayLobby = ({
   const closeRules = () => setRulesOpen(false)
   // Loading screen from the start click, or the host's signal, until the game replaces the lobby
   const isStarting = usePlayStarting(id)
+  const voteSettings = usePlayLiveVote(id, rules.settings)
   const [isLaunching, setLaunching] = useState(false)
   const launch = async () => {
     setLaunching(true)
@@ -154,7 +159,10 @@ export const PlayLobby = ({
 
   return (
     <div className={PLAY_ROOM.middle}>
-      {(isLaunching || isStarting) && isLobby && <PlayLoading game={game} hasChat />}
+      {/* Running without its table yet: never an empty page */}
+      {(isLobby ? isLaunching || isStarting : status === PlayStatuses.Running) && (
+        <PlayLoading game={game} hasChat />
+      )}
       {isLobby && (
         <header className={PLAY_ROOM.lobbyHead}>
           <h1 className={PLAY_ROOM.lobbyTitle}>{PLAY_HUB_COPY.lobbyWaiting}</h1>
@@ -165,8 +173,8 @@ export const PlayLobby = ({
           )}
         </header>
       )}
-      {isLobby && isPrivate && me.isSeated && <PlayLobbyLink sessionId={id} joinCode={joinCode} />}
-      <section className={PLAY_ROOM.box}>
+      {isLobby && isPrivate && me.isSeated && <PlayLobbyLink sessionId={id} joinCode={joinCode} skin={skin} />}
+      <section className={cn(skin ? PLAY_ROOM.boxSkinned : PLAY_ROOM.box, skin)}>
         <div className={PLAY_ROOM.summary}>
           <button
             type="button"
@@ -233,7 +241,7 @@ export const PlayLobby = ({
         </div>
 
         {isLobby && !isPrivate && me.isSeated && (
-          <PlayLobbyLink sessionId={id} joinCode={joinCode} />
+          <PlayLobbyLink sessionId={id} joinCode={joinCode} skin={skin} />
         )}
 
         <div className={PLAY_ROOM.actions}>
@@ -284,7 +292,7 @@ export const PlayLobby = ({
       {isLobby && Vote && (
         <Vote
           sessionId={id}
-          settings={rules.settings}
+          settings={voteSettings}
           serverTime={serverTime}
           viewerId={viewerId}
           hostId={seats.find((seat) => seat.isHost)?.accountId ?? ''}

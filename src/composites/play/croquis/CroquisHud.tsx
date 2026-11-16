@@ -44,7 +44,7 @@ export const CroquisHud = ({
       key: 'clock',
       caption: CROQUIS_HUD_COPY.clock,
       figure: (
-        <span className="block w-32">
+        <span className="block w-32 max-w-full">
           {isReveal ? (
             <span className={CROQUIS_BOARD.clockTrack} />
           ) : (
@@ -63,7 +63,7 @@ export const CroquisHud = ({
       key: 'drawer',
       caption: CROQUIS_HUD_COPY.drawer,
       figure: (
-        <span className="block max-w-28 truncate">
+        <span className="block max-w-48 truncate">
           {board.drawerId === viewerId ? CROQUIS_HUD_COPY.you : (drawer?.name ?? '')}
         </span>
       ),

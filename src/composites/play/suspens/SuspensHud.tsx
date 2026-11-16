@@ -49,7 +49,7 @@ export const SuspensHud = ({
       key: 'clock',
       caption: SUSPENS_HUD_COPY.clock,
       figure: (
-        <span className="block w-32">
+        <span className="block w-32 max-w-full">
           {isReveal || !clock.endsAt ? (
             <span className={SUSPENS_BOARD.clockTrack} />
           ) : (
@@ -69,7 +69,7 @@ export const SuspensHud = ({
           {
             key: 'setter',
             caption: SUSPENS_HUD_COPY.setter,
-            figure: <span className="block max-w-28 truncate">{setter.name}</span>,
+            figure: <span className="block max-w-48 truncate">{setter.name}</span>,
           },
         ]
       : []),

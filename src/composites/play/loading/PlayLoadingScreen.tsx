@@ -138,13 +138,9 @@ export const PlayLoadingScreen = ({
         </div>
 
         <div className={PLAY_LOADING_STYLES.footer}>
-          <Image
-            src={APP_ASSETS.brain}
-            alt=""
-            width={40}
-            height={40}
-            className={PLAY_LOADING_STYLES.memora}
-          />
+          <p className={PLAY_LOADING_STYLES.tip} role="status" key={tipAt % tips.length}>
+            {tips[tipAt % tips.length]}
+          </p>
           <div className={PLAY_LOADING_STYLES.meter}>
             <div
               role="progressbar"
@@ -158,9 +154,6 @@ export const PlayLoadingScreen = ({
             </div>
             <span className={PLAY_LOADING_STYLES.percent}>{progress}%</span>
           </div>
-          <p className={PLAY_LOADING_STYLES.tip} role="status" key={tipAt % tips.length}>
-            {tips[tipAt % tips.length]}
-          </p>
         </div>
       </div>
     </div>

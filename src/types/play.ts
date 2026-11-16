@@ -239,6 +239,8 @@ export interface PlayCandidate {
 export interface PlayInviteCandidate extends PlayCandidate {
   // Shared a finished game with the caller
   hasPlayedWith: boolean
+  // Ms of the latest game shared with the caller, 0 for none
+  playedAt: number
   // Sat at a table lately
   isRecent: boolean
 }

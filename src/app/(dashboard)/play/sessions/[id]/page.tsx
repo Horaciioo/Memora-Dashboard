@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
+import { GROUND_LAYERS } from '@/composites/play/hub/groundLayers'
 import { PlayLobbyFeed } from '@/composites/play/hub/lobby/PlayLobbyFeed'
 import { PlayLobby } from '@/composites/play/hub/lobby/PlayLobby'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
@@ -16,7 +17,13 @@ import { inviteCandidates, listMessages, listSpectators, readSession } from '@/c
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { nullIfMissing } from '@/core/lib/errors'
 import { ROUTES } from '@/declarations/navigation'
-import { PLAY_GAMES, PLAY_HUB_COPY, hudSkinOf, playKeysOf } from '@/declarations/play'
+import {
+  PLAY_GAMES,
+  PLAY_HUB_COPY,
+  hudSkinOf,
+  lobbySkinOf,
+  playKeysOf,
+} from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION, PLAY_HUB, PLAY_ROOM } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
@@ -169,8 +176,16 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
     )
   }
 
+  const lobbySkin = lobbySkinOf(game.game)
+  const GroundLayer = lobbySkin && meta.ground ? GROUND_LAYERS[meta.ground] : undefined
+
   return (
-    <div className={meta.ground ?? undefined} style={playKeysOf(game.game)}>
+    <div
+      className={cn(meta.ground, lobbySkin && 'play-skinned')}
+      style={playKeysOf(game.game)}
+      data-hud={lobbySkin ? game.game.toLowerCase() : undefined}
+    >
+      {GroundLayer && <GroundLayer />}
       <PlaySignal topic={PLAY_TOPICS.session(id)} />
 
       <div className={BAC_SESSION.page}>
@@ -186,6 +201,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
 
           <div className={PLAY_ROOM.center}>
             <PlayLobby
+              skin={lobbySkin}
               id={game.id}
               gameSlug={meta.slug}
               status={game.status}
@@ -210,6 +226,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
 
         <PlayChatBubble
           chat={{ ...chat, feed: lobbyFeed, initialTab: 'feed' }}
+          skin={lobbySkin}
           above={
             <AppLink href={ROUTES.playGame(meta.slug)} className={PLAY_ROOM.back}>
               <BackIcon className={PLAY_HUB.backIcon} aria-hidden="true" />

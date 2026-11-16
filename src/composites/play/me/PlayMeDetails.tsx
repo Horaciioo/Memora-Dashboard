@@ -11,7 +11,7 @@ import {
   PLAY_SETTINGS,
 } from '@/declarations/play'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
-import { PLAY_FOLD, PLAY_ME, PLAY_PROFILE } from '@/declarations/ui/variants'
+import { PLAY_ME, PLAY_PROFILE } from '@/declarations/ui/variants'
 import type { PlayProfileView } from '@/types/play'
 import { cn } from '@/utils/classnames'
 
@@ -30,7 +30,7 @@ export const PlayMeDetails = ({ profile }: { profile: PlayProfileView }) => {
     .map(({ game, played }) => ({ game, played }))
 
   return (
-    <div className={cn(PLAY_FOLD.body, PLAY_ME.body)}>
+    <div className={PLAY_ME.body}>
       <PlayMeFigures totals={profile.global} />
       <div className={PLAY_ME.pair}>
         <PlayMeRecord totals={profile.global} />

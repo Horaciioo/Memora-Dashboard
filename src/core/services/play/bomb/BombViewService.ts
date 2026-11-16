@@ -38,6 +38,7 @@ export const bombBoards = async (session: EngineSession) => {
     isCountdown: table ? now < table.startsAt : false,
     isOver: isTableOver(alive.length, seats.length),
     startsAt: table?.startsAt ?? now,
+    turnAt: table?.turnAt ?? null,
     prompt: table?.prompt ?? '',
     turnId: table?.turnId ?? null,
     draft: table?.draft ?? '',

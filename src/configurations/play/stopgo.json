@@ -64,7 +64,8 @@
   "fx": {
     "flightMs": 650,
     "markMs": 900,
-    "drawMs": 450
+    "drawMs": 450,
+    "revealMs": 1000
   },
   "colors": ["red", "blue", "green", "yellow"],
   "feedSize": 40

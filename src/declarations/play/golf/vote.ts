@@ -92,6 +92,7 @@ export const GOLF_VOTE_COPY = {
   back: 'Retour',
   you: 'Toi',
   timer: 'Temps restant',
+  progress: 'Étape {n} sur {total}',
   deckTitle: 'Tirage du tournoi',
   deckLead: 'Les parcours du tournoi, dans l’ordre de jeu.',
   deckSlot: 'Parcours {n}',

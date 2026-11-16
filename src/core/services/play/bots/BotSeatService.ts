@@ -9,8 +9,8 @@ import { pickSeatColor } from '@/core/lib/play'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { signalPlay } from '@/core/lib/play/signal'
-import { botLevelsOf, PLAY_BOT_AVATARS, PLAY_BOT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
-import { areBotsAwake } from '@/declarations/play/bots'
+import { botLevelsOf, PLAY_BOT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
+import { areBotsAwake, botAvatarOf } from '@/declarations/play/bots'
 import { announceInChat } from '@/core/services/play/PlayChatService'
 import { lockSession, requireHost } from '@/core/services/play/PlaySessionService'
 import { PlayMessageKinds, PlayStatuses } from '@/utils/constants/play'
@@ -32,7 +32,7 @@ const findOrCreateBot = async (
   const discordId = `play-bot:${level}:${index}`
   const face = {
     displayName: PLAY_BOT_SETTINGS.callsigns[index],
-    avatarUrl: PLAY_BOT_AVATARS[level],
+    avatarUrl: botAvatarOf(index),
   }
   const bot = await tx.account.upsert({
     where: { discordId },

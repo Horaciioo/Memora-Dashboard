@@ -43,7 +43,7 @@ export const EchoHud = ({
       key: 'clock',
       caption: ECHO_HUD_COPY.clock,
       figure: (
-        <span className="block w-32">
+        <span className="block w-32 max-w-full">
           {isReveal ? (
             <span className={ECHO_BOARD.clockTrack} />
           ) : (

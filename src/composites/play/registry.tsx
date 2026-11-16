@@ -7,6 +7,8 @@ import { BacRulesDrawer } from '@/composites/play/baccalaureat/BacRulesDrawer'
 import { BacSetupDrawer } from '@/composites/play/baccalaureat/BacSetupDrawer'
 import { BombRulesDrawer } from '@/composites/play/bomb/BombRulesDrawer'
 import { BombSetupDrawer } from '@/composites/play/bomb/BombSetupDrawer'
+import { ConcordatRulesDrawer } from '@/composites/play/concordat/ConcordatRulesDrawer'
+import { ConcordatSetupDrawer } from '@/composites/play/concordat/ConcordatSetupDrawer'
 import { CroquisRulesDrawer } from '@/composites/play/croquis/CroquisRulesDrawer'
 import { CroquisSetupDrawer } from '@/composites/play/croquis/CroquisSetupDrawer'
 import { EchoRulesDrawer } from '@/composites/play/echo/EchoRulesDrawer'
@@ -31,6 +33,7 @@ import { navalVoteFace } from '@/composites/play/naval/world/navalVoteFace'
 import { declaredVote } from '@/composites/play/vote/PlayStartVote'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
+import { concordatSettingsOf } from '@/core/lib/play/concordat/settings'
 import { croquisSettingsOf } from '@/core/lib/play/croquis/settings'
 import { echoSettingsOf } from '@/core/lib/play/echo/settings'
 import { stopGoSettingsOf } from '@/core/lib/play/stopgo/settings'
@@ -111,6 +114,7 @@ export const PLAY_SETUP_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   [PlayGames.Croquis]: CroquisSetupDrawer,
   [PlayGames.Suspens]: SuspensSetupDrawer,
   [PlayGames.StopGo]: StopGoSetupDrawer,
+  [PlayGames.Concordat]: ConcordatSetupDrawer,
 }
 
 /**
@@ -129,6 +133,7 @@ export const PLAY_START_VOTES: Partial<Record<PlayGameName, ComponentType<PlayVo
   [PlayGames.Croquis]: declaredVote(PlayGames.Croquis),
   [PlayGames.Suspens]: declaredVote(PlayGames.Suspens),
   [PlayGames.StopGo]: declaredVote(PlayGames.StopGo),
+  [PlayGames.Concordat]: declaredVote(PlayGames.Concordat),
   [PlayGames.Jumble]: declaredVote(PlayGames.Jumble),
 }
 
@@ -149,6 +154,9 @@ export const PLAY_RULES_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   ),
   [PlayGames.Ludo]: ({ open, onClose, settings }) => (
     <LudoRulesDrawer open={open} onClose={onClose} settings={ludoSettingsOf(settings)} />
+  ),
+  [PlayGames.Concordat]: ({ open, onClose, settings }) => (
+    <ConcordatRulesDrawer open={open} onClose={onClose} settings={concordatSettingsOf(settings)} />
   ),
   [PlayGames.StopGo]: ({ open, onClose, settings }) => (
     <StopGoRulesDrawer open={open} onClose={onClose} settings={stopGoSettingsOf(settings)} />

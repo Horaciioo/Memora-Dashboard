@@ -39,6 +39,8 @@ export interface BaccalaureatGameSettings {
   // Stop called for the first player done
   autoStop: boolean
   flash: boolean
+  // Host choices set aside while flash mode runs
+  kept?: { categories: BaccalaureatCategory[]; roundSeconds: number }
   // Points of a word written twice
   sharedRule: BaccalaureatSharingKey
 }
@@ -192,23 +194,29 @@ export const readBaccalaureatSettings = (
 
   // Flash mode, short and light
   const flash = typeof raw.flash === 'boolean' ? raw.flash : current.flash
+  // Flash sets the host's choices aside, a normal game gets them back
+  const source = !flash && current.flash && current.kept ? current.kept : current
+  const kept = flash
+    ? (current.kept ?? { categories: current.categories, roundSeconds: current.roundSeconds })
+    : undefined
   const askedSeconds =
     raw.flash === true
       ? BACCALAUREAT_SETTINGS.flash.roundSeconds
       : readBodyInteger(raw, 'roundSeconds')
 
   const settings: BaccalaureatGameSettings = {
-    categories: readCategories(withPack(raw, raw.flash === true), current.categories),
+    categories: readCategories(withPack(raw, raw.flash === true), source.categories),
     letters,
     rounds,
     roundSeconds: clampToRange(
       askedSeconds,
-      current.roundSeconds,
+      source.roundSeconds,
       BACCALAUREAT_SETTINGS.roundSeconds
     ),
     stop: typeof raw.stop === 'boolean' ? raw.stop : current.stop,
     autoStop: typeof raw.autoStop === 'boolean' ? raw.autoStop : current.autoStop,
     flash,
+    ...(kept && { kept }),
     sharedRule: isSharingKey(raw.sharedRule) ? raw.sharedRule : current.sharedRule,
   }
 

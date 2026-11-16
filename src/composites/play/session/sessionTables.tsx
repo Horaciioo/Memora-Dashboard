@@ -2,6 +2,9 @@ import type { ReactNode } from 'react'
 
 import { BaccalaureatBoard } from '@/composites/play/baccalaureat/BaccalaureatBoard'
 import type { BacBoardView } from '@/composites/play/baccalaureat/types'
+import { ConcordatBoard } from '@/composites/play/concordat/board/ConcordatBoard'
+import { ConcordatFeed } from '@/composites/play/concordat/feed/ConcordatFeed'
+import type { ConcordatBoard as ConcordatBoardView } from '@/core/lib/play/concordat'
 import { CroquisBoard } from '@/composites/play/croquis/CroquisBoard'
 import type { CroquisBoardView } from '@/composites/play/croquis/types'
 import { EchoBoard } from '@/composites/play/echo/EchoBoard'
@@ -177,6 +180,23 @@ export const PLAY_SESSION_TABLES: Partial<
       ),
     }
   },
+  [PlayGames.Concordat]: ({ sessionId, board, seats, spectators, me }) => ({
+    board: (
+      <ConcordatBoard
+        sessionId={sessionId}
+        board={board as ConcordatBoardView | null}
+        faces={seats}
+        isSeated={me.isSeated}
+      />
+    ),
+    feed: (
+      <ConcordatFeed
+        sessionId={sessionId}
+        board={board as ConcordatBoardView | null}
+        players={[...seats, ...spectators]}
+      />
+    ),
+  }),
   [PlayGames.StopGo]: ({ sessionId, board, seats, spectators, viewerId, me }) => ({
     board: (
       <StopGoBoard

@@ -13,6 +13,13 @@ import type { LudoExitRule } from '@/declarations/play/ludo/settings'
 import { NAVAL_MODE_COPY } from '@/declarations/play/naval/copy'
 import { NAVAL_MAPS, NAVAL_RANDOM_MAP, navalMapSize } from '@/declarations/play/naval/maps'
 import { countStep, voteCountsOf } from '@/declarations/play/voteCounts'
+import { CONCORDAT_SETTINGS } from '@/declarations/play/concordat/settings'
+import {
+  CONCORDAT_SPEED_HINTS,
+  CONCORDAT_SPEED_LABELS,
+  CONCORDAT_STYLE_HINTS,
+  CONCORDAT_STYLE_LABELS,
+} from '@/declarations/play/concordat/copy'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { CROQUIS_SETTINGS } from '@/declarations/play/croquis/settings'
 import type { IconName } from '@/declarations/ui/icons'
@@ -330,6 +337,30 @@ export const PLAY_VOTE_STEPS: Partial<Record<PlayGameName, PlayVoteStepSpec[]>> 
       }
     ),
   ],
+  [PlayGames.Concordat]: [
+    {
+      key: 'style',
+      title: 'Carte',
+      lead: 'Quelle forme pour la carte ?',
+      initial: CONCORDAT_SETTINGS.initialStyle,
+      choices: CONCORDAT_SETTINGS.styles.map((style) => ({
+        key: style,
+        label: CONCORDAT_STYLE_LABELS[style],
+        hint: CONCORDAT_STYLE_HINTS[style],
+      })),
+    },
+    {
+      key: 'speed',
+      title: 'Vitesse',
+      lead: 'À quelle vitesse tourne la partie ?',
+      initial: CONCORDAT_SETTINGS.initialSpeed,
+      choices: CONCORDAT_SETTINGS.speeds.map((speed) => ({
+        key: speed,
+        label: CONCORDAT_SPEED_LABELS[speed],
+        hint: CONCORDAT_SPEED_HINTS[speed],
+      })),
+    },
+  ],
   [PlayGames.Croquis]: [
     countStep('laps', voteCountsOf('croquis', 'laps', [1, 2, 3]), CROQUIS_SETTINGS.laps.initial, {
       title: 'Tours de table',
@@ -407,6 +438,7 @@ export const PLAY_VOTE_SETTINGS: Partial<
     differences: Number(chosen.differences),
   }),
   [PlayGames.Croquis]: (chosen) => ({ laps: Number(chosen.laps) }),
+  [PlayGames.Concordat]: (chosen) => ({ style: chosen.style, speed: chosen.speed }),
   [PlayGames.StopGo]: (chosen) => ({
     target: Number(chosen.target),
     turnSeconds: Number(chosen.turnSeconds),

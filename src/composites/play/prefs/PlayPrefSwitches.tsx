@@ -4,7 +4,6 @@ import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { usePlayPrefsStore } from '@/core/store/play/playPrefs'
 import { PLAY_PREFS, PLAY_PREFS_COPY, playPrefId, playPrefInitial } from '@/declarations/play/prefs'
 import { PLAY_HUD, PLAY_ONLINE } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
 import type { PlayGameName } from '@/utils/constants/play'
 
 export interface PlayPrefSwitchesProps {
@@ -51,7 +50,7 @@ export const PlayPrefSwitches = ({
 
   return rows.map((row) =>
     isHud ? (
-      <div key={row.key} className={cn(PLAY_HUD.setting, 'justify-between')} title={row.hint}>
+      <div key={row.key} className={PLAY_HUD.setting} title={row.hint}>
         <span>{row.label}</span>
         <Toggle bare checked={row.checked} onChange={row.onChange} label={row.label} />
       </div>
