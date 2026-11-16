@@ -4609,9 +4609,6 @@ model StopGoPlayer {
   shields        String[]  @default([])
   // Last malus suffered, the same one cannot come twice in a row
   lastHazard     String?
-  // Unused since safeties replaced the jokers
-  immunityUsedAt DateTime?
-  cleanupUsedAt  DateTime?
   // Turns missed in a row
   strikes        Int       @default(0)
   finishedAt     DateTime?
