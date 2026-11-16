@@ -12,6 +12,8 @@ export const STOPGO_TRACK = {
   // Straight run before and after a bend
   lead: 100,
   run: 100,
+  // Length added to each long straight of a map
+  stretch: 500,
   // Grass kept beside the outer kerb
   pad: 200,
   // Grass above the finish and below the start
@@ -24,9 +26,76 @@ export const STOPGO_TRACK = {
   signClear: 34,
   // Car move over a gap of km
   move: { perKm: 24, minMs: 1500, maxMs: 5500 },
+  // Screen pixels per board unit at most, the track never grows past it
+  zoom: 0.7,
   // Camera glide, key steps and page share
-  camera: { glideMs: 3000, step: 120, pageShare: 0.8, focusShare: 0.5, phoneFocusShare: 0.34 },
+  camera: { glideMs: 3000, step: 120, pageShare: 0.8, focusShare: 0.5, phoneFocusShare: 0.5 },
 } as const
+
+/**
+ * Road features, an esse crosses the road, a kink goes out and back, a snake is two tight esses
+ * @type {readonly string[]}
+ */
+
+export const STOPGO_FEATURES = ['esse', 'kink', 'snake'] as const
+
+export type StopGoFeature = (typeof STOPGO_FEATURES)[number]
+
+/**
+ * Circuit per race distance, the longer the race the fuller the circuit
+ * @type {Record<number, { maps: StopGoFeature[][], landmarks: number, scatter: number }>}
+ */
+
+export const STOPGO_CIRCUITS: Record<
+  number,
+  { maps: StopGoFeature[][]; landmarks: number; scatter: number }
+> = {
+  500: { maps: [['esse'], ['esse']], landmarks: 1, scatter: 22 },
+  1000: {
+    maps: [['esse'], ['kink', 'esse'], ['esse'], ['esse', 'kink']],
+    landmarks: 2,
+    scatter: 30,
+  },
+  1500: {
+    maps: [
+      ['kink', 'esse'],
+      ['snake'],
+      ['esse', 'esse'],
+      ['kink', 'kink'],
+      ['esse', 'kink'],
+      ['snake', 'esse'],
+    ],
+    landmarks: 3,
+    scatter: 38,
+  },
+  2000: {
+    maps: [
+      ['kink', 'esse'],
+      ['snake', 'esse'],
+      ['esse', 'kink'],
+      ['snake', 'snake'],
+      ['kink', 'kink'],
+      ['esse', 'snake'],
+      ['kink', 'esse', 'esse'],
+      ['snake', 'kink'],
+    ],
+    landmarks: 4,
+    scatter: 46,
+  },
+}
+
+/**
+ * Circuit of a distance, the nearest one below when none is written for it
+ * @param {number} target - Distance to reach
+ * @return {{ maps: StopGoFeature[][], landmarks: number, scatter: number }} - Circuit
+ */
+
+export const circuitOf = (target: number) => {
+  const keys = Object.keys(STOPGO_CIRCUITS).map(Number).sort((a, b) => a - b)
+  const key = [...keys].reverse().find((km) => km <= target) ?? keys[0]
+
+  return STOPGO_CIRCUITS[key]
+}
 
 /**
  * Scenery kinds
@@ -53,9 +122,6 @@ export const STOPGO_DECOR = {
     { kind: 'pit', radius: 96 },
     { kind: 'lake', radius: 110 },
   ],
-  // Pieces and landmarks per map
-  scatterPerMap: 30,
-  landmarksPerMap: 2,
   // Tries before a piece is dropped
   tries: 6,
   // Space left between two pieces
@@ -63,8 +129,6 @@ export const STOPGO_DECOR = {
 } as const satisfies {
   scatter: readonly { kind: StopGoDecorKind; weight: number; radius: readonly [number, number] }[]
   landmarks: readonly { kind: StopGoDecorKind; radius: number }[]
-  scatterPerMap: number
-  landmarksPerMap: number
   tries: number
   gap: number
 }

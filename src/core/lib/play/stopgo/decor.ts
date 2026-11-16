@@ -1,7 +1,7 @@
 import { seededRng } from '@/core/lib/play/seeded'
 import type { SeededRng } from '@/core/lib/play/seeded'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
-import { STOPGO_DECOR, STOPGO_MEADOW, STOPGO_TRACK } from '@/declarations/play/stopgo/track'
+import { STOPGO_DECOR, STOPGO_MEADOW, STOPGO_TRACK, circuitOf } from '@/declarations/play/stopgo/track'
 import type { StopGoDecorKind } from '@/declarations/play/stopgo/track'
 
 import { edgeAt, pointAt, signsOf } from '@/core/lib/play/stopgo/track'
@@ -100,11 +100,13 @@ export const decorOf = (plan: StopGoTrackPlan, seed: string, mapIndex: number) =
     }
   }
 
-  for (let count = 0; count < STOPGO_DECOR.landmarksPerMap; count++) {
+  const circuit = circuitOf(plan.target)
+
+  for (let count = 0; count < circuit.landmarks; count++) {
     const landmark = STOPGO_DECOR.landmarks[Math.floor(rng() * STOPGO_DECOR.landmarks.length)]
     place(landmark.kind, landmark.radius)
   }
-  for (let count = 0; count < STOPGO_DECOR.scatterPerMap; count++) {
+  for (let count = 0; count < circuit.scatter; count++) {
     const { kind, radius } = pickScatter(rng)
     place(kind, radius[0] + rng() * (radius[1] - radius[0]))
   }

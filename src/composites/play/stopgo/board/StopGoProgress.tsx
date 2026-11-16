@@ -69,7 +69,7 @@ export const StopGoProgress = ({
     <div
       role="img"
       aria-label={STOPGO_BOARD_COPY.progress}
-      className="absolute inset-y-6 right-2 z-10 w-3 cursor-pointer touch-none rounded-full bg-black/25 before:absolute before:-inset-x-3 before:inset-y-0 before:content-[''] max-md:top-28 max-md:bottom-[19rem]"
+      className="absolute inset-y-6 right-0 z-10 w-3 cursor-pointer touch-none rounded-full bg-black/25 before:absolute before:-inset-x-3 before:inset-y-0 before:content-[''] max-md:top-24 max-md:bottom-[calc(var(--stopgo-dock-h,10rem)+6.5rem)]"
       onPointerDown={goTo}
     >
       <div

@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import { StopGoCard } from '@/composites/play/stopgo/cards/StopGoCard'
+import { StopGoDrawn } from '@/composites/play/stopgo/cards/StopGoDrawn'
 import { reasonOf } from '@/composites/play/stopgo/cards/reasons'
 import type { StopGoHandCardView } from '@/composites/play/stopgo/cards/types'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
-import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { STOPGO_HAND } from '@/declarations/ui/variants/games/play/stopgo'
 import { cn } from '@/utils/classnames'
 
@@ -21,6 +21,8 @@ export interface StopGoHandProps {
   target: number
   chosenId: string | null
   isTurn: boolean
+  // First turn: the hand is dealt card by card from the pile
+  isOpening: boolean
   onChoose: (id: string | null) => void
   onQuickPlay: (id: string) => void
 }
@@ -42,20 +44,20 @@ export const StopGoHand = ({
   target,
   chosenId,
   isTurn,
+  isOpening,
   onChoose,
   onQuickPlay,
 }: StopGoHandProps) => {
   const isMobile = useIsMobileShell()
   // Cards held at the last render, the others slide in from the pile
   const ids = cards.map((card) => card.id)
-  const [held, setHeld] = useState<ReadonlySet<string>>(() => new Set(ids))
-  const key = ids.join()
+  const [held, setHeld] = useState<ReadonlySet<string>>(() => new Set(isOpening ? [] : ids))
+  const [landed, setLanded] = useState<ReadonlySet<string>>(() => new Set(isOpening ? [] : ids))
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => setHeld(new Set(key ? key.split(',') : [])), 700)
-
-    return () => window.clearTimeout(timer)
-  }, [key])
+  const land = (id: string) => {
+    setLanded((old) => new Set(old).add(id))
+    setHeld((old) => new Set(old).add(id))
+  }
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -78,13 +80,20 @@ export const StopGoHand = ({
         return (
           <div
             key={card.id}
-            className={cn(STOPGO_HAND.slot, !held.has(card.id) && STOPGO_HAND.slotDrawn)}
-            style={
-              held.has(card.id)
-                ? undefined
-                : ({ '--stopgo-draw-ms': `${STOPGO_SETTINGS.drawMs}ms` } as CSSProperties)
-            }
+            className={cn(STOPGO_HAND.slot, !landed.has(card.id) && STOPGO_HAND.slotDrawn)}
+            style={{ '--stopgo-i': index } as CSSProperties}
+            data-stopgo-slot={card.id}
           >
+            {!held.has(card.id) && (
+              <StopGoDrawn
+                cardKey={card.key}
+                slotId={card.id}
+                delayMs={
+                  cards.filter((other, at) => at < index && !held.has(other.id)).length * 1400
+                }
+                onDone={() => land(card.id)}
+              />
+            )}
             <StopGoCard
               cardKey={card.key}
               index={index}

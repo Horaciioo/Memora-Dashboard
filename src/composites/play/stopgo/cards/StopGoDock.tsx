@@ -2,23 +2,28 @@
 
 import { useState } from 'react'
 
-import { StopGoCarState } from '@/composites/play/stopgo/cards/StopGoCarState'
+import { StopGoDeck } from '@/composites/play/stopgo/cards/StopGoDeck'
 import { StopGoHand } from '@/composites/play/stopgo/cards/StopGoHand'
 import { StopGoCounter } from '@/composites/play/stopgo/cards/StopGoCounter'
+import { useFoldSlide } from '@/composites/play/stopgo/cards/useFoldSlide'
 import { StopGoPick } from '@/composites/play/stopgo/cards/StopGoPick'
 import { StopGoRivalRow } from '@/composites/play/stopgo/cards/StopGoRivalRow'
 import { StopGoPiles } from '@/composites/play/stopgo/cards/StopGoPiles'
 import { StopGoTray } from '@/composites/play/stopgo/cards/StopGoTray'
 import { reasonOf } from '@/composites/play/stopgo/cards/reasons'
+import { useDockHeight } from '@/composites/play/stopgo/cards/useDockHeight'
 import type { StopGoOpponent } from '@/composites/play/stopgo/cards/types'
+import { playStopGoSound } from '@/composites/play/stopgo/sound'
 import { useStopGoPlay } from '@/composites/play/stopgo/cards/useStopGoPlay'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { STOPGO_HAND_COPY } from '@/declarations/play/stopgo/copy'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
+import { ICONS } from '@/declarations/ui/icons'
 import { STOPGO_HAND } from '@/declarations/ui/variants/games/play/stopgo'
 import { StopGoPhases } from '@/utils/constants/play'
+import { cn } from '@/utils/classnames'
 import { SECOND_MS } from '@/utils/constants/time'
 
 export interface StopGoDockProps {
@@ -29,6 +34,12 @@ export interface StopGoDockProps {
   avatars: Record<string, string | null>
   colors: StopGoOpponent['color'][]
 }
+
+// Gap between two card sounds while the hand folds or unfolds
+const FLIP_STEP_MS = 70
+
+// Keys do nothing while the hand is folded
+const noop = () => undefined
 
 // Share of a clock left, between 0 and 1
 const shareLeft = (endsAt: Date | string | null, now: number, seconds: number): number =>
@@ -49,14 +60,21 @@ export const StopGoDock = ({
   colors,
 }: StopGoDockProps) => {
   const moves = useStopGoPlay(sessionId, board)
+  const dockRef = useDockHeight()
   const now = useServerNow(board.serverTime)
   const [chosenId, setChosenId] = useState<string | null>(null)
+  // Turn whose drawn card was taken from the deck
+  const [drawnTurn, setDrawnTurn] = useState<number | null>(null)
+  const [isFolded, setIsFolded] = useState(false)
   const { you, players } = board
   const me = players.find(({ accountId }) => accountId === viewerId)
 
   const isLive = board.phase === StopGoPhases.Playing
   const isTurn = isLive && board.turnId === viewerId && !board.window && !board.pickerId
-  const cards = (you?.hand ?? []).filter((card) => !card.isPicking)
+  const held = (you?.hand ?? []).filter((card) => !card.isPicking)
+  // The card dealt at the start of the turn waits on the deck until it is taken
+  const isWaiting = isTurn && held.length > STOPGO_SETTINGS.handSize && drawnTurn !== board.turnNo
+  const cards = isWaiting ? held.slice(0, -1) : held
   const chosen = cards.find((card) => card.id === chosenId)
   const rivals: StopGoOpponent[] = players
     .map((player, lane) => ({
@@ -81,76 +99,102 @@ export const StopGoDock = ({
     if (isTurn && aims && aims.length === 0) void play(id)
   }
 
+  // One card sound per card, in the order the hand moves
+  const toggleFold = () => {
+    setChosenId(null)
+    const next = !isFolded
+    setIsFolded(next)
+    cards.forEach((_, index) => {
+      globalThis.setTimeout(
+        () => playStopGoSound(next ? 'card' : 'draw', 0.55),
+        index * FLIP_STEP_MS
+      )
+    })
+  }
+
+  // A drag down folds, a drag up unfolds, a plain tap flips it
+  const slide = useFoldSlide(isFolded, toggleFold)
+
   if (!you || !me) return null
+  const FoldIcon = ICONS.expand
   const aims = chosen ? you.playable[chosen.id] : undefined
   const window = board.window
   const picking = (you.hand ?? []).filter((card) => card.isPicking)
 
   return (
     <>
-      <div className={STOPGO_HAND.rivals}>
-        {players
-          .filter(({ accountId }) => accountId !== viewerId)
-          .map((player) => (
-            <StopGoCarState
-              key={player.accountId}
-              player={player}
-              name={names[player.accountId] ?? ''}
-            />
-          ))}
-      </div>
-      <div className={STOPGO_HAND.dock}>
-        <StopGoRivalRow players={players} rivals={rivals} avatars={avatars} />
-        <StopGoCarState player={me} name={names[viewerId] ?? ''} isMe />
-        <div className={STOPGO_HAND.mid}>
-          {chosen && (
-            <StopGoTray
-              key={chosen.id}
-              card={chosen}
-              aims={isTurn ? (aims ?? undefined) : undefined}
-              reason={
-                isTurn
-                  ? reasonOf(chosen.key, me, board.target)
-                  : fillPlayMessage(STOPGO_HAND_COPY.waitTurn, {
-                      name: names[board.turnId ?? ''] ?? '',
-                    })
-              }
-              opponents={rivals}
-              isTurn={isTurn}
-              isSaving={moves.isSaving}
-              onPlay={(targets) => void play(chosen.id, targets)}
-              onDiscard={() => void discard(chosen.id)}
-              onCancel={() => setChosenId(null)}
-            />
-          )}
-          {you.canReveal && isTurn && (
-            <button
-              type="button"
-              className={STOPGO_HAND.sealed}
-              disabled={moves.isSaving}
-              onClick={moves.reveal}
-            >
-              {fillPlayMessage(STOPGO_HAND_COPY.reveal, { cost: STOPGO_SETTINGS.mysteryCost })}
-              <small>
-                {fillPlayMessage(STOPGO_HAND_COPY.revealAfter, {
-                  km: Math.max(0, me.km - STOPGO_SETTINGS.mysteryCost),
-                })}
-              </small>
-            </button>
-          )}
-          <StopGoHand
-            cards={cards}
-            playable={you.playable}
-            me={me}
-            target={board.target}
-            chosenId={chosenId}
-            isTurn={isTurn}
-            onChoose={setChosenId}
-            onQuickPlay={quickPlay}
-          />
+      <StopGoDeck
+        pileCount={board.pileCount}
+        isWaiting={isWaiting}
+        onDraw={() => setDrawnTurn(board.turnNo)}
+      />
+      <div ref={dockRef} className={cn(STOPGO_HAND.dock, isFolded && STOPGO_HAND.dockFolded)}>
+        <StopGoRivalRow rivals={rivals} avatars={avatars} />
+        <div className={STOPGO_HAND.handBox}>
+          <button
+            type="button"
+            className={cn(STOPGO_HAND.fold, isFolded && STOPGO_HAND.foldShut)}
+            aria-expanded={!isFolded}
+            onPointerDown={slide.down}
+            onPointerUp={slide.up}
+            onPointerCancel={slide.cancel}
+            onClick={slide.click}
+          >
+            <FoldIcon className="size-4" aria-hidden="true" />
+            {isFolded ? STOPGO_HAND_COPY.unfold : STOPGO_HAND_COPY.fold}
+          </button>
+          <div className={STOPGO_HAND.mid} data-folded={isFolded || undefined} inert={isFolded}>
+            <div className={STOPGO_HAND.midInner}>
+              {chosen && (
+                <StopGoTray
+                  key={chosen.id}
+                  card={chosen}
+                  aims={isTurn ? (aims ?? undefined) : undefined}
+                  reason={
+                    isTurn
+                      ? reasonOf(chosen.key, me, board.target)
+                      : fillPlayMessage(STOPGO_HAND_COPY.waitTurn, {
+                          name: names[board.turnId ?? ''] ?? '',
+                        })
+                  }
+                  opponents={rivals}
+                  isTurn={isTurn}
+                  isSaving={moves.isSaving}
+                  onPlay={(targets) => void play(chosen.id, targets)}
+                  onDiscard={() => void discard(chosen.id)}
+                  onCancel={() => setChosenId(null)}
+                />
+              )}
+              {you.canReveal && isTurn && (
+                <button
+                  type="button"
+                  className={STOPGO_HAND.sealed}
+                  disabled={moves.isSaving}
+                  onClick={moves.reveal}
+                >
+                  {fillPlayMessage(STOPGO_HAND_COPY.reveal, { cost: STOPGO_SETTINGS.mysteryCost })}
+                  <small>
+                    {fillPlayMessage(STOPGO_HAND_COPY.revealAfter, {
+                      km: Math.max(0, me.km - STOPGO_SETTINGS.mysteryCost),
+                    })}
+                  </small>
+                </button>
+              )}
+              <StopGoHand
+                cards={cards}
+                playable={you.playable}
+                me={me}
+                target={board.target}
+                chosenId={chosenId}
+                isTurn={isTurn}
+                isOpening={board.turnNo === 1}
+                onChoose={isFolded ? noop : setChosenId}
+                onQuickPlay={isFolded ? noop : quickPlay}
+              />
+            </div>
+          </div>
         </div>
         <StopGoPiles
-          pileCount={board.pileCount}
           discardTop={board.discardTop}
           isDropTarget={isTurn && !!chosen}
           onDiscardDrop={() => chosen && void discard(chosen.id)}

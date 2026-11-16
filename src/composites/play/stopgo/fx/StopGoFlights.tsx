@@ -44,7 +44,7 @@ const originOf = ({ kind, fromId }: StopGoFlight, viewerId: string) => {
   if (kind === 'toDiscard') return centreOf(STOPGO_FX_ANCHORS.car(fromId))
   if (fromId === viewerId) return centreOf(STOPGO_FX_ANCHORS.hand)
 
-  return centreOf(STOPGO_FX_ANCHORS.panel(fromId)) ?? centreOf(STOPGO_FX_ANCHORS.car(fromId))
+  return centreOf(STOPGO_FX_ANCHORS.car(fromId))
 }
 
 /**

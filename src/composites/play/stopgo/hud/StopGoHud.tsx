@@ -18,7 +18,7 @@ export interface StopGoHudProps {
 }
 
 /**
- * Race HUD: whose turn, the distance, the turn clock, the pile, and the ranking by kilometres
+ * Race HUD: whose turn, the distance, the turn clock, and the ranking by kilometres behind a trophy key
  * @param {StopGoHudProps} props - Race
  * @return {JSX.Element}
  */
@@ -39,7 +39,6 @@ export const StopGoHud = ({ sessionId, board, faces, viewerId, isSeated }: StopG
     },
     { key: 'turn', caption: STOPGO_HUD_COPY.turn, figure: holder?.name ?? '' },
     { key: 'time', caption: STOPGO_HUD_COPY.time, figure: seconds },
-    { key: 'pile', caption: STOPGO_HUD_COPY.pile, figure: board.pileCount },
   ]
 
   const rows = board.players
@@ -69,6 +68,8 @@ export const StopGoHud = ({ sessionId, board, faces, viewerId, isSeated }: StopG
       isSeated={isSeated}
       blocks={blocks}
       rows={rows}
+      hasStrip={false}
+      isWide
     />
   )
 }

@@ -1,4 +1,3 @@
-import { StopGoCardGlyph } from '@/composites/play/stopgo/art/StopGoCardGlyph'
 import { StopGoCarShape } from '@/composites/play/stopgo/art/StopGoCarShape'
 import { useAnimatedKm } from '@/composites/play/stopgo/board/useAnimatedKm'
 import type { StopGoMark } from '@/composites/play/stopgo/fx/useStopGoFx'
@@ -6,7 +5,6 @@ import { useStopGoAimStore } from '@/core/store/play/stopgoAim'
 import { pointAt } from '@/core/lib/play/stopgo'
 import type { StopGoTrackPlan } from '@/core/lib/play/stopgo'
 import type { StopGoCarColor } from '@/declarations/play/stopgo/art'
-import type { StopGoHazard } from '@/declarations/play/stopgo/cards'
 import { STOPGO_BOARD_COPY } from '@/declarations/play/stopgo/track'
 import { initialsOf } from '@/utils/format/initials'
 
@@ -19,7 +17,6 @@ export interface StopGoCarProps {
   name: string
   avatarUrl: string | null
   hasLeft: boolean
-  hazards: StopGoHazard[]
   // Moment the car is living
   mark?: StopGoMark
 }
@@ -28,10 +25,6 @@ export interface StopGoCarProps {
 const SCALE = 1.6
 const PORTRAIT = 13
 const RING = 34
-// Malus badges sit beside the car, clear of the portrait
-const BADGE = 26
-const BADGE_X = 24
-const BADGE_Y = -48
 
 /**
  * Car on its road, glides along the track and wears the portrait of its driver
@@ -48,7 +41,6 @@ export const StopGoCar = ({
   name,
   avatarUrl,
   hasLeft,
-  hazards,
   mark,
 }: StopGoCarProps) => {
   const { x, y, heading } = pointAt(plan, useAnimatedKm(km), lane)
@@ -103,21 +95,6 @@ export const StopGoCar = ({
           </text>
         </>
       )}
-      {hazards.map((hazard, index) => (
-        <foreignObject
-          key={hazard}
-          x={BADGE_X + index * (BADGE + 4)}
-          y={BADGE_Y}
-          width={BADGE}
-          height={BADGE}
-          className={mark?.kind === 'hit' && mark.hazard === hazard ? 'stopgo-fx-badge' : undefined}
-          style={{ animationDelay: `${mark?.delayMs ?? 0}ms` }}
-        >
-          <span className="stopgo-car-badge">
-            <StopGoCardGlyph name={hazard} />
-          </span>
-        </foreignObject>
-      ))}
       {isAimable && tap && (
         <circle
           r={RING + 8}

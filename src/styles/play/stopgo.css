@@ -19,6 +19,12 @@
     repeating-linear-gradient(0deg, rgb(255 255 255 / 0.07) 0 7rem, transparent 7rem 14rem),
     linear-gradient(180deg, var(--stopgo-grass) 0%, var(--stopgo-grass-deep) 100%);
   background-color: var(--stopgo-grass);
+  scrollbar-width: none;
+}
+
+/* The race column replaces the system scrollbar */
+.stopgo-ground::-webkit-scrollbar {
+  display: none;
 }
 
 /* Bunting sways on the hub */
@@ -38,7 +44,7 @@
 
 /* Cards: warm paper, family colour on the head, sized on the screen height */
 .stopgo-card {
-  --size: clamp(4.4rem, 15dvh, 8.6rem);
+  --size: clamp(3.6rem, 11.5dvh, 6.6rem);
   position: relative;
   display: grid;
   grid-template-rows: auto 1fr auto auto;
@@ -48,27 +54,63 @@
   padding: 0 0.3rem 0.4rem;
   overflow: hidden;
   border-radius: 0.7rem;
-  background: var(--stopgo-card);
+  background:
+    radial-gradient(
+      120% 70% at 50% 100%,
+      color-mix(in oklab, var(--family, #888) 14%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      165deg,
+      color-mix(in oklab, var(--stopgo-card) 88%, #fff),
+      var(--stopgo-card) 45%,
+      color-mix(in oklab, var(--stopgo-card) 90%, #000)
+    );
   color: var(--stopgo-card-ink);
   box-shadow:
-    0 0.1rem 0 rgb(0 0 0 / 0.25),
-    0 0.6rem 1rem -0.5rem rgb(0 0 0 / 0.5);
-  font-size: calc(var(--size) / 9);
+    inset 0 0 0 0.12rem rgb(255 255 255 / 0.55),
+    inset 0 -0.35rem 0.6rem -0.3rem rgb(0 0 0 / 0.18),
+    0 0.1rem 0 rgb(0 0 0 / 0.3),
+    0 0.2rem 0 rgb(0 0 0 / 0.12),
+    0 0.8rem 1.1rem -0.5rem rgb(0 0 0 / 0.55);
+  font-size: calc(var(--size) / 7.6);
   line-height: 1.15;
   text-align: center;
+  transform-origin: 50% 100%;
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
+    transform 0.22s cubic-bezier(0.3, 1.4, 0.5, 1),
+    box-shadow 0.22s ease;
+}
+
+/* Light sheen that sweeps across when a card is lifted */
+.stopgo-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.5) 50%, transparent 65%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+.stopgo-card-playable:hover::after,
+.stopgo-card-chosen::after {
+  transform: translateX(120%);
+  transition: transform 0.7s ease;
 }
 
 .stopgo-card-head {
   align-self: stretch;
   margin: 0 -0.3rem 0.3rem;
   min-height: 1.4em;
-  background: var(--family);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--family) 82%, #fff) 0%,
+    var(--family) 55%,
+    color-mix(in oklab, var(--family) 80%, #000) 100%
+  );
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.3);
   color: #fff;
   font-weight: 900;
-  font-size: 0.9em;
+  font-size: 1em;
   line-height: 1.5;
 }
 
@@ -90,15 +132,19 @@
 
 .stopgo-card-glyph {
   align-self: center;
-  width: 44%;
+  width: 52%;
   color: var(--stopgo-card-ink);
+  filter: drop-shadow(0 0.12rem 0.1rem rgb(0 0 0 / 0.25));
 }
 
 .stopgo-card-km {
   align-self: center;
-  font-size: 2.3em;
+  font-size: 2.6em;
   font-weight: 900;
   color: var(--family);
+  text-shadow:
+    0 1px 0 rgb(255 255 255 / 0.7),
+    0 0.12em 0.1em rgb(0 0 0 / 0.25);
 }
 
 .stopgo-card-name {
@@ -117,7 +163,7 @@
 }
 .stopgo-card-playable:hover,
 .stopgo-card-chosen {
-  transform: translateY(-0.7rem);
+  transform: translateY(-0.9rem) scale(1.07) rotate(-1.5deg);
 }
 .stopgo-card-chosen {
   box-shadow:
@@ -125,8 +171,8 @@
     0 1rem 1.4rem -0.6rem rgb(0 0 0 / 0.6);
 }
 .stopgo-card-locked {
-  filter: grayscale(0.85);
-  opacity: 0.62;
+  filter: grayscale(0.6);
+  opacity: 0.8;
   cursor: default;
 }
 .stopgo-card-locked.stopgo-card-chosen {
@@ -163,7 +209,7 @@
   inset: auto 0 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: 1rem;
   padding: 0.5rem 1rem 0.8rem;
@@ -186,6 +232,20 @@
   justify-content: center;
   gap: 0.5rem;
   padding-top: 0.8rem;
+}
+/* Desktop: more air between cards and around the dock */
+@media (min-width: 768px) {
+  .stopgo-hand {
+    gap: 1.1rem;
+    padding-top: 1rem;
+  }
+  .stopgo-dock {
+    gap: 1.6rem;
+    padding-bottom: 1.2rem;
+  }
+  .stopgo-piles {
+    gap: 1rem;
+  }
 }
 
 .stopgo-hand-slot {
@@ -284,66 +344,154 @@
   box-shadow: 0 0 0 0.2rem var(--stopgo-gold);
 }
 
-/* Car state panel */
-.stopgo-panel {
-  display: grid;
-  gap: 0.35rem;
-  min-width: 10rem;
-  max-width: 13rem;
-  padding: 0.6rem 0.8rem;
-  border-radius: 0.9rem;
-  background: var(--stopgo-asphalt);
-  color: var(--stopgo-line);
-  font-size: 0.8rem;
-}
-.stopgo-panel-title {
-  font-weight: 900;
-  font-size: 0.85rem;
-}
-.stopgo-state {
-  opacity: 0.85;
-}
-.stopgo-malus li {
+/* Fold key above the dock, the hand slides away */
+.stopgo-fold {
+  position: absolute;
+  bottom: calc(100% + 0.1rem);
+  left: 50%;
+  translate: -50% 0;
+  z-index: 3;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: var(--stopgo-asphalt);
+  color: var(--stopgo-line);
+  font-size: 0.75rem;
   font-weight: 800;
 }
-.stopgo-shields {
+.stopgo-fold svg {
+  transition: transform 0.25s ease;
+}
+.stopgo-fold:not(.stopgo-fold-shut) svg {
+  transform: rotate(180deg);
+}
+/* Hand and its fold key, the key stays centred above the cards */
+.stopgo-hand-box {
+  position: relative;
+  min-width: 0;
+}
+/* The hand shell shrinks to nothing while the hand fades and sinks */
+.stopgo-dock-mid {
   display: grid;
-  gap: 0.2rem;
+  grid-template-rows: 1fr;
+  min-width: 0;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.stopgo-shield {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  font-weight: 800;
+.stopgo-dock-mid-inner {
+  display: grid;
+  min-height: 0;
+  gap: 0.4rem;
 }
-.stopgo-shield button {
-  text-decoration: underline;
-  font-weight: 900;
-  color: var(--stopgo-gold);
-  cursor: pointer;
+.stopgo-dock-mid[data-folded] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(1.5rem);
 }
-.stopgo-shield-none {
-  opacity: 0.5;
+.stopgo-dock-mid[data-folded] > .stopgo-dock-mid-inner {
+  overflow: hidden;
+}
+/* Cards stay side by side and flip down one after the other, back up in the same order */
+.stopgo-dock-mid .stopgo-hand-slot {
+  transform-origin: 50% 100%;
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--stopgo-i, 0) * 55ms),
+    opacity 0.3s ease calc(var(--stopgo-i, 0) * 55ms);
+}
+.stopgo-dock-mid[data-folded] .stopgo-hand-slot {
+  opacity: 0;
+  transform: translateY(2.2rem) rotate(calc((var(--stopgo-i, 0) - 3) * 4deg)) scale(0.8);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stopgo-dock-mid,
+  .stopgo-dock-mid .stopgo-hand-slot,
+  .stopgo-fold svg {
+    transition: none;
+  }
+}
+.stopgo-dock-folded {
+  background: none;
 }
 
-.stopgo-rivals {
+/* Deck to take from, collection sheet */
+.stopgo-deck {
   position: absolute;
   top: 6.5rem;
-  left: 1.75rem;
+  right: 1.75rem;
   z-index: 20;
   display: grid;
+  justify-items: center;
   gap: 0.4rem;
-  max-height: calc(100dvh - 22rem);
-  overflow-y: auto;
-  scrollbar-width: none;
+  color: var(--stopgo-line);
+  font-weight: 800;
+  pointer-events: none;
+  animation: stopgo-deck-float 4s ease-in-out infinite;
+}
+.stopgo-deck-stack {
+  position: relative;
+  width: 4.6rem;
+  height: 6.4rem;
   pointer-events: auto;
 }
-.stopgo-rivals .stopgo-panel {
-  min-width: 9rem;
-  padding: 0.4rem 0.6rem;
+.stopgo-deck-stack:disabled {
+  cursor: default;
+}
+/* Each card turned and shifted a little, the top one nearly straight */
+.stopgo-deck-card {
+  position: absolute;
+  inset: 0;
+  transform: translate(calc(var(--layer) * -0.18rem), calc(var(--layer) * -0.14rem))
+    rotate(calc((var(--layer) - 1.5) * 3.5deg));
+  filter: drop-shadow(0 0.3rem 0.4rem rgb(0 0 0 / 0.35));
+}
+.stopgo-deck-card .stopgo-card {
+  --size: 4.6rem;
+}
+.stopgo-deck-ready .stopgo-deck-stack {
+  cursor: pointer;
+  animation: stopgo-deck-pulse 1.4s ease-in-out infinite;
+}
+@keyframes stopgo-deck-float {
+  50% {
+    transform: translateY(-0.35rem);
+  }
+}
+@keyframes stopgo-deck-pulse {
+  50% {
+    transform: scale(1.06) rotate(-2deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stopgo-deck,
+  .stopgo-deck-ready .stopgo-deck-stack {
+    animation: none;
+  }
+}
+@media (max-width: 767px) {
+  /* Deck and discard float side by side above the dock, right of the race column */
+  .stopgo-deck {
+    top: auto;
+    right: 1rem;
+    bottom: calc(var(--stopgo-dock-h, 10rem) + 0.5rem);
+  }
+  .stopgo-deck-stack {
+    width: 3.4rem;
+    height: 4.8rem;
+  }
+  .stopgo-deck-card .stopgo-card {
+    --size: 3.4rem;
+  }
+  .stopgo-deck small,
+  .stopgo-pile small {
+    font-size: 0.65rem;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 0.7);
+  }
 }
 
 /* Offers cover the board: Good draw and coup fourré */
@@ -414,34 +562,32 @@
   user-select: none;
 }
 
-/* Phone: dock in three rows, fan of cards, sheets from the bottom */
+/* Phone: one strip (rivals, fold) over the hand, piles float above, tray floats over all */
 @media (max-width: 767px) {
   .stopgo-dock {
+    --stopgo-strip: 2.75rem;
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      'rivals piles'
-      'me me'
+      'rivals fold'
       'mid mid';
-    gap: 0.4rem;
+    align-items: center;
+    gap: 0.35rem 0.5rem;
     padding: 0.5rem 0.5rem 0.4rem;
     overscroll-behavior: none;
-  }
-  .stopgo-rivals {
-    display: none;
   }
   .stopgo-rival-row {
     grid-area: rivals;
     position: relative;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    min-height: var(--stopgo-strip);
   }
   .stopgo-rival {
     display: grid;
     place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 2.5rem;
+    height: 2.5rem;
     padding: 0.15rem;
     border-radius: 999px;
     background: var(--car);
@@ -453,55 +599,30 @@
   .stopgo-rival-aim {
     box-shadow: 0 0 0 0.18rem var(--stopgo-gold);
   }
-  .stopgo-fiche {
-    position: absolute;
-    bottom: calc(100% + 0.5rem);
-    left: 0;
-    z-index: 30;
-    width: min(16rem, 80vw);
-  }
-  .stopgo-fiche .stopgo-panel {
-    display: grid;
-    max-width: none;
-    box-shadow: 0 0.8rem 1.4rem -0.6rem rgb(0 0 0 / 0.6);
-  }
 
-  .stopgo-piles {
-    grid-area: piles;
-    gap: 0.4rem;
-  }
-  .stopgo-pile .stopgo-card {
-    --size: 2.8rem;
+  .stopgo-piles,
+  .stopgo-hand-box {
+    display: contents;
   }
   .stopgo-pile {
+    position: absolute;
+    right: 5rem;
+    bottom: calc(100% + 0.5rem);
     font-size: 0.65rem;
   }
-
-  .stopgo-dock > .stopgo-panel {
-    grid-area: me;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.2rem 0.8rem;
-    min-width: 0;
-    max-width: none;
-    padding: 0.4rem 0.7rem;
+  .stopgo-pile .stopgo-card {
+    --size: 3.4rem;
   }
-  .stopgo-dock > .stopgo-panel .stopgo-malus,
-  .stopgo-dock > .stopgo-panel .stopgo-shields {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.2rem 0.7rem;
+  .stopgo-fold {
+    position: static;
+    translate: none;
+    grid-area: fold;
+    min-height: var(--stopgo-strip);
+    padding: 0 0.9rem;
+    font-size: 0.8rem;
   }
-  .stopgo-shield button {
-    min-height: 2.75rem;
-  }
-
   .stopgo-dock-mid {
     grid-area: mid;
-    display: grid;
-    min-width: 0;
-    gap: 0.4rem;
   }
 
   .stopgo-hand {
@@ -509,15 +630,27 @@
     padding: 0.8rem 1.2rem 0 0;
     overscroll-behavior: none;
   }
+  /* Keys 1 to 7 mean nothing on a touch screen, the hint waits in the tray */
+  .stopgo-hand .stopgo-card-head {
+    min-height: 0.7rem;
+    font-size: 0;
+  }
+  .stopgo-hand .stopgo-card-hint {
+    display: none;
+  }
   .stopgo-hand-slot {
     flex: 1 1 0;
-    max-width: 4.2rem;
+    max-width: 3.7rem;
   }
   .stopgo-hand .stopgo-card {
-    --size: 4.2rem;
+    --size: 3.7rem;
   }
 
   .stopgo-tray {
+    position: absolute;
+    inset-inline: 0;
+    bottom: calc(100% + var(--stopgo-strip) + 0.9rem);
+    z-index: 5;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
@@ -609,21 +742,17 @@
   animation: stopgo-shake 0.5s linear both;
 }
 
-.stopgo-car-badge {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  padding: 0.12rem;
-  border-radius: 999px;
-  background: var(--stopgo-kerb-white);
-  color: var(--stopgo-asphalt-deep);
-}
-.stopgo-fx-badge {
-  animation: stopgo-pop 0.4s ease-out backwards;
-}
-
 .stopgo-hand-slot-drawn {
-  animation: stopgo-draw var(--stopgo-draw-ms, 450ms) cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+  visibility: hidden;
+}
+.stopgo-drawn {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 56;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
 @keyframes stopgo-ring {
@@ -664,26 +793,15 @@
     transform: scale(1);
   }
 }
-@keyframes stopgo-draw {
-  0% {
-    opacity: 0;
-    transform: translate(14rem, 2rem) rotate(8deg) scale(0.6);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .stopgo-fx-ring,
-  .stopgo-fx-shake,
-  .stopgo-fx-badge,
-  .stopgo-hand-slot-drawn {
+  .stopgo-fx-shake {
     animation: none;
   }
 
   .stopgo-card,
+  .stopgo-card::after,
   .stopgo-target {
     transition: none;
   }
@@ -720,5 +838,28 @@
   .stopgo-load-lamp,
   .stopgo-load-car {
     animation: none;
+  }
+}
+
+/* Hub cars lap their road, then rest off screen */
+.play-road-car {
+  offset-rotate: auto 90deg;
+  animation: play-road-drive 8s linear infinite both;
+}
+
+@keyframes play-road-drive {
+  0% {
+    offset-distance: 0%;
+  }
+  70%,
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-road-car {
+    animation: none;
+    offset-distance: 45%;
   }
 }

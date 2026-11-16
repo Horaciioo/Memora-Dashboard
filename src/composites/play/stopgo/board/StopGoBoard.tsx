@@ -63,10 +63,11 @@ export const StopGoBoard = ({
   const mine = players.find(({ accountId }) => accountId === viewerId)
   const focusKm = mine?.km ?? Math.max(...players.map(({ km }) => km))
   const focusMap = Math.min(plan.maps.length - 1, Math.floor(focusKm / STOPGO_SETTINGS.mapKm))
-  const maps = plan.maps
-    .map((_, index) => index)
-    .filter((index) => Math.abs(index - focusMap) <= NEIGHBOURS)
+  // Road and signs are cheap, scenery only near the car
+  const allMaps = plan.maps.map((_, index) => index)
+  const maps = allMaps.filter((index) => Math.abs(index - focusMap) <= NEIGHBOURS)
   const scroller = useRef<HTMLDivElement>(null)
+  const drawing = useRef<SVGSVGElement>(null)
   const height = plan.mapHeight * plan.maps.length + 2 * STOPGO_TRACK.capHeight
 
   const viewTop = -plan.mapHeight * plan.maps.length - STOPGO_TRACK.capHeight
@@ -75,12 +76,14 @@ export const StopGoBoard = ({
     const box = scroller.current
     if (!box) return 0
     const { y } = pointAt(plan, focusKm, 0)
+    // The phone dock covers the foot of the track, the camera centres on what stays visible
+    const covered = isMobile ? Number.parseFloat(getComputedStyle(box).paddingBottom) || 0 : 0
 
     const { focusShare, phoneFocusShare } = STOPGO_TRACK.camera
 
     return (
-      ((y - viewTop) * box.clientWidth) / plan.width -
-      box.clientHeight * (isMobile ? phoneFocusShare : focusShare)
+      ((y - viewTop) * (drawing.current?.clientWidth ?? box.clientWidth)) / plan.width -
+      (box.clientHeight - covered) * (isMobile ? phoneFocusShare : focusShare)
     )
   }, [plan, focusKm, viewTop, isMobile])
 
@@ -97,11 +100,13 @@ export const StopGoBoard = ({
     <div className="relative size-full">
       <div
         ref={scroller}
-        className="stopgo-ground size-full touch-pan-y [scrollbar-width:none] overflow-x-hidden overflow-y-auto overscroll-contain"
+        className="stopgo-ground size-full touch-pan-y [scrollbar-width:none] overflow-x-hidden overflow-y-auto overscroll-contain max-md:pb-[var(--stopgo-dock-h,10rem)]"
       >
         <svg
+          ref={drawing}
+          style={{ width: `min(100%, ${plan.width * STOPGO_TRACK.zoom}px)` }}
           viewBox={`${plan.minX} ${viewTop} ${plan.width} ${height}`}
-          className="block w-full"
+          className="mx-auto block"
           role="img"
         >
           <defs>
@@ -123,8 +128,8 @@ export const StopGoBoard = ({
           {maps.map((map) => (
             <StopGoDecor key={map} plan={plan} seed={sessionId} map={map} />
           ))}
-          <StopGoTrack plan={plan} maps={maps} colors={colors} />
-          <StopGoSigns plan={plan} maps={maps} />
+          <StopGoTrack plan={plan} maps={allMaps} colors={colors} />
+          <StopGoSigns plan={plan} maps={allMaps} />
           {players.map((player, lane) => {
             const face = faces.find(({ id }) => id === player.accountId)
 
@@ -139,7 +144,6 @@ export const StopGoBoard = ({
                 name={face?.name ?? ''}
                 avatarUrl={face?.avatarUrl ?? null}
                 hasLeft={player.hasLeft}
-                hazards={player.hazards}
                 mark={marks[player.accountId]}
               />
             )
