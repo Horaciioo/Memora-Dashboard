@@ -127,6 +127,120 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.13.2',
+    date: '2026-11-16',
+    title: 'Deux nouveaux jeux',
+    intro:
+      '« Stop & Go » et « Concordat » rejoignent Memora Play, dans une interface de jeu plus légère.',
+    description:
+      'Memora Play comptait dix jeux et une interface de partie qui prenait beaucoup de place. Cette version ajoute deux jeux, une course de cartes et un jeu de conquête sur carte du monde, et allège l’écran de partie pour laisser plus de place au plateau.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Concordat » dans « Memora Play » : un jeu de conquête sur une carte du monde où l’on étend son territoire, engage une part de ses troupes, bâtit, négocie et trahit.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité de jouer à « Concordat » seul : les autres nations sont tenues par des joueurs automatiques.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout du choix de la forme de la carte et de la vitesse de la partie dans le vote de lancement de « Concordat ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de « Stop & Go » à la liste des jeux jouables de « Memora Play », avec des circuits aux virages variés et une pioche de cartes à l’écran.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout du visage de chaque joueur sur son pion dans « Ludo ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une touche « Trophée » dans l’interface de partie pour afficher ou masquer les scores, cachés au début de chaque partie.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une barre « Étape n sur total » dans les votes de lancement pour voir où l’on en est.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de l’interface de partie de « Memora Play » : blocs, touches et menus plus petits, pour laisser plus de place au plateau.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de la touche « Quitter » de « Memora Play » : elle devient une touche à part, séparée des réglages, dans tous les jeux.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de l’accueil de « Memora Play » : les deux jeux à l’honneur sont côte à côte, tous les jeux sont présentés en affiches, et la carte du joueur se déplie en bas à droite.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration visuelle du salon d’attente de « Memora Play » : la boîte du salon, le lien d’invitation et le chat reprennent les couleurs du jeu.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration des joueurs automatiques de « Memora Play » : chacun a maintenant son propre portrait.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de la « Bataille navale » : la vue ne suivait pas la mer attaquée par un autre capitaine pendant son tir.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de la « Bataille navale » : les épaves d’une mer pouvaient apparaître sur une autre.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction du salon d’attente de « Golf » : la liste d’invitation était coupée.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction des parties de « Memora Play » : chaque message du chat faisait redessiner le plateau.',
+      },
+    ],
+    comments: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        text: 'Une course de cartes et un jeu de conquête : Memora Play passe à douze jeux.',
+      },
+    ],
+  },
+  {
     version: '0.13.1',
     date: '2026-11-15',
     title: 'Play passe en plein écran',
