@@ -80,6 +80,8 @@ const SHIFTERS: Record<
     SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),
         "turnEndsAt" = "turnEndsAt" + (${s}::float8 * interval '1 second')
     WHERE "sessionId" = ${id}`,
+  // The loop is paused with its timers, no date to shift
+  CONCORDAT: async () => undefined,
   STOP_GO: (tx, id, s) => tx.$executeRaw`
     UPDATE play_stopgo_games
     SET "startsAt" = "startsAt" + (${s}::float8 * interval '1 second'),

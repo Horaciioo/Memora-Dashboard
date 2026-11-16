@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 
 import { StopGoCarShape } from '@/composites/play/stopgo/art/StopGoCarShape'
-import { StopGoRoadStrip } from '@/composites/play/stopgo/art/StopGoRoadStrip'
 
 /**
  * Fill from a colour token
@@ -49,8 +48,87 @@ const TILES = [
   { letter: 'U', x: 32, y: 28, angle: 0, size: 25, fill: '--play-gold' },
 ]
 
-// Logos of the newer games, drawn as objects like the posters
+// Logos of the newer games
 export const NEW_MARKS: Record<string, ReactNode> = {
+  playConcordat: (
+    <>
+      <defs>
+        <radialGradient id="concordat-sea" cx="0.32" cy="0.28" r="0.9">
+          <stop offset="0" style={{ stopColor: 'var(--play-concordat-sea-light)' }} />
+          <stop offset="0.5" style={{ stopColor: 'var(--play-concordat-sea)' }} />
+          <stop offset="1" style={{ stopColor: 'var(--play-concordat-deep)' }} />
+        </radialGradient>
+        <radialGradient id="concordat-air" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0.8" style={{ stopColor: 'var(--play-concordat-glow)', stopOpacity: 0 }} />
+          <stop offset="1" style={{ stopColor: 'var(--play-concordat-glow)', stopOpacity: 0.3 }} />
+        </radialGradient>
+        <linearGradient id="concordat-land" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0" style={{ stopColor: 'var(--play-concordat-land-light)' }} />
+          <stop offset="0.55" style={{ stopColor: 'var(--play-concordat-land)' }} />
+          <stop offset="1" style={{ stopColor: 'var(--play-concordat-sand)' }} />
+        </linearGradient>
+        <linearGradient id="concordat-base" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style={{ stopColor: 'var(--play-concordat-glow)' }} />
+          <stop offset="1" style={{ stopColor: 'var(--play-concordat-dusk)' }} />
+        </linearGradient>
+        <linearGradient id="concordat-shade" x1="0.25" y1="0.1" x2="0.9" y2="1">
+          <stop offset="0.4" stopColor="black" stopOpacity="0" />
+          <stop offset="1" stopColor="black" stopOpacity="0.55" />
+        </linearGradient>
+        <clipPath id="concordat-globe">
+          <circle cx="32" cy="28" r="23" />
+        </clipPath>
+      </defs>
+      <Ground width={22} />
+      {/* Stand */}
+      <path d="M22 61h20l-4-5H26Z" fill="url(#concordat-base)" />
+      <rect x="29" y="49" width="6" height="8" rx="1.5" fill="url(#concordat-base)" />
+      {/* Atmosphere and ocean */}
+      <circle cx="32" cy="28" r="26" fill="url(#concordat-air)" />
+      <circle cx="32" cy="28" r="23" fill="url(#concordat-sea)" />
+      <g clipPath="url(#concordat-globe)">
+        <g fill="none" stroke="white" strokeWidth="0.6" opacity="0.16">
+          <ellipse cx="32" cy="28" rx="11" ry="23" />
+          <path d="M8 18h48M8 38h48M32 4v48" />
+        </g>
+        <g transform="translate(6.4 4) scale(0.8)">
+          {/* Shallows, land, relief */}
+          <path
+            d="M6 17C6.5 15.3 8.2 12.5 10 11C11.8 9.5 14.7 8.3 17 8C19.3 7.7 22.2 8.2 24 9C25.8 9.8 27.8 11.7 28 13C28.2 14.3 25.3 15.7 25 17C24.7 18.3 26.5 19.7 26 21C25.5 22.3 23.2 23.5 22 25C20.8 26.5 20.0 29.3 19 30C18.0 30.7 16.8 30.0 16 29C15.2 28.0 15.0 25.0 14 24C13.0 23.0 11.2 23.5 10 23C8.8 22.5 7.7 22.0 7 21C6.3 20.0 5.5 18.7 6 17Z M27 5C27.8 4.2 30.8 4.5 32 5C33.2 5.5 34.2 6.8 34 8C33.8 9.2 32.2 11.7 31 12C29.8 12.3 27.7 11.2 27 10C26.3 8.8 26.2 5.8 27 5Z M15 31C16.2 29.8 19.0 29.5 21 30C23.0 30.5 25.8 32.3 27 34C28.2 35.7 28.5 37.8 28 40C27.5 42.2 25.3 44.8 24 47C22.7 49.2 21.2 52.5 20 53C18.8 53.5 17.5 51.8 17 50C16.5 48.2 17.5 44.2 17 42C16.5 39.8 14.3 38.8 14 37C13.7 35.2 13.8 32.2 15 31Z M35 15C35.5 13.7 35.7 12.0 37 11C38.3 10.0 41.3 8.8 43 9C44.7 9.2 45.5 11.7 47 12C48.5 12.3 51.0 10.2 52 11C53.0 11.8 53.8 15.7 53 17C52.2 18.3 48.5 18.2 47 19C45.5 19.8 45.5 21.7 44 22C42.5 22.3 39.7 21.5 38 21C36.3 20.5 34.5 20.0 34 19C33.5 18.0 34.5 16.3 35 15Z M34 25C35.3 24.0 38.0 23.2 40 23C42.0 22.8 44.3 23.3 46 24C47.7 24.7 49.0 25.8 50 27C51.0 28.2 52.2 29.3 52 31C51.8 32.7 50.0 35.0 49 37C48.0 39.0 47.0 40.8 46 43C45.0 45.2 44.2 49.0 43 50C41.8 51.0 40.0 50.3 39 49C38.0 47.7 37.7 44.5 37 42C36.3 39.5 35.8 36.2 35 34C34.2 31.8 32.2 30.5 32 29C31.8 27.5 32.7 26.0 34 25Z M54 19C55.0 17.7 56.7 17.2 58 18C59.3 18.8 61.3 21.3 62 24C62.7 26.7 62.8 32.0 62 34C61.2 36.0 58.5 36.3 57 36C55.5 35.7 53.8 33.7 53 32C52.2 30.3 51.8 28.2 52 26C52.2 23.8 53.0 20.3 54 19Z"
+            fill="none"
+            strokeWidth="3"
+            strokeLinejoin="round"
+            style={{ stroke: 'var(--play-concordat-sea-light)' }}
+            opacity="0.5"
+          />
+          <path
+            d="M6 17C6.5 15.3 8.2 12.5 10 11C11.8 9.5 14.7 8.3 17 8C19.3 7.7 22.2 8.2 24 9C25.8 9.8 27.8 11.7 28 13C28.2 14.3 25.3 15.7 25 17C24.7 18.3 26.5 19.7 26 21C25.5 22.3 23.2 23.5 22 25C20.8 26.5 20.0 29.3 19 30C18.0 30.7 16.8 30.0 16 29C15.2 28.0 15.0 25.0 14 24C13.0 23.0 11.2 23.5 10 23C8.8 22.5 7.7 22.0 7 21C6.3 20.0 5.5 18.7 6 17Z M27 5C27.8 4.2 30.8 4.5 32 5C33.2 5.5 34.2 6.8 34 8C33.8 9.2 32.2 11.7 31 12C29.8 12.3 27.7 11.2 27 10C26.3 8.8 26.2 5.8 27 5Z M15 31C16.2 29.8 19.0 29.5 21 30C23.0 30.5 25.8 32.3 27 34C28.2 35.7 28.5 37.8 28 40C27.5 42.2 25.3 44.8 24 47C22.7 49.2 21.2 52.5 20 53C18.8 53.5 17.5 51.8 17 50C16.5 48.2 17.5 44.2 17 42C16.5 39.8 14.3 38.8 14 37C13.7 35.2 13.8 32.2 15 31Z M35 15C35.5 13.7 35.7 12.0 37 11C38.3 10.0 41.3 8.8 43 9C44.7 9.2 45.5 11.7 47 12C48.5 12.3 51.0 10.2 52 11C53.0 11.8 53.8 15.7 53 17C52.2 18.3 48.5 18.2 47 19C45.5 19.8 45.5 21.7 44 22C42.5 22.3 39.7 21.5 38 21C36.3 20.5 34.5 20.0 34 19C33.5 18.0 34.5 16.3 35 15Z M34 25C35.3 24.0 38.0 23.2 40 23C42.0 22.8 44.3 23.3 46 24C47.7 24.7 49.0 25.8 50 27C51.0 28.2 52.2 29.3 52 31C51.8 32.7 50.0 35.0 49 37C48.0 39.0 47.0 40.8 46 43C45.0 45.2 44.2 49.0 43 50C41.8 51.0 40.0 50.3 39 49C38.0 47.7 37.7 44.5 37 42C36.3 39.5 35.8 36.2 35 34C34.2 31.8 32.2 30.5 32 29C31.8 27.5 32.7 26.0 34 25Z M54 19C55.0 17.7 56.7 17.2 58 18C59.3 18.8 61.3 21.3 62 24C62.7 26.7 62.8 32.0 62 34C61.2 36.0 58.5 36.3 57 36C55.5 35.7 53.8 33.7 53 32C52.2 30.3 51.8 28.2 52 26C52.2 23.8 53.0 20.3 54 19Z"
+            fill="url(#concordat-land)"
+          />
+          <path
+            d="M6 17C6.5 15.3 8.2 12.5 10 11C11.8 9.5 14.7 8.3 17 8C19.3 7.7 22.2 8.2 24 9C25.8 9.8 27.8 11.7 28 13C28.2 14.3 25.3 15.7 25 17C24.7 18.3 26.5 19.7 26 21C25.5 22.3 23.2 23.5 22 25C20.8 26.5 20.0 29.3 19 30C18.0 30.7 16.8 30.0 16 29C15.2 28.0 15.0 25.0 14 24C13.0 23.0 11.2 23.5 10 23C8.8 22.5 7.7 22.0 7 21C6.3 20.0 5.5 18.7 6 17Z M27 5C27.8 4.2 30.8 4.5 32 5C33.2 5.5 34.2 6.8 34 8C33.8 9.2 32.2 11.7 31 12C29.8 12.3 27.7 11.2 27 10C26.3 8.8 26.2 5.8 27 5Z M15 31C16.2 29.8 19.0 29.5 21 30C23.0 30.5 25.8 32.3 27 34C28.2 35.7 28.5 37.8 28 40C27.5 42.2 25.3 44.8 24 47C22.7 49.2 21.2 52.5 20 53C18.8 53.5 17.5 51.8 17 50C16.5 48.2 17.5 44.2 17 42C16.5 39.8 14.3 38.8 14 37C13.7 35.2 13.8 32.2 15 31Z M35 15C35.5 13.7 35.7 12.0 37 11C38.3 10.0 41.3 8.8 43 9C44.7 9.2 45.5 11.7 47 12C48.5 12.3 51.0 10.2 52 11C53.0 11.8 53.8 15.7 53 17C52.2 18.3 48.5 18.2 47 19C45.5 19.8 45.5 21.7 44 22C42.5 22.3 39.7 21.5 38 21C36.3 20.5 34.5 20.0 34 19C33.5 18.0 34.5 16.3 35 15Z M34 25C35.3 24.0 38.0 23.2 40 23C42.0 22.8 44.3 23.3 46 24C47.7 24.7 49.0 25.8 50 27C51.0 28.2 52.2 29.3 52 31C51.8 32.7 50.0 35.0 49 37C48.0 39.0 47.0 40.8 46 43C45.0 45.2 44.2 49.0 43 50C41.8 51.0 40.0 50.3 39 49C38.0 47.7 37.7 44.5 37 42C36.3 39.5 35.8 36.2 35 34C34.2 31.8 32.2 30.5 32 29C31.8 27.5 32.7 26.0 34 25Z M54 19C55.0 17.7 56.7 17.2 58 18C59.3 18.8 61.3 21.3 62 24C62.7 26.7 62.8 32.0 62 34C61.2 36.0 58.5 36.3 57 36C55.5 35.7 53.8 33.7 53 32C52.2 30.3 51.8 28.2 52 26C52.2 23.8 53.0 20.3 54 19Z"
+            fill="none"
+            stroke="black"
+            strokeWidth="0.6"
+            opacity="0.25"
+          />
+        </g>
+        <ellipse cx="32" cy="4.5" rx="13" ry="5" fill="white" opacity="0.85" />
+        <circle cx="32" cy="28" r="23" fill="url(#concordat-shade)" />
+      </g>
+      {/* Glints */}
+      <ellipse
+        cx="22"
+        cy="14"
+        rx="7"
+        ry="3.2"
+        transform="rotate(-35 22 14)"
+        fill="white"
+        opacity="0.45"
+      />
+      <path d="M10 6l1.2 3 3 1.2-3 1.2L10 14.4l-1.2-3-3-1.2 3-1.2Z" fill="white" opacity="0.9" />
+    </>
+  ),
   playJumble: (
     <>
       <Ground width={24} />
@@ -168,11 +246,8 @@ export const NEW_MARKS: Record<string, ReactNode> = {
   ),
   playStopGo: (
     <>
-      <Ground x={22} width={14} />
-      {/* Tight bend */}
-      <StopGoRoadStrip path="M17 61V36A11 11 0 0 1 28 25H59" width={19} />
-      {/* Single-seater on the straight */}
-      <g transform="translate(17 46) scale(0.36)">
+      {/* Lone single-seater, nose up-right */}
+      <g transform="translate(32 32) rotate(28) scale(0.66)">
         <StopGoCarShape color="red" />
       </g>
     </>

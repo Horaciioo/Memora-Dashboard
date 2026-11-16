@@ -85,7 +85,10 @@ server.listen(port, hostname, () => {
 for (const signal of ['SIGTERM', 'SIGINT']) {
   process.once(signal, () => {
     globalThis.memoraRealtime?.close()
-    server.close(() => process.exit(0))
+    // Games kept in memory are saved before the exit
+    Promise.resolve(globalThis.concordatFlush?.())
+      .catch(() => {})
+      .finally(() => server.close(() => process.exit(0)))
     setTimeout(() => process.exit(0), HUB_WAIT_MS).unref()
   })
 }

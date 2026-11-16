@@ -143,6 +143,20 @@ export const PLAY_CONCEPT: Record<PlayGameName, PlayConceptStep[]> = {
       text: 'Le premier qui ramène tous ses pions au centre gagne.',
     },
   ],
+  [PlayGames.Concordat]: [
+    {
+      title: 'Une carte, un départ',
+      text: 'Pose ton point de départ sur la carte. Ta nation grandit pendant que tu choisis où frapper.',
+    },
+    {
+      title: 'Engage un pourcentage',
+      text: 'Choisis un voisin et la part de tes troupes à lancer. Un front long est un front fragile.',
+    },
+    {
+      title: 'Tiens la carte',
+      text: 'Garde tes provinces, étends-toi sans t’étirer. À la fin, la nation la plus étendue gagne.',
+    },
+  ],
   [PlayGames.StopGo]: [
     {
       title: 'Une voiture, une route',

@@ -56,6 +56,7 @@
   "play.games.ludo": true,
   "play.games.bataille-navale": true,
   "play.games.stop-and-go": true,
+  "play.games.concordat": true,
   "play": true,
   "play.lounge": true,
   "play.invites": true,

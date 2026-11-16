@@ -11,12 +11,13 @@ import { usePlayBusyStore } from '@/core/store/play/playBusy'
 import { usePlayLoadingGameStore } from '@/core/store/play/playLoadingGame'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_BOT_COPY } from '@/declarations/play/bots'
+import { PLAY_GAMES } from '@/declarations/play/games'
 import { PLAY_HUB_COPY } from '@/declarations/play/hub'
 import { PLAY_BUSY } from '@/declarations/play/loading'
 import type { PlayBusyGesture } from '@/declarations/play/loading'
 import { PLAY_FOLLOW_COPY } from '@/declarations/play/invites'
 import { GolfVoteActions } from '@/declarations/play/golf/vote'
-import { PlayVisibilities } from '@/utils/constants/play'
+import { PlayBotKinds, PlayVisibilities } from '@/utils/constants/play'
 import type { PlayBotKindName, PlayGameName, PlayInviteRoleName } from '@/utils/constants/play'
 
 /**
@@ -84,6 +85,10 @@ export const usePlayMoves = () => {
             visibility: PlayVisibilities.Private,
           })
           try {
+            // A strategy game on one's own gets its nations from bots
+            if (PLAY_GAMES.get(game).soloBots) {
+              await apiPost(API_ROUTES.playBots(table.id), { level: PlayBotKinds.Medium, fill: true })
+            }
             await apiPost(API_ROUTES.playStart(table.id), {})
           } catch (error) {
             // A table that never started is closed, not left waiting

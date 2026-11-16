@@ -7,6 +7,8 @@ import { ECHO_HUB } from '@/declarations/play/echo/copy'
 import { ECHO_SETTINGS } from '@/declarations/play/echo/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { CONCORDAT_HUB } from '@/declarations/play/concordat/hub'
+import { CONCORDAT_SETTINGS } from '@/declarations/play/concordat/settings'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { STOPGO_HUB } from '@/declarations/play/stopgo/art'
 import { SUSPENS_HUB } from '@/declarations/play/suspens/copy'
@@ -38,6 +40,7 @@ import type { PlayGameName } from '@/utils/constants/play'
  * @property {number} minPlayers - Seat floor
  * @property {number} maxPlayers - Seat ceiling
  * @property {boolean} playable - Engine shipped
+ * @property {boolean} [soloBots] - A solo table is filled with bots
  */
 
 export interface PlayGameMeta {
@@ -51,6 +54,7 @@ export interface PlayGameMeta {
   minPlayers: number
   maxPlayers: number
   playable: boolean
+  soloBots?: boolean
 }
 
 /**
@@ -189,7 +193,21 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     ground: STOPGO_HUB.ground,
     minPlayers: STOPGO_SETTINGS.minPlayers,
     maxPlayers: STOPGO_SETTINGS.maxPlayers,
-    // Dev only until the final audit
+    playable: true,
+  },
+  [PlayGames.Concordat]: {
+    label: 'Concordat',
+    slug: 'concordat',
+    tagline:
+      'Étends ton territoire, bâtis, négocie, trahis. Une carte, des nations, un seul gagnant.',
+    tone: '--play-concordat',
+    logo: 'playConcordat',
+    backdrop: 'map',
+    ground: CONCORDAT_HUB.ground,
+    minPlayers: CONCORDAT_SETTINGS.minPlayers,
+    maxPlayers: CONCORDAT_SETTINGS.maxPlayers,
+    soloBots: true,
+    // Dev only until the first playable milestone
     playable: APP_ENVIRONMENT === 'dev',
   },
 })
@@ -199,7 +217,7 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
  * @type {PlayGameName[]}
  */
 
-export const PLAY_FEATURED_GAMES: PlayGameName[] = [PlayGames.Naval]
+export const PLAY_FEATURED_GAMES: PlayGameName[] = [PlayGames.StopGo, PlayGames.Concordat]
 
 /**
  * Game behind a URL segment

@@ -2,6 +2,7 @@ import { baccalaureatAdapter } from '@/core/services/nexus/handlers/game/adapter
 import { bombAdapter } from '@/core/services/nexus/handlers/game/adapters/bomb'
 import { croquisAdapter } from '@/core/services/nexus/handlers/game/adapters/croquis'
 import { echoAdapter } from '@/core/services/nexus/handlers/game/adapters/echo'
+import { concordatAdapter } from '@/core/services/nexus/handlers/game/adapters/concordat'
 import { stopgoAdapter } from '@/core/services/nexus/handlers/game/adapters/stopgo'
 import { suspensAdapter } from '@/core/services/nexus/handlers/game/adapters/suspens'
 import { glitchAdapter } from '@/core/services/nexus/handlers/game/adapters/glitch'
@@ -28,6 +29,7 @@ export const GAME_ADAPTERS: Record<PlayGameName, GameAdapter> = {
   [PlayGames.Glitch]: glitchAdapter,
   [PlayGames.Suspens]: suspensAdapter,
   [PlayGames.StopGo]: stopgoAdapter,
+  [PlayGames.Concordat]: concordatAdapter,
   [PlayGames.Echo]: echoAdapter,
   [PlayGames.Croquis]: croquisAdapter,
 }

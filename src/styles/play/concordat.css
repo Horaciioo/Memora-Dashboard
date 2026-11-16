@@ -1,0 +1,111 @@
+/* Concordat table: open sea seen from above, light from the top */
+.concordat-table {
+  background:
+    radial-gradient(60rem 36rem at 50% -10%, rgb(255 255 255 / 0.22), transparent 70%),
+    linear-gradient(180deg, var(--concordat-sea-lit), var(--concordat-sea));
+}
+
+/* Engagement slider, a thin rail with a square brass marker */
+.concordat-slider {
+  appearance: none;
+  height: 0.3rem;
+  border-radius: 0.1rem;
+  background: var(--concordat-hairline);
+  accent-color: var(--concordat-brass);
+}
+
+.concordat-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 0.7rem;
+  height: 1.1rem;
+  border: 0.1rem solid var(--concordat-plate);
+  border-radius: 0.1rem;
+  background: var(--concordat-brass);
+  cursor: grab;
+}
+
+.concordat-slider::-moz-range-thumb {
+  width: 0.7rem;
+  height: 1.1rem;
+  border: 0.1rem solid var(--concordat-plate);
+  border-radius: 0.1rem;
+  background: var(--concordat-brass);
+  cursor: grab;
+}
+
+/* Loading: the border of an island draws itself, pawns drop onto the board */
+.concordat-load-coast {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: concordat-load-draw 3.2s ease-in-out infinite;
+}
+
+.concordat-load-pawn {
+  animation: concordat-load-drop 2.4s cubic-bezier(0.3, 1.4, 0.5, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+@keyframes concordat-load-draw {
+  0% {
+    stroke-dashoffset: 420;
+  }
+  70%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes concordat-load-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-1.2rem);
+  }
+  30%,
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+/* Zone won: rises, holds, fades */
+.concordat-zone-pop {
+  animation: concordat-zone-pop 2.6s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+
+@keyframes concordat-zone-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1.06);
+  }
+  25%,
+  80% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-1.5rem) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concordat-zone-pop {
+    animation: none;
+  }
+
+  .concordat-load-coast,
+  .concordat-load-pawn {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}

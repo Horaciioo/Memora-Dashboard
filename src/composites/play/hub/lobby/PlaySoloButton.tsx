@@ -30,7 +30,7 @@ export const PlaySoloButton = ({
 }: PlaySoloButtonProps) => {
   const moves = usePlayMoves()
   // Games that need a second player wait for the bots to wake up
-  const needsOthers = PLAY_GAMES.get(game).minPlayers > 1
+  const needsOthers = PLAY_GAMES.get(game).minPlayers > 1 && !PLAY_GAMES.get(game).soloBots
   const reason = lockedReason ?? (needsOthers ? PLAY_HUB_COPY.soloNeedsPlayers : null)
   const isLocked = disabled || needsOthers
 

@@ -202,6 +202,12 @@ export const SCENES: Record<string, (tone: string) => ReactNode> = {
       <Sparks />
     </>
   ),
+  map: () => (
+    <>
+      <g transform="translate(-134 -130) scale(4.2)">{NEW_MARKS.playConcordat}</g>
+      <Sparks />
+    </>
+  ),
   sea: (tone) => (
     <>
       <circle r="114" {...tint('--play-naval-night')} />

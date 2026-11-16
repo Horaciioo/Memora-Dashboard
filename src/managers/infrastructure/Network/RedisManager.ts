@@ -339,11 +339,8 @@ export default class RedisManager extends EventEmitter {
       if (!this.redisPublisher) this.redisPublisher = await this._createClient('publisher')
 
       // Publish
-      const recipients = await this.redisPublisher.publish(channel, payload)
-
-      this.logger.debug(`Published to ${channel}, reached ${recipients} clients`)
-
-      return recipients
+      // Never logged, the live bus fires constantly
+      return await this.redisPublisher.publish(channel, payload)
     } catch (error) {
       this.logger.error(`Publish to channel ${channel} failed`, error)
 

@@ -60,6 +60,14 @@ export const scheduleDeadline = (
 }
 
 /**
+ * Deadline still waiting
+ * @param {string} key - Timer key
+ * @return {boolean} - Pending
+ */
+
+export const hasDeadline = (key: string): boolean => timers.has(key)
+
+/**
  * Drop a game's pending deadline
  * @param {string} sessionId - Game
  * @return {void}
@@ -73,12 +81,12 @@ export const clearDeadline = (sessionId: string): void => {
 
 /**
  * Session timer key, one per kind
- * @param {'idle' | 'away'} kind - Timer kind
+ * @param {'idle' | 'away' | 'bot' | 'tick'} kind - Timer kind
  * @param {string} sessionId - Game
  * @return {string} - Key
  */
 
-export const timerKey = (kind: 'idle' | 'away' | 'bot', sessionId: string): string =>
+export const timerKey = (kind: 'idle' | 'away' | 'bot' | 'tick', sessionId: string): string =>
   `${kind}:${sessionId}`
 
 /**
@@ -102,6 +110,7 @@ export const clearSessionTimers = (sessionId: string): void => {
   settled.delete(sessionId)
   clearDeadline(timerKey('idle', sessionId))
   clearDeadline(timerKey('away', sessionId))
+  clearDeadline(timerKey('tick', sessionId))
   // Every bot of the table
   const bots = `${timerKey('bot', sessionId)}:`
   for (const key of [...timers.keys()]) if (key.startsWith(bots)) clearDeadline(key)

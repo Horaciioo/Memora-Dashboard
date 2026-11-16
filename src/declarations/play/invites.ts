@@ -101,6 +101,7 @@ export const PLAY_INVITE_GAMES: Record<PlayGameName, { play: string; watch: stri
   [PlayGames.Glitch]: { play: 'à Glitch', watch: 'de Glitch' },
   [PlayGames.Suspens]: { play: 'à Suspens', watch: 'de Suspens' },
   [PlayGames.StopGo]: { play: 'à Stop & Go', watch: 'de Stop & Go' },
+  [PlayGames.Concordat]: { play: 'à Concordat', watch: 'de Concordat' },
   [PlayGames.Ludo]: { play: 'au Ludo', watch: 'de Ludo' },
   [PlayGames.Naval]: { play: 'à la Bataille navale', watch: 'de Bataille navale' },
 }

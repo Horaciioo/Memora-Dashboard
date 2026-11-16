@@ -59,6 +59,7 @@ export const CONFIGURATION_FILES: Record<ConfigurationFolder, string[]> = {
     'baccalaureat',
     'bomb',
     'bots',
+    'concordat',
     'croquis',
     'echo',
     'glitch',

@@ -18,6 +18,7 @@ export const PLAY_HUD_GAMES: ReadonlySet<PlayGameName> = new Set([
   PlayGames.Croquis,
   PlayGames.Suspens,
   PlayGames.StopGo,
+  PlayGames.Concordat,
 ])
 
 /**
@@ -37,7 +38,16 @@ export const PLAY_HUD_SKINS: ReadonlyMap<PlayGameName, string> = new Map([
   [PlayGames.Croquis, 'play-hud-block'],
   [PlayGames.Suspens, 'play-hud-block'],
   [PlayGames.StopGo, 'play-hud-block'],
+  [PlayGames.Concordat, 'play-hud-block'],
 ])
+
+/**
+ * Block skin of a lobby surface, the one of the game's own HUD blocks
+ * @param {PlayGameName} game - Game
+ * @return {string | undefined}
+ */
+
+export const lobbySkinOf = (game: PlayGameName) => PLAY_HUD_SKINS.get(game)
 
 /**
  * Shared HUD copy
@@ -46,6 +56,7 @@ export const PLAY_HUD_SKINS: ReadonlyMap<PlayGameName, string> = new Map([
 
 export const PLAY_HUD_COPY = {
   settings: 'Paramètres',
+  exit: 'Quitter',
   scorecard: 'Scores',
   collapse: 'Réduire',
   expand: 'Développer',

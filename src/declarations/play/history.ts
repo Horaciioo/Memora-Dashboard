@@ -50,6 +50,10 @@ export const PLAY_HISTORY_FACTS: Record<PlayGameName, Array<{ key: string; label
     { key: 'drawn', label: 'Dessins faits' },
     { key: 'understood', label: 'Dessins compris' },
   ],
+  [PlayGames.Concordat]: [
+    { key: 'tiles', label: 'Tuiles tenues au plus haut' },
+    { key: 'provinces', label: 'Provinces tenues' },
+  ],
   [PlayGames.StopGo]: [
     { key: 'km', label: 'Kilomètres parcourus' },
     { key: 'attacks', label: 'Attaques posées' },

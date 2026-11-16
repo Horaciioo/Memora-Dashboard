@@ -38,4 +38,6 @@ export const PLAY_STREAM_EVENTS = {
   board: 'board',
   // One chat line
   chat: 'chat',
+  // Changes of a real-time game since the previous one, binary
+  diff: 'diff',
 } as const
