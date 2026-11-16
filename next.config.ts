@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Second dev server
   distDir: process.env.NEXT_DIST_DIR || '.next',
+  // Docker build skips types, CI checks them
+  typescript: { ignoreBuildErrors: process.env.SKIP_TYPECHECK === '1' },
   // Exposed to the browser
   env: { NEXT_PUBLIC_APP_VERSION: displayVersion(version, stageOfBranch(deployedBranch)) },
   // Old French addresses keep working

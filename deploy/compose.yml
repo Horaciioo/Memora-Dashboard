@@ -34,6 +34,9 @@ services:
     build:
       context: ..
       target: build
+      args:
+        APP_ENV: ${APP_ENV:-main}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
     profiles: [tools]
     env_file: .env
     environment:
