@@ -424,6 +424,7 @@ model Account {
   ludoMoves             LudoMove[]
   stopGoPlayers         StopGoPlayer[]
   stopGoMoves           StopGoMove[]
+  concordatPlayers      ConcordatPlayer[]
   playMessages          PlayMessage[]
   navalPlayers          NavalPlayer[]
   playInvitesSent       PlayInvite[]             @relation("PlayInviteFrom")
@@ -3130,6 +3131,7 @@ enum PlayGame {
   CROQUIS
   SUSPENS
   STOP_GO
+  CONCORDAT
 }
 
 // Play bot level
@@ -3228,6 +3230,9 @@ model PlaySession {
   stopGoGame     StopGoGame?
   stopGoPlayers  StopGoPlayer[]
   stopGoMoves    StopGoMove[]
+  concordatGame    ConcordatGame?
+  concordatPlayers ConcordatPlayer[]
+  concordatEvents  ConcordatEvent[]
   golfGame       GolfGame?
   golfPlayers    GolfPlayer[]
   golfMoves      GolfMove[]
@@ -4637,4 +4642,69 @@ model StopGoMove {
 
   @@index([sessionId, rev])
   @@map("play_stopgo_moves")
+}
+
+// Concordat table
+model ConcordatGame {
+  sessionId       String   @id
+  seed            Int
+  size            String
+  style           String
+  speed           String
+  durationMinutes Int
+  // Encoded map
+  map             Bytes
+  // Deflated snapshot of the live state
+  snapshot        Bytes?
+  snapshotTick    Int      @default(0)
+  // Bumped with each snapshot
+  rev             Int      @default(0)
+  phase           String
+  // Process running the loop
+  ownerId         String?
+  heartbeatAt     DateTime?
+  startsAt        DateTime
+  updatedAt       DateTime @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_concordat_games")
+}
+
+// Nation of a player in a Concordat game
+model ConcordatPlayer {
+  id        String  @id @default(cuid())
+  sessionId String
+  accountId String
+  // Owner byte on the map
+  nation    Int
+  tiles     Int     @default(0)
+  peakTiles Int     @default(0)
+  score     Int     @default(0)
+  rank      Int?
+  provinces Int     @default(0)
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@unique([sessionId, nation])
+  @@map("play_concordat_players")
+}
+
+// Journal line of a Concordat game
+model ConcordatEvent {
+  id        String   @id @default(cuid())
+  sessionId String
+  tick      Int
+  kind      String
+  actor     Int      @default(0)
+  victim    Int      @default(0)
+  tile      Int      @default(-1)
+  createdAt DateTime @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, tick])
+  @@map("play_concordat_events")
 }
