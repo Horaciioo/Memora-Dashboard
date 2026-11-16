@@ -186,15 +186,12 @@ export const PLAY_BOT_LEVEL_LABELS: Record<PlayBotKindName, string> = {
 }
 
 /**
- * Robot portrait per level
- * @type {Record<PlayBotKindName, string>}
+ * Portrait of a callsign, Lorelei by Lisa Wischofsky (CC0)
+ * @param {number} index - Callsign index
+ * @return {string} - Image path
  */
 
-export const PLAY_BOT_AVATARS: Record<PlayBotKindName, string> = {
-  EASY: '/play/bots/easy.svg',
-  MEDIUM: '/play/bots/medium.svg',
-  HARD: '/play/bots/hard.svg',
-}
+export const botAvatarOf = (index: number): string => `/play/bots/avatars/${index}.svg`
 
 /**
  * Levels offered per game, one for Ludo
