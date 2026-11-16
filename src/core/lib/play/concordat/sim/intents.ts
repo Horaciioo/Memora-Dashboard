@@ -9,10 +9,12 @@ import {
   answerRefusal,
   breakRefusal,
   breakTie,
+  aidRefusal,
   giftRefusal,
   noteAttack,
   propose,
   proposeRefusal,
+  sendAid,
   sendGift,
 } from '@/core/lib/play/concordat/diplomacy'
 import { tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
@@ -127,6 +129,35 @@ const feintRefusal = (
   return engageRefusal(state, { ...intent, kind: 'engage' })
 }
 
+// Reason a defence is refused
+const defendRefusal = (
+  state: ConcordatState,
+  intent: Extract<ConcordatIntent, { kind: 'defend' }>
+): string | null => {
+  const me = state.players[intent.playerId - 1]
+  if (!Number.isInteger(intent.percent) || intent.percent < 1 || intent.percent > 100)
+    return 'badPercent'
+  if (!state.corps.some((corps) => corps.owner === intent.target && corps.target === me.id))
+    return 'noAttack'
+
+  return Math.floor((me.troops * intent.percent) / 100) < 1 ? 'tooFew' : null
+}
+
+// Put a share of the reserve against the pushes of one attacker, split by their troops
+const defend = (
+  state: ConcordatState,
+  intent: Extract<ConcordatIntent, { kind: 'defend' }>
+): void => {
+  const me = state.players[intent.playerId - 1]
+  const pushes = state.corps.filter(
+    (corps) => corps.owner === intent.target && corps.target === me.id
+  )
+  const amount = Math.floor((me.troops * intent.percent) / 100)
+  const total = pushes.reduce((sum, corps) => sum + corps.troops, 0) || 1
+  me.troops -= amount
+  for (const corps of pushes) corps.guard = (corps.guard ?? 0) + (amount * corps.troops) / total
+}
+
 // Send troops out
 const engage = (
   state: ConcordatState,
@@ -194,6 +225,8 @@ const systemRefusal = (state: ConcordatState, intent: ConcordatIntent): string |
       return breakRefusal(state, intent.playerId, intent.with)
     case 'gift':
       return giftRefusal(state, intent)
+    case 'aid':
+      return aidRefusal(state, intent)
     case 'closeTrade':
       return null
     default:
@@ -224,6 +257,8 @@ const applySystem = (state: ConcordatState, intent: ConcordatIntent): void => {
       return breakTie(state, intent.playerId, intent.with)
     case 'gift':
       return sendGift(state, intent)
+    case 'aid':
+      return sendAid(state, intent)
     case 'research':
       return startResearch(state, intent.playerId, intent.path)
     case 'launch':
@@ -250,6 +285,7 @@ export const intentRefusal = (state: ConcordatState, intent: ConcordatIntent): s
   if (state.phase !== ConcordatPhases.Playing) return 'notPlaying'
   if (intent.kind === 'engage') return engageRefusal(state, intent)
   if (intent.kind === 'feint') return feintRefusal(state, intent)
+  if (intent.kind === 'defend') return defendRefusal(state, intent)
   if (intent.kind === 'retreat') {
     return state.corps.some((corps) => corps.owner === me.id && corps.target === intent.target)
       ? null
@@ -257,6 +293,23 @@ export const intentRefusal = (state: ConcordatState, intent: ConcordatIntent): s
   }
 
   return systemRefusal(state, intent)
+}
+
+// A push with no way by land crosses the water instead, from the nearest own coast
+const landing = (state: ConcordatState, intent: ConcordatIntent): string | null => {
+  if (intent.kind !== 'engage' || intent.tile === undefined) return 'noContact'
+
+  const move: ConcordatIntent = {
+    kind: 'sail',
+    playerId: intent.playerId,
+    tile: intent.tile,
+    percent: intent.percent,
+  }
+  const refusal = systemRefusal(state, move)
+  if (refusal) return refusal
+  applySystem(state, move)
+
+  return null
 }
 
 /**
@@ -268,12 +321,14 @@ export const intentRefusal = (state: ConcordatState, intent: ConcordatIntent): s
 
 export const applyIntent = (state: ConcordatState, intent: ConcordatIntent): string | null => {
   const refusal = intentRefusal(state, intent)
+  if (refusal === 'noContact' || refusal === 'farZone') return landing(state, intent)
   if (refusal) return refusal
 
   // One handler per kind
   if (intent.kind === 'placeStart') state.players[intent.playerId - 1].start = intent.tile
   else if (intent.kind === 'engage') engage(state, intent)
   else if (intent.kind === 'feint') sendFeint(state, intent.playerId, intent.target, intent.percent)
+  else if (intent.kind === 'defend') defend(state, intent)
   else if (intent.kind !== 'retreat') applySystem(state, intent)
   else {
     const corps = state.corps.find(

@@ -1,6 +1,8 @@
 import { buildingById, isWorking } from '@/core/lib/play/concordat/buildings/rules'
 import { tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
-import { tradeIncomeOf } from '@/core/lib/play/concordat/trade/income'
+import { linkAllies } from '@/core/lib/play/concordat/trade/open'
+import { spawnCargo } from '@/core/lib/play/concordat/trade/ships'
+import { tradeIncomesOf } from '@/core/lib/play/concordat/trade/income'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatRoute, ConcordatState } from '@/types/concordat'
 import { ConcordatRouteKinds, ConcordatShipKinds, ConcordatTies } from '@/utils/constants/concordat'
@@ -14,7 +16,10 @@ const isStanding = (state: ConcordatState, route: ConcordatRoute): boolean => {
   const first = buildingById(state, route.buildingA)
   const second = buildingById(state, route.buildingB)
 
+  const isKept = !route.isAlliance || tieKindOf(state, route.a, route.b) === ConcordatTies.Alliance
+
   return Boolean(
+    isKept &&
     first &&
     second &&
     first.owner === route.a &&
@@ -62,7 +67,10 @@ const isCut = (state: ConcordatState, route: ConcordatRoute): boolean =>
  */
 
 export const runTrade = (state: ConcordatState): void => {
-  if (!CONCORDAT.features.trade || state.tick % trade.checkTicks !== 0) return
+  if (!CONCORDAT.features.trade) return
+  spawnCargo(state)
+  if (state.tick % trade.linkTicks === 0) linkAllies(state)
+  if (state.tick % trade.checkTicks !== 0) return
 
   const kept = state.routes.filter((route) => isStanding(state, route))
   if (kept.length !== state.routes.length) {
@@ -83,7 +91,6 @@ export const runTrade = (state: ConcordatState): void => {
       state.isSystemsDirty = true
     }
   }
-  for (const player of state.players) {
-    state.effects[player.id - 1].trade = player.alive ? tradeIncomeOf(state, player.id, cut) : 0
-  }
+  const incomes = tradeIncomesOf(state, cut)
+  for (const player of state.players) state.effects[player.id - 1].trade = incomes[player.id - 1]
 }

@@ -74,6 +74,7 @@ export const STOPGO_SETTINGS = {
     min: 15,
     max: 60,
   }),
+  safeties: readBoolean(stopgo.safeties, { path: 'play/stopgo.safeties', fallback: true }),
   turnStep: readInteger(stopgo.turnStep, { path: 'play/stopgo.turnStep', fallback: 5, min: 1 }),
   strikes: readInteger(stopgo.strikes, { path: 'play/stopgo.strikes', fallback: 3, min: 1 }),
   afkSeconds: readInteger(stopgo.afkSeconds, {
@@ -87,7 +88,6 @@ export const STOPGO_SETTINGS = {
     min: 0,
   }),
   kmShare: Math.min(1, Math.max(0, Number(stopgo.kmShare) || 0)),
-  pityShare: Math.min(1, Math.max(0, Number(stopgo.pityShare) || 0)),
   counterSeconds: readInteger(counter.seconds, {
     path: 'play/stopgo.counter.seconds',
     fallback: 5,

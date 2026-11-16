@@ -1,6 +1,9 @@
+import type { CSSProperties } from 'react'
+
 import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayConfetti } from '@/composites/play/baccalaureat/PlayConfetti'
 import { PlayMedal } from '@/composites/play/shared/PlayMedal'
+import { PLAY_END_TIMING } from '@/declarations/play/end'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_BOARD, PLAY_PODIUM, PLAY_PODIUM_BLOCKS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -9,6 +12,12 @@ import { cn } from '@/utils/classnames'
 const PODIUM_ORDER = [2, 1, 3]
 const PODIUM_SIZE = PODIUM_ORDER.length
 const WINNER = 1
+// Moment each place rises, third first
+const RISE_AT: Record<number, number> = {
+  1: PLAY_END_TIMING.first,
+  2: PLAY_END_TIMING.second,
+  3: PLAY_END_TIMING.third,
+}
 
 /**
  * Player on a final ranking
@@ -42,14 +51,18 @@ export const PlayPodium = ({
 
   return (
     <div className={PLAY_PODIUM.stage}>
-      {hasWinner && <PlayConfetti />}
+      {hasWinner && <PlayConfetti delayMs={PLAY_END_TIMING.confetti} />}
       <div className={PLAY_PODIUM.row}>
         {PODIUM_ORDER.map((place) => {
           const entry = ranked[place - 1]
           if (!entry) return null
 
           return (
-            <div key={place} className={PLAY_PODIUM.place}>
+            <div
+              key={place}
+              className={PLAY_PODIUM.place}
+              style={{ '--at': `${RISE_AT[place]}ms` } as CSSProperties}
+            >
               <div className={PLAY_PODIUM.face}>
                 {place === WINNER && hasWinner && (
                   <CrownIcon className={PLAY_PODIUM.crown} aria-hidden="true" />
@@ -71,7 +84,10 @@ export const PlayPodium = ({
         })}
       </div>
       {ranked.length > PODIUM_SIZE && (
-        <ol className={BAC_BOARD.ranks}>
+        <ol
+          className={cn(BAC_BOARD.ranks, 'play-end-in')}
+          style={{ animationDelay: `${PLAY_END_TIMING.rest}ms` }}
+        >
           {ranked.slice(PODIUM_SIZE).map((entry, index) => (
             <li key={entry.accountId} className={BAC_BOARD.rank}>
               <span className={BAC_BOARD.rankIndex}>{index + PODIUM_SIZE + 1}</span>

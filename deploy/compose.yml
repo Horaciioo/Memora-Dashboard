@@ -34,6 +34,9 @@ services:
     build:
       context: ..
       target: build
+      args:
+        APP_ENV: ${APP_ENV:-main}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
     profiles: [tools]
     env_file: .env
     environment:
@@ -108,6 +111,7 @@ services:
       DOMAIN: ${DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./maintenance.html:/srv/maintenance.html:ro
       - caddy-data:/data
       - caddy-config:/config
     depends_on: [app, status]

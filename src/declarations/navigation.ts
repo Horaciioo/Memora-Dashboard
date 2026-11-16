@@ -86,6 +86,7 @@ export const ROUTES = {
   playLive: '/play/live',
   playOnline: '/play/online',
   playStats: '/play/stats',
+  playSettings: '/play/settings',
   playStatsGame: (slug: string) => `/play/stats?game=${slug}`,
   playHistory: (game?: string, cursor?: string) => {
     const query = new URLSearchParams()
@@ -103,7 +104,6 @@ export const ROUTES = {
   playSessionInvite: (id: string) => `/play/sessions/${id}?${PLAY_INVITE_QUERY}=1`,
   playJoinCode: (code: string) => `/play/join/${code}`,
   preferences: '/preferences',
-  preferencesPlay: '/preferences?tab=play',
   settings: '/settings',
   teams: '/settings/creators',
   settingsSection: (section: string) => `/settings/${section}`,

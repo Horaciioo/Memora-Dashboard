@@ -4,6 +4,7 @@ import { ConcordatGlyph } from '@/composites/play/concordat/hud/ConcordatGlyph'
 import {
   clockText,
   compactFigure,
+  troopFigure,
   landShareText,
   landTilesOf,
   playerRgb,
@@ -12,6 +13,7 @@ import {
 } from '@/core/lib/play/concordat'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
+import { ConcordatCoin } from '@/composites/play/concordat/hud/ConcordatCoin'
 import { CONCORDAT_STAT_GLYPHS } from '@/declarations/play/concordat/glyphs'
 import {
   CONCORDAT_BUILDING_TITLES,
@@ -22,13 +24,10 @@ import {
 import { CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { CONCORDAT_HOVER } from '@/declarations/ui/variants'
-import {
-  CONCORDAT_BUILDING_ORDER,
-  ConcordatPowers,
-  ConcordatShipKinds,
-  ConcordatTerrains,
-  ConcordatTies,
-} from '@/utils/constants/concordat'
+import { ConcordatPowers, ConcordatShipKinds, ConcordatTerrains } from '@/utils/constants/concordat'
+
+// Counted buildings, always shown even at zero
+const CONCORDAT_HOVER_BUILDINGS = ['market', 'barracks', 'port', 'silo', 'sam'] as const
 
 export interface ConcordatHoverCardProps {
   client: ConcordatClientState
@@ -78,7 +77,7 @@ export const ConcordatHoverCard = ({ client, names, tile, holder }: ConcordatHov
     : null
 
   const badges = [
-    ...CONCORDAT_BUILDING_ORDER.map((kind) => ({
+    ...CONCORDAT_HOVER_BUILDINGS.map((kind) => ({
       key: kind,
       title: CONCORDAT_BUILDING_TITLES[kind],
       count: client.systems.buildings.filter(
@@ -94,7 +93,7 @@ export const ConcordatHoverCard = ({ client, names, tile, holder }: ConcordatHov
       ).length,
       glyph: 'fighter' as const,
     },
-  ].filter((badge) => badge.count > 0)
+  ]
 
   const kindLabel =
     player.kind === ConcordatPowers.Human
@@ -105,79 +104,62 @@ export const ConcordatHoverCard = ({ client, names, tile, holder }: ConcordatHov
 
   return (
     <div className={CONCORDAT_HOVER.card} data-hud="concordat">
-      <div className={CONCORDAT_HOVER.left}>
-        <span className={CONCORDAT_HOVER.gold}>
-          <svg width={14} height={14} viewBox="0 0 24 24" aria-hidden="true">
-            <path d={CONCORDAT_STAT_GLYPHS.gold} fill="currentColor" fillRule="evenodd" />
+      <span className={CONCORDAT_HOVER.gold}>
+        <ConcordatCoin />
+        {compactFigure(player.gold)}
+      </span>
+      <div
+        className={CONCORDAT_HOVER.bar}
+        role="img"
+        aria-label={fillPlayMessage(CONCORDAT_HOVER_COPY.troopsOf, {
+          troops: troopFigure(player.troops),
+          max: troopFigure(max),
+        })}
+      >
+        <span className={CONCORDAT_HOVER.barFill} style={{ width: `${fill}%` }} />
+        <span className={CONCORDAT_HOVER.barPush} style={{ left: `${fill}%`, width: `${push}%` }} />
+        <span className={CONCORDAT_HOVER.barText}>
+          <svg width={13} height={13} viewBox="0 0 24 24" aria-hidden="true">
+            <path d={CONCORDAT_STAT_GLYPHS.troops} fill="currentColor" fillRule="evenodd" />
           </svg>
-          {compactFigure(player.gold)}
+          {troopFigure(player.troops)} / {troopFigure(max)}
         </span>
-        {sending > 0 && (
-          <span className={CONCORDAT_HOVER.sending} title={CONCORDAT_HOVER_COPY.sending}>
-            ↑ {compactFigure(sending)}
-          </span>
-        )}
-        <div
-          className={CONCORDAT_HOVER.bar}
-          role="img"
-          aria-label={fillPlayMessage(CONCORDAT_HOVER_COPY.troopsOf, {
-            troops: compactFigure(player.troops),
-            max: compactFigure(max),
-          })}
-        >
-          <span className={CONCORDAT_HOVER.barFill} style={{ width: `${fill}%` }} />
-          <span
-            className={CONCORDAT_HOVER.barPush}
-            style={{ left: `${fill}%`, width: `${push}%` }}
-          />
-          <span className={CONCORDAT_HOVER.barText}>
-            <svg width={11} height={11} viewBox="0 0 24 24" aria-hidden="true">
-              <path d={CONCORDAT_STAT_GLYPHS.troops} fill="currentColor" fillRule="evenodd" />
-            </svg>
-            {compactFigure(player.troops)} / {compactFigure(max)}
-          </span>
-        </div>
       </div>
+      <span className={CONCORDAT_HOVER.sending} title={CONCORDAT_HOVER_COPY.sending}>
+        ↑ {troopFigure(sending)}
+      </span>
       <div className={CONCORDAT_HOVER.right}>
         <span className={CONCORDAT_HOVER.nameRow}>
           <span className={CONCORDAT_HOVER.swatch} style={{ background: rgbText(rgb) }} />
           <span className={CONCORDAT_HOVER.name}>{names[holder]}</span>
+          <span className={CONCORDAT_HOVER.faint}>
+            {player.alive ? kindLabel : CONCORDAT_HUD_COPY.fallen}
+          </span>
         </span>
         <span className={CONCORDAT_HOVER.faint}>
-          {player.alive ? kindLabel : CONCORDAT_HUD_COPY.fallen}
-          {' · '}
           {fillPlayMessage(CONCORDAT_HUD_COPY.engageValue, {
             percent: landShareText(player.tiles, land),
           })}
           {province ? ` · ${province.name}` : ''}
+          {tie && (
+            <>
+              {' · '}
+              {CONCORDAT_TIE_LABELS[tie]}
+              {tieRow
+                ? ` · ${clockText((tieRow.until - client.tick) / CONCORDAT_TICKS_PER_SECOND)}`
+                : ''}
+            </>
+          )}
         </span>
-        {tie && (
-          <span
-            className={
-              tie === ConcordatTies.Alliance
-                ? CONCORDAT_HOVER.tieAlly
-                : tie === ConcordatTies.Peace
-                  ? CONCORDAT_HOVER.tiePeace
-                  : CONCORDAT_HOVER.tieWar
-            }
-          >
-            {CONCORDAT_TIE_LABELS[tie]}
-            {tieRow
-              ? ` · ${clockText((tieRow.until - client.tick) / CONCORDAT_TICKS_PER_SECOND)}`
-              : ''}
-          </span>
-        )}
-        {badges.length > 0 && (
-          <span className={CONCORDAT_HOVER.badges}>
-            {badges.map((badge) => (
-              <span key={badge.key} className={CONCORDAT_HOVER.badge} title={badge.title}>
-                <ConcordatGlyph kind={badge.glyph} size={13} />
-                {badge.count}
-              </span>
-            ))}
-          </span>
-        )}
       </div>
+      <span className={CONCORDAT_HOVER.badges}>
+        {badges.map((badge) => (
+          <span key={badge.key} className={CONCORDAT_HOVER.badge} title={badge.title}>
+            <ConcordatGlyph kind={badge.glyph} size={16} />
+            {badge.count}
+          </span>
+        ))}
+      </span>
     </div>
   )
 }

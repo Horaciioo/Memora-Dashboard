@@ -1,5 +1,6 @@
 import { buildingById } from '@/core/lib/play/concordat/buildings/rules'
 import { seaAround, seaPath } from '@/core/lib/play/concordat/navy/path'
+import { sailRoute } from '@/core/lib/play/concordat/navy/route'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
@@ -67,11 +68,9 @@ export const sail = (
   state: ConcordatState,
   intent: Extract<ConcordatIntent, { kind: 'sail' }>
 ): void => {
-  const port = buildingById(state, intent.port)
   const me = state.players[intent.playerId - 1]
-  const way =
-    port && seaPath(state.map, seaAround(state.map, port.tile), seaAround(state.map, intent.tile))
-  if (!port || !way) return
+  const way = sailRoute(state, me.id, intent.tile)?.way
+  if (!way) return
 
   const troops = Math.floor((me.troops * intent.percent) / 100)
   me.troops -= troops
@@ -85,7 +84,7 @@ export const sail = (
     troops,
     landing: intent.tile,
     ttl: 0,
-    port: port.id,
+    port: 0,
     progress: 0,
   })
   state.isSystemsDirty = true

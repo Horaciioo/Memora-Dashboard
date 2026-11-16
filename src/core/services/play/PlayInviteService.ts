@@ -115,7 +115,10 @@ const playedWith = async (accountId: string): Promise<Map<string, number>> => {
     select: { sessionId: true },
   })
   const seats = await prisma.playSeat.findMany({
-    where: { sessionId: { in: games.map((game) => game.sessionId) }, accountId: { not: accountId } },
+    where: {
+      sessionId: { in: games.map((game) => game.sessionId) },
+      accountId: { not: accountId },
+    },
     select: { accountId: true, joinedAt: true },
   })
   const latest = new Map<string, number>()

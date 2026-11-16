@@ -27,7 +27,7 @@ const SWIPE_DISMISS_PX = 80
 const ToastTitle = ({
   title,
   emphasis,
-  isNegative
+  isNegative,
 }: {
   title: string
   emphasis?: string

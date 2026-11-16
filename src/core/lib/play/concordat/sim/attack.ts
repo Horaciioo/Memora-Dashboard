@@ -16,6 +16,18 @@ const near = new Int32Array(NEIGHBOR_SLOTS)
 const around = new Int32Array(NEIGHBOR_SLOTS)
 
 /**
+ * Corps removed, the guard against it goes home
+ * @param {ConcordatState} state - Game
+ * @param {ConcordatCorps} corps - Corps
+ * @return {void}
+ */
+
+export const drop = (state: ConcordatState, corps: ConcordatCorps): void => {
+  if (corps.guard && corps.target) state.players[corps.target - 1].troops += corps.guard
+  state.corps = state.corps.filter((other) => other !== corps)
+}
+
+/**
  * Corps troops back to the reserve
  * @param {ConcordatState} state - Game
  * @param {ConcordatCorps} corps - Corps
@@ -25,7 +37,7 @@ const around = new Int32Array(NEIGHBOR_SLOTS)
 
 export const disband = (state: ConcordatState, corps: ConcordatCorps, lossShare: number): void => {
   state.players[corps.owner - 1].troops += corps.troops * (1 - lossShare)
-  state.corps = state.corps.filter((other) => other !== corps)
+  drop(state, corps)
 }
 
 // Own neighbours of a tile
@@ -86,7 +98,7 @@ const tileCost = (
   tile: number,
   mine: number
 ): number => {
-  const density = defenseDensity(state, corps.owner, corps.target)
+  const density = defenseDensity(state, corps.owner, corps.target, corps.guard)
   let cost = density * TERRAIN_DEFENSE[state.map.terrain[tile]]
   cost *=
     (1 + fortressBonus(state, corps.target, tile)) * attackFactor(state, corps.owner, corps.target)
@@ -209,7 +221,10 @@ const capture = (
 
   // Defender bleeds, calm drops
   const defender = state.players[corps.target - 1]
-  defender.troops = Math.max(0, defender.troops - cost * sim.defenderLoss)
+  const bleed = cost * sim.defenderLoss
+  const guarded = Math.min(corps.guard ?? 0, bleed)
+  corps.guard = (corps.guard ?? 0) - guarded
+  defender.troops = Math.max(0, defender.troops - (bleed - guarded))
   attacker.stability = Math.max(0, attacker.stability - sim.stabilityConquest)
   if (defender.capital === tile) {
     defender.capital = -1
@@ -233,10 +248,20 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
   if (!contact.tiles.length) return disband(state, corps, 0)
 
   // Budget follows the length of the front
-  const density = Math.max(0.01, defenseDensity(state, corps.owner, corps.target))
+  const density = Math.max(0.01, defenseDensity(state, corps.owner, corps.target, corps.guard))
   const frontage = Math.max(1, Math.min(contact.tiles.length, corps.troops / density))
   const pace = front.driveMin + (front.driveMax - front.driveMin) * (corps.drive ?? 0.5)
-  corps.progress += contact.tiles.length * front.speed * pace * TICK_SECONDS * state.speed
+  // Force ratio: the guard slows the push by its weight against the attackers
+  const guard = (corps.guard ?? 0) * sim.guardWeight
+  const ratio = Math.max(sim.guardFloor, corps.troops / (corps.troops + guard))
+  // Tired corps slow down little by little instead of stopping dead
+  const fade = Math.min(1, Math.max(front.fadeFloor, corps.troops / front.fadeTroops))
+  corps.progress +=
+    contact.tiles.length * front.speed * pace * ratio * fade * TICK_SECONDS * state.speed
+
+  // Not enough progress for a tile and no hole to fill: skip the ranking sort
+  if (corps.progress < 1 && !contact.own.some((mine) => mine >= sim.enclaveNeighbors)) return
+
   const scale = lossScale(state, corps)
 
   // Take tiles while budget and troops allow
@@ -268,7 +293,7 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
     corps.progress = Math.min(corps.progress, 1)
     corps.troops -= corps.troops * sim.stallLoss * TICK_SECONDS * state.speed
   }
-  if (corps.troops < 1) state.corps = state.corps.filter((other) => other !== corps)
+  if (corps.troops < 1) drop(state, corps)
 }
 
 /**

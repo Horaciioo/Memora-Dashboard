@@ -6,8 +6,10 @@ import { ConcordatGlyph } from '@/composites/play/concordat/hud/ConcordatGlyph'
 import { ConcordatGold } from '@/composites/play/concordat/hud/ConcordatGold'
 import {
   airOpenAt,
+  builtCountOf,
   buildCostOf,
   clockText,
+  compactFigure,
   stockOf,
   weaponsOpenAt,
 } from '@/core/lib/play/concordat'
@@ -33,6 +35,7 @@ interface Slot {
   glyph: Parameters<typeof ConcordatGlyph>[0]['kind']
   title: string
   note: string
+  count?: number
   isOff: boolean
   tool: ConcordatTool
 }
@@ -76,6 +79,7 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
         glyph: kind,
         title: CONCORDAT_BUILDING_TITLES[kind],
         note: String(cost),
+        count: builtCountOf(client, kind),
         isOff: gold < cost,
         tool: { kind: 'build', building: kind },
       }
@@ -92,7 +96,7 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
       key: 'heavy',
       glyph: 'heavy',
       title: CONCORDAT_HUD_COPY.heavy,
-      note: waitTicks > 0 ? '·' : String(weapons.heavyCost),
+      note: waitTicks > 0 ? '·' : compactFigure(weapons.heavyCost),
       isOff: waitTicks > 0 || stock.heavy >= weapons.heavyMax || gold < weapons.heavyCost,
       tool: { kind: 'launch', isHeavy: true },
     },
@@ -156,7 +160,7 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
         // Spoken label, the tip draws the cost as a glyph
         const title = isLocked
           ? `${slot.title}, ${lockText}`
-          : `${slot.title}, ${fillPlayMessage(CONCORDAT_HUD_COPY.goldCost, { gold: cost })}`
+          : `${slot.title}, ${fillPlayMessage(CONCORDAT_HUD_COPY.goldCost, { gold: compactFigure(cost) })}`
 
         return (
           <div key={slot.key} className="group/arm relative shrink-0">
@@ -169,6 +173,7 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
               onClick={() => setTool(isArmed ? null : slot.tool)}
             >
               <span className={CONCORDAT_HUD.armKey}>{index + 1}</span>
+              {slot.count ? <span className={CONCORDAT_HUD.armCount}>{slot.count}</span> : null}
               <ConcordatGlyph kind={slot.glyph} />
               <span className={CONCORDAT_HUD.armNote}>{slot.note}</span>
             </button>

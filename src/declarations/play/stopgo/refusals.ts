@@ -15,6 +15,7 @@ export const StopGoRefusals = {
   TooFewTargets: 'tooFewTargets',
   BadTarget: 'badTarget',
   AlreadyHit: 'alreadyHit',
+  AlreadyStopped: 'alreadyStopped',
   Shielded: 'shielded',
   AlreadyLaid: 'alreadyLaid',
   NoCounter: 'noCounter',

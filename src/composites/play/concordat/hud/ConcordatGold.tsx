@@ -1,4 +1,5 @@
-import { CONCORDAT_STAT_GLYPHS } from '@/declarations/play/concordat/glyphs'
+import { ConcordatCoin } from '@/composites/play/concordat/hud/ConcordatCoin'
+import { compactFigure } from '@/core/lib/play/concordat/view/ranking'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 
 export interface ConcordatGoldProps {
@@ -17,10 +18,7 @@ export interface ConcordatGoldProps {
 export const ConcordatGold = ({ amount, prefix = '', className }: ConcordatGoldProps) => (
   <span className={className ?? 'inline-flex items-center gap-1 tabular-nums'}>
     {prefix}
-    {amount}
-    <svg width={14} height={14} viewBox="0 0 24 24" role="img" aria-label={CONCORDAT_HUD_COPY.gold}>
-      <title>{CONCORDAT_HUD_COPY.gold}</title>
-      <path d={CONCORDAT_STAT_GLYPHS.gold} fill="currentColor" fillRule="evenodd" />
-    </svg>
+    {compactFigure(amount)}
+    <ConcordatCoin title={CONCORDAT_HUD_COPY.gold} />
   </span>
 )

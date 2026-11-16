@@ -13,7 +13,11 @@ const height = (LAT_MAX - LAT_MIN) * PPD
 const mask = new Uint8Array(width * height)
 
 const polygonsOf = (geometry) =>
-  geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.type === 'MultiPolygon' ? geometry.coordinates : []
+  geometry.type === 'Polygon'
+    ? [geometry.coordinates]
+    : geometry.type === 'MultiPolygon'
+      ? geometry.coordinates
+      : []
 
 // Even-odd fill of one polygon at pixel centres, value 1 or 0
 const fill = (rings, value) => {
@@ -75,5 +79,8 @@ for (const cell of mask) {
 push(run)
 
 const packed = deflateSync(Uint8Array.from(bytes)).toString('base64')
-writeFileSync(outPath, JSON.stringify({ ppd: PPD, lonMin: LON_MIN, latMax: LAT_MAX, width, height, data: packed }))
+writeFileSync(
+  outPath,
+  JSON.stringify({ ppd: PPD, lonMin: LON_MIN, latMax: LAT_MAX, width, height, data: packed })
+)
 console.log(width, height, bytes.length, packed.length)

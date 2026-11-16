@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { LevelFrame } from '@/composites/play/skin/LevelFrame'
 import { PlayLevelBar } from '@/composites/play/member/stats/PlayLevelBar'
 import { levelShare } from '@/core/lib/play'
 import { fillPlayMessage, PLAY_HUB_COPY, tierOf } from '@/declarations/play'
@@ -24,7 +24,7 @@ export const PlayPlayerCard = ({ totals, player }: PlayPlayerCardProps) => {
     <div className={PLAY_STATS.playerFrame}>
       <div className={PLAY_STATS.player}>
         <div className={PLAY_STATS.face}>
-          <Avatar name={player.name} src={player.avatarUrl} size="xl" />
+          <LevelFrame level={level.level} name={player.name} src={player.avatarUrl} size="xl" />
           <span className={PLAY_STATS.faceLevel}>{level.level}</span>
         </div>
 

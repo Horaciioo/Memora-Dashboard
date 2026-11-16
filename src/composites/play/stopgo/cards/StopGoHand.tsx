@@ -9,6 +9,7 @@ import { reasonOf } from '@/composites/play/stopgo/cards/reasons'
 import type { StopGoHandCardView } from '@/composites/play/stopgo/cards/types'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import type { StopGoBoardView } from '@/core/lib/play/stopgo'
+import { STOPGO_HAND_COPY } from '@/declarations/play/stopgo/copy'
 import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { STOPGO_HAND } from '@/declarations/ui/variants/games/play/stopgo'
 import { cn } from '@/utils/classnames'
@@ -25,6 +26,10 @@ export interface StopGoHandProps {
   isTurn: boolean
   // First turn: the hand is dealt card by card from the pile
   isOpening: boolean
+  // Sealed cards still taking a slot, their face stays hidden
+  sealedCount: number
+  canReveal: boolean
+  onReveal: () => void
   onChoose: (id: string | null) => void
   onQuickPlay: (id: string) => void
 }
@@ -48,6 +53,9 @@ export const StopGoHand = ({
   chosenId,
   isTurn,
   isOpening,
+  sealedCount,
+  canReveal,
+  onReveal,
   onChoose,
   onQuickPlay,
 }: StopGoHandProps) => {
@@ -110,6 +118,20 @@ export const StopGoHand = ({
           </div>
         )
       })}
+      {Array.from({ length: sealedCount }, (_, at) => (
+        <div key={`sealed-${at}`} className={STOPGO_HAND.slot}>
+          <button
+            type="button"
+            className={cn('stopgo-card stopgo-card-back', STOPGO_HAND.mystery)}
+            disabled={!canReveal}
+            title={STOPGO_HAND_COPY.mysteryHint}
+            onClick={onReveal}
+          >
+            <b aria-hidden>?</b>
+            <small>{STOPGO_HAND_COPY.mysteryCard}</small>
+          </button>
+        </div>
+      ))}
     </div>
   )
 }

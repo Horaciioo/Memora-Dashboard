@@ -3,13 +3,19 @@
 import { useRef, useState } from 'react'
 import type { Dispatch, RefObject, SetStateAction } from 'react'
 
+import { tieOfRows } from '@/core/lib/play/concordat'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
 import { reachOf } from '@/core/lib/play/concordat/sim/area'
 import { baseFor, batteryFor } from '@/core/lib/play/concordat/view/arsenal'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import { ConcordatBuildingKinds } from '@/utils/constants/concordat'
-import { ConcordatIntents, ConcordatPhases, ConcordatTerrains } from '@/utils/constants/concordat'
+import {
+  ConcordatIntents,
+  ConcordatPhases,
+  ConcordatTerrains,
+  ConcordatTies,
+} from '@/utils/constants/concordat'
 
 export interface ConcordatStrike {
   tile: number
@@ -149,8 +155,26 @@ export const useConcordatTaps = ({
 
       return
     }
+    // Hostile land is hit at once, each tap sends the share again
+    if (tieOfRows(client.systems.ties, client.me, holder) === ConcordatTies.Hostile) {
+      mark(tile, 'expand')
+      void act({ type: ConcordatIntents.Engage, target: holder, percent, tile }).then((isDone) => {
+        if (!isDone) mark(tile, 'refused')
+      })
+
+      return
+    }
     setMenu({ holder, tile, x, y })
   }
 
-  return { hover, onHover, onTap }
+  // Right click opens the gestures of a nation
+  const onMenu = (tile: number, x: number, y: number) => {
+    const holder = tile < 0 ? 0 : client.owner[tile]
+    if (!isSeated || !holder || holder === client.me) return
+    if (client.phase !== ConcordatPhases.Playing) return
+    setStrike(null)
+    setMenu({ holder, tile, x, y })
+  }
+
+  return { hover, onHover, onTap, onMenu }
 }

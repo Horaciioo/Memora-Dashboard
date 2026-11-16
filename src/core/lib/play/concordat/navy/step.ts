@@ -1,5 +1,6 @@
 import { isWorking } from '@/core/lib/play/concordat/buildings/rules'
 import { escortsOf, foesOf, landShip } from '@/core/lib/play/concordat/navy/land'
+import { settleCargo } from '@/core/lib/play/concordat/trade/ships'
 import { emit } from '@/core/lib/play/concordat/sim/emit'
 import { ticksOf, TICK_SECONDS } from '@/core/lib/play/concordat/sim/tables'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
@@ -22,7 +23,12 @@ const reach = (state: ConcordatState, first: number, second: number): number => 
 const sailOn = (state: ConcordatState, ship: ConcordatShip): void => {
   if (!ship.path.length) return
 
-  const speed = ship.kind === ConcordatShipKinds.War ? navy.warSpeed : navy.transportSpeed
+  const speeds = {
+    [ConcordatShipKinds.War]: navy.warSpeed,
+    [ConcordatShipKinds.Transport]: navy.transportSpeed,
+    [ConcordatShipKinds.Trade]: CONCORDAT.trade.ships.speed,
+  }
+  const speed = speeds[ship.kind]
   const boost = 1 + state.effects[ship.owner - 1].shipSpeed
   ship.progress += speed * boost * TICK_SECONDS * state.speed
   while (ship.progress >= 1 && ship.path.length) {
@@ -80,6 +86,10 @@ export const runNavy = (state: ConcordatState): void => {
 
   for (const ship of [...state.ships]) {
     sailOn(state, ship)
+    if (ship.kind === ConcordatShipKinds.Trade) {
+      if (settleCargo(state, ship)) state.ships = state.ships.filter((other) => other !== ship)
+      continue
+    }
     if (ship.kind !== ConcordatShipKinds.Transport) continue
 
     if (isIntercepted(state, ship)) {

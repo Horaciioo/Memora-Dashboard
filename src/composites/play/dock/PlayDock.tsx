@@ -3,12 +3,12 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayDockFeed } from '@/composites/play/dock/PlayDockFeed'
 import { PlayDockPlayer } from '@/composites/play/dock/PlayDockPlayer'
 import { PlayDockStats } from '@/composites/play/dock/PlayDockStats'
 import { PlayDockTrophies } from '@/composites/play/dock/PlayDockTrophies'
+import { LevelFrame } from '@/composites/play/skin/LevelFrame'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HISTORY_COPY, PLAY_HUB_COPY } from '@/declarations/play'
@@ -206,11 +206,11 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
           className={PLAY_DOCK.avatarButton}
           onClick={() => toggle('player')}
         >
-          <Avatar
+          <LevelFrame
+            level={profile.global.level.level}
             name={player.name}
             src={player.avatarUrl}
             size="lg"
-            className={PLAY_DOCK.avatarRing}
           />
           <span className={PLAY_DOCK.level}>{profile.global.level.level}</span>
           {tip(PLAY_HUB_COPY.dockPlayer)}

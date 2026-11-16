@@ -22,9 +22,9 @@ export interface StopGoCarProps {
 }
 
 // Car and portrait scale
-const SCALE = 1.6
-const PORTRAIT = 13
-const RING = 34
+const SCALE = 1.15
+const PORTRAIT = 10
+const RING = 26
 
 /**
  * Car on its road, glides along the track and wears the portrait of its driver

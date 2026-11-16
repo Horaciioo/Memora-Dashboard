@@ -36,7 +36,10 @@ export const usePlayLiveVote = (
   return useMemo(
     () =>
       live && live.base === base
-        ? ({ ...(settings as Record<string, unknown>), vote: live.vote } as unknown as Prisma.JsonValue)
+        ? ({
+            ...(settings as Record<string, unknown>),
+            vote: live.vote,
+          } as unknown as Prisma.JsonValue)
         : settings,
     [live, base, settings]
   )

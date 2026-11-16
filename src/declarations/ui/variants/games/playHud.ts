@@ -13,7 +13,7 @@ export const PLAY_HUD = {
   // Stage under the HUD, fills the screen
   stage: 'relative flex min-h-0 w-full flex-1 flex-col items-center justify-center',
   // Top row: players, info card, keys
-  top: 'absolute inset-x-3 top-3 flex items-start justify-between gap-3 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:pr-[3.75rem] md:inset-x-5 md:top-4',
+  top: 'play-hud-top absolute inset-x-3 top-3 flex items-start justify-between gap-3 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:pr-[3.75rem] md:inset-x-5 md:top-4',
   strip: `${BLOCK} pointer-events-auto hidden items-center gap-2.5 px-2.5 py-1.5 md:order-1 md:flex`,
   player: 'relative flex flex-col items-center gap-1',
   playerFace: 'overflow-hidden rounded-full',

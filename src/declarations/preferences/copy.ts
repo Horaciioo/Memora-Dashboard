@@ -9,7 +9,6 @@ export const PREFERENCES_COPY = {
   tabInformation: 'Informations',
   tabDisplay: 'Préférences',
   tabSecurity: 'Sécurité',
-  tabPlay: 'Memora Play',
   informationTitle: 'Mes informations',
   informationLead: 'Ce que tu peux corriger toi-même.',
   fileTitle: 'Mon profil',

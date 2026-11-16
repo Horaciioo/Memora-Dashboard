@@ -144,7 +144,9 @@ export const useConcordatLayers = (
       ownerContext?.putImageData(current.owner, 0, 0, box.x, box.y, box.width, box.height)
     }
     // Names follow the land a little late
-    if (isFresh || performance.now() - current.placesAt > labelMs) {
+    // A full scan costs tens of ms on a big map: only when land moved
+    const isStale = performance.now() - current.placesAt > labelMs
+    if (isFresh || (touched.length > 0 && isStale)) {
       current.places = placesOf(client.owner, client.map.width, client.players.length)
       current.placesAt = performance.now()
     }

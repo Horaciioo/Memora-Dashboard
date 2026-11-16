@@ -1,10 +1,8 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import { FileTabs } from '@/components/structures/page/FileTabs'
-import { PlayStatsBoard } from '@/composites/play/member/PlayStatsBoard'
 import { ProfileCard } from '@/composites/preferences/ProfileCard'
 import type { AccountsSectionProps } from '@/composites/preferences/AccountsSection'
 import { AppearanceTab } from '@/composites/preferences/tabs/AppearanceTab'
@@ -21,15 +19,12 @@ import { SETTINGS_TABS } from '@/declarations/preferences/settings'
 import type { SettingsTabName } from '@/declarations/preferences/settings'
 import { TABS_STYLES, PREFERENCE_STYLES } from '@/declarations/ui/variants'
 import type { FieldDefinition } from '@/types/forms'
-import type { PlayProfileView } from '@/types/play'
 import type { ProfileDetail, AccountSession } from '@/types/preferences'
 import type { PushSettingsView } from '@/types/push'
 
 export interface PreferencesPanelProps extends Omit<AccountsSectionProps, 'discord'> {
   initialProfile: ProfileDetail
   fields: FieldDefinition[]
-  // Memora Play stats, for members it opens to
-  play: PlayProfileView | null
   push: { publicKey: string | null; settings: PushSettingsView }
   dock: { candidates: NavigationItem[]; saved: string[] }
   sessions: AccountSession[]
@@ -47,17 +42,13 @@ export const PreferencesPanel = ({
   links,
   available,
   returned,
-  play,
   push,
   dock,
   sessions,
 }: PreferencesPanelProps) => {
-  const params = useSearchParams()
   const state = useProfile(initialProfile)
   const { profile } = state
-  const [tab, setTab] = useState<string>(() =>
-    params.get('tab') === 'play' && play ? 'play' : 'information'
-  )
+  const [tab, setTab] = useState<string>('information')
 
   // One tab of the strip, its panel framed the same way
   const entry = (name: SettingsTabName, render: () => React.ReactNode) => ({
@@ -94,23 +85,6 @@ export const PreferencesPanel = ({
           )),
           entry('security', () => <SecurityTab sessions={sessions} links={links} />),
           entry('privacy', () => <PrivacyTab state={state} />),
-          ...(play
-            ? [
-                {
-                  value: 'play',
-                  label: PREFERENCES_COPY.tabPlay,
-                  icon: 'play' as const,
-                  render: () => (
-                    <div className={TABS_STYLES.panel}>
-                      <PlayStatsBoard
-                        state={play}
-                        player={{ name: profile.displayName, avatarUrl: profile.avatarUrl }}
-                      />
-                    </div>
-                  ),
-                },
-              ]
-            : []),
         ]}
       />
     </div>

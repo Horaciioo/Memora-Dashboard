@@ -37,11 +37,7 @@ export const Avatar = ({ name, src, size = 'sm', className, title = name }: Avat
     className={cn(AVATAR_STYLES.base, AVATAR_STYLES[size], className)}
     title={title || undefined}
   >
-    {src ? (
-      <AvatarImage name={name} src={src} size={PIXEL_SIZES[size]} />
-    ) : (
-      initialsOf(name)
-    )}
+    {src ? <AvatarImage name={name} src={src} size={PIXEL_SIZES[size]} /> : initialsOf(name)}
   </span>
 )
 

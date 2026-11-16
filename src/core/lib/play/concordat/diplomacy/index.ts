@@ -1,4 +1,5 @@
 export * from '@/core/lib/play/concordat/diplomacy/actions'
+export * from '@/core/lib/play/concordat/diplomacy/aid'
 export * from '@/core/lib/play/concordat/diplomacy/offers'
 export * from '@/core/lib/play/concordat/diplomacy/rules'
 export * from '@/core/lib/play/concordat/diplomacy/step'

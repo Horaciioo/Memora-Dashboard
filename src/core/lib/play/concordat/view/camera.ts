@@ -89,8 +89,10 @@ export const zoomCamera = (
   pointY: number,
   limits: number[]
 ): ConcordatCamera => {
-  const scale = Math.min(limits[1], Math.max(limits[0], camera.scale * factor))
-  const ratio = scale / camera.scale
+  // A dead scale (zero or NaN) restarts from the smallest zoom
+  const from = camera.scale > 0 ? camera.scale : limits[0] || 1
+  const scale = Math.min(limits[1], Math.max(limits[0], from * factor))
+  const ratio = scale / from
 
   return {
     scale,

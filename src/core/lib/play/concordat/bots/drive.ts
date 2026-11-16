@@ -6,7 +6,7 @@ import { economyMoves } from '@/core/lib/play/concordat/bots/economy'
 import { betrayalMove, militaryMoves } from '@/core/lib/play/concordat/bots/military'
 import { botProfileOf } from '@/core/lib/play/concordat/bots/profile'
 import { seaMoves } from '@/core/lib/play/concordat/bots/sea'
-import { answerMoves, proposeMoves } from '@/core/lib/play/concordat/bots/talks'
+import { aidMoves, answerMoves, proposeMoves } from '@/core/lib/play/concordat/bots/talks'
 import { temperOf, tribeMemoryOf, tribeMoves } from '@/core/lib/play/concordat/bots/tribe'
 import type { ConcordatTribeMemory } from '@/core/lib/play/concordat/bots/tribe'
 import { botViewOf } from '@/core/lib/play/concordat/bots/view'
@@ -84,6 +84,7 @@ export const decideBot = (
     ...militaryMoves(context),
     ...seaMoves(context),
     ...proposeMoves(context, memory.lastProposal),
+    ...aidMoves(context),
     ...economyMoves(context),
   ].slice(0, bots.maxIntents + context.state.offers.length)
 }

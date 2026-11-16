@@ -67,7 +67,11 @@ export const STOPGO_HAND = {
   deckCard: 'stopgo-deck-card',
   deckReady: 'stopgo-deck-ready',
   deckInfo: 'stopgo-deck-info',
+  mystery: 'stopgo-card-mystery',
   light: 'stopgo-light',
+  roster: 'stopgo-roster',
+  rosterRow: 'stopgo-roster-row',
+  rosterMalus: 'stopgo-roster-malus',
   pile: 'stopgo-pile',
   pileOver: 'stopgo-pile-over',
   sealed: 'stopgo-sealed',
@@ -75,6 +79,15 @@ export const STOPGO_HAND = {
   offerRow: 'stopgo-offer-row',
   offerLead: 'stopgo-offer-lead',
   offerClock: 'stopgo-offer-clock',
+  cue: 'stopgo-cue',
+  cueSplash: 'stopgo-cue-splash',
+  cueSteps: 'stopgo-cue-steps',
+  cueStep: 'stopgo-cue-step',
+  cueStepOn: 'stopgo-cue-step-on',
+  cueStepDone: 'stopgo-cue-step-done',
+  cueWait: 'stopgo-cue-wait',
+  cueHit: 'stopgo-cue-hit',
+  handAwait: 'stopgo-hand-await',
 } as const
 
 /**

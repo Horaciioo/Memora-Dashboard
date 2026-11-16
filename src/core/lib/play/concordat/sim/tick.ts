@@ -9,7 +9,7 @@ import { applyWeaponUpkeep, runWeapons } from '@/core/lib/play/concordat/weapons
 import { runDiplomacy } from '@/core/lib/play/concordat/diplomacy/step'
 import { runNavy } from '@/core/lib/play/concordat/navy/step'
 import { runTrade } from '@/core/lib/play/concordat/trade/step'
-import { runCombat } from '@/core/lib/play/concordat/sim/attack'
+import { drop, runCombat } from '@/core/lib/play/concordat/sim/attack'
 import { beginPlay } from '@/core/lib/play/concordat/sim/create'
 import { runEconomy } from '@/core/lib/play/concordat/sim/economy'
 import { applyIntent } from '@/core/lib/play/concordat/sim/intents'
@@ -28,7 +28,7 @@ const eliminateEmpty = (state: ConcordatState): void => {
     player.alive = false
     player.troops = 0
     player.eliminatedAt = state.tick
-    state.corps = state.corps.filter((corps) => corps.owner !== player.id)
+    for (const corps of state.corps.filter((other) => other.owner === player.id)) drop(state, corps)
     emit(state, {
       tick: state.tick,
       kind: 'eliminated',

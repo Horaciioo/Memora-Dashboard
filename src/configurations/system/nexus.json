@@ -14,12 +14,7 @@
   "attempts": {
     "windowMinutes": 15,
     "maxFailures": 5,
-    "backoffSeconds": [
-      1,
-      2,
-      4,
-      8
-    ],
+    "backoffSeconds": [1, 2, 4, 8],
     "lockoutMinutes": 30,
     "dayFailures": 20,
     "dayLockoutHours": 24
@@ -88,11 +83,7 @@
     "logBuffer": 5000,
     "infoSampleRate": 0.1,
     "infoPerMinute": 200,
-    "windowsMinutes": [
-      1,
-      5,
-      60
-    ],
+    "windowsMinutes": [1, 5, 60],
     "routeKeysMax": 300
   },
   "db": {

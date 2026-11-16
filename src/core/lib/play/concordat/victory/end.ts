@@ -24,10 +24,11 @@ const landOf = (state: ConcordatState): number => {
   const known = landTotals.get(state.map)
   if (known !== undefined) return known
 
-  const total = state.map.terrain.reduce(
-    (sum, kind) => sum + (kind === ConcordatTerrains.Sea ? 0 : 1),
-    0
-  )
+  // Plain loop, a reduce over millions of tiles costs tens of ms
+  const { terrain } = state.map
+  let total = 0
+  for (let index = 0; index < terrain.length; index++)
+    if (terrain[index] !== ConcordatTerrains.Sea) total++
   landTotals.set(state.map, total)
 
   return total
@@ -51,15 +52,20 @@ export const landShare = (state: ConcordatState, side: number): number => {
 
 // Leader of the land, with its first nation for the journal
 const dominantSide = (state: ConcordatState): { side: number; first: number } | null => {
-  for (const side of livingSides(state)) {
-    if (landShare(state, side) >= victory.dominationShare) {
-      return {
-        side,
-        first:
-          state.players.find((player) => player.alive && sideOf(state, player.id) === side)?.id ??
-          0,
-      }
-    }
+  // One pass: land and first nation of every living side
+  const held = new Map<number, { tiles: number; first: number }>()
+  for (const player of state.players) {
+    if (!player.alive) continue
+
+    const side = sideOf(state, player.id)
+    const entry = held.get(side)
+    if (entry) entry.tiles += player.tiles
+    else held.set(side, { tiles: player.tiles, first: player.id })
+  }
+
+  const total = landOf(state)
+  for (const [side, entry] of held) {
+    if (total && entry.tiles / total >= victory.dominationShare) return { side, first: entry.first }
   }
 
   return null

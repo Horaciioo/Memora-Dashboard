@@ -26,7 +26,11 @@ export const routeIncome = (state: ConcordatState, route: ConcordatRoute): numbe
   const weight = Math.sqrt(first.level * second.level)
   const isCondemnedParty = isCondemned(state, route.a) || isCondemned(state, route.b)
 
-  return trade.base * reach * weight * ramp * (isCondemnedParty ? 1 - trade.condemnedMalus : 1)
+  const ally = route.isAlliance ? 1 + trade.allyBonus : 1
+
+  return (
+    trade.base * reach * weight * ramp * ally * (isCondemnedParty ? 1 - trade.condemnedMalus : 1)
+  )
 }
 
 /**
@@ -51,4 +55,28 @@ export const tradeIncomeOf = (
   const cap = trade.capShare * grossOf(state.players[playerId - 1]) + trade.capFloor
 
   return Math.min(sum, cap)
+}
+
+/**
+ * Trade income of every nation in one pass over the routes, index is the id minus one
+ * @param {ConcordatState} state - Game
+ * @param {Set<number>} cut - Routes cut by war or blockade
+ * @return {number[]} - Gold per second
+ */
+
+export const tradeIncomesOf = (state: ConcordatState, cut: Set<number>): number[] => {
+  const sums = new Array<number>(state.players.length).fill(0)
+  for (const route of state.routes) {
+    if (cut.has(route.id)) continue
+
+    const income = routeIncome(state, route)
+    sums[route.a - 1] += income
+    if (route.b !== route.a) sums[route.b - 1] += income
+  }
+
+  return sums.map((sum, index) => {
+    const player = state.players[index]
+
+    return player.alive ? Math.min(sum, trade.capShare * grossOf(player) + trade.capFloor) : 0
+  })
 }

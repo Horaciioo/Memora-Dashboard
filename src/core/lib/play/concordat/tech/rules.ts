@@ -90,7 +90,9 @@ export const researchRefusal = (
   const mine = state.techs[playerId - 1]
   if (mine.path >= 0) return 'researching'
   if (levelOf(state, playerId, path) >= tiersOf(path).length) return 'pathDone'
-  if (state.players[playerId - 1].provincesHeld < CONCORDAT.merit.tech[levelOf(state, playerId, path)])
+  if (
+    state.players[playerId - 1].provincesHeld < CONCORDAT.merit.tech[levelOf(state, playerId, path)]
+  )
     return 'needsZones'
 
   return state.players[playerId - 1].gold < researchCost(state, playerId, path) ? 'noGold' : null

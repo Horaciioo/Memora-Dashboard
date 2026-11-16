@@ -3,10 +3,18 @@
 import { useEffect } from 'react'
 import type { CSSProperties } from 'react'
 
+import { StopGoLamp } from '@/composites/play/stopgo/art/StopGoLamp'
 import { StopGoCardBack } from '@/composites/play/stopgo/cards/StopGoCard'
 import { STOPGO_HAND_COPY } from '@/declarations/play/stopgo/copy'
 import { STOPGO_HAND } from '@/declarations/ui/variants/games/play/stopgo'
 import { cn } from '@/utils/classnames'
+
+// Words under the light
+const STOPGO_LIGHT_COPY = {
+  green: STOPGO_HAND_COPY.lightGreen,
+  red: STOPGO_HAND_COPY.lightRed,
+  broken: STOPGO_HAND_COPY.lightBroken,
+} as const
 
 // Cards of the stack, each one a little off the one under it
 const STACK = [0, 1, 2, 3]
@@ -16,8 +24,10 @@ export interface StopGoDeckProps {
   // The player owes a card, the deck waits for the click
   isWaiting: boolean
   isSaving: boolean
-  // Own car may roll
-  isGreen: boolean
+  // Own turn, the light is shown only then
+  isTurn: boolean
+  // Own light: green, red after a red light, broken after any other malus
+  light: 'green' | 'red' | 'broken'
   onDraw: () => void
 }
 
@@ -31,7 +41,8 @@ export const StopGoDeck = ({
   pileCount,
   isWaiting,
   isSaving,
-  isGreen,
+  isTurn,
+  light,
   onDraw,
 }: StopGoDeckProps) => {
   // Space takes the card of the turn
@@ -72,10 +83,12 @@ export const StopGoDeck = ({
         <small>
           {isWaiting ? STOPGO_HAND_COPY.draw : STOPGO_HAND_COPY.pile} {pileCount}
         </small>
-        <span className={STOPGO_HAND.light} data-light={isGreen ? 'green' : 'red'}>
-          <i aria-hidden />
-          {isGreen ? STOPGO_HAND_COPY.lightGreen : STOPGO_HAND_COPY.lightRed}
-        </span>
+        {isTurn && (
+          <span className={STOPGO_HAND.light} data-light={light}>
+            <StopGoLamp light={light} />
+            {STOPGO_LIGHT_COPY[light]}
+          </span>
+        )}
       </div>
     </div>
   )

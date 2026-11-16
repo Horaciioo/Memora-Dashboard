@@ -5,6 +5,17 @@
     linear-gradient(180deg, var(--concordat-sea-lit), var(--concordat-sea));
 }
 
+/* Percent field, no spinner arrows */
+.concordat-percent {
+  appearance: textfield;
+}
+
+.concordat-percent::-webkit-inner-spin-button,
+.concordat-percent::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
 /* Engagement slider, a thin rail with a square brass marker */
 .concordat-slider {
   appearance: none;

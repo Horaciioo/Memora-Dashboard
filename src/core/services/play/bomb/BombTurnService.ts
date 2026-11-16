@@ -93,7 +93,14 @@ export const openTable = async (session: EngineSession): Promise<EngineStep> => 
       })),
     }),
     prisma.bombGame.create({
-      data: { sessionId: session.id, prompt, turnId: order[0], startsAt, explodesAt, turnAt: startsAt },
+      data: {
+        sessionId: session.id,
+        prompt,
+        turnId: order[0],
+        startsAt,
+        explodesAt,
+        turnAt: startsAt,
+      },
     }),
   ])
 

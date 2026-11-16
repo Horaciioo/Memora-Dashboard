@@ -12,23 +12,25 @@ const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
 
 /**
  * One burst of confetti falling over the page
+ * @param {Object} props - Delay
+ * @param {number} [props.delayMs] - Wait before the burst
  * @return {JSX.Element | null}
  */
 
-export const PlayConfetti = () => {
+export const PlayConfetti = ({ delayMs = 0 }: { delayMs?: number }) => {
   const [pieces, setPieces] = useState<ConfettiPiece[]>([])
 
   // Thrown once on the client, swept when the last piece has landed
   useEffect(() => {
     if (window.matchMedia(REDUCED_MOTION).matches) return
-    const start = window.setTimeout(() => setPieces(confettiBurst()), 0)
-    const end = window.setTimeout(() => setPieces([]), CONFETTI_LIFETIME_MS)
+    const start = window.setTimeout(() => setPieces(confettiBurst()), delayMs)
+    const end = window.setTimeout(() => setPieces([]), delayMs + CONFETTI_LIFETIME_MS)
 
     return () => {
       window.clearTimeout(start)
       window.clearTimeout(end)
     }
-  }, [])
+  }, [delayMs])
 
   if (pieces.length === 0) return null
 

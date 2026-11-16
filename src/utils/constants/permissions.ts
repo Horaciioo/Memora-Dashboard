@@ -731,7 +731,8 @@ export const PermissionsList: PermissionMeta[] = [
     name: Permissions.UnbanRead,
     group: PermissionGroups.Unban,
     displayName: 'Voir les demandes de déban',
-    description: 'Ouvrir la page Débannissement et lire les demandes des YouTubeurs de ton périmètre.',
+    description:
+      'Ouvrir la page Débannissement et lire les demandes des YouTubeurs de ton périmètre.',
     important: false,
   },
   {

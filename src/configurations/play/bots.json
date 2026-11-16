@@ -1,6 +1,6 @@
 {
   "maxPerGame": 7,
-  "asleep": [],
+  "asleep": ["CONCORDAT"],
   "driver": {
     "retryMs": 4000,
     "retries": 2

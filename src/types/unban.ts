@@ -184,4 +184,3 @@ export interface UnbanRequestDetail extends UnbanRequestItem {
   votes: UnbanVoteSummary
   actions: UnbanActionName[]
 }
-

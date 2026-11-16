@@ -43,25 +43,6 @@ export const isShielded = (car: StopGoCar, hazard: StopGoHazard): boolean =>
   car.shields.some((shield) => (STOPGO_SAFETIES[shield] as readonly string[]).includes(hazard))
 
 /**
- * Remedies a stopped car still lacks to roll again
- * @param {StopGoCar} car - Car
- * @param {StopGoCardKey[]} held - Cards already in hand
- * @return {StopGoCardKey[]} - Remedies to find, none for a car that rolls
- */
-
-export const needsOf = (car: StopGoCar, held: StopGoCardKey[] = []): StopGoCardKey[] => {
-  if (isMoving(car)) return []
-  const keys = car.hazards
-    .filter((hazard) => STOPGO_HAZARDS[hazard].kind !== StopGoHazardKinds.Limit)
-    .map((hazard) => STOPGO_HAZARDS[hazard].remedy as StopGoCardKey)
-
-  // A car that never got the light also needs green
-  if (!car.isGreen && !keys.includes('green')) keys.push('green')
-
-  return keys.filter((key) => !held.includes(key))
-}
-
-/**
  * Card of a hand that stops a hazard right away
  * @param {{ id: string, key: StopGoCardKey }[]} hand - Hand
  * @param {StopGoHazard} hazard - Attack key
@@ -123,9 +104,11 @@ const distanceVerdict = (spec: StopGoCardSpec, car: StopGoCar, targetKm: number)
 const remedyVerdict = (spec: StopGoCardSpec, car: StopGoCar): Verdict => {
   const hazard = spec.hazard as StopGoHazard
 
-  // Green also starts a stopped car
+  // Green lifts a red light or starts a car never cleared, not one stopped by a breakdown
   if (hazard === 'red') {
-    return isMoving(car) && !car.hazards.includes('red') ? StopGoRefusals.AlreadyGreen : null
+    const isStarting = !car.isGreen && !car.shields.includes('siren')
+
+    return car.hazards.includes('red') || isStarting ? null : StopGoRefusals.AlreadyGreen
   }
 
   return car.hazards.includes(hazard) ? null : StopGoRefusals.NoHazard
@@ -141,6 +124,13 @@ const remedyVerdict = (spec: StopGoCardSpec, car: StopGoCar): Verdict => {
 export const aimVerdict = (hazard: StopGoHazard, car: StopGoCar): Verdict => {
   if (isShielded(car, hazard)) return StopGoRefusals.Shielded
   if (car.hazards.includes(hazard)) return StopGoRefusals.AlreadyHit
+
+  // A stopped car takes no second stop, only the speed limit stacks on it
+  const isStop = STOPGO_HAZARDS[hazard].kind !== StopGoHazardKinds.Limit
+  const isStopped = car.hazards.some(
+    (held) => STOPGO_HAZARDS[held].kind !== StopGoHazardKinds.Limit
+  )
+  if (isStop && isStopped) return StopGoRefusals.AlreadyStopped
 
   // The malus a car just suffered cannot come twice in a row
   return car.lastHazard === hazard ? StopGoRefusals.SameMalus : null

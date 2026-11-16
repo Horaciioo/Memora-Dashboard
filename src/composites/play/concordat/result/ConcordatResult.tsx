@@ -1,6 +1,5 @@
 'use client'
 
-import { ConcordatTimeline } from '@/composites/play/concordat/result/ConcordatTimeline'
 import { PlayPodium } from '@/composites/play/results/PlayPodium'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
@@ -20,7 +19,7 @@ export interface ConcordatResultProps {
 }
 
 /**
- * Podium of the nations, then the history of the game
+ * Podium of the nations
  * @param {ConcordatResultProps} props - Finished game
  * @return {JSX.Element}
  */
@@ -50,13 +49,6 @@ export const ConcordatResult = ({ client, names, faces }: ConcordatResultProps) 
           }
         })}
       />
-      <div className={CONCORDAT_RESULT.under}>
-        <span className={CONCORDAT_RESULT.caption}>{CONCORDAT_RESULT_COPY.timeline}</span>
-        <div className={CONCORDAT_RESULT.timeline}>
-          <ConcordatTimeline client={client} />
-        </div>
-        <span className={CONCORDAT_RESULT.hint}>{CONCORDAT_RESULT_COPY.timelineHint}</span>
-      </div>
     </div>
   )
 }

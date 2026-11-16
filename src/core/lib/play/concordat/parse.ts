@@ -73,13 +73,10 @@ const systemIntent = (playerId: number, raw: Record<string, unknown>): Concordat
       : { kind: 'sortie', playerId, base, tile, air: kind }
   }
   if (type === ConcordatIntents.Sail) {
-    const port = id('port')
     const tile = id('tile')
     const percent = id('percent', 100)
 
-    return port === null || tile === null || percent === null
-      ? null
-      : { kind: 'sail', playerId, port, tile, percent }
+    return tile === null || percent === null ? null : { kind: 'sail', playerId, tile, percent }
   }
 
   return diplomacyIntent(playerId, raw)
@@ -119,6 +116,11 @@ const diplomacyIntent = (
     return peer === null ? null : { kind: 'break', playerId, with: peer }
   if (type === ConcordatIntents.CloseTrade) {
     return peer === null ? null : { kind: 'closeTrade', playerId, with: peer }
+  }
+  if (type === ConcordatIntents.Aid) {
+    const percent = whole(raw.percent, 100)
+
+    return peer === null || percent === null ? null : { kind: 'aid', playerId, to: peer, percent }
   }
   if (type === ConcordatIntents.Gift) {
     const amount = whole(raw.amount, 1_000_000)
@@ -161,13 +163,21 @@ export const intentFromBody = (
 
     return target === null || percent === null ? null : { kind: 'feint', playerId, target, percent }
   }
+  if (raw.type === ConcordatIntents.Defend) {
+    const target = whole(raw.target, 255)
+    const percent = whole(raw.percent, 100)
+
+    return target === null || percent === null
+      ? null
+      : { kind: 'defend', playerId, target, percent }
+  }
   if (raw.type === ConcordatIntents.Retreat) {
     const target = whole(raw.target, 255)
 
     return target === null ? null : { kind: 'retreat', playerId, target }
   }
   if (raw.type === ConcordatIntents.PlaceStart) {
-    const tile = whole(raw.tile, 2_000_000)
+    const tile = whole(raw.tile, ID_MAX)
 
     return tile === null ? null : { kind: 'placeStart', playerId, tile }
   }

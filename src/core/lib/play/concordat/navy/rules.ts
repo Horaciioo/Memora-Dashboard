@@ -1,7 +1,7 @@
 import { buildingById, isWorking } from '@/core/lib/play/concordat/buildings/rules'
 import { hasTreaty } from '@/core/lib/play/concordat/diplomacy/ties'
-import { distanceBetween } from '@/core/lib/play/concordat/map'
 import { seaAround, seaPath } from '@/core/lib/play/concordat/navy/path'
+import { sailRoute } from '@/core/lib/play/concordat/navy/route'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
 import {
@@ -82,9 +82,6 @@ export const sailRefusal = (
 ): string | null => {
   if (!CONCORDAT.features.navy) return 'featureOff'
 
-  const port = portOf(state, intent.playerId, intent.port)
-  if (!port) return 'noPort'
-
   const me = state.players[intent.playerId - 1]
   const { tile } = intent
   if (!Number.isInteger(tile) || tile < 0 || tile >= state.owner.length) return 'badTile'
@@ -101,17 +98,14 @@ export const sailRefusal = (
     return 'protected'
   if (holder && hasTreaty(state, me.id, holder.id)) return 'treaty'
 
-  const distance = distanceBetween(port.tile, tile, state.map.width)
-  if (distance < navy.minSail || distance > navy.sailRange) return 'outOfRange'
   if (Math.floor((me.troops * intent.percent) / 100) < sim.minEngage) return 'tooFew'
   if (me.gold < navy.transportCost) return 'noGold'
 
   const inFlight = state.ships.filter(
-    (ship) => ship.port === port.id && ship.kind === ConcordatShipKinds.Transport
+    (ship) => ship.owner === me.id && ship.kind === ConcordatShipKinds.Transport
   ).length
   if (inFlight >= navy.maxTransports) return 'fleetFull'
 
-  const way = seaPath(state.map, seaAround(state.map, port.tile), seaAround(state.map, tile))
-
-  return way ? null : 'noWay'
+  // No building needed, the nearest own coast sends it
+  return sailRoute(state, me.id, tile) ? null : 'noWay'
 }

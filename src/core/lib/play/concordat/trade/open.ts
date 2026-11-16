@@ -4,7 +4,11 @@ import { distanceBetween } from '@/core/lib/play/concordat/map'
 import { seaAround, seaPath } from '@/core/lib/play/concordat/navy/path'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatBuilding, ConcordatRoute, ConcordatState } from '@/types/concordat'
-import { ConcordatBuildingKinds, ConcordatRouteKinds } from '@/utils/constants/concordat'
+import {
+  ConcordatBuildingKinds,
+  ConcordatRouteKinds,
+  ConcordatTies,
+} from '@/utils/constants/concordat'
 import type { ConcordatRouteKind } from '@/utils/constants/concordat'
 
 const { trade } = CONCORDAT
@@ -113,6 +117,33 @@ export const tradeRefusal = (
 export const routeCost = (state: ConcordatState, first: number, second: number): number =>
   trade.routeCost * (isCondemned(state, first) || isCondemned(state, second) ? 2 : 1)
 
+// Open the best route of each kind, free of charge
+const linkRoutes = (
+  state: ConcordatState,
+  first: number,
+  second: number,
+  kinds: ConcordatRouteKind[],
+  isAlliance: boolean
+): number => {
+  let opened = 0
+  for (const kind of kinds) {
+    if (
+      routesOf(state, first).length >= trade.maxRoutes ||
+      routesOf(state, second).length >= trade.maxRoutes
+    )
+      break
+
+    const route = bestRoute(state, first, second, kind)
+    if (!route) continue
+
+    state.routes.push({ ...route, id: state.nextId++, since: state.tick, isAlliance })
+    opened++
+  }
+  if (opened) state.isSystemsDirty = true
+
+  return opened
+}
+
 /**
  * Open the best land route and the best sea route between two nations
  * @param {ConcordatState} state - Game
@@ -123,25 +154,25 @@ export const routeCost = (state: ConcordatState, first: number, second: number):
 
 export const openTradeRoutes = (state: ConcordatState, first: number, second: number): boolean => {
   if (tradeRefusal(state, first, second)) return false
-
-  let opened = 0
-  for (const kind of Object.values(ConcordatRouteKinds)) {
-    if (
-      routesOf(state, first).length >= trade.maxRoutes ||
-      routesOf(state, second).length >= trade.maxRoutes
-    )
-      break
-
-    const route = bestRoute(state, first, second, kind)
-    if (!route) continue
-
-    state.routes.push({ ...route, id: state.nextId++, since: state.tick })
-    opened++
-  }
-  if (!opened) return false
+  if (!linkRoutes(state, first, second, Object.values(ConcordatRouteKinds), false)) return false
 
   state.players[first - 1].gold -= routeCost(state, first, second)
-  state.isSystemsDirty = true
 
   return true
+}
+
+/**
+ * Allies link their markets by land for free, the lines end with the alliance
+ * @param {ConcordatState} state - Game
+ * @return {void}
+ */
+
+export const linkAllies = (state: ConcordatState): void => {
+  for (const relation of state.relations) {
+    if (relation.kind !== ConcordatTies.Alliance) continue
+    if (!state.players[relation.a - 1]?.alive || !state.players[relation.b - 1]?.alive) continue
+
+    // Several lines per pair, the best first, until a side is full
+    while (linkRoutes(state, relation.a, relation.b, [ConcordatRouteKinds.Land], true));
+  }
 }

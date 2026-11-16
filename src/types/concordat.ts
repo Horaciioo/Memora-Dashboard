@@ -125,6 +125,8 @@ export interface ConcordatCorps {
   aim?: number
   // Province the push works on, it stops once whole
   zone?: number
+  // Troops the target put against this push
+  guard?: number
 }
 
 /**
@@ -181,6 +183,8 @@ export interface ConcordatShip {
   port: number
   // Fraction of the next tile crossed
   progress: number
+  // Port building a cargo ship sails to
+  dest?: number
 }
 
 /**
@@ -197,6 +201,9 @@ export interface ConcordatRelation {
   until: number
   // Tick a announced break takes effect, zero when none
   breakAt: number
+  // Tick of the last reinforcements sent by the lower and by the higher nation
+  aidA?: number
+  aidB?: number
 }
 
 /**
@@ -237,6 +244,8 @@ export interface ConcordatRoute {
   length: number
   // War or blockade stops the income
   isCut: boolean
+  // Born of an alliance, ends with it
+  isAlliance?: boolean
 }
 
 /**
@@ -509,6 +518,7 @@ export interface ConcordatState {
 export type ConcordatIntent =
   | { kind: 'engage'; playerId: number; target: number; percent: number; tile?: number }
   | { kind: 'feint'; playerId: number; target: number; percent: number }
+  | { kind: 'defend'; playerId: number; target: number; percent: number }
   | { kind: 'research'; playerId: number; path: ConcordatTechPath }
   | {
       kind: 'launch'
@@ -526,7 +536,7 @@ export type ConcordatIntent =
   | { kind: 'upgrade'; playerId: number; id: number }
   | { kind: 'buildShip'; playerId: number; port: number }
   | { kind: 'moveShip'; playerId: number; ship: number; tile: number }
-  | { kind: 'sail'; playerId: number; port: number; tile: number; percent: number }
+  | { kind: 'sail'; playerId: number; tile: number; percent: number }
   | {
       kind: 'propose'
       playerId: number
@@ -539,6 +549,7 @@ export type ConcordatIntent =
   | { kind: 'accept'; playerId: number; offer: number }
   | { kind: 'refuse'; playerId: number; offer: number }
   | { kind: 'break'; playerId: number; with: number }
+  | { kind: 'aid'; playerId: number; to: number; percent: number }
   | { kind: 'gift'; playerId: number; to: number; resource: 'gold' | 'troops'; amount: number }
   | { kind: 'closeTrade'; playerId: number; with: number }
 

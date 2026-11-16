@@ -1,4 +1,5 @@
 import { STOPGO_CARD_KEYS, STOPGO_CARDS, StopGoFamilies } from '@/declarations/play/stopgo/cards'
+import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import type { StopGoCardKey } from '@/declarations/play/stopgo/cards'
 
 import type { StopGoCard } from '@/core/lib/play/stopgo/state'
@@ -25,6 +26,22 @@ export const buildDeck = (counts: Record<StopGoCardKey, number>): StopGoCard[] =
   )
 
 /**
+ * Quantity per card, safeties dropped when the table plays without
+ * @param {boolean} safeties - Safeties kept
+ * @return {Record<StopGoCardKey, number>} - Quantity per key
+ */
+
+export const deckOf = (safeties: boolean): Record<StopGoCardKey, number> =>
+  Object.fromEntries(
+    STOPGO_CARD_KEYS.map((key) => [
+      key,
+      !safeties && STOPGO_CARDS[key].family === StopGoFamilies.Safety
+        ? 0
+        : STOPGO_SETTINGS.deck[key],
+    ])
+  ) as Record<StopGoCardKey, number>
+
+/**
  * Fisher-Yates shuffle
  * @param {T[]} cards - Items
  * @param {Random} random - Random source
@@ -41,18 +58,6 @@ export const shuffle = <T>(cards: T[], random: Random): T[] => {
   }
 
   return result
-}
-
-/**
- * Cards a stopped player needs and the share of draws steered to them
- * @typedef {Object} StopGoWanted
- * @property {StopGoCardKey[]} keys - Remedies that free the car
- * @property {number} share - Chance a draw goes to one of them, 0 to 1
- */
-
-export interface StopGoWanted {
-  keys: StopGoCardKey[]
-  share: number
 }
 
 /**
@@ -86,24 +91,12 @@ export interface StopGoDraw {
  * @param {StopGoCard[]} pile - Draw pile, top last
  * @param {number | undefined} kmShare - Share of distance cards, 0 to 1, none to take the top
  * @param {Random} random - Random source
- * @param {StopGoWanted} [wanted] - Cards a stopped player needs
  * @return {number} - Index in the pile
  */
 
-const pickIndex = (
-  pile: StopGoCard[],
-  kmShare: number | undefined,
-  random: Random,
-  wanted?: StopGoWanted
-): number => {
+const pickIndex = (pile: StopGoCard[], kmShare: number | undefined, random: Random): number => {
   const top = pile.length - 1
 
-  // A stopped player is steered to the card that frees the car
-  if (wanted?.keys.length && random() < wanted.share) {
-    for (let index = top; index >= 0; index--) {
-      if (wanted.keys.includes(pile[index].key)) return index
-    }
-  }
   if (kmShare === undefined) return top
   const wantsKm = random() < kmShare
 
@@ -121,7 +114,6 @@ const pickIndex = (
  * @param {number} maxReshuffles - Reshuffle cap
  * @param {Random} random - Random source
  * @param {number} [kmShare] - Share of distance cards among the cards drawn, 0 to 1
- * @param {StopGoWanted} [wanted] - Cards a stopped player needs
  * @return {StopGoDraw} - Card and piles
  */
 
@@ -129,8 +121,7 @@ export const draw = (
   piles: StopGoPiles,
   maxReshuffles: number,
   random: Random,
-  kmShare?: number,
-  wanted?: StopGoWanted
+  kmShare?: number
 ): StopGoDraw => {
   let { pile, discard, reshuffles } = piles
 
@@ -142,7 +133,7 @@ export const draw = (
     discard = discard.slice(-1)
     reshuffles += 1
   }
-  const index = pickIndex(pile, kmShare, random, wanted)
+  const index = pickIndex(pile, kmShare, random)
 
   return {
     card: pile[index] ?? null,

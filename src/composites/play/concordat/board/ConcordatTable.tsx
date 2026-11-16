@@ -91,7 +91,7 @@ export const ConcordatTable = ({
     [client.players, faces]
   )
   const me = client.players[client.me - 1]
-  const { hover, onHover, onTap } = useConcordatTaps({
+  const { hover, onHover, onTap, onMenu } = useConcordatTaps({
     client,
     act,
     isSeated,
@@ -111,6 +111,7 @@ export const ConcordatTable = ({
     invalidate,
     onTap,
     onHover,
+    onMenu,
   })
 
   useEffect(() => {
@@ -159,24 +160,19 @@ export const ConcordatTable = ({
     invalidate()
   })
 
-  // Back to my nation, or to a spot of the minimap
+  // Back to my nation, or to a spot of the minimap, once per request
+  const seen = useRef({ tick: recenterTick, jump })
   useEffect(() => {
-    if (recenterTick && me)
-      recenter(Math.max(me.capital, me.start), size.current.height / CONCORDAT_ART.focusTiles)
-  }, [recenterTick, me, recenter, size])
-  useEffect(() => {
-    if (jump.tile >= 0) recenter(jump.tile, camera.current.scale)
-  }, [jump, recenter, camera])
-
-  // Glide home when picking ends
-  const lastPhase = useRef(client.phase)
-  useEffect(() => {
-    const wasPicking = lastPhase.current === ConcordatPhases.Picking
-    lastPhase.current = client.phase
-    if (wasPicking && client.phase === ConcordatPhases.Playing && me) {
-      recenter(Math.max(me.capital, me.start), size.current.height / CONCORDAT_ART.focusTiles)
+    if (recenterTick !== seen.current.tick) {
+      seen.current.tick = recenterTick
+      if (me)
+        recenter(Math.max(me.capital, me.start), size.current.height / CONCORDAT_ART.focusTiles)
     }
-  }, [client.phase, me, recenter, size])
+    if (jump !== seen.current.jump) {
+      seen.current.jump = jump
+      if (jump.tile >= 0) recenter(jump.tile, camera.current.scale)
+    }
+  }, [recenterTick, jump, me, recenter, size, camera])
 
   // Escape leaves the menu
   useEffect(() => {

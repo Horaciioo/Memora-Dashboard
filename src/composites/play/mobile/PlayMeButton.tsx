@@ -26,6 +26,7 @@ export const PlayMeButton = () => {
   const boundary = useRef<HTMLDivElement>(null)
   useOutsideDismiss(isOpen, boundary, () => setIsOpen(false))
   const LeaveIcon = ICONS.playLeave
+  const SettingsIcon = ICONS.settings
 
   if (!session) return null
 
@@ -59,6 +60,15 @@ export const PlayMeButton = () => {
           >
             <PlayTabGlyph name="stats" className={PLAY_TABS.menuIcon} />
             {PLAY_ME_COPY.stats}
+          </AppLink>
+          <AppLink
+            role="menuitem"
+            href={ROUTES.playSettings}
+            onClick={() => setIsOpen(false)}
+            className={PLAY_TABS.menuItem}
+          >
+            <SettingsIcon className={PLAY_TABS.menuIcon} aria-hidden="true" />
+            {PLAY_ME_COPY.settings}
           </AppLink>
           <AppLink
             role="menuitem"

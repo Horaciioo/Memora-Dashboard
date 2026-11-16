@@ -6,6 +6,7 @@ import type {
   PlayMessageKindName,
   PlayStatusName,
 } from '@/utils/constants/play'
+import type { PlayXpPartName } from '@/declarations/play/xp'
 import type { Prisma } from '@prisma/client'
 
 /**
@@ -448,4 +449,90 @@ export interface PlayGroupInvitationView {
 export interface PlayGroupState {
   groups: PlayGroupView[]
   invitations: PlayGroupInvitationView[]
+}
+
+/**
+ * One line of the XP a game paid
+ * @typedef {Object} PlayXpPart
+ * @property {PlayXpPartName} key - What it pays for
+ * @property {number} xp - XP, negative for a cut
+ */
+
+export interface PlayXpPart {
+  key: PlayXpPartName
+  xp: number
+}
+
+/**
+ * Level standing before and after a game
+ * @typedef {Object} PlayRewardLadder
+ */
+
+export interface PlayRewardLadder {
+  before: PlayLevelView
+  after: PlayLevelView
+}
+
+/**
+ * XP screen of a finished game, as its player reads it
+ * @typedef {Object} PlayRewardView
+ */
+
+export interface PlayRewardView {
+  gained: number
+  parts: PlayXpPart[]
+  game: PlayRewardLadder
+  global: PlayRewardLadder
+}
+
+/**
+ * One figure of the end page
+ * @typedef {Object} PlayEndStat
+ */
+
+export interface PlayEndStat {
+  key: string
+  label: string
+  value: string
+}
+
+/**
+ * Title won on a counter of the game, held by whoever led the table
+ * @typedef {Object} PlayEndAward
+ */
+
+export interface PlayEndAward {
+  key: string
+  label: string
+  value: number
+  accountId: string
+  name: string
+  avatarUrl: string | null
+  isMe: boolean
+}
+
+/**
+ * Career of the reader in the game just played
+ * @typedef {Object} PlayEndCareer
+ */
+
+export interface PlayEndCareer {
+  played: number
+  wins: number
+  winRate: number
+  streak: number
+  bestStreak: number
+}
+
+/**
+ * Everything the end page tells about a finished game
+ * @typedef {Object} PlayEndReport
+ */
+
+export interface PlayEndReport {
+  place: { rank: number; total: number } | null
+  winner: { accountId: string; name: string; avatarUrl: string | null } | null
+  stats: PlayEndStat[]
+  awards: PlayEndAward[]
+  career: PlayEndCareer | null
 }
