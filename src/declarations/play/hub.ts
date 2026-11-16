@@ -186,6 +186,10 @@ export const PLAY_HUB_COPY = {
   accept: 'Y aller',
   decline: 'Refuser',
   statsTitle: 'Tes stats',
+  settingsTitle: 'Paramètres',
+  settingsSound: 'Son',
+  settingsMotion: 'Animations',
+  settingsGames: 'Affichage des parties',
   profileTitle: 'Profil',
   trophiesTitle: 'Tes trophées',
   // Invite panel

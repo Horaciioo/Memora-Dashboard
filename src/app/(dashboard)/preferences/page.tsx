@@ -7,7 +7,6 @@ import { readSessions } from '@/core/services/auth/SessionService'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { profileFields, readProfile } from '@/core/services/preferences/ProfileService'
 import { listPlatformLinks } from '@/core/services/platforms/PlatformAccountService'
-import { readPlayProfile } from '@/core/services/play'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { reachableViews } from '@/core/services/auth/ViewService'
 import { readPushSettings } from '@/core/services/push'
@@ -25,7 +24,6 @@ import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { LivePlatforms } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
-import { Permissions } from '@/utils/constants/permissions'
 
 export interface PreferencesPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -62,11 +60,10 @@ export default async function PreferencesPage({ searchParams }: PreferencesPageP
 
   const token = (await cookies()).get(SESSION_COOKIE)?.value
 
-  const [profile, seal, links, play, push, sessions] = await Promise.all([
+  const [profile, seal, links, push, sessions] = await Promise.all([
     readProfile(session.id),
     readSealState(),
     listPlatformLinks(session.id),
-    access.can(Permissions.PlayAccess) ? readPlayProfile(session.id) : null,
     readPushSettings(session.id),
     readSessions(session.id, token),
   ])
@@ -93,7 +90,6 @@ export default async function PreferencesPage({ searchParams }: PreferencesPageP
           [LivePlatforms.YouTube]: isYoutubeConfigured(),
         }}
         returned={returnedLink(query)}
-        play={play}
         push={{ publicKey: isPushConfigured() ? VAPID_KEYS.publicKey : null, settings: push }}
         dock={{ candidates, saved: session.mobileDock }}
         sessions={sessions}

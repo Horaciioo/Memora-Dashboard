@@ -89,5 +89,6 @@ export const PLAY_BUBBLES = { max: 3, ttlMs: 7000 } as const
 export const PLAY_ME_COPY = {
   open: 'Mon profil',
   stats: 'Afficher mes stats',
+  settings: 'Paramètres',
   leave: 'Quitter Memora Play',
 } as const

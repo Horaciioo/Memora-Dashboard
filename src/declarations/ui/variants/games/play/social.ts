@@ -87,7 +87,7 @@ export const PLAY_CROSS = {
   // Featured game on top, then every game as a poster
   wall: 'flex w-full flex-col gap-3',
   wallTitle: 'text-sm font-extrabold tracking-[0.2em] text-[var(--play-ink-soft)] uppercase',
-  tiles: 'grid w-full grid-cols-3 gap-2 sm:grid-cols-5 md:gap-3 lg:grid-flow-col lg:auto-cols-fr lg:grid-cols-none',
+  tiles: 'grid w-full grid-cols-3 gap-2 sm:grid-cols-5 md:gap-3',
   tile: 'w-full',
   live: 'min-h-0 shrink',
   online: 'min-h-0 shrink-0',
