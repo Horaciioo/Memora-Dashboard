@@ -336,6 +336,13 @@ export const shipsOf = (state: ConcordatState): ConcordatShipRow[] =>
 export const offersFor = (state: ConcordatState, playerId: number): ConcordatOfferRow[] =>
   playerId ? state.offers.filter((offer) => offer.from === playerId || offer.to === playerId) : []
 
+// Byte of each ship kind
+const SHIP_CODES: ConcordatShipKind[] = [
+  ConcordatShipKinds.Transport,
+  ConcordatShipKinds.War,
+  ConcordatShipKinds.Trade,
+]
+
 /**
  * Bytes of the ships
  * @param {number[]} bytes - Output
@@ -347,7 +354,7 @@ export const writeShips = (bytes: number[], ships: ConcordatShipRow[]): void => 
   writeVarint(bytes, ships.length)
   for (const ship of ships) {
     writeVarint(bytes, ship.id)
-    bytes.push(ship.owner, ship.kind === ConcordatShipKinds.War ? 1 : 0)
+    bytes.push(ship.owner, SHIP_CODES.indexOf(ship.kind))
     writeVarint(bytes, ship.tile)
     writeVarint(bytes, ship.troops)
     writeVarint(bytes, ship.landing + 1)
@@ -365,7 +372,7 @@ export const readShips = (reader: ByteReader): ConcordatShipRow[] => {
   for (let count = reader.varint(); count > 0; count--) {
     const id = reader.varint()
     const owner = reader.byte()
-    const kind = reader.byte() ? ConcordatShipKinds.War : ConcordatShipKinds.Transport
+    const kind = SHIP_CODES[reader.byte()] ?? ConcordatShipKinds.Transport
     ships.push({
       id,
       owner,

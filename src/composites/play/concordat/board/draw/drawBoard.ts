@@ -9,6 +9,7 @@ import {
   drawNationNames,
   drawProvinceNames,
 } from '@/composites/play/concordat/board/draw/drawLabels'
+import { drawRoutes } from '@/composites/play/concordat/board/draw/drawRoutes'
 import { drawBuildings } from '@/composites/play/concordat/board/draw/drawBuildings'
 import { drawAim, drawStrikes, drawZones } from '@/composites/play/concordat/board/draw/drawStrikes'
 import { drawPawns, drawStructures } from '@/composites/play/concordat/board/draw/drawMarks'
@@ -43,6 +44,7 @@ export const drawBoard = (context: CanvasRenderingContext2D, scene: ConcordatSce
   drawZones(context, scene)
   drawArrows(context, scene)
   drawEchoes(context, scene)
+  drawRoutes(context, scene)
   drawBuildings(context, scene)
   drawStructures(context, scene)
   drawStrikes(context, scene)

@@ -159,14 +159,19 @@ export const ConcordatTable = ({
     invalidate()
   })
 
-  // Back to my nation, or to a spot of the minimap
+  // Back to my nation, or to a spot of the minimap, once per request
+  const seen = useRef({ tick: recenterTick, jump })
   useEffect(() => {
-    if (recenterTick && me)
-      recenter(Math.max(me.capital, me.start), size.current.height / CONCORDAT_ART.focusTiles)
-  }, [recenterTick, me, recenter, size])
-  useEffect(() => {
-    if (jump.tile >= 0) recenter(jump.tile, camera.current.scale)
-  }, [jump, recenter, camera])
+    if (recenterTick !== seen.current.tick) {
+      seen.current.tick = recenterTick
+      if (me)
+        recenter(Math.max(me.capital, me.start), size.current.height / CONCORDAT_ART.focusTiles)
+    }
+    if (jump !== seen.current.jump) {
+      seen.current.jump = jump
+      if (jump.tile >= 0) recenter(jump.tile, camera.current.scale)
+    }
+  }, [recenterTick, jump, me, recenter, size, camera])
 
   // Glide home when picking ends
   const lastPhase = useRef(client.phase)

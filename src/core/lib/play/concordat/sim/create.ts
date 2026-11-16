@@ -202,6 +202,7 @@ export const startRefusal = (
   const crowded = state.players.some(
     (other) =>
       other.id !== playerId &&
+      other.kind === ConcordatPowers.Human &&
       distanceBetween(other.start, tile, map.width) < CONCORDAT.map.start.placeGap
   )
 

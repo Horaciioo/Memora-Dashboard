@@ -127,6 +127,21 @@ export const CONCORDAT_ART = {
   pawn: { base: 1.7, min: 8, max: 20, ring: 2.4, aiScale: 4 },
   // Smallest boat on screen, in pixels
   ship: { min: 12 },
+  // Trade lines: width from zoom, arc, casing, cut grey, pulse size and speed
+  routes: {
+    min: 1.5,
+    max: 5,
+    base: 0.28,
+    arc: 0.12,
+    alpha: 0.85,
+    casing: 0.7,
+    halo: 2.5,
+    cut: [150, 150, 150],
+    dash: [6, 6],
+    pulse: 0.9,
+    pulseMs: 3000,
+    pulseSlow: 6,
+  },
   // Arrow of a corps, width from its troops
   arrow: { min: 2, max: 9, scale: 0.012, dash: [10, 7], speed: 0.04, head: 1.7 },
   // Hover wash over a nation, then the picked ring of a start

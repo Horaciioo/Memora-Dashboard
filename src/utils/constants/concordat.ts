@@ -70,6 +70,7 @@ export const ConcordatIntents = {
   Refuse: 'refuse',
   Break: 'break',
   Gift: 'gift',
+  Aid: 'aid',
   CloseTrade: 'closeTrade',
   Research: 'research',
   Feint: 'feint',
@@ -182,6 +183,7 @@ export const CONCORDAT_BUILDING_ORDER: readonly ConcordatBuildingKind[] = [
 export const ConcordatShipKinds = {
   Transport: 'transport',
   War: 'war',
+  Trade: 'trade',
 } as const
 
 export type ConcordatShipKind = (typeof ConcordatShipKinds)[keyof typeof ConcordatShipKinds]
@@ -425,6 +427,7 @@ export const ConcordatTargetActions = {
   Peace: 'peace',
   Alliance: 'alliance',
   Trade: 'trade',
+  Aid: 'aid',
   Break: 'break',
 } as const
 

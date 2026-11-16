@@ -79,6 +79,9 @@ export const CONCORDAT_RULES_COPY = {
   attack: 'Attaque',
   attackValue:
     'Un clic envoie une part de tes troupes : tout le contact avec la cible avance, plus vite quand le front est long.',
+  trade: 'Commerce',
+  tradeValue:
+    'Tes ports envoient seuls des cargos vers tes autres ports et ceux de tes alliés : chaque arrivée rapporte de l’or aux deux camps, plus la route est longue, et le commerce entre alliés rapporte 60 % de plus. Une alliance rompue ou un navire de guerre ennemi coupe la route. Entre alliés, les marchés se relient par des lignes, les troupes grandissent 30 % plus vite, et tu peux envoyer des renforts (un dixième se perd en route).',
   mode: 'Format',
   win: 'Victoire',
   winValue:
@@ -201,6 +204,29 @@ export const CONCORDAT_REFUSALS: Record<string, string> = {
   maxLevel: 'Ce bâtiment est au niveau maximum.',
   farZone: 'Cette zone n’est pas à ta portée.',
   unknown: 'Cette commande n’est pas disponible.',
+  duplicate: 'Une offre du même genre attend déjà une réponse.',
+  tooManyOffers: 'Tu as trop d’offres en attente.',
+  alreadyTied: 'Un traité de ce genre vous lie déjà.',
+  tooManyAllies: 'Un des deux camps a déjà le maximum d’alliés.',
+  badLength: 'Cette durée de paix n’existe pas.',
+  badOffer: 'Cette offre n’existe pas.',
+  badRequest: 'Cette demande n’est pas valable.',
+  hostile: 'Cette nation te considère comme ennemie.',
+  noOffer: 'Cette offre n’est plus là.',
+  noTreaty: 'Aucun traité ne vous lie.',
+  alreadyBreaking: 'La rupture est déjà en cours.',
+  tooMuch: 'Tu offres plus que tu ne peux donner.',
+  tooManyRoutes: 'Tu as atteint le maximum de routes commerciales.',
+  partnerFull: 'Ce partenaire a atteint le maximum de routes.',
+  noRoute: 'Aucune route ne relie ces nations.',
+  noPort: 'Il faut un port en service.',
+  fleetFull: 'Ta flotte est déjà au maximum.',
+  noShip: 'Ce navire n’existe plus.',
+  noWay: 'Aucune voie maritime jusque là.',
+  notAllied: 'Seuls tes alliés reçoivent des renforts.',
+  aidCooldown: 'Tes derniers renforts partent à peine, attends un peu.',
+  aidSmall: 'Il n’y a pas assez de troupes à envoyer.',
+  aidFull: 'Cet allié ne peut pas accueillir plus de troupes.',
 }
 
 /**

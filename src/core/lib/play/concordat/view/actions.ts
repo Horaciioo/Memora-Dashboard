@@ -39,7 +39,11 @@ const ACTIONS: Record<ConcordatTieKind, ConcordatTargetAction[]> = {
     ConcordatTargetActions.Trade,
     ConcordatTargetActions.Break,
   ],
-  [ConcordatTies.Alliance]: [ConcordatTargetActions.Trade, ConcordatTargetActions.Break],
+  [ConcordatTies.Alliance]: [
+    ConcordatTargetActions.Aid,
+    ConcordatTargetActions.Trade,
+    ConcordatTargetActions.Break,
+  ],
 }
 
 /**
@@ -69,6 +73,8 @@ export const bodyFor = (
     return { type: ConcordatIntents.Engage, target, percent, tile }
   }
   if (action === ConcordatTargetActions.Break) return { type: ConcordatIntents.Break, with: target }
+  if (action === ConcordatTargetActions.Aid)
+    return { type: ConcordatIntents.Aid, to: target, percent }
   if (action === ConcordatTargetActions.Trade)
     return { type: ConcordatIntents.OpenTrade, to: target }
   const offer =

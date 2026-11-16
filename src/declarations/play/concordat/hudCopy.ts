@@ -162,6 +162,7 @@ export const CONCORDAT_ACTION_LABELS: Record<ConcordatTargetAction, string> = {
   [ConcordatTargetActions.Peace]: 'Proposer la paix',
   [ConcordatTargetActions.Alliance]: 'Proposer une alliance',
   [ConcordatTargetActions.Trade]: 'Commercer',
+  [ConcordatTargetActions.Aid]: 'Envoyer des renforts',
   [ConcordatTargetActions.Break]: 'Rompre le traité',
 }
 

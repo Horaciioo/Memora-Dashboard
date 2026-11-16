@@ -403,10 +403,38 @@
     "condemnedMalus": 0.5,
     "routeCost": 30,
     "checkTicks": 20,
-    "closeTrust": 4
+    "closeTrust": 4,
+    "linkTicks": 100,
+    "allyBonus": 0.6,
+    "pact": {
+      "growth": 0.3,
+      "capPerLine": 15,
+      "maxLines": 3,
+      "aidLoss": 0.1,
+      "aidMin": 10,
+      "aidCooldownSeconds": 20,
+      "aidTrust": 1
+    },
+    "ships": {
+      "checkTicks": 20,
+      "spawnSeconds": 25,
+      "maxPerPort": 2,
+      "maxSpawns": 3,
+      "minLength": 12,
+      "speed": 2.6,
+      "goldBase": 10,
+      "goldPerTile": 0.35,
+      "goldCap": 90,
+      "partnerShare": 1,
+      "captureShare": 0.5,
+      "pirateRadius": 6
+    }
   },
   "bots": {
     "awaySeconds": 30,
+    "aidReserve": 0.6,
+    "aidNeedRatio": 0.4,
+    "aidPercent": 25,
     "samples": 40,
     "maxIntents": 4,
     "levelShare": { "recruit": 0.4, "strategist": 0.4, "raptor": 0.2 },

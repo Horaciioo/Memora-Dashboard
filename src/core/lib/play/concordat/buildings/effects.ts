@@ -1,4 +1,5 @@
 import { isWorking, kindOf } from '@/core/lib/play/concordat/buildings/rules'
+import { applyPactEffects } from '@/core/lib/play/concordat/diplomacy/aid'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatState } from '@/types/concordat'
 import { ConcordatShipKinds } from '@/utils/constants/concordat'
@@ -50,6 +51,8 @@ export const refreshEffects = (state: ConcordatState): void => {
       })
     }
   }
+
+  applyPactEffects(state)
 
   for (const ship of state.ships) {
     if (ship.kind === ConcordatShipKinds.War) {

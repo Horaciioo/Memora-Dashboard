@@ -119,6 +119,7 @@ export const drawStructures = (context: CanvasRenderingContext2D, scene: Concord
   for (const ship of client.ships) {
     const [x, y] = centerOf(scene, ship.tile)
     const isWar = ship.kind === ConcordatShipKinds.War
+    const isCargo = ship.kind === ConcordatShipKinds.Trade
 
     // Dotted course toward the coast it lands on
     if (ship.landing >= 0) {
@@ -141,7 +142,7 @@ export const drawStructures = (context: CanvasRenderingContext2D, scene: Concord
       context,
       at[0],
       at[1],
-      size * 1.4,
+      size * (isCargo ? 1.1 : 1.4),
       angle(scene),
       colors[ship.owner] ?? frame.shadow,
       scene.now,

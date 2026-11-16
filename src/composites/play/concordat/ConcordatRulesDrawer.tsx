@@ -55,6 +55,7 @@ export const ConcordatRulesDrawer = ({ open, onClose, settings }: ConcordatRules
       value: fillPlayMessage(copy.startValue, { seconds: CONCORDAT.pickSeconds }),
     },
     { label: copy.attack, value: copy.attackValue },
+    { label: copy.trade, value: copy.tradeValue },
     {
       label: copy.win,
       value: fillPlayMessage(copy.winValue, {

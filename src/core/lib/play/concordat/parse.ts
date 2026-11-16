@@ -120,6 +120,11 @@ const diplomacyIntent = (
   if (type === ConcordatIntents.CloseTrade) {
     return peer === null ? null : { kind: 'closeTrade', playerId, with: peer }
   }
+  if (type === ConcordatIntents.Aid) {
+    const percent = whole(raw.percent, 100)
+
+    return peer === null || percent === null ? null : { kind: 'aid', playerId, to: peer, percent }
+  }
   if (type === ConcordatIntents.Gift) {
     const amount = whole(raw.amount, 1_000_000)
     const resource = raw.resource === 'gold' || raw.resource === 'troops' ? raw.resource : null

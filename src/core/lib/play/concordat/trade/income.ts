@@ -26,7 +26,11 @@ export const routeIncome = (state: ConcordatState, route: ConcordatRoute): numbe
   const weight = Math.sqrt(first.level * second.level)
   const isCondemnedParty = isCondemned(state, route.a) || isCondemned(state, route.b)
 
-  return trade.base * reach * weight * ramp * (isCondemnedParty ? 1 - trade.condemnedMalus : 1)
+  const ally = route.isAlliance ? 1 + trade.allyBonus : 1
+
+  return (
+    trade.base * reach * weight * ramp * ally * (isCondemnedParty ? 1 - trade.condemnedMalus : 1)
+  )
 }
 
 /**

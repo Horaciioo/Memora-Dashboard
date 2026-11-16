@@ -1,4 +1,5 @@
-import { isCondemned, proposeRefusal, tieKindOf } from '@/core/lib/play/concordat/diplomacy'
+import { aidRefusal, alliesOf, isCondemned, proposeRefusal, tieKindOf } from '@/core/lib/play/concordat/diplomacy'
+import { troopCap } from '@/core/lib/play/concordat/sim/economy'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import type { ConcordatBotContext } from '@/core/lib/play/concordat/bots/view'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
@@ -101,6 +102,33 @@ export const proposeMoves = (
     lastProposal.set(id, state.tick)
 
     return [move]
+  }
+
+  return []
+}
+
+/**
+ * A loyal bot sends a share of its troops to an ally that runs low
+ * @param {ConcordatBotContext} context - Decision
+ * @return {ConcordatIntent[]} - Commands
+ */
+
+export const aidMoves = (context: ConcordatBotContext): ConcordatIntent[] => {
+  const { state, profile, view, roll } = context
+  if (view.me.troops < bots.aidReserve * troopCap(view.me)) return []
+
+  for (const id of alliesOf(state, view.me.id)) {
+    const ally = state.players[id - 1]
+    if (!ally.alive || ally.troops > view.me.troops * bots.aidNeedRatio) continue
+    if (roll(120 + id) > profile.loyalty) continue
+
+    const move: ConcordatIntent = {
+      kind: 'aid',
+      playerId: view.me.id,
+      to: id,
+      percent: bots.aidPercent,
+    }
+    if (!aidRefusal(state, move as Extract<ConcordatIntent, { kind: 'aid' }>)) return [move]
   }
 
   return []

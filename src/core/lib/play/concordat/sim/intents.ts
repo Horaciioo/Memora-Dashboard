@@ -9,10 +9,12 @@ import {
   answerRefusal,
   breakRefusal,
   breakTie,
+  aidRefusal,
   giftRefusal,
   noteAttack,
   propose,
   proposeRefusal,
+  sendAid,
   sendGift,
 } from '@/core/lib/play/concordat/diplomacy'
 import { tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
@@ -194,6 +196,8 @@ const systemRefusal = (state: ConcordatState, intent: ConcordatIntent): string |
       return breakRefusal(state, intent.playerId, intent.with)
     case 'gift':
       return giftRefusal(state, intent)
+    case 'aid':
+      return aidRefusal(state, intent)
     case 'closeTrade':
       return null
     default:
@@ -224,6 +228,8 @@ const applySystem = (state: ConcordatState, intent: ConcordatIntent): void => {
       return breakTie(state, intent.playerId, intent.with)
     case 'gift':
       return sendGift(state, intent)
+    case 'aid':
+      return sendAid(state, intent)
     case 'research':
       return startResearch(state, intent.playerId, intent.path)
     case 'launch':
