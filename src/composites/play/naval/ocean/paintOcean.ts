@@ -148,8 +148,11 @@ const paintLayers = (
   pen.ctx.drawImage(water, 0, 0, pen.width, pen.width)
 
   return () => {
-    const down = wrecks.map(({ ship }) => ship.id).join(',')
-    const marksKey = `${key}|${marksVersionOf(pen, marks)}|${down}`
+    // Wrecks by place and side, another sea never reuses this layer
+    const down = wrecks
+      .map(({ ship }) => `${ship.id}:${ship.x}:${ship.y}:${ship.isHorizontal ? 1 : 0}`)
+      .join(',')
+    const marksKey = `${key}|${scene.skin.key}|${marksVersionOf(pen, marks)}|${down}`
     const still = freshLayer(pen.marked, marksKey, pen, (ctx) => {
       paintWrecks({ ...frame, ctx }, wrecks)
       paintStillMarks({ ...frame, ctx }, marks)
