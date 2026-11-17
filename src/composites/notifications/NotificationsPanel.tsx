@@ -103,9 +103,7 @@ export const NotificationsPanel = ({
         )}
       </div>
 
-      {entries.length > 0 && (
-        <div className={cn(NESTED_BOX.group, 'm-1.5 mt-0')}>{seeAll}</div>
-      )}
+      {entries.length > 0 && <div className={cn(NESTED_BOX.group, 'm-1.5 mt-0')}>{seeAll}</div>}
     </div>
   )
 }

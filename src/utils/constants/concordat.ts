@@ -335,7 +335,15 @@ export const CONCORDAT_STRIKE_ORDER: readonly ConcordatStrikeKind[] =
  * @type {readonly string[]}
  */
 
-export const CONCORDAT_WEAPONS = ['missile', 'heavy', 'mirv', 'shell', 'rocket', 'heli', 'fighter'] as const
+export const CONCORDAT_WEAPONS = [
+  'missile',
+  'heavy',
+  'mirv',
+  'shell',
+  'rocket',
+  'heli',
+  'fighter',
+] as const
 
 export type ConcordatWeaponName = (typeof CONCORDAT_WEAPONS)[number]
 
