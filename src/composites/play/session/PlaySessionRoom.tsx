@@ -213,7 +213,7 @@ export const PlaySessionRoom = ({
               isOver={replay !== null}
             />
           )}
-          <PlayGameChatBar chat={{ ...chat, load }} crowd={crowdFaces} feed={feed} />
+          <PlayGameChatBar chat={{ ...chat, load }} crowd={crowdFaces} feed={feed} game={game} />
         </>
       ) : isHud ? (
         // Last lines only, in the HUD corner, kept mounted so the lines keep coming

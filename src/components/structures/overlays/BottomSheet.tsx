@@ -17,6 +17,8 @@ export interface BottomSheetProps {
   title: string
   // Floats above the panel on the scrim
   figure?: ReactNode
+  // Game HUD skin name for the data-hud root, the content brings its own blocks
+  hud?: string
   children: ReactNode
 }
 
@@ -26,11 +28,12 @@ export interface BottomSheetProps {
  * @param {() => void} onClose - Dismiss handler
  * @param {string} title - Accessible name
  * @param {ReactNode} [figure] - Title and line floating above the panel
+ * @param {string} [hud] - Game HUD skin name
  * @param {ReactNode} children - Sheet content
  * @return {JSX.Element | null}
  */
 
-export const BottomSheet = ({ open, onClose, title, figure, children }: BottomSheetProps) => {
+export const BottomSheet = ({ open, onClose, title, figure, hud, children }: BottomSheetProps) => {
   const containerRef = useFocusTrap(open, onClose)
   const titleId = useId()
   const drag = useSheetDrag(onClose)
@@ -39,7 +42,7 @@ export const BottomSheet = ({ open, onClose, title, figure, children }: BottomSh
   if (!open || typeof document === 'undefined') return null
 
   return createPortal(
-    <div className={BOTTOM_SHEET.overlay} role="presentation" onMouseDown={onClose}>
+    <div className={BOTTOM_SHEET.overlay} role="presentation" data-hud={hud} onMouseDown={onClose}>
       <div
         ref={containerRef}
         role="dialog"
@@ -64,7 +67,7 @@ export const BottomSheet = ({ open, onClose, title, figure, children }: BottomSh
         <h2 id={titleId} className="sr-only">
           {title}
         </h2>
-        <div className={BOTTOM_SHEET.panel}>
+        <div className={hud ? BOTTOM_SHEET.panelHud : BOTTOM_SHEET.panel}>
           <div className={BOTTOM_SHEET.grip} {...drag.handlers}>
             <span className={BOTTOM_SHEET.gripBar} aria-hidden="true" />
           </div>

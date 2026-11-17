@@ -11,6 +11,8 @@ import { usePlayBubbles } from '@/core/hooks/data/play/usePlayBubbles'
 import { usePlayChatDraft } from '@/core/hooks/data/play/usePlayChatDraft'
 import { usePlayChatLines } from '@/core/hooks/data/play/usePlayChatLines'
 import { PLAY_HUB_COPY, PLAY_MOBILE_COPY } from '@/declarations/play'
+import { PLAY_HUD_SKINS } from '@/declarations/play/hud'
+import type { PlayGameName } from '@/utils/constants/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_GAME_BAR } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -20,6 +22,8 @@ export interface PlayGameChatBarProps {
   // Absent in a lobby
   crowd?: { players: PlayFace[]; spectators: PlayFace[] }
   feed?: ReactNode
+  // Game with its own HUD skin, the feed sheet wears it
+  game?: PlayGameName
 }
 
 /**
@@ -28,7 +32,7 @@ export interface PlayGameChatBarProps {
  * @return {JSX.Element}
  */
 
-export const PlayGameChatBar = ({ chat, crowd, feed }: PlayGameChatBarProps) => {
+export const PlayGameChatBar = ({ chat, crowd, feed, game }: PlayGameChatBarProps) => {
   const { lines, add } = usePlayChatLines(chat.sessionId, chat.messages)
   const { draft, setDraft, onKeyDown } = usePlayChatDraft(chat.sessionId, add)
   const bubbles = usePlayBubbles(lines)
@@ -36,6 +40,7 @@ export const PlayGameChatBar = ({ chat, crowd, feed }: PlayGameChatBarProps) => 
   const [isSheetOpen, setSheetOpen] = useState(false)
   const BubblesIcon = isShown ? ICONS.playChat : ICONS.hidden
   const FeedIcon = ICONS.playFeed
+  const skin = game ? PLAY_HUD_SKINS.get(game) : undefined
 
   return (
     <>
@@ -89,9 +94,11 @@ export const PlayGameChatBar = ({ chat, crowd, feed }: PlayGameChatBarProps) => 
         open={isSheetOpen}
         onClose={() => setSheetOpen(false)}
         title={PLAY_MOBILE_COPY.chatFeed}
+        hud={skin ? game?.toLowerCase() : undefined}
       >
         <PlayChat
           {...chat}
+          skin={skin}
           messages={lines}
           isSide
           crowd={crowd}
