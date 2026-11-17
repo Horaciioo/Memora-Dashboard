@@ -129,10 +129,11 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
     version: '0.13.3',
     date: '2026-11-17',
-    title: 'On relooke les joueurs',
-    intro: 'Memora Play relooke les joueurs !',
+    title: "Les Joueurs se font un p'tit relooking",
+    intro:
+      "Memora Play relooke les joueurs sous toutes ces formes, avec des cadrants fidèles, un système de status (pour éviter les notifs non désirées) ainsi qu'un tas d'autres choses !",
     description:
-      'Memora Play manquait d’un moyen de découvrir un joueur en un coup d’œil, et il fallait deviner qui était réellement disponible. Cette version ajoute une carte de joueur, un statut de disponibilité que chacun règle lui-même et une administration de Play plus complète, avec joueurs, journal et chiffres.',
+      "Cette version ajoute une carte de joueur, un statut de disponibilité que chacun règle lui-même ainsi que des outils d'administrateurs plus précis !",
     items: [
       {
         tag: ChangelogTags.Added,
