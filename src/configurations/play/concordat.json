@@ -151,7 +151,7 @@
     "intentQueue": 40
   },
   "front": {
-    "speed": 4,
+    "speed": 12,
     "driveMin": 0.6,
     "driveMax": 2.4,
     "maxContact": 2500,
