@@ -5,7 +5,7 @@ import type { ConcordatEffects, ConcordatPlayerState, ConcordatState } from '@/t
 const { sim } = CONCORDAT
 
 /**
- * Troop ceiling of a nation, sublinear in its size
+ * Troop ceiling of a nation, sublinear in its size so a giant stays attackable
  * @param {ConcordatPlayerState} player - Nation
  * @return {number} - Ceiling
  */
@@ -32,13 +32,15 @@ export const upkeepOf = (player: ConcordatPlayerState, cut = 0): number =>
   sim.upkeepPerTile * player.tiles * (1 + player.tiles / sim.upkeepScale) * (1 - Math.min(1, cut))
 
 /**
- * Gold per second from the land alone, before buildings and trade
+ * Gold per second from a flat base and the land, before buildings and trade
  * @param {ConcordatPlayerState} player - Nation
  * @return {number} - Gold per second
  */
 
 export const grossOf = (player: ConcordatPlayerState): number =>
-  player.income / INCOME_SCALE + player.provincesHeld * sim.provinceGold
+  sim.baseGold +
+  sim.landGold * (player.income / INCOME_SCALE) ** sim.goldExponent +
+  player.provincesHeld * sim.provinceGold
 
 // One nation for one tick, troops out in the field count against the ceiling
 const grow = (
@@ -57,7 +59,9 @@ const grow = (
   } else {
     const slack = 1 - total / cap
     const rate =
-      (sim.growthBase + sim.growthRate * player.troops) * (1 + effects.growth) * player.growthShare
+      (sim.growthBase + sim.growthRate * player.troops ** sim.growthPower) *
+      (1 + effects.growth) *
+      player.growthShare
     player.troops += rate * slack * calm * dt
   }
 

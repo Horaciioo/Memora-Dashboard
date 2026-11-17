@@ -185,6 +185,50 @@ export interface ConcordatShip {
   progress: number
   // Port building a cargo ship sails to
   dest?: number
+  // Warship health, kills and veteran rank, tick it may fire again, heading home to heal
+  hp?: number
+  kills?: number
+  vet?: number
+  coolAt?: number
+  isRetreating?: boolean
+}
+
+/**
+ * Nation marked as the one to hit, seen by the allies of the marker
+ * @typedef {Object} ConcordatTargetMark
+ */
+
+export interface ConcordatTargetMark {
+  by: number
+  target: number
+  until: number
+  // Tick the marker may mark again
+  readyAt: number
+}
+
+/**
+ * Emoji thrown at one nation or at everyone
+ * @typedef {Object} ConcordatEmoji
+ */
+
+export interface ConcordatEmoji {
+  from: number
+  // Zero for everyone
+  to: number
+  emoji: number
+  until: number
+}
+
+/**
+ * Trade ban of one nation against another
+ * @typedef {Object} ConcordatEmbargo
+ */
+
+export interface ConcordatEmbargo {
+  from: number
+  to: number
+  // End tick, zero for a ban held until lifted
+  until: number
 }
 
 /**
@@ -481,6 +525,13 @@ export interface ConcordatState {
   coalitions: ConcordatCoalition[]
   // Public credit per player, index is the id minus one
   trust: number[]
+  // Trade bans, and the tick each traitor mark ends, index is the id minus one
+  embargoes: ConcordatEmbargo[]
+  traitors: number[]
+  // Multi-warhead missiles launched so far in the game
+  mirvs: number
+  targets: ConcordatTargetMark[]
+  emojis: ConcordatEmoji[]
   // Rebuilt every tick from the buildings, never stored
   effects: ConcordatEffects[]
   // Territory over time and every journal line
@@ -527,7 +578,7 @@ export type ConcordatIntent =
       tile: number
       heavy: boolean
       // Shell or rocket from a battery, missing for a silo missile
-      weapon?: 'shell' | 'rocket'
+      weapon?: 'shell' | 'rocket' | 'mirv'
     }
   | { kind: 'sortie'; playerId: number; base: number; tile: number; air: ConcordatAirKind }
   | { kind: 'retreat'; playerId: number; target: number }
@@ -552,6 +603,9 @@ export type ConcordatIntent =
   | { kind: 'aid'; playerId: number; to: number; percent: number }
   | { kind: 'gift'; playerId: number; to: number; resource: 'gold' | 'troops'; amount: number }
   | { kind: 'closeTrade'; playerId: number; with: number }
+  | { kind: 'embargo'; playerId: number; with: number; on: boolean }
+  | { kind: 'target'; playerId: number; with: number }
+  | { kind: 'emoji'; playerId: number; to: number; emoji: number }
 
 /**
  * How one bot plays, level and personality merged

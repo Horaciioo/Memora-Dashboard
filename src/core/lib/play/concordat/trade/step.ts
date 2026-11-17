@@ -1,6 +1,8 @@
 import { buildingById, isWorking } from '@/core/lib/play/concordat/buildings/rules'
+import { isEmbargoed } from '@/core/lib/play/concordat/diplomacy/embargo'
 import { tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
 import { linkAllies } from '@/core/lib/play/concordat/trade/open'
+import { spawnTrains } from '@/core/lib/play/concordat/trade/trains'
 import { spawnCargo } from '@/core/lib/play/concordat/trade/ships'
 import { tradeIncomesOf } from '@/core/lib/play/concordat/trade/income'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
@@ -58,7 +60,9 @@ const isBlockaded = (state: ConcordatState, route: ConcordatRoute): boolean => {
 
 // War between the parties or a blockade cuts a route
 const isCut = (state: ConcordatState, route: ConcordatRoute): boolean =>
-  tieKindOf(state, route.a, route.b) === ConcordatTies.Hostile || isBlockaded(state, route)
+  tieKindOf(state, route.a, route.b) === ConcordatTies.Hostile ||
+  isEmbargoed(state, route.a, route.b) ||
+  isBlockaded(state, route)
 
 /**
  * Trade phase of a tick: routes checked now and then, income handed out
@@ -69,6 +73,7 @@ const isCut = (state: ConcordatState, route: ConcordatRoute): boolean =>
 export const runTrade = (state: ConcordatState): void => {
   if (!CONCORDAT.features.trade) return
   spawnCargo(state)
+  spawnTrains(state)
   if (state.tick % trade.linkTicks === 0) linkAllies(state)
   if (state.tick % trade.checkTicks !== 0) return
 

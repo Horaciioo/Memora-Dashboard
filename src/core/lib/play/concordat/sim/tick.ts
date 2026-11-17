@@ -6,10 +6,13 @@ import { applyTechEffects, endFeints, finishResearch } from '@/core/lib/play/con
 import { endReason, runDomination } from '@/core/lib/play/concordat/victory'
 import { applyAirGuards, runAir } from '@/core/lib/play/concordat/air'
 import { applyWeaponUpkeep, runWeapons } from '@/core/lib/play/concordat/weapons'
+import { runEmbargoes } from '@/core/lib/play/concordat/diplomacy/embargo'
+import { runSignals } from '@/core/lib/play/concordat/diplomacy/signals'
 import { runDiplomacy } from '@/core/lib/play/concordat/diplomacy/step'
 import { runNavy } from '@/core/lib/play/concordat/navy/step'
 import { runTrade } from '@/core/lib/play/concordat/trade/step'
-import { drop, runCombat } from '@/core/lib/play/concordat/sim/attack'
+import { runCombat } from '@/core/lib/play/concordat/sim/attack'
+import { eliminate } from '@/core/lib/play/concordat/sim/fall'
 import { beginPlay } from '@/core/lib/play/concordat/sim/create'
 import { runEconomy } from '@/core/lib/play/concordat/sim/economy'
 import { applyIntent } from '@/core/lib/play/concordat/sim/intents'
@@ -23,19 +26,7 @@ const HISTORY_LIMIT = 400
 // Nations without land fall
 const eliminateEmpty = (state: ConcordatState): void => {
   for (const player of state.players) {
-    if (!player.alive || player.tiles > 0) continue
-
-    player.alive = false
-    player.troops = 0
-    player.eliminatedAt = state.tick
-    for (const corps of state.corps.filter((other) => other.owner === player.id)) drop(state, corps)
-    emit(state, {
-      tick: state.tick,
-      kind: 'eliminated',
-      actor: 0,
-      victim: player.id,
-      tile: -1,
-    })
+    if (player.alive && player.tiles <= 0) eliminate(state, player, 0)
   }
 }
 
@@ -100,6 +91,8 @@ export const stepTick = (
   runWorld(state)
   runDiplomacy(state)
   runNavy(state)
+  runEmbargoes(state)
+  runSignals(state)
   runTrade(state)
   runEconomy(state)
   runCombat(state)

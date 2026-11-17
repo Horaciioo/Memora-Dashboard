@@ -1,6 +1,8 @@
 import { isWorking } from '@/core/lib/play/concordat/buildings/rules'
+import { addKill, runWarships } from '@/core/lib/play/concordat/navy/combat'
 import { escortsOf, foesOf, landShip } from '@/core/lib/play/concordat/navy/land'
 import { settleCargo } from '@/core/lib/play/concordat/trade/ships'
+import { settleTrain } from '@/core/lib/play/concordat/trade/trains'
 import { emit } from '@/core/lib/play/concordat/sim/emit'
 import { ticksOf, TICK_SECONDS } from '@/core/lib/play/concordat/sim/tables'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
@@ -27,6 +29,7 @@ const sailOn = (state: ConcordatState, ship: ConcordatShip): void => {
     [ConcordatShipKinds.War]: navy.warSpeed,
     [ConcordatShipKinds.Transport]: navy.transportSpeed,
     [ConcordatShipKinds.Trade]: CONCORDAT.trade.ships.speed,
+    [ConcordatShipKinds.Train]: CONCORDAT.trade.trains.speed,
   }
   const speed = speeds[ship.kind]
   const boost = 1 + state.effects[ship.owner - 1].shipSpeed
@@ -90,9 +93,20 @@ export const runNavy = (state: ConcordatState): void => {
       if (settleCargo(state, ship)) state.ships = state.ships.filter((other) => other !== ship)
       continue
     }
+    if (ship.kind === ConcordatShipKinds.Train) {
+      if (settleTrain(state, ship)) state.ships = state.ships.filter((other) => other !== ship)
+      continue
+    }
     if (ship.kind !== ConcordatShipKinds.Transport) continue
 
     if (isIntercepted(state, ship)) {
+      const hunter = state.ships.find(
+        (other) =>
+          other.kind === ConcordatShipKinds.War &&
+          other.owner !== ship.owner &&
+          reach(state, other.tile, ship.tile) <= navy.interceptRadius
+      )
+      if (hunter) addKill(hunter)
       state.players[ship.owner - 1].troops += ship.troops * (1 - navy.interceptLoss)
       emit(state, { tick: state.tick, kind: 'sunk', actor: 0, victim: ship.owner, tile: ship.tile })
       state.ships = state.ships.filter((other) => other !== ship)
@@ -103,5 +117,6 @@ export const runNavy = (state: ConcordatState): void => {
       state.isSystemsDirty = true
     }
   }
+  runWarships(state)
   wearOrphans(state)
 }

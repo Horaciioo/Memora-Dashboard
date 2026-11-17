@@ -28,7 +28,7 @@ const BEAT_MS = 5000
 // Least gap between two board refreshes caused by offers, every reader rebuilds its board
 const OFFERS_MS = 1500
 // Diffs between two full sends of the slow parts
-const SYSTEMS_EVERY = 25
+const SYSTEMS_EVERY = 50
 // Least gap between two saves caused by major events
 const MAJOR_SNAPSHOT_GAP_MS = 3000
 
@@ -114,6 +114,28 @@ export const queueIntent = (
   return loop ? offerIntent(loop.queue, intent, now) : 'gone'
 }
 
+// Figures last sent per loop, a diff carries only the rows that moved
+const sentRows = new WeakMap<ConcordatLoop, Map<number, string>>()
+
+// Rows that changed since the last send, all of them on a full pass
+const movedRows = <Row extends { id: number }>(
+  loop: ConcordatLoop,
+  rows: Row[],
+  isFull: boolean
+): Row[] => {
+  const sent = sentRows.get(loop) ?? new Map<number, string>()
+  sentRows.set(loop, sent)
+  const moved = rows.filter((row) => {
+    const key = JSON.stringify(row)
+    const isMoved = isFull || sent.get(row.id) !== key
+    if (isMoved) sent.set(row.id, key)
+
+    return isMoved
+  })
+
+  return moved
+}
+
 // Public diff of the changes so far
 const flushDiff = (loop: ConcordatLoop, now: number): void => {
   const { state } = loop
@@ -129,6 +151,7 @@ const flushDiff = (loop: ConcordatLoop, now: number): void => {
     baseRev,
     withSystems,
   })
+  diff.players = movedRows(loop, diff.players, loop.rev % SYSTEMS_EVERY === 0)
   // Still dirty after a skip, the next diff tries again
   if (state.isOffersDirty && now - loop.lastOffersAt >= OFFERS_MS) {
     state.isOffersDirty = false

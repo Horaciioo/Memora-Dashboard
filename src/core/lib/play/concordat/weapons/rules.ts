@@ -49,6 +49,15 @@ export const stockCap = (state: ConcordatState, playerId: number): number =>
   silosOf(state, playerId).reduce((sum, silo) => sum + silo.level * weapons.stockPerLevel, 0)
 
 /**
+ * Gold of the next multi-warhead missile, dearer after each one fired in the game
+ * @param {number} launched - Multi-warhead missiles already fired
+ * @return {number} - Gold
+ */
+
+export const mirvPrice = (launched: number): number =>
+  weapons.mirv.cost + weapons.mirv.extraPerLaunch * launched
+
+/**
  * Seconds a missile flies, longer for a far target and for a heavy one
  * @param {ConcordatState} state - Game
  * @param {ConcordatStrikeKind} kind - Kind
@@ -70,7 +79,10 @@ export const flightTicks = (
   const reach = Math.min(1, distance / weapons.range)
   const seconds = weapons.flightMin + (weapons.flightMax - weapons.flightMin) * reach
 
-  return ticksOf(seconds + (kind === 'heavy' ? weapons.heavyExtra : 0))
+  const extra =
+    kind === 'heavy' ? weapons.heavyExtra : kind === 'mirv' ? weapons.mirv.extraSeconds : 0
+
+  return ticksOf(seconds + extra)
 }
 
 /**
@@ -140,7 +152,11 @@ export const launchRefusal = (
   const weapon = intent.weapon ?? (intent.heavy ? 'heavy' : 'missile')
   if (!state.weapons.includes(weapon)) return 'weaponOff'
   const isGun = intent.weapon === 'shell' || intent.weapon === 'rocket'
-  const unlock = isGun ? air.unlockMinutes : weapons.unlockMinutes
+  const unlock = isGun
+    ? air.unlockMinutes
+    : weapon === 'mirv'
+      ? weapons.mirv.unlockMinutes
+      : weapons.unlockMinutes
   if (state.tick < state.pickEnd + ticksOf(unlock * 60)) return 'tooEarly'
   const badTile = tileRefusal(state, intent.tile)
   if (badTile) return badTile
@@ -152,6 +168,16 @@ export const launchRefusal = (
 
   const refusal = holderRefusal(state, intent.playerId, intent.tile)
   if (refusal) return refusal
+
+  if (weapon === 'mirv') {
+    if (!modeRules(state.mode).heavy) return 'heavyOff'
+    if (silo.level < weapons.mirv.siloLevel) return 'siloLevel'
+    if (state.players[intent.playerId - 1].provincesHeld < weapons.mirv.zones) return 'needsZones'
+    if ((silo.coolAt ?? 0) > state.tick) return 'cooling'
+    if (!state.owner[intent.tile]) return 'badTarget'
+
+    return state.players[intent.playerId - 1].gold < mirvPrice(state.mirvs) ? 'noGold' : null
+  }
 
   const arms = state.arms[intent.playerId - 1]
   if (intent.heavy) {

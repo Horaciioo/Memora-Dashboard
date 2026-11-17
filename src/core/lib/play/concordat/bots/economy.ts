@@ -12,6 +12,7 @@ import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
 import {
   CONCORDAT_TECH_ORDER,
+  ConcordatBotLevels,
   ConcordatBuildingKinds,
   ConcordatTerrains,
 } from '@/utils/constants/concordat'
@@ -61,30 +62,65 @@ const nextKind = (context: ConcordatBotContext, owned: number): ConcordatBuildin
   return profile.build[owned % profile.build.length]
 }
 
-// A new building, or an upgrade once the roster is full
-const buildMove = (context: ConcordatBotContext): ConcordatIntent | null => {
-  const { state, view, profile, isCaretaker } = context
+// Best upgrade within reach, null when none
+const upgradeMove = (context: ConcordatBotContext): ConcordatIntent | null => {
+  const { state, view } = context
   const playerId = view.me.id
-  const mine = state.buildings.filter((building) => building.owner === playerId)
-  const limit = isCaretaker ? bots.caretaker.maxBuildings : profile.maxBuildings
-
-  if (mine.length < limit) {
-    const kind = nextKind(context, mine.length)
-    if (view.me.gold < buildCost(state, playerId, kind) * (1 + bots.gold.spareShare)) return null
-
-    const tile = siteFor(state, playerId, kind)
-
-    return tile === null ? null : { kind: 'build', playerId, building: kind, tile }
-  }
-
-  const target = mine
-    .filter((building) => !upgradeRefusal(state, playerId, building.id))
+  const target = state.buildings
+    .filter(
+      (building) => building.owner === playerId && !upgradeRefusal(state, playerId, building.id)
+    )
     .sort((first, second) => upgradeCost(first) - upgradeCost(second))[0]
   const best = target ? buildingById(state, target.id) : null
 
   return best && view.me.gold >= upgradeCost(best) * (1 + bots.gold.spareShare)
     ? { kind: 'upgrade', playerId, id: best.id }
     : null
+}
+
+// A new building: a silo first once rich, then the personality list
+const raiseMove = (
+  context: ConcordatBotContext,
+  owned: number,
+  isRich: boolean
+): ConcordatIntent | null => {
+  const { state, view, profile } = context
+  const playerId = view.me.id
+  const hasSilo = state.buildings.some(
+    (building) => building.owner === playerId && building.kind === ConcordatBuildingKinds.Silo
+  )
+  const wantsSilo = isRich && !hasSilo && profile.level !== ConcordatBotLevels.Recruit
+  const kinds = [...(wantsSilo ? [ConcordatBuildingKinds.Silo] : []), nextKind(context, owned)]
+
+  for (const kind of kinds) {
+    if (view.me.gold < buildCost(state, playerId, kind) * (1 + bots.gold.spareShare)) continue
+
+    const tile = siteFor(state, playerId, kind)
+    if (tile !== null) return { kind: 'build', playerId, building: kind, tile }
+  }
+
+  return null
+}
+
+// A new building, or an upgrade once the roster is full, a rich bot keeps raising more
+const buildMove = (context: ConcordatBotContext): ConcordatIntent | null => {
+  const { state, view, profile, isCaretaker, roll } = context
+  const playerId = view.me.id
+  const owned = state.buildings.filter((building) => building.owner === playerId).length
+  const base = isCaretaker ? bots.caretaker.maxBuildings : profile.maxBuildings
+  const extra = isCaretaker
+    ? 0
+    : Math.min(bots.rich.maxExtra, Math.floor(view.me.gold / bots.rich.step))
+  const isRich = extra > 0
+
+  // The rich alternate between raising and upgrading, the others fill their roster first
+  if (isRich && roll(3) < bots.rich.upgradeChance) {
+    const upgrade = upgradeMove(context)
+    if (upgrade) return upgrade
+  }
+  if (owned < base + extra) return raiseMove(context, owned, isRich)
+
+  return upgradeMove(context)
 }
 
 // Next tier of the favourite path, then the others

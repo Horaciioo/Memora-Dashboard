@@ -13,7 +13,7 @@ import { ConcordatEventKinds, ConcordatPhases } from '@/utils/constants/concorda
 import type { ConcordatPhaseName } from '@/utils/constants/concordat'
 
 // Protocol version, first byte of a diff
-export const DIFF_VERSION = 2
+export const DIFF_VERSION = 3
 
 const PHASES: ConcordatPhaseName[] = [
   ConcordatPhases.Picking,

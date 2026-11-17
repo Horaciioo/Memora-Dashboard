@@ -4,6 +4,7 @@ import { tileNoise } from '@/core/lib/play/concordat/sim/rng'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import { economyMoves } from '@/core/lib/play/concordat/bots/economy'
 import { betrayalMove, militaryMoves } from '@/core/lib/play/concordat/bots/military'
+import { strikeMoves } from '@/core/lib/play/concordat/bots/strike'
 import { botProfileOf } from '@/core/lib/play/concordat/bots/profile'
 import { seaMoves } from '@/core/lib/play/concordat/bots/sea'
 import { aidMoves, answerMoves, proposeMoves } from '@/core/lib/play/concordat/bots/talks'
@@ -82,6 +83,7 @@ export const decideBot = (
     ...answerMoves(context),
     ...(betrayal ? [betrayal] : []),
     ...militaryMoves(context),
+    ...strikeMoves(context),
     ...seaMoves(context),
     ...proposeMoves(context, memory.lastProposal),
     ...aidMoves(context),

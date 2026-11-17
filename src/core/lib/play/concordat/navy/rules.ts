@@ -91,11 +91,7 @@ export const sailRefusal = (
     return 'badPercent'
 
   const holder = state.owner[tile] ? state.players[state.owner[tile] - 1] : null
-  if (
-    holder &&
-    (!holder.alive || state.tick < holder.protectedUntil || state.tick < me.protectedUntil)
-  )
-    return 'protected'
+  if (holder && (!holder.alive || state.tick < holder.protectedUntil)) return 'protected'
   if (holder && hasTreaty(state, me.id, holder.id)) return 'treaty'
 
   if (Math.floor((me.troops * intent.percent) / 100) < sim.minEngage) return 'tooFew'

@@ -57,7 +57,9 @@ const systemIntent = (playerId: number, raw: Record<string, unknown>): Concordat
     const tile = id('tile')
 
     // A strike is only fired with the second confirmation
-    const weapon = raw.weapon === 'shell' || raw.weapon === 'rocket' ? raw.weapon : undefined
+    const weapon = raw.weapon === 'shell' || raw.weapon === 'rocket' || raw.weapon === 'mirv'
+        ? raw.weapon
+        : undefined
 
     return silo === null || tile === null || raw.confirm !== true
       ? null
@@ -116,6 +118,17 @@ const diplomacyIntent = (
     return peer === null ? null : { kind: 'break', playerId, with: peer }
   if (type === ConcordatIntents.CloseTrade) {
     return peer === null ? null : { kind: 'closeTrade', playerId, with: peer }
+  }
+  if (type === ConcordatIntents.Target) {
+    return peer === null ? null : { kind: 'target', playerId, with: peer }
+  }
+  if (type === ConcordatIntents.Emoji) {
+    const emoji = whole(raw.emoji, 255)
+
+    return peer === null || emoji === null ? null : { kind: 'emoji', playerId, to: peer, emoji }
+  }
+  if (type === ConcordatIntents.Embargo) {
+    return peer === null ? null : { kind: 'embargo', playerId, with: peer, on: raw.on !== false }
   }
   if (type === ConcordatIntents.Aid) {
     const percent = whole(raw.percent, 100)

@@ -20,7 +20,7 @@ const { weapons, air } = CONCORDAT
 // Share of strikes stopped by research
 const interceptChance = (state: ConcordatState, strike: ConcordatStrike): number => {
   const holder = state.owner[strike.tile]
-  if (!holder || strike.kind === 'shell') return 0
+  if (!holder || strike.kind === 'shell' || strike.kind === 'mirv') return 0
 
   // Fortresses stop no strike, only research and SAM batteries do
   return Math.min(weapons.interceptCap, state.effects[holder - 1].intercept)
@@ -73,6 +73,48 @@ const detonate = (state: ConcordatState, strike: ConcordatStrike): void => {
   })
 }
 
+// A multi-warhead missile splits over the land of its target, each warhead falls on its own
+const split = (state: ConcordatState, carrier: ConcordatStrike): void => {
+  const { width, height, terrain } = state.map
+  const holder = state.owner[carrier.tile]
+  const { warheads, spread, warheadSeconds } = weapons.mirv
+  const cx = carrier.tile % width
+  const cy = Math.floor(carrier.tile / width)
+
+  for (let index = 0; index < warheads; index++) {
+    // A few draws to find ground of the same nation, the centre when none
+    let tile = carrier.tile
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const x = Math.min(
+        width - 1,
+        Math.max(0, Math.round(cx + (nextRandom(state) - 0.5) * 2 * spread))
+      )
+      const y = Math.min(
+        height - 1,
+        Math.max(0, Math.round(cy + (nextRandom(state) - 0.5) * 2 * spread))
+      )
+      const candidate = y * width + x
+      if (terrain[candidate] !== ConcordatTerrains.Sea && state.owner[candidate] === holder) {
+        tile = candidate
+        break
+      }
+    }
+    state.strikes.push({
+      id: state.nextId++,
+      owner: carrier.owner,
+      kind: 'warhead',
+      tile,
+      from: carrier.tile,
+      launchedAt: state.tick,
+      impactAt: state.tick + ticksOf(warheadSeconds * (0.7 + 0.6 * nextRandom(state))),
+      by: -1,
+      shotAt: 0,
+      killAt: 0,
+    })
+  }
+  state.isSystemsDirty = true
+}
+
 // Strikes that reach their target or are shot down on the way
 const land = (state: ConcordatState): void => {
   const due = state.strikes.filter(
@@ -83,6 +125,10 @@ const land = (state: ConcordatState): void => {
   state.strikes = state.strikes.filter((strike) => !due.includes(strike))
   state.isSystemsDirty = true
   for (const strike of due) {
+    if (strike.kind === 'mirv') {
+      split(state, strike)
+      continue
+    }
     const isShot = Boolean(strike.killAt)
     if (isShot || nextRandom(state) < interceptChance(state, strike)) {
       emit(state, {
@@ -101,6 +147,8 @@ const land = (state: ConcordatState): void => {
 // Chance a battery of this level stops the strike
 const samChance = (level: number, strike: ConcordatStrike): number => {
   const base = air.samMissile[Math.min(level, air.samMissile.length) - 1]
+
+  if (strike.kind === 'warhead') return base * weapons.mirv.samShare
 
   return strike.kind === 'heavy' ? base * air.samHeavy : base
 }
@@ -138,7 +186,8 @@ const defend = (state: ConcordatState): void => {
   const flight = ticksOf(air.interceptSeconds)
 
   for (const strike of state.strikes) {
-    if (strike.kind === 'shell' || strike.killAt || strike.impactAt - state.tick > lead) continue
+    if (strike.kind === 'shell' || strike.kind === 'mirv') continue
+    if (strike.killAt || strike.impactAt - state.tick > lead) continue
     const holder = state.owner[strike.tile]
     const sam = holder ? readySam(state, holder, strike.tile) : null
     if (!sam) continue
