@@ -48,6 +48,8 @@ export const CONCORDAT_BOARD = {
   menuTie: 'text-xs font-bold text-[var(--play-ink-faint)]',
   menuItem: `${BUTTON} text-left text-[var(--play-ink)] hover:bg-[var(--play-chip)]`,
   menuMain: `${BUTTON} bg-[var(--play-accent)] text-left ${ON_BRASS}`,
+  emojis: 'grid grid-cols-8 gap-0.5 px-1 pt-1',
+  emoji: 'grid aspect-square place-items-center rounded-[0.15rem] text-base hover:bg-[var(--play-chip)]',
   waiting: 'grid size-full place-items-center text-lg font-bold text-[var(--concordat-card)]',
 } as const
 
@@ -128,6 +130,30 @@ export const CONCORDAT_HUD = {
   // Under the info card, centred
   notice:
     'pointer-events-none absolute top-[5.75rem] left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 max-md:top-[5.5rem]',
+  // Attacks against me, under the info card
+  alarm: 'concordat-alarm pointer-events-none absolute inset-0 z-10',
+  alarmFlash: 'concordat-alarm-flash pointer-events-none absolute inset-0 z-10',
+  alerts:
+    'pointer-events-none absolute top-[8.5rem] left-1/2 z-20 flex w-[min(26rem,calc(100vw-1.5rem))] -translate-x-1/2 flex-col gap-2 max-md:top-[8rem]',
+  alert: `${BLOCK} concordat-alert-in pointer-events-auto flex flex-col gap-2 px-4 py-3 shadow-[0_0_0_0.15rem_var(--concordat-alarm)]`,
+  alertHead: 'flex items-center gap-2',
+  alertTitle: 'min-w-0 flex-1 truncate text-base font-black text-[var(--play-ink)]',
+  alertTroops: 'text-sm font-bold tabular-nums text-[var(--play-ink-soft)]',
+  alertBar: 'h-1.5 w-full overflow-hidden rounded-[0.1rem] bg-[var(--play-chip)]',
+  alertFill: 'h-full bg-[var(--concordat-alarm)] transition-[width] duration-300',
+  alertActions: 'flex items-center gap-2',
+  alertMain: `${BUTTON} flex-1 bg-[var(--concordat-alarm)] text-white`,
+  alertSide: `${BUTTON} flex-1 bg-[var(--play-chip)] text-[var(--play-ink)]`,
+  // Start timer: a thin bar across the top, a line under the info card
+  timerBar: 'pointer-events-none fixed inset-x-0 top-0 z-30 h-1.5 bg-[var(--play-chip)]/60',
+  timerFill: 'h-full bg-[var(--play-accent)] transition-[width] duration-200 ease-linear',
+  // Outgoing pushes, a strip above the pill
+  fronts: 'pointer-events-none flex max-w-[calc(100vw-1.5rem)] flex-wrap items-center justify-center gap-1.5',
+  front: `${BLOCK} pointer-events-auto flex items-center gap-2 px-2.5 py-1.5 text-xs font-bold text-[var(--play-ink)]`,
+  frontName: 'max-w-28 truncate',
+  frontTroops: 'tabular-nums text-[var(--play-ink-soft)]',
+  frontCancel: `${BUTTON} bg-[var(--play-chip)] px-1.5 py-0.5 text-[var(--play-ink)]`,
+  gain: 'concordat-alert-in ml-1 text-sm font-bold tabular-nums text-[var(--play-value)]',
   // Zone won, centred above the board
   zones:
     'pointer-events-none absolute top-[32%] left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2',

@@ -2,10 +2,11 @@ import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
 
 /**
  * Weapons and aircraft with a pictogram of their own
- * @typedef {'missile' | 'heavy' | 'shell' | 'rocket' | 'heli' | 'fighter'} ConcordatWeaponGlyph
+ * @typedef {'missile' | 'heavy' | 'mirv' | 'shell' | 'rocket' | 'heli' | 'fighter'} ConcordatWeaponGlyph
  */
 
-export type ConcordatWeaponGlyph = 'missile' | 'heavy' | 'shell' | 'rocket' | 'heli' | 'fighter'
+export type ConcordatWeaponGlyph =
+  'missile' | 'heavy' | 'mirv' | 'shell' | 'rocket' | 'heli' | 'fighter'
 
 // Aircraft seen from above, nose up
 const PLANE_PATH =
@@ -38,6 +39,11 @@ export const CONCORDAT_WEAPON_GLYPHS: Record<ConcordatWeaponGlyph, { path: strin
     missile: {
       turn: 45,
       path: 'M12 2 C13.8 4.5 14.5 8 14.5 12 V17 H9.5 V12 C9.5 8 10.2 4.5 12 2 Z M9.5 13 L7 17.5 V19 L9.5 17.5 Z M14.5 13 L17 17.5 V19 L14.5 17.5 Z M10.8 18.2 H13.2 L12 22.5 Z M12 7 m-1.4 0 a1.4 1.4 0 1 0 2.8 0 a1.4 1.4 0 1 0 -2.8 0',
+    },
+    // Three small warheads side by side
+    mirv: {
+      turn: 0,
+      path: 'M12 2 C13.4 4 14 6.5 14 9 V13 H10 V9 C10 6.5 10.6 4 12 2 Z M5 8 C6.2 9.7 6.7 11.6 6.7 13.6 V17 H3.3 V13.6 C3.3 11.6 3.8 9.7 5 8 Z M19 8 C20.2 9.7 20.7 11.6 20.7 13.6 V17 H17.3 V13.6 C17.3 11.6 17.8 9.7 19 8 Z M10 14 H14 L12 19 Z M3.3 18 H6.7 L5 22 Z M17.3 18 H20.7 L19 22 Z',
     },
     // Fat warhead with a trefoil hole
     heavy: {
@@ -92,6 +98,11 @@ export const CONCORDAT_GLYPHS: Record<ConcordatBuildingKind, { path: string; isS
     sam: {
       isStroke: false,
       path: 'M3 14 A10 10 0 0 1 13 4 Z M13 7 L21 2.5 L22 4.3 L14.5 9 Z M10.5 11 H12.5 V17 H10.5 Z M6.5 18 H16.5 V21 H6.5 Z',
+    },
+    // Factory with a sawtooth roof and a chimney
+    factory: {
+      isStroke: false,
+      path: 'M3 21 V11 L8 7.5 V11 L13 7.5 V11 L18 7.5 V4 H20.5 V21 Z M6 15 H9 V18 H6 Z M11 15 H14 V18 H11 Z M16 15 H18 V21 H16 Z',
     },
     // Aircraft over a runway
     airbase: {

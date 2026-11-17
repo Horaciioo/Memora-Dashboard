@@ -216,6 +216,7 @@ export const CONCORDAT_REFUSALS: Record<string, string> = {
   tooManyRoutes: 'Tu as atteint le maximum de routes commerciales.',
   partnerFull: 'Ce partenaire a atteint le maximum de routes.',
   noRoute: 'Aucune route ne relie ces nations.',
+  embargoed: 'Un embargo bloque le commerce entre vous.',
   noPort: 'Il faut un port en service.',
   fleetFull: 'Ta flotte est déjà au maximum.',
   noShip: 'Ce navire n’existe plus.',

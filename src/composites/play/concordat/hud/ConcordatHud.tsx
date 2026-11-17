@@ -1,7 +1,9 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { ConcordatFronts } from '@/composites/play/concordat/hud/ConcordatFronts'
+import { ConcordatAlerts } from '@/composites/play/concordat/hud/ConcordatAlerts'
 import { ConcordatPanels } from '@/composites/play/concordat/hud/ConcordatPanels'
 import { ConcordatMeter } from '@/composites/play/concordat/hud/ConcordatMeter'
 import { ConcordatZones } from '@/composites/play/concordat/hud/ConcordatZones'
@@ -23,6 +25,10 @@ import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 import { ConcordatPhases, ConcordatTerrains } from '@/utils/constants/concordat'
 import { PlayGames } from '@/utils/constants/play'
+
+// Smallest jump shown as a gain, and how long it stays
+const GAIN_FLOOR = 800
+const GAIN_MS = 2000
 
 // Nations listed in the ranking, tribes never
 const SCOREBOARD_SIZE = 12
@@ -56,6 +62,25 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
     CONCORDAT_TICKS_PER_SECOND
 
   const blocks = [{ key: 'clock', caption: CONCORDAT_HUD_COPY.time, figure: clockText(seconds) }]
+  const economy = client.systems.figures[client.me - 1]
+
+  // A jump of gold well above the income, spoils or a gift, pops for two seconds
+  const [gain, setGain] = useState(0)
+  const gold = me?.gold ?? 0
+  const income = economy?.income ?? 0
+  const lastGold = useRef(gold)
+  const gainTimer = useRef(0)
+  useEffect(() => {
+    const delta = gold - lastGold.current
+    lastGold.current = gold
+    const expected = (Math.max(0, income) / 600) * client.speed
+    if (delta <= expected * 4 + GAIN_FLOOR) return
+
+    setGain((current) => current + delta)
+    window.clearTimeout(gainTimer.current)
+    gainTimer.current = window.setTimeout(() => setGain(0), GAIN_MS)
+  }, [gold, income, client.speed])
+  useEffect(() => () => window.clearTimeout(gainTimer.current), [])
   const figures = me
     ? [
         {
@@ -65,8 +90,35 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
             percent: landShareText(me.tiles, land),
           }),
         },
-        { key: 'troops', caption: CONCORDAT_HUD_COPY.troops, figure: troopFigure(me.troops) },
-        { key: 'gold', caption: CONCORDAT_HUD_COPY.gold, figure: compactFigure(me.gold) },
+        {
+          key: 'troops',
+          caption: CONCORDAT_HUD_COPY.troops,
+          figure: economy
+            ? fillPlayMessage(CONCORDAT_HUD_COPY.troopsOf, {
+                troops: troopFigure(me.troops),
+                max: troopFigure(economy.maxTroops),
+              })
+            : troopFigure(me.troops),
+        },
+        {
+          key: 'gold',
+          caption: CONCORDAT_HUD_COPY.gold,
+          figure: (
+            <>
+              {economy
+                ? fillPlayMessage(CONCORDAT_HUD_COPY.goldRate, {
+                    gold: compactFigure(me.gold),
+                    rate: `${economy.income < 0 ? '-' : '+'}${compactFigure(Math.abs(economy.income))}`,
+                  })
+                : compactFigure(me.gold)}
+              {gain > 0 && (
+                <span key={gain} className={CONCORDAT_HUD.gain}>
+                  +{compactFigure(gain)}
+                </span>
+              )}
+            </>
+          ),
+        },
       ]
     : []
   const rows = featuredPlayers(client.players, SCOREBOARD_SIZE).map((player) => ({
@@ -94,11 +146,13 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
       isCompact
     >
       <ConcordatNotices client={client} isSeated={isSeated} />
+      {isPlaying && <ConcordatAlerts client={client} names={names} act={act} />}
       <ConcordatMeter client={client} />
-      <ConcordatZones client={client} />
+      <ConcordatZones client={client} names={names} />
       <ConcordatPanels client={client} names={names} land={land} />
       {isPlaying && (
         <div className={CONCORDAT_HUD.dock}>
+          <ConcordatFronts client={client} names={names} act={act} />
           <ConcordatPill figures={figures} client={client} names={names} act={act} />
         </div>
       )}

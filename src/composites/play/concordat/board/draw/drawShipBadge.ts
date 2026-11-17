@@ -14,6 +14,8 @@ const { badge } = ship
  * @param {number} size - Hull length in pixels
  * @param {readonly number[]} color - Owner colour
  * @param {ConcordatShipKind} kind - Ship kind
+ * @param {number} [hp] - Health in percent, a bar shows once hurt
+ * @param {number} [vet] - Veteran rank, one pip each
  * @return {void}
  */
 
@@ -23,7 +25,9 @@ export const drawShipBadge = (
   y: number,
   size: number,
   color: readonly number[],
-  kind: ConcordatShipKind
+  kind: ConcordatShipKind,
+  hp = 100,
+  vet = 0
 ): void => {
   const radius = size * badge.radius
   const top = y - size * badge.lift
@@ -63,4 +67,27 @@ export const drawShipBadge = (
     context.stroke()
   }
   context.restore()
+
+  // Health bar under a hurt warship, rank pips over it
+  if (kind !== ConcordatShipKinds.War) return
+  const barWidth = size * 0.9
+  const barY = y + size * 0.55
+  if (hp < 100) {
+    context.fillStyle = rgbText(frame.rgb, 0.85)
+    context.fillRect(x - barWidth / 2 - 1, barY - 1, barWidth + 2, size * 0.14 + 2)
+    context.fillStyle = hp > 50 ? 'rgb(92 184 92)' : hp > 25 ? 'rgb(232 178 48)' : 'rgb(214 76 64)'
+    context.fillRect(x - barWidth / 2, barY, (barWidth * hp) / 100, size * 0.14)
+  }
+  context.fillStyle = 'rgb(255 214 90)'
+  for (let pip = 0; pip < vet; pip++) {
+    context.beginPath()
+    context.arc(
+      x + (pip - (vet - 1) / 2) * size * 0.22,
+      top - radius - size * 0.12,
+      size * 0.07,
+      0,
+      Math.PI * 2
+    )
+    context.fill()
+  }
 }

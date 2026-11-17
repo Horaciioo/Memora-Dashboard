@@ -20,6 +20,9 @@ import { ConcordatTerrains } from '@/utils/constants/concordat'
 
 const { nation, territory, wash, repaintShare, labelMs, flash } = CONCORDAT_ART
 
+// Scattered order of a tile, so a batch dissolves in instead of sweeping row by row
+const scatter = (tile: number): number => Math.imul(tile ^ (tile >>> 15), 2246822519) >>> 0
+
 // Canvas of one pixel per tile
 const layerOf = (width: number, height: number): HTMLCanvasElement => {
   const layer = document.createElement('canvas')
@@ -40,6 +43,10 @@ export interface Held {
   washed: number
   land: number
   waves: ConcordatWave[]
+  // Tiles taken but not yet painted, each shows when its moment comes
+  pending: ConcordatWave[]
+  // Moment the last batch of tiles arrived
+  batchAt: number
 }
 
 // Layers of a map, the ones of the same map held before are kept
@@ -70,6 +77,8 @@ const build = (client: ConcordatClientState, previous: Held | null): Held => {
     washed: 0,
     land: isSameMap ? previous.land : landTilesOf(client.map.terrain, ConcordatTerrains.Sea),
     waves: [],
+    pending: [],
+    batchAt: 0,
   }
 }
 
@@ -106,6 +115,34 @@ const washLayer = (current: Held, holder: number): void => {
 }
 
 /**
+ * Paint the tiles whose moment has come
+ * @param {Held} current - Held layers
+ * @param {number} now - Clock in milliseconds
+ * @return {boolean} - Tiles still waiting
+ */
+
+export const revealDue = (current: Held, now: number): boolean => {
+  const { pending, client } = current
+  if (!pending.length) return false
+  const due: number[] = []
+  let kept = 0
+  for (const wave of pending) {
+    if (wave.at <= now) due.push(wave.tile)
+    else pending[kept++] = wave
+  }
+  pending.length = kept
+  if (due.length) {
+    paintOwners(current.owner, client.owner, due, current.colors, territory)
+    const box = boxOf(due, client.map.width, client.map.height)
+    current.layers.owner
+      .getContext('2d')
+      ?.putImageData(current.owner, 0, 0, box.x, box.y, box.width, box.height)
+  }
+
+  return kept > 0
+}
+
+/**
  * Offscreen layers of the map kept in step
  * @param {ConcordatClientState | null} client - Game
  * @param {number} version - Redraw counter
@@ -126,22 +163,29 @@ export const useConcordatLayers = (
     const current = isFresh || !held.current ? build(client, held.current) : held.current
     held.current = current
     const touched = drainTouched(client)
-    const isBulk = isFresh || touched.length > client.owner.length * repaintShare
-    // Taken tiles light up one after the other, front first
-    if (!isBulk) {
+    // A backlog too deep to trickle is shown at once, like a big change
+    const isBulk =
+      isFresh ||
+      touched.length > client.owner.length * repaintShare ||
+      current.pending.length + touched.length > flash.cap
+    // Taken tiles come in one after the other across the gap to the next batch
+    if (isFresh || isBulk) current.pending.length = 0
+    if (!isBulk && touched.length) {
       const start = performance.now()
-      touched.forEach((tile, index) =>
-        current.waves.push({ tile, at: start + (index / touched.length) * flash.spread })
-      )
+      const gap = Math.min(flash.spread, Math.max(flash.minSpread, start - current.batchAt))
+      current.batchAt = start
+      const order = [...touched].sort((first, second) => scatter(first) - scatter(second))
+      order.forEach((tile, index) => {
+        const wave = { tile, at: start + (index / order.length) * gap }
+        current.waves.push(wave)
+        current.pending.push(wave)
+      })
       if (current.waves.length > flash.cap)
         current.waves.splice(0, current.waves.length - flash.cap)
     }
-    paintOwners(current.owner, client.owner, isBulk ? null : touched, current.colors, territory)
-    const ownerContext = current.layers.owner.getContext('2d')
-    if (isBulk) ownerContext?.putImageData(current.owner, 0, 0)
-    else if (touched.length) {
-      const box = boxOf(touched, client.map.width, client.map.height)
-      ownerContext?.putImageData(current.owner, 0, 0, box.x, box.y, box.width, box.height)
+    if (isBulk) {
+      paintOwners(current.owner, client.owner, null, current.colors, territory)
+      current.layers.owner.getContext('2d')?.putImageData(current.owner, 0, 0)
     }
     // Names follow the land a little late
     // A full scan costs tens of ms on a big map: only when land moved

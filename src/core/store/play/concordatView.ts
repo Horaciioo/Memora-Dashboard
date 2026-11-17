@@ -14,7 +14,7 @@ import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
 
 export type ConcordatTool =
   | { kind: 'build'; building: ConcordatBuildingKind }
-  | { kind: 'launch'; isHeavy: boolean; weapon?: 'shell' | 'rocket' }
+  | { kind: 'launch'; isHeavy: boolean; weapon?: 'shell' | 'rocket' | 'mirv' }
   | { kind: 'sortie'; air: 'heli' | 'fighter' }
 
 /**

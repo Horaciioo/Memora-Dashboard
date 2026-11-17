@@ -21,7 +21,7 @@ export interface ConcordatStrike {
   tile: number
   silo: number
   isHeavy: boolean
-  weapon?: 'shell' | 'rocket'
+  weapon?: 'shell' | 'rocket' | 'mirv'
   air?: 'heli' | 'fighter'
   x: number
   y: number
@@ -111,7 +111,7 @@ export const useConcordatTaps = ({
 
       return setStrike({ tile, silo: base.id, isHeavy: false, air: tool.air, x, y })
     }
-    if (tool.weapon) {
+    if (tool.weapon === 'shell' || tool.weapon === 'rocket') {
       const battery = batteryFor(client, tile)
       if (!battery || client.owner[tile] === client.me) return mark(tile, 'refused')
 
@@ -123,7 +123,11 @@ export const useConcordatTaps = ({
           building.owner === client.me &&
           building.kind === ConcordatBuildingKinds.Silo &&
           building.readyAt <= client.tick &&
-          (!tool.isHeavy || building.level >= CONCORDAT.weapons.heavyLevel) &&
+          (!tool.isHeavy ||
+            building.level >=
+              (tool.weapon === 'mirv'
+                ? CONCORDAT.weapons.mirv.siloLevel
+                : CONCORDAT.weapons.heavyLevel)) &&
           reachOf(building.tile, tile, client.map.width) <= CONCORDAT.weapons.range
       )
       .sort(
@@ -131,7 +135,14 @@ export const useConcordatTaps = ({
           reachOf(first.tile, tile, client.map.width) - reachOf(second.tile, tile, client.map.width)
       )[0]
     if (!silo || client.owner[tile] === client.me) return mark(tile, 'refused')
-    setStrike({ tile, silo: silo.id, isHeavy: tool.isHeavy, x, y })
+    setStrike({
+      tile,
+      silo: silo.id,
+      isHeavy: tool.isHeavy,
+      weapon: tool.weapon === 'mirv' ? 'mirv' : undefined,
+      x,
+      y,
+    })
   }
 
   const onTap = (tile: number, x: number, y: number) => {

@@ -69,3 +69,41 @@ export const drawBoat = (
   context.fillRect(-size * 0.2, -size * 0.1, size * 0.28, size * 0.2)
   context.restore()
 }
+
+/**
+ * Small train on its rail: a locomotive and two cars in the colour of its nation
+ * @param {CanvasRenderingContext2D} context - Canvas
+ * @param {number} x - Centre in pixels
+ * @param {number} y - Centre in pixels
+ * @param {number} size - Length of the locomotive in pixels
+ * @param {number} angle - Heading in radians, zero looks right
+ * @param {readonly number[]} body - Colour of the cars
+ * @return {void}
+ */
+
+export const drawTrain = (
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  angle: number,
+  body: readonly number[]
+): void => {
+  context.save()
+  context.translate(x, y)
+  context.rotate(angle)
+  context.fillStyle = rgbText(boat.rim)
+  context.fillRect(-size * 1.6, -size * 0.09, size * 2.3, size * 0.18)
+  context.fillStyle = rgbText(body)
+  context.strokeStyle = rgbText(boat.rim)
+  context.lineWidth = Math.max(1, size * 0.06)
+  for (const offset of [-1.3, -0.65, 0]) {
+    context.beginPath()
+    context.rect(size * (offset - 0.28), -size * 0.2, size * 0.56, size * 0.4)
+    context.fill()
+    context.stroke()
+  }
+  context.fillStyle = rgbText(boat.rim)
+  context.fillRect(size * 0.1, -size * 0.12, size * 0.14, size * 0.24)
+  context.restore()
+}

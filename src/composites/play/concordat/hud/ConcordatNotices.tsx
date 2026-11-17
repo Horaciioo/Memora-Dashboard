@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { isLandLocked } from '@/core/lib/play/concordat'
+import { clockText, isLandLocked } from '@/core/lib/play/concordat'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
 import { CONCORDAT_BUILDING_LABELS } from '@/declarations/play/concordat/hudCopy'
 import { fillPlayMessage } from '@/declarations/play/copy'
+import { CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 import { ConcordatPhases } from '@/utils/constants/concordat'
@@ -50,8 +51,36 @@ export const ConcordatNotices = ({ client, isSeated }: ConcordatNoticesProps) =>
     return () => clearInterval(timer)
   }, [isPlaying, isSeated])
 
+  // Start timer: the pick countdown, then the shield of my nation
+  const ticksPerSecond = CONCORDAT_TICKS_PER_SECOND
+  const shieldEnd = client.systems.shields[client.me - 1] ?? 0
+  const shieldLeft = isPlaying && isSeated ? Math.max(0, shieldEnd - client.tick) : 0
+  // The first reading is the full length, the bar drains from there
+  const [shieldTotal, setShieldTotal] = useState(0)
+  if (shieldLeft > shieldTotal) setShieldTotal(shieldLeft)
+  const barShare = isPicking
+    ? Math.max(0, (client.pickEnd - client.tick) / Math.max(1, client.pickEnd))
+    : shieldTotal
+      ? shieldLeft / shieldTotal
+      : 0
+
   return (
     <div className={CONCORDAT_HUD.notice}>
+      {(isPicking || shieldLeft > 0) && (
+        <div className={CONCORDAT_HUD.timerBar} aria-hidden>
+          <div className={CONCORDAT_HUD.timerFill} style={{ width: `${barShare * 100}%` }} />
+        </div>
+      )}
+      {shieldLeft > 0 && (
+        <div className={CONCORDAT_HUD.pick} title={CONCORDAT_HUD_COPY.shieldHint}>
+          <span className={CONCORDAT_HUD.pickTitle}>
+            {fillPlayMessage(CONCORDAT_HUD_COPY.shielded, {
+              time: clockText(shieldLeft / ticksPerSecond),
+            })}
+          </span>
+          <span className={CONCORDAT_HUD.pickHint}>{CONCORDAT_HUD_COPY.shieldHint}</span>
+        </div>
+      )}
       {isPicking && (
         <div className={CONCORDAT_HUD.pick}>
           <span className={CONCORDAT_HUD.pickTitle}>{CONCORDAT_HUD_COPY.pickTitle}</span>
