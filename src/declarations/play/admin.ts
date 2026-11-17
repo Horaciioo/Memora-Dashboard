@@ -159,3 +159,32 @@ export const PLAY_ADMIN_FIELDS: Record<PlayAdminDrawer, FieldDefinition[]> = {
     },
   ],
 }
+
+/**
+ * Copy of the Play admin page
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_BOARD_ADMIN_COPY = {
+  title: 'Admin',
+  menu: 'Admin',
+  totalPlayers: 'Joueurs',
+  totalActive: 'Ont joué',
+  totalBanned: 'Interdits',
+  totalXp: 'XP au total',
+  everyoneTitle: 'Tout le monde',
+  everyoneNote: 'Donne ou retire de l’XP à tous les modérateurs d’un coup.',
+  everyoneAction: 'Passer de l’XP à tous',
+  everyoneConfirm: 'Passer {amount} XP à tout le monde ?',
+  everyoneDescription:
+    '{count} modérateurs sont touchés sur {target}. Chacun le verra dans son journal.',
+  everyoneDone: 'XP passée à tous',
+  playersTitle: 'Joueurs',
+  search: 'Chercher un joueur',
+  empty: 'Aucun joueur ne correspond.',
+  bonus: 'dont {xp} XP au global',
+  banned: 'Interdit',
+  file: 'Ouvrir la fiche',
+  levelShort: 'Niv. {level}',
+  rowHint: 'Clique pour passer de l’XP',
+} as const

@@ -40,6 +40,7 @@ export {
   openSessionIds,
   requireSeat,
 } from '@/core/services/play/PlaySessionService'
+export { adjustEveryonesXp, readPlayAdminBoard } from '@/core/services/play/PlayAdminBoardService'
 export {
   adjustPlayXp,
   correctPlayStats,

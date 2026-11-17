@@ -34,14 +34,16 @@ const TARGET_SELECT = {
  * Load the member a heavy gesture lands on, refusing what it must never touch
  * @param {string} id - Account identifier
  * @param {AdminActor} actor - Who is acting
+ * @param {boolean} [allowSelf] - The root account may target itself
  * @return {Promise<TargetRow>} - Target
  */
 
-export const loadTarget = async (id: string, actor: AdminActor) => {
+export const loadTarget = async (id: string, actor: AdminActor, allowSelf = false) => {
   const row = await prisma.account.findUnique({ where: { id }, select: TARGET_SELECT })
   if (!row) throw notFound()
 
-  // Neither the root account nor oneself
+  // Neither the root account nor oneself, unless the root targets itself
+  if (allowSelf && row.id === actor.id && isRootIdentity(row.discordId)) return row
   if (isRootIdentity(row.discordId)) throw immutable(MEMBER_COPY.rootLocked)
   if (row.id === actor.id) throw forbidden()
 

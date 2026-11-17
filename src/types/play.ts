@@ -536,3 +536,29 @@ export interface PlayEndReport {
   awards: PlayEndAward[]
   career: PlayEndCareer | null
 }
+
+/**
+ * One moderator on the Play admin board
+ * @typedef {Object} PlayAdminRow
+ */
+
+export interface PlayAdminRow {
+  accountId: string
+  name: string
+  avatarUrl: string | null
+  xp: number
+  level: number
+  bonusXp: number
+  played: number
+  isBanned: boolean
+}
+
+/**
+ * Play admin board: every moderator and the totals above them
+ * @typedef {Object} PlayAdminBoard
+ */
+
+export interface PlayAdminBoard {
+  players: PlayAdminRow[]
+  totals: { players: number; active: number; banned: number; xp: number }
+}

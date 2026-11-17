@@ -267,6 +267,27 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.PlayAccess,
         text: 'Correction des parties de « Memora Play » : chaque message du chat faisait redessiner le plateau.',
       },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.playAdmin,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Admin » dans « Memora Play » : la liste de tous les joueurs avec leur niveau et leur XP, les totaux, et la possibilité de passer de l’XP à un joueur d’un clic.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.playAdmin,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de donner ou retirer de l’XP à tous les modérateurs d’un coup depuis « Admin ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’un accès « Admin » dans le menu de ton portrait en bas de « Memora Play ».',
+      },
     ],
     comments: [
       {

@@ -38,7 +38,7 @@ const gameOf = (raw: Record<string, unknown>): PlayGameName => {
  * @return {PlayGameName | null} - Game, null for the global line
  */
 
-const targetOf = (raw: Record<string, unknown>): PlayGameName | null =>
+export const targetOf = (raw: Record<string, unknown>): PlayGameName | null =>
   raw.game === PLAY_ADMIN_TARGETS.global ? null : gameOf(raw)
 
 /**
@@ -49,7 +49,7 @@ const targetOf = (raw: Record<string, unknown>): PlayGameName | null =>
  * @return {number} - Value
  */
 
-const integerOf = (
+export const integerOf = (
   raw: Record<string, unknown>,
   field: string,
   range: { min: number; max: number }
@@ -85,7 +85,7 @@ export const readPlayAdmin = async (accountId: string): Promise<PlayAdminState> 
  * @return {Promise<number>} - XP before
  */
 
-const writeXp = async (
+export const writeXp = async (
   accountId: string,
   game: PlayGameName,
   next: (current: number) => number
@@ -122,7 +122,7 @@ const gamesXp = async (tx: Prisma.TransactionClient, accountId: string): Promise
  * @return {Promise<void>} - Written
  */
 
-const writeBonus = async (
+export const writeBonus = async (
   accountId: string,
   next: (bonus: number, games: number) => number
 ): Promise<void> =>
@@ -152,7 +152,7 @@ export const adjustPlayXp = async (
   accountId: string,
   raw: Record<string, unknown>
 ) => {
-  await loadTarget(accountId, actor)
+  await loadTarget(accountId, actor, true)
   const game = targetOf(raw)
   const limit = PLAY_SETTINGS.admin.maxXpChange
   const amount = integerOf(raw, 'amount', { min: -limit, max: limit })
@@ -185,7 +185,7 @@ export const setPlayLevel = async (
   accountId: string,
   raw: Record<string, unknown>
 ) => {
-  await loadTarget(accountId, actor)
+  await loadTarget(accountId, actor, true)
   const game = targetOf(raw)
   const level = integerOf(raw, 'level', { min: 1, max: PLAY_SETTINGS.levels.max })
 

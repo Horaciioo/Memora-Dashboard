@@ -83,6 +83,7 @@ export const API_ROUTES = {
   playFollow: (id: string) => `/api/play/sessions/${id}/follow`,
   playMember: (id: string) => `/api/play/players/${id}`,
   playMemberXp: (id: string) => `/api/play/players/${id}/xp`,
+  playAdminXp: '/api/play/admin/xp',
   playMemberLevel: (id: string) => `/api/play/players/${id}/level`,
   playMemberReset: (id: string) => `/api/play/players/${id}/reset`,
   playMemberRemove: (id: string) => `/api/play/players/${id}/remove`,
