@@ -29,6 +29,11 @@ type SystemsFields = Pick<
   | 'routes'
   | 'coalitions'
   | 'trust'
+  | 'embargoes'
+  | 'traitors'
+  | 'mirvs'
+  | 'targets'
+  | 'emojis'
   | 'effects'
   | 'history'
   | 'log'
@@ -107,6 +112,11 @@ export const freshSystems = (players: number): SystemsFields => ({
   routes: [],
   coalitions: [],
   trust: Array.from({ length: players }, () => CONCORDAT.diplomacy.trustStart),
+  embargoes: [],
+  traitors: Array.from({ length: players }, () => 0),
+  targets: [],
+  emojis: [],
+  mirvs: 0,
   effects: Array.from({ length: players }, emptyEffects),
   history: [],
   log: [],

@@ -27,7 +27,7 @@ import type {
 } from '@/utils/constants/concordat'
 
 // Protocol version of a board
-export const BOARD_VERSION = 2
+export const BOARD_VERSION = 3
 
 /**
  * Nation as the board first shows it

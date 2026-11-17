@@ -5,7 +5,7 @@ import { buildingById } from '@/core/lib/play/concordat/buildings/rules'
 import { reachOf } from '@/core/lib/play/concordat/sim/area'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import { emit } from '@/core/lib/play/concordat/sim/emit'
-import { flightTicks } from '@/core/lib/play/concordat/weapons/rules'
+import { flightTicks, mirvPrice } from '@/core/lib/play/concordat/weapons/rules'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
 import { ConcordatTies } from '@/utils/constants/concordat'
@@ -38,6 +38,10 @@ export const launchStrike = (
     me.gold -= kind === 'shell' ? air.battery.shellCost : air.battery.rocketCost
     const cooldown = air.battery.cooldown[Math.min(silo.level, air.battery.cooldown.length) - 1]
     silo.coolAt = state.tick + ticksOf(cooldown)
+  } else if (kind === 'mirv') {
+    me.gold -= mirvPrice(state.mirvs)
+    state.mirvs++
+    silo.coolAt = state.tick + ticksOf(weapons.mirv.cooldownSeconds)
   } else {
     me.gold -= intent.heavy ? weapons.heavyCost : weapons.missileCost
     if (intent.heavy) arms.heavy++
@@ -47,7 +51,15 @@ export const launchStrike = (
   // A strike on a nation not at open war costs the credit of the shooter
   noteAttack(state, me.id, holder)
   if (!isWar)
-    adjustTrust(state, me.id, -(kind === 'heavy' ? weapons.heavyTrust : weapons.strikeTrust))
+    adjustTrust(
+      state,
+      me.id,
+      -(kind === 'mirv'
+        ? weapons.mirv.trust
+        : kind === 'heavy'
+          ? weapons.heavyTrust
+          : weapons.strikeTrust)
+    )
 
   state.strikes.push({
     id: state.nextId++,

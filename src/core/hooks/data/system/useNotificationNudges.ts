@@ -10,6 +10,8 @@ import { useNotificationsStore } from '@/core/store/notifications'
 import { NOTIFICATION_SETTINGS, NUDGE_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFICATION_KIND_REGISTRY } from '@/declarations/notifications/registries'
 import { NOTIFICATION_STREAM_EVENTS } from '@/declarations/notifications/topics'
+import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
+import { Availabilities } from '@/utils/constants/availability'
 import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
 
 /**
@@ -39,6 +41,8 @@ export const useNotificationNudges = (isArmed: boolean): NotificationNudges => {
   const queue = useNotificationsStore((state) => state.nudges)
   const shift = useNotificationsStore((state) => state.shiftNudge)
   const size = NOTIFICATION_SETTINGS.panelSize
+  // Do not disturb: the bell fills, no bubble
+  const isQuiet = useAuthContext().session?.availability === Availabilities.Dnd
 
   // Stream
   useEffect(() => {
@@ -48,7 +52,7 @@ export const useNotificationNudges = (isArmed: boolean): NotificationNudges => {
     const source = new EventSource(API_ROUTES.notificationsStream)
     const onFresh = (event: MessageEvent<string>) => {
       const entry = JSON.parse(event.data) as NotificationEntry
-      useNotificationsStore.getState().receive(entry, isReadable(entry))
+      useNotificationsStore.getState().receive(entry, isReadable(entry) && !isQuiet)
     }
 
     source.addEventListener(NOTIFICATION_STREAM_EVENTS.fresh, onFresh as EventListener)
@@ -57,7 +61,7 @@ export const useNotificationNudges = (isArmed: boolean): NotificationNudges => {
       source.removeEventListener(NOTIFICATION_STREAM_EVENTS.fresh, onFresh as EventListener)
       source.close()
     }
-  }, [isArmed])
+  }, [isArmed, isQuiet])
 
   // Poll
   const { data } = useQuery({
@@ -83,9 +87,9 @@ export const useNotificationNudges = (isArmed: boolean): NotificationNudges => {
       if (known.current.has(entry.id)) continue
 
       known.current.add(entry.id)
-      useNotificationsStore.getState().receive(entry, isReadable(entry))
+      useNotificationsStore.getState().receive(entry, isReadable(entry) && !isQuiet)
     }
-  }, [data])
+  }, [data, isQuiet])
 
   return { queue, shift }
 }

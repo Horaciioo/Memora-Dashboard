@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { drawFlash } from '@/composites/play/concordat/board/draw/drawFlash'
+import { drawSignals } from '@/composites/play/concordat/board/draw/drawSignals'
 import { drawBoard } from '@/composites/play/concordat/board/draw/drawBoard'
 import { warOf } from '@/composites/play/concordat/board/draw/warState'
 import { ConcordatToolGhost } from '@/composites/play/concordat/hud/ConcordatToolGhost'
@@ -15,7 +16,7 @@ import { useConcordatCamera } from '@/composites/play/concordat/board/useConcord
 import { useConcordatFrame } from '@/composites/play/concordat/board/useConcordatFrame'
 import type { ConcordatStrike } from '@/composites/play/concordat/board/useConcordatTaps'
 import type { ConcordatDraw } from '@/composites/play/concordat/board/useConcordatFrame'
-import { useConcordatLayers } from '@/composites/play/concordat/board/useConcordatLayers'
+import { revealDue, useConcordatLayers } from '@/composites/play/concordat/board/useConcordatLayers'
 import { useConcordatTaps } from '@/composites/play/concordat/board/useConcordatTaps'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
@@ -28,6 +29,7 @@ import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import { CONCORDAT_BOARD } from '@/declarations/ui/variants'
 import { ConcordatIntents, ConcordatPhases } from '@/utils/constants/concordat'
+import { ConcordatTargetActions } from '@/utils/constants/concordat'
 import type { ConcordatTargetAction } from '@/utils/constants/concordat'
 
 // Zone a tool covers on the map, in tiles
@@ -147,15 +149,25 @@ export const ConcordatTable = ({
         font: (font.current ||= getComputedStyle(target).fontFamily),
         now,
       }
+      const isRevealing = revealDue(current, now)
       const isWar = drawBoard(context, scene)
       const isSpreading = drawFlash(context, scene, current.waves)
+      const isSignalling = drawSignals(context, scene)
 
       const isEchoing = marks.some((item) => performance.now() - item.at < CONCORDAT_ART.mark.ms)
 
       const isSailing =
         client.ships.length > 0 || camera.current.scale >= CONCORDAT_ART.detail.crossings
 
-      return isWar || isSpreading || isEchoing || isSailing || client.corps.length > 0
+      return (
+        isWar ||
+        isRevealing ||
+        isSignalling ||
+        isSpreading ||
+        isEchoing ||
+        isSailing ||
+        client.corps.length > 0
+      )
     }
     invalidate()
   })
@@ -177,15 +189,34 @@ export const ConcordatTable = ({
   // Escape leaves the menu
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      setMenu(null)
-      setStrike(null)
-      setTool(null)
+      if (event.target instanceof HTMLInputElement) return
+      if (event.key === 'Escape') {
+        setMenu(null)
+        setStrike(null)
+        setTool(null)
+
+        return
+      }
+      if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return
+      // T and Y move the engagement, C brings the camera home
+      const { percent: current, setPercent, recenter: goHome } = useConcordatViewStore.getState()
+      const key = event.key.toLowerCase()
+      const { min, max, hotkeyStep } = CONCORDAT_ART.engage
+      if (key === 't') setPercent(Math.max(min, current - hotkeyStep))
+      else if (key === 'y') setPercent(Math.min(max, current + hotkeyStep))
+      else if (key === 'c') goHome()
+      else if (key === 'k' || key === 'l') {
+        // K asks the nation under the pointer for an alliance, L breaks the treaty
+        const holder = hoverTile.current >= 0 ? client.owner[hoverTile.current] : 0
+        if (!holder || holder === client.me) return
+        const action = key === 'k' ? ConcordatTargetActions.Alliance : ConcordatTargetActions.Break
+        void act(bodyFor(action, holder, current))
+      }
     }
     window.addEventListener('keydown', onKey)
 
     return () => window.removeEventListener('keydown', onKey)
-  }, [setTool])
+  }, [setTool, client, act])
   useEffect(() => invalidate(), [marks, invalidate])
 
   if (client.phase === ConcordatPhases.Ended) {
@@ -193,7 +224,7 @@ export const ConcordatTable = ({
   }
 
   const pick = (action: ConcordatTargetAction) => {
-    if (menu) void act(bodyFor(action, menu.holder, percent, menu.tile))
+    if (menu) void act(bodyFor(action, menu.holder, percent, menu.tile, me?.gold ?? 0))
     setMenu(null)
   }
 
@@ -226,11 +257,18 @@ export const ConcordatTable = ({
           name={names[menu.holder]}
           color={playerRgb(client.players[menu.holder - 1], CONCORDAT_ART.nation)}
           tie={tieOfRows(client.systems.ties, client.me, menu.holder)}
+          isEmbargoed={client.systems.embargoes.some(
+            (ban) => ban.from === client.me && ban.to === menu.holder
+          )}
           x={menu.x}
           y={menu.y}
           width={view.width}
           height={view.height}
           onPick={pick}
+          onEmoji={(emoji) => {
+            void act({ type: ConcordatIntents.Emoji, to: menu.holder, emoji })
+            setMenu(null)
+          }}
         />
       )}
       {strike && (

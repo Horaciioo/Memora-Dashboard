@@ -1809,3 +1809,26 @@
       -100% 0;
   }
 }
+
+/* Player card pops in */
+.play-card-in {
+  animation: play-card-in 220ms var(--motion-ease-out) backwards;
+}
+
+@keyframes play-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.96);
+  }
+}
+
+/* Portraits open a card */
+[data-play-card] > * {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-card-in {
+    animation: none;
+  }
+}

@@ -1,5 +1,5 @@
 import type { ConcordatScene } from '@/composites/play/concordat/board/draw/types'
-import { rgbText } from '@/core/lib/play/concordat'
+import { rgbText, troopFigure } from '@/core/lib/play/concordat'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
 import { ConcordatPhases } from '@/utils/constants/concordat'
 
@@ -36,6 +36,27 @@ export const drawArrow = (
   context.fill()
 }
 
+// Troops of a push on a dark chip at the middle of its arrow
+const drawTroops = (
+  context: CanvasRenderingContext2D,
+  font: string,
+  at: [number, number],
+  text: string,
+  isAlarm: boolean
+): void => {
+  context.font = `700 ${arrow.label}px ${font}`
+  const width = context.measureText(text).width + arrow.label * 0.9
+  const height = arrow.label * 1.5
+  context.fillStyle = isAlarm ? rgbText(arrow.alarm, 0.92) : 'rgb(20 28 30 / 0.7)'
+  context.beginPath()
+  context.roundRect(at[0] - width / 2, at[1] - height / 2, width, height, height / 3)
+  context.fill()
+  context.fillStyle = '#fff'
+  context.textAlign = 'center'
+  context.textBaseline = 'middle'
+  context.fillText(text, at[0], at[1] + 0.5)
+}
+
 /**
  * Engagements between two nations, width from the troops sent
  * @param {CanvasRenderingContext2D} context - Canvas
@@ -50,14 +71,25 @@ export const drawArrows = (context: CanvasRenderingContext2D, scene: ConcordatSc
     const source = places[corps.owner - 1]
     const target = places[corps.target - 1]
     if (!source?.tiles || !target?.tiles) continue
-    const width = Math.min(arrow.max, Math.max(arrow.min, corps.troops * arrow.scale))
-    drawArrow(
+    const isAgainstMe = corps.target === client.me
+    const width =
+      Math.min(arrow.max, Math.max(arrow.min, corps.troops * arrow.scale)) *
+      (isAgainstMe ? arrow.alarmWidth : 1)
+    const from: [number, number] = [
+      camera.x + source.x * camera.scale,
+      camera.y + source.y * camera.scale,
+    ]
+    const to: [number, number] = [
+      camera.x + target.x * camera.scale,
+      camera.y + target.y * camera.scale,
+    ]
+    drawArrow(context, from, to, width, isAgainstMe ? arrow.alarm : colors[corps.owner], now)
+    drawTroops(
       context,
-      [camera.x + source.x * camera.scale, camera.y + source.y * camera.scale],
-      [camera.x + target.x * camera.scale, camera.y + target.y * camera.scale],
-      width,
-      colors[corps.owner],
-      now
+      scene.font,
+      [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2],
+      troopFigure(corps.troops),
+      isAgainstMe
     )
   }
 }

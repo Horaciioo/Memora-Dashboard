@@ -3,6 +3,7 @@ import 'server-only'
 import { isSimulated } from '@/core/lib/auth/simulation'
 import { conflict, forbidden } from '@/core/lib/errors'
 import { forwardTopic } from '@/core/lib/realtime/server/frames'
+import { joinPresence } from '@/core/lib/realtime/server/presence'
 import type {
   RealtimeConnection,
   RealtimeRequest,
@@ -68,7 +69,16 @@ const playTopic = (
 export const PLAY_REALTIME_TOPICS: RealtimeTopic[] = [
   playTopic(
     (topic) => topic === PLAY_TOPICS.lobbies,
-    (topic, connection) => forwardTopic(topic, connection)
+    (topic, connection) => {
+      // Signals, and the members standing in Play
+      const stopSignals = forwardTopic(topic, connection)
+      const leavePresence = joinPresence(topic, connection)
+
+      return () => {
+        stopSignals()
+        leavePresence()
+      }
+    }
   ),
   playTopic(
     (topic) => topic === PLAY_TOPICS.groups,

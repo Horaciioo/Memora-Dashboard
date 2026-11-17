@@ -1,6 +1,7 @@
 import { writeVarint } from '@/core/lib/play/concordat/bytes'
 import type { ByteReader } from '@/core/lib/play/concordat/bytes'
 import { calmFactor, grossOf, troopCap, upkeepOf } from '@/core/lib/play/concordat/sim/economy'
+import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatState } from '@/types/concordat'
 import {
   CONCORDAT_BUILDING_ORDER,
@@ -158,6 +159,40 @@ export interface ConcordatZoneRow {
 }
 
 /**
+ * Trade ban as drawn, zero for no end
+ * @typedef {Object} ConcordatEmbargoRow
+ */
+
+export interface ConcordatEmbargoRow {
+  from: number
+  to: number
+  until: number
+}
+
+/**
+ * Target mark as drawn
+ * @typedef {Object} ConcordatTargetRow
+ */
+
+export interface ConcordatTargetRow {
+  by: number
+  target: number
+  until: number
+}
+
+/**
+ * Emoji over a nation as drawn
+ * @typedef {Object} ConcordatEmojiRow
+ */
+
+export interface ConcordatEmojiRow {
+  from: number
+  to: number
+  emoji: number
+  until: number
+}
+
+/**
  * Stock of a nation, index is the id minus one
  * @typedef {Object} ConcordatArmsRow
  */
@@ -191,6 +226,15 @@ export interface ConcordatSystemsRows {
   zones: ConcordatZoneRow[]
   arms: ConcordatArmsRow[]
   figures: ConcordatFigureRow[]
+  // Trade bans in force, then the tick each traitor mark ends, index is the id minus one
+  embargoes: ConcordatEmbargoRow[]
+  traitors: number[]
+  // Tick each nation's start shield ends, zero for none
+  shields: number[]
+  targets: ConcordatTargetRow[]
+  emojis: ConcordatEmojiRow[]
+  // Multi-warhead missiles launched so far, the next one costs more
+  mirvs: number
 }
 
 /**
@@ -206,6 +250,9 @@ export interface ConcordatShipRow {
   troops: number
   // Destination coast of a transport
   landing: number
+  // Health in percent and veteran rank
+  hp: number
+  vet: number
 }
 
 /**
@@ -308,6 +355,12 @@ export const systemsOf = (state: ConcordatState): ConcordatSystemsRows => ({
   })),
   arms: state.arms.map(({ missiles, heavy }) => ({ missiles, heavy })),
   figures: figuresOf(state),
+  embargoes: state.embargoes.map(({ from, to, until }) => ({ from, to, until })),
+  traitors: [...state.traitors],
+  shields: state.players.map((player) => player.protectedUntil),
+  targets: state.targets.map(({ by, target, until }) => ({ by, target, until })),
+  emojis: state.emojis.map(({ from, to, emoji, until }) => ({ from, to, emoji, until })),
+  mirvs: state.mirvs,
 })
 
 /**
@@ -317,13 +370,15 @@ export const systemsOf = (state: ConcordatState): ConcordatSystemsRows => ({
  */
 
 export const shipsOf = (state: ConcordatState): ConcordatShipRow[] =>
-  state.ships.map(({ id, owner, kind, tile, troops, landing }) => ({
+  state.ships.map(({ id, owner, kind, tile, troops, landing, hp, vet }) => ({
     id,
     owner,
     kind,
     tile,
     troops: Math.round(troops),
     landing,
+    hp: hp === undefined ? 100 : Math.max(1, Math.round((hp * 100) / CONCORDAT.navy.warHp)),
+    vet: vet ?? 0,
   }))
 
 /**
@@ -341,6 +396,7 @@ const SHIP_CODES: ConcordatShipKind[] = [
   ConcordatShipKinds.Transport,
   ConcordatShipKinds.War,
   ConcordatShipKinds.Trade,
+  ConcordatShipKinds.Train,
 ]
 
 /**
@@ -358,6 +414,7 @@ export const writeShips = (bytes: number[], ships: ConcordatShipRow[]): void => 
     writeVarint(bytes, ship.tile)
     writeVarint(bytes, ship.troops)
     writeVarint(bytes, ship.landing + 1)
+    bytes.push(Math.min(100, ship.hp), Math.min(3, ship.vet))
   }
 }
 
@@ -380,6 +437,8 @@ export const readShips = (reader: ByteReader): ConcordatShipRow[] => {
       tile: reader.varint(),
       troops: reader.varint(),
       landing: reader.varint() - 1,
+      hp: reader.byte(),
+      vet: reader.byte(),
     })
   }
 
@@ -484,6 +543,28 @@ export const writeSystems = (bytes: number[], rows: ConcordatSystemsRows): void 
     writeVarint(bytes, figure.income < 0 ? -figure.income * 2 - 1 : figure.income * 2)
     writeVarint(bytes, figure.trade)
   }
+
+  writeVarint(bytes, rows.embargoes.length)
+  for (const ban of rows.embargoes) {
+    bytes.push(ban.from, ban.to)
+    writeVarint(bytes, ban.until)
+  }
+  bytes.push(rows.traitors.length)
+  for (const until of rows.traitors) writeVarint(bytes, until)
+  bytes.push(rows.shields.length)
+  for (const until of rows.shields) writeVarint(bytes, until)
+
+  bytes.push(Math.min(255, rows.targets.length))
+  for (const mark of rows.targets.slice(0, 255)) {
+    bytes.push(mark.by, mark.target)
+    writeVarint(bytes, mark.until)
+  }
+  bytes.push(Math.min(255, rows.emojis.length))
+  for (const item of rows.emojis.slice(0, 255)) {
+    bytes.push(item.from, item.to, item.emoji)
+    writeVarint(bytes, item.until)
+  }
+  writeVarint(bytes, rows.mirvs)
 }
 
 /**
@@ -612,6 +693,28 @@ export const readSystems = (reader: ByteReader): ConcordatSystemsRows => {
     })
   }
 
+  const embargoes: ConcordatEmbargoRow[] = []
+  for (let count = reader.varint(); count > 0; count--) {
+    embargoes.push({ from: reader.byte(), to: reader.byte(), until: reader.varint() })
+  }
+  const traitors: number[] = []
+  for (let count = reader.byte(); count > 0; count--) traitors.push(reader.varint())
+  const shields: number[] = []
+  for (let count = reader.byte(); count > 0; count--) shields.push(reader.varint())
+  const targets: ConcordatTargetRow[] = []
+  for (let count = reader.byte(); count > 0; count--) {
+    targets.push({ by: reader.byte(), target: reader.byte(), until: reader.varint() })
+  }
+  const emojis: ConcordatEmojiRow[] = []
+  for (let count = reader.byte(); count > 0; count--) {
+    emojis.push({
+      from: reader.byte(),
+      to: reader.byte(),
+      emoji: reader.byte(),
+      until: reader.varint(),
+    })
+  }
+
   return {
     buildings,
     ties,
@@ -624,5 +727,11 @@ export const readSystems = (reader: ByteReader): ConcordatSystemsRows => {
     zones,
     arms,
     figures,
+    embargoes,
+    traitors,
+    shields,
+    targets,
+    emojis,
+    mirvs: reader.varint(),
   }
 }

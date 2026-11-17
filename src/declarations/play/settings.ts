@@ -159,6 +159,11 @@ export const PLAY_SETTINGS = {
       fallback: 14,
       min: 1,
     }),
+    recentListSize: readInteger(privateGames.recentListSize, {
+      path: 'play/play.privateGames.recentListSize',
+      fallback: 12,
+      min: 1,
+    }),
   },
   lobbyIdleMinutes: readInteger(play.lobbyIdleMinutes, {
     path: 'play/play.lobbyIdleMinutes',
@@ -199,6 +204,16 @@ export const PLAY_SETTINGS = {
       fallback: 100000,
       min: 1,
     }),
+    logSize: readInteger(admin.logSize, {
+      path: 'play/play.admin.logSize',
+      fallback: 150,
+      min: 1,
+    }),
+    maxSelection: readInteger(admin.maxSelection, {
+      path: 'play/play.admin.maxSelection',
+      fallback: 200,
+      min: 1,
+    }),
   },
   leaderboardSize: readInteger(play.leaderboardSize, {
     path: 'play/play.leaderboardSize',
@@ -228,6 +243,16 @@ export const PLAY_SETTINGS = {
   profileRecent: readInteger(play.profileRecent, {
     path: 'play/play.profileRecent',
     fallback: 5,
+    min: 1,
+  }),
+  feedRecent: readInteger(play.feedRecent, {
+    path: 'play/play.feedRecent',
+    fallback: 5,
+    min: 1,
+  }),
+  cardRecent: readInteger(play.cardRecent, {
+    path: 'play/play.cardRecent',
+    fallback: 3,
     min: 1,
   }),
   profileTopGames: readInteger(play.profileTopGames, {

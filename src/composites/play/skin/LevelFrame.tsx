@@ -1,6 +1,8 @@
 import { useId } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
+import { hexPath, LevelFrameFxBack, LevelFrameFxFront } from '@/composites/play/skin/LevelFrameFx'
+import { LevelFrameWings } from '@/composites/play/skin/LevelFrameWings'
 import type { AvatarSize } from '@/declarations/ui/variants/surfaces'
 import { frameOf, skinOf } from '@/core/lib/play/skins'
 import { FRAME_GEOMETRY as G } from '@/declarations/play/skinGeometry'
@@ -22,85 +24,42 @@ export interface LevelFrameProps {
 
 const RAD = Math.PI / 180
 
-/**
- * Hexagon points around the centre
- * @param {number} radius - Radius
- * @return {string} - Points
- */
+// Half-width of the drawing kept, small sizes crop to the metal so the frame hugs the portrait
+const VIEW = { plain: 78, medal: 90, ornate: G.centre } as const
 
-const hex = (radius: number): string =>
-  Array.from({ length: 6 }, (_, index) => {
-    const angle = (-90 + 60 * index) * RAD
+const corner = (radius: number, index: number) => ({
+  x: G.centre + radius * Math.cos((-90 + 60 * index) * RAD),
+  y: G.centre + radius * Math.sin((-90 + 60 * index) * RAD),
+})
 
-    return `${G.centre + radius * Math.cos(angle)},${G.centre + radius * Math.sin(angle)}`
-  }).join(' ')
-
-/**
- * Five-point star
- * @param {number} cx - Centre x
- * @param {number} cy - Centre y
- * @return {string} - Points
- */
-
-const star = (cx: number, cy: number): string =>
-  Array.from({ length: 10 }, (_, index) => {
-    const radius = index % 2 ? G.starRadius * 0.45 : G.starRadius
-    const angle = (-90 + 36 * index) * RAD
-
-    return `${cx + radius * Math.cos(angle)},${cy + radius * Math.sin(angle)}`
-  }).join(' ')
+const stop = (offset: number, color: string, opacity?: number) => (
+  <stop offset={offset} style={{ stopColor: color }} stopOpacity={opacity} />
+)
 
 /**
- * Portrait in its level frame, ornaments growing with the level like the old Overwatch borders
+ * Portrait in its level frame, ornaments growing every ten levels inside a metal
  * @param {LevelFrameProps} props - Portrait and level
  * @return {JSX.Element}
  */
 
 export const LevelFrame = ({ level, name, src, size, className, bleed }: LevelFrameProps) => {
-  const metal = `m${useId().replace(/:/g, '')}`
+  const id = `f${useId().replace(/:/g, '')}`
   const skin = skinOf(level)
-  const { leaves, hasChin, hasArch, stars } = frameOf(level)
+  const hasMedal = size === 'xl' || size === 'lg'
+  const base = frameOf(level)
+  // Petals and ornaments at every size, glow and motion only where there is room
+  const frame = hasMedal ? base : { ...base, fx: 0 }
+  const view = base.wing || base.crest ? VIEW.ornate : hasMedal ? VIEW.medal : VIEW.plain
   const face = FACE_PX[size] ?? 64
-  // Box where the portrait takes its share of the frame
-  const box = Math.round((face * G.size) / (2 * G.face))
-  const leafAt = (index: number) => {
-    const angle = (G.leafFrom + G.leafStep * index) * RAD
-
-    return {
-      x: G.centre + G.leafRadius * Math.cos(angle),
-      y: G.centre + G.leafRadius * Math.sin(angle),
-      turn: G.leafFrom + G.leafStep * index + 90 + G.leafTilt,
-    }
-  }
-  const leafMarks = Array.from({ length: leaves }, (_, index) => {
-    const { x, y, turn } = leafAt(index)
-
-    return (
-      <g key={index} transform={`translate(${x} ${y}) rotate(${turn}) scale(${G.leafScale})`}>
-        <path
-          d={G.leaf}
-          fill={`url(#${metal})`}
-          stroke="var(--skin-ink)"
-          strokeOpacity={0.4}
-          strokeWidth={0.6}
-        />
-        <path
-          d={G.vein}
-          fill="none"
-          stroke="var(--skin-ink)"
-          strokeOpacity={0.45}
-          strokeWidth={0.5}
-        />
-      </g>
-    )
-  })
-  const archPoints = [210, 270, 330]
-    .map((degrees) => {
-      const angle = degrees * RAD
-
-      return `${G.centre + G.archRadius * Math.cos(angle)},${G.centre + G.archRadius * Math.sin(angle)}`
-    })
-    .join(' ')
+  const box = Math.round((face * view) / G.face)
+  const metal = `url(#${id}m)`
+  const bottom = G.centre + G.medal.y
+  const digits = String(level).length > 2 ? 15 : 18
+  const hexOf = (radius: number) =>
+    hexPath(radius)
+      .replace(/[MLZ]/g, ' ')
+      .trim()
+      .replace(/\s{2,}/g, ' ')
 
   return (
     <span
@@ -111,8 +70,9 @@ export const LevelFrame = ({ level, name, src, size, className, bleed }: LevelFr
       <Avatar name={name} src={src} size={size} className={LEVEL_FRAME_VIEW.face} />
       <svg
         aria-hidden="true"
-        viewBox={`0 0 ${G.size} ${G.size}`}
-        className={LEVEL_FRAME_VIEW.art}
+        viewBox={`${G.centre - view} ${G.centre - view} ${2 * view} ${2 * view}`}
+        data-fx={frame.fx}
+        className={cn(LEVEL_FRAME_VIEW.art, 'skin-art')}
         style={
           bleed
             ? {
@@ -127,80 +87,198 @@ export const LevelFrame = ({ level, name, src, size, className, bleed }: LevelFr
         }
       >
         <defs>
-          <linearGradient id={metal} x1="0" y1="0" x2="0" y2="1">
-            <stop
-              offset="0"
-              style={{ stopColor: 'color-mix(in srgb, white 65%, var(--skin-from))' }}
-            />
-            <stop offset="0.4" style={{ stopColor: 'var(--skin-from)' }} />
-            <stop offset="0.75" style={{ stopColor: 'var(--skin-to)' }} />
-            <stop
-              offset="1"
-              style={{ stopColor: 'color-mix(in srgb, black 30%, var(--skin-to))' }}
-            />
+          <linearGradient id={`${id}m`} x1="0" y1="0" x2="0" y2="1">
+            {stop(0, 'var(--skin-a)')}
+            {stop(0.45, 'var(--skin-b)')}
+            {stop(1, 'var(--skin-c)')}
           </linearGradient>
+          <linearGradient id={`${id}n`} x1="0" y1="1" x2="0" y2="0">
+            {stop(0, 'var(--skin-a)')}
+            {stop(0.5, 'var(--skin-b)')}
+            {stop(1, 'var(--skin-c)')}
+          </linearGradient>
+          <linearGradient id={`${id}w`} x1="0" y1="0" x2="1" y2="0">
+            {stop(0, 'var(--skin-c)')}
+            {stop(0.35, 'var(--skin-b)')}
+            {stop(1, 'var(--skin-a)')}
+          </linearGradient>
+          <linearGradient id={`${id}g`} x1="0" y1="0" x2="1" y2="0">
+            {stop(0, '#fff', 0)}
+            {stop(0.5, '#fff', 0.85)}
+            {stop(1, '#fff', 0)}
+          </linearGradient>
+          <radialGradient
+            id={`${id}h`}
+            gradientUnits="userSpaceOnUse"
+            cx={G.centre}
+            cy={G.centre}
+            r={G.halo}
+          >
+            {stop(0.45, 'var(--skin-b)', 0.38)}
+            {stop(1, 'var(--skin-b)', 0)}
+          </radialGradient>
+          <clipPath id={`${id}k`}>
+            <path
+              clipRule="evenodd"
+              fillRule="evenodd"
+              d={`${hexPath(G.metal)} ${hexPath(G.hollow)}`}
+            />
+          </clipPath>
+          <clipPath id={`${id}o`}>
+            <path
+              clipRule="evenodd"
+              fillRule="evenodd"
+              d={`M-100 -100H340V340H-100Z ${hexPath(G.face)}`}
+            />
+          </clipPath>
+          <clipPath id={`${id}c`}>
+            <path d={hexPath(G.face - 1)} />
+          </clipPath>
         </defs>
 
-        {/* Leaves open from the lower sides upward, mirrored on the right */}
-        <g>{leafMarks}</g>
-        <g transform={`translate(${G.size} 0) scale(-1 1)`}>{leafMarks}</g>
+        <g clipPath={`url(#${id}o)`}>
+          <LevelFrameFxBack fx={frame.fx} id={id} />
+        </g>
+        <LevelFrameWings step={frame} fill={`url(#${id}w)`} />
 
-        {hasChin && (
-          <path
-            d={G.chin}
-            fill={`url(#${metal})`}
-            stroke="var(--skin-ink)"
-            strokeOpacity={0.45}
-            strokeWidth={1}
-            strokeLinejoin="round"
-          />
+        {frame.ring && (
+          <>
+            <polygon
+              points={hexOf(G.ringLine)}
+              fill="none"
+              stroke="var(--skin-a)"
+              strokeOpacity={0.85}
+              strokeWidth={1.8}
+              strokeLinejoin="round"
+            />
+            <polygon
+              points={hexOf(G.ringOuter)}
+              fill="none"
+              stroke="var(--skin-c)"
+              strokeOpacity={0.8}
+              strokeWidth={1}
+              strokeLinejoin="round"
+            />
+          </>
         )}
 
+        <path fillRule="evenodd" d={`${hexPath(G.metal)} ${hexPath(G.hollow)}`} fill={metal} />
+        <path
+          fillRule="evenodd"
+          d={`${hexPath(G.hollow)} ${hexPath(G.face)}`}
+          fill={`url(#${id}n)`}
+        />
         <polygon
-          points={hex(G.ring)}
+          points={hexOf(G.metal)}
           fill="none"
-          stroke={`url(#${metal})`}
-          strokeWidth={G.ringWidth}
+          stroke="var(--skin-c)"
+          strokeWidth={2}
           strokeLinejoin="round"
         />
         <polygon
-          points={hex(G.ring + G.ringWidth / 2)}
+          points={hexOf(G.bevel)}
           fill="none"
-          stroke="var(--skin-ink)"
+          stroke="var(--skin-hi)"
+          strokeOpacity={0.75}
+          strokeWidth={1.4}
+          strokeLinejoin="round"
+        />
+        <polygon
+          points={hexOf(G.hollow)}
+          fill="none"
+          stroke="var(--skin-c)"
+          strokeWidth={1.2}
+          strokeLinejoin="round"
+        />
+        <polygon
+          points={hexOf(G.hollowLine)}
+          fill="none"
+          stroke="var(--skin-hi)"
           strokeOpacity={0.45}
           strokeWidth={1}
           strokeLinejoin="round"
         />
         <polygon
-          points={hex(G.ring - G.ringWidth / 2)}
+          points={hexOf(G.face)}
           fill="none"
-          stroke="var(--skin-ink)"
-          strokeOpacity={0.55}
-          strokeWidth={1}
+          stroke="var(--skin-c)"
+          strokeWidth={2}
           strokeLinejoin="round"
         />
+        <polygon
+          points={hexOf(G.face)}
+          fill="none"
+          stroke="#000"
+          strokeOpacity={0.35}
+          strokeWidth={3}
+          strokeLinejoin="round"
+          clipPath={`url(#${id}c)`}
+        />
 
-        {hasArch && (
-          <polyline
-            points={archPoints}
-            fill="none"
-            stroke={`url(#${metal})`}
-            strokeWidth={G.archWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
+        {frame.studs &&
+          Array.from({ length: 6 }, (_, index) => {
+            const { x, y } = corner(G.metal, index)
+
+            return (
+              <g key={index}>
+                <circle cx={x} cy={y} r={G.studRadius} fill="var(--skin-c)" />
+                <circle cx={x} cy={y} r={G.studRadius - 1} fill="var(--skin-b)" />
+                <circle cx={x - 0.8} cy={y - 0.9} r={1} fill="var(--skin-hi)" />
+              </g>
+            )
+          })}
+
+        {frame.gem && (
+          <g>
+            <path
+              d={`M${G.centre} ${G.centre + G.gem.y} l9 10 l-9 12 l-9 -12z`}
+              fill="var(--skin-gem)"
+              stroke="var(--skin-c)"
+              strokeWidth={1.5}
+              strokeLinejoin="round"
+            />
+            <path
+              d={`M${G.centre} ${G.centre + G.gem.y + 3} l4 7 l-4 3 l-4 -3z`}
+              fill="#fff"
+              fillOpacity={0.55}
+            />
+          </g>
         )}
 
-        {Array.from({ length: stars }, (_, index) => (
-          <polygon
-            key={index}
-            points={star(G.centre + (index - (stars - 1) / 2) * G.starGap, G.starY)}
-            fill={`url(#${metal})`}
-            stroke="var(--skin-ink)"
-            strokeOpacity={0.5}
-            strokeWidth={0.8}
-          />
-        ))}
+        {hasMedal && (
+          <>
+            {/* Level medal laid on the lower frame */}
+            <circle
+              cx={G.centre}
+              cy={bottom}
+              r={G.medal.radius}
+              fill={metal}
+              stroke="var(--skin-c)"
+              strokeWidth={1.6}
+            />
+            <circle
+              cx={G.centre}
+              cy={bottom}
+              r={G.medal.inner}
+              fill="#0d0e11"
+              stroke="var(--skin-hi)"
+              strokeOpacity={0.5}
+            />
+            <text
+              x={G.centre}
+              y={bottom + 0.5}
+              textAnchor="middle"
+              dominantBaseline="central"
+              fontWeight={700}
+              fontSize={digits}
+              fill="var(--skin-hi)"
+            >
+              {level}
+            </text>
+          </>
+        )}
+
+        <LevelFrameFxFront fx={frame.fx} id={id} />
       </svg>
     </span>
   )

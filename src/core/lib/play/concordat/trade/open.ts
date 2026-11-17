@@ -1,4 +1,5 @@
 import { isWorking } from '@/core/lib/play/concordat/buildings/rules'
+import { isEmbargoed } from '@/core/lib/play/concordat/diplomacy/embargo'
 import { isCondemned } from '@/core/lib/play/concordat/diplomacy/trust'
 import { distanceBetween } from '@/core/lib/play/concordat/map'
 import { seaAround, seaPath } from '@/core/lib/play/concordat/navy/path'
@@ -95,6 +96,7 @@ export const tradeRefusal = (
   second: number
 ): string | null => {
   if (!CONCORDAT.features.trade) return 'featureOff'
+  if (isEmbargoed(state, first, second)) return 'embargoed'
   if (routesOf(state, first).length >= trade.maxRoutes) return 'tooManyRoutes'
   if (routesOf(state, second).length >= trade.maxRoutes) return 'partnerFull'
   if (state.players[first - 1].gold < routeCost(state, first, second)) return 'noGold'

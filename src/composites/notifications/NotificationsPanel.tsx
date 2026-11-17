@@ -10,7 +10,7 @@ import { NotificationsList } from '@/composites/notifications/NotificationsList'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
-import { RAIL_POPOVER } from '@/declarations/ui/blocks'
+import { NESTED_BOX, RAIL_POPOVER } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import { NOTIFICATION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -78,7 +78,7 @@ export const NotificationsPanel = ({
         )}
       </div>
 
-      <div className={RAIL_POPOVER.body}>
+      <div className={cn(RAIL_POPOVER.body, NESTED_BOX.frame)}>
         {isLoading && (
           <>
             <div className="flex justify-center py-2">
@@ -97,15 +97,14 @@ export const NotificationsPanel = ({
           />
         )}
         {!isLoading && entries.length > 0 && (
-          <NotificationsList entries={entries} onOpen={onOpen} />
+          <div className={NESTED_BOX.group}>
+            <NotificationsList entries={entries} onOpen={onOpen} />
+          </div>
         )}
       </div>
 
       {entries.length > 0 && (
-        <div className={NOTIFICATION_STYLES.footer}>
-          <span className={NOTIFICATION_STYLES.footerRule} role="separator" />
-          {seeAll}
-        </div>
+        <div className={cn(NESTED_BOX.group, 'm-1.5 mt-0')}>{seeAll}</div>
       )}
     </div>
   )

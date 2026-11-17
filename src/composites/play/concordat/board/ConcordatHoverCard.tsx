@@ -141,6 +141,16 @@ export const ConcordatHoverCard = ({ client, names, tile, holder }: ConcordatHov
             percent: landShareText(player.tiles, land),
           })}
           {province ? ` · ${province.name}` : ''}
+          {(client.systems.traitors[holder - 1] ?? 0) > client.tick &&
+            ` · ${CONCORDAT_HOVER_COPY.traitor}`}
+          {isOther &&
+            client.systems.embargoes.some(
+              (ban) =>
+                (ban.until === 0 || ban.until > client.tick) &&
+                ((ban.from === client.me && ban.to === holder) ||
+                  (ban.from === holder && ban.to === client.me))
+            ) &&
+            ` · ${CONCORDAT_HOVER_COPY.embargo}`}
           {tie && (
             <>
               {' · '}

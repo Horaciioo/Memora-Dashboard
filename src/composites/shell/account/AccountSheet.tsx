@@ -5,8 +5,10 @@ import { ThemeToggle } from '@/components/elements/actions/ThemeToggle'
 import { BottomSheet } from '@/components/structures/overlays/BottomSheet'
 import { logout } from '@/app/login/actions'
 import { CreatorPicker } from '@/composites/shell/creator/CreatorPicker'
+import { AvailabilityMenu } from '@/composites/shell/account/AvailabilityMenu'
+import { AccountBadges } from '@/composites/shell/account/AccountBadges'
 import { ROUTES } from '@/declarations/navigation'
-import { ACCOUNT_SHEET } from '@/declarations/ui/blocks'
+import { ACCOUNT_SHEET, NESTED_BOX } from '@/declarations/ui/blocks'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { ICONS } from '@/declarations/ui/icons'
@@ -60,7 +62,14 @@ export const AccountSheet = ({ open, viewContext, displayName, onClose }: Accoun
           />
         )}
 
-        <div className={ACCOUNT_SHEET.sheetBlock}>
+        <div className={NESTED_BOX.group}>
+          <AvailabilityMenu />
+        </div>
+        <div className={NESTED_BOX.group}>
+          <AccountBadges />
+        </div>
+
+        <div className={cn(NESTED_BOX.group, ACCOUNT_SHEET.sheetBlock, 'p-3')}>
           <span className={ACCOUNT_SHEET.sheetLabel}>{NAV_COPY.theme}</span>
           <ThemeToggle isFull />
         </div>

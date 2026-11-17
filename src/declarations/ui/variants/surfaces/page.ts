@@ -117,6 +117,23 @@ export const TABS_STYLES = {
 } as const
 
 /**
+ * Tab strip of Memora Play: same strip and gliding pill, the pill violet
+ * @type {Record<string, string>}
+ */
+
+export const TABS_PLAY = {
+  ...TABS_STYLES,
+  list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-[var(--radius-lg)] bg-[var(--play-chip)] p-1 ring-1 ring-[var(--play-line)]',
+  tab: 'relative z-10 min-h-11 shrink-0 rounded-[calc(var(--radius-lg)-0.25rem)] px-3 py-1.5 text-sm font-semibold text-[var(--play-ink-soft)] transition-colors hover:text-[var(--play-ink)] sm:px-3.5 md:min-h-0',
+  active: 'text-[var(--play-key-ink)] hover:text-[var(--play-key-ink)]',
+  danger: 'text-[var(--play-alert)] hover:text-[var(--play-alert)]',
+  activeDanger: 'text-[var(--play-key-ink)] hover:text-[var(--play-key-ink)]',
+  indicator:
+    'tab-indicator pointer-events-none absolute top-1 bottom-1 left-0 rounded-[calc(var(--radius-lg)-0.25rem)] bg-[var(--play-key)] shadow-[0_0.2rem_0_var(--play-key-deep)]',
+  iconTone: '',
+} as const
+
+/**
  * Corner ribbon styles
  * @type {Record<string, string>}
  */

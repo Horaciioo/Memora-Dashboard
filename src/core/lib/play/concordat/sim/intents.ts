@@ -9,6 +9,13 @@ import {
   answerRefusal,
   breakRefusal,
   breakTie,
+  embargoRefusal,
+  emojiRefusal,
+  markTarget,
+  sendEmoji,
+  targetRefusal,
+  layEmbargo,
+  liftEmbargo,
   aidRefusal,
   giftRefusal,
   noteAttack,
@@ -96,8 +103,7 @@ const engageRefusal = (
     return 'badTile'
   if (intent.target === intent.playerId) return 'self'
   if (intent.target && (!target || !target.alive)) return 'badTarget'
-  if (target && (state.tick < me.protectedUntil || state.tick < target.protectedUntil))
-    return 'protected'
+  if (target && state.tick < target.protectedUntil) return 'protected'
   if (target && areTeamMates(state, me.id, target.id)) return 'teamMate'
   if (target && tieKindOf(state, me.id, target.id) === ConcordatTies.Peace) return 'treaty'
   if (Math.floor((me.troops * intent.percent) / 100) < sim.minEngage) return 'tooFew'
@@ -165,9 +171,23 @@ const engage = (
 ): void => {
   const me = state.players[intent.playerId - 1]
   const drive = Math.min(1, Math.max(0, intent.percent / 100))
-  const amount = Math.floor(me.troops * drive)
+  let amount = Math.floor(me.troops * drive)
   me.troops -= amount
   noteAttack(state, me.id, intent.target)
+
+  // Two pushes head on cancel each other troop for troop, the bigger one carries on
+  const opposing = intent.target
+    ? state.corps.find(
+        (other) => other.owner === intent.target && other.target === me.id && !other.feint
+      )
+    : undefined
+  if (opposing) {
+    const clash = Math.min(amount, opposing.troops)
+    amount -= clash
+    opposing.troops -= clash
+    if (opposing.troops < 1) disband(state, opposing, 0)
+    if (amount < 1) return
+  }
 
   // Reinforce the corps already pushing
   const corps = state.corps.find(
@@ -229,6 +249,12 @@ const systemRefusal = (state: ConcordatState, intent: ConcordatIntent): string |
       return aidRefusal(state, intent)
     case 'closeTrade':
       return null
+    case 'embargo':
+      return embargoRefusal(state, intent.playerId, intent.with)
+    case 'target':
+      return targetRefusal(state, intent)
+    case 'emoji':
+      return emojiRefusal(state, intent)
     default:
       return 'unknown'
   }
@@ -267,6 +293,15 @@ const applySystem = (state: ConcordatState, intent: ConcordatIntent): void => {
       return launchSortie(state, intent)
     case 'closeTrade':
       closeTrade(state, intent.playerId, intent.with)
+      break
+    case 'embargo':
+      if (intent.on) layEmbargo(state, intent.playerId, intent.with, 0)
+      else liftEmbargo(state, intent.playerId, intent.with)
+      break
+    case 'target':
+      return markTarget(state, intent)
+    case 'emoji':
+      return sendEmoji(state, intent)
   }
 }
 
@@ -334,7 +369,7 @@ export const applyIntent = (state: ConcordatState, intent: ConcordatIntent): str
     const corps = state.corps.find(
       (other) => other.owner === intent.playerId && other.target === intent.target
     )
-    if (corps) disband(state, corps, sim.retreatLoss)
+    if (corps) disband(state, corps, corps.target ? sim.retreatLoss : 0)
   }
 
   return null

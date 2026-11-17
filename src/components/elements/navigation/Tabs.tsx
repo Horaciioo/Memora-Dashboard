@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useBannerHost } from '@/core/hooks/interaction/layout/useBannerHost'
 import { PAGE_TABS_HOST_ID } from '@/declarations/ui/banners'
-import { TABS_STYLES } from '@/declarations/ui/variants'
+import { TABS_PLAY, TABS_STYLES } from '@/declarations/ui/variants'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 import { glideDurationMs, prefersReducedMotion } from '@/utils/motion'
@@ -30,6 +30,8 @@ export interface TabsProps {
   inBanner?: boolean
   // Longer glide and a pulse on arrival
   emphasis?: boolean
+  // Dressed for Memora Play, the pill violet
+  isPlay?: boolean
 }
 
 // Last box drawn per strip, survives a remount
@@ -47,6 +49,7 @@ const EMPHASIS_FACTOR = 1.5
  * @param {boolean} [centered] - Centres the strip
  * @param {boolean} [inBanner] - Sits under the banner
  * @param {boolean} [emphasis] - Slow glide with pulse
+ * @param {boolean} [isPlay] - Memora Play colours
  * @return {JSX.Element}
  */
 
@@ -58,7 +61,9 @@ export const Tabs = ({
   centered,
   inBanner,
   emphasis,
+  isPlay,
 }: TabsProps) => {
+  const styles = isPlay ? TABS_PLAY : TABS_STYLES
   const host = useBannerHost(PAGE_TABS_HOST_ID)
   const tabsRef = useRef(new Map<string, HTMLButtonElement>())
   const listRef = useRef<HTMLDivElement | null>(null)
@@ -139,7 +144,7 @@ export const Tabs = ({
   const strip = (
     <div
       ref={listRef}
-      className={cn(TABS_STYLES.list, centered && TABS_STYLES.listCentered)}
+      className={cn(styles.list, centered && styles.listCentered)}
       role="tablist"
       aria-label={label}
     >
@@ -160,30 +165,28 @@ export const Tabs = ({
             aria-label={item.label}
             onClick={() => onChange(item.value)}
             className={cn(
-              TABS_STYLES.tab,
-              isActive && (item.danger ? TABS_STYLES.activeDanger : TABS_STYLES.active),
-              item.danger && !isActive && TABS_STYLES.danger,
-              item.flagged && !isActive && !item.danger && TABS_STYLES.flagged
+              styles.tab,
+              isActive && (item.danger ? styles.activeDanger : styles.active),
+              item.danger && !isActive && styles.danger,
+              item.flagged && !isActive && !item.danger && styles.flagged
             )}
           >
-            <span className={TABS_STYLES.content}>
+            <span className={styles.content}>
               {Icon && (
                 <Icon
                   className={cn(
-                    TABS_STYLES.icon,
-                    !item.danger && !(item.flagged && !isActive) && TABS_STYLES.iconTone
+                    styles.icon,
+                    !item.danger && !(item.flagged && !isActive) && styles.iconTone
                   )}
                   aria-hidden="true"
                 />
               )}
-              <span className={cn(TABS_STYLES.label, Icon && TABS_STYLES.labelBeside)}>
-                {item.label}
-              </span>
+              <span className={cn(styles.label, Icon && styles.labelBeside)}>{item.label}</span>
             </span>
           </button>
         )
       })}
-      <span ref={ruleRef} className={TABS_STYLES.indicator} aria-hidden="true" />
+      <span ref={ruleRef} className={styles.indicator} aria-hidden="true" />
     </div>
   )
 

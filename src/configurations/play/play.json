@@ -31,7 +31,8 @@
   },
   "privateGames": {
     "codeLength": 6,
-    "recentDays": 14
+    "recentDays": 14,
+    "recentListSize": 12
   },
   "idle": {
     "gameMinutes": 15,
@@ -46,6 +47,8 @@
   "historySize": 30,
   "historyPage": 15,
   "profileRecent": 5,
+  "feedRecent": 5,
+  "cardRecent": 3,
   "profileTopGames": 3,
   "invites": {
     "pollSeconds": 60,
@@ -53,7 +56,9 @@
     "edgePx": 12
   },
   "admin": {
-    "maxXpChange": 10000,
-    "maxCounter": 100000
+    "maxXpChange": 2000000000,
+    "maxCounter": 100000,
+    "logSize": 150,
+    "maxSelection": 200
   }
 }

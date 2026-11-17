@@ -1,3 +1,5 @@
+import { GAME_BULK_HANDLERS } from '@/core/services/nexus/handlers/game/bulk'
+import { GAME_FIGURES_HANDLERS } from '@/core/services/nexus/handlers/game/figures'
 import { GAME_CONTROL_HANDLERS } from '@/core/services/nexus/handlers/game/control'
 import { GAME_OVERRIDE_HANDLERS } from '@/core/services/nexus/handlers/game/override'
 import { GAME_PLAYER_HANDLERS } from '@/core/services/nexus/handlers/game/player'
@@ -15,5 +17,7 @@ export const GAME_HANDLERS: Record<string, NexusHandler> = {
   ...GAME_CONTROL_HANDLERS,
   ...GAME_OVERRIDE_HANDLERS,
   ...GAME_PLAYER_HANDLERS,
+  ...GAME_BULK_HANDLERS,
+  ...GAME_FIGURES_HANDLERS,
   ...GAME_GROUP_HANDLERS,
 }

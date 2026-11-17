@@ -20,11 +20,14 @@ import { isRootIdentity } from '@/declarations/access/identity'
 import { isAccessClosed } from '@/core/lib/auth/closed'
 import type { SessionUser } from '@/types/auth'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
-import type { Account, AccountFunction, Youtuber } from '@prisma/client'
+import type { Account, AccountFunction, JobFunction, Youtuber } from '@prisma/client'
 import { DAY_MS } from '@/utils/constants/time'
 
 // Account row a session is built from
-type SessionAccount = Account & { youtubers: Youtuber[]; functions: AccountFunction[] }
+type SessionAccount = Account & {
+  youtubers: Youtuber[]
+  functions: (AccountFunction & { jobFunction: JobFunction })[]
+}
 
 // A session records its use at most once a day
 const STAMP_INTERVAL_MS = DAY_MS
@@ -59,6 +62,15 @@ export const toSessionUser = async (account: SessionAccount): Promise<SessionUse
       ? await simulatedCreatorIds(account.id, actual, activeYoutuberId)
       : youtuberIds,
     functionIds: held.functions.map((entry) => entry.functionId),
+    functions: held.functions
+      .map(({ jobFunction }) => ({
+        id: jobFunction.id,
+        label: jobFunction.name,
+        kind: jobFunction.kind,
+        icon: jobFunction.icon,
+        position: jobFunction.position,
+      }))
+      .sort((left, right) => left.kind.localeCompare(right.kind) || left.position - right.position),
     isRoot: isRoot && !wearing,
     actual,
     display: toDisplayPreferences(account),
@@ -67,6 +79,7 @@ export const toSessionUser = async (account: SessionAccount): Promise<SessionUse
     seenReleaseVersion: account.seenReleaseVersion,
     favorites: toFavorites(account.favorites),
     mobileDock: account.mobileDock,
+    availability: account.availability,
     permissions: await resolveAccountPermissions(held, activeYoutuberId, !wearing),
   }
 }
@@ -83,7 +96,11 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
 
   const session = await prisma.session.findUnique({
     where: { token: digestSessionToken(token) },
-    include: { account: { include: { youtubers: true, functions: true } } },
+    include: {
+      account: {
+        include: { youtubers: true, functions: { include: { jobFunction: true } } },
+      },
+    },
   })
   if (!session || session.expiresAt < new Date()) return null
 

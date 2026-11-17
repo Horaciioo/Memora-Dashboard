@@ -1,10 +1,11 @@
+import { layEmbargo, markTraitor } from '@/core/lib/play/concordat/diplomacy/embargo'
 import { adjustTrust, isCondemned } from '@/core/lib/play/concordat/diplomacy/trust'
 import { clearTie, setTie, tieBetween } from '@/core/lib/play/concordat/diplomacy/ties'
 import { emit } from '@/core/lib/play/concordat/sim/emit'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
-import { ConcordatTies } from '@/utils/constants/concordat'
+import { ConcordatPowers, ConcordatTies } from '@/utils/constants/concordat'
 
 const { diplomacy } = CONCORDAT
 
@@ -103,6 +104,13 @@ export const sendGift = (
 export const noteAttack = (state: ConcordatState, attacker: number, target: number): void => {
   if (!target || !CONCORDAT.features.diplomacy) return
 
+  // Striking a nation lifts the start shield of the one who strikes
+  const striker = state.players[attacker - 1]
+  if (state.tick < striker.protectedUntil) {
+    striker.protectedUntil = 0
+    state.isSystemsDirty = true
+  }
+
   const tie = tieBetween(state, attacker, target)
   const isSpared = isCondemned(state, target)
   const isCoalition = state.coalitions.some(
@@ -116,10 +124,14 @@ export const noteAttack = (state: ConcordatState, attacker: number, target: numb
       0,
       state.players[attacker - 1].stability - diplomacy.betrayalStability
     )
+    markTraitor(state, attacker, target)
     emit(state, { tick: state.tick, kind: 'betrayal', actor: attacker, victim: target, tile: -1 })
   } else if (!tie && !isSpared && !isCoalition) {
     adjustTrust(state, attacker, -diplomacy.surprise)
   }
+  // The attacked refuse the attacker's trade for a short while
+  if (state.players[target - 1].kind !== ConcordatPowers.Tribe)
+    layEmbargo(state, target, attacker, diplomacy.embargoAttackSeconds)
   setTie(state, { a: attacker, b: target, kind: ConcordatTies.Hostile })
 }
 

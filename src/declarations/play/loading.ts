@@ -49,7 +49,7 @@ export const PLAY_SESSION_LOAD = {
   timeoutMs: 20000,
   // Percent reached at the end of each step
   // Shortest load: the bar never runs faster, so the squares are seen
-  minMs: 4000,
+  minMs: 1800,
   floor: 30,
   percent: { mounted: 35, socket: 55, fonts: 70, images: 85, painted: 100 },
 } as const

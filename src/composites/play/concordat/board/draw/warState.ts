@@ -138,7 +138,9 @@ export const strikePoint = (
 export const strikeProgress = (row: ConcordatStrikeRow, tick: number): number =>
   Math.min(1, Math.max(0, (tick - row.launchedAt) / Math.max(1, row.impactAt - row.launchedAt)))
 
-const burstKindOf = (kind: ConcordatStrikeRow['kind']): ConcordatBurstKind => kind
+// A warhead bursts like a rocket, the carrier never bursts
+const burstKindOf = (kind: ConcordatStrikeRow['kind']): ConcordatBurstKind =>
+  kind === 'warhead' ? 'rocket' : kind === 'mirv' ? 'heavy' : kind
 
 const addBurst = (
   fx: ConcordatWarFx,

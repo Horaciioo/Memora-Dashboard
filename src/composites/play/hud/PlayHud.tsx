@@ -32,6 +32,8 @@ export interface PlayHudProps {
   isCompact?: boolean
   // Wider info card when the game has room for it
   isWide?: boolean
+  // Info card on the left edge instead of the centre
+  isStart?: boolean
   // Block on the left, level with the table
   lead?: ReactNode
   // Extra blocks over the table
@@ -53,6 +55,7 @@ export const PlayHud = ({
   hasStrip = true,
   isCompact = false,
   isWide = false,
+  isStart = false,
   lead,
   children,
 }: PlayHudProps) => {
@@ -105,9 +108,11 @@ export const PlayHud = ({
                 ? PLAY_HUD.cardSlim
                 : hasStrip
                   ? PLAY_HUD.card
-                  : isWide
-                    ? PLAY_HUD.cardWide
-                    : PLAY_HUD.cardAlone
+                  : isStart
+                    ? PLAY_HUD.cardStart
+                    : isWide
+                      ? PLAY_HUD.cardWide
+                      : PLAY_HUD.cardAlone
             }
           >
             {shown.map((block, index) => (

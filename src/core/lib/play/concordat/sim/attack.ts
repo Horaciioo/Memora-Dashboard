@@ -1,6 +1,9 @@
 import { emit } from '@/core/lib/play/concordat/sim/emit'
+import { drop } from '@/core/lib/play/concordat/sim/fall'
+import { claimPocket, collapseNation } from '@/core/lib/play/concordat/sim/pockets'
 import { fortressBonus } from '@/core/lib/play/concordat/buildings/effects'
 import { attackFactor } from '@/core/lib/play/concordat/diplomacy/actions'
+import { isTraitor } from '@/core/lib/play/concordat/diplomacy/embargo'
 import { neighborsOf, NEIGHBOR_SLOTS } from '@/core/lib/play/concordat/map'
 import { defenseDensity } from '@/core/lib/play/concordat/sim/defense'
 import { tileNoise } from '@/core/lib/play/concordat/sim/rng'
@@ -14,18 +17,6 @@ const { sim, front } = CONCORDAT
 const near = new Int32Array(NEIGHBOR_SLOTS)
 // Apart from near: ownAround reads it while the walk still holds this one
 const around = new Int32Array(NEIGHBOR_SLOTS)
-
-/**
- * Corps removed, the guard against it goes home
- * @param {ConcordatState} state - Game
- * @param {ConcordatCorps} corps - Corps
- * @return {void}
- */
-
-export const drop = (state: ConcordatState, corps: ConcordatCorps): void => {
-  if (corps.guard && corps.target) state.players[corps.target - 1].troops += corps.guard
-  state.corps = state.corps.filter((other) => other !== corps)
-}
 
 /**
  * Corps troops back to the reserve
@@ -104,6 +95,9 @@ const tileCost = (
     (1 + fortressBonus(state, corps.target, tile)) * attackFactor(state, corps.owner, corps.target)
   if (corps.target && state.players[corps.target - 1].capital === tile) cost *= sim.capitalDefense
   if (mine >= sim.enclaveNeighbors) cost *= sim.enclaveFactor
+
+  // A traitor defends worse for a while
+  if (corps.target && isTraitor(state, corps.target)) cost *= CONCORDAT.diplomacy.traitorDefense
 
   // A giant defends worse
   if (corps.target) {
@@ -226,12 +220,18 @@ const capture = (
   corps.guard = (corps.guard ?? 0) - guarded
   defender.troops = Math.max(0, defender.troops - (bleed - guarded))
   attacker.stability = Math.max(0, attacker.stability - sim.stabilityConquest)
+
+  // Spoils of war: a share of the purse per tile and a part of the blood spilled comes back
+  const loot = (defender.gold / (defender.tiles + 1)) * sim.plunderGold
+  defender.gold -= loot
+  attacker.gold += loot
+  corps.troops += bleed * sim.plunderTroops
   if (defender.capital === tile) {
     defender.capital = -1
     defender.stability = Math.max(0, defender.stability - sim.stabilityCapital)
-    const loot = defender.gold * sim.capitalLootShare
-    defender.gold -= loot
-    attacker.gold += loot
+    const treasure = defender.gold * sim.capitalLootShare
+    defender.gold -= treasure
+    attacker.gold += treasure
     emit(state, {
       tick: state.tick,
       kind: 'capitalTaken',
@@ -239,6 +239,20 @@ const capture = (
       victim: defender.id,
       tile,
     })
+  }
+  if (defender.alive && defender.tiles < sim.collapseTiles) {
+    collapseNation(state, attacker.id, defender.id)
+  }
+}
+
+// Pockets of the target touching a tile just taken
+const claimAround = (state: ConcordatState, corps: ConcordatCorps, tile: number): void => {
+  if (!corps.target || !state.players[corps.target - 1].alive) return
+
+  const count = neighborsOf(tile, state.map.width, state.map.height, near)
+  for (let slot = 0; slot < count; slot++) {
+    const next = near[slot]
+    if (state.owner[next] === corps.target) claimPocket(state, corps.owner, corps.target, next)
   }
 }
 
@@ -256,8 +270,9 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
   const ratio = Math.max(sim.guardFloor, corps.troops / (corps.troops + guard))
   // Tired corps slow down little by little instead of stopping dead
   const fade = Math.min(1, Math.max(front.fadeFloor, corps.troops / front.fadeTroops))
+  const shame = isTraitor(state, corps.owner) ? CONCORDAT.diplomacy.traitorSpeed : 1
   corps.progress +=
-    contact.tiles.length * front.speed * pace * ratio * fade * TICK_SECONDS * state.speed
+    contact.tiles.length * front.speed * pace * ratio * fade * shame * TICK_SECONDS * state.speed
 
   // Not enough progress for a tile and no hole to fill: skip the ranking sort
   if (corps.progress < 1 && !contact.own.some((mine) => mine >= sim.enclaveNeighbors)) return
@@ -267,6 +282,7 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
   // Take tiles while budget and troops allow
   let taken = 0
   let blocked = 0
+  const sealed: number[] = []
   for (const index of rankContact(state, corps, contact)) {
     if (taken >= sim.maxTilesPerTick || corps.troops < 1) break
 
@@ -286,7 +302,11 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
     capture(state, corps, tile, cost, scale)
     if (!isEnclave) corps.progress -= 1
     taken++
+    if (corps.target && taken <= sim.pocketChecks) sealed.push(tile)
   }
+
+  // Land walled in by the tiles just taken falls with them
+  for (const tile of sealed) claimAround(state, corps, tile)
 
   // A stalled push bleeds
   if (!taken && blocked) {

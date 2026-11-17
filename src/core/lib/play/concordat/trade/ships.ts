@@ -1,4 +1,6 @@
 import { isWorking } from '@/core/lib/play/concordat/buildings/rules'
+import { isEmbargoed } from '@/core/lib/play/concordat/diplomacy/embargo'
+import { emit } from '@/core/lib/play/concordat/sim/emit'
 import { isCondemned } from '@/core/lib/play/concordat/diplomacy/trust'
 import { tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
 import { distanceBetween } from '@/core/lib/play/concordat/map'
@@ -16,15 +18,20 @@ import {
 const { ships: cargo } = CONCORDAT.trade
 
 /**
- * Whether cargo may flow between two nations, itself or an ally
+ * Whether cargo may flow between two nations: itself, an ally or a nation at peace, never under an embargo
  * @param {ConcordatState} state - Game
  * @param {number} first - Sender
  * @param {number} second - Receiver
  * @return {boolean} - Allowed
  */
 
-export const canShip = (state: ConcordatState, first: number, second: number): boolean =>
-  first === second || tieKindOf(state, first, second) === ConcordatTies.Alliance
+export const canShip = (state: ConcordatState, first: number, second: number): boolean => {
+  if (first === second) return true
+  if (isEmbargoed(state, first, second)) return false
+  const tie = tieKindOf(state, first, second)
+
+  return tie === ConcordatTies.Alliance || tie === ConcordatTies.Peace
+}
 
 // Working ports of a living nation
 const portsOf = (state: ConcordatState): ConcordatBuilding[] =>
@@ -71,6 +78,26 @@ const pirateOf = (state: ConcordatState, ship: ConcordatShip): number => {
   return 0
 }
 
+// Ship taken by a pirate: it turns to the nearest port of the captor, false when none can be reached
+const seize = (state: ConcordatState, ship: ConcordatShip, pirate: number): boolean => {
+  let best: { port: ConcordatBuilding; path: number[] } | null = null
+  for (const port of portsOf(state).filter((other) => other.owner === pirate)) {
+    const path = seaPath(state.map, [ship.tile], seaAround(state.map, port.tile))
+    if (path && (!best || path.length < best.path.length)) best = { port, path }
+  }
+  if (!best) return false
+
+  const victim = ship.owner
+  ship.owner = pirate
+  ship.dest = best.port.id
+  ship.path = best.path.slice(1)
+  ship.progress = 0
+  emit(state, { tick: state.tick, kind: 'captured', actor: pirate, victim, tile: ship.tile })
+  state.isSystemsDirty = true
+
+  return true
+}
+
 /**
  * Advance one cargo ship, pay it on arrival, lose it when the way closes
  * @param {ConcordatState} state - Game
@@ -86,9 +113,10 @@ export const settleCargo = (state: ConcordatState, ship: ConcordatShip): boolean
   state.isSystemsDirty = true
   if (!port) return true
 
-  // A foe warship takes a share of the load
+  // A foe warship takes the ship and sails it to its own port, the loser gets nothing
   const gold = cargoGold(state, ship, port.owner)
   if (pirate) {
+    if (seize(state, ship, pirate)) return false
     state.players[pirate - 1].gold += gold * cargo.captureShare
 
     return true

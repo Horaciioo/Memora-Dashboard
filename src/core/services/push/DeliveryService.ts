@@ -16,6 +16,7 @@ import {
 } from '@/declarations/notifications/categories'
 import { isPushConfigured } from '@/declarations/pwa/vapid'
 import type { PushPayload } from '@/declarations/pwa/worker'
+import { Availabilities } from '@/utils/constants/availability'
 import type { NotificationKindName } from '@/utils/constants/notifications'
 import { NOTIFICATION_KINDS } from '@/utils/constants/notifications'
 import { PUSH_DELIVERY_STATUSES } from '@/utils/constants/push'
@@ -160,6 +161,7 @@ const readPending = (ids: string[]) =>
           status: true,
           frozenAt: true,
           pushMutedCategories: true,
+          availability: true,
           pushSubscriptions: liveDevices(),
         },
       },
@@ -180,6 +182,9 @@ const attemptsOf = (
 ): PushAttempt[] => {
   const kind = NOTIFICATION_KINDS.byId(row.kind)?.name
   if (!kind || isAccessClosed(row.recipient)) return []
+
+  // Do not disturb keeps the bell only
+  if (row.recipient.availability === Availabilities.Dnd) return []
 
   // A silenced family stays in the bell only
   const category = PUSH_CATEGORY_OF_KIND[kind]

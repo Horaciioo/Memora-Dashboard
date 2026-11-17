@@ -17,6 +17,9 @@ import type {
   ConcordatState,
   ConcordatArms,
   ConcordatDomination,
+  ConcordatEmbargo,
+  ConcordatEmoji,
+  ConcordatTargetMark,
   ConcordatAircraft,
   ConcordatScar,
   ConcordatStrike,
@@ -61,6 +64,11 @@ export interface ConcordatSnapshot {
   routes?: ConcordatRoute[]
   coalitions?: ConcordatCoalition[]
   trust?: number[]
+  embargoes?: ConcordatEmbargo[]
+  traitors?: number[]
+  mirvs?: number
+  targets?: ConcordatTargetMark[]
+  emojis?: ConcordatEmoji[]
   history?: ConcordatSample[]
   log?: ConcordatEvent[]
   mode?: ConcordatState['mode']
@@ -110,6 +118,11 @@ export const exportState = (state: ConcordatState): ConcordatSnapshot => ({
   routes: structuredClone(state.routes),
   coalitions: structuredClone(state.coalitions),
   trust: structuredClone(state.trust),
+  embargoes: structuredClone(state.embargoes),
+  traitors: [...state.traitors],
+  mirvs: state.mirvs,
+  targets: structuredClone(state.targets),
+  emojis: structuredClone(state.emojis),
   history: structuredClone(state.history),
   log: structuredClone(state.log),
   mode: state.mode,
@@ -170,6 +183,11 @@ export const importState = (map: ConcordatMap, snapshot: ConcordatSnapshot): Con
     routes: snapshot.routes ?? [],
     coalitions: snapshot.coalitions ?? [],
     trust: snapshot.trust ?? snapshot.players.map(() => CONCORDAT.diplomacy.trustStart),
+    embargoes: snapshot.embargoes ?? [],
+    traitors: snapshot.traitors ?? snapshot.players.map(() => 0),
+    mirvs: snapshot.mirvs ?? 0,
+    targets: snapshot.targets ?? [],
+    emojis: snapshot.emojis ?? [],
     effects: snapshot.players.map(emptyEffects),
     history: snapshot.history ?? [],
     log: snapshot.log ?? [],

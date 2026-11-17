@@ -1,3 +1,4 @@
+import { NEST_TINT } from '@/declarations/ui/nest'
 import { EMPTY_VALUE, PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 
 /**
@@ -262,6 +263,20 @@ export const TOP_BAR = {
 } as const
 
 /**
+ * Boxes in a box: groups on slightly raised cards inside one panel
+ * @type {Record<string, string>}
+ */
+
+export const NESTED_BOX = {
+  // Outer panel padding and gap between groups
+  frame: 'flex flex-col gap-1.5 p-1.5',
+  // Panel colour tinted by ink, so it reads on any palette and in rail context
+  group: `flex flex-col gap-0.5 rounded-[var(--radius-lg)] ${NEST_TINT} p-1`,
+  // Hairline between rows of one group
+  rule: 'mx-2 h-px bg-[var(--color-border)]',
+} as const
+
+/**
  * Account sheet classes
  * @type {Record<string, string>}
  */
@@ -293,6 +308,45 @@ export const ACCOUNT_SHEET = {
     'flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm font-semibold transition-colors active:bg-[var(--color-hover)]',
   sheetActionDanger: 'text-[var(--color-danger)]',
   sheetActionIcon: 'size-5 shrink-0',
+} as const
+
+/**
+ * Availability picker classes
+ * @type {Record<string, string>}
+ */
+
+export const AVAILABILITY_PICKER = {
+  list: 'flex flex-col gap-0.5',
+  option:
+    'flex w-full items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-1.5 text-left text-sm font-semibold transition-colors hover:bg-[var(--color-hover)]',
+  optionActive: 'bg-[var(--color-hover)]',
+  text: 'flex min-w-0 flex-col',
+  note: 'truncate text-xs font-normal text-[var(--color-ink-subtle)]',
+  mark: 'size-3.5 shrink-0',
+  // Discord-style row: dot, name, caret
+  menu: 'flex flex-col gap-0.5',
+  rowLabel: 'min-w-0 flex-1 truncate',
+  caret: 'size-3.5 shrink-0 text-[var(--color-ink-subtle)]',
+  // Side menu lifted to the body, beside its row
+  flyout:
+    'surface-enter fixed z-[80] rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 shadow-[var(--shadow-lg)]',
+  badge:
+    'absolute -right-0.5 -bottom-0.5 grid size-3.5 place-items-center rounded-full bg-[var(--color-surface-raised)]',
+} as const
+
+/**
+ * Shelf of badges under the status row
+ * @type {Record<string, string>}
+ */
+
+export const MENU_SHELF = {
+  shelf: 'flex flex-col gap-2 px-2 py-1.5',
+  title: PROPERTY_LABEL,
+  list: 'flex flex-col gap-0.5',
+  item: 'flex items-center gap-2.5 px-1 py-1 text-sm font-semibold',
+  glyph: 'size-6 shrink-0',
+  name: 'min-w-0 truncate',
+  empty: `text-sm ${EMPTY_VALUE}`,
 } as const
 
 /**
@@ -417,8 +471,6 @@ export const CREATOR_MENU = {
   chevronOpen: 'rotate-180',
   // Portrait beside the name, not above
   head: 'flex shrink-0 flex-col items-center gap-1 border-b border-[var(--color-border)] px-4 py-3 text-center',
-  body: 'flex flex-col gap-1 p-2',
-  divider: 'h-px bg-[var(--color-border)]',
 } as const
 
 /**

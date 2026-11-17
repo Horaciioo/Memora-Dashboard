@@ -8,7 +8,7 @@ import { cn } from '@/utils/classnames'
  * Pawn drawn on a 40 × 44 grid, for any svg
  * @param {Object} props - Pawn
  * @param {LudoCornerName} props.colour - Colour
- * @param {string | null} [props.avatarUrl] - Face on the cap, colour ring when absent
+ * @param {string | null} [props.avatarUrl] - Face on the top, white when absent
  * @return {JSX.Element}
  */
 
@@ -28,26 +28,25 @@ export const LudoPawnShape = ({
       {/* Body side */}
       <path
         d="M3 18v8a17 13 0 0 0 34 0v-8z"
-        fill="var(--play-ludo-pawn-side)"
+        fill={`var(--play-ludo-${colour}-deep)`}
         stroke="var(--play-ludo-pawn-rim)"
         strokeWidth="0.6"
       />
-      {/* Top face */}
-      <ellipse cx="20" cy="18" rx="17" ry="13" fill="var(--play-ludo-pawn)" />
-      {/* Coloured cap */}
-      <ellipse cx="20" cy="18" rx="9.5" ry="7.4" fill={`var(--play-ludo-${colour}-deep)`} />
-      <ellipse cx="20" cy="17.2" rx="8.6" ry="6.5" fill={`var(--play-ludo-${colour})`} />
+      {/* Top face in the player's colour */}
+      <ellipse cx="20" cy="18" rx="17" ry="13" fill={`var(--play-ludo-${colour})`} />
+      {/* Face of the player, white when none */}
+      <ellipse cx="20" cy="17.4" rx="11.6" ry="9" fill="var(--play-ludo-pawn)" />
       {avatarUrl && (
         <>
           <clipPath id={clipId}>
-            <ellipse cx="20" cy="17.2" rx="8.6" ry="6.5" />
+            <ellipse cx="20" cy="17.4" rx="11.6" ry="9" />
           </clipPath>
           <image
             href={avatarUrl}
-            x="11.4"
-            y="10.7"
-            width="17.2"
-            height="13"
+            x="8.4"
+            y="8.4"
+            width="23.2"
+            height="18"
             preserveAspectRatio="xMidYMid slice"
             clipPath={`url(#${clipId})`}
           />
@@ -58,10 +57,10 @@ export const LudoPawnShape = ({
 }
 
 /**
- * White draughtsman with a coloured cap, seen from above at an angle
+ * Coloured draughtsman with the player's face, seen from above at an angle
  * @param {Object} props - Pawn
  * @param {LudoCornerName} props.colour - Colour
- * @param {string | null} [props.avatarUrl] - Face on the cap
+ * @param {string | null} [props.avatarUrl] - Face on the top
  * @param {string} [props.className] - Extra classes
  * @return {JSX.Element}
  */

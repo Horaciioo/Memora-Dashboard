@@ -248,9 +248,13 @@ export const beginPlay = (state: ConcordatState): void => {
     player.capital = player.start
     player.gold = CONCORDAT.sim.startGold
 
-    // Nobody is shielded, every nation may fight from the first second
-    if (player.kind === ConcordatPowers.Human) player.troops = CONCORDAT.sim.startTroops
+    // A seat is shielded for the set time, striking a nation lifts the shield
+    if (player.kind === ConcordatPowers.Human) {
+      player.troops = CONCORDAT.sim.startTroops
+      player.protectedUntil = state.tick + state.protectionTicks
+    }
   }
   openMode(state, state.teamCount)
+  state.isSystemsDirty = true
   emit(state, { tick: state.tick, kind: 'started', actor: 0, victim: 0, tile: -1 })
 }

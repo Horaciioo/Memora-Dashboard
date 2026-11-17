@@ -1,3 +1,5 @@
+import { EVENT_TYPES } from '@/utils/constants/events'
+
 /**
  * Journal target of Play entries
  * @type {string}
@@ -46,3 +48,10 @@ export const PLAY_OUTCOME_LABELS = {
   DRAW: 'égalité',
   LOSS: 'défaite',
 } as const
+
+/**
+ * Kinds of Play line the journal filter offers
+ * @type {string[]}
+ */
+
+export const PLAY_LOG_EVENTS = EVENT_TYPES.names.filter((name) => name.startsWith('Play'))

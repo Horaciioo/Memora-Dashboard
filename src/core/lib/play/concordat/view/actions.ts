@@ -1,3 +1,4 @@
+import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatTieRow } from '@/core/lib/play/concordat/wire/systems'
 import {
   ConcordatIntents,
@@ -49,10 +50,17 @@ const ACTIONS: Record<ConcordatTieKind, ConcordatTargetAction[]> = {
 /**
  * Gestures offered on a nation
  * @param {ConcordatTieKind} tie - Tie with it
+ * @param {boolean} [isEmbargoed] - My trade ban stands against it
  * @return {ConcordatTargetAction[]} - Gestures
  */
 
-export const actionsFor = (tie: ConcordatTieKind): ConcordatTargetAction[] => ACTIONS[tie]
+export const actionsFor = (tie: ConcordatTieKind, isEmbargoed = false): ConcordatTargetAction[] => [
+  ...ACTIONS[tie],
+  ...(tie === ConcordatTies.Alliance ? [] : [ConcordatTargetActions.Mark]),
+  // Gold goes to friends only
+  ...(tie === ConcordatTies.Hostile ? [] : [ConcordatTargetActions.Donate]),
+  isEmbargoed ? ConcordatTargetActions.Lift : ConcordatTargetActions.Embargo,
+]
 
 /**
  * Request body of a gesture
@@ -60,6 +68,7 @@ export const actionsFor = (tie: ConcordatTieKind): ConcordatTargetAction[] => AC
  * @param {number} target - Nation
  * @param {number} percent - Share of troops
  * @param {number} [tile] - Tile clicked, its zone is the one attacked
+ * @param {number} [gold] - Gold held, the share of a donation
  * @return {Record<string, unknown>} - Body
  */
 
@@ -67,12 +76,31 @@ export const bodyFor = (
   action: ConcordatTargetAction,
   target: number,
   percent: number,
-  tile?: number
+  tile?: number,
+  gold = 0
 ): Record<string, unknown> => {
   if (action === ConcordatTargetActions.Attack) {
     return { type: ConcordatIntents.Engage, target, percent, tile }
   }
+  if (action === ConcordatTargetActions.Donate) {
+    const share = Math.floor((gold * percent) / 100)
+
+    return {
+      type: ConcordatIntents.Gift,
+      to: target,
+      resource: 'gold',
+      amount: Math.min(share, Math.floor(gold * CONCORDAT.diplomacy.giftMax)),
+    }
+  }
+  if (action === ConcordatTargetActions.Mark) return { type: ConcordatIntents.Target, with: target }
   if (action === ConcordatTargetActions.Break) return { type: ConcordatIntents.Break, with: target }
+  if (action === ConcordatTargetActions.Embargo || action === ConcordatTargetActions.Lift) {
+    return {
+      type: ConcordatIntents.Embargo,
+      with: target,
+      on: action === ConcordatTargetActions.Embargo,
+    }
+  }
   if (action === ConcordatTargetActions.Aid)
     return { type: ConcordatIntents.Aid, to: target, percent }
   if (action === ConcordatTargetActions.Trade)

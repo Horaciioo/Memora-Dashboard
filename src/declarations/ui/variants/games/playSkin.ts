@@ -19,5 +19,5 @@ export const LEVEL_FRAME_VIEW = {
   root: 'relative inline-grid shrink-0 place-items-center',
   // Regular hexagon, points up and down
   face: 'rounded-none [clip-path:polygon(50%_0,93.3%_25%,93.3%_75%,50%_100%,6.7%_75%,6.7%_25%)]',
-  art: 'pointer-events-none absolute inset-0 size-full overflow-visible drop-shadow-[0_2px_3px_rgb(0_0_0/0.35)]',
+  art: 'pointer-events-none absolute inset-0 size-full overflow-visible',
 } as const

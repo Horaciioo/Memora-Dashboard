@@ -3,33 +3,26 @@
 import { useRef, useState } from 'react'
 
 import { LevelFrame } from '@/composites/play/skin/LevelFrame'
-import AppLink from '@/components/elements/navigation/AppLink'
-import { PlayTabGlyph } from '@/composites/play/mobile/PlayTabGlyphs'
+import { PlayMeMenu } from '@/composites/play/mobile/PlayMeMenu'
+import { PlayTrophiesDialog } from '@/composites/play/mobile/PlayTrophiesDialog'
 import { usePlayLevel } from '@/core/hooks/data/play/usePlayLevel'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
-import { ROUTES } from '@/declarations/navigation'
 import { PLAY_ME_COPY } from '@/declarations/play'
-import { PLAY_BOARD_ADMIN_COPY } from '@/declarations/play/admin'
-import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_TABS } from '@/declarations/ui/variants'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { cn } from '@/utils/classnames'
-import { Permissions } from '@/utils/constants/permissions'
 
 /**
- * Portrait in the middle of the tab bar, opening stats or the way out of Play
+ * Portrait in the middle of the tab bar, opening the member box
  * @return {JSX.Element | null}
  */
 
 export const PlayMeButton = () => {
-  const { session, can } = useAuthContext()
+  const { session } = useAuthContext()
   const level = usePlayLevel()
   const [isOpen, setIsOpen] = useState(false)
+  const [hasTrophies, setHasTrophies] = useState(false)
   const boundary = useRef<HTMLDivElement>(null)
   useOutsideDismiss(isOpen, boundary, () => setIsOpen(false))
-  const LeaveIcon = ICONS.playLeave
-  const SettingsIcon = ICONS.settings
-  const AdminIcon = ICONS.shield
 
   if (!session) return null
 
@@ -54,46 +47,15 @@ export const PlayMeButton = () => {
       </button>
 
       {isOpen && (
-        <div role="menu" className={PLAY_TABS.menu}>
-          <AppLink
-            role="menuitem"
-            href={ROUTES.playStats}
-            onClick={() => setIsOpen(false)}
-            className={PLAY_TABS.menuItem}
-          >
-            <PlayTabGlyph name="stats" className={PLAY_TABS.menuIcon} />
-            {PLAY_ME_COPY.stats}
-          </AppLink>
-          <AppLink
-            role="menuitem"
-            href={ROUTES.playSettings}
-            onClick={() => setIsOpen(false)}
-            className={PLAY_TABS.menuItem}
-          >
-            <SettingsIcon className={PLAY_TABS.menuIcon} aria-hidden="true" />
-            {PLAY_ME_COPY.settings}
-          </AppLink>
-          {can(Permissions.PlayManage) && (
-            <AppLink
-              role="menuitem"
-              href={ROUTES.playAdmin}
-              onClick={() => setIsOpen(false)}
-              className={PLAY_TABS.menuItem}
-            >
-              <AdminIcon className={PLAY_TABS.menuIcon} aria-hidden="true" />
-              {PLAY_BOARD_ADMIN_COPY.menu}
-            </AppLink>
-          )}
-          <AppLink
-            role="menuitem"
-            href={ROUTES.dashboard}
-            className={cn(PLAY_TABS.menuItem, PLAY_TABS.menuLeave)}
-          >
-            <LeaveIcon className={PLAY_TABS.menuIcon} aria-hidden="true" />
-            {PLAY_ME_COPY.leave}
-          </AppLink>
-        </div>
+        <PlayMeMenu
+          onClose={() => setIsOpen(false)}
+          onTrophies={() => {
+            setIsOpen(false)
+            setHasTrophies(true)
+          }}
+        />
       )}
+      {hasTrophies && <PlayTrophiesDialog onClose={() => setHasTrophies(false)} />}
     </div>
   )
 }

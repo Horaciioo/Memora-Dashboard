@@ -193,9 +193,11 @@ export const readBaccalaureatSettings = (
   if (letters.length < rounds) refuse('letters', PLAY_ERRORS.letterCount)
 
   // Flash mode, short and light
-  const flash = typeof raw.flash === 'boolean' ? raw.flash : current.flash
+  // Categories picked by the host end flash mode unless it is asked again
+  const isPicked = raw.categories !== undefined || raw.customCategories !== undefined
+  const flash = typeof raw.flash === 'boolean' ? raw.flash : isPicked ? false : current.flash
   // Flash sets the host's choices aside, a normal game gets them back
-  const source = !flash && current.flash && current.kept ? current.kept : current
+  const source = !flash && current.flash && current.kept && !isPicked ? current.kept : current
   const kept = flash
     ? (current.kept ?? { categories: current.categories, roundSeconds: current.roundSeconds })
     : undefined

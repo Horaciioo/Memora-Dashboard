@@ -27,7 +27,7 @@ export const CONCORDAT_HUD_COPY = {
   pickClock: 'Départ dans {seconds} s',
   engage: 'Engagement',
   engageHint:
-    'Part de tes troupes envoyée à chaque clic, rappuie pour en renvoyer autant. Clic droit : diplomatie.',
+    'Part de tes troupes envoyée à chaque clic, rappuie pour en renvoyer autant. T et Y la baissent ou la montent, C recentre, K propose une alliance, L rompt, Maj + R riposte. Clic droit : diplomatie.',
   engageValue: '{percent} %',
   corps: 'Mes corps',
   noCorps: 'Aucun corps engagé.',
@@ -38,6 +38,16 @@ export const CONCORDAT_HUD_COPY = {
   defendHint:
     'Met ce pourcentage de tes troupes face à cette attaque : plus elle est forte face aux assaillants, plus le front ralentit.',
   attacked: 'Attaque subie',
+  troopsOf: '{troops} / {max}',
+  goldRate: '{gold} ({rate}/min)',
+  cancelPush: 'Rappeler ces troupes',
+  shielded: 'Départ protégé, {time}',
+  shieldHint: 'Personne ne peut te frapper. Attaquer une nation lève la protection.',
+  underAttack: '{name} t’attaque !',
+  underAttackHint: 'Un front est ouvert contre toi, les troupes envoyées avancent sur ta terre.',
+  counter: 'Riposter',
+  counterHint: 'Lance ton propre assaut contre cet assaillant avec le pourcentage engagé.',
+  killed: '{name} est tombé',
   offers: 'Propositions',
   accept: 'Accepter',
   refuse: 'Refuser',
@@ -62,6 +72,10 @@ export const CONCORDAT_HUD_COPY = {
   weapons: 'Armes',
   missile: 'Missile',
   heavy: 'Missile lourd',
+  mirv: 'Missile à têtes multiples',
+  mirvInbound: '{name} : missile à têtes multiples en approche',
+  strikeInbound: '{name} : {kind} en approche',
+  strikeSeconds: 'Impact dans {seconds} s',
   shell: 'Obus',
   rocket: 'Roquettes',
   heli: 'Hélicoptère',
@@ -106,6 +120,7 @@ export const CONCORDAT_BUILDING_LABELS: Record<ConcordatBuildingKind, string> = 
   sam: 'une batterie antiaérienne',
   airbase: 'une base aérienne',
   battery: 'une batterie d’artillerie',
+  factory: 'une usine',
 }
 
 /**
@@ -124,6 +139,7 @@ export const CONCORDAT_BUILDING_TITLES: Record<ConcordatBuildingKind, string> = 
   sam: 'Antiaérienne',
   airbase: 'Base aérienne',
   battery: 'Artillerie',
+  factory: 'Usine',
 }
 
 /**
@@ -144,6 +160,9 @@ export const CONCORDAT_ARM_HINTS: Record<string, string> = {
     'Envoie des hélicoptères et des chasseurs. Chaque niveau ajoute un appareil dans le ciel.',
   battery:
     'Tire obus et roquettes à moyenne portée, sans silo. Recharge entre deux tirs. Les antiaériennes arrêtent les roquettes, pas les obus.',
+  factory:
+    'Lance des trains vers les marchés de tes alliés, des nations en paix et les tiens : chaque arrivée rapporte de l’or. Plus elle monte, plus il y a de trains.',
+  mirv: 'Un seul missile qui se divise au-dessus de la nation visée en neuf têtes, chacune tombe à un endroit différent de ses terres. Silo de niveau 3, très cher et de plus en plus avec chaque tir de la partie. Les antimissiles peuvent arrêter chaque tête.',
   shell:
     'Obus d’artillerie : petite zone, tir rapide et bon marché. Il faut une batterie à portée.',
   rocket:
@@ -169,6 +188,10 @@ export const CONCORDAT_ACTION_LABELS: Record<ConcordatTargetAction, string> = {
   [ConcordatTargetActions.Trade]: 'Commercer',
   [ConcordatTargetActions.Aid]: 'Envoyer des renforts',
   [ConcordatTargetActions.Break]: 'Rompre le traité',
+  [ConcordatTargetActions.Donate]: 'Donner de l’or',
+  [ConcordatTargetActions.Mark]: 'Désigner comme cible',
+  [ConcordatTargetActions.Embargo]: 'Décréter un embargo',
+  [ConcordatTargetActions.Lift]: 'Lever l’embargo',
 }
 
 /**
@@ -198,6 +221,8 @@ export const CONCORDAT_FEED_COPY = {
   launched: '*a lancé* un missile sur {victim}',
   impact: '*a frappé* {victim}',
   sortie: '*a envoyé* un chasseur sur {victim}',
+  captured: '*a capturé* un navire de commerce de {victim}',
+  warshipSunk: '*a coulé* un navire de guerre de {victim}',
   shotDown: '*a abattu* un appareil de {victim}',
   researched: '*a terminé* une recherche',
   built: '*a bâti* un édifice',
@@ -305,6 +330,13 @@ export const CONCORDAT_STANDINGS_COPY = {
  * @type {Record<string, string>}
  */
 
+/**
+ * Emojis a nation can throw, the index travels on the wire
+ * @type {readonly string[]}
+ */
+
+export const CONCORDAT_EMOJIS = ['👍', '🤝', '😂', '😡', '🙏', '🔥', '💀', '👋'] as const
+
 export const CONCORDAT_HOVER_COPY = {
   human: 'Joueur',
   country: 'Pays',
@@ -312,4 +344,6 @@ export const CONCORDAT_HOVER_COPY = {
   ships: 'Navires de guerre',
   sending: 'Troupes envoyées à l’attaque',
   troopsOf: '{troops} troupes sur {max}',
+  traitor: 'Traître',
+  embargo: 'Embargo',
 } as const

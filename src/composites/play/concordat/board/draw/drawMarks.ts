@@ -1,7 +1,7 @@
 import type { ConcordatScene } from '@/composites/play/concordat/board/draw/types'
 import { rgbText } from '@/core/lib/play/concordat'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
-import { drawBoat } from '@/composites/play/concordat/board/draw/drawBoat'
+import { drawBoat, drawTrain } from '@/composites/play/concordat/board/draw/drawBoat'
 import { drawShipBadge } from '@/composites/play/concordat/board/draw/drawShipBadge'
 import { ConcordatPhases, ConcordatPowers, ConcordatShipKinds } from '@/utils/constants/concordat'
 
@@ -141,7 +141,12 @@ export const drawStructures = (context: CanvasRenderingContext2D, scene: Concord
     const at = [fromX + (x - fromX) * glide, fromY + (y - fromY) * glide]
     const hull = size * (isCargo ? 1.1 : 1.4)
     const color = colors[ship.owner] ?? frame.shadow
+    if (ship.kind === ConcordatShipKinds.Train) {
+      drawTrain(context, at[0], at[1], size * 0.9, angle(scene), color)
+
+      continue
+    }
     drawBoat(context, at[0], at[1], hull, angle(scene), color, scene.now, ship.id, isMoving, isWar)
-    drawShipBadge(context, at[0], at[1], hull, color, ship.kind)
+    drawShipBadge(context, at[0], at[1], hull, color, ship.kind, ship.hp, ship.vet)
   }
 }

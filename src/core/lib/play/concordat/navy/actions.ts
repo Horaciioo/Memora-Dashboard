@@ -34,6 +34,9 @@ export const buildShip = (
     ttl: ticksOf(navy.orphanSeconds),
     port: port.id,
     progress: 0,
+    hp: navy.warHp,
+    kills: 0,
+    vet: 0,
   })
   state.isSystemsDirty = true
 }

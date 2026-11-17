@@ -15,6 +15,9 @@ import type { PlayAdminState } from '@/types/play'
 import type { Prisma } from '@prisma/client'
 import type { PlayGameName } from '@/utils/constants/play'
 
+// Largest value a database integer holds
+const INT_MAX = 2147483647
+
 // Counters a lead may correct
 const STAT_FIELDS = ['wins', 'draws', 'losses', 'streak'] as const
 
@@ -95,7 +98,7 @@ export const writeXp = async (
       where: { accountId_game: { accountId, game } },
     })
     const before = stat?.xp ?? 0
-    const xp = Math.max(0, next(before))
+    const xp = Math.min(INT_MAX, Math.max(0, next(before)))
     await tx.playGameStat.upsert({
       where: { accountId_game: { accountId, game } },
       create: { accountId, game, xp },
@@ -131,7 +134,7 @@ export const writeBonus = async (
       tx.playProfile.findUnique({ where: { accountId } }),
       gamesXp(tx, accountId),
     ])
-    const bonusXp = Math.max(-games, next(profile?.bonusXp ?? 0, games))
+    const bonusXp = Math.min(INT_MAX - games, Math.max(-games, next(profile?.bonusXp ?? 0, games)))
     await tx.playProfile.upsert({
       where: { accountId },
       create: { accountId, bonusXp },

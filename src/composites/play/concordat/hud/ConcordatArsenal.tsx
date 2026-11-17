@@ -10,6 +10,7 @@ import {
   buildCostOf,
   clockText,
   compactFigure,
+  mirvPrice,
   stockOf,
   weaponsOpenAt,
 } from '@/core/lib/play/concordat'
@@ -29,6 +30,10 @@ import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 import { CONCORDAT_BUILDING_ORDER } from '@/utils/constants/concordat'
 
 const { weapons, air } = CONCORDAT
+
+// Extra wait of a multi-warhead missile after the other weapons open
+const mirvDelayTicks =
+  ((weapons.mirv.unlockMinutes - weapons.unlockMinutes) * 60 * 1000) / CONCORDAT.tickMs
 
 interface Slot {
   key: string
@@ -99,6 +104,17 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
       note: waitTicks > 0 ? '·' : compactFigure(weapons.heavyCost),
       isOff: waitTicks > 0 || stock.heavy >= weapons.heavyMax || gold < weapons.heavyCost,
       tool: { kind: 'launch', isHeavy: true },
+    },
+    {
+      key: 'mirv',
+      glyph: 'mirv',
+      title: CONCORDAT_HUD_COPY.mirv,
+      note: waitTicks > 0 ? '·' : compactFigure(mirvPrice(client.systems.mirvs)),
+      isOff:
+        waitTicks > 0 ||
+        client.tick < weaponsOpenAt(client) + mirvDelayTicks ||
+        gold < mirvPrice(client.systems.mirvs),
+      tool: { kind: 'launch', isHeavy: true, weapon: 'mirv' },
     },
     ...(['shell', 'rocket'] as const).map((weapon): Slot => ({
       key: weapon,

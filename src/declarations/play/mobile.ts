@@ -91,4 +91,5 @@ export const PLAY_ME_COPY = {
   stats: 'Afficher mes stats',
   settings: 'Paramètres',
   leave: 'Quitter Memora Play',
+  trophies: 'Trophées',
 } as const

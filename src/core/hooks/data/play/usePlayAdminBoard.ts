@@ -6,11 +6,11 @@ import { useCallback } from 'react'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { PLAY_BOARD_ADMIN_COPY, PLAY_MEMBER_COPY } from '@/declarations/play/admin'
+import { PLAY_BOARD_ADMIN_COPY as COPY } from '@/declarations/play/admin'
 import type { FieldIssue, FormValues } from '@/types/forms'
 
 /**
- * XP gestures of the Play admin page
+ * Bulk gestures of the Play admin page
  * @typedef {Object} PlayAdminBoardActions
  * @property {boolean} isSaving - Gesture in flight
  * @property {FieldIssue[]} issues - Drawer failures
@@ -19,12 +19,12 @@ import type { FieldIssue, FormValues } from '@/types/forms'
 export interface PlayAdminBoardActions {
   isSaving: boolean
   issues: FieldIssue[]
-  adjustOne: (accountId: string, values: FormValues) => Promise<boolean>
-  adjustAll: (values: FormValues) => Promise<boolean>
+  giveXp: (accountIds: string[], values: FormValues) => Promise<boolean>
+  resetPlay: (accountIds: string[], values: FormValues) => Promise<boolean>
 }
 
 /**
- * Drive the XP gestures of the Play admin page, the page refreshed after each
+ * Drive the bulk gestures, the page refreshed after each
  * @return {PlayAdminBoardActions} - State and gestures
  */
 
@@ -47,8 +47,10 @@ export const usePlayAdminBoard = (): PlayAdminBoardActions => {
   return {
     isSaving,
     issues,
-    adjustOne: (accountId, values) =>
-      send(API_ROUTES.playMemberXp(accountId), values, PLAY_MEMBER_COPY.xpDone),
-    adjustAll: (values) => send(API_ROUTES.playAdminXp, values, PLAY_BOARD_ADMIN_COPY.everyoneDone),
+    // An empty list reaches everyone
+    giveXp: (accountIds, values) =>
+      send(API_ROUTES.playAdminXp, { ...values, accountIds }, COPY.giveDone),
+    resetPlay: (accountIds, values) =>
+      send(API_ROUTES.playAdminReset, { ...values, accountIds }, COPY.resetDone),
   }
 }

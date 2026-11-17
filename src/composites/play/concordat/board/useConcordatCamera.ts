@@ -25,6 +25,10 @@ const ARROWS: Record<string, [number, number]> = {
   ArrowRight: [-1, 0],
   ArrowUp: [0, 1],
   ArrowDown: [0, -1],
+  a: [1, 0],
+  d: [-1, 0],
+  w: [0, 1],
+  s: [0, -1],
 }
 
 export interface ConcordatCameraProps {
@@ -293,6 +297,7 @@ export const useConcordatCamera = ({
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null
       if (target?.closest('input, textarea, [contenteditable="true"]')) return
+      if (event.ctrlKey || event.metaKey || event.altKey) return
       const step = ARROWS[event.key]
       const centre = [size.current.width / 2, size.current.height / 2]
       if (step) {
@@ -303,8 +308,9 @@ export const useConcordatCamera = ({
           x: camera.current.x + step[0] * zoom.pan,
           y: camera.current.y + step[1] * zoom.pan,
         })
-      } else if (event.key === '+' || event.key === '-') {
-        const factor = event.key === '+' ? 1 + zoom.keyStep : 1 / (1 + zoom.keyStep)
+      } else if (['+', '-', 'q', 'e'].includes(event.key)) {
+        const factor =
+          event.key === '+' || event.key === 'e' ? 1 + zoom.keyStep : 1 / (1 + zoom.keyStep)
         zoomTo(factor, centre[0], centre[1])
       }
     }

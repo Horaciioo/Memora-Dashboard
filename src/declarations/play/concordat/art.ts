@@ -144,14 +144,35 @@ export const CONCORDAT_ART = {
     pulseSlow: 6,
   },
   // Arrow of a corps, width from its troops
-  arrow: { min: 2, max: 9, scale: 0.012, dash: [10, 7], speed: 0.04, head: 1.7 },
+  arrow: {
+    min: 2,
+    max: 9,
+    scale: 0.012,
+    dash: [10, 7],
+    speed: 0.04,
+    head: 1.7,
+    alarm: [214, 76, 64],
+    alarmWidth: 1.5,
+    label: 11,
+  },
+  // Target ring and emoji bubble, sizes in pixels and seconds
+  signal: {
+    target: [214, 76, 64],
+    radius: 16,
+    line: 3,
+    pulse: 0.006,
+    emoji: 20,
+    seconds: 5,
+    lift: 34,
+    rise: 22,
+  },
   // Hover wash over a nation, then the picked ring of a start
   wash: { alpha: 0.28, rgb: [255, 255, 255] },
   pick: { fill: 0.22, line: 2.5, rgb: [255, 255, 255] },
   // Province lines and names on the paper
   paper: { line: [30, 52, 64], alpha: 0.28, ownDark: 0.55, name: [32, 48, 58], nameAlpha: 0.7 },
   // Conquest front: lifetime, spread over a diff, whitening, opacity, smallest zoom, queue cap
-  flash: { ms: 700, spread: 260, lift: 0.18, alpha: 0.4, minScale: 1.2, cap: 12000 },
+  flash: { ms: 700, spread: 260, minSpread: 90, lift: 0.18, alpha: 0.4, minScale: 1.2, cap: 12000 },
   // Click echo: lifetime of a mark, ripple radius in pixels, goal ring while expanding
   mark: { ms: 9000, ripple: 700, reach: 46, goal: 12, red: [214, 76, 64] },
   // Pixel ratio cap of the canvas
@@ -165,9 +186,9 @@ export const CONCORDAT_ART = {
   // Label recompute rhythm
   labelMs: 2500,
   // Engagement slider, in percent
-  engage: { min: 1, max: 100, step: 1, initial: 20 },
+  engage: { min: 1, max: 100, step: 1, initial: 20, hotkeyStep: 5 },
   // Floating boxes over the map, in pixels
-  menu: { width: 240, height: 220, gap: 12 },
+  menu: { width: 240, height: 290, gap: 12 },
   strikeMenu: { width: 240, height: 140 },
   tip: { width: 240, height: 96, gap: 16 },
   // Tiles seen from top to bottom when the camera lands on a nation

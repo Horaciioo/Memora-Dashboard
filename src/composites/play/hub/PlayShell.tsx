@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 
+import { PlayCardHost } from '@/composites/play/card/PlayCardHost'
 import { PlayBusyToast } from '@/composites/play/loading/PlayBusyToast'
 
 import type { PlayDockProps } from '@/composites/play/dock/PlayDock'
@@ -73,6 +74,7 @@ export const PlayShell = ({
         <PlaySignal topic={PLAY_TOPICS.groups} />
         <PlayTabBar invites={dock.invites} presence={dock.presence} groupCalls={dock.groupCalls} />
         <PlayReward reward={reward} />
+        <PlayCardHost />
         <PlayTrophyNotice notice={trophyNotice} />
         <PlayInviteHost isPlay />
         <PlayBusyToast />

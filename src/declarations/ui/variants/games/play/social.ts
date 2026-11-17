@@ -88,7 +88,7 @@ export const PLAY_CROSS = {
   wall: 'flex w-full flex-col gap-3',
   wallTitle: 'text-sm font-extrabold tracking-[0.2em] text-[var(--play-ink-soft)] uppercase',
   tiles:
-    'grid w-full grid-cols-4 gap-2 sm:grid-cols-4 md:grid-cols-5 md:gap-4 xl:grid-cols-6 2xl:grid-cols-8',
+    'grid w-full grid-cols-4 gap-2 sm:grid-cols-4 md:grid-cols-6 md:gap-4 xl:grid-cols-7 2xl:grid-cols-9',
   tile: 'w-full',
   live: 'min-h-0 shrink',
   online: 'min-h-0 shrink-0',

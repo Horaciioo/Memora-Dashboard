@@ -16,6 +16,12 @@ export const PLAY_HUB_COPY = {
   featureTitle: 'À la une',
   featureBadge: 'Vedette',
   featurePlay: 'Jouer',
+  // Desktop hub
+  navTitle: 'Jeux',
+  friendsTitle: 'Joueurs',
+  tabRecent: 'Récents',
+  recentEmpty: 'Tu n’as encore joué avec personne.',
+  recentSince: 'Dernière partie {since}',
   loungeTitle: 'Salon',
   homeTitle: 'Memora Play',
   sectionProgress: 'Ta progression',

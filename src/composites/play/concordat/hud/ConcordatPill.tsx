@@ -1,5 +1,7 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
 import { ConcordatCoin } from '@/composites/play/concordat/hud/ConcordatCoin'
 import { CONCORDAT_STAT_GLYPHS } from '@/declarations/play/concordat/glyphs'
 import { ConcordatArsenal } from '@/composites/play/concordat/hud/ConcordatArsenal'
@@ -10,7 +12,7 @@ import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 
 export interface ConcordatPillProps extends ConcordatCorpsProps {
-  figures: { key: string; caption: string; figure: number | string }[]
+  figures: { key: string; caption: string; figure: ReactNode }[]
 }
 
 /**

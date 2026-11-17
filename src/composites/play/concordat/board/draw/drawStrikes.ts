@@ -60,9 +60,12 @@ export const drawStrikes = (context: CanvasRenderingContext2D, scene: ConcordatS
 
   for (const row of client.systems.strikes) {
     if ((row.killAt && tick >= row.killAt) || tick >= row.impactAt) continue
-    const isHeavy = row.kind === ConcordatStrikeKinds.Heavy
+    const isHeavy =
+      row.kind === ConcordatStrikeKinds.Heavy || row.kind === ConcordatStrikeKinds.Mirv
     const isGun =
-      row.kind === ConcordatStrikeKinds.Shell || row.kind === ConcordatStrikeKinds.Rocket
+      row.kind === ConcordatStrikeKinds.Shell ||
+      row.kind === ConcordatStrikeKinds.Rocket ||
+      row.kind === ConcordatStrikeKinds.Warhead
     const to = screenOf(scene, row.tile)
     const progress = strikeProgress(row, tick)
     const blast = weapons.radius[row.kind] * camera.scale

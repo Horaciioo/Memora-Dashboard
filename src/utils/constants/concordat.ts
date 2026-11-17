@@ -72,6 +72,9 @@ export const ConcordatIntents = {
   Gift: 'gift',
   Aid: 'aid',
   CloseTrade: 'closeTrade',
+  Embargo: 'embargo',
+  Target: 'target',
+  Emoji: 'emoji',
   Research: 'research',
   Feint: 'feint',
   Defend: 'defend',
@@ -157,6 +160,7 @@ export const ConcordatBuildingKinds = {
   Sam: 'sam',
   Airbase: 'airbase',
   Battery: 'battery',
+  Factory: 'factory',
 } as const
 
 export type ConcordatBuildingKind =
@@ -178,6 +182,7 @@ export const CONCORDAT_BUILDING_ORDER: readonly ConcordatBuildingKind[] = [
   'sam',
   'airbase',
   'battery',
+  'factory',
 ]
 
 // Ships of a port
@@ -185,6 +190,7 @@ export const ConcordatShipKinds = {
   Transport: 'transport',
   War: 'war',
   Trade: 'trade',
+  Train: 'train',
 } as const
 
 export type ConcordatShipKind = (typeof ConcordatShipKinds)[keyof typeof ConcordatShipKinds]
@@ -274,6 +280,8 @@ export const ConcordatEventKinds = [
   'zoneWon',
   'sortie',
   'shotDown',
+  'captured',
+  'warshipSunk',
 ] as const
 
 export type ConcordatEventKind = (typeof ConcordatEventKinds)[number]
@@ -308,6 +316,8 @@ export const ConcordatStrikeKinds = {
   Heavy: 'heavy',
   Shell: 'shell',
   Rocket: 'rocket',
+  Mirv: 'mirv',
+  Warhead: 'warhead',
 } as const
 
 export type ConcordatStrikeKind = (typeof ConcordatStrikeKinds)[keyof typeof ConcordatStrikeKinds]
@@ -325,7 +335,7 @@ export const CONCORDAT_STRIKE_ORDER: readonly ConcordatStrikeKind[] =
  * @type {readonly string[]}
  */
 
-export const CONCORDAT_WEAPONS = ['missile', 'heavy', 'shell', 'rocket', 'heli', 'fighter'] as const
+export const CONCORDAT_WEAPONS = ['missile', 'heavy', 'mirv', 'shell', 'rocket', 'heli', 'fighter'] as const
 
 export type ConcordatWeaponName = (typeof CONCORDAT_WEAPONS)[number]
 
@@ -430,6 +440,10 @@ export const ConcordatTargetActions = {
   Trade: 'trade',
   Aid: 'aid',
   Break: 'break',
+  Embargo: 'embargo',
+  Lift: 'lift',
+  Donate: 'donate',
+  Mark: 'mark',
 } as const
 
 export type ConcordatTargetAction =

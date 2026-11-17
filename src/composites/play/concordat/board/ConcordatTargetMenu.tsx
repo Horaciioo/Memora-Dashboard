@@ -4,6 +4,7 @@ import { actionsFor, rgbText } from '@/core/lib/play/concordat'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
 import {
   CONCORDAT_ACTION_LABELS,
+  CONCORDAT_EMOJIS,
   CONCORDAT_TIE_LABELS,
 } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT_BOARD } from '@/declarations/ui/variants'
@@ -15,11 +16,13 @@ export interface ConcordatTargetMenuProps {
   name: string
   color: readonly number[]
   tie: ConcordatTieKind
+  isEmbargoed: boolean
   x: number
   y: number
   width: number
   height: number
   onPick: (action: ConcordatTargetAction) => void
+  onEmoji: (emoji: number) => void
 }
 
 /**
@@ -32,11 +35,13 @@ export const ConcordatTargetMenu = ({
   name,
   color,
   tie,
+  isEmbargoed,
   x,
   y,
   width,
   height,
   onPick,
+  onEmoji,
 }: ConcordatTargetMenuProps) => (
   <div
     role="menu"
@@ -52,7 +57,7 @@ export const ConcordatTargetMenu = ({
       <span className={CONCORDAT_BOARD.menuName}>{name}</span>
       <span className={CONCORDAT_BOARD.menuTie}>{CONCORDAT_TIE_LABELS[tie]}</span>
     </div>
-    {actionsFor(tie).map((action, index) => (
+    {actionsFor(tie, isEmbargoed).map((action, index) => (
       <button
         key={action}
         type="button"
@@ -63,5 +68,19 @@ export const ConcordatTargetMenu = ({
         {CONCORDAT_ACTION_LABELS[action]}
       </button>
     ))}
+    <div className={CONCORDAT_BOARD.emojis}>
+      {CONCORDAT_EMOJIS.map((emoji, index) => (
+        <button
+          key={emoji}
+          type="button"
+          role="menuitem"
+          aria-label={emoji}
+          className={CONCORDAT_BOARD.emoji}
+          onClick={() => onEmoji(index)}
+        >
+          {emoji}
+        </button>
+      ))}
+    </div>
   </div>
 )
