@@ -155,13 +155,14 @@ export const CONCORDAT_HUD = {
   frontTroops: 'tabular-nums text-[var(--play-ink-soft)]',
   frontCancel: `${BUTTON} bg-[var(--play-chip)] px-1.5 py-0.5 text-[var(--play-ink)]`,
   gain: 'concordat-alert-in ml-1 text-sm font-bold tabular-nums text-[var(--play-value)]',
-  // Zone won, centred above the board
+  // Zone won, centred above the board, small top left on mobile
   zones:
-    'pointer-events-none absolute top-[32%] left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2',
-  zone: `${BLOCK} concordat-zone-pop flex flex-col items-center gap-0.5 px-6 py-3 text-center`,
-  zoneTitle: 'text-xl font-bold tracking-wide uppercase text-[var(--play-ink)]',
+    'pointer-events-none absolute top-[32%] left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 max-md:top-[calc(3.5rem+env(safe-area-inset-top))] max-md:left-3 max-md:max-w-[calc(100vw-8rem)] max-md:translate-x-0 max-md:items-start max-md:gap-1',
+  zone: `${BLOCK} concordat-zone-pop flex flex-col items-center gap-0.5 px-6 py-3 text-center max-md:items-start max-md:px-2 max-md:py-1 max-md:text-left`,
+  zoneTitle:
+    'text-xl font-bold tracking-wide uppercase text-[var(--play-ink)] max-md:text-[0.65rem] max-md:leading-tight',
   zoneGold:
-    'inline-flex items-center gap-1 text-sm font-bold tabular-nums text-[var(--play-value)]',
+    'inline-flex items-center gap-1 text-sm font-bold tabular-nums text-[var(--play-value)] max-md:text-[0.65rem]',
   pick: `${BLOCK} flex max-w-[18rem] flex-col items-center gap-0.5 px-3 py-1.5 text-center`,
   pickTitle: 'text-sm font-bold text-[var(--play-ink)]',
   pickHint: 'text-xs font-bold text-[var(--play-ink-faint)] max-md:text-[0.6rem]',
