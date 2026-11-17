@@ -26,7 +26,16 @@ export interface LudoPathProps {
  * @return {JSX.Element}
  */
 
-export const LudoPath = ({ map, corner, pawn, from, to, turns, avatarUrl, onPick }: LudoPathProps) => {
+export const LudoPath = ({
+  map,
+  corner,
+  pawn,
+  from,
+  to,
+  turns,
+  avatarUrl,
+  onPick,
+}: LudoPathProps) => {
   const steps = walkSteps(map, corner, from, to)
   const colour = LUDO_CORNERS[corner]
 
