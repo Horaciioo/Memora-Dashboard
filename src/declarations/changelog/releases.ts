@@ -245,6 +245,18 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Amélioration de l’interface de partie sur mobile : boutons collés au bord droit et fil de la partie aux couleurs du jeu.',
       },
       {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de « Concordat » : les fronts avancent plus vite, une conquête ne traîne plus.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de « Concordat » sur mobile : l’annonce d’une zone conquise passe en petit en haut à gauche et ne masque plus la carte.',
+      },
+      {
         tag: ChangelogTags.Fixed,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
