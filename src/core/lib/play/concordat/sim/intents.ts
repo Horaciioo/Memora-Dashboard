@@ -64,31 +64,6 @@ const touches = (state: ConcordatState, playerId: number, target: number): boole
   return false
 }
 
-// A zone is a neighbour when land of the target in it touches the own border
-const zoneTouches = (
-  state: ConcordatState,
-  playerId: number,
-  target: number,
-  zone: number
-): boolean => {
-  const { width, height, terrain, province } = state.map
-
-  for (const edge of state.players[playerId - 1].front) {
-    const count = neighborsOf(edge, width, height, near)
-    for (let slot = 0; slot < count; slot++) {
-      const next = near[slot]
-      if (
-        province[next] === zone &&
-        state.owner[next] === target &&
-        terrain[next] !== ConcordatTerrains.Sea
-      )
-        return true
-    }
-  }
-
-  return false
-}
-
 // Reason an engagement is refused
 const engageRefusal = (
   state: ConcordatState,
@@ -108,10 +83,6 @@ const engageRefusal = (
   if (target && tieKindOf(state, me.id, target.id) === ConcordatTies.Peace) return 'treaty'
   if (Math.floor((me.troops * intent.percent) / 100) < sim.minEngage) return 'tooFew'
   if (!touches(state, intent.playerId, intent.target)) return 'noContact'
-
-  // Only a neighbouring zone, a far one is reached by sea
-  const zone = intent.tile === undefined ? 0 : state.map.province[intent.tile]
-  if (zone && !zoneTouches(state, intent.playerId, intent.target, zone)) return 'farZone'
 
   const existing = state.corps.some(
     (corps) => corps.owner === me.id && corps.target === intent.target && !corps.feint
@@ -193,14 +164,12 @@ const engage = (
   const corps = state.corps.find(
     (other) => other.owner === me.id && other.target === intent.target && !other.feint
   )
-  const aim = !intent.target && intent.tile !== undefined ? intent.tile : undefined
-  const zone = intent.tile === undefined ? 0 : state.map.province[intent.tile] || undefined
   if (corps) {
     corps.drive =
       ((corps.drive ?? drive) * corps.troops + drive * amount) / (corps.troops + amount || 1)
     corps.troops += amount
-    if (aim !== undefined) corps.aim = aim
-    if (zone) corps.zone = zone
+    corps.aim = undefined
+    corps.zone = undefined
   } else {
     state.corps.push({
       id: state.nextCorpsId++,
@@ -209,8 +178,6 @@ const engage = (
       troops: amount,
       progress: 0,
       drive,
-      aim,
-      zone,
     })
   }
 }
@@ -356,7 +323,7 @@ const landing = (state: ConcordatState, intent: ConcordatIntent): string | null 
 
 export const applyIntent = (state: ConcordatState, intent: ConcordatIntent): string | null => {
   const refusal = intentRefusal(state, intent)
-  if (refusal === 'noContact' || refusal === 'farZone') return landing(state, intent)
+  if (refusal === 'noContact') return landing(state, intent)
   if (refusal) return refusal
 
   // One handler per kind
