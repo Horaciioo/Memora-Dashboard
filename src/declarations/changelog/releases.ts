@@ -250,6 +250,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.PlayAccess,
         text: 'Correction de « Concordat » : un joueur encore en attente d’apparition pouvait être éliminé avant d’avoir posé son premier territoire.',
       },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction de « Concordat » : un clic sur une terre libre ou ennemie n’avançait qu’à l’endroit visé, il étend désormais le territoire sur tout le front.',
+      },
     ],
     comments: [],
   },
