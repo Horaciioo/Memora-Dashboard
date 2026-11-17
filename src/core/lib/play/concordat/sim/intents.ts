@@ -64,6 +64,26 @@ const touches = (state: ConcordatState, playerId: number, target: number): boole
   return false
 }
 
+// No border, the push crosses the water
+const landingMove = (
+  intent: Extract<ConcordatIntent, { kind: 'engage' }>
+): Extract<ConcordatIntent, { kind: 'sail' }> => ({
+  kind: 'sail',
+  playerId: intent.playerId,
+  tile: intent.tile ?? -1,
+  percent: intent.percent,
+})
+
+// Reason a landing is refused
+const landingRefusal = (
+  state: ConcordatState,
+  intent: Extract<ConcordatIntent, { kind: 'engage' }>
+): string | null => {
+  const move = landingMove(intent)
+
+  return isTileBlocked(state, move.tile, 'blocksSea') ? 'storm' : sailRefusal(state, move)
+}
+
 // Reason an engagement is refused
 const engageRefusal = (
   state: ConcordatState,
@@ -82,7 +102,9 @@ const engageRefusal = (
   if (target && areTeamMates(state, me.id, target.id)) return 'teamMate'
   if (target && tieKindOf(state, me.id, target.id) === ConcordatTies.Peace) return 'treaty'
   if (Math.floor((me.troops * intent.percent) / 100) < sim.minEngage) return 'tooFew'
-  if (!touches(state, intent.playerId, intent.target)) return 'noContact'
+  if (!touches(state, intent.playerId, intent.target)) {
+    return intent.tile === undefined ? 'noContact' : landingRefusal(state, intent)
+  }
 
   const existing = state.corps.some(
     (corps) => corps.owner === me.id && corps.target === intent.target && !corps.feint
@@ -301,13 +323,8 @@ export const intentRefusal = (state: ConcordatState, intent: ConcordatIntent): s
 const landing = (state: ConcordatState, intent: ConcordatIntent): string | null => {
   if (intent.kind !== 'engage' || intent.tile === undefined) return 'noContact'
 
-  const move: ConcordatIntent = {
-    kind: 'sail',
-    playerId: intent.playerId,
-    tile: intent.tile,
-    percent: intent.percent,
-  }
-  const refusal = systemRefusal(state, move)
+  const move = landingMove(intent)
+  const refusal = landingRefusal(state, intent)
   if (refusal) return refusal
   applySystem(state, move)
 
@@ -323,8 +340,10 @@ const landing = (state: ConcordatState, intent: ConcordatIntent): string | null 
 
 export const applyIntent = (state: ConcordatState, intent: ConcordatIntent): string | null => {
   const refusal = intentRefusal(state, intent)
-  if (refusal === 'noContact') return landing(state, intent)
   if (refusal) return refusal
+  if (intent.kind === 'engage' && !touches(state, intent.playerId, intent.target)) {
+    return landing(state, intent)
+  }
 
   // One handler per kind
   if (intent.kind === 'placeStart') state.players[intent.playerId - 1].start = intent.tile
