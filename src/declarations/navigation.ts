@@ -87,6 +87,7 @@ export const ROUTES = {
   playOnline: '/play/online',
   playStats: '/play/stats',
   playSettings: '/play/settings',
+  playAdmin: '/play/admin',
   playStatsGame: (slug: string) => `/play/stats?game=${slug}`,
   playHistory: (game?: string, cursor?: string) => {
     const query = new URLSearchParams()
