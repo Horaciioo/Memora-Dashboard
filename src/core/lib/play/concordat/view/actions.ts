@@ -67,7 +67,7 @@ export const actionsFor = (tie: ConcordatTieKind, isEmbargoed = false): Concorda
  * @param {ConcordatTargetAction} action - Gesture
  * @param {number} target - Nation
  * @param {number} percent - Share of troops
- * @param {number} [tile] - Tile clicked, its zone is the one attacked
+ * @param {number} [tile] - Tile clicked, used for a landing
  * @param {number} [gold] - Gold held, the share of a donation
  * @return {Record<string, unknown>} - Body
  */
