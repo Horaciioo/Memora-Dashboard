@@ -237,7 +237,8 @@ export const placePowers = (input: {
   const tribes: ConcordatPowerSpec[] = tiles.map((tile, index) => ({
     kind: ConcordatPowers.Tribe,
     name: names[index],
-    color: packedColor((index * 47 + 30) % 360, 0.28, 0.56),
+    // Wild tribes are war grey, a few shades apart
+    color: packedColor(0, 0, 0.5 + (index % 5) * 0.025),
     tile,
     tiles: powers.tribe.tiles,
   }))

@@ -14,6 +14,7 @@ import { runTrade } from '@/core/lib/play/concordat/trade/step'
 import { runCombat } from '@/core/lib/play/concordat/sim/attack'
 import { eliminate } from '@/core/lib/play/concordat/sim/fall'
 import { beginPlay } from '@/core/lib/play/concordat/sim/create'
+import { runSpawns } from '@/core/lib/play/concordat/sim/spawn'
 import { runEconomy } from '@/core/lib/play/concordat/sim/economy'
 import { applyIntent } from '@/core/lib/play/concordat/sim/intents'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
@@ -26,7 +27,7 @@ const HISTORY_LIMIT = 400
 // Nations without land fall
 const eliminateEmpty = (state: ConcordatState): void => {
   for (const player of state.players) {
-    if (player.alive && player.tiles <= 0) eliminate(state, player, 0)
+    if (player.alive && player.tiles <= 0 && !player.spawnAt) eliminate(state, player, 0)
   }
 }
 
@@ -95,6 +96,7 @@ export const stepTick = (
   runSignals(state)
   runTrade(state)
   runEconomy(state)
+  runSpawns(state)
   runCombat(state)
   eliminateEmpty(state)
   runDomination(state)

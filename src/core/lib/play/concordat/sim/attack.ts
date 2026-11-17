@@ -116,6 +116,8 @@ const lossScale = (state: ConcordatState, corps: ConcordatCorps): number => {
 
   // Wild land and wild tribes are cheap to take, wild tribes are cheap to fight
   if (!target && attacker.kind === ConcordatPowers.Tribe) scale *= tribe.freeLoss
+  // A seat claims free land cheaply so a small start still spreads
+  if (!target && attacker.kind === ConcordatPowers.Human) scale *= sim.humanFreeLoss
   if (target?.kind === ConcordatPowers.Tribe && attacker.kind !== ConcordatPowers.Tribe) {
     scale *= tribe.hitLoss
   }

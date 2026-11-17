@@ -14,6 +14,9 @@ export const PLAY_HUD = {
   stage: 'relative flex min-h-0 w-full flex-1 flex-col items-center justify-center',
   // Top row: players, info card, keys
   top: 'play-hud-top absolute inset-x-3 top-3 flex items-start justify-between gap-3 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:pr-[3.75rem] md:inset-x-5 md:top-4',
+  // Phone, keys alone against the right edge
+  topFlush:
+    'play-hud-top absolute inset-x-3 top-3 flex items-start justify-between gap-3 max-md:inset-x-0 max-md:top-0 md:inset-x-5 md:top-4',
   strip: `${BLOCK} pointer-events-auto hidden items-center gap-2.5 px-2.5 py-1.5 md:order-1 md:flex`,
   player: 'relative flex flex-col items-center gap-1',
   playerFace: 'overflow-hidden rounded-full',
@@ -37,6 +40,7 @@ export const PLAY_HUD = {
   // Keys and the settings card hanging under them
   keys: 'pointer-events-auto relative ml-auto md:order-3',
   keyRow: `${BLOCK} flex items-center gap-0.5 p-1`,
+  keyRowFlush: 'rounded-t-none rounded-r-none',
   key: 'grid size-9 place-items-center rounded-full text-[var(--play-ink)] transition-transform hover:-translate-y-0.5 hover:bg-[var(--play-chip)]',
   // Active key tints its glyph, no square behind
   keyOn: 'text-[var(--play-accent)]',

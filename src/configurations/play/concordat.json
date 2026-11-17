@@ -12,6 +12,12 @@
     "min": 10,
     "max": 60
   },
+  "startTroopsRange": {
+    "default": 3500,
+    "min": 3500,
+    "max": 20000,
+    "step": 500
+  },
   "protectionMinutes": {
     "default": 3,
     "min": 0,
@@ -90,7 +96,8 @@
     }
   },
   "sim": {
-    "startTroops": 100,
+    "startTroops": 14,
+    "troopBaseline": 100,
     "troopUnit": 250,
     "startGold": 150000,
     "capBase": 450,
@@ -119,7 +126,8 @@
     "zoneGoldMin": 6000,
     "upkeepPerTile": 0.03,
     "upkeepScale": 1000000,
-    "neutralDensity": 0.6,
+    "neutralDensity": 0.25,
+    "humanFreeLoss": 0.5,
     "maxTilesPerTick": 600,
     "attackerLoss": 0.42,
     "defenderLoss": 0.35,
@@ -130,7 +138,7 @@
     "enclaveNeighbors": 3,
     "capitalDefense": 2,
     "capitalLootShare": 0.25,
-    "minEngage": 5,
+    "minEngage": 1,
     "retreatLoss": 0.25,
     "maxCorps": 6,
     "stabilityConquest": 0.5,
@@ -143,7 +151,7 @@
     "intentQueue": 40
   },
   "front": {
-    "speed": 3,
+    "speed": 4,
     "driveMin": 0.6,
     "driveMax": 2.4,
     "maxContact": 2500,
@@ -156,7 +164,7 @@
     "giantTiles": 15000,
     "giantLoss": 0.5,
     "giantDefense": 0.7,
-    "fadeTroops": 30,
+    "fadeTroops": 4,
     "fadeFloor": 0.2
   },
   "powers": {
@@ -195,6 +203,7 @@
     "tribe": {
       "troops": 60,
       "tiles": 24,
+      "spawnSeconds": [4, 120],
       "cap": 0.34,
       "growth": 0.5,
       "gold": 0.5,

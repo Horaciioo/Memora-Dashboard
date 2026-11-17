@@ -24,6 +24,8 @@ export interface PlayHudKeysProps {
   game: PlayGameName
   sessionId: string
   isSeated: boolean
+  // Squared against the right edge
+  isFlush?: boolean
 }
 
 /**
@@ -32,7 +34,7 @@ export interface PlayHudKeysProps {
  * @return {JSX.Element}
  */
 
-export const PlayHudKeys = ({ game, sessionId, isSeated }: PlayHudKeysProps) => {
+export const PlayHudKeys = ({ game, sessionId, isSeated, isFlush = false }: PlayHudKeysProps) => {
   const [panel, setPanel] = useState<'settings' | 'exit' | null>(null)
   const { isScreen, isChatOpen, toggleScreen, toggleChat } = usePlayStageStore()
   const ExitIcon = ICONS.playLeave
@@ -55,7 +57,7 @@ export const PlayHudKeys = ({ game, sessionId, isSeated }: PlayHudKeysProps) => 
 
   return (
     <div ref={keysRef} className={PLAY_HUD.keys}>
-      <div className={PLAY_HUD.keyRow}>
+      <div className={cn(PLAY_HUD.keyRow, isFlush && PLAY_HUD.keyRowFlush)}>
         {game === PlayGames.Concordat && (
           <button
             type="button"

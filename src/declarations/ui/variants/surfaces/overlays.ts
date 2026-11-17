@@ -44,6 +44,8 @@ export const BOTTOM_SHEET = {
   figure: 'w-full px-12 text-center text-[var(--color-on-media)]',
   panel:
     'relative flex max-h-[calc(100dvh-9rem)] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/95 shadow-[var(--shadow-lg)]',
+  // Same panel under a game HUD skin, colours come from the skin
+  panelHud: 'relative flex max-h-[calc(100dvh-9rem)] w-full flex-col overflow-hidden',
   // Pulled down to close
   grip: 'flex shrink-0 cursor-grab touch-none justify-center pt-2.5 pb-1',
   gripBar: 'h-1 w-10 rounded-full bg-[var(--color-ink)]/20',

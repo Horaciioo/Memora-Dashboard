@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import type { Dispatch, RefObject, SetStateAction } from 'react'
 
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { tieOfRows } from '@/core/lib/play/concordat'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
 import { reachOf } from '@/core/lib/play/concordat/sim/area'
@@ -29,6 +30,9 @@ export interface ConcordatStrike {
 
 // Pointer travel that moves the tooltip within one nation
 const TIP_TRAVEL = 18
+// Two taps closer than this in time and space make a double tap
+const DOUBLE_MS = 380
+const DOUBLE_TRAVEL = 28
 
 export interface ConcordatHover {
   tile: number
@@ -70,6 +74,8 @@ export const useConcordatTaps = ({
   const setTool = useConcordatViewStore((state) => state.setTool)
   const [hover, setHover] = useState<ConcordatHover | null>(null)
   const last = useRef<ConcordatHover | null>(null)
+  const isMobile = useIsMobileShell()
+  const lastTap = useRef<{ holder: number; at: number; x: number; y: number } | null>(null)
   const { terrain } = client.map
 
   const onHover = (tile: number, x: number, y: number) => {
@@ -166,15 +172,28 @@ export const useConcordatTaps = ({
 
       return
     }
-    // Hostile land is hit at once, each tap sends the share again
-    if (tieOfRows(client.systems.ties, client.me, holder) === ConcordatTies.Hostile) {
+    const attack = (): void => {
       mark(tile, 'expand')
       void act({ type: ConcordatIntents.Engage, target: holder, percent, tile }).then((isDone) => {
         if (!isDone) mark(tile, 'refused')
       })
-
-      return
     }
+    // On a phone a tap opens the choices, a double tap attacks
+    if (isMobile) {
+      const now = Date.now()
+      const before = lastTap.current
+      const isDouble =
+        !!before &&
+        before.holder === holder &&
+        now - before.at < DOUBLE_MS &&
+        Math.hypot(before.x - x, before.y - y) < DOUBLE_TRAVEL
+      lastTap.current = isDouble ? null : { holder, at: now, x, y }
+      if (isDouble) return attack()
+
+      return setMenu({ holder, tile, x, y })
+    }
+    // Hostile land is hit at once, each tap sends the share again
+    if (tieOfRows(client.systems.ties, client.me, holder) === ConcordatTies.Hostile) return attack()
     setMenu({ holder, tile, x, y })
   }
 

@@ -5,7 +5,7 @@ import { difficultyOf, placePowers } from '@/core/lib/play/concordat/powers'
 import type { ConcordatPowerSpec } from '@/core/lib/play/concordat/powers'
 import { seededRng } from '@/core/lib/play/seeded'
 import { freshSystems } from '@/core/lib/play/concordat/sim/fresh'
-import { nextRandom } from '@/core/lib/play/concordat/sim/rng'
+import { nextRandom, tileNoise } from '@/core/lib/play/concordat/sim/rng'
 import { transferTile } from '@/core/lib/play/concordat/sim/tiles'
 import { CONCORDAT, CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
 import type { ConcordatMap, ConcordatPlayerState, ConcordatState } from '@/types/concordat'
@@ -37,6 +37,8 @@ export interface ConcordatGameRequest {
   seed: number
   // Defaults to the configured protection
   protectionSeconds?: number
+  // Troops of each seat at the start, in simulation units
+  startTroops?: number
   // Format, free for all by default
   mode?: ConcordatModeName
   // Weapons allowed, all by default
@@ -76,7 +78,8 @@ const newPlayer = (id: number, accountId: string | null, start: number): Concord
 const newPower = (
   id: number,
   spec: ConcordatPowerSpec,
-  difficulty: ConcordatDifficultyName
+  difficulty: ConcordatDifficultyName,
+  scale: number
 ): ConcordatPlayerState => {
   const player = newPlayer(id, null, spec.tile)
   player.kind = spec.kind
@@ -85,7 +88,7 @@ const newPower = (
 
   if (spec.kind === ConcordatPowers.Tribe) {
     const { tribe } = CONCORDAT.powers
-    player.troops = tribe.troops
+    player.troops = tribe.troops * scale
     player.capShare = tribe.cap
     player.growthShare = tribe.growth
     player.goldShare = tribe.gold
@@ -95,7 +98,7 @@ const newPower = (
 
   // A country grows with the difficulty
   const level = difficultyOf(difficulty)
-  player.troops = level.troops
+  player.troops = level.troops * scale
   player.capShare = level.cap
   player.growthShare = level.growth
   player.goldShare = CONCORDAT.powers.country.gold
@@ -133,6 +136,7 @@ export const createGame = (request: ConcordatGameRequest): ConcordatState => {
     speed: request.speed,
     pickEnd: toTicks(CONCORDAT.pickSeconds),
     endTick: 0,
+    startTroops: request.startTroops ?? CONCORDAT.sim.startTroops,
     weapons: [],
     protectionTicks: toTicks(
       Math.max(
@@ -171,7 +175,14 @@ export const createGame = (request: ConcordatGameRequest): ConcordatState => {
 
   // Countries and tribes after the seats
   crowd?.powers.forEach((spec, index) =>
-    state.players.push(newPower(seats.length + index + 1, spec, request.populate!.difficulty))
+    state.players.push(
+      newPower(
+        seats.length + index + 1,
+        spec,
+        request.populate!.difficulty,
+        state.startTroops / CONCORDAT.sim.troopBaseline
+      )
+    )
   )
 
   return state
@@ -219,13 +230,34 @@ const startTilesOf = (player: ConcordatPlayerState): number => {
 }
 
 /**
+ * Claim the round first land of a power on free tiles
+ * @param {ConcordatState} state - Game
+ * @param {ConcordatPlayerState} player - Power
+ * @return {void}
+ */
+
+export const claimStart = (state: ConcordatState, player: ConcordatPlayerState): void => {
+  const { map } = state
+  const area = startTerritory(
+    player.start,
+    map.terrain,
+    map.width,
+    map.height,
+    (tile) => !state.owner[tile],
+    startTilesOf(player)
+  )
+  for (const tile of area) transferTile(state, tile, player.id)
+  player.capital = player.start
+  player.gold = CONCORDAT.sim.startGold
+}
+
+/**
  * Claim every start and open the game
  * @param {ConcordatState} state - Game
  * @return {void}
  */
 
 export const beginPlay = (state: ConcordatState): void => {
-  const { map } = state
   state.phase = ConcordatPhases.Playing
 
   // Claim in a fair random order
@@ -235,22 +267,19 @@ export const beginPlay = (state: ConcordatState): void => {
     ;[order[index], order[swap]] = [order[swap], order[index]]
   }
   for (const player of order) {
-    const area = startTerritory(
-      player.start,
-      map.terrain,
-      map.width,
-      map.height,
-      // One zone only, the one under the start tile
-      (tile) => !state.owner[tile] && map.province[tile] === map.province[player.start],
-      startTilesOf(player)
-    )
-    for (const tile of area) transferTile(state, tile, player.id)
-    player.capital = player.start
-    player.gold = CONCORDAT.sim.startGold
+    // Tribes form later, one by one, the rest claims its disc now
+    if (player.kind === ConcordatPowers.Tribe) {
+      const [from, to] = CONCORDAT.powers.tribe.spawnSeconds
+      player.spawnAt =
+        state.tick + toTicks(from + (to - from) * tileNoise(player.id * 7919 + player.start, 91))
+
+      continue
+    }
+    claimStart(state, player)
 
     // A seat is shielded for the set time, striking a nation lifts the shield
     if (player.kind === ConcordatPowers.Human) {
-      player.troops = CONCORDAT.sim.startTroops
+      player.troops = state.startTroops
       player.protectedUntil = state.tick + state.protectionTicks
     }
   }

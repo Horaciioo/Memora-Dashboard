@@ -17,7 +17,7 @@ export interface LudoSeatFace extends LudoRanked {
 }
 
 // Effects of a colour worth a chip on its plate
-const effectsOf = (seat: LudoSeatFace, isMine: boolean): LudoEffectName[] =>
+export const effectsOf = (seat: LudoSeatFace, isMine: boolean): LudoEffectName[] =>
   (
     [
       seat.effects.ghost && 'ghost',

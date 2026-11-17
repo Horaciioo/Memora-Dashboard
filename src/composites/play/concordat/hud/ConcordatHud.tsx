@@ -4,12 +4,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { ConcordatFronts } from '@/composites/play/concordat/hud/ConcordatFronts'
 import { ConcordatAlerts } from '@/composites/play/concordat/hud/ConcordatAlerts'
+import { ConcordatThreats } from '@/composites/play/concordat/hud/ConcordatThreats'
 import { ConcordatPanels } from '@/composites/play/concordat/hud/ConcordatPanels'
 import { ConcordatMeter } from '@/composites/play/concordat/hud/ConcordatMeter'
 import { ConcordatZones } from '@/composites/play/concordat/hud/ConcordatZones'
 import { ConcordatPill } from '@/composites/play/concordat/hud/ConcordatPill'
 import { ConcordatNotices } from '@/composites/play/concordat/hud/ConcordatNotices'
 import { PlayHud } from '@/composites/play/hud/PlayHud'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
 import {
   clockText,
@@ -48,6 +50,7 @@ export interface ConcordatHudProps {
  */
 
 export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: ConcordatHudProps) => {
+  const isMobile = useIsMobileShell()
   const me = client.players[client.me - 1]
   const land = useMemo(
     () => landTilesOf(client.map.terrain, ConcordatTerrains.Sea),
@@ -61,7 +64,10 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
     (isCountingUp ? client.tick - client.pickEnd : lastTick - client.tick) /
     CONCORDAT_TICKS_PER_SECOND
 
-  const blocks = [{ key: 'clock', caption: CONCORDAT_HUD_COPY.time, figure: clockText(seconds) }]
+  // No clock on a phone, the keys alone sit flush right
+  const blocks = isMobile
+    ? []
+    : [{ key: 'clock', caption: CONCORDAT_HUD_COPY.time, figure: clockText(seconds) }]
   const economy = client.systems.figures[client.me - 1]
 
   // A jump of gold well above the income, spoils or a gift, pops for two seconds
@@ -105,12 +111,15 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
           caption: CONCORDAT_HUD_COPY.gold,
           figure: (
             <>
-              {economy
-                ? fillPlayMessage(CONCORDAT_HUD_COPY.goldRate, {
-                    gold: compactFigure(me.gold),
+              {compactFigure(me.gold)}
+              {economy && (
+                <span className={CONCORDAT_HUD.statRate}>
+                  {' '}
+                  {fillPlayMessage(CONCORDAT_HUD_COPY.goldRate, {
                     rate: `${economy.income < 0 ? '-' : '+'}${compactFigure(Math.abs(economy.income))}`,
-                  })
-                : compactFigure(me.gold)}
+                  })}
+                </span>
+              )}
               {gain > 0 && (
                 <span key={gain} className={CONCORDAT_HUD.gain}>
                   +{compactFigure(gain)}
@@ -144,15 +153,17 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
       rows={rows}
       hasStrip={false}
       isCompact
+      isFlush={isMobile}
     >
       <ConcordatNotices client={client} isSeated={isSeated} />
-      {isPlaying && <ConcordatAlerts client={client} names={names} act={act} />}
+      {isPlaying && <ConcordatAlerts client={client} act={act} />}
       <ConcordatMeter client={client} />
       <ConcordatZones client={client} names={names} />
       <ConcordatPanels client={client} names={names} land={land} />
       {isPlaying && (
         <div className={CONCORDAT_HUD.dock}>
           <ConcordatFronts client={client} names={names} act={act} />
+          <ConcordatThreats client={client} names={names} act={act} />
           <ConcordatPill figures={figures} client={client} names={names} act={act} />
         </div>
       )}

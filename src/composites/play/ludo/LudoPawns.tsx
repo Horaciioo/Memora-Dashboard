@@ -226,6 +226,7 @@ export const LudoPawns = ({
             from={pawns[viewerId]?.[entry.pawn] ?? YARD_STEP}
             to={entry.to}
             turns={turns}
+            avatarUrl={looks[viewerId] === undefined ? mine.avatarUrl : null}
             onPick={targets.length > 1 ? () => onPick(entry.pawn, entry.to) : undefined}
           />
         ))}

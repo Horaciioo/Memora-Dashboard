@@ -1,8 +1,6 @@
-/* Concordat table: open sea seen from above, light from the top */
+/* Concordat table: one flat sea colour */
 .concordat-table {
-  background:
-    radial-gradient(60rem 36rem at 50% -10%, rgb(255 255 255 / 0.22), transparent 70%),
-    linear-gradient(180deg, var(--concordat-sea-lit), var(--concordat-sea));
+  background: var(--concordat-sea);
 }
 
 /* Percent field, no spinner arrows */

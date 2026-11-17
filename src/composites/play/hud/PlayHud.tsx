@@ -34,6 +34,8 @@ export interface PlayHudProps {
   isWide?: boolean
   // Info card on the left edge instead of the centre
   isStart?: boolean
+  // Keys stuck to the right edge on a phone
+  isFlush?: boolean
   // Block on the left, level with the table
   lead?: ReactNode
   // Extra blocks over the table
@@ -56,6 +58,7 @@ export const PlayHud = ({
   isCompact = false,
   isWide = false,
   isStart = false,
+  isFlush = false,
   lead,
   children,
 }: PlayHudProps) => {
@@ -68,8 +71,8 @@ export const PlayHud = ({
   if (isHidden) {
     return (
       <div className={PLAY_HUD.root} data-hud={game.toLowerCase()}>
-        <div className={PLAY_HUD.top}>
-          <PlayHudKeys game={game} sessionId={sessionId} isSeated={isSeated} />
+        <div className={isFlush ? PLAY_HUD.topFlush : PLAY_HUD.top}>
+          <PlayHudKeys game={game} sessionId={sessionId} isSeated={isSeated} isFlush={isFlush} />
         </div>
       </div>
     )
@@ -79,7 +82,7 @@ export const PlayHud = ({
 
   return (
     <div className={PLAY_HUD.root} data-hud={game.toLowerCase()}>
-      <div className={PLAY_HUD.top}>
+      <div className={isFlush ? PLAY_HUD.topFlush : PLAY_HUD.top}>
         {hasStrip && (
           <ul className={PLAY_HUD.strip}>
             {rows.map((row) => (
@@ -126,7 +129,7 @@ export const PlayHud = ({
             ))}
           </div>
         )}
-        <PlayHudKeys game={game} sessionId={sessionId} isSeated={isSeated} />
+        <PlayHudKeys game={game} sessionId={sessionId} isSeated={isSeated} isFlush={isFlush} />
       </div>
       {lead && <div className={PLAY_HUD.lead}>{lead}</div>}
       {!isCompact && isScoreOpen && (

@@ -89,4 +89,3 @@ export const PLAY_CAREER = {
     'flex items-center justify-between gap-3 text-xs font-semibold tabular-nums text-[var(--play-ink-soft)]',
   rowRecord: 'flex gap-3 text-sm font-extrabold',
 } as const
-

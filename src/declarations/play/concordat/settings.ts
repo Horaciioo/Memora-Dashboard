@@ -60,6 +60,18 @@ export const CONCORDAT_PROTECTION = {
 }
 
 /**
+ * Starting troops range, in displayed troops
+ * @type {{ initial: number, min: number, max: number, step: number }}
+ */
+
+export const CONCORDAT_START_TROOPS = {
+  initial: CONCORDAT.startTroopsRange.default,
+  min: CONCORDAT.startTroopsRange.min,
+  max: CONCORDAT.startTroopsRange.max,
+  step: CONCORDAT.startTroopsRange.step,
+}
+
+/**
  * Team count range of a team format
  * @type {{ initial: number, min: number, max: number }}
  */
