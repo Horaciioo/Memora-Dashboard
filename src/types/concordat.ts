@@ -102,6 +102,8 @@ export interface ConcordatPlayerState {
   goldShare: number
   // Bot level of a country, absent otherwise
   level?: ConcordatBotLevelName
+  // Tick a tribe is still to form its first land, absent once formed
+  spawnAt?: number
 }
 
 /**
@@ -505,6 +507,8 @@ export interface ConcordatState {
   pickEnd: number
   endTick: number
   protectionTicks: number
+  // Troops of a seat once the game opens
+  startTroops: number
   rng: number
   owner: Uint8Array
   players: ConcordatPlayerState[]

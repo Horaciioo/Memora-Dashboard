@@ -11,7 +11,7 @@ export const CONCORDAT_ART = {
   // Territory alpha, inside then on its border
   territory: { fill: 0.5, edge: 0.85, edgeShade: 0.72 },
   // Board frame around the paper map, in tiles then pixels
-  frame: { size: 0.9, min: 8, max: 18, rgb: [236, 239, 241], shadow: [14, 48, 70] },
+  frame: { size: 0.9, min: 8, max: 18, rgb: [148, 152, 154], shadow: [14, 30, 44] },
   // Hard drop shadow of the frame, in pixels
   drop: { x: 6, y: 8, alpha: 0.42 },
   // Camera limits in pixels per tile, wheel divisor as OpenFront, zoom out room past the whole map
@@ -193,5 +193,5 @@ export const CONCORDAT_ART = {
   tip: { width: 240, height: 96, gap: 16 },
   // Tiles seen from top to bottom when the camera lands on a nation
   focusTiles: 480,
-  minimap: { width: 224, border: 2, frame: 'rgb(255 255 255)' },
+  minimap: { width: 224, border: 2, frame: 'rgb(148 152 154)' },
 } as const

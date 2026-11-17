@@ -449,9 +449,7 @@
 
 /* Concordat room: dark sea under the end page, like the board */
 .play-room:has(.concordat-map) {
-  background:
-    radial-gradient(60rem 30rem at 50% -10%, rgb(255 255 255 / 0.12), transparent 70%),
-    linear-gradient(180deg, var(--concordat-sea-lit), var(--concordat-sea));
+  background: var(--concordat-sea);
 }
 
 .play-room:has(.concordat-map)::before,

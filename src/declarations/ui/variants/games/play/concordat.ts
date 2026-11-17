@@ -61,14 +61,16 @@ export const CONCORDAT_BOARD = {
 
 export const CONCORDAT_HUD = {
   // Bottom centre: one pill with figures, engagement and corps
-  dock: 'pointer-events-none absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 max-md:bottom-[5.5rem]',
-  pill: `${BLOCK} pointer-events-auto relative flex w-[min(50rem,calc(100vw-1.5rem))] flex-col gap-3 px-5 py-3.5 opacity-90 transition-opacity hover:opacity-100`,
-  stats: 'flex items-baseline justify-between gap-3',
-  stat: 'flex items-baseline gap-1.5',
-  statFigure: 'text-sm leading-none font-bold tabular-nums text-[var(--play-ink)]',
+  dock: 'pointer-events-none absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 max-md:bottom-1.5',
+  pill: `${BLOCK} pointer-events-auto relative flex w-[min(50rem,calc(100vw-1rem))] flex-col gap-3 px-5 py-3.5 opacity-90 max-md:gap-1.5 max-md:px-2.5 max-md:py-2 transition-opacity hover:opacity-100`,
+  stats: 'flex items-baseline justify-between gap-3 max-md:gap-1.5',
+  stat: 'flex items-baseline gap-1.5 max-md:gap-1',
+  statFigure:
+    'text-sm leading-none font-bold whitespace-nowrap tabular-nums text-[var(--play-ink)] max-md:text-[0.6rem]',
+  statRate: 'max-md:hidden',
   statCaption:
-    'text-[0.55rem] leading-none font-bold tracking-[0.2em] text-[var(--play-ink-faint)] uppercase',
-  row: 'flex items-center gap-3',
+    'text-[0.55rem] leading-none font-bold tracking-[0.2em] text-[var(--play-ink-faint)] uppercase max-md:text-[0.45rem] max-md:tracking-widest',
+  row: 'flex items-center gap-3 max-md:gap-2',
   minimap: `${BLOCK} pointer-events-auto relative overflow-hidden p-1.5`,
   minimapCanvas: 'block cursor-pointer rounded-[0.1rem]',
   // Top left: standings sidebar, keys row then the table
@@ -94,7 +96,7 @@ export const CONCORDAT_HUD = {
   caption: CAPTION,
   percent: 'w-10 shrink-0 text-sm leading-none font-bold tabular-nums text-[var(--play-ink-soft)]',
   percentField:
-    'flex shrink-0 items-center rounded-md bg-[var(--play-chip)] px-1.5 py-0.5 text-sm leading-none font-bold tabular-nums text-[var(--play-ink)]',
+    'flex shrink-0 items-center rounded-md bg-[var(--play-chip)] px-1.5 py-0.5 text-sm max-md:text-[0.6rem] leading-none font-bold tabular-nums text-[var(--play-ink)]',
   percentInput: 'concordat-percent w-7 bg-transparent text-right',
   slider: 'concordat-slider min-w-0 flex-1 cursor-pointer',
   corpsKey: `${BUTTON} bg-[var(--play-chip)] py-1 text-xs text-[var(--play-ink)]`,
@@ -105,10 +107,10 @@ export const CONCORDAT_HUD = {
   corpsTroops: 'tabular-nums text-[var(--play-ink-soft)]',
   swatch: 'size-3 shrink-0 rounded-[0.1rem]',
   retreat: `${BUTTON} bg-[var(--play-chip)] py-1 text-xs text-[var(--play-ink)]`,
-  arms: 'flex items-center justify-between gap-1',
-  arm: 'relative flex size-9 shrink-0 flex-col items-center justify-center gap-px rounded-[0.15rem] bg-[var(--play-chip)] text-[var(--play-ink)] transition-colors hover:bg-[var(--play-line)] disabled:opacity-40',
+  arms: 'flex items-center justify-between gap-1 max-md:justify-start max-md:overflow-x-auto max-md:overscroll-x-contain max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden',
+  arm: 'relative flex size-9 max-md:size-8 shrink-0 flex-col items-center justify-center gap-px rounded-[0.15rem] bg-[var(--play-chip)] text-[var(--play-ink)] transition-colors hover:bg-[var(--play-line)] disabled:opacity-40',
   armOn:
-    'relative flex size-9 shrink-0 flex-col items-center justify-center gap-px rounded-[0.15rem] bg-[var(--play-accent)] text-[var(--concordat-plate)]',
+    'relative flex size-9 max-md:size-8 shrink-0 flex-col items-center justify-center gap-px rounded-[0.15rem] bg-[var(--play-accent)] text-[var(--concordat-plate)]',
   armTip:
     'pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 hidden w-56 -translate-x-1/2 flex-col gap-1 rounded-[0.15rem] bg-[var(--concordat-plate)] px-3 py-2 text-xs font-bold text-[var(--concordat-khaki)] shadow-lg group-hover/arm:flex',
   armTipHead: 'flex items-center justify-between gap-3',
@@ -120,8 +122,8 @@ export const CONCORDAT_HUD = {
     'pointer-events-none fixed top-0 left-0 z-40 flex size-12 items-center justify-center rounded-[0.2rem] bg-[var(--play-accent)] text-[var(--concordat-plate)] opacity-90 shadow-lg',
   armCount:
     'pointer-events-none absolute top-0.5 right-1 text-[0.6rem] leading-none font-extrabold tabular-nums',
-  armNote: 'text-[0.6rem] leading-none font-bold tabular-nums opacity-70',
-  toolBar: `${BLOCK} pointer-events-auto flex items-center gap-3 px-4 py-2 text-sm font-bold text-[var(--play-ink)]`,
+  armNote: 'text-[0.6rem] max-md:text-[0.5rem] leading-none font-bold tabular-nums opacity-70',
+  toolBar: `${BLOCK} pointer-events-auto flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-[var(--play-ink)]`,
   // Under the keys, top right
   meter: `${BLOCK} pointer-events-none absolute top-[4.25rem] right-5 z-[5] flex w-44 flex-col gap-1 px-3 py-2 max-md:top-[calc(4.5rem+env(safe-area-inset-top))] max-md:right-3`,
   meterRow: 'flex items-baseline justify-between gap-3',
@@ -130,21 +132,18 @@ export const CONCORDAT_HUD = {
   meterNote: 'text-[0.65rem] leading-tight font-bold text-[var(--play-ink-soft)]',
   // Under the info card, centred
   notice:
-    'pointer-events-none absolute top-[5.75rem] left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 max-md:top-[5.5rem]',
+    'pointer-events-none absolute top-[5.75rem] left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-1.5 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:left-3 max-md:translate-x-0 max-md:items-start',
+  shield: `${BLOCK} flex items-center gap-1.5 px-2 py-1 text-[0.65rem] leading-none font-bold tabular-nums text-[var(--play-ink)]`,
   // Attacks against me, under the info card
   alarm: 'concordat-alarm pointer-events-none absolute inset-0 z-10',
   alarmFlash: 'concordat-alarm-flash pointer-events-none absolute inset-0 z-10',
-  alerts:
-    'pointer-events-none absolute top-[8.5rem] left-1/2 z-20 flex w-[min(26rem,calc(100vw-1.5rem))] -translate-x-1/2 flex-col gap-2 max-md:top-[8rem]',
-  alert: `${BLOCK} concordat-alert-in pointer-events-auto flex flex-col gap-2 px-4 py-3 shadow-[0_0_0_0.15rem_var(--concordat-alarm)]`,
-  alertHead: 'flex items-center gap-2',
-  alertTitle: 'min-w-0 flex-1 truncate text-base font-black text-[var(--play-ink)]',
-  alertTroops: 'text-sm font-bold tabular-nums text-[var(--play-ink-soft)]',
-  alertBar: 'h-1.5 w-full overflow-hidden rounded-[0.1rem] bg-[var(--play-chip)]',
-  alertFill: 'h-full bg-[var(--concordat-alarm)] transition-[width] duration-300',
-  alertActions: 'flex items-center gap-2',
-  alertMain: `${BUTTON} flex-1 bg-[var(--concordat-alarm)] text-white`,
-  alertSide: `${BUTTON} flex-1 bg-[var(--play-chip)] text-[var(--play-ink)]`,
+  // Glued to the pill, icon keys only
+  threats: `${BLOCK} concordat-alert-in pointer-events-auto -mb-2 flex flex-col gap-1 rounded-b-none px-1.5 py-1.5 shadow-[0_0_0_0.1rem_var(--concordat-alarm)]`,
+  threat: 'flex items-center gap-1.5 text-[0.65rem] font-bold tabular-nums text-[var(--play-ink)]',
+  threatFigure: 'min-w-8 text-right',
+  threatKey:
+    'grid size-6 place-items-center rounded-[0.15rem] bg-[var(--play-chip)] text-[var(--play-ink)] active:bg-[var(--concordat-alarm)] active:text-white',
+  threatIcon: 'size-3.5',
   // Start timer: a thin bar across the top, a line under the info card
   timerBar: 'pointer-events-none fixed inset-x-0 top-0 z-30 h-1.5 bg-[var(--play-chip)]/60',
   timerFill: 'h-full bg-[var(--play-accent)] transition-[width] duration-200 ease-linear',
@@ -163,9 +162,9 @@ export const CONCORDAT_HUD = {
   zoneTitle: 'text-xl font-bold tracking-wide uppercase text-[var(--play-ink)]',
   zoneGold:
     'inline-flex items-center gap-1 text-sm font-bold tabular-nums text-[var(--play-value)]',
-  pick: `${BLOCK} flex max-w-[28rem] flex-col items-center gap-1 px-5 py-3 text-center`,
-  pickTitle: 'text-lg font-bold text-[var(--play-ink)]',
-  pickHint: 'text-sm font-bold text-[var(--play-ink-faint)]',
+  pick: `${BLOCK} flex max-w-[18rem] flex-col items-center gap-0.5 px-3 py-1.5 text-center`,
+  pickTitle: 'text-sm font-bold text-[var(--play-ink)]',
+  pickHint: 'text-xs font-bold text-[var(--play-ink-faint)] max-md:text-[0.6rem]',
   accept: `${BUTTON} bg-[var(--play-accent)] py-1 text-xs ${ON_BRASS}`,
   refuse: `${BUTTON} bg-[var(--play-chip)] py-1 text-xs text-[var(--play-ink)]`,
 } as const

@@ -110,6 +110,7 @@ export const openGame = async (session: EngineSession): Promise<EngineStep> => {
     durationMinutes: settings.durationMinutes,
     seed,
     protectionSeconds: settings.protectionMinutes * 60,
+    startTroops: settings.startTroops / CONCORDAT.sim.troopUnit,
     mode: settings.mode,
     teams: settings.teams,
     weapons: settings.weapons,

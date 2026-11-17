@@ -94,6 +94,8 @@ export const drawProvinceLines = (
 
   context.lineWidth = 1
   for (const [owner, path] of paths) {
+    // Free land shows no zones, they only appear under a nation
+    if (!owner) continue
     const rgb = scene.colors[owner]
     context.strokeStyle =
       owner && rgb

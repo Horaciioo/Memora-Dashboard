@@ -72,13 +72,10 @@ export const ConcordatNotices = ({ client, isSeated }: ConcordatNoticesProps) =>
         </div>
       )}
       {shieldLeft > 0 && (
-        <div className={CONCORDAT_HUD.pick} title={CONCORDAT_HUD_COPY.shieldHint}>
-          <span className={CONCORDAT_HUD.pickTitle}>
-            {fillPlayMessage(CONCORDAT_HUD_COPY.shielded, {
-              time: clockText(shieldLeft / ticksPerSecond),
-            })}
-          </span>
-          <span className={CONCORDAT_HUD.pickHint}>{CONCORDAT_HUD_COPY.shieldHint}</span>
+        <div className={CONCORDAT_HUD.shield} title={CONCORDAT_HUD_COPY.shieldHint}>
+          {fillPlayMessage(CONCORDAT_HUD_COPY.shielded, {
+            time: clockText(shieldLeft / ticksPerSecond),
+          })}
         </div>
       )}
       {isPicking && (

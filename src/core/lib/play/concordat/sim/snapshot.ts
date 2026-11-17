@@ -40,6 +40,8 @@ export interface ConcordatSnapshot {
   pickEnd: number
   endTick: number
   protectionTicks: number
+  // Missing on an old save
+  startTroops?: number
   rng: number
   nextCorpsId: number
   // Base64 of the owner layer
@@ -100,6 +102,7 @@ export const exportState = (state: ConcordatState): ConcordatSnapshot => ({
   pickEnd: state.pickEnd,
   endTick: state.endTick,
   protectionTicks: state.protectionTicks,
+  startTroops: state.startTroops,
   rng: state.rng,
   nextCorpsId: state.nextCorpsId,
   owner: Buffer.from(state.owner).toString('base64'),
@@ -157,6 +160,7 @@ export const importState = (map: ConcordatMap, snapshot: ConcordatSnapshot): Con
     pickEnd: snapshot.pickEnd,
     endTick: snapshot.endTick,
     protectionTicks: snapshot.protectionTicks,
+    startTroops: snapshot.startTroops ?? CONCORDAT.sim.startTroops,
     rng: snapshot.rng,
     owner: new Uint8Array(Buffer.from(snapshot.owner, 'base64')),
     players: snapshot.players.map((player) => ({

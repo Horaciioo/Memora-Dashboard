@@ -5,7 +5,7 @@ import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import { ConcordatTerrains } from '@/utils/constants/concordat'
 
 /**
- * Land tiles a start claims, grown raggedly from the origin
+ * Land tiles a start claims, a round disc around the origin
  * @param {number} origin - Start tile
  * @param {Uint8Array} terrain - Terrain ids
  * @param {number} width - Width
@@ -39,10 +39,24 @@ export const startTerritory = (
     }
   }
 
-  // Grow by random picks so the shape stays ragged
+  // Grow from the nearest tile outwards so the land is a round disc
+  const originX = origin % width
+  const originY = Math.floor(origin / width)
   open(origin)
   while (claimed.length < wanted && frontier.length) {
-    const pick = Math.floor(tileNoise(origin + claimed.length, 7) * frontier.length)
+    let pick = 0
+    let best = Infinity
+    for (let index = 0; index < frontier.length; index++) {
+      const tile = frontier[index]
+      const gap =
+        ((tile % width) - originX) ** 2 +
+        (Math.floor(tile / width) - originY) ** 2 +
+        tileNoise(tile, 7) * 0.9
+      if (gap < best) {
+        best = gap
+        pick = index
+      }
+    }
     claimed.push(frontier[pick])
     const joined = frontier[pick]
     frontier[pick] = frontier[frontier.length - 1]

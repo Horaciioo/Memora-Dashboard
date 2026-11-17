@@ -1,9 +1,10 @@
 import type { ConcordatScene } from '@/composites/play/concordat/board/draw/types'
 import { rgbText, tieOfRows, troopFigure } from '@/core/lib/play/concordat'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
-import { CONCORDAT_ALLIANCE_GLYPH } from '@/declarations/play/concordat/glyphs'
+import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
+import { ConcordatPowers } from '@/utils/constants/concordat'
 
-const { label, paper, detail } = CONCORDAT_ART
+const { label } = CONCORDAT_ART
 
 // Text with a pale outline so it reads on any colour
 const outlined = (context: CanvasRenderingContext2D, text: string, x: number, y: number): void => {
@@ -14,53 +15,16 @@ const outlined = (context: CanvasRenderingContext2D, text: string, x: number, y:
   context.fillText(text, x, y)
 }
 
-// Parsed on first use, the server has no Path2D
-let handshake: Path2D | null = null
-
-// Handshake glyph centred on a point, haloed like the names
+// Handshake emoji centred over an ally, large like on a desktop map
 const drawHandshake = (
   context: CanvasRenderingContext2D,
   x: number,
   y: number,
-  size: number
+  size: number,
+  font: string
 ): void => {
-  handshake ??= new Path2D(CONCORDAT_ALLIANCE_GLYPH)
-  context.save()
-  context.translate(x - size / 2, y - size / 2)
-  context.scale(size / 24, size / 24)
-  context.lineJoin = 'round'
-  context.lineWidth = (label.stroke * 24) / size
-  context.strokeStyle = rgbText(label.halo, 0.85)
-  context.stroke(handshake)
-  context.fillStyle = rgbText(label.ink)
-  context.fill(handshake)
-  context.restore()
-}
-
-/**
- * Province names on the paper, close up
- * @param {CanvasRenderingContext2D} context - Canvas
- * @param {ConcordatScene} scene - Frame data
- * @return {void}
- */
-
-export const drawProvinceNames = (
-  context: CanvasRenderingContext2D,
-  scene: ConcordatScene
-): void => {
-  const { camera, client, width, height } = scene
-  if (camera.scale < detail.provinceNames) return
-
-  context.font = `italic 600 ${Math.round(camera.scale * 0.9)}px ${scene.font}`
-  context.fillStyle = rgbText(paper.name, paper.nameAlpha)
-  context.textAlign = 'center'
-  context.textBaseline = 'middle'
-  for (const province of client.map.provinces) {
-    const x = camera.x + (province.x + 0.5) * camera.scale
-    const y = camera.y + (province.y + 0.5) * camera.scale
-    if (x < 0 || y < 0 || x > width || y > height) continue
-    context.fillText(province.name, x, y)
-  }
+  context.font = `${Math.round(size)}px ${font}`
+  context.fillText(CONCORDAT_HUD_COPY.allyEmoji, x, y)
 }
 
 /**
@@ -76,7 +40,10 @@ export const drawNationNames = (context: CanvasRenderingContext2D, scene: Concor
   context.textAlign = 'center'
   context.textBaseline = 'middle'
   places.forEach((place, index) => {
-    if (place.tiles < label.minTiles || !client.players[index]?.alive) return
+    const player = client.players[index]
+    // Wild tribes stay unnamed grey land
+    if (place.tiles < label.minTiles || !player?.alive || player.kind === ConcordatPowers.Tribe)
+      return
     const size = Math.min(label.max, place.span * camera.scale * label.share)
     if (size < label.min) return
     context.font = `800 ${Math.round(size)}px ${scene.font}`
@@ -89,7 +56,7 @@ export const drawNationNames = (context: CanvasRenderingContext2D, scene: Concor
       index + 1 !== client.me &&
       tieOfRows(client.systems.ties, client.me, index + 1) === 'alliance'
     ) {
-      drawHandshake(context, x, y - size * 0.95, size * 0.9)
+      drawHandshake(context, x, y - size * 1.5, size * 1.9, scene.font)
     }
 
     // Troops available, under the name

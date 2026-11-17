@@ -4,6 +4,7 @@ import { clampToRange, readBodyInteger } from '@/core/lib/play/parse'
 import {
   CONCORDAT_PROTECTION,
   CONCORDAT_SETTINGS,
+  CONCORDAT_START_TROOPS,
   CONCORDAT_TEAMS,
 } from '@/declarations/play/concordat/settings'
 import { CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
@@ -29,6 +30,8 @@ export interface ConcordatGameSettings {
   difficulty: ConcordatDifficultyName
   durationMinutes: number
   protectionMinutes: number
+  // Displayed troops of each seat at the start
+  startTroops: number
   mode: ConcordatModeName
   teams: number
   weapons: ConcordatWeaponName[]
@@ -50,6 +53,7 @@ export const concordatDefaults = (): ConcordatGameSettings => ({
   difficulty: CONCORDAT_SETTINGS.initialDifficulty,
   durationMinutes: CONCORDAT_SETTINGS.unlimited,
   protectionMinutes: CONCORDAT_PROTECTION.initial,
+  startTroops: CONCORDAT_START_TROOPS.initial,
   mode: CONCORDAT_SETTINGS.initialMode,
   teams: CONCORDAT_TEAMS.initial,
   weapons: [...CONCORDAT_WEAPONS],
@@ -104,6 +108,11 @@ export const readConcordatSettings = (
       readBodyInteger(raw, 'protectionMinutes'),
       current.protectionMinutes,
       CONCORDAT_PROTECTION
+    ),
+    startTroops: clampToRange(
+      readBodyInteger(raw, 'startTroops'),
+      current.startTroops,
+      CONCORDAT_START_TROOPS
     ),
     mode: pickOne(raw.mode, CONCORDAT_SETTINGS.modes, current.mode),
     teams: clampToRange(readBodyInteger(raw, 'teams'), current.teams, CONCORDAT_TEAMS),

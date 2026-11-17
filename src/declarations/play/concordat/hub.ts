@@ -14,29 +14,29 @@ export const CONCORDAT_HUB = {
   // Share of the land colour kept on the shore line
   outline: 1,
   // Pale line of the sea along the shore
-  foam: [244, 248, 250],
+  foam: [150, 154, 156],
   // Light from the north west: height step that makes a tile lighter or darker, in channel units
   relief: 0,
   // RGB per terrain id, sea first
   land: [
     [0, 0, 0],
-    [232, 214, 160],
-    [150, 196, 112],
-    [92, 150, 92],
-    [176, 170, 118],
-    [150, 146, 150],
-    [112, 176, 214],
-    [226, 196, 128],
+    [230, 216, 170],
+    [212, 214, 156],
+    [176, 192, 128],
+    [208, 196, 152],
+    [226, 224, 214],
+    [74, 118, 164],
+    [232, 212, 164],
   ],
-  // RGB of the deep sea
-  sea: [58, 104, 156],
-  // Water from shallow to deep, then reach in tiles and how far the steps wander
+  // RGB of the sea
+  sea: [74, 118, 164],
+  // One flat water colour, the steps all match, then reach in tiles and how far they wander
   depths: [
-    [150, 212, 218],
-    [112, 184, 206],
-    [82, 150, 192],
-    [58, 116, 168],
-    [44, 92, 148],
+    [74, 118, 164],
+    [74, 118, 164],
+    [74, 118, 164],
+    [74, 118, 164],
+    [74, 118, 164],
   ],
   reach: 18,
   warp: 0.7,

@@ -24,7 +24,11 @@ import {
   CONCORDAT_STYLE_CHOICE_LABELS,
 } from '@/declarations/play/concordat/copy'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
-import { CONCORDAT_SETTINGS, CONCORDAT_TEAMS } from '@/declarations/play/concordat/settings'
+import {
+  CONCORDAT_SETTINGS,
+  CONCORDAT_START_TROOPS,
+  CONCORDAT_TEAMS,
+} from '@/declarations/play/concordat/settings'
 import { CONCORDAT_SETUP } from '@/declarations/ui/variants'
 import { CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
 
@@ -222,6 +226,23 @@ export const ConcordatSetupDrawer = ({
                     labels={labels}
                   />
                 )}
+              </SetupSection>
+              <SetupSection
+                styles={CONCORDAT_SETUP}
+                title={CONCORDAT_SETUP_COPY.startTroops}
+                hint={CONCORDAT_SETUP_COPY.startTroopsHint}
+              >
+                <SetupStepper
+                  styles={CONCORDAT_SETUP}
+                  value={settings.startTroops}
+                  range={CONCORDAT_START_TROOPS}
+                  step={CONCORDAT_START_TROOPS.step}
+                  display={fillPlayMessage(CONCORDAT_SETUP_COPY.troopsValue, {
+                    troops: (settings.startTroops / 1000).toLocaleString('fr-FR'),
+                  })}
+                  onChange={set('startTroops')}
+                  labels={labels}
+                />
               </SetupSection>
             </>
           )}
