@@ -33,5 +33,9 @@ export const PlayAvatar = ({
   if (level === undefined)
     return <Avatar name={name} src={src} size={size} className={className} title={title} />
 
-  return <LevelFrame level={level} name={name} src={src} size={size} className={className} bleed />
+  return (
+    <span data-play-card={accountId} className="contents">
+      <LevelFrame level={level} name={name} src={src} size={size} className={className} bleed />
+    </span>
+  )
 }

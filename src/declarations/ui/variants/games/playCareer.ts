@@ -90,14 +90,3 @@ export const PLAY_CAREER = {
   rowRecord: 'flex gap-3 text-sm font-extrabold',
 } as const
 
-/**
- * Avatar wrapped in its level ring
- * @type {Record<string, string>}
- */
-
-export const PLAY_RING = {
-  root: 'relative inline-grid shrink-0 place-items-center rounded-full p-1.5 bg-[conic-gradient(var(--ring,var(--play-gold))_var(--share),var(--ring-track,var(--play-track))_0)]',
-  face: 'rounded-full ring-4 ring-[var(--ring-gap,var(--play-panel-strong))]',
-  level:
-    'absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[var(--ring,var(--play-gold))] px-3 py-0.5 text-xs font-extrabold whitespace-nowrap tabular-nums text-[var(--play-night)] ring-2 ring-[var(--ring-gap,var(--play-panel-strong))]',
-} as const

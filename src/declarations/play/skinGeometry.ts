@@ -1,28 +1,32 @@
-// Frame drawn on a 200 square, the portrait hexagon at its centre
+// Frame drawn on a 240 square, the portrait hexagon at its centre
 export const FRAME_GEOMETRY = {
-  size: 200,
-  centre: 100,
+  size: 240,
+  centre: 120,
   // Portrait hexagon radius, the share of the box its height takes is 2 * this / size
   face: 54,
-  // Metal ring around it
-  ring: 58,
-  ringWidth: 8,
-  // Where leaves sit and how they open
-  leafRadius: 73,
-  leafFrom: 112,
-  leafStep: 20,
-  leafTilt: 28,
-  leafScale: 0.95,
-  // Pointed leaf from its stem, 24 long, with its veins
-  leaf: 'M0 0 C4 -3.6 14 -5 24 0 C14 5 4 3.6 0 0Z',
-  vein: 'M1 0 L21 0 M5 0 L9.5 -2.8 M5 0 L9.5 2.8 M10 0 L14.5 -3 M10 0 L14.5 3 M14.5 0 L18.5 -2.4 M14.5 0 L18.5 2.4',
-  // Piece under the bottom point
-  chin: 'M85 159 L115 159 L107 175 L93 175 Z',
-  // Light arch over the top
-  archRadius: 67,
-  archWidth: 3,
-  // Stars under the frame
-  starY: 186,
-  starGap: 17,
-  starRadius: 7,
+  // Hexagon radii, outside in: line ring, metal, bevel, hollow, hollow line, portrait edge
+  ringOuter: 87,
+  ringLine: 84,
+  metal: 74,
+  bevel: 70,
+  hollow: 63,
+  hollowLine: 58,
+  // Wing root and crest root from the centre
+  wingRoot: { x: 52, y: 38 },
+  crestRoot: { x: 10, y: -68 },
+  // Level medal sits on the lower frame, above its point
+  medal: { radius: 23, inner: 19, y: 62 },
+  gem: { y: -92 },
+  studRadius: 3.6,
+  // Sparkles: x, y from the centre, size, delay
+  sparks: [
+    [-68, -46, 5, 0],
+    [70, -50, 4.5, 0.8],
+    [94, 22, 4, 1.5],
+    [-94, 16, 4, 0.4],
+    [0, -86, 5, 1.1],
+    [-58, 58, 4, 1.9],
+    [60, 60, 4.5, 0.6],
+  ],
+  halo: 98,
 } as const

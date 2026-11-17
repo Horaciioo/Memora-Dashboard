@@ -1,68 +1,162 @@
-/* Level skins, set by data-skin and read by the badge and the rail petals */
-[data-skin='grey'] {
-  --skin-from: #b9bcc4;
-  --skin-to: #8b8f9a;
-  --skin-ink: #1f2230;
-}
+/* Level skins, set by data-skin: a light, a mid, a dark, a highlight and a gem */
 [data-skin='bronze'] {
-  --skin-from: #e0a070;
-  --skin-to: #a8622f;
-  --skin-ink: #2d1606;
+  --skin-a: #f0b184;
+  --skin-b: #a2623a;
+  --skin-c: #4d2c15;
+  --skin-hi: #ffe0c4;
+  --skin-from: var(--skin-a);
+  --skin-to: var(--skin-b);
+  --skin-ink: var(--skin-c);
+  --skin-gem: #ffb070;
 }
 [data-skin='silver'] {
-  --skin-from: #f1f3f8;
-  --skin-to: #aab2c2;
-  --skin-ink: #202533;
+  --skin-a: #f7f9fc;
+  --skin-b: #a3abb9;
+  --skin-c: #555b68;
+  --skin-hi: #ffffff;
+  --skin-from: var(--skin-a);
+  --skin-to: var(--skin-b);
+  --skin-ink: var(--skin-c);
+  --skin-gem: #e8f0ff;
 }
 [data-skin='gold'] {
-  --skin-from: #ffe48a;
-  --skin-to: #e0a91f;
-  --skin-ink: #3a2700;
+  --skin-a: #fff0b5;
+  --skin-b: #e2b445;
+  --skin-c: #85601a;
+  --skin-hi: #fffbe0;
+  --skin-from: var(--skin-a);
+  --skin-to: var(--skin-b);
+  --skin-ink: var(--skin-c);
+  --skin-gem: #fff3b0;
 }
-[data-skin='diamond'] {
-  --skin-from: #d9f6ff;
-  --skin-to: #6fd0f0;
-  --skin-ink: #08354a;
+[data-skin='platinum'] {
+  --skin-a: #eafcff;
+  --skin-b: #85d6e3;
+  --skin-c: #2f7c8c;
+  --skin-hi: #ffffff;
+  --skin-from: var(--skin-a);
+  --skin-to: var(--skin-b);
+  --skin-ink: var(--skin-c);
+  --skin-gem: #8ff0ff;
 }
 [data-skin='emerald'] {
-  --skin-from: #6fe3a4;
-  --skin-to: #17a05d;
-  --skin-ink: #042b17;
+  --skin-a: #d2ffe0;
+  --skin-b: #47c77e;
+  --skin-c: #1b6a40;
+  --skin-hi: #f0fff5;
+  --skin-from: var(--skin-a);
+  --skin-to: var(--skin-b);
+  --skin-ink: var(--skin-c);
+  --skin-gem: #7dffb0;
 }
-[data-skin='royalBlue'] {
-  --skin-from: #6f8dff;
-  --skin-to: #2740c4;
-  --skin-ink: #ffffff;
+[data-skin='diamond'] {
+  --skin-a: #e8ebff;
+  --skin-b: #8191ff;
+  --skin-c: #3138a0;
+  --skin-hi: #ffffff;
+  --skin-from: var(--skin-a);
+  --skin-to: var(--skin-b);
+  --skin-ink: var(--skin-c);
+  --skin-gem: #b9c2ff;
 }
-[data-skin='royalRed'] {
-  --skin-from: #ff6b78;
-  --skin-to: #b3122b;
-  --skin-ink: #ffffff;
+[data-skin='master'] {
+  --skin-a: #f4e2ff;
+  --skin-b: #b862e4;
+  --skin-c: #5b1f80;
+  --skin-hi: #fff0ff;
+  --skin-from: var(--skin-a);
+  --skin-to: var(--skin-b);
+  --skin-ink: var(--skin-c);
+  --skin-gem: #e3a8ff;
+}
+[data-skin='legend'] {
+  --skin-a: #ff8f9b;
+  --skin-b: #c8102e;
+  --skin-c: #5a0716;
+  --skin-hi: #ffe4e4;
+  --skin-from: var(--skin-a);
+  --skin-to: var(--skin-b);
+  --skin-ink: var(--skin-c);
+  --skin-gem: #ffd34d;
 }
 
 .skin-badge {
   overflow: hidden;
-  background: linear-gradient(135deg, var(--skin-from), var(--skin-to));
-  color: var(--skin-ink);
+  background: linear-gradient(135deg, var(--skin-a), var(--skin-b));
+  color: var(--skin-c);
+}
+[data-skin='master'] .skin-badge,
+[data-skin='legend'] .skin-badge {
+  color: var(--skin-hi);
 }
 
-/* Sparkle crossing the top skin, on its own */
-.skin-badge[data-skin='royalRed']::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.7) 50%, transparent 65%);
-  transform: translateX(-120%);
-  animation: skin-sparkle 2.6s ease-in-out infinite;
+/* Frame art, soft shadow then a glow that grows with the effects tier */
+.skin-art {
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35));
+}
+.skin-art[data-fx='1'] {
+  filter: drop-shadow(0 0 4px var(--skin-b));
+}
+.skin-art[data-fx='2'],
+.skin-art[data-fx='3'],
+.skin-art[data-fx='4'] {
+  filter: drop-shadow(0 0 6px var(--skin-b));
 }
 
-@keyframes skin-sparkle {
-  to {
-    transform: translateX(120%);
+.skin-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.skin-spark {
+  opacity: 0;
+  transform: scale(0.2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skin-sweep {
+    animation: skin-sweep 3.6s ease-in-out infinite;
+  }
+  .skin-spark {
+    animation: skin-twinkle 2.4s ease-in-out infinite;
+  }
+  .skin-halo {
+    animation: skin-breathe 3.2s ease-in-out infinite;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .skin-badge[data-skin='royalRed']::after {
-    animation: none;
+  .skin-spark {
+    opacity: 1;
+    transform: scale(0.7);
+  }
+}
+
+@keyframes skin-sweep {
+  0%,
+  35% {
+    transform: translateX(-140px);
+  }
+  80%,
+  100% {
+    transform: translateX(300px);
+  }
+}
+@keyframes skin-twinkle {
+  0%,
+  100% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes skin-breathe {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 1;
   }
 }
