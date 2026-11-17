@@ -28,10 +28,14 @@ export const PLAY_TABS = {
   // Portrait button in the middle, its frame rising over the bar
   meHost: 'relative z-10 -mt-14 -mb-6 flex shrink-0',
   me: 'relative flex w-28 shrink-0 items-center justify-center rounded-full transition-transform active:scale-95',
-  menu: 'absolute bottom-full left-1/2 z-50 mb-3 flex w-56 -translate-x-1/2 flex-col gap-1 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 shadow-[var(--shadow-lg)]',
+  menu: 'absolute bottom-full left-1/2 z-50 mb-3 flex w-60 -translate-x-1/2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
   menuItem:
     'flex min-h-11 items-center gap-3 rounded-xl px-3 text-left text-sm font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
   menuLeave: 'text-[var(--color-danger)]',
+  menuText: 'min-w-0 flex-1 truncate',
+  menuCaret: 'size-3.5 shrink-0 text-[var(--color-ink-subtle)]',
+  // Trophies window, one column
+  trophiesWindow: 'max-w-lg',
   menuIcon: 'size-6 shrink-0',
   // Page swap, slid from the tab side
   slide: 'flex min-h-full w-full flex-col gap-8',

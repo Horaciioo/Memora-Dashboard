@@ -39,7 +39,7 @@ const FAN = [
  * @return {JSX.Element}
  */
 
-const Tile = ({
+export const Tile = ({
   letter,
   size,
   fill,

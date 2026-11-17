@@ -5,7 +5,7 @@ import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { listNotices, listPlayHistory, readPlayPresence } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
-import { PLAY_MOBILE_COPY } from '@/declarations/play'
+import { PLAY_MOBILE_COPY, PLAY_SETTINGS } from '@/declarations/play'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { PLAY_BOX, PLAY_HUB } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
@@ -22,7 +22,7 @@ export default async function PlayFeedPage() {
   const [invites, presence, { entries }] = await Promise.all([
     listNotices(session.id),
     readPlayPresence(session.id),
-    listPlayHistory(session.id, { game: null, cursor: null }),
+    listPlayHistory(session.id, { game: null, cursor: null, size: PLAY_SETTINGS.feedRecent }),
   ])
 
   return (

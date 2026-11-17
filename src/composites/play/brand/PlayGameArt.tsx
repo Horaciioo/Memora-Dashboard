@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { LudoBoardArt } from '@/composites/play/brand/LudoBoardArt'
+import { MARK_SCENES } from '@/composites/play/brand/banner/markScenes'
 import { StopGoCarShape } from '@/composites/play/stopgo/art/StopGoCarShape'
 import { StopGoRoadStrip } from '@/composites/play/stopgo/art/StopGoRoadStrip'
 import { PLAY_GAMES } from '@/declarations/play'
@@ -161,6 +162,7 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
       die={{ x: 340, y: 96, size: 56, angle: -14 }}
     />
   ),
+  ...MARK_SCENES,
 }
 
 // Question marks scattered over a secret game
