@@ -14,6 +14,31 @@ export const MEMORA_COMMANDS = [
     handler: 'memora.inventory',
     output: 'record',
   }),
+  defineCommand({
+    id: 'memora.availability',
+    syntax: '$memora.availability --id=<membre>',
+    description: 'Lire en ligne, hors ligne ou ne pas déranger',
+    category: 'memora',
+    handler: 'memora.availability',
+    args: [{ name: 'id', type: 'id', required: true }],
+    output: 'record',
+  }),
+  defineCommand({
+    id: 'memora.availability.set',
+    syntax: '$memora.availability.set --id=<membre> --value=online|offline|dnd',
+    description: 'Mettre un membre en ligne, hors ligne ou ne pas déranger',
+    category: 'memora',
+    handler: 'memora.availabilitySet',
+    level: 'write',
+    confirm: 'preview',
+    audit: 'full',
+    risk: 'medium',
+    args: [
+      { name: 'id', type: 'id', required: true },
+      { name: 'value', type: 'enum', values: ['online', 'offline', 'dnd'], required: true },
+    ],
+    output: 'record',
+  }),
 ]
 
 /**

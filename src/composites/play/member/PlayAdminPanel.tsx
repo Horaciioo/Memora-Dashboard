@@ -20,9 +20,14 @@ import { formatDay } from '@/utils/format/time/dates'
 
 type Confirm = 'remove' | 'wipe'
 
+// Blocks of the panel
+export type PlayAdminSection = 'progress' | 'actions' | 'game' | 'access'
+
 export interface PlayAdminPanelProps {
   memberId: string
   initial: PlayAdminState
+  // Blocks drawn, every one without
+  only?: PlayAdminSection | PlayAdminSection[]
 }
 
 // Title of each drawer
@@ -52,11 +57,13 @@ const CONFIRMS: Record<Confirm, { title: string; description: string }> = {
  * @return {JSX.Element}
  */
 
-export const PlayAdminPanel = ({ memberId, initial }: PlayAdminPanelProps) => {
+export const PlayAdminPanel = ({ memberId, initial, only }: PlayAdminPanelProps) => {
   const play = usePlayAdmin(memberId, initial)
   const [drawer, setDrawer] = useState<{ kind: PlayAdminDrawer; values?: FormValues } | null>(null)
   const [confirm, setConfirm] = useState<Confirm | null>(null)
   const { ban, presence } = play.state
+  const shows = (section: PlayAdminSection) =>
+    !only || (Array.isArray(only) ? only.includes(section) : only === section)
 
   // Gesture behind each drawer and confirmation
   const submit: Record<PlayAdminDrawer, (values: FormValues) => Promise<boolean>> = {
@@ -86,84 +93,92 @@ export const PlayAdminPanel = ({ memberId, initial }: PlayAdminPanelProps) => {
 
   return (
     <div className={PLAY_MEMBER.stack}>
-      <Section title={PLAY_MEMBER_COPY.sectionProgress} raised>
-        <PlayProgressCards
-          state={play.state}
-          onSelect={(game) => setDrawer({ kind: 'xp', values: { game } })}
-        />
-      </Section>
+      {shows('progress') && (
+        <Section title={PLAY_MEMBER_COPY.sectionProgress} raised>
+          <PlayProgressCards
+            state={play.state}
+            onSelect={(game) => setDrawer({ kind: 'xp', values: { game } })}
+          />
+        </Section>
+      )}
 
-      <Section title={PLAY_MEMBER_COPY.sectionActions} raised>
-        <div className={MEMBER_ADMIN.split}>
-          <AdminCell
-            label={PLAY_MEMBER_COPY.xpAction}
-            note={PLAY_MEMBER_COPY.xpNote}
-            onClick={() => setDrawer({ kind: 'xp' })}
-          />
-          <AdminCell
-            label={PLAY_MEMBER_COPY.levelAction}
-            note={PLAY_MEMBER_COPY.levelNote}
-            onClick={() => setDrawer({ kind: 'level' })}
-          />
-          <AdminCell
-            label={PLAY_MEMBER_COPY.statsAction}
-            note={PLAY_MEMBER_COPY.statsNote}
-            onClick={() => setDrawer({ kind: 'stats' })}
-          />
-          <AdminCell
-            variant="danger"
-            label={PLAY_MEMBER_COPY.resetAction}
-            note={PLAY_MEMBER_COPY.resetNote}
-            onClick={() => setDrawer({ kind: 'reset' })}
-          />
-          <AdminCell
-            variant="danger"
-            label={PLAY_MEMBER_COPY.wipeAction}
-            note={PLAY_MEMBER_COPY.wipeNote}
-            onClick={() => setConfirm('wipe')}
-          />
-        </div>
-      </Section>
-
-      <Section title={PLAY_MEMBER_COPY.sectionGame} raised>
-        {presence ? (
+      {shows('actions') && (
+        <Section title={PLAY_MEMBER_COPY.sectionActions} raised>
           <div className={MEMBER_ADMIN.split}>
             <AdminCell
+              label={PLAY_MEMBER_COPY.xpAction}
+              note={PLAY_MEMBER_COPY.xpNote}
+              onClick={() => setDrawer({ kind: 'xp' })}
+            />
+            <AdminCell
+              label={PLAY_MEMBER_COPY.levelAction}
+              note={PLAY_MEMBER_COPY.levelNote}
+              onClick={() => setDrawer({ kind: 'level' })}
+            />
+            <AdminCell
+              label={PLAY_MEMBER_COPY.statsAction}
+              note={PLAY_MEMBER_COPY.statsNote}
+              onClick={() => setDrawer({ kind: 'stats' })}
+            />
+            <AdminCell
               variant="danger"
-              label={PLAY_MEMBER_COPY.removeAction}
-              note={playPresenceLabel(presence)}
-              onClick={() => setConfirm('remove')}
+              label={PLAY_MEMBER_COPY.resetAction}
+              note={PLAY_MEMBER_COPY.resetNote}
+              onClick={() => setDrawer({ kind: 'reset' })}
+            />
+            <AdminCell
+              variant="danger"
+              label={PLAY_MEMBER_COPY.wipeAction}
+              note={PLAY_MEMBER_COPY.wipeNote}
+              onClick={() => setConfirm('wipe')}
             />
           </div>
-        ) : (
-          <p className={PLAY_MEMBER.empty}>{PLAY_MEMBER_COPY.noGame}</p>
-        )}
-      </Section>
+        </Section>
+      )}
 
-      <Section title={PLAY_MEMBER_COPY.sectionAccess} raised>
-        <div className={MEMBER_ADMIN.split}>
-          {ban ? (
-            <AdminCell
-              label={PLAY_MEMBER_COPY.unbanAction}
-              note={[
-                fillPlayMessage(PLAY_MEMBER_COPY.bannedSince, { date: formatDay(ban.since) }),
-                ban.reason,
-              ]
-                .filter(Boolean)
-                .join('. ')}
-              isLoading={play.isSaving}
-              onClick={() => void play.unban()}
-            />
+      {shows('game') && (
+        <Section title={PLAY_MEMBER_COPY.sectionGame} raised>
+          {presence ? (
+            <div className={MEMBER_ADMIN.split}>
+              <AdminCell
+                variant="danger"
+                label={PLAY_MEMBER_COPY.removeAction}
+                note={playPresenceLabel(presence)}
+                onClick={() => setConfirm('remove')}
+              />
+            </div>
           ) : (
-            <AdminCell
-              variant="danger"
-              label={PLAY_MEMBER_COPY.banAction}
-              note={PLAY_MEMBER_COPY.banNote}
-              onClick={() => setDrawer({ kind: 'ban' })}
-            />
+            <p className={PLAY_MEMBER.empty}>{PLAY_MEMBER_COPY.noGame}</p>
           )}
-        </div>
-      </Section>
+        </Section>
+      )}
+
+      {shows('access') && (
+        <Section title={PLAY_MEMBER_COPY.sectionAccess} raised>
+          <div className={MEMBER_ADMIN.split}>
+            {ban ? (
+              <AdminCell
+                label={PLAY_MEMBER_COPY.unbanAction}
+                note={[
+                  fillPlayMessage(PLAY_MEMBER_COPY.bannedSince, { date: formatDay(ban.since) }),
+                  ban.reason,
+                ]
+                  .filter(Boolean)
+                  .join('. ')}
+                isLoading={play.isSaving}
+                onClick={() => void play.unban()}
+              />
+            ) : (
+              <AdminCell
+                variant="danger"
+                label={PLAY_MEMBER_COPY.banAction}
+                note={PLAY_MEMBER_COPY.banNote}
+                onClick={() => setDrawer({ kind: 'ban' })}
+              />
+            )}
+          </div>
+        </Section>
+      )}
 
       <FormDrawer
         key={drawer ? `${drawer.kind}-${String(drawer.values?.game ?? '')}` : 'closed'}
