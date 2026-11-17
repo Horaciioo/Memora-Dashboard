@@ -249,7 +249,7 @@ export const LudoBoard = ({
         <div
           className={cn(
             map.name === 'star' ? LUDO_BOARD.frameStar : LUDO_BOARD.frame,
-            LUDO_BOARD.frameFull
+            map.name === 'star' ? LUDO_BOARD.frameFullStar : LUDO_BOARD.frameFull
           )}
           style={tone as CSSProperties}
         >

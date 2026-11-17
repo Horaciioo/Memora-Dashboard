@@ -78,6 +78,7 @@ export const LudoHud = ({
       blocks={blocks}
       rows={rows}
       hasStrip={false}
+      isStart={map.corners > 4}
       lead={lead}
     />
   )

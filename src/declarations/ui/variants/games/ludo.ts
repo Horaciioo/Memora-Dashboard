@@ -21,6 +21,8 @@ export const LUDO_BOARD = {
     'min-h-7 max-w-full truncate text-center text-lg leading-7 font-extrabold text-[var(--play-ink)]',
   // Full screen: the board takes the height left
   frameFull: 'lg:w-[min(64rem,calc(100dvh-16rem),calc(100vw-24rem))]!',
+  // Six players: the board takes the room the card left
+  frameFullStar: 'lg:w-[min(76rem,calc(100dvh-9rem),calc(100vw-24rem))]!',
   // The viewer's turn: blue text, no box
   statusCall: 'text-[var(--play-ludo-call)]',
   frame:
