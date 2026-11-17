@@ -131,7 +131,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: '2026-11-17',
     title: "Les Joueurs se font un p'tit relooking",
     intro:
-      "Memora Play relooke les joueurs sous toutes ces formes, avec des cadrants fidèles, un système de status (pour éviter les notifs non désirées) ainsi qu'un tas d'autres choses !",
+      "Memora Play relooke les joueurs sous toutes leurs formes, avec des cadrants fidèles, un système de status (pour éviter les notifs non désirées) ainsi qu'un tas d'autres choses !",
     description:
       "Cette version ajoute une carte de joueur, un statut de disponibilité que chacun règle lui-même ainsi que des outils d'administrateurs plus précis !",
     items: [
