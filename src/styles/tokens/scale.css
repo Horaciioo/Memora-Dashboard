@@ -1,6 +1,8 @@
 /* Scales: spacing, type, radius, shadow, motion. Short, fixed, no free values elsewhere */
 
 :root {
+  /* Nested box: share of ink mixed into the panel colour, any palette follows */
+  --nest-strength: 5%;
   /* Spacing, base 4px */
   --space-1: 0.25rem;
   --space-2: 0.5rem;

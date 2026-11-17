@@ -155,8 +155,8 @@ export const DRAWER_ACTIONS = {
 
 export const MENU_STYLES = {
   panel:
-    'surface-enter fixed z-[70] min-w-52 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel py-1 shadow-[var(--shadow-lg)]',
-  item: 'flex min-h-11 w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-40 md:min-h-0',
+    'surface-enter fixed z-[70] flex min-w-52 flex-col gap-1.5 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel p-1.5 shadow-[var(--shadow-lg)]',
+  item: 'flex min-h-11 w-full items-center gap-2.5 rounded-[var(--radius-md)] px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-hover)] disabled:pointer-events-none disabled:opacity-40 md:min-h-9',
   danger: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
   icon: 'h-4 w-4 shrink-0 opacity-70',
   separator: 'my-1 h-px bg-[var(--color-border)]',
@@ -167,7 +167,7 @@ export const MENU_STYLES = {
   heading: 'px-3 pt-1.5 pb-1 text-xs font-semibold text-[var(--color-ink-subtle)]',
   chevron: 'ml-auto h-4 w-4 shrink-0 opacity-60',
   empty: 'px-3 py-2 text-sm text-[var(--color-ink-subtle)]',
-  scroll: 'max-h-[min(70vh,28rem)] overflow-y-auto',
+  scroll: 'flex max-h-[min(70vh,28rem)] flex-col gap-1.5 overflow-y-auto',
 } as const
 
 /**
@@ -177,11 +177,11 @@ export const MENU_STYLES = {
 
 export const SELECTION_MENU_STYLES = {
   panel:
-    'surface-enter fixed z-[60] flex w-64 flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-1.5 shadow-[var(--shadow-lg)]',
+    'surface-enter fixed z-[60] flex w-64 flex-col gap-1.5 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel p-1.5 shadow-[var(--shadow-lg)]',
   search:
     'w-full rounded-[var(--radius-md)] border border-[var(--color-pick)] bg-[var(--color-field)] px-2.5 py-1.5 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
   heading: 'px-2.5 pt-2 pb-1 text-xs font-semibold text-[var(--color-ink-subtle)]',
-  item: 'flex min-h-9 w-full items-center gap-2.5 rounded-[var(--radius-sm)] px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)] focus-visible:bg-[var(--color-surface)] focus-visible:outline-none',
+  item: 'flex min-h-9 w-full items-center gap-2.5 rounded-[var(--radius-md)] px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
   danger: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
   icon: 'h-4 w-4 shrink-0 opacity-70',
   separator: 'mx-1 my-0.5 h-px bg-[var(--color-border)]',

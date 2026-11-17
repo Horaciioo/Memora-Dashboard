@@ -31,6 +31,18 @@ export interface PlayLobbyCard {
 }
 
 /**
+ * Member a player shared a game with
+ * @typedef {Object} PlayRecentPlayer
+ */
+
+export interface PlayRecentPlayer {
+  id: string
+  name: string
+  image: string | null
+  playedAt: Date
+}
+
+/**
  * What an engine sees of a game
  * @typedef {Object} EngineSession
  * @property {string} id - Game
@@ -551,6 +563,8 @@ export interface PlayAdminRow {
   bonusXp: number
   played: number
   isBanned: boolean
+  // Creators the player moderates for
+  youtuberIds: string[]
 }
 
 /**
@@ -560,5 +574,115 @@ export interface PlayAdminRow {
 
 export interface PlayAdminBoard {
   players: PlayAdminRow[]
+  // Creators in the order of the console
+  youtubers: { id: string; name: string; avatarUrl: string | null; bannerUrl?: string | null }[]
   totals: { players: number; active: number; banned: number; xp: number }
+}
+
+/**
+ * Player card: portrait, level, figures and last games
+ * @typedef {Object} PlayCardView
+ */
+
+export interface PlayCardView {
+  accountId: string
+  name: string
+  avatarUrl: string | null
+  level: PlayLevelView
+  xp: number
+  played: number
+  wins: number
+  winRate: number
+  bestStreak: number
+  lastSeenAt: string | null
+  presence: PlayPresence | null
+  recent: Pick<
+    PlayHistoryEntry,
+    'sessionId' | 'game' | 'outcome' | 'rank' | 'players' | 'finishedAt' | 'xp'
+  >[]
+}
+
+/**
+ * One Play line of the admin journal
+ * @typedef {Object} PlayAdminLog
+ */
+
+export interface PlayAdminLog {
+  id: string
+  summary: string
+  // Kind of line, as the journal names it
+  eventLabel: string | null
+  createdAt: string
+  actorName: string | null
+  subjectId: string | null
+  subjectName: string | null
+  // Done by the Administration, not by play
+  isAdminAction: boolean
+}
+
+/**
+ * One page of the Play journal
+ * @typedef {Object} PlayAdminLogPage
+ */
+
+export interface PlayAdminLogPage {
+  entries: PlayAdminLog[]
+  total: number
+  pages: number
+  page: number
+}
+
+/**
+ * Figures above the Play journal
+ * @typedef {Object} PlayAdminLogStats
+ */
+
+export interface PlayAdminLogStats {
+  last24h: number
+  week: number
+  adminWeek: number
+}
+
+/**
+ * Figures of Play for the admin page
+ * @typedef {Object} PlayAdminStats
+ */
+
+export interface PlayAdminDay {
+  // Local day, YYYY-MM-DD
+  date: string
+  finished: number
+  // Distinct human players seated in a game finished that day
+  players: number
+  xp: number
+  // Minutes played over the finished games
+  minutes: number
+  byGame: Partial<Record<PlayGameName, number>>
+}
+
+/**
+ * Player of the week by XP earned
+ * @typedef {Object} PlayAdminLeader
+ */
+
+export interface PlayAdminLeader {
+  accountId: string
+  name: string
+  avatarUrl: string | null
+  xp: number
+  played: number
+}
+
+export interface PlayAdminStats {
+  // Last thirty days, oldest first, empty days kept
+  days: PlayAdminDay[]
+  // Games finished per hour of the day over the thirty days
+  hours: number[]
+  leaders: PlayAdminLeader[]
+  lobby: number
+  running: number
+  finishedToday: number
+  finishedWeek: number
+  activeWeek: number
+  games: { game: PlayGameName; finished: number; week: number }[]
 }

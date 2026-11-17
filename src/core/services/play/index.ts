@@ -27,6 +27,7 @@ export {
 } from '@/core/services/play/TrophyService'
 export type { TrophyNotice } from '@/core/services/play/TrophyService'
 export { readPlaySheet } from '@/core/services/play/SheetService'
+export { readPlayCard } from '@/core/services/play/CardService'
 export {
   readLeaderboards,
   readPlayPlayer,
@@ -40,7 +41,18 @@ export {
   openSessionIds,
   requireSeat,
 } from '@/core/services/play/PlaySessionService'
-export { adjustEveryonesXp, readPlayAdminBoard } from '@/core/services/play/PlayAdminBoardService'
+export {
+  adjustEveryonesXp,
+  readPlayAdminBoard,
+  readPlayAdminPlayer,
+  resetSelectedPlay,
+} from '@/core/services/play/PlayAdminBoardService'
+export {
+  readPlayAdminLogPage,
+  readPlayAdminLogs,
+  readPlayAdminLogStats,
+} from '@/core/services/play/PlayAdminLogService'
+export { readPlayAdminStats } from '@/core/services/play/PlayAdminStatsService'
 export {
   adjustPlayXp,
   correctPlayStats,
@@ -61,6 +73,7 @@ export {
   answerInvite,
   inviteCandidates,
   inviteToSession,
+  listRecentPlayers,
 } from '@/core/services/play/PlayInviteService'
 export { closeNotice, setFollow } from '@/core/services/play/PlayFollowService'
 export { listNotices } from '@/core/services/play/PlayNoticeService'

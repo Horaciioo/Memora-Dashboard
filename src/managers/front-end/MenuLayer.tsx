@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 
 import { MENU_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
+import { NESTED_BOX } from '@/declarations/ui/blocks'
 import { MENU_STYLES } from '@/declarations/ui/variants'
 import type { MenuItem } from '@/managers/front-end/MenuManager'
 import { cn } from '@/utils/classnames'
@@ -70,45 +71,58 @@ interface MenuRowsProps {
  * @return {JSX.Element}
  */
 
-const MenuRows = ({ items, onClose, onFlyout }: MenuRowsProps) => (
-  <>
-    {items.map((item) => {
-      const Icon = item.icon ? ICONS[item.icon] : null
-      const Chevron = ICONS.next
+const MenuRows = ({ items, onClose, onFlyout }: MenuRowsProps) => {
+  const Chevron = ICONS.next
 
-      return (
-        <div key={item.id}>
-          {item.separatorBefore && <div className={MENU_STYLES.separator} />}
-          {item.section && <p className={MENU_STYLES.heading}>{item.section}</p>}
-          <button
-            type="button"
-            role="menuitem"
-            disabled={item.disabled}
-            aria-haspopup={item.submenu ? 'menu' : undefined}
-            onMouseEnter={(event) => {
-              const box = event.currentTarget.getBoundingClientRect()
-              onFlyout?.(
-                item.submenu ? { items: item.submenu, x: box.right, y: box.top } : null,
-                event.currentTarget
-              )
-            }}
-            onClick={() => {
-              if (item.submenu) return
-              onClose()
-              item.onSelect?.()
-            }}
-            className={cn(MENU_STYLES.item, item.danger && MENU_STYLES.danger)}
-          >
-            {Icon && <Icon className={MENU_STYLES.icon} aria-hidden="true" />}
-            {item.label}
-            {item.shortcut && <span className={MENU_STYLES.shortcut}>{item.shortcut}</span>}
-            {item.submenu && <Chevron className={MENU_STYLES.chevron} aria-hidden="true" />}
-          </button>
+  // A separator or a section heading opens a new group
+  const groups = items.reduce<MenuItem[][]>((all, item) => {
+    if (all.length === 0 || item.separatorBefore || item.section) all.push([])
+    all[all.length - 1].push(item)
+
+    return all
+  }, [])
+
+  return (
+    <>
+      {groups.map((group) => (
+        <div key={group[0].id} className={NESTED_BOX.group}>
+          {group[0].section && <p className={MENU_STYLES.heading}>{group[0].section}</p>}
+          {group.map((item) => {
+            const Icon = item.icon ? ICONS[item.icon] : null
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="menuitem"
+                disabled={item.disabled}
+                aria-haspopup={item.submenu ? 'menu' : undefined}
+                onMouseEnter={(event) => {
+                  const box = event.currentTarget.getBoundingClientRect()
+                  onFlyout?.(
+                    item.submenu ? { items: item.submenu, x: box.right, y: box.top } : null,
+                    event.currentTarget
+                  )
+                }}
+                onClick={() => {
+                  if (item.submenu) return
+                  onClose()
+                  item.onSelect?.()
+                }}
+                className={cn(MENU_STYLES.item, item.danger && MENU_STYLES.danger)}
+              >
+                {Icon && <Icon className={MENU_STYLES.icon} aria-hidden="true" />}
+                {item.label}
+                {item.shortcut && <span className={MENU_STYLES.shortcut}>{item.shortcut}</span>}
+                {item.submenu && <Chevron className={MENU_STYLES.chevron} aria-hidden="true" />}
+              </button>
+            )
+          })}
         </div>
-      )
-    })}
-  </>
-)
+      ))}
+    </>
+  )
+}
 
 /**
  * Menu layer

@@ -17,6 +17,7 @@ export const NAV_COPY = {
   railBack: 'Retour au menu',
   expandRail: 'Agrandir le menu',
   status: 'Statut',
+  badges: 'Badges',
   historyBack: 'Page précédente',
   historyForward: 'Page suivante',
   home: 'Accueil',

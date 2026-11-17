@@ -1,3 +1,4 @@
+import { NEST_TINT } from '@/declarations/ui/nest'
 import type { AvatarSize } from '@/declarations/ui/variants/surfaces'
 import { EMPTY_VALUE } from '@/declarations/ui/variants/controls/fields'
 
@@ -26,14 +27,13 @@ export const SELECT_MENU_STYLES = {
   chevron: 'h-4 w-4 shrink-0 text-[var(--color-on-field-subtle)] transition-transform',
   chevronOpen: 'rotate-180',
   panel:
-    'popover-enter fixed z-[70] flex max-h-72 flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
-  search:
-    'w-full border-b border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
+    'popover-enter fixed z-[70] flex max-h-72 flex-col gap-1.5 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel p-1.5 shadow-[var(--shadow-lg)]',
+  search: `w-full shrink-0 rounded-[var(--radius-lg)] ${NEST_TINT} px-3 py-2 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]`,
   // Rows breathe
-  list: 'flex flex-1 flex-col gap-0.5 overflow-y-auto p-1.5',
+  list: `flex flex-1 flex-col gap-0.5 overflow-y-auto rounded-[var(--radius-lg)] ${NEST_TINT} p-1`,
   option:
-    'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-2.5 text-left opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
-  optionActive: 'bg-[var(--color-surface)] opacity-100',
+    'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2.5 text-left opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-hover)] hover:opacity-100',
+  optionActive: 'bg-[var(--color-hover)] opacity-100',
   optionDisabled: 'cursor-not-allowed opacity-50',
   scrim: 'fixed inset-0 z-[65] bg-transparent',
   // Chosen entry

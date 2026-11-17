@@ -88,6 +88,7 @@ export const ROUTES = {
   playStats: '/play/stats',
   playSettings: '/play/settings',
   playAdmin: '/play/admin',
+  playAdminPlayer: (id: string) => `/play/admin/${id}`,
   playStatsGame: (slug: string) => `/play/stats?game=${slug}`,
   playHistory: (game?: string, cursor?: string) => {
     const query = new URLSearchParams()

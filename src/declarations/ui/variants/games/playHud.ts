@@ -22,6 +22,8 @@ export const PLAY_HUD = {
   card: `${BLOCK} pointer-events-auto flex w-[32rem] max-w-full items-center gap-3 px-5 py-2.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:order-2`,
   // No strip beside it: centred on the screen
   cardAlone: `${BLOCK} pointer-events-auto flex w-[26rem] max-w-full items-center gap-3 px-5 py-2.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:absolute md:left-1/2 md:-translate-x-1/2`,
+  // Same card pushed to the left edge, off the board's way
+  cardStart: `${BLOCK} pointer-events-auto flex w-[26rem] max-w-full items-center gap-3 px-5 py-2.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:absolute md:left-0`,
   // Wide card centred, leaves room for the keys on both sides
   cardWide: `${BLOCK} pointer-events-auto flex w-[56rem] max-w-[calc(100%-26rem)] items-center gap-6 px-8 py-3.5 max-md:w-auto max-md:max-w-full max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:absolute md:left-1/2 md:-translate-x-1/2`,
   // Clock alone, small and centred

@@ -7,6 +7,7 @@ export const PLAY_ERRORS = {
   banned: 'L’Administration t’a retiré l’accès à Play.',
   banReason: 'Écris le motif.',
   unknownGame: 'Ce jeu n’existe pas.',
+  unknownPlayer: 'Ce joueur n’existe pas.',
   unplayable: 'Ce jeu arrive bientôt.',
   sessionMissing: 'Cette partie n’existe plus.',
   notSeated: 'Tu ne fais pas partie de cette partie.',

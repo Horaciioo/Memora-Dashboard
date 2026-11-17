@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 
 import { FloatingLayer } from '@/components/structures/overlays/FloatingLayer'
 import { ICONS } from '@/declarations/ui/icons'
+import { NESTED_BOX } from '@/declarations/ui/blocks'
 import { SELECTION_MENU_STYLES } from '@/declarations/ui/variants'
 import { SELECTION_COPY } from '@/declarations/work/copy'
 import type { MenuItem } from '@/managers/front-end'
@@ -54,6 +55,14 @@ export const SelectionMenu = ({ items, count }: SelectionMenuProps) => {
     item.label.toLowerCase().includes(query.trim().toLowerCase())
   )
 
+  // A separator opens a new group
+  const groups = shown.reduce<(typeof shown)[]>((all, item) => {
+    if (all.length === 0 || item.separatorBefore) all.push([])
+    all[all.length - 1].push(item)
+
+    return all
+  }, [])
+
   return (
     <FloatingLayer>
       <div
@@ -71,34 +80,39 @@ export const SelectionMenu = ({ items, count }: SelectionMenuProps) => {
           aria-label={SELECTION_COPY.search}
           className={SELECTION_MENU_STYLES.search}
         />
-        <p className={SELECTION_MENU_STYLES.heading}>{SELECTION_COPY.label}</p>
-        {shown.length === 0 && <p className={SELECTION_MENU_STYLES.empty}>{SELECTION_COPY.none}</p>}
-        {shown.map((item) => {
-          const Icon = item.icon ? ICONS[item.icon] : null
+        <div className={NESTED_BOX.group}>
+          <p className={SELECTION_MENU_STYLES.heading}>{SELECTION_COPY.label}</p>
+          {shown.length === 0 && (
+            <p className={SELECTION_MENU_STYLES.empty}>{SELECTION_COPY.none}</p>
+          )}
+        </div>
+        {groups.map((group) => (
+          <div key={group[0].id} className={NESTED_BOX.group}>
+            {group.map((item) => {
+              const Icon = item.icon ? ICONS[item.icon] : null
 
-          return (
-            <div key={item.id}>
-              {item.separatorBefore && <div className={SELECTION_MENU_STYLES.separator} />}
-              <button
-                type="button"
-                role="menuitem"
-                disabled={item.disabled}
-                onClick={item.onSelect}
-                className={cn(
-                  SELECTION_MENU_STYLES.item,
-                  item.danger && SELECTION_MENU_STYLES.danger
-                )}
-              >
-                {Icon && <Icon className={SELECTION_MENU_STYLES.icon} aria-hidden="true" />}
-                {item.label}
-                {item.shortcut && (
-                  <span className={SELECTION_MENU_STYLES.shortcut}>{item.shortcut}</span>
-                )}
-              </button>
-            </div>
-          )
-        })}
-        <div className={SELECTION_MENU_STYLES.separator} />
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="menuitem"
+                  disabled={item.disabled}
+                  onClick={item.onSelect}
+                  className={cn(
+                    SELECTION_MENU_STYLES.item,
+                    item.danger && SELECTION_MENU_STYLES.danger
+                  )}
+                >
+                  {Icon && <Icon className={SELECTION_MENU_STYLES.icon} aria-hidden="true" />}
+                  {item.label}
+                  {item.shortcut && (
+                    <span className={SELECTION_MENU_STYLES.shortcut}>{item.shortcut}</span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        ))}
         <p className={SELECTION_MENU_STYLES.footer}>{SELECTION_COPY.count(count)}</p>
       </div>
     </FloatingLayer>
