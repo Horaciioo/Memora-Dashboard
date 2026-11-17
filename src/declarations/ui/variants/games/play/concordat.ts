@@ -49,7 +49,8 @@ export const CONCORDAT_BOARD = {
   menuItem: `${BUTTON} text-left text-[var(--play-ink)] hover:bg-[var(--play-chip)]`,
   menuMain: `${BUTTON} bg-[var(--play-accent)] text-left ${ON_BRASS}`,
   emojis: 'grid grid-cols-8 gap-0.5 px-1 pt-1',
-  emoji: 'grid aspect-square place-items-center rounded-[0.15rem] text-base hover:bg-[var(--play-chip)]',
+  emoji:
+    'grid aspect-square place-items-center rounded-[0.15rem] text-base hover:bg-[var(--play-chip)]',
   waiting: 'grid size-full place-items-center text-lg font-bold text-[var(--concordat-card)]',
 } as const
 
@@ -148,7 +149,8 @@ export const CONCORDAT_HUD = {
   timerBar: 'pointer-events-none fixed inset-x-0 top-0 z-30 h-1.5 bg-[var(--play-chip)]/60',
   timerFill: 'h-full bg-[var(--play-accent)] transition-[width] duration-200 ease-linear',
   // Outgoing pushes, a strip above the pill
-  fronts: 'pointer-events-none flex max-w-[calc(100vw-1.5rem)] flex-wrap items-center justify-center gap-1.5',
+  fronts:
+    'pointer-events-none flex max-w-[calc(100vw-1.5rem)] flex-wrap items-center justify-center gap-1.5',
   front: `${BLOCK} pointer-events-auto flex items-center gap-2 px-2.5 py-1.5 text-xs font-bold text-[var(--play-ink)]`,
   frontName: 'max-w-28 truncate',
   frontTroops: 'tabular-nums text-[var(--play-ink-soft)]',

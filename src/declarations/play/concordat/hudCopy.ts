@@ -162,8 +162,7 @@ export const CONCORDAT_ARM_HINTS: Record<string, string> = {
     'Tire obus et roquettes à moyenne portée, sans silo. Recharge entre deux tirs. Les antiaériennes arrêtent les roquettes, pas les obus.',
   factory:
     'Lance des trains vers les marchés de tes alliés, des nations en paix et les tiens : chaque arrivée rapporte de l’or. Plus elle monte, plus il y a de trains.',
-  mirv:
-    'Un seul missile qui se divise au-dessus de la nation visée en neuf têtes, chacune tombe à un endroit différent de ses terres. Silo de niveau 3, très cher et de plus en plus avec chaque tir de la partie. Les antimissiles peuvent arrêter chaque tête.',
+  mirv: 'Un seul missile qui se divise au-dessus de la nation visée en neuf têtes, chacune tombe à un endroit différent de ses terres. Silo de niveau 3, très cher et de plus en plus avec chaque tir de la partie. Les antimissiles peuvent arrêter chaque tête.',
   shell:
     'Obus d’artillerie : petite zone, tir rapide et bon marché. Il faut une batterie à portée.',
   rocket:

@@ -57,7 +57,8 @@ const systemIntent = (playerId: number, raw: Record<string, unknown>): Concordat
     const tile = id('tile')
 
     // A strike is only fired with the second confirmation
-    const weapon = raw.weapon === 'shell' || raw.weapon === 'rocket' || raw.weapon === 'mirv'
+    const weapon =
+      raw.weapon === 'shell' || raw.weapon === 'rocket' || raw.weapon === 'mirv'
         ? raw.weapon
         : undefined
 
