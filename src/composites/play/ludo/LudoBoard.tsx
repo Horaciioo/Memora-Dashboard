@@ -12,6 +12,7 @@ import { LudoGrid } from '@/composites/play/ludo/LudoGrid'
 import { LudoDuelRoll } from '@/composites/play/ludo/LudoDuelRoll'
 import { LudoJokerOffer } from '@/composites/play/ludo/LudoJokerOffer'
 import { LudoPawns } from '@/composites/play/ludo/LudoPawns'
+import { LudoCornerPlates } from '@/composites/play/ludo/LudoCornerPlates'
 import { LudoPlates } from '@/composites/play/ludo/LudoPlates'
 import type { LudoSeatFace } from '@/composites/play/ludo/LudoPlates'
 import { LudoResult } from '@/composites/play/ludo/LudoResult'
@@ -231,7 +232,6 @@ export const LudoBoard = ({
         isSeated={isSeated}
         turnId={row.turnId}
         seconds={Math.ceil(msLeft / SECOND_MS)}
-        lead={<LudoPlates {...row} />}
       />
       <div className={map.name === 'star' ? LUDO_BOARD.boardStar : LUDO_BOARD.board}>
         {countdown > 0 && (
@@ -246,55 +246,60 @@ export const LudoBoard = ({
           <LudoPlates {...row} />
         </div>
 
-        <div
-          className={cn(
-            map.name === 'star' ? LUDO_BOARD.frameStar : LUDO_BOARD.frame,
-            map.name === 'star' ? LUDO_BOARD.frameFullStar : LUDO_BOARD.frameFull
-          )}
-          style={tone as CSSProperties}
-        >
+        <div className={LUDO_BOARD.stage}>
+          <LudoCornerPlates {...row} turns={turns} />
           <div
-            className={LUDO_BOARD.surface}
-            style={{ '--cells': map.size } as CSSProperties}
-            data-map={map.name}
-            aria-label={LUDO_BOARD_COPY.board}
-          >
-            <LudoGrid
-              board={map.name}
-              turns={turns}
-              lit={heldStars(map, present, motion.pawns, motion.walking)}
-              palette={palette}
-              isChaos={isChaos}
-            />
-            <LudoPawns
-              map={map}
-              players={present}
-              pawns={motion.pawns}
-              turns={turns}
-              viewerId={viewerId}
-              movable={isStill ? board.movable : []}
-              hop={motion.hop}
-              strike={motion.strike}
-              onPick={(pawn, to) => void send({ type: 'move', pawn, to })}
-              looks={motion.looks}
-              ghosts={motion.ghosts}
-              fading={motion.fading}
-              rewind={motion.rewind}
-              isBlind={(me?.effects.blind ?? 0) > 0}
-              isDisguised={me !== undefined && (motion.looks[viewerId] ?? me.corner) !== me.corner}
-            />
-            <LudoChaosLayer
-              map={map}
-              motion={motion}
-              players={present}
-              names={names}
-              turns={turns}
-            />
-            {isMyRoll && call.count > 0 && (
-              <div key={call.count} className={LUDO_BOARD.banner} aria-hidden="true">
-                <span className={LUDO_BOARD.bannerText}>{LUDO_BOARD_COPY.yourTurn}</span>
-              </div>
+            className={cn(
+              map.name === 'star' ? LUDO_BOARD.frameStar : LUDO_BOARD.frame,
+              map.name === 'star' ? LUDO_BOARD.frameFullStar : LUDO_BOARD.frameFull
             )}
+            style={tone as CSSProperties}
+          >
+            <div
+              className={LUDO_BOARD.surface}
+              style={{ '--cells': map.size } as CSSProperties}
+              data-map={map.name}
+              aria-label={LUDO_BOARD_COPY.board}
+            >
+              <LudoGrid
+                board={map.name}
+                turns={turns}
+                lit={heldStars(map, present, motion.pawns, motion.walking)}
+                palette={palette}
+                isChaos={isChaos}
+              />
+              <LudoPawns
+                map={map}
+                players={present}
+                pawns={motion.pawns}
+                turns={turns}
+                viewerId={viewerId}
+                movable={isStill ? board.movable : []}
+                hop={motion.hop}
+                strike={motion.strike}
+                onPick={(pawn, to) => void send({ type: 'move', pawn, to })}
+                looks={motion.looks}
+                ghosts={motion.ghosts}
+                fading={motion.fading}
+                rewind={motion.rewind}
+                isBlind={(me?.effects.blind ?? 0) > 0}
+                isDisguised={
+                  me !== undefined && (motion.looks[viewerId] ?? me.corner) !== me.corner
+                }
+              />
+              <LudoChaosLayer
+                map={map}
+                motion={motion}
+                players={present}
+                names={names}
+                turns={turns}
+              />
+              {isMyRoll && call.count > 0 && (
+                <div key={call.count} className={LUDO_BOARD.banner} aria-hidden="true">
+                  <span className={LUDO_BOARD.bannerText}>{LUDO_BOARD_COPY.yourTurn}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         {pending?.type === 'duel' &&

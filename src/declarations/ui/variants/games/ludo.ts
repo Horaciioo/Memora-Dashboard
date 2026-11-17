@@ -12,7 +12,11 @@ export const LUDO_BOARD = {
   boardStar:
     'relative mx-auto my-auto flex w-full flex-col items-center gap-3 px-2 select-none sm:px-0 in-[.play-boxfull]:pt-20',
   // Players on a phone, where the corner card is hidden
-  phoneRow: 'md:hidden',
+  phoneRow: 'lg:hidden',
+  // Board and its corner plates, shifted left on wide screens
+  stage: 'relative lg:-translate-x-10',
+  // Plates around the board only on wide screens
+  corners: 'max-lg:hidden',
   // Die under the board, room kept for a double throw
   dieSlot: 'flex min-h-[4.6rem] items-center justify-center',
   figure: 'play-figure text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
@@ -39,6 +43,28 @@ export const LUDO_BOARD = {
   starLit: 'ludo-star-lit',
   starShape: 'ludo-star-shape',
   starShapeLit: 'ludo-star-shape-lit',
+} as const
+
+/**
+ * Place of each screen corner beside the board, clockwise from the top left
+ * @type {Record<string, readonly string[]>}
+ */
+
+export const LUDO_CORNER_SLOTS = {
+  cross: [
+    'right-full top-0 mr-4',
+    'left-full top-0 ml-4',
+    'left-full bottom-0 ml-4',
+    'right-full bottom-0 mr-4',
+  ],
+  star: [
+    'right-full top-0 mr-4',
+    'left-full top-0 ml-4',
+    'left-full top-1/2 ml-4 -translate-y-1/2',
+    'left-full bottom-0 ml-4',
+    'right-full bottom-0 mr-4',
+    'right-full top-1/2 mr-4 -translate-y-1/2',
+  ],
 } as const
 
 /**

@@ -14,6 +14,8 @@ export interface LudoPathProps {
   to: number
   // View turn
   turns: number
+  // Face of the player on the ghost
+  avatarUrl?: string | null
   // The landing can be chosen
   onPick?: () => void
 }
@@ -24,7 +26,7 @@ export interface LudoPathProps {
  * @return {JSX.Element}
  */
 
-export const LudoPath = ({ map, corner, pawn, from, to, turns, onPick }: LudoPathProps) => {
+export const LudoPath = ({ map, corner, pawn, from, to, turns, avatarUrl, onPick }: LudoPathProps) => {
   const steps = walkSteps(map, corner, from, to)
   const colour = LUDO_CORNERS[corner]
 
@@ -44,10 +46,10 @@ export const LudoPath = ({ map, corner, pawn, from, to, turns, onPick }: LudoPat
           <span key={step} className={LUDO_PIECES.ghost} style={place}>
             {onPick ? (
               <button type="button" className={LUDO_PIECES.ghostButton} onClick={onPick}>
-                <LudoPawn colour={colour} />
+                <LudoPawn colour={colour} avatarUrl={avatarUrl} />
               </button>
             ) : (
-              <LudoPawn colour={colour} />
+              <LudoPawn colour={colour} avatarUrl={avatarUrl} />
             )}
           </span>
         ) : (

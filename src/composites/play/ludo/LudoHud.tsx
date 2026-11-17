@@ -1,7 +1,5 @@
 'use client'
 
-import type { ReactNode } from 'react'
-
 import type { LudoSeatFace } from '@/composites/play/ludo/LudoPlates'
 import { PlayHud } from '@/composites/play/hud/PlayHud'
 import { isHomeStep } from '@/core/lib/play/ludo/track'
@@ -19,8 +17,6 @@ export interface LudoHudProps {
   turnId: string | null
   // Seconds left on the turn clock
   seconds: number
-  // Players in a column on the left
-  lead: ReactNode
 }
 
 /**
@@ -37,7 +33,6 @@ export const LudoHud = ({
   isSeated,
   turnId,
   seconds,
-  lead,
 }: LudoHudProps) => {
   const homeOf = (seat: LudoSeatFace) => seat.pawns.filter((step) => isHomeStep(map, step)).length
   const holder = seats.find((seat) => seat.accountId === turnId)
@@ -79,7 +74,6 @@ export const LudoHud = ({
       rows={rows}
       hasStrip={false}
       isStart={map.corners > 4}
-      lead={lead}
     />
   )
 }
