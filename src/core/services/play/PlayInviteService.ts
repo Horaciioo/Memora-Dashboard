@@ -11,7 +11,7 @@ import { joinSession } from '@/core/services/play/LobbyService'
 import { notifyPlayInvite } from '@/core/services/play/PlayInviteNotifier'
 import { loadSession, requireSeat } from '@/core/services/play/PlaySessionService'
 import { PLAY_ERRORS, PLAY_SETTINGS } from '@/declarations/play'
-import type { PlayNoticeView } from '@/types/play'
+import type { PlayNoticeView, PlayRecentPlayer } from '@/types/play'
 import {
   PLAY_OPEN_STATUSES,
   PlayInviteRoles,
@@ -127,6 +127,36 @@ const playedWith = async (accountId: string): Promise<Map<string, number>> => {
   }
 
   return latest
+}
+
+/**
+ * Members a player shared a game with, latest first
+ * @param {string} viewerId - Player
+ * @return {Promise<PlayRecentPlayer[]>} - Former opponents with the time of their last game
+ */
+
+export const listRecentPlayers = async (viewerId: string): Promise<PlayRecentPlayer[]> => {
+  const former = [...(await playedWith(viewerId))]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, PLAY_SETTINGS.privateGames.recentListSize)
+  const members = await prisma.account.findMany({
+    where: {
+      id: { in: former.map(([id]) => id) },
+      leftAt: null,
+      anonymisedAt: null,
+      frozenAt: null,
+    },
+    select: { id: true, displayName: true, avatarUrl: true },
+  })
+  const byId = new Map(members.map((member) => [member.id, member]))
+
+  return former.flatMap(([id, playedAt]) => {
+    const member = byId.get(id)
+
+    return member
+      ? [{ id, name: member.displayName, image: member.avatarUrl, playedAt: new Date(playedAt) }]
+      : []
+  })
 }
 
 /**

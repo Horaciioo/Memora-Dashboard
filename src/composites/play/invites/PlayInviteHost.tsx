@@ -8,6 +8,8 @@ import { usePendingNotice } from '@/core/store/play/playNotices'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_FEED_BEACON } from '@/declarations/ui/beacons'
 import { PLAY_INVITE_CALL } from '@/declarations/ui/variants'
+import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
+import { Availabilities } from '@/utils/constants/availability'
 
 /**
  * Game invitations of the member: over the dock feed key in Play, on phones elsewhere
@@ -20,8 +22,9 @@ export const PlayInviteHost = ({ isPlay }: { isPlay?: boolean }) => {
   usePlayNoticeFeed()
   const invite = usePendingNotice()
   const pathname = usePathname()
+  const isQuiet = useAuthContext().session?.availability === Availabilities.Dnd
 
-  if (!invite) return null
+  if (!invite || isQuiet) return null
   // The hub shows it under the profile card
   if (isPlay && pathname === ROUTES.play) return null
   if (isPlay) return <PlayInviteBubble key={invite.id} invite={invite} beacon={PLAY_FEED_BEACON} />

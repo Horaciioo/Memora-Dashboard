@@ -119,6 +119,9 @@ export const readPlayLevels = async (): Promise<Record<string, number>> => {
   return Object.fromEntries(accounts.map(({ id }) => [id, levelOf(xp.get(id) ?? 0).level]))
 }
 
+// Admins stay out of the rankings
+const NOT_ADMIN = { role: { not: 'ADMIN' } } as const
+
 /**
  * Best players over every game by one measure, counters summed
  * @param {PlayLeaderMetric} metric - Ranking measure
@@ -128,7 +131,7 @@ export const readPlayLevels = async (): Promise<Record<string, number>> => {
 const leadersOfAll = async (metric: PlayLeaderMetric): Promise<PlayLeader[]> => {
   const sums = await prisma.playGameStat.groupBy({
     by: ['accountId'],
-    where: { played: { gt: 0 } },
+    where: { played: { gt: 0 }, account: NOT_ADMIN },
     _sum: { xp: true, wins: true, played: true },
     orderBy: PLAY_LEADER_METRICS[metric].sort.map((field) => ({
       _sum: { [field]: 'desc' as const },
@@ -176,7 +179,7 @@ const leadersBy = async (
   if (game === null) return leadersOfAll(metric)
 
   const leaders = await prisma.playGameStat.findMany({
-    where: { game, played: { gt: 0 } },
+    where: { game, played: { gt: 0 }, account: NOT_ADMIN },
     orderBy: PLAY_LEADER_METRICS[metric].sort.map((field) => ({ [field]: 'desc' as const })),
     take: PLAY_SETTINGS.leaderboardSize,
     include: { account: { select: { displayName: true, avatarUrl: true } } },
