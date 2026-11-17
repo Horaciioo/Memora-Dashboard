@@ -309,6 +309,8 @@ model Account {
   mobileDock            String[]     @default([])
   // Push categories the member silenced
   pushMutedCategories   String[]     @default([])
+  // Shown online, offline, or offline with no notification
+  availability          Availability @default(ONLINE)
   anonymisedAt          DateTime?
   // Access shut until lifted
   frozenAt              DateTime?
@@ -3132,6 +3134,13 @@ enum PlayGame {
   SUSPENS
   STOP_GO
   CONCORDAT
+}
+
+// How a member chooses to show
+enum Availability {
+  ONLINE
+  OFFLINE
+  DND
 }
 
 // Play bot level

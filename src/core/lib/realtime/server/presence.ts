@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { prisma } from '@/core/lib/db'
 import { invalidInput } from '@/core/lib/errors'
 import { membersOf } from '@/core/lib/realtime/members'
 import { touchPlaySeen } from '@/core/services/play/SeenService'
@@ -9,6 +10,8 @@ import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { PRESENCE_COPY } from '@/declarations/system/presence'
 import { REALTIME_EVENTS, REALTIME_OPS, REALTIME_SETTINGS } from '@/declarations/system/realtime'
 import type { PresenceMember, PresenceSeat, PresenceState } from '@/types/presence'
+import { Availabilities } from '@/utils/constants/availability'
+import type { AvailabilityName } from '@/utils/constants/availability'
 import { SECOND_MS } from '@/utils/constants/time'
 
 // Longest place accepted
@@ -29,9 +32,32 @@ interface PresenceRoom {
 const globalForPresence = globalThis as unknown as {
   presenceRooms?: Map<string, PresenceRoom>
   presenceSweep?: ReturnType<typeof setInterval>
+  presenceHidden?: Set<string>
+  presenceKnown?: Set<string>
 }
 
 const rooms = (globalForPresence.presenceRooms ??= new Map())
+// Members showing offline, and members already read
+const hidden = (globalForPresence.presenceHidden ??= new Set())
+const known = (globalForPresence.presenceKnown ??= new Set())
+
+/**
+ * Seats and departures a room shows
+ * @param {string} topic - Room
+ * @param {PresenceRoom} room - Room
+ * @return {PresenceMember[]} - Members
+ */
+
+const shownMembers = (topic: string, room: PresenceRoom): PresenceMember[] => {
+  // A game needs its seated players, shown or not
+  const isShown = (accountId: string) =>
+    PLAY_TOPICS.sessionIdOf(topic) !== null || !hidden.has(accountId)
+
+  return membersOf(
+    [...room.seats.values()].filter((seat) => isShown(seat.accountId)),
+    [...room.departed.values()].filter((member) => isShown(member.accountId))
+  )
+}
 
 /**
  * Send the room to every seat
@@ -43,7 +69,7 @@ const broadcast = (topic: string): void => {
   const room = rooms.get(topic)
   if (!room) return
   room.flush = null
-  const members = membersOf([...room.seats.values()], [...room.departed.values()])
+  const members = shownMembers(topic, room)
   const frame = eventFrame(topic, REALTIME_EVENTS.presence, { members })
   for (const connection of room.seats.keys()) connection.send(frame)
   if (!room.seats.size && !room.departed.size) rooms.delete(topic)
@@ -105,6 +131,43 @@ const sweep = (): void => {
 }
 
 /**
+ * Show or hide a member in every room
+ * @param {string} accountId - Member
+ * @param {AvailabilityName} choice - Chosen availability
+ * @return {void}
+ */
+
+export const applyAvailability = (accountId: string, choice: AvailabilityName): void => {
+  known.add(accountId)
+  if (choice === Availabilities.Online) hidden.delete(accountId)
+  else hidden.add(accountId)
+
+  for (const [topic, room] of rooms) {
+    const isIn =
+      room.departed.has(accountId) ||
+      [...room.seats.values()].some((seat) => seat.accountId === accountId)
+    if (isIn) schedule(topic)
+  }
+}
+
+/**
+ * Read a member's choice once
+ * @param {string} accountId - Member
+ * @return {void}
+ */
+
+const learnAvailability = (accountId: string): void => {
+  if (known.has(accountId)) return
+  known.add(accountId)
+  void prisma.account
+    .findUnique({ where: { id: accountId }, select: { availability: true } })
+    .then((account) => {
+      if (account) applyAvailability(accountId, account.availability)
+    })
+    .catch(() => known.delete(accountId))
+}
+
+/**
  * Seat a socket in a room, its access already checked
  * @param {string} topic - Room
  * @param {RealtimeConnection} connection - Socket
@@ -125,6 +188,7 @@ export const joinPresence = (topic: string, connection: RealtimeConnection): (()
   }
   rooms.set(topic, room)
   const { session } = connection
+  learnAvailability(session.id)
   room.seats.set(connection, {
     accountId: session.id,
     name: session.displayName,
@@ -192,7 +256,7 @@ export const PRESENCE_REALTIME_REQUESTS: Record<string, RealtimeRequest> = {
 export const presenceOf = (topic: string): PresenceMember[] => {
   const room = rooms.get(topic)
 
-  return room ? membersOf([...room.seats.values()], [...room.departed.values()]) : []
+  return room ? shownMembers(topic, room) : []
 }
 
 /**

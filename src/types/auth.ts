@@ -1,5 +1,7 @@
 import type { ColorVisionMode, FontScale, ThemePreference } from '@/declarations/access/preferences'
 import type { FavoritePage } from '@/types/favorites'
+import type { MemberFunction } from '@/types/members'
+import type { AvailabilityName } from '@/utils/constants/availability'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import type { PermissionName } from '@/utils/constants/permissions'
 
@@ -25,12 +27,14 @@ export interface ActualIdentity {
  * @property {string | null} divisionId - Division identifier
  * @property {string[]} youtuberIds - Assigned YouTubers
  * @property {string[]} functionIds - Functions held
+ * @property {MemberFunction[]} functions - Functions held, named, principal first
  * @property {boolean} isRoot - Root administrator
  * @property {ActualIdentity} actual - Real identity behind a view
  * @property {DisplayPreferences} display - Display preferences
  * @property {number | null} historyConsentVersion - Consent version agreed to
  * @property {string | null} seenReleaseVersion - Last note read
  * @property {FavoritePage[]} favorites - Pages starred
+ * @property {AvailabilityName} availability - Online, offline or do not disturb
  * @property {string | null} timezone - Zone clock times read in
  * @property {Permission[]} permissions - Granted permissions
  */
@@ -45,12 +49,14 @@ export interface SessionUser {
   divisionId: string | null
   youtuberIds: string[]
   functionIds: string[]
+  functions: MemberFunction[]
   isRoot: boolean
   actual: ActualIdentity
   historyConsentVersion: number | null
   seenReleaseVersion: string | null
   favorites: FavoritePage[]
   mobileDock: string[]
+  availability: AvailabilityName
   display: DisplayPreferences
   timezone: string | null
   permissions: Permission[]
