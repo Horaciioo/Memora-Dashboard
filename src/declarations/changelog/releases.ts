@@ -127,6 +127,91 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.13.3',
+    date: '2026-11-17',
+    title: 'Une meilleure identité de Joueurs',
+    intro:
+      'Chaque joueur de Memora Play a sa carte, tu choisis maintenant comment tu apparais, et l’administration de Play s’étoffe.',
+    description:
+      'Memora Play manquait d’un moyen de découvrir un joueur en un coup d’œil, et il fallait deviner qui était réellement disponible. Cette version ajoute une carte de joueur, un statut de disponibilité que chacun règle lui-même et une administration de Play plus complète, avec joueurs, journal et chiffres.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Carte de joueur » dans « Memora Play » : niveau, victoires, meilleure série et dernières parties d’un joueur dans une carte qui s’ouvre d’un clic sur son visage.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la possibilité de choisir sa disponibilité dans le menu du compte : « En ligne », « Hors ligne » ou « Ne pas déranger ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’un mode « Ne pas déranger » qui te fait apparaître hors ligne et coupe les notifications.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’un onglet « Logs » dans « Admin Play » pour retrouver chaque ligne du journal, avec recherche, période, type et joueur.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’un onglet « Chiffres » dans « Admin Play » avec les parties en cours, les parties terminées, les joueurs actifs et les graphiques sur 7 ou 30 jours.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de choisir plusieurs joueurs dans « Admin Play » pour leur passer de l’XP ou remettre leur progression à zéro d’un seul geste.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’une fiche par joueur dans « Admin Play », avec ses informations, sa progression, ses logs et ses actions.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration de la liste des joueurs de « Admin Play » : filtres par état et par YouTubeur, joueurs en ligne regroupés en premier.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration visuelle de l’accueil de « Memora Play » : bannière par jeu, liste des amis et dernières parties au même endroit.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration visuelle des cadres de niveau autour des avatars, avec de nouveaux effets.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration visuelle des pions et du plateau de « Ludo ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du menu « Moi » sur mobile : trophées et accès au profil réunis.',
+      },
+    ],
+    comments: [],
+  },
+  {
     version: '0.13.2',
     date: '2026-11-16',
     title: 'Deux nouveaux jeux',
