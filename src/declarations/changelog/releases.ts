@@ -129,9 +129,8 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
     version: '0.13.3',
     date: '2026-11-17',
-    title: 'Une meilleure identité de Joueurs',
-    intro:
-      'Chaque joueur de Memora Play a sa carte, tu choisis maintenant comment tu apparais, et l’administration de Play s’étoffe.',
+    title: 'On relooke les joueurs',
+    intro: 'Memora Play relooke les joueurs !',
     description:
       'Memora Play manquait d’un moyen de découvrir un joueur en un coup d’œil, et il fallait deviner qui était réellement disponible. Cette version ajoute une carte de joueur, un statut de disponibilité que chacun règle lui-même et une administration de Play plus complète, avec joueurs, journal et chiffres.',
     items: [
