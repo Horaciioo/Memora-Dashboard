@@ -9,6 +9,7 @@
 @import './tokens/play.css';
 @import './tokens/skins.css';
 @import './play/arcade.css';
+@import './play/laurel.css';
 @import './play/scroll.css';
 @import './play/croquis.css';
 @import './play/suspens.css';

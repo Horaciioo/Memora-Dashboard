@@ -1,0 +1,225 @@
+/* Level laurel, painted by the data-skin palette */
+.laurel-art {
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.25));
+}
+.laurel-edge {
+  stroke: var(--laurel-c);
+  stroke-opacity: 0.6;
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+}
+.laurel-shadow {
+  fill: var(--laurel-c);
+  fill-opacity: 0.2;
+}
+.laurel-sheen {
+  fill: var(--laurel-shine);
+  fill-opacity: var(--laurel-sheen);
+}
+.laurel-vein {
+  fill: none;
+  stroke: var(--laurel-vein);
+  stroke-opacity: 0.75;
+  stroke-width: 0.8;
+  stroke-linecap: round;
+}
+.laurel-vein-soft {
+  stroke-opacity: 0.38;
+  stroke-width: 0.55;
+}
+.laurel-reflect {
+  fill: none;
+  stroke: var(--laurel-shine);
+  stroke-opacity: 0.55;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+.laurel-stem {
+  fill: none;
+  stroke: var(--laurel-c);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.laurel-berry {
+  fill: var(--laurel-gem);
+  stroke: var(--laurel-c);
+  stroke-opacity: 0.7;
+  stroke-width: 0.7;
+}
+.laurel-twinkle,
+.laurel-orb {
+  fill: var(--laurel-shine);
+  stroke: var(--laurel-c);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+}
+.laurel-twinkle,
+.laurel-pulse,
+.laurel-orbit {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.laurel-gem {
+  fill: var(--laurel-gem);
+  stroke: var(--laurel-c);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+}
+.laurel-halo {
+  fill: none;
+  stroke: var(--laurel-hi);
+  stroke-width: 2.6;
+  stroke-opacity: 0.75;
+}
+.laurel-ring {
+  fill: none;
+  stroke: var(--laurel-shine);
+  stroke-width: 2;
+}
+.laurel-badge {
+  fill: var(--laurel-c);
+  stroke: var(--laurel-hi);
+}
+.laurel-level {
+  fill: var(--laurel-hi);
+  font-size: 12px;
+  font-weight: 700;
+}
+.laurel-level-wide {
+  font-size: 10px;
+}
+.laurel-ember {
+  fill: var(--laurel-gem);
+  opacity: 0;
+}
+.laurel-sweep {
+  opacity: 0;
+}
+
+.laurel-wreath[data-sway='1'] {
+  --sway: 1.4deg;
+}
+.laurel-wreath[data-sway='2'] {
+  --sway: 2.6deg;
+}
+.laurel-wreath[data-sway='3'] {
+  --sway: 4deg;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .laurel-sway {
+    transform-box: fill-box;
+    transform-origin: 0% 50%;
+    animation: laurel-sway 4.4s ease-in-out infinite;
+  }
+  .laurel-sweep {
+    animation: laurel-sweep 4.6s ease-in-out infinite;
+  }
+  [data-skin='master'] .laurel-sweep,
+  [data-skin='legend'] .laurel-sweep {
+    animation-duration: 3.4s;
+  }
+  .laurel-twinkle {
+    animation: laurel-twinkle 2.4s ease-in-out infinite;
+  }
+  .laurel-pulse {
+    animation: laurel-pulse 3s ease-in-out infinite;
+  }
+  .laurel-orbit {
+    animation: laurel-orbit 20s linear infinite;
+  }
+  .laurel-ember {
+    animation: laurel-ember 3.2s ease-in infinite;
+  }
+  [data-skin='diamond'] .laurel-wreath,
+  [data-skin='master'] .laurel-wreath {
+    animation: laurel-hue 6s ease-in-out infinite;
+  }
+  [data-skin='legend'] .laurel-wreath {
+    animation: laurel-bright 3s ease-in-out infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .laurel-twinkle {
+    transform: scale(0.8);
+  }
+}
+
+@keyframes laurel-sway {
+  0%,
+  100% {
+    transform: rotate(calc(var(--sway) * -1));
+  }
+  50% {
+    transform: rotate(var(--sway));
+  }
+}
+@keyframes laurel-sweep {
+  0% {
+    opacity: 1;
+    transform: translateX(-50px);
+  }
+  50%,
+  100% {
+    opacity: 1;
+    transform: translateX(150px);
+  }
+}
+@keyframes laurel-twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+@keyframes laurel-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+@keyframes laurel-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes laurel-ember {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+@keyframes laurel-hue {
+  0%,
+  100% {
+    filter: hue-rotate(-20deg);
+  }
+  50% {
+    filter: hue-rotate(24deg);
+  }
+}
+@keyframes laurel-bright {
+  0%,
+  100% {
+    filter: brightness(0.9);
+  }
+  50% {
+    filter: brightness(1.3);
+  }
+}
