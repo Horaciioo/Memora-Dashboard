@@ -186,8 +186,6 @@ export const PLAY_ROOM = {
   seatOff: 'opacity-40',
   seatAvatar: 'relative',
   seatCrown: 'absolute -top-4 left-1/2 size-5 -translate-x-1/2 text-[var(--play-gold)]',
-  seatBadge:
-    'play-badge-pop absolute -right-1 -bottom-1 grid size-5 place-items-center rounded-full bg-[var(--play-golf-glow)] text-black/70',
   seatBadgeIcon: 'size-3',
   seatName: 'w-full truncate text-sm font-extrabold',
   seatRole: 'text-[0.6rem] font-extrabold tracking-wider text-[var(--play-gold-ink)] uppercase',
