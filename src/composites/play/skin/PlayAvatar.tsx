@@ -12,6 +12,8 @@ export interface PlayAvatarProps {
   size?: Exclude<AvatarSize, 'hero'>
   className?: string
   title?: string
+  // Click stays with the parent, no card
+  isInert?: boolean
 }
 
 /**
@@ -27,6 +29,7 @@ export const PlayAvatar = ({
   size = 'sm',
   className,
   title,
+  isInert,
 }: PlayAvatarProps) => {
   const level = usePlayLevels()[accountId]
 
@@ -34,7 +37,7 @@ export const PlayAvatar = ({
     return <Avatar name={name} src={src} size={size} className={className} title={title} />
 
   return (
-    <span data-play-card={accountId} className="contents">
+    <span data-play-card={isInert ? undefined : accountId} className="contents">
       <LevelFrame level={level} name={name} src={src} size={size} className={className} bleed />
     </span>
   )

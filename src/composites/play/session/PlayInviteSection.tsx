@@ -45,6 +45,7 @@ export const PlayInviteSection = ({ title, people, sent, onSend }: PlayInviteSec
             >
               <span className={PLAY_INVITE.faceAvatar}>
                 <PlayAvatar
+                  isInert
                   accountId={entry.id}
                   name={entry.displayName}
                   src={entry.avatarUrl}
