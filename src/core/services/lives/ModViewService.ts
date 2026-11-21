@@ -6,7 +6,8 @@ import type { AppError } from '@/core/lib/errors'
 import { claimGestureKey, releaseGestureKey } from '@/core/lib/lives/idempotency'
 import { isFollowing } from '@/core/services/lives/FocusService'
 import { readConnection } from '@/core/lib/lives/recent'
-import { readRoomMemory } from '@/core/lib/lives/room'
+import { TWITCH_LIMITS } from '@/declarations/platforms/twitch'
+import { pushRoomEvent, readRoomMemory } from '@/core/lib/lives/room'
 import { logger } from '@/core/lib/logger'
 import { gateIntent } from '@/core/lib/modview/gate'
 import { blankModView } from '@/core/lib/modview/feed'
@@ -498,6 +499,21 @@ export const actOnLive = async (input: {
       )
     } catch (error) {
       throw await translateRefusal(error, input.viewerId)
+    }
+  }
+
+  // A mode shows at once, Twitch's echo confirms it
+  if (input.intent.kind === 'mode') {
+    const { mode, enabled, seconds } = input.intent
+    if (mode === 'slow') {
+      pushRoomEvent(input.liveId, {
+        kind: 'modes',
+        modes: {
+          slowSeconds: enabled
+            ? Math.min(Math.max(3, seconds ?? 30), TWITCH_LIMITS.maxSlowSeconds)
+            : null,
+        },
+      })
     }
   }
 

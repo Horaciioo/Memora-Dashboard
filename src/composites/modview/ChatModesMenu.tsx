@@ -46,6 +46,17 @@ const SLOW_OPTIONS: FieldOption[] = SLOW_DURATIONS.map((seconds) => ({
 const TERM_LISTS = ['blocked'] as const
 
 /**
+ * Slow delays, with the one in force when Twitch holds an unlisted one
+ * @param {number | null} current - Delay in force
+ * @return {FieldOption[]} - Options
+ */
+
+const slowOptionsOf = (current: number | null): FieldOption[] =>
+  current === null || SLOW_DURATIONS.includes(current)
+    ? SLOW_OPTIONS
+    : [...SLOW_OPTIONS, { value: String(current), label: formatDuration(current) }]
+
+/**
  * Whether one mode is on
  * @param {ModViewState['modes']} modes - Modes in force
  * @param {ChatModeName} mode - Mode
@@ -107,7 +118,7 @@ export const ChatModesMenu = ({ state, gate, onAct, hasTerms }: ChatModesMenuPro
                 <SelectMenu
                   size="compact"
                   label={option.label}
-                  options={SLOW_OPTIONS}
+                  options={slowOptionsOf(state.modes.slowSeconds)}
                   emptyLabel={MODVIEW_COPY.slowOff}
                   value={state.modes.slowSeconds === null ? '' : String(state.modes.slowSeconds)}
                   disabled={!check.allowed}
