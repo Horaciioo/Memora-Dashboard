@@ -17,12 +17,10 @@ export const CALENDAR_AGENDA = {
     'flex flex-col pt-0.5 text-micro leading-tight font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   month: 'font-semibold normal-case first-letter:uppercase',
   rows: 'flex flex-col',
-  row: 'flex min-h-11 items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 sm:gap-4 sm:px-3 text-left transition-colors hover:bg-[var(--color-hover)]',
+  // Home planning row, flush to the sheet
+  row: 'ml-0 w-full text-left',
   rowSelected: 'ring-2 ring-[var(--color-pick)] ring-inset',
-  bullet: 'h-2 w-2 shrink-0 rounded-full bg-current',
-  time: 'w-16 shrink-0 text-sm sm:w-24 text-[var(--color-ink-subtle)] tabular-nums',
-  title: 'min-w-0 flex-1 truncate text-sm font-semibold',
-  meta: 'hidden shrink-0 text-sm text-[var(--color-ink-subtle)] md:inline',
+  time: 'shrink-0 text-xs font-bold tabular-nums text-[var(--color-ink)]',
 } as const
 
 /**
@@ -42,9 +40,6 @@ export const CALENDAR_MOBILE = {
   view: 'flex min-h-11 items-center px-4 text-left text-sm font-medium transition-colors hover:bg-[var(--color-hover)]',
   viewActive: 'text-[var(--color-ink-accent)] font-bold',
   scrim: 'fixed inset-0 z-30',
-  today:
-    'touch-target flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border-2 border-[var(--color-ink)] text-sm font-bold tabular-nums',
-  creator: '!w-auto shrink-0 rounded-full border-0 p-0.5',
   // Week of a phone month: bars of the periods lie under the day numbers
   lanes: 'pointer-events-none absolute inset-x-0 top-7 z-[3] grid auto-rows-5 gap-y-0.5 md:hidden',
   lane: 'pointer-events-auto chip-solid truncate px-1 text-left text-micro font-semibold leading-5',
@@ -55,6 +50,7 @@ export const CALENDAR_MOBILE = {
   // Sheet of a touched day
   sheetTitle: 'text-lg font-bold first-letter:uppercase',
   sheetBody: 'flex flex-col gap-4',
+  sheetAdd: 'w-full',
   // One dot per entry of a day, wrapped under its number
   dots: 'flex flex-wrap justify-center gap-1 px-0.5',
   dot: 'size-2 rounded-full bg-[var(--accent-mobile)]',

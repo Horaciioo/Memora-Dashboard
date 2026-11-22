@@ -34,17 +34,15 @@ export const recruitmentEntries = async ({
   }
 
   const [sessions, candidates] = await Promise.all([
-    // Campaigns are for readers
-    !canRead
-      ? []
-      : prisma.recruitmentSession.findMany({
-          where: scopedWhere('recruitmentSession', scope, {
-            opensAt: { not: null, lte: to },
-            OR: [{ closesAt: { gte: from } }, { closesAt: null, opensAt: { gte: from } }],
-          }),
-          include: { youtuber: { select: { accent: true } } },
-          orderBy: { opensAt: 'asc' },
-        }),
+    // Everyone sees the campaign zones, only readers open them
+    prisma.recruitmentSession.findMany({
+      where: scopedWhere('recruitmentSession', scope, {
+        opensAt: { not: null, lte: to },
+        OR: [{ closesAt: { gte: from } }, { closesAt: null, opensAt: { gte: from } }],
+      }),
+      include: { youtuber: { select: { accent: true } } },
+      orderBy: { opensAt: 'asc' },
+    }),
     prisma.recruitmentCandidate.findMany({
       where: {
         interviewAt: { gte: from, lte: to },
@@ -76,9 +74,9 @@ export const recruitmentEntries = async ({
         kind: CalendarKinds.Zone,
         accent: row.youtuber.accent,
         youtuberId: row.youtuberId,
-        description: row.summary,
+        description: canRead ? row.summary : null,
         subjectName: null,
-        href: ROUTES.recruitment(row.id),
+        href: canRead ? ROUTES.recruitment(row.id) : undefined,
       })
 
     return [

@@ -177,7 +177,6 @@ export const CalendarBoard = ({
     toggleLayer,
     setHiddenLayers,
     toggleCreator,
-    setHiddenCreators,
     unit: storedUnit,
     setUnit: storeUnit,
   } = useCalendarFiltersStore()
@@ -229,18 +228,6 @@ export const CalendarBoard = ({
   // Day under the pointer, its zones show their titles
   const [hoverDay, setHoverDay] = useState<string | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<CalendarEntry[] | null>(null)
-
-  // A phone follows one creator at a time, hiding the others
-  const soloId =
-    hiddenCreators.length > 0 && youtubers.length - hiddenCreators.length === 1
-      ? (youtubers.find((option) => !hiddenCreators.includes(option.value))?.value ?? '')
-      : ''
-  const soloCreator = (creatorId: string) =>
-    setHiddenCreators(
-      creatorId
-        ? youtubers.filter((option) => option.value !== creatorId).map((option) => option.value)
-        : []
-    )
 
   const days = useMemo(() => unitGrid(cursor, unit), [cursor, unit])
 
@@ -412,6 +399,14 @@ export const CalendarBoard = ({
     setDialog('form')
   }
 
+  // A day picked opens the form on its morning
+  const openFormOn = (dayKey: string) =>
+    openForm(null, {
+      startsAt: toFieldValue(
+        dayBounds(dayKey, CALENDAR_SETTINGS.dayStartHour, CALENDAR_SETTINGS.dayEndHour).startsAt
+      ),
+    })
+
   const { covers, slotProps } = useSlotDraft((from, to) => {
     const [fromDay, fromHour] = from.split(SLOT_SEPARATOR)
     const [toDay, toHour] = to.split(SLOT_SEPARATOR)
@@ -441,7 +436,7 @@ export const CalendarBoard = ({
       startsAt: toFieldValue(bounds.startsAt),
       endsAt: toFieldValue(bounds.endsAt),
     })
-  }, canManage)
+  }, canManage && !isMobile)
 
   const openEntry = (entry: CalendarEntry, additive: boolean) => {
     // A modifier key gathers a selection
@@ -605,11 +600,7 @@ export const CalendarBoard = ({
               unit={unit}
               units={MOBILE_UNITS}
               onUnit={setUnit}
-              onToday={() => setCursor(toDayKey(new Date()))}
               isLoading={calendar.isLoading}
-              youtubers={youtubers}
-              soloId={soloId}
-              onSolo={soloCreator}
               railProps={sessionId ? undefined : railProps}
             />
 
@@ -832,7 +823,16 @@ export const CalendarBoard = ({
                                 {...(canManage ? containerProps(day.key) : {})}
                                 {...slotProps(day.key)}
                                 onMouseEnter={() => setHoverDay(day.key)}
-                                onClick={isMobile ? () => pickDay(day.key) : undefined}
+                                onClick={
+                                  isMobile
+                                    ? (event) => {
+                                        // A tap on a chip or label already acts
+                                        if ((event.target as HTMLElement).closest('button, a'))
+                                          return
+                                        pickDay(day.key)
+                                      }
+                                    : undefined
+                                }
                               >
                                 <button
                                   type="button"
@@ -851,22 +851,12 @@ export const CalendarBoard = ({
                                   className={CALENDAR_MOBILE.laneSpacer}
                                   style={{ height: `${seated.lanes * 1.375}rem` }}
                                 />
-                                {canManage && (
+                                {canManage && !isMobile && (
                                   <button
                                     type="button"
                                     aria-label={CALENDAR_COPY.add}
                                     className={CALENDAR_STYLES.dayAdd}
-                                    onClick={() =>
-                                      openForm(null, {
-                                        startsAt: toFieldValue(
-                                          dayBounds(
-                                            day.key,
-                                            CALENDAR_SETTINGS.dayStartHour,
-                                            CALENDAR_SETTINGS.dayEndHour
-                                          ).startsAt
-                                        ),
-                                      })
-                                    }
+                                    onClick={() => openFormOn(day.key)}
                                   >
                                     <DayAddIcon className="h-3.5 w-3.5" aria-hidden="true" />
                                   </button>
@@ -919,12 +909,7 @@ export const CalendarBoard = ({
         }}
         onCreate={(dayKey) => {
           setPickedDay(null)
-          openForm(null, {
-            startsAt: toFieldValue(
-              dayBounds(dayKey, CALENDAR_SETTINGS.dayStartHour, CALENDAR_SETTINGS.dayEndHour)
-                .startsAt
-            ),
-          })
+          openFormOn(dayKey)
         }}
         onClose={() => setPickedDay(null)}
       />
@@ -983,25 +968,24 @@ export const CalendarBoard = ({
 
       <Dialog
         open={dialog === 'detail' && opened !== null}
-        title={opened ? [opened.emoji, opened.title].filter(Boolean).join(' ') : ''}
+        title={openedEntry ? [openedEntry.emoji, openedEntry.title].filter(Boolean).join(' ') : ''}
         description={opened ? CALENDAR_SOURCE_REGISTRY.get(opened.source).summary : undefined}
         size={
           opened?.slot === 'range' ? 'xl' : opened?.slot ? 'sm' : opened?.rollCall ? 'xl' : 'md'
         }
         onClose={() => setDialog(null)}
         footer={
-          opened && (opened.href || !opened.readOnly) ? (
+          opened && (opened.href || (!opened.readOnly && canManage)) ? (
             <>
               {opened.href && (
                 <Link href={opened.href}>
                   <Button>{ACTION_COPY.open}</Button>
                 </Link>
               )}
-              {!opened.readOnly && (
+              {!opened.readOnly && canManage && (
                 <>
                   <Button
                     variant="danger"
-                    disabled={!canManage}
                     onClick={() => {
                       setPendingDeletion([opened])
                       setDialog(null)
@@ -1012,7 +996,6 @@ export const CalendarBoard = ({
                   <Button
                     variant="primary"
                     className="text-white!"
-                    disabled={!canManage}
                     onClick={() => openForm(opened)}
                   >
                     {ACTION_COPY.edit}
