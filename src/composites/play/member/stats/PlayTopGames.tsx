@@ -13,20 +13,23 @@ import type { PlaySheetView } from '@/types/play'
  * @param {Object} props - Games
  * @param {PlaySheetView['topGames']} props.games - Most played first
  * @param {string} [props.playerId] - Another player, none for the viewer
+ * @param {boolean} [props.isWide] - Spans the grid
  * @return {JSX.Element | null}
  */
 
 export const PlayTopGames = ({
   games,
   playerId,
+  isWide,
 }: {
   games: PlaySheetView['topGames']
   playerId?: string
+  isWide?: boolean
 }) => {
   if (games.length === 0) return null
 
   return (
-    <PlayFold title={PLAY_PROFILE_COPY.topGames}>
+    <PlayFold title={PLAY_PROFILE_COPY.topGames} isWide={isWide}>
       <ul className={PLAY_PROFILE.list}>
         {games.map(({ game, played }) => {
           const row = (

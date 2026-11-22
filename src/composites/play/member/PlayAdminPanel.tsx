@@ -1,11 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { Section } from '@/components/structures/page/Section'
 import { AdminCell } from '@/composites/members/admin/AdminCell'
+import { PlayAdminCell } from '@/composites/play/admin/PlayAdminCell'
+import { PlayAdminProgress } from '@/composites/play/admin/PlayAdminProgress'
+import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
 import { PlayProgressCards } from '@/composites/play/member/PlayProgressCards'
 import { usePlayAdmin } from '@/core/hooks/data/play/usePlayAdmin'
 import { playPresenceLabel } from '@/core/lib/play/presence'
@@ -13,7 +17,7 @@ import { fillPlayMessage } from '@/declarations/play'
 import { PLAY_ADMIN_FIELDS, PLAY_MEMBER_COPY } from '@/declarations/play/admin'
 import type { PlayAdminDrawer } from '@/declarations/play/admin'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { MEMBER_ADMIN, PLAY_MEMBER } from '@/declarations/ui/variants'
+import { MEMBER_ADMIN, PLAY_ADMIN, PLAY_MEMBER } from '@/declarations/ui/variants'
 import type { PlayAdminState } from '@/types/play'
 import type { FormValues } from '@/types/forms'
 import { formatDay } from '@/utils/format/time/dates'
@@ -28,6 +32,8 @@ export interface PlayAdminPanelProps {
   initial: PlayAdminState
   // Blocks drawn, every one without
   only?: PlayAdminSection | PlayAdminSection[]
+  // Play colours instead of the dashboard ones
+  isPlay?: boolean
 }
 
 // Title of each drawer
@@ -52,18 +58,47 @@ const CONFIRMS: Record<Confirm, { title: string; description: string }> = {
 }
 
 /**
+ * Titled block of the panel, a ribbon box in Play colours or a raised section
+ * @param {Object} props - Block
+ * @return {JSX.Element}
+ */
+
+const Block = ({
+  isPlay,
+  title,
+  children,
+}: {
+  isPlay?: boolean
+  title: string
+  children: ReactNode
+}) =>
+  isPlay ? (
+    <PlayPageTitle heading="h2" className={PLAY_ADMIN.cell} body={children}>
+      {title}
+    </PlayPageTitle>
+  ) : (
+    <Section title={title} raised>
+      {children}
+    </Section>
+  )
+
+/**
  * Play view of the Admin tab: levels, current game, access, gestures
  * @param {PlayAdminPanelProps} props - Member and resolved state
  * @return {JSX.Element}
  */
 
-export const PlayAdminPanel = ({ memberId, initial, only }: PlayAdminPanelProps) => {
+export const PlayAdminPanel = ({ memberId, initial, only, isPlay }: PlayAdminPanelProps) => {
   const play = usePlayAdmin(memberId, initial)
   const [drawer, setDrawer] = useState<{ kind: PlayAdminDrawer; values?: FormValues } | null>(null)
   const [confirm, setConfirm] = useState<Confirm | null>(null)
   const { ban, presence } = play.state
   const shows = (section: PlayAdminSection) =>
     !only || (Array.isArray(only) ? only.includes(section) : only === section)
+
+  const Cell = isPlay ? PlayAdminCell : AdminCell
+  const cells = isPlay ? PLAY_ADMIN.cells : MEMBER_ADMIN.split
+  const emptyClass = isPlay ? PLAY_ADMIN.note : PLAY_MEMBER.empty
 
   // Gesture behind each drawer and confirmation
   const submit: Record<PlayAdminDrawer, (values: FormValues) => Promise<boolean>> = {
@@ -92,55 +127,62 @@ export const PlayAdminPanel = ({ memberId, initial, only }: PlayAdminPanelProps)
   }
 
   return (
-    <div className={PLAY_MEMBER.stack}>
+    <div className={isPlay ? PLAY_ADMIN.cols : PLAY_MEMBER.stack}>
       {shows('progress') && (
-        <Section title={PLAY_MEMBER_COPY.sectionProgress} raised>
-          <PlayProgressCards
-            state={play.state}
-            onSelect={(game) => setDrawer({ kind: 'xp', values: { game } })}
-          />
-        </Section>
+        <Block isPlay={isPlay} title={PLAY_MEMBER_COPY.sectionProgress}>
+          {isPlay ? (
+            <PlayAdminProgress
+              state={play.state}
+              onSelect={(game) => setDrawer({ kind: 'xp', values: { game } })}
+            />
+          ) : (
+            <PlayProgressCards
+              state={play.state}
+              onSelect={(game) => setDrawer({ kind: 'xp', values: { game } })}
+            />
+          )}
+        </Block>
       )}
 
       {shows('actions') && (
-        <Section title={PLAY_MEMBER_COPY.sectionActions} raised>
-          <div className={MEMBER_ADMIN.split}>
-            <AdminCell
+        <Block isPlay={isPlay} title={PLAY_MEMBER_COPY.sectionActions}>
+          <div className={cells}>
+            <Cell
               label={PLAY_MEMBER_COPY.xpAction}
               note={PLAY_MEMBER_COPY.xpNote}
               onClick={() => setDrawer({ kind: 'xp' })}
             />
-            <AdminCell
+            <Cell
               label={PLAY_MEMBER_COPY.levelAction}
               note={PLAY_MEMBER_COPY.levelNote}
               onClick={() => setDrawer({ kind: 'level' })}
             />
-            <AdminCell
+            <Cell
               label={PLAY_MEMBER_COPY.statsAction}
               note={PLAY_MEMBER_COPY.statsNote}
               onClick={() => setDrawer({ kind: 'stats' })}
             />
-            <AdminCell
+            <Cell
               variant="danger"
               label={PLAY_MEMBER_COPY.resetAction}
               note={PLAY_MEMBER_COPY.resetNote}
               onClick={() => setDrawer({ kind: 'reset' })}
             />
-            <AdminCell
+            <Cell
               variant="danger"
               label={PLAY_MEMBER_COPY.wipeAction}
               note={PLAY_MEMBER_COPY.wipeNote}
               onClick={() => setConfirm('wipe')}
             />
           </div>
-        </Section>
+        </Block>
       )}
 
       {shows('game') && (
-        <Section title={PLAY_MEMBER_COPY.sectionGame} raised>
+        <Block isPlay={isPlay} title={PLAY_MEMBER_COPY.sectionGame}>
           {presence ? (
-            <div className={MEMBER_ADMIN.split}>
-              <AdminCell
+            <div className={cells}>
+              <Cell
                 variant="danger"
                 label={PLAY_MEMBER_COPY.removeAction}
                 note={playPresenceLabel(presence)}
@@ -148,16 +190,16 @@ export const PlayAdminPanel = ({ memberId, initial, only }: PlayAdminPanelProps)
               />
             </div>
           ) : (
-            <p className={PLAY_MEMBER.empty}>{PLAY_MEMBER_COPY.noGame}</p>
+            <p className={emptyClass}>{PLAY_MEMBER_COPY.noGame}</p>
           )}
-        </Section>
+        </Block>
       )}
 
       {shows('access') && (
-        <Section title={PLAY_MEMBER_COPY.sectionAccess} raised>
-          <div className={MEMBER_ADMIN.split}>
+        <Block isPlay={isPlay} title={PLAY_MEMBER_COPY.sectionAccess}>
+          <div className={cells}>
             {ban ? (
-              <AdminCell
+              <Cell
                 label={PLAY_MEMBER_COPY.unbanAction}
                 note={[
                   fillPlayMessage(PLAY_MEMBER_COPY.bannedSince, { date: formatDay(ban.since) }),
@@ -169,7 +211,7 @@ export const PlayAdminPanel = ({ memberId, initial, only }: PlayAdminPanelProps)
                 onClick={() => void play.unban()}
               />
             ) : (
-              <AdminCell
+              <Cell
                 variant="danger"
                 label={PLAY_MEMBER_COPY.banAction}
                 note={PLAY_MEMBER_COPY.banNote}
@@ -177,7 +219,7 @@ export const PlayAdminPanel = ({ memberId, initial, only }: PlayAdminPanelProps)
               />
             )}
           </div>
-        </Section>
+        </Block>
       )}
 
       <FormDrawer

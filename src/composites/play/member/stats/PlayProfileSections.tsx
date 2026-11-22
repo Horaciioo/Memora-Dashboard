@@ -24,9 +24,9 @@ export const PlayProfileSections = ({
   playerId?: string
 }) => (
   <>
-    <PlayTopGames games={sheet.topGames} playerId={playerId} />
-    <PlayRecords records={sheet.records} />
-    <PlayFold title={PLAY_PROFILE_COPY.recent}>
+    <PlayTopGames games={sheet.topGames} playerId={playerId} isWide={sheet.records.length === 0} />
+    {sheet.records.length > 0 && <PlayRecords records={sheet.records} />}
+    <PlayFold title={PLAY_PROFILE_COPY.recent} isWide>
       <PlayHistory entries={sheet.recent} isOwn={!playerId} />
       {!playerId && sheet.recent.length > 0 && (
         <AppLink href={ROUTES.playHistory()} className={PLAY_PROFILE.more}>

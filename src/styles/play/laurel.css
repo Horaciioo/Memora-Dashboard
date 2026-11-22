@@ -82,11 +82,11 @@
 }
 .laurel-level {
   fill: var(--laurel-hi);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
 }
 .laurel-level-wide {
-  font-size: 10px;
+  font-size: 8px;
 }
 .laurel-ember {
   fill: var(--laurel-gem);
@@ -202,7 +202,7 @@
   }
   100% {
     opacity: 0;
-    transform: translateY(-16px);
+    transform: translateY(-8px);
   }
 }
 @keyframes laurel-hue {

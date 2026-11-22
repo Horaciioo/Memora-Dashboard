@@ -1,4 +1,4 @@
-import { playTime } from '@/composites/play/member/stats/PlayStatTiles'
+import { playTime } from '@/composites/play/member/stats/playTime'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_CAREER } from '@/declarations/ui/variants'
 import type { PlayTileTotals } from '@/types/play'

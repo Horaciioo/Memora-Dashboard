@@ -24,7 +24,8 @@ export const PLAY_PROFILE_COPY = {
   online: 'En ligne',
   offline: 'Hors ligne',
   seen: 'Vu {since}',
-  invite: 'Lancer une partie',
+  rate: 'Taux de victoire',
+  invite: 'Proposer une partie',
   inviteHere: 'Inviter à ta partie',
 } as const
 

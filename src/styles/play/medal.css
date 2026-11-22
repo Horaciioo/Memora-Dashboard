@@ -1,0 +1,24 @@
+/* Medal: hexagon, number, two tails */
+.play-medal {
+  display: inline-block;
+  flex: none;
+  filter: drop-shadow(0 0.1rem 0 color-mix(in srgb, var(--play-night) 45%, transparent));
+}
+
+/* Player card: tier glow behind the portrait */
+.play-card-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 15rem;
+  background: radial-gradient(
+    ellipse 70% 100% at 50% 0%,
+    color-mix(in srgb, var(--tier) 38%, transparent),
+    transparent 75%
+  );
+  pointer-events: none;
+}
+
+.play-card-sheet > :not(button) {
+  position: relative;
+}
