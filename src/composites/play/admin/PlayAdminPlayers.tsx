@@ -5,19 +5,21 @@ import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import type { FilterDefinition } from '@/components/structures/data/FilterBar'
+import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { PlayAdminBulk, type BulkMode } from '@/composites/play/admin/PlayAdminBulk'
-import { PlayAdminFilterBar } from '@/composites/play/admin/PlayAdminFilterBar'
 import { PlayAdminGroup } from '@/composites/play/admin/PlayAdminGroup'
 import { PlayAdminCard } from '@/composites/play/admin/PlayAdminCard'
 import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { ROUTES } from '@/declarations/navigation'
+import { fillPlayMessage } from '@/declarations/play'
 import { PLAY_BOARD_ADMIN_COPY as COPY } from '@/declarations/play/admin'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { PLAY_ADMIN } from '@/declarations/ui/variants'
+import { ICONS } from '@/declarations/ui/icons'
+import { PLAY_ADMIN, PLAY_BOX } from '@/declarations/ui/variants'
 import type { PlayAdminBoard } from '@/types/play'
 import { withToggled } from '@/utils/format/arrays'
 import { foldText } from '@/utils/format/strings'
+import { formatNumber } from '@/utils/format/numbers'
 
 // States a player is filtered by
 const PLAY_STATES = [
@@ -34,7 +36,7 @@ export interface PlayAdminPlayersProps {
 }
 
 /**
- * Player list of the Play admin, laid out like the moderator list: filter bar, one box per creator, sections inside
+ * Player list of the Play admin: figures, search and menus, one box per creator, sections inside
  * @param {PlayAdminPlayersProps} props - Board and reach
  * @return {JSX.Element}
  */
@@ -80,31 +82,24 @@ export const PlayAdminPlayers = ({ board, canBulk }: PlayAdminPlayersProps) => {
       key: youtuber.id,
       label: youtuber.name,
       image: youtuber.avatarUrl,
-      banner: youtuber.bannerUrl,
       players: shown.filter((entry) => entry.youtuberIds.includes(youtuber.id)),
     }))
     const loose = shown.filter((entry) => !entry.youtuberIds.some((id) => known.has(id)))
 
-    return [
-      ...boxes,
-      { key: 'none', label: COPY.noYoutuber, image: null, banner: null, players: loose },
-    ].filter((group) => group.players.length > 0 || (!isFiltered && group.key !== 'none'))
+    return [...boxes, { key: 'none', label: COPY.noYoutuber, image: null, players: loose }].filter(
+      (group) => group.players.length > 0 || (!isFiltered && group.key !== 'none')
+    )
   }, [board.youtubers, shown, isFiltered])
 
-  const filterDefinitions: FilterDefinition[] = [
-    {
-      name: 'youtuber',
-      label: COPY.filterYoutuber,
-      allLabel: COPY.allYoutubers,
-      options: board.youtubers.map((youtuber) => ({
-        value: youtuber.id,
-        label: youtuber.name,
-        image: youtuber.avatarUrl,
-      })),
-      mark: 'avatar',
-    },
-    { name: 'state', label: COPY.filterStatus, allLabel: COPY.filterAll, options: PLAY_STATES },
-  ]
+  const setFilter = (name: string, value: string) =>
+    setFilters((current) => ({ ...current, [name]: value }))
+
+  const totals = [
+    [COPY.totalPlayers, board.totals.players],
+    [COPY.totalActive, board.totals.active],
+    [COPY.totalBanned, board.totals.banned],
+    [COPY.totalXp, board.totals.xp],
+  ] as const
 
   const resetFilters = () => {
     setSearch('')
@@ -117,25 +112,61 @@ export const PlayAdminPlayers = ({ board, canBulk }: PlayAdminPlayersProps) => {
       ? setChosen((current) => withToggled(current, accountId))
       : router.push(ROUTES.playAdminPlayer(accountId))
 
+  const SearchIcon = ICONS.search
+
   return (
-    <div className={PLAY_ADMIN.panel}>
-      <PlayAdminFilterBar
-        searchLabel={COPY.search}
-        search={search}
-        onSearch={setSearch}
-        filters={filterDefinitions}
-        values={filters}
-        onFilter={(name, value) => setFilters((current) => ({ ...current, [name]: value }))}
-        onReset={resetFilters}
-        isFiltered={isFiltered}
-        action={
-          canBulk && (
-            <Button variant="arcade" onClick={() => setForm('give')}>
-              {COPY.giveEveryone}
-            </Button>
-          )
-        }
-      />
+    <div className={PLAY_BOX.flat}>
+      <dl className={PLAY_ADMIN.totals}>
+        {totals.map(([label, value]) => (
+          <div key={label} className={PLAY_ADMIN.total}>
+            <dd className={PLAY_ADMIN.totalValue}>{formatNumber(value)}</dd>
+            <dt className={PLAY_ADMIN.totalLabel}>{label}</dt>
+          </div>
+        ))}
+      </dl>
+
+      <div className={PLAY_ADMIN.toolbar}>
+        <label className={PLAY_BOX.search}>
+          <SearchIcon className={PLAY_BOX.searchIcon} aria-hidden="true" />
+          <input
+            type="search"
+            value={search}
+            aria-label={COPY.search}
+            placeholder={COPY.search}
+            onChange={(event) => setSearch(event.target.value)}
+            className={PLAY_BOX.searchInput}
+          />
+        </label>
+        <SelectMenu
+          isPlay
+          label={COPY.filterYoutuber}
+          emptyLabel={COPY.allYoutubers}
+          mark="avatar"
+          options={board.youtubers.map((youtuber) => ({
+            value: youtuber.id,
+            label: youtuber.name,
+            image: youtuber.avatarUrl,
+          }))}
+          value={filters.youtuber ?? ''}
+          onChange={(value) => setFilter('youtuber', value)}
+        />
+        <SelectMenu
+          isPlay
+          label={COPY.filterStatus}
+          emptyLabel={COPY.filterAll}
+          options={PLAY_STATES}
+          value={filters.state ?? ''}
+          onChange={(value) => setFilter('state', value)}
+        />
+      </div>
+
+      {canBulk && (
+        <div className={PLAY_ADMIN.toolbarAction}>
+          <Button variant="arcade" onClick={() => setForm('give')}>
+            {COPY.giveEveryone}
+          </Button>
+        </div>
+      )}
 
       {isFiltered && shown.length === 0 ? (
         <EmptyState
@@ -174,7 +205,7 @@ export const PlayAdminPlayers = ({ board, canBulk }: PlayAdminPlayersProps) => {
                 key={group.key}
                 name={group.label}
                 avatarUrl={group.image}
-                bannerUrl={group.banner}
+                note={fillPlayMessage(COPY.groupCount, { count: group.players.length })}
                 isOpen={flipped.has(group.key) !== isOpenByDefault}
                 onToggle={() => setFlipped((current) => withToggled(current, group.key))}
               >

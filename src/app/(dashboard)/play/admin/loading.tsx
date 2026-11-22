@@ -1,12 +1,12 @@
 import { PLAY_ADMIN } from '@/declarations/ui/variants'
 
-// Creator banners while the board loads
-const BANNERS = 4
+// Boxes drawn grey while a page loads
+const BOXES = 4
 
 export default function Loading() {
   return (
-    <div className={PLAY_ADMIN.groups} aria-busy="true">
-      {Array.from({ length: BANNERS }, (_, index) => (
+    <div className={PLAY_ADMIN.skeletons} aria-busy="true">
+      {Array.from({ length: BOXES }, (_, index) => (
         <span key={index} className={PLAY_ADMIN.skeleton} />
       ))}
     </div>
