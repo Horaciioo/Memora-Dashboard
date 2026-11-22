@@ -140,7 +140,13 @@ export const strikeProgress = (row: ConcordatStrikeRow, tick: number): number =>
 
 // A warhead bursts like a rocket, the carrier never bursts
 const burstKindOf = (kind: ConcordatStrikeRow['kind']): ConcordatBurstKind =>
-  kind === 'warhead' ? 'rocket' : kind === 'mirv' ? 'heavy' : kind
+  kind === 'warhead' || kind === 'bombSmall'
+    ? 'rocket'
+    : kind === 'mirv' || kind === 'bombHuge'
+      ? 'heavy'
+      : kind === 'bombLarge'
+        ? 'missile'
+        : kind
 
 const addBurst = (
   fx: ConcordatWarFx,

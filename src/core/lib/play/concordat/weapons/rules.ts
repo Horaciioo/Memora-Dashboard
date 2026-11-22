@@ -2,15 +2,14 @@ import { buildingById, isWorking } from '@/core/lib/play/concordat/buildings/rul
 import { modeRules } from '@/core/lib/play/concordat/modes/rules'
 import { reachOf } from '@/core/lib/play/concordat/sim/area'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
-import { tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatBuilding, ConcordatIntent, ConcordatState } from '@/types/concordat'
 import {
   ConcordatBuildingKinds,
   ConcordatTerrains,
-  ConcordatTies,
 } from '@/utils/constants/concordat'
-import type { ConcordatStrikeKind } from '@/utils/constants/concordat'
+import type { ConcordatBombName, ConcordatStrikeKind } from '@/utils/constants/concordat'
+import { CONCORDAT_BOMBS } from '@/utils/constants/concordat'
 
 const { weapons, air } = CONCORDAT
 
@@ -79,11 +78,25 @@ export const flightTicks = (
   const reach = Math.min(1, distance / weapons.range)
   const seconds = weapons.flightMin + (weapons.flightMax - weapons.flightMin) * reach
 
-  const extra =
-    kind === 'heavy' ? weapons.heavyExtra : kind === 'mirv' ? weapons.mirv.extraSeconds : 0
+  const extra = isBomb(kind)
+    ? weapons.bombs[kind].extraSeconds
+    : kind === 'heavy'
+      ? weapons.heavyExtra
+      : kind === 'mirv'
+        ? weapons.mirv.extraSeconds
+        : 0
 
   return ticksOf(seconds + extra)
 }
+
+/**
+ * Whether a weapon name is one of the bombs
+ * @param {string | undefined} weapon - Name
+ * @return {boolean} - Bomb
+ */
+
+export const isBomb = (weapon: string | undefined): weapon is ConcordatBombName =>
+  CONCORDAT_BOMBS.some((bomb) => bomb === weapon)
 
 /**
  * Reach of a battery of this level
@@ -108,7 +121,6 @@ const holderRefusal = (state: ConcordatState, playerId: number, tile: number): s
   const target = holder ? state.players[holder - 1] : null
   if (holder === playerId) return 'self'
   if (target && state.tick < target.protectedUntil) return 'protected'
-  if (target && tieKindOf(state, playerId, holder) === ConcordatTies.Peace) return 'treaty'
 
   return null
 }
@@ -168,6 +180,14 @@ export const launchRefusal = (
 
   const refusal = holderRefusal(state, intent.playerId, intent.tile)
   if (refusal) return refusal
+
+  if (isBomb(weapon)) {
+    const bomb = weapons.bombs[weapon]
+    if (silo.level < bomb.siloLevel) return 'siloLevel'
+    if ((silo.coolAt ?? 0) > state.tick) return 'cooling'
+
+    return state.players[intent.playerId - 1].gold < bomb.cost ? 'noGold' : null
+  }
 
   if (weapon === 'mirv') {
     if (!modeRules(state.mode).heavy) return 'heavyOff'

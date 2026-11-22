@@ -1,7 +1,10 @@
 import type { ConcordatScene } from '@/composites/play/concordat/board/draw/types'
 import { rgbText } from '@/core/lib/play/concordat'
+import { seaAround, seaPath } from '@/core/lib/play/concordat/navy/path'
+import type { ConcordatMap } from '@/types/concordat'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
-import { drawBoat, drawTrain } from '@/composites/play/concordat/board/draw/drawBoat'
+import { drawUnit, lengthOf, pixelAt } from '@/composites/play/concordat/board/draw/drawBoat'
+import { drawTrain } from '@/composites/play/concordat/board/draw/drawTrain'
 import { drawShipBadge } from '@/composites/play/concordat/board/draw/drawShipBadge'
 import { ConcordatPhases, ConcordatPowers, ConcordatShipKinds } from '@/utils/constants/concordat'
 
@@ -100,6 +103,20 @@ const voyageOf = (
   }
 }
 
+// Sea course of each transport, found once from where it was first seen
+const courses = new Map<number, { landing: number; way: number[] }>()
+
+// Tiles still to cross, from the ship on
+const courseOf = (map: ConcordatMap, id: number, tile: number, landing: number): number[] => {
+  let course = courses.get(id)
+  if (!course || course.landing !== landing) {
+    course = { landing, way: seaPath(map, [tile], seaAround(map, landing)) ?? [] }
+    courses.set(id, course)
+  }
+
+  return course.way.slice(Math.max(0, course.way.indexOf(tile)))
+}
+
 /**
  * Ships as hulls at any zoom, with their course to the far shore
  * @param {CanvasRenderingContext2D} context - Canvas
@@ -109,29 +126,30 @@ const voyageOf = (
 
 export const drawStructures = (context: CanvasRenderingContext2D, scene: ConcordatScene): void => {
   const { camera, client, colors } = scene
-  const size = Math.max(look.min, camera.scale * 0.8)
+  const pixel = pixelAt(camera.scale)
 
   // A sunk ship forgets its voyage
   if (voyages.size > client.ships.length) {
     const alive = new Set(client.ships.map((ship) => ship.id))
     for (const id of voyages.keys()) if (!alive.has(id)) voyages.delete(id)
+    for (const id of courses.keys()) if (!alive.has(id)) courses.delete(id)
   }
 
   for (const ship of client.ships) {
     const [x, y] = centerOf(scene, ship.tile)
-    const isWar = ship.kind === ConcordatShipKinds.War
-    const isCargo = ship.kind === ConcordatShipKinds.Trade
 
-    // Dotted course toward the coast it lands on
-    if (ship.landing >= 0) {
-      const [goalX, goalY] = centerOf(scene, ship.landing)
+    // Dotted course over the water toward the coast it lands on
+    if (ship.kind === ConcordatShipKinds.Transport && ship.landing >= 0) {
+      const way = courseOf(client.map, ship.id, ship.tile, ship.landing)
       context.save()
       context.setLineDash(arrow.dash)
       context.lineWidth = 2
+      context.lineJoin = 'round'
       context.strokeStyle = rgbText(colors[ship.owner] ?? frame.shadow, 0.8)
       context.beginPath()
       context.moveTo(x, y)
-      context.lineTo(goalX, goalY)
+      for (const tile of way) context.lineTo(...centerOf(scene, tile))
+      context.lineTo(...centerOf(scene, ship.landing))
       context.stroke()
       context.restore()
     }
@@ -139,14 +157,27 @@ export const drawStructures = (context: CanvasRenderingContext2D, scene: Concord
     const { from, glide, angle, isMoving } = voyageOf(ship.id, ship.tile, scene.now)
     const [fromX, fromY] = centerOf(scene, from)
     const at = [fromX + (x - fromX) * glide, fromY + (y - fromY) * glide]
-    const hull = size * (isCargo ? 1.1 : 1.4)
     const color = colors[ship.owner] ?? frame.shadow
     if (ship.kind === ConcordatShipKinds.Train) {
-      drawTrain(context, at[0], at[1], size * 0.9, angle(scene), color)
-
+      drawTrain(context, at[0], at[1], camera.scale, angle(scene), color)
       continue
     }
-    drawBoat(context, at[0], at[1], hull, angle(scene), color, scene.now, ship.id, isMoving, isWar)
+    drawUnit(
+      context,
+      at[0],
+      at[1],
+      pixel,
+      angle(scene),
+      color,
+      ship.kind,
+      scene.now,
+      ship.id,
+      isMoving
+    )
+    if (ship.kind === ConcordatShipKinds.Trade) continue
+
+    // The tag keeps a floor so a far boat stays readable
+    const hull = Math.max(look.min, lengthOf(ship.kind, pixel))
     drawShipBadge(context, at[0], at[1], hull, color, ship.kind, ship.hp, ship.vet)
   }
 }

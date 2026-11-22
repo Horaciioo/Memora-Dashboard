@@ -9,6 +9,7 @@ import type {
   ConcordatEventKind,
   ConcordatDifficultyName,
   ConcordatModeName,
+  ConcordatLaunchWeapon,
   ConcordatStrikeKind,
   ConcordatTechPath,
   ConcordatWorldKind,
@@ -123,7 +124,7 @@ export interface ConcordatCorps {
   drive?: number
   // End tick of a feint, absent on a real push
   feint?: number
-  // Free land tile the push heads for
+  // Tile the push heads for
   aim?: number
   // Province the push works on, it stops once whole
   zone?: number
@@ -243,7 +244,7 @@ export interface ConcordatRelation {
   b: number
   kind: ConcordatTieKind
   since: number
-  // End tick of a peace, zero when open
+  // End tick, zero when open
   until: number
   // Tick a announced break takes effect, zero when none
   breakAt: number
@@ -262,11 +263,9 @@ export interface ConcordatOffer {
   from: number
   to: number
   kind: ConcordatOfferKind
-  // Peace length
-  minutes: number
   // Request wording
   ask: number
-  // Third nation of a request or coalition
+  // Third nation of a request
   about: number
   expiresAt: number
 }
@@ -295,18 +294,6 @@ export interface ConcordatRoute {
 }
 
 /**
- * Nations joined against a fallen one
- * @typedef {Object} ConcordatCoalition
- */
-
-export interface ConcordatCoalition {
-  id: number
-  target: number
-  members: number[]
-  until: number
-}
-
-/**
  * Effects of the buildings of one nation
  * @typedef {Object} ConcordatEffects
  */
@@ -331,8 +318,6 @@ export interface ConcordatEffects {
   intercept: number
   shipSpeed: number
   trustGain: number
-  // Longer peace, share
-  peace: number
   // Added to the blockade reach of warships
   blockade: number
   // Share of the land upkeep spared
@@ -519,14 +504,13 @@ export interface ConcordatState {
   events: ConcordatEvent[]
   // Tiles changed since the last drain
   changed: number[]
-  // Ids of buildings, ships, offers, routes and coalitions
+  // Ids of buildings, ships, offers and routes
   nextId: number
   buildings: ConcordatBuilding[]
   ships: ConcordatShip[]
   relations: ConcordatRelation[]
   offers: ConcordatOffer[]
   routes: ConcordatRoute[]
-  coalitions: ConcordatCoalition[]
   // Public credit per player, index is the id minus one
   trust: number[]
   // Trade bans, and the tick each traitor mark ends, index is the id minus one
@@ -582,14 +566,14 @@ export type ConcordatIntent =
       tile: number
       heavy: boolean
       // Shell or rocket from a battery, missing for a silo missile
-      weapon?: 'shell' | 'rocket' | 'mirv'
+      weapon?: ConcordatLaunchWeapon
     }
   | { kind: 'sortie'; playerId: number; base: number; tile: number; air: ConcordatAirKind }
   | { kind: 'retreat'; playerId: number; target: number }
   | { kind: 'placeStart'; playerId: number; tile: number }
   | { kind: 'build'; playerId: number; building: ConcordatBuildingKind; tile: number }
   | { kind: 'upgrade'; playerId: number; id: number }
-  | { kind: 'buildShip'; playerId: number; port: number }
+  | { kind: 'buildShip'; playerId: number; tile: number }
   | { kind: 'moveShip'; playerId: number; ship: number; tile: number }
   | { kind: 'sail'; playerId: number; tile: number; percent: number }
   | {
@@ -597,7 +581,6 @@ export type ConcordatIntent =
       playerId: number
       to: number
       offer: ConcordatOfferKind
-      minutes: number
       ask: number
       about: number
     }
@@ -637,6 +620,9 @@ export interface ConcordatBotProfile {
   betrays: number
   sails: number
   opportunity: number
+  // Ports it raises, warships it keeps
+  ports: number
+  warships: number
   build: ConcordatBuildingKind[]
   techPath: ConcordatTechPath
   // Weights of the personality

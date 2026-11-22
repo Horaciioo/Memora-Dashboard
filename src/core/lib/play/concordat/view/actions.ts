@@ -29,17 +29,7 @@ export const tieOfRows = (
 
 // Gestures per tie, the first is the main one
 const ACTIONS: Record<ConcordatTieKind, ConcordatTargetAction[]> = {
-  [ConcordatTies.Hostile]: [
-    ConcordatTargetActions.Attack,
-    ConcordatTargetActions.Peace,
-    ConcordatTargetActions.Alliance,
-    ConcordatTargetActions.Trade,
-  ],
-  [ConcordatTies.Peace]: [
-    ConcordatTargetActions.Alliance,
-    ConcordatTargetActions.Trade,
-    ConcordatTargetActions.Break,
-  ],
+  [ConcordatTies.Hostile]: [ConcordatTargetActions.Attack, ConcordatTargetActions.Alliance],
   [ConcordatTies.Alliance]: [
     ConcordatTargetActions.Aid,
     ConcordatTargetActions.Trade,
@@ -105,10 +95,6 @@ export const bodyFor = (
     return { type: ConcordatIntents.Aid, to: target, percent }
   if (action === ConcordatTargetActions.Trade)
     return { type: ConcordatIntents.OpenTrade, to: target }
-  const offer =
-    action === ConcordatTargetActions.Peace
-      ? ConcordatOfferKinds.Peace
-      : ConcordatOfferKinds.Alliance
 
-  return { type: ConcordatIntents.Propose, to: target, offer }
+  return { type: ConcordatIntents.Propose, to: target, offer: ConcordatOfferKinds.Alliance }
 }

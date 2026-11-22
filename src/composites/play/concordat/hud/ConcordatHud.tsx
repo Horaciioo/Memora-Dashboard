@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ConcordatFronts } from '@/composites/play/concordat/hud/ConcordatFronts'
 import { ConcordatAlerts } from '@/composites/play/concordat/hud/ConcordatAlerts'
 import { ConcordatThreats } from '@/composites/play/concordat/hud/ConcordatThreats'
+import { ConcordatOffers } from '@/composites/play/concordat/hud/ConcordatOffers'
 import { ConcordatPanels } from '@/composites/play/concordat/hud/ConcordatPanels'
 import { ConcordatMeter } from '@/composites/play/concordat/hud/ConcordatMeter'
 import { ConcordatZones } from '@/composites/play/concordat/hud/ConcordatZones'
@@ -99,12 +100,22 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
         {
           key: 'troops',
           caption: CONCORDAT_HUD_COPY.troops,
-          figure: economy
-            ? fillPlayMessage(CONCORDAT_HUD_COPY.troopsOf, {
+          figure: economy ? (
+            <>
+              {fillPlayMessage(CONCORDAT_HUD_COPY.troopsOf, {
                 troops: troopFigure(me.troops),
                 max: troopFigure(economy.maxTroops),
-              })
-            : troopFigure(me.troops),
+              })}
+              <span className={CONCORDAT_HUD.statRate}>
+                {' '}
+                {fillPlayMessage(CONCORDAT_HUD_COPY.troopsRate, {
+                  rate: `${economy.growth < 0 ? '-' : '+'}${troopFigure(Math.abs(economy.growth))}`,
+                })}
+              </span>
+            </>
+          ) : (
+            troopFigure(me.troops)
+          ),
         },
         {
           key: 'gold',
@@ -157,13 +168,16 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
     >
       <ConcordatNotices client={client} isSeated={isSeated} />
       {isPlaying && <ConcordatAlerts client={client} act={act} />}
+      {isPlaying && <ConcordatOffers client={client} names={names} act={act} />}
       <ConcordatMeter client={client} />
       <ConcordatZones client={client} names={names} />
       <ConcordatPanels client={client} names={names} land={land} />
       {isPlaying && (
         <div className={CONCORDAT_HUD.dock}>
-          <ConcordatFronts client={client} names={names} act={act} />
-          <ConcordatThreats client={client} names={names} act={act} />
+          <div className={CONCORDAT_HUD.lines}>
+            <ConcordatThreats client={client} names={names} act={act} />
+            <ConcordatFronts client={client} names={names} act={act} />
+          </div>
           <ConcordatPill figures={figures} client={client} names={names} act={act} />
         </div>
       )}

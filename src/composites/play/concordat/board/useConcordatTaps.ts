@@ -11,8 +11,10 @@ import { baseFor, batteryFor } from '@/core/lib/play/concordat/view/arsenal'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import { ConcordatBuildingKinds } from '@/utils/constants/concordat'
+import type { ConcordatBombName, ConcordatLaunchWeapon } from '@/utils/constants/concordat'
 import {
   ConcordatIntents,
+  ConcordatShipKinds,
   ConcordatPhases,
   ConcordatTerrains,
   ConcordatTies,
@@ -22,14 +24,25 @@ export interface ConcordatStrike {
   tile: number
   silo: number
   isHeavy: boolean
-  weapon?: 'shell' | 'rocket' | 'mirv'
+  weapon?: ConcordatLaunchWeapon
   air?: 'heli' | 'fighter'
   x: number
   y: number
 }
 
+// Silo level a launch tool asks for
+const siloLevelOf = (tool: { isHeavy: boolean; weapon?: ConcordatLaunchWeapon }): number => {
+  if (tool.weapon === 'mirv') return CONCORDAT.weapons.mirv.siloLevel
+  if (tool.weapon && tool.weapon in CONCORDAT.weapons.bombs)
+    return CONCORDAT.weapons.bombs[tool.weapon as ConcordatBombName].siloLevel
+
+  return tool.isHeavy ? CONCORDAT.weapons.heavyLevel : 0
+}
+
 // Pointer travel that moves the tooltip within one nation
 const TIP_TRAVEL = 18
+// Tiles within which a tap picks an own warship
+const SHIP_PICK = 2
 // Two taps closer than this in time and space make a double tap
 const DOUBLE_MS = 380
 const DOUBLE_TRAVEL = 28
@@ -110,6 +123,7 @@ export const useConcordatTaps = ({
 
       return
     }
+    if (tool.kind === 'fleet') return
     if (tool.kind === 'sortie') {
       const base = baseFor(client, tile)
       const isMine = client.owner[tile] === client.me
@@ -129,11 +143,7 @@ export const useConcordatTaps = ({
           building.owner === client.me &&
           building.kind === ConcordatBuildingKinds.Silo &&
           building.readyAt <= client.tick &&
-          (!tool.isHeavy ||
-            building.level >=
-              (tool.weapon === 'mirv'
-                ? CONCORDAT.weapons.mirv.siloLevel
-                : CONCORDAT.weapons.heavyLevel)) &&
+          building.level >= siloLevelOf(tool) &&
           reachOf(building.tile, tile, client.map.width) <= CONCORDAT.weapons.range
       )
       .sort(
@@ -145,15 +155,54 @@ export const useConcordatTaps = ({
       tile,
       silo: silo.id,
       isHeavy: tool.isHeavy,
-      weapon: tool.weapon === 'mirv' ? 'mirv' : undefined,
+      weapon: tool.weapon,
       x,
       y,
+    })
+  }
+
+  // Own warship close to a tile
+  const shipNear = (tile: number) =>
+    client.ships.find(
+      (ship) =>
+        ship.owner === client.me &&
+        ship.kind === ConcordatShipKinds.War &&
+        reachOf(ship.tile, tile, client.map.width) <= SHIP_PICK
+    )
+
+  // Fleet tool: pick a warship, send the picked one, or buy a new one at the aimed sea tile
+  const applyFleet = (tile: number) => {
+    const { fleetShip, setFleetShip } = useConcordatViewStore.getState()
+    const near = shipNear(tile)
+    if (near) return setFleetShip(near.id)
+    if (terrain[tile] !== ConcordatTerrains.Sea) return mark(tile, 'refused')
+
+    const body =
+      fleetShip === null
+        ? { type: ConcordatIntents.BuildShip, tile }
+        : { type: ConcordatIntents.MoveShip, ship: fleetShip, tile }
+    void act(body).then((isDone) => {
+      mark(tile, isDone ? 'build' : 'refused')
+      if (isDone) {
+        setFleetShip(null)
+        if (fleetShip === null) setTool(null)
+      }
     })
   }
 
   const onTap = (tile: number, x: number, y: number) => {
     setMenu(null)
     setStrike(null)
+    if (tile >= 0 && isSeated && client.me && client.phase === ConcordatPhases.Playing) {
+      const { tool } = useConcordatViewStore.getState()
+      const near = shipNear(tile)
+      if (tool?.kind === 'fleet') return applyFleet(tile)
+      if (!tool && near) {
+        useConcordatViewStore.getState().setFleetShip(near.id)
+
+        return setTool({ kind: 'fleet' })
+      }
+    }
     if (tile < 0 || !isSeated || !client.me || terrain[tile] === ConcordatTerrains.Sea) return
     if (client.phase === ConcordatPhases.Picking) {
       void act({ type: ConcordatIntents.PlaceStart, tile })

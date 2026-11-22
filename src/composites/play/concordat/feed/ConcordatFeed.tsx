@@ -7,9 +7,7 @@ import { PlaySessionFeed } from '@/composites/play/session/PlaySessionFeed'
 import type { PlayFeedLine } from '@/composites/play/session/PlaySessionFeed'
 import { useConcordatGame } from '@/core/hooks/data/play/useConcordatGame'
 import type { ConcordatBoard } from '@/core/lib/play/concordat'
-import { CONCORDAT_FEED_COPY, CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
-import { CONCORDAT_HUD } from '@/declarations/ui/variants'
-import { ConcordatIntents } from '@/utils/constants/concordat'
+import { CONCORDAT_FEED_COPY } from '@/declarations/play/concordat/hudCopy'
 
 export interface ConcordatFeedProps {
   sessionId: string
@@ -22,27 +20,27 @@ interface Told {
   kind: string
   actor: number
   victim: number
-  offer?: number
   // An attack still going
   isOpen?: boolean
   at: Date
 }
 
 // Journal kinds with a line, announce is split by what it announces
-const lineKindOf = (kind: string, actor: number): string => {
+const lineKindOf = (kind: string, actor: number, victim: number): string => {
+  if (kind === 'landed' && victim === 0) return 'landedFree'
   if (kind === 'announce') return actor === 5 ? 'warning' : 'worldAnnounce'
 
   return kind
 }
 
 /**
- * Concordat feed, a line per event the chat can tell, offers and attacks included
+ * Concordat feed, a line per event the chat can tell, attacks included, offers go to the popup
  * @param {ConcordatFeedProps} props - Game and faces
  * @return {JSX.Element | null}
  */
 
 export const ConcordatFeed = ({ sessionId, board, players }: ConcordatFeedProps) => {
-  const { client, act } = useConcordatGame(sessionId, board)
+  const { client } = useConcordatGame(sessionId, board)
   // Lines in the order they were first read
   const [told, setTold] = useState<Record<string, Told>>({})
   if (!client) return null
@@ -53,7 +51,7 @@ export const ConcordatFeed = ({ sessionId, board, players }: ConcordatFeedProps)
 
   const seen: Record<string, Omit<Told, 'at'>> = {}
   client.log.forEach((event, index) => {
-    const kind = lineKindOf(event.kind, event.actor)
+    const kind = lineKindOf(event.kind, event.actor, event.victim)
     if (kind in CONCORDAT_FEED_COPY) {
       const isWorld = kind === 'worldAnnounce' || kind === 'worldEnd'
       seen[`${index}:${event.kind}`] = {
@@ -63,14 +61,6 @@ export const ConcordatFeed = ({ sessionId, board, players }: ConcordatFeedProps)
       }
     }
   })
-  for (const offer of client.offers) {
-    seen[`offer:${offer.id}`] = {
-      kind: `offer${offer.kind[0].toUpperCase()}${offer.kind.slice(1)}`,
-      actor: offer.from,
-      victim: offer.to,
-      offer: offer.id,
-    }
-  }
   // An attack tells once, again when it comes back after a stop
   const attackers = new Set(
     client.me ? client.corps.filter((row) => row.target === client.me).map((row) => row.owner) : []
@@ -97,11 +87,11 @@ export const ConcordatFeed = ({ sessionId, board, players }: ConcordatFeedProps)
     })
   }
 
-  const pending = new Set(client.offers.filter((offer) => offer.to === client.me).map((o) => o.id))
   const feed: PlayFeedLine[] = Object.entries(told)
     .map(([id, line]) => ({
       id,
       kind: line.kind,
+      isTimeless: true,
       accountId: accountOf(line.actor),
       at: line.at,
       values: {
@@ -109,25 +99,6 @@ export const ConcordatFeed = ({ sessionId, board, players }: ConcordatFeedProps)
         victim: nameOf(line.victim),
         ...(accountOf(line.actor) || !line.actor ? {} : { actor: nameOf(line.actor) }),
       },
-      action:
-        line.offer && pending.has(line.offer) ? (
-          <span className="flex gap-2">
-            <button
-              type="button"
-              className={CONCORDAT_HUD.accept}
-              onClick={() => void act({ type: ConcordatIntents.Accept, offer: line.offer })}
-            >
-              {CONCORDAT_HUD_COPY.accept}
-            </button>
-            <button
-              type="button"
-              className={CONCORDAT_HUD.refuse}
-              onClick={() => void act({ type: ConcordatIntents.Refuse, offer: line.offer })}
-            >
-              {CONCORDAT_HUD_COPY.refuse}
-            </button>
-          </span>
-        ) : undefined,
     }))
     .toReversed()
 

@@ -71,7 +71,7 @@ export const landShip = (state: ConcordatState, ship: ConcordatShip): void => {
   const holder = state.owner[ship.landing]
   const target = holder ? state.players[holder - 1] : null
 
-  // Peace made at sea, or a nation fallen: the troops sail home
+  // Alliance made at sea, or a nation fallen: the troops sail home
   if (holder === me.id || (target && (!target.alive || hasTreaty(state, me.id, holder)))) {
     me.troops += ship.troops
     return
@@ -115,22 +115,14 @@ export const landShip = (state: ConcordatState, ship: ConcordatShip): void => {
  */
 
 export const foesOf = (state: ConcordatState, ship: ConcordatShip): number[] => {
-  const holder = state.owner[ship.landing]
+  const foes = new Set<number>([state.owner[ship.landing]])
+  for (const tie of state.relations) {
+    if (tie.kind !== 'hostile') continue
+    if (tie.a === ship.owner) foes.add(tie.b)
+    else if (tie.b === ship.owner) foes.add(tie.a)
+  }
 
-  return state.players
-    .filter(
-      (player) =>
-        player.alive &&
-        player.id !== ship.owner &&
-        (player.id === holder ||
-          state.relations.some(
-            (tie) =>
-              tie.kind === 'hostile' &&
-              Math.min(player.id, ship.owner) === tie.a &&
-              Math.max(player.id, ship.owner) === tie.b
-          ))
-    )
-    .map((player) => player.id)
+  return [...foes].filter((id) => id && id !== ship.owner && state.players[id - 1].alive)
 }
 
 /**

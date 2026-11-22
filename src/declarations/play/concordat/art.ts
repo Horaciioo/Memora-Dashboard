@@ -27,25 +27,28 @@ export const CONCORDAT_ART = {
     glide: 110,
   },
   // Zoom steps that unlock details
-  detail: { crossings: 0.8, provinces: 1, provinceNames: 2.4, buildings: 1.1 },
-  // Boat on a river crossing, in tiles then pixels
+  detail: { buildings: 0.8 },
+  // Boat motion and colours
   boat: {
-    size: 2.4,
-    min: 12,
-    max: 26,
-    rgb: [236, 244, 248],
-    alpha: 0.92,
     bobMs: 520,
     bob: 0.05,
     sway: 0.05,
     wake: [236, 244, 248],
     rim: [244, 248, 250],
     gun: [40, 52, 60],
+    deck: [196, 168, 124],
+    plank: [150, 122, 84],
+    shadow: [14, 40, 58],
+    cargo: [228, 224, 214],
+    flag: [255, 255, 255],
     // Tiles a boat glides per second at best
     glide: 1,
+    wakeMs: 1100,
   },
+  // Pixel sprites: smallest pixel on screen and its share of a tile
+  sprite: { minPixel: 2, perScale: 0.3, tradeGrow: 1.7 },
   // Building token, in pixels, then its ring and level pips
-  token: { base: 1.2, min: 8, max: 26, ring: 1.4, glyph: 0.62, pip: 0.09, badge: 0.27 },
+  token: { base: 4.4, min: 24, max: 76, ring: 2, glyph: 0.7, pip: 0.08, badge: 0.27 },
   // Missiles: trail, reticle and the fallout ground
   strike: {
     arc: 0.28,
@@ -128,6 +131,22 @@ export const CONCORDAT_ART = {
   // Smallest boat on screen, in pixels
   // Round tag over it: radius and lift from the hull length, white rim
   ship: { min: 22, badge: { radius: 0.4, lift: 0.85, rim: 1.5 } },
+  // Train: cars, then width and length over the rail width, and the cap in pixels
+  train: { cars: 3, width: 1.7, length: 2.4, gap: 0.35, max: 16 },
+  // Rails: width from zoom, then casing, dashed core, cut and preview colours
+  rails: {
+    min: 3,
+    max: 9,
+    base: 0.3,
+    casing: [24, 26, 30],
+    core: [250, 250, 250],
+    shade: 0.45,
+    tint: 0.55,
+    cut: [196, 92, 80],
+    ghost: [120, 126, 134],
+    ghostAlpha: 0.55,
+    dash: [0.55, 0.45],
+  },
   // Trade lines: width from zoom, arc, casing, cut grey, pulse size and speed
   routes: {
     min: 1.5,

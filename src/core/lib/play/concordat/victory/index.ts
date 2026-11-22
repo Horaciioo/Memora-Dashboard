@@ -1,2 +1,6 @@
+export * from '@/core/lib/play/concordat/victory/absorb'
 export * from '@/core/lib/play/concordat/victory/end'
+export * from '@/core/lib/play/concordat/victory/hegemony'
+export * from '@/core/lib/play/concordat/victory/land'
+export * from '@/core/lib/play/concordat/victory/ramp'
 export * from '@/core/lib/play/concordat/victory/score'

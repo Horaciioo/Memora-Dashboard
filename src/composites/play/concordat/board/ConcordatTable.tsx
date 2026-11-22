@@ -156,8 +156,7 @@ export const ConcordatTable = ({
 
       const isEchoing = marks.some((item) => performance.now() - item.at < CONCORDAT_ART.mark.ms)
 
-      const isSailing =
-        client.ships.length > 0 || camera.current.scale >= CONCORDAT_ART.detail.crossings
+      const isSailing = client.ships.length > 0
 
       return (
         isWar ||
@@ -250,7 +249,7 @@ export const ConcordatTable = ({
       </div>
       <ConcordatToolGhost />
       {hover && !menu && client.phase === ConcordatPhases.Playing && (
-        <ConcordatHoverCard client={client} names={names} tile={hover.tile} holder={hover.holder} />
+        <ConcordatHoverCard client={client} names={names} holder={hover.holder} />
       )}
       {menu && (
         <ConcordatTargetMenu

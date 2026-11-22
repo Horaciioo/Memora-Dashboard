@@ -27,7 +27,7 @@ export const areHostile = (state: ConcordatState, first: number, second: number)
   if (first === second) return false
   const tie = tieKindOf(state, first, second)
 
-  return tie !== ConcordatTies.Peace && tie !== ConcordatTies.Alliance
+  return tie !== ConcordatTies.Alliance
 }
 
 /**
@@ -86,7 +86,6 @@ export const sortieRefusal = (
   } else if (holder !== intent.playerId && holder) {
     const target = state.players[holder - 1]
     if (state.tick < target.protectedUntil) return 'protected'
-    if (tieKindOf(state, intent.playerId, holder) === ConcordatTies.Peace) return 'treaty'
   }
   if (!modeRules(state.mode).weapons) return 'featureOff'
 

@@ -150,7 +150,7 @@ const samChance = (level: number, strike: ConcordatStrike): number => {
 
   if (strike.kind === 'warhead') return base * weapons.mirv.samShare
 
-  return strike.kind === 'heavy' ? base * air.samHeavy : base
+  return strike.kind === 'heavy' || strike.kind === 'bombHuge' ? base * air.samHeavy : base
 }
 
 // Nearest ready anti-missile battery of a nation that covers a tile

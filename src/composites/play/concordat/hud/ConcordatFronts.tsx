@@ -1,8 +1,7 @@
 'use client'
 
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
-import { playerRgb, rgbText, troopFigure } from '@/core/lib/play/concordat'
-import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
+import { troopFigure } from '@/core/lib/play/concordat'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 import { ConcordatIntents } from '@/utils/constants/concordat'
@@ -30,18 +29,10 @@ export const ConcordatFronts = ({ client, names, act }: ConcordatFrontsProps) =>
     <div className={CONCORDAT_HUD.fronts}>
       {mine.slice(0, LISTED).map((corps) => (
         <div key={corps.target} className={CONCORDAT_HUD.front}>
-          <span
-            className={CONCORDAT_HUD.swatch}
-            style={{
-              background: corps.target
-                ? rgbText(playerRgb(client.players[corps.target - 1], CONCORDAT_ART.nation))
-                : 'var(--play-ink-faint)',
-            }}
-          />
+          <span className={CONCORDAT_HUD.frontTroops}>{troopFigure(corps.troops)}</span>
           <span className={CONCORDAT_HUD.frontName}>
             {corps.target ? names[corps.target] : CONCORDAT_HUD_COPY.free}
           </span>
-          <span className={CONCORDAT_HUD.frontTroops}>{troopFigure(corps.troops)}</span>
           <button
             type="button"
             className={CONCORDAT_HUD.frontCancel}

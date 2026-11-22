@@ -33,6 +33,8 @@ export interface ConcordatBotContext {
   isCaretaker: boolean
   // Stable noise of this decision, 0 to 1
   roll: (salt: number) => number
+  // Urge to strike, 0 at the start to 1 once the game is old
+  pressure: number
 }
 
 /**

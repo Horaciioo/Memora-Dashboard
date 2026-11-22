@@ -1,31 +1,25 @@
-import { buildingById, isWorking } from '@/core/lib/play/concordat/buildings/rules'
 import { hasTreaty } from '@/core/lib/play/concordat/diplomacy/ties'
-import { seaAround, seaPath } from '@/core/lib/play/concordat/navy/path'
-import { sailRoute } from '@/core/lib/play/concordat/navy/route'
+import { seaPath } from '@/core/lib/play/concordat/navy/path'
+import { sailRoute, warRoute } from '@/core/lib/play/concordat/navy/route'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
-import {
-  ConcordatBuildingKinds,
-  ConcordatShipKinds,
-  ConcordatTerrains,
-} from '@/utils/constants/concordat'
+import { ConcordatShipKinds, ConcordatTerrains } from '@/utils/constants/concordat'
 
 const { navy, sim } = CONCORDAT
 
-// Working port of the sender
-const portOf = (state: ConcordatState, playerId: number, id: number) => {
-  const port = buildingById(state, id)
+/**
+ * Own warships of a nation
+ * @param {ConcordatState} state - Game
+ * @param {number} playerId - Nation
+ * @return {number} - Count
+ */
 
-  return port &&
-    port.owner === playerId &&
-    port.kind === ConcordatBuildingKinds.Port &&
-    isWorking(port, state.tick)
-    ? port
-    : null
-}
+export const fleetOf = (state: ConcordatState, playerId: number): number =>
+  state.ships.filter((ship) => ship.owner === playerId && ship.kind === ConcordatShipKinds.War)
+    .length
 
 /**
- * Why a warship cannot be built, null when it can
+ * Why a warship cannot be bought, null when it can: it is a weapon, launched from the nearest own coast
  * @param {ConcordatState} state - Game
  * @param {Extract<ConcordatIntent, { kind: 'buildShip' }>} intent - Order
  * @return {string | null} - Reason
@@ -37,17 +31,15 @@ export const buildShipRefusal = (
 ): string | null => {
   if (!CONCORDAT.features.navy) return 'featureOff'
 
-  const port = portOf(state, intent.playerId, intent.port)
-  if (!port) return 'noPort'
+  const { tile, playerId } = intent
+  if (!Number.isInteger(tile) || tile < 0 || tile >= state.owner.length) return 'badTile'
+  if (state.map.terrain[tile] !== ConcordatTerrains.Sea) return 'badTile'
+  if (fleetOf(state, playerId) >= navy.maxWar + state.effects[playerId - 1].ships)
+    return 'fleetFull'
+  if (state.players[playerId - 1].provincesHeld < navy.warZones) return 'needsZones'
+  if (state.players[playerId - 1].gold < navy.warCost) return 'noGold'
 
-  const fleet = state.ships.filter(
-    (ship) => ship.owner === intent.playerId && ship.kind === ConcordatShipKinds.War
-  ).length
-  if (fleet >= state.effects[intent.playerId - 1].ships) return 'fleetFull'
-  if (state.players[intent.playerId - 1].provincesHeld < navy.warZones) return 'needsZones'
-  if (!seaAround(state.map, port.tile).length) return 'noPort'
-
-  return state.players[intent.playerId - 1].gold < navy.warCost ? 'noGold' : null
+  return warRoute(state, playerId, tile) ? null : 'noWay'
 }
 
 /**

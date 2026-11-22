@@ -88,7 +88,7 @@ export const CONCORDAT_RULES_COPY = {
   mode: 'Format',
   win: 'Victoire',
   winValue:
-    'Le premier à tenir {share} % des terres gagne, ou le meilleur score au bout du temps : territoire, économie, accomplissements.',
+    'Tenir {share} % des terres, seul ou avec ses alliés, fait gagner. Ce seuil baisse avec le temps jusqu’à {end} % et il faut le garder quelques secondes. Un pays trop grand se fait des ennemis, les petits États finissent absorbés. Sinon, le meilleur score gagne au bout du temps : territoire, économie, accomplissements.',
 } as const
 
 /**
@@ -208,7 +208,6 @@ export const CONCORDAT_REFUSALS: Record<string, string> = {
   tooManyOffers: 'Tu as trop d’offres en attente.',
   alreadyTied: 'Un traité de ce genre vous lie déjà.',
   tooManyAllies: 'Un des deux camps a déjà le maximum d’alliés.',
-  badLength: 'Cette durée de paix n’existe pas.',
   badOffer: 'Cette offre n’existe pas.',
   badRequest: 'Cette demande n’est pas valable.',
   hostile: 'Cette nation te considère comme ennemie.',

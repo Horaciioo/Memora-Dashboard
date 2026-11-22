@@ -31,6 +31,9 @@ export const disband = (state: ConcordatState, corps: ConcordatCorps, lossShare:
   drop(state, corps)
 }
 
+// Ticks between two turns of a corps, the front work is the heaviest of the game
+const COMBAT_STRIDE = 1
+
 // Own neighbours of a tile
 const ownAround = (state: ConcordatState, tile: number, owner: number): number => {
   const count = neighborsOf(tile, state.map.width, state.map.height, near)
@@ -87,12 +90,12 @@ const tileCost = (
   state: ConcordatState,
   corps: ConcordatCorps,
   tile: number,
-  mine: number
+  mine: number,
+  factor: number
 ): number => {
   const density = defenseDensity(state, corps.owner, corps.target, corps.guard)
   let cost = density * TERRAIN_DEFENSE[state.map.terrain[tile]]
-  cost *=
-    (1 + fortressBonus(state, corps.target, tile)) * attackFactor(state, corps.owner, corps.target)
+  cost *= (1 + fortressBonus(state, corps.target, tile)) * factor
   if (corps.target && state.players[corps.target - 1].capital === tile) cost *= sim.capitalDefense
   if (mine >= sim.enclaveNeighbors) cost *= sim.enclaveFactor
 
@@ -260,26 +263,38 @@ const claimAround = (state: ConcordatState, corps: ConcordatCorps, tile: number)
 
 // One corps for one tick: the whole contact advances, faster the longer it is
 const push = (state: ConcordatState, corps: ConcordatCorps): void => {
+  // A corps acts every other tick, with the time of both
+  const seconds = TICK_SECONDS * state.speed * COMBAT_STRIDE
   const contact = gatherContact(state, corps)
   if (!contact.tiles.length) return disband(state, corps, 0)
 
   // Budget follows the length of the front
   const density = Math.max(0.01, defenseDensity(state, corps.owner, corps.target, corps.guard))
   const frontage = Math.max(1, Math.min(contact.tiles.length, corps.troops / density))
-  const pace = front.driveMin + (front.driveMax - front.driveMin) * (corps.drive ?? 0.5)
-  // Force ratio: the guard slows the push by its weight against the attackers
-  const guard = (corps.guard ?? 0) * sim.guardWeight
-  const ratio = Math.max(sim.guardFloor, corps.troops / (corps.troops + guard))
+  const pace = (front.driveMin + (front.driveMax - front.driveMin) * (corps.drive ?? 0.5)) / 1.5
   // Tired corps slow down little by little instead of stopping dead
   const fade = Math.min(1, Math.max(front.fadeFloor, corps.troops / front.fadeTroops))
   const shame = isTraitor(state, corps.owner) ? CONCORDAT.diplomacy.traitorSpeed : 1
+  // Like OpenFront: free land goes in bursts, a nation holds the faster the more it outnumbers the push
+  let rate = front.freeSpeed
+  if (corps.target) {
+    const defenders = state.players[corps.target - 1].troops + (corps.guard ?? 0) * sim.guardWeight
+    const outnumbered = defenders / Math.max(1, corps.troops)
+    const clamped = Math.min(front.ratioMax, Math.max(front.ratioMin, outnumbered))
+    const hopeless = Math.min(50, Math.max(1, outnumbered / front.hopeless))
+    rate = front.speed / (clamped * hopeless)
+  }
+  // A clicked spot draws more troops, the front still spreads everywhere
+  if (corps.aim !== undefined && state.owner[corps.aim] === corps.owner) corps.aim = undefined
+  const lead = corps.aim === undefined ? 1 : 1 + front.aimBoost
   corps.progress +=
-    contact.tiles.length * front.speed * pace * ratio * fade * shame * TICK_SECONDS * state.speed
+    Math.max(contact.tiles.length, front.minFront) * rate * pace * fade * shame * lead * seconds
 
   // Not enough progress for a tile and no hole to fill: skip the ranking sort
   if (corps.progress < 1 && !contact.own.some((mine) => mine >= sim.enclaveNeighbors)) return
 
   const scale = lossScale(state, corps)
+  const factor = attackFactor(state, corps.owner, corps.target)
 
   // Take tiles while budget and troops allow
   let taken = 0
@@ -294,7 +309,7 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
     const tile = contact.tiles[index]
     if (state.owner[tile] !== corps.target) continue
 
-    const cost = tileCost(state, corps, tile, contact.own[index])
+    const cost = tileCost(state, corps, tile, contact.own[index], factor)
     const isThin = corps.target > 0 && corps.troops / frontage < cost
     if (isThin || corps.troops < cost * sim.attackerLoss * scale) {
       blocked++
@@ -313,7 +328,7 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
   // A stalled push bleeds
   if (!taken && blocked) {
     corps.progress = Math.min(corps.progress, 1)
-    corps.troops -= corps.troops * sim.stallLoss * TICK_SECONDS * state.speed
+    corps.troops -= corps.troops * sim.stallLoss * seconds
   }
   if (corps.troops < 1) drop(state, corps)
 }
@@ -329,6 +344,6 @@ export const runCombat = (state: ConcordatState): void => {
     if (!state.corps.includes(corps)) continue
     const target = corps.target ? state.players[corps.target - 1] : null
     if (target && !target.alive) disband(state, corps, 0)
-    else push(state, corps)
+    else if ((state.tick + corps.id) % COMBAT_STRIDE === 0) push(state, corps)
   }
 }

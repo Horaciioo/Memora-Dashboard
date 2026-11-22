@@ -1,23 +1,12 @@
+import { drawSprite, spriteWidth } from '@/composites/play/concordat/board/draw/pixelSprite'
 import type { ConcordatScene } from '@/composites/play/concordat/board/draw/types'
 import { rgbText } from '@/core/lib/play/concordat'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
-import { CONCORDAT_GLYPHS } from '@/declarations/play/concordat/glyphs'
 
 const { detail, frame, token } = CONCORDAT_ART
 
-// Glyph paths are parsed once
-const PATHS = new Map<string, Path2D>()
-const pathOf = (d: string): Path2D => {
-  const known = PATHS.get(d)
-  if (known) return known
-  const path = new Path2D(d)
-  PATHS.set(d, path)
-
-  return path
-}
-
 /**
- * Buildings as round tokens in the nation colour with a pictogram and level pips
+ * Buildings as pixel houses in the nation colour, level pips under them
  * @param {CanvasRenderingContext2D} context - Canvas
  * @param {ConcordatScene} scene - Frame data
  * @return {void}
@@ -52,71 +41,40 @@ export const drawBuildings = (context: CanvasRenderingContext2D, scene: Concorda
     const x = camera.x + (column + 0.5) * camera.scale
     const y = camera.y + (row + 0.5) * camera.scale
     const isBuilding = building.readyAt > client.tick
-    const glyph = CONCORDAT_GLYPHS[building.kind]
     const color = colors[building.owner] ?? frame.shadow
 
     context.save()
     context.translate(x, y)
     context.globalAlpha = isBuilding ? 0.7 : 1
 
-    // Shadow, body and pale ring
-    context.fillStyle = rgbText(frame.shadow, 0.35)
-    context.beginPath()
-    context.ellipse(radius * 0.18, radius * 0.7, radius, radius * 0.45, 0, 0, Math.PI * 2)
-    context.fill()
-    context.fillStyle = rgbText(color)
-    context.strokeStyle = rgbText(frame.rgb)
-    context.lineWidth = token.ring * (building.owner === client.me ? 1.5 : 1)
-    context.beginPath()
-    context.arc(0, 0, radius, 0, Math.PI * 2)
-    context.fill()
-    context.stroke()
-
-    // Pictogram, cream on the colour
-    const unit = (size * token.glyph) / 24
-    context.save()
-    context.scale(unit, unit)
-    context.translate(-12, -12)
-    context.fillStyle = rgbText(frame.rgb)
-    context.strokeStyle = rgbText(frame.rgb)
-    if (glyph.isStroke) {
-      context.lineWidth = 2.1
-      context.lineCap = 'round'
-      context.lineJoin = 'round'
-      context.stroke(pathOf(glyph.path))
-    } else {
-      context.fill(pathOf(glyph.path), 'evenodd')
+    // The house, one sprite pixel snapped to whole screen pixels
+    const pixel = Math.max(2, Math.round(size / spriteWidth(building.kind)))
+    if (building.owner === client.me) {
+      context.fillStyle = rgbText(frame.rgb, 0.9)
+      const pad = pixel * 5.2
+      context.fillRect(-pad, -pad, pad * 2, pad * 2)
     }
-    context.restore()
+    drawSprite(context, building.kind, color, 0, 0, pixel, 0)
 
-    // A turning dashed ring while it rises
+    // A turning dashed square while it rises
     if (isBuilding) {
       context.setLineDash([4, 4])
       context.lineDashOffset = -now * 0.01
       context.strokeStyle = rgbText(frame.rgb, 0.95)
       context.lineWidth = 1.6
-      context.beginPath()
-      context.arc(0, 0, radius + 3, 0, Math.PI * 2)
-      context.stroke()
+      context.strokeRect(-radius - 3, -radius - 3, size + 6, size + 6)
       context.setLineDash([])
     }
 
-    // Level pips under the token
-    const pip = Math.max(1.8, size * token.pip)
+    // Level pips under the house, square pixels
+    const pip = Math.max(2, Math.round(size * token.pip))
     for (let level = 0; level < building.level; level++) {
+      const px = Math.round((level - (building.level - 1) / 2) * pip * 2.4 - pip / 2)
+      const py = Math.round(radius + pip)
+      context.fillStyle = rgbText(frame.shadow)
+      context.fillRect(px - 1, py - 1, pip + 2, pip + 2)
       context.fillStyle = rgbText(frame.rgb)
-      context.strokeStyle = rgbText(frame.shadow, 0.8)
-      context.lineWidth = 1
-      context.beginPath()
-      context.arc(
-        (level - (building.level - 1) / 2) * pip * 2.6,
-        radius + pip * 2.2,
-        pip,
-        0,
-        Math.PI * 2
-      )
-      context.fill()
-      context.stroke()
+      context.fillRect(px, py, pip, pip)
     }
 
     // Stack count, top right
@@ -127,10 +85,8 @@ export const drawBuildings = (context: CanvasRenderingContext2D, scene: Concorda
       context.fillStyle = rgbText(frame.rgb)
       context.strokeStyle = rgbText(color)
       context.lineWidth = Math.max(1.4, token.ring * 0.8)
-      context.beginPath()
-      context.arc(bx, by, badge, 0, Math.PI * 2)
-      context.fill()
-      context.stroke()
+      context.fillRect(bx - badge, by - badge, badge * 2, badge * 2)
+      context.strokeRect(bx - badge, by - badge, badge * 2, badge * 2)
       context.fillStyle = rgbText(color)
       context.font = `700 ${Math.round(badge * 1.35)}px ${font}`
       context.textAlign = 'center'

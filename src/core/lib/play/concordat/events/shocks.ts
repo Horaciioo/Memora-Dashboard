@@ -148,9 +148,7 @@ export const announceShock = (state: ConcordatState, draw: ConcordatShock): void
 const partnersOf = (state: ConcordatState, holder: number): number[] =>
   state.relations
     .filter(
-      (tie) =>
-        (tie.a === holder || tie.b === holder) &&
-        (tie.kind === ConcordatTies.Peace || tie.kind === ConcordatTies.Alliance)
+      (tie) => (tie.a === holder || tie.b === holder) && tie.kind === ConcordatTies.Alliance
     )
     .map((tie) => (tie.a === holder ? tie.b : tie.a))
 

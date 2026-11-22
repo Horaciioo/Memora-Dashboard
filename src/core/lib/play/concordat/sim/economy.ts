@@ -39,8 +39,31 @@ export const upkeepOf = (player: ConcordatPlayerState, cut = 0): number =>
 
 export const grossOf = (player: ConcordatPlayerState): number =>
   sim.baseGold +
-  sim.landGold * (player.income / INCOME_SCALE) ** sim.goldExponent +
-  player.provincesHeld * sim.provinceGold
+  sim.landGold * (player.income / INCOME_SCALE) ** sim.goldExponent
+
+/**
+ * Net troops per second, negative when over the ceiling
+ * @param {ConcordatPlayerState} player - Nation
+ * @param {ConcordatEffects} effects - Bonuses
+ * @param {number} committed - Troops out in the field
+ * @return {number} - Troops per second
+ */
+
+export const troopRateOf = (
+  player: ConcordatPlayerState,
+  effects: ConcordatEffects,
+  committed: number
+): number => {
+  const cap = troopCap(player, effects.cap)
+  const total = player.troops + committed
+  if (total > cap) return -total * sim.overCapDecay
+
+  const rate =
+    (sim.growthBase + sim.growthRate * player.troops ** sim.growthPower) *
+    (1 + effects.growth) *
+    player.growthShare
+  return rate * (1 - total / cap) * calmFactor(player)
+}
 
 // One nation for one tick, troops out in the field count against the ceiling
 const grow = (
@@ -49,21 +72,10 @@ const grow = (
   dt: number,
   committed: number
 ): void => {
-  const cap = troopCap(player, effects.cap)
-  const calm = calmFactor(player)
-
   // Troops climb to the ceiling, then melt back
-  const total = player.troops + committed
-  if (total > cap) {
-    player.troops -= Math.min(player.troops, total * sim.overCapDecay * dt)
-  } else {
-    const slack = 1 - total / cap
-    const rate =
-      (sim.growthBase + sim.growthRate * player.troops ** sim.growthPower) *
-      (1 + effects.growth) *
-      player.growthShare
-    player.troops += rate * slack * calm * dt
-  }
+  player.troops = Math.max(0, player.troops + troopRateOf(player, effects, committed) * dt)
+
+  const calm = calmFactor(player)
 
   // Gold earned minus upkeep
   const earned =

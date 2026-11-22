@@ -1,12 +1,31 @@
+import { alliesOf } from '@/core/lib/play/concordat/diplomacy/ties'
 import { sideOf } from '@/core/lib/play/concordat/modes/rules'
 import { emit } from '@/core/lib/play/concordat/sim/emit'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
+import { landOf } from '@/core/lib/play/concordat/victory/land'
+import { dominationHold, dominationNeed } from '@/core/lib/play/concordat/victory/ramp'
 import { CONCORDAT, CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
 import type { ConcordatState } from '@/types/concordat'
-import { ConcordatEnds, ConcordatPowers, ConcordatTerrains } from '@/utils/constants/concordat'
+import { ConcordatEnds, ConcordatPowers } from '@/utils/constants/concordat'
 import type { ConcordatEndName } from '@/utils/constants/concordat'
 
-const { victory } = CONCORDAT
+/**
+ * A nation with every nation its alliances reach, living ones only
+ * @param {ConcordatState} state - Game
+ * @param {number} playerId - Nation
+ * @return {number[]} - Nations of the bloc, the first one included
+ */
+
+export const blocOf = (state: ConcordatState, playerId: number): number[] => {
+  const bloc = [playerId]
+  for (let index = 0; index < bloc.length; index++) {
+    for (const id of alliesOf(state, bloc[index])) {
+      if (!bloc.includes(id) && state.players[id - 1].alive) bloc.push(id)
+    }
+  }
+
+  return bloc
+}
 
 /**
  * Sides still in play
@@ -16,23 +35,6 @@ const { victory } = CONCORDAT
 
 export const livingSides = (state: ConcordatState): Set<number> =>
   new Set(state.players.filter((player) => player.alive).map((player) => sideOf(state, player.id)))
-
-// Land tiles of a map, counted once
-const landTotals = new WeakMap<ConcordatState['map'], number>()
-
-const landOf = (state: ConcordatState): number => {
-  const known = landTotals.get(state.map)
-  if (known !== undefined) return known
-
-  // Plain loop, a reduce over millions of tiles costs tens of ms
-  const { terrain } = state.map
-  let total = 0
-  for (let index = 0; index < terrain.length; index++)
-    if (terrain[index] !== ConcordatTerrains.Sea) total++
-  landTotals.set(state.map, total)
-
-  return total
-}
 
 /**
  * Share of the land a side holds
@@ -50,7 +52,7 @@ export const landShare = (state: ConcordatState, side: number): number => {
   return total ? held / total : 0
 }
 
-// Leader of the land, with its first nation for the journal
+// Strongest side or alliance bloc over the needed share, with its first nation for the journal
 const dominantSide = (state: ConcordatState): { side: number; first: number } | null => {
   // One pass: land and first nation of every living side
   const held = new Map<number, { tiles: number; first: number }>()
@@ -63,12 +65,30 @@ const dominantSide = (state: ConcordatState): { side: number; first: number } | 
     else held.set(side, { tiles: player.tiles, first: player.id })
   }
 
-  const total = landOf(state)
-  for (const [side, entry] of held) {
-    if (total && entry.tiles / total >= victory.dominationShare) return { side, first: entry.first }
+  // A chain of alliances counts as one bloc, outside the team modes
+  const candidates = [...held].map(([side, entry]) => ({ side, ...entry }))
+  if (!state.teams.some(Boolean)) {
+    const seen = new Set<number>()
+    for (const player of state.players) {
+      if (!player.alive || player.kind === ConcordatPowers.Tribe || seen.has(player.id)) continue
+
+      const bloc = blocOf(state, player.id)
+      for (const id of bloc) seen.add(id)
+      if (bloc.length < 2) continue
+
+      const tiles = bloc.reduce((sum, id) => sum + state.players[id - 1].tiles, 0)
+      candidates.push({ side: sideOf(state, player.id), tiles, first: player.id })
+    }
   }
 
-  return null
+  const total = landOf(state)
+  const need = dominationNeed(state)
+  let best: { side: number; first: number; tiles: number } | null = null
+  for (const entry of candidates) {
+    if (total && entry.tiles / total >= need && (!best || entry.tiles > best.tiles)) best = entry
+  }
+
+  return best
 }
 
 /**
@@ -103,7 +123,7 @@ export const runDomination = (state: ConcordatState): void => {
 export const dominantWinner = (state: ConcordatState): number =>
   CONCORDAT.features.victory &&
   state.domination.side &&
-  state.tick - state.domination.since >= ticksOf(victory.dominationSeconds)
+  state.tick - state.domination.since >= ticksOf(dominationHold(state))
     ? state.domination.side
     : 0
 
@@ -128,4 +148,23 @@ export const endReason = (state: ConcordatState): ConcordatEndName | null => {
   if (dominantWinner(state)) return ConcordatEnds.Domination
 
   return state.endTick > 0 && state.tick >= state.endTick ? ConcordatEnds.Time : null
+}
+
+/**
+ * Sides that won by domination: the leading side and, outside the team modes, its allies
+ * @param {ConcordatState} state - Game
+ * @return {Set<number>} - Side keys, empty when none
+ */
+
+export const winningSides = (state: ConcordatState): Set<number> => {
+  const side = dominantWinner(state)
+  if (!side) return new Set()
+
+  const sides = new Set([side])
+  const leader = state.players.find((player) => player.alive && sideOf(state, player.id) === side)
+  if (leader && !state.teams.some(Boolean)) {
+    for (const id of blocOf(state, leader.id)) sides.add(sideOf(state, id))
+  }
+
+  return sides
 }

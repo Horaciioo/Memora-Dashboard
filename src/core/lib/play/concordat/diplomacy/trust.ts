@@ -1,3 +1,4 @@
+import { hegemonOf } from '@/core/lib/play/concordat/victory/hegemony'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatState } from '@/types/concordat'
 
@@ -27,4 +28,4 @@ export const adjustTrust = (state: ConcordatState, playerId: number, delta: numb
  */
 
 export const isCondemned = (state: ConcordatState, playerId: number): boolean =>
-  state.trust[playerId - 1] < diplomacy.coalitionBelow
+  state.trust[playerId - 1] < diplomacy.condemnedBelow || hegemonOf(state) === playerId

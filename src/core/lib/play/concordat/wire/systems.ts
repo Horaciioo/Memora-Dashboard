@@ -1,6 +1,12 @@
 import { writeVarint } from '@/core/lib/play/concordat/bytes'
 import type { ByteReader } from '@/core/lib/play/concordat/bytes'
-import { calmFactor, grossOf, troopCap, upkeepOf } from '@/core/lib/play/concordat/sim/economy'
+import {
+  calmFactor,
+  grossOf,
+  troopCap,
+  troopRateOf,
+  upkeepOf,
+} from '@/core/lib/play/concordat/sim/economy'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatState } from '@/types/concordat'
 import {
@@ -48,7 +54,7 @@ export interface ConcordatTieRow {
   a: number
   b: number
   kind: ConcordatTieKind
-  // End of a peace, zero when open
+  // End tick, zero when open
   until: number
   // End of an announced break, zero when none
   breakAt: number
@@ -67,16 +73,6 @@ export interface ConcordatRouteRow {
   buildingA: number
   buildingB: number
   isCut: boolean
-}
-
-/**
- * Coalition as drawn
- * @typedef {Object} ConcordatCoalitionRow
- */
-
-export interface ConcordatCoalitionRow {
-  target: number
-  members: number[]
 }
 
 /**
@@ -143,6 +139,8 @@ export interface ConcordatFigureRow {
   income: number
   // Part of the gold per minute that comes from trade
   trade: number
+  // Net troops per second, may be negative
+  growth: number
 }
 
 /**
@@ -219,7 +217,6 @@ export interface ConcordatSystemsRows {
   // Credit per nation, index is the id minus one
   trust: number[]
   routes: ConcordatRouteRow[]
-  coalitions: ConcordatCoalitionRow[]
   strikes: ConcordatStrikeRow[]
   aircraft: ConcordatAircraftRow[]
   scars: ConcordatScarRow[]
@@ -265,7 +262,6 @@ export interface ConcordatOfferRow {
   from: number
   to: number
   kind: string
-  minutes: number
   ask: number
   about: number
   expiresAt: number
@@ -274,7 +270,7 @@ export interface ConcordatOfferRow {
 // Troop ceiling, net income and trade income of every nation
 const figuresOf = (state: ConcordatState): ConcordatFigureRow[] =>
   state.players.map((player) => {
-    if (!player.alive) return { maxTroops: 0, income: 0, trade: 0 }
+    if (!player.alive) return { maxTroops: 0, income: 0, trade: 0, growth: 0 }
 
     const effects = state.effects[player.id - 1]
     const calm = calmFactor(player)
@@ -282,11 +278,16 @@ const figuresOf = (state: ConcordatState): ConcordatFigureRow[] =>
     const earned = (grossOf(player) + effects.gold + effects.trade) * factor - effects.malus
     const spent = upkeepOf(player, effects.upkeepCut) + effects.upkeep
     const minute = 60 * state.speed
+    const committed = state.corps.reduce(
+      (sum, corps) => sum + (corps.owner === player.id ? corps.troops : 0),
+      0
+    )
 
     return {
       maxTroops: Math.round(troopCap(player, effects.cap)),
       income: Math.round((earned - spent) * minute),
       trade: Math.round(effects.trade * factor * minute),
+      growth: Math.round(troopRateOf(player, effects, committed) * state.speed),
     }
   })
 
@@ -316,7 +317,6 @@ export const systemsOf = (state: ConcordatState): ConcordatSystemsRows => ({
     buildingB,
     isCut,
   })),
-  coalitions: state.coalitions.map(({ target, members }) => ({ target, members: [...members] })),
   strikes: state.strikes.map(
     ({ id, owner, kind, tile, from, launchedAt, impactAt, by, shotAt, killAt }) => ({
       id,
@@ -483,11 +483,6 @@ export const writeSystems = (bytes: number[], rows: ConcordatSystemsRows): void 
     writeVarint(bytes, route.buildingB)
   }
 
-  bytes.push(rows.coalitions.length)
-  for (const coalition of rows.coalitions) {
-    bytes.push(coalition.target, coalition.members.length, ...coalition.members)
-  }
-
   writeVarint(bytes, rows.strikes.length)
   for (const strike of rows.strikes) {
     writeVarint(bytes, strike.id)
@@ -542,6 +537,7 @@ export const writeSystems = (bytes: number[], rows: ConcordatSystemsRows): void 
     writeVarint(bytes, figure.maxTroops)
     writeVarint(bytes, figure.income < 0 ? -figure.income * 2 - 1 : figure.income * 2)
     writeVarint(bytes, figure.trade)
+    writeVarint(bytes, figure.growth < 0 ? -figure.growth * 2 - 1 : figure.growth * 2)
   }
 
   writeVarint(bytes, rows.embargoes.length)
@@ -615,14 +611,6 @@ export const readSystems = (reader: ByteReader): ConcordatSystemsRows => {
     routes.push({ id, a, b, kind, isCut, buildingA: reader.varint(), buildingB: reader.varint() })
   }
 
-  const coalitions: ConcordatCoalitionRow[] = []
-  for (let count = reader.byte(); count > 0; count--) {
-    const target = reader.byte()
-    const members: number[] = []
-    for (let member = reader.byte(); member > 0; member--) members.push(reader.byte())
-    coalitions.push({ target, members })
-  }
-
   const strikes: ConcordatStrikeRow[] = []
   for (let count = reader.varint(); count > 0; count--) {
     const id = reader.varint()
@@ -686,10 +674,13 @@ export const readSystems = (reader: ByteReader): ConcordatSystemsRows => {
   for (let count = reader.byte(); count > 0; count--) {
     const maxTroops = reader.varint()
     const folded = reader.varint()
+    const trade = reader.varint()
+    const growthFolded = reader.varint()
     figures.push({
       maxTroops,
       income: folded % 2 ? -(folded + 1) / 2 : folded / 2,
-      trade: reader.varint(),
+      trade,
+      growth: growthFolded % 2 ? -(growthFolded + 1) / 2 : growthFolded / 2,
     })
   }
 
@@ -720,7 +711,6 @@ export const readSystems = (reader: ByteReader): ConcordatSystemsRows => {
     ties,
     trust,
     routes,
-    coalitions,
     strikes,
     aircraft,
     scars,

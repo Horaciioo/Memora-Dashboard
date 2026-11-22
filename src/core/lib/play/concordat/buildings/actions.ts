@@ -49,7 +49,7 @@ export const upgradeBuilding = (state: ConcordatState, playerId: number, id: num
   const building = buildingById(state, id)
   if (!building) return
 
-  state.players[playerId - 1].gold -= upgradeCost(building)
+  state.players[playerId - 1].gold -= upgradeCost(state, building)
   building.level++
   building.readyAt = state.tick + ticksOf(kindOf(building.kind).buildSeconds)
   state.isSystemsDirty = true

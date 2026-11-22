@@ -1,6 +1,6 @@
 import { sideOf } from '@/core/lib/play/concordat/modes/rules'
 import {
-  dominantWinner,
+  winningSides,
   livingSides,
   scoreRows,
   sideScore,
@@ -28,7 +28,7 @@ export interface ConcordatStanding {
 export const standingsOf = (state: ConcordatState): ConcordatStanding[] => {
   const rows = scoreRows(state)
   const sides = livingSides(state)
-  const domination = dominantWinner(state)
+  const winners = winningSides(state)
 
   // Sort keys, best first: dominant side, living side, side score, living, own score, late fall
   const keysOf = (id: number): number[] => {
@@ -36,7 +36,7 @@ export const standingsOf = (state: ConcordatState): ConcordatStanding[] => {
     const mine = state.players[id - 1]
 
     return [
-      side === domination ? 0 : 1,
+      winners.has(side) ? 0 : 1,
       sides.has(side) ? 0 : 1,
       -sideScore(state, rows, side),
       mine.alive ? 0 : 1,

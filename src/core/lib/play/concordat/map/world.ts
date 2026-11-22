@@ -75,21 +75,24 @@ export const sampleLand = (
   const offsetX = (window.lonMin - world.lonMin) * world.ppd
   const offsetY = (world.latMax - window.latMax) * world.ppd
 
+  // Column bounds once, they do not change from row to row
+  const edges = new Int32Array(width + 1)
+  for (let x = 0; x <= width; x++) edges[x] = Math.min(world.width, Math.floor(offsetX + x * step))
+
   for (let y = 0; y < height; y++) {
     const fromY = Math.floor(offsetY + y * step)
-    const toY = Math.max(fromY + 1, Math.floor(offsetY + (y + 1) * step))
+    const toY = Math.min(world.height, Math.max(fromY + 1, Math.floor(offsetY + (y + 1) * step)))
+    const rows = toY - fromY
     for (let x = 0; x < width; x++) {
-      const fromX = Math.floor(offsetX + x * step)
-      const toX = Math.max(fromX + 1, Math.floor(offsetX + (x + 1) * step))
+      const fromX = edges[x]
+      const toX = Math.max(fromX + 1, edges[x + 1])
       let count = 0
-      let total = 0
-      for (let sy = fromY; sy < toY && sy < world.height; sy++) {
-        for (let sx = fromX; sx < toX && sx < world.width; sx++) {
-          count += source[sy * world.width + sx]
-          total++
-        }
+      for (let sy = fromY; sy < toY; sy++) {
+        const base = sy * world.width
+        for (let sx = fromX; sx < toX && sx < world.width; sx++) count += source[base + sx]
       }
-      land[y * width + x] = total && count * 2 >= total ? 1 : 0
+      const total = rows * (Math.min(toX, world.width) - fromX)
+      land[y * width + x] = total > 0 && count * 2 >= total ? 1 : 0
     }
   }
 

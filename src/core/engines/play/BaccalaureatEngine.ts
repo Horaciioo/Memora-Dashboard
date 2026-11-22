@@ -2,12 +2,14 @@ import 'server-only'
 
 import { conflict, forbidden } from '@/core/lib/errors'
 import { BaccalaureatPhases, roundPhase } from '@/core/lib/play/baccalaureat'
-import { PLAY_ERRORS } from '@/declarations/play'
+import { after } from '@/core/lib/play/clock'
+import { BACCALAUREAT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
 import { IDLE_STEP } from '@/core/engines/play/steps'
 import type { EngineSession, EngineStep, PlayEngine } from '@/types/play'
 import {
   castVote,
   reviewedRoundId,
+  scoreIfJudged,
   scoreRound,
 } from '@/core/services/play/baccalaureat/BaccalaureatReviewService'
 import {
@@ -30,7 +32,7 @@ import {
 } from '@/core/services/play/baccalaureat/BaccalaureatViewService'
 
 // Most phases one settle walks through
-const MAX_SETTLE_STEPS = 4
+const MAX_SETTLE_STEPS = 6
 
 /**
  * Advance the latest round by one timed phase
@@ -50,8 +52,16 @@ const settleOnce = async (session: EngineSession): Promise<EngineStep> => {
     const closesAt = closingAt(round)
     if (now < closesAt) return { ...IDLE_STEP, deadline: closesAt }
     const reviewEndsAt = await closeRound(round.id)
+    // Closed by another settle, follow its review clock
+    if (!reviewEndsAt) {
+      const fresh = await latestRound(session.id)
 
-    return { changed: Boolean(reviewEndsAt), finished: false, deadline: reviewEndsAt }
+      return { ...IDLE_STEP, deadline: fresh?.reviewEndsAt ?? null }
+    }
+    // Nothing to judge, count at once
+    await scoreIfJudged(session, round.id)
+
+    return { changed: true, finished: false, deadline: reviewEndsAt }
   }
   if (phase === BaccalaureatPhases.Review) {
     if (round.reviewEndsAt && now < round.reviewEndsAt)
@@ -59,9 +69,26 @@ const settleOnce = async (session: EngineSession): Promise<EngineStep> => {
 
     return { ...IDLE_STEP, changed: await scoreRound(session, round.id) }
   }
+  // The host is slow, the table moves on by itself
+  if (phase === BaccalaureatPhases.Scored && round.scoredAt) {
+    if (round.index + 1 >= baccalaureatSettingsOf(session.settings).rounds) return IDLE_STEP
+    const nextAt = nextRoundAt(round.scoredAt)
+    if (now < nextAt) return { ...IDLE_STEP, deadline: nextAt }
+    const opened = await openRound(session, round.index + 1).catch(() => null)
+
+    return opened ?? IDLE_STEP
+  }
 
   return IDLE_STEP
 }
+
+/**
+ * Moment the next letter opens by itself
+ * @param {Date} scoredAt - Round counted
+ * @return {Date} - Opening time
+ */
+
+const nextRoundAt = (scoredAt: Date): Date => after(scoredAt, BACCALAUREAT_SETTINGS.nextSeconds)
 
 /**
  * Game over once the last round is counted
@@ -77,7 +104,13 @@ const closeIfLast = async (session: EngineSession, changed: boolean): Promise<En
     roundPhase(round) === BaccalaureatPhases.Scored &&
     round.index + 1 >= baccalaureatSettingsOf(session.settings).rounds
 
-  return { changed: changed || isLast, finished: isLast, deadline: null }
+  // Next letter waits a few seconds, then opens without the host
+  const deadline =
+    round?.scoredAt && !isLast && roundPhase(round) === BaccalaureatPhases.Scored
+      ? nextRoundAt(round.scoredAt)
+      : null
+
+  return { changed: changed || isLast, finished: isLast, deadline }
 }
 
 /**

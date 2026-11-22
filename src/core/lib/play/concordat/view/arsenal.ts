@@ -36,14 +36,18 @@ export const buildCostOf = (client: ConcordatClientState, kind: ConcordatBuildin
 
 /**
  * Gold to raise a building one level, zero at the top
+ * @param {ConcordatClientState} client - Game
  * @param {ConcordatBuildingRow} building - Building
  * @return {number} - Gold
  */
 
-export const upgradeCostOf = (building: ConcordatBuildingRow): number =>
+export const upgradeCostOf = (
+  client: ConcordatClientState,
+  building: ConcordatBuildingRow
+): number =>
   building.level >= buildings.kinds[building.kind].levels.length
     ? 0
-    : raisePriceOf(building.kind, building.level)
+    : raisePriceOf(building.kind, building.level, builtCountOf(client, building.kind))
 
 /**
  * Own building near a tile, the weakest of a stack

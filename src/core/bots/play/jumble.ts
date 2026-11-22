@@ -32,7 +32,8 @@ export const JUMBLE_BOT: PlayBotStrategy = {
     // Longer words take longer to read, a word of the pace length sets the base
     const { min, max } = PLAY_BOT_SETTINGS.jumble.thinkMs
     const reach = seeded(`${botId}:${turn}:pace`)
-    const size = board.length / JUMBLE_SETTINGS.paceLength
+    // Reading slows down less than the length
+    const size = (board.length / JUMBLE_SETTINGS.paceLength) ** 0.7
 
     return {
       key: `guess:${turn}`,

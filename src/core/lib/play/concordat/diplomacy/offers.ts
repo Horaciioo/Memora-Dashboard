@@ -47,7 +47,6 @@ export const propose = (
     from: intent.playerId,
     to: intent.to,
     kind: intent.offer,
-    minutes: intent.minutes,
     ask: intent.ask,
     about: intent.about,
   })
@@ -65,64 +64,24 @@ const callBackCorps = (state: ConcordatState, first: number, second: number): vo
 // Treaty sealed by an accepted offer
 const seal = (state: ConcordatState, offer: ConcordatOffer): boolean => {
   const kind = CONCORDAT_OFFER_ORDER.indexOf(offer.kind)
-  if (offer.kind === ConcordatOfferKinds.Peace) {
-    setTie(state, {
-      a: offer.from,
-      b: offer.to,
-      kind: ConcordatTies.Peace,
-      until:
-        state.tick +
-        ticksOf(
-          offer.minutes *
-            60 *
-            (1 + Math.max(state.effects[offer.from - 1].peace, state.effects[offer.to - 1].peace))
-        ),
-    })
-  } else if (offer.kind === ConcordatOfferKinds.Alliance) {
+  if (offer.kind === ConcordatOfferKinds.Alliance) {
     const isFull =
       alliesOf(state, offer.from).length >= diplomacy.maxAllies ||
       alliesOf(state, offer.to).length >= diplomacy.maxAllies
     if (isFull) return false
 
-    setTie(state, {
-      a: offer.from,
-      b: offer.to,
-      kind: ConcordatTies.Alliance,
-      until: diplomacy.allianceRenewMinutes
-        ? state.tick + ticksOf(diplomacy.allianceRenewMinutes * 60)
-        : 0,
-    })
+    setTie(state, { a: offer.from, b: offer.to, kind: ConcordatTies.Alliance })
   } else if (offer.kind === ConcordatOfferKinds.Trade) {
     if (tieKindOf(state, offer.from, offer.to) === ConcordatTies.Hostile)
       clearTie(state, offer.from, offer.to)
     if (!openTradeRoutes(state, offer.from, offer.to)) return false
   }
-  if (offer.kind === ConcordatOfferKinds.Peace || offer.kind === ConcordatOfferKinds.Alliance) {
+  if (offer.kind === ConcordatOfferKinds.Alliance) {
     callBackCorps(state, offer.from, offer.to)
   }
   emit(state, { tick: state.tick, kind: 'treaty', actor: offer.from, victim: offer.to, tile: kind })
 
   return true
-}
-
-// Join or open the coalition against a fallen nation
-const joinCoalition = (state: ConcordatState, offer: ConcordatOffer): void => {
-  const until = state.tick + ticksOf(diplomacy.coalitionSeconds)
-  const known = state.coalitions.find((coalition) => coalition.target === offer.about)
-  if (known) {
-    if (!known.members.includes(offer.to)) known.members.push(offer.to)
-    known.until = Math.max(known.until, until)
-  } else {
-    state.coalitions.push({ id: state.nextId++, target: offer.about, members: [offer.to], until })
-  }
-  state.isSystemsDirty = true
-  emit(state, {
-    tick: state.tick,
-    kind: 'coalition',
-    actor: offer.to,
-    victim: offer.about,
-    tile: -1,
-  })
 }
 
 /**
@@ -141,8 +100,7 @@ export const answerOffer = (state: ConcordatState, offerId: number, isYes: boole
   state.isOffersDirty = true
   if (!isYes) return
 
-  if (offer.kind === ConcordatOfferKinds.Coalition) joinCoalition(state, offer)
-  else seal(state, offer)
+  seal(state, offer)
 }
 
 /**

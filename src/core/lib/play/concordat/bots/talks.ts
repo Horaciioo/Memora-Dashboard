@@ -30,22 +30,20 @@ const verdictOf = (context: ConcordatBotContext, offer: ConcordatOffer, roll: nu
   const { state, profile, view, isCaretaker } = context
   const sender = state.players[offer.from - 1]
 
-  if (offer.kind === ConcordatOfferKinds.Peace) {
-    const isCrushing = view.me.troops > (sender?.troops ?? 0) * 2 && profile.opportunity === 1
-    if (isCaretaker) return true
-
-    return isWeakerThan(context, offer.from) || (!isCrushing && roll < profile.answers)
-  }
   if (offer.kind === ConcordatOfferKinds.Alliance) {
-    const isTrusted =
-      state.trust[offer.from - 1] >= diplomacy.trustStart && !isCondemned(state, offer.from)
+    if (view.allies >= diplomacy.maxAllies || isCondemned(state, offer.from)) return false
 
-    return isTrusted && view.allies < diplomacy.maxAllies && roll < profile.alliance
+    const isCrushing = view.me.troops > (sender?.troops ?? 0) * 2 && profile.opportunity === 1
+    if (isCaretaker || isWeakerThan(context, offer.from)) return true
+
+    const isTrusted = state.trust[offer.from - 1] >= diplomacy.trustStart
+
+    return (
+      (isTrusted && roll < Math.max(profile.alliance, context.pressure * bots.lateAlliance)) ||
+      (!isCrushing && roll < profile.answers)
+    )
   }
   if (offer.kind === ConcordatOfferKinds.Trade) return roll < Math.min(1, profile.trade + 0.3)
-  if (offer.kind === ConcordatOfferKinds.Coalition) {
-    return !isCaretaker && state.players[offer.about - 1].tiles > view.me.tiles * 1.2
-  }
 
   // A request is never granted
   return false
@@ -67,7 +65,7 @@ export const answerMoves = (context: ConcordatBotContext): ConcordatIntent[] =>
     }))
 
 /**
- * Proposals to the neighbours: peace when weak, alliance to the trusted, trade to partners
+ * Proposals to the neighbours: alliance when weak or to the trusted, trade to partners
  * @param {ConcordatBotContext} context - Decision
  * @param {Map<number, number>} lastProposal - Tick of the last proposal per nation
  * @return {ConcordatIntent[]} - Commands
@@ -87,8 +85,12 @@ export const proposeMoves = (
     const tie = tieKindOf(state, playerId, id)
     const isTrusted = state.trust[id - 1] >= diplomacy.trustStart
     let offer: ConcordatOfferKind | null = null
-    if (!tie && (isCaretaker || isWeakerThan(context, id))) offer = ConcordatOfferKinds.Peace
-    else if (tie === ConcordatTies.Peace && isTrusted && roll(60 + id) < profile.alliance)
+    if (!tie && (isCaretaker || isWeakerThan(context, id))) offer = ConcordatOfferKinds.Alliance
+    else if (
+      !tie &&
+      isTrusted &&
+      roll(60 + id) < Math.max(profile.alliance, context.pressure * bots.lateAlliance)
+    )
       offer = ConcordatOfferKinds.Alliance
     else if (tie && tie !== ConcordatTies.Hostile && roll(80 + id) < profile.trade)
       offer = ConcordatOfferKinds.Trade
@@ -99,7 +101,6 @@ export const proposeMoves = (
       playerId,
       to: id,
       offer,
-      minutes: bots.peaceMinutes,
       ask: 0,
       about: 0,
     }

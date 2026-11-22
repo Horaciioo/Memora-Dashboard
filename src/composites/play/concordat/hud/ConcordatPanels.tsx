@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import {
@@ -18,7 +18,6 @@ import type {
   ConcordatStandingRow,
 } from '@/core/lib/play/concordat'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
-import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
 import { CONCORDAT_STANDINGS_COPY } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
@@ -26,7 +25,6 @@ import { fillPlayMessage } from '@/declarations/play/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { ConcordatPhases } from '@/utils/constants/concordat'
 
 // Rows seen at once before the list scrolls, the player's own row hangs below beyond them
 const WINDOW_ROWS = 5
@@ -72,8 +70,6 @@ const hintOf = (column: ConcordatStandingColumn): string => {
  */
 
 export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) => {
-  const isOpen = usePlayScoreStore((state) => state.isOpen)
-  const toggle = usePlayScoreStore((state) => state.toggle)
   const sort = useConcordatViewStore((state) => state.standSort)
   const isDesc = useConcordatViewStore((state) => state.standDesc)
   const columns = useConcordatViewStore((state) => state.standColumns)
@@ -82,33 +78,8 @@ export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) =
   const jumpTo = useConcordatViewStore((state) => state.jumpTo)
   const [isPicking, setPicking] = useState(false)
   const root = useRef<HTMLDivElement>(null)
-  const isGreeted = useRef(false)
-  const TrophyIcon = ICONS.trophy
   const GearIcon = ICONS.settingsLine
   const ArrowIcon = ICONS.expand
-  const isPlaying = client.phase === ConcordatPhases.Playing
-
-  // Open once the game starts, like a leaderboard that is there from the first minute
-  useEffect(() => {
-    if (!isPlaying || isGreeted.current) return
-    isGreeted.current = true
-    if (!usePlayScoreStore.getState().isOpen) toggle()
-  }, [isPlaying, toggle])
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null
-      if (event.metaKey || event.ctrlKey || event.altKey) return
-      if (target?.closest('input:not([type="range"]), textarea, [contenteditable="true"]')) return
-      if (event.key === 'Tab') {
-        event.preventDefault()
-        toggle()
-      }
-    }
-    window.addEventListener('keydown', onKey)
-
-    return () => window.removeEventListener('keydown', onKey)
-  }, [toggle])
 
   useOutsideDismiss(isPicking, root, () => setPicking(false))
 
@@ -155,28 +126,16 @@ export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) =
       <div className={CONCORDAT_HUD.standKeys}>
         <button
           type="button"
-          className={isOpen ? CONCORDAT_HUD.standKeyOn : CONCORDAT_HUD.standKey}
-          aria-pressed={isOpen}
-          aria-label={isOpen ? CONCORDAT_STANDINGS_COPY.hide : CONCORDAT_STANDINGS_COPY.show}
-          title={`${CONCORDAT_STANDINGS_COPY.title} (Tab)`}
-          onClick={toggle}
+          className={isPicking ? CONCORDAT_HUD.standKeyOn : CONCORDAT_HUD.standKey}
+          aria-pressed={isPicking}
+          aria-label={CONCORDAT_STANDINGS_COPY.columns}
+          title={CONCORDAT_STANDINGS_COPY.columns}
+          onClick={() => setPicking((open) => !open)}
         >
-          <TrophyIcon className="size-4" />
+          <GearIcon className="size-4" />
         </button>
-        {isOpen && (
-          <button
-            type="button"
-            className={isPicking ? CONCORDAT_HUD.standKeyOn : CONCORDAT_HUD.standKey}
-            aria-pressed={isPicking}
-            aria-label={CONCORDAT_STANDINGS_COPY.columns}
-            title={CONCORDAT_STANDINGS_COPY.columns}
-            onClick={() => setPicking((open) => !open)}
-          >
-            <GearIcon className="size-4" />
-          </button>
-        )}
       </div>
-      {isOpen && isPicking && (
+      {isPicking && (
         <div className={CONCORDAT_HUD.standPicker}>
           {CONCORDAT_STANDING_COLUMNS.map((column) => (
             <button
@@ -192,37 +151,35 @@ export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) =
           ))}
         </div>
       )}
-      {isOpen && (
-        <div className={CONCORDAT_HUD.standTable}>
-          <div className={CONCORDAT_HUD.standHead} style={{ gridTemplateColumns: template }}>
-            <span>{CONCORDAT_STANDINGS_COPY.rank}</span>
-            <span>{CONCORDAT_STANDINGS_COPY.name}</span>
-            {shown.map((column) => (
-              <button
-                key={column}
-                type="button"
-                className={CONCORDAT_HUD.standSortKey}
-                title={hintOf(column)}
-                onClick={() => sortStandings(column)}
-              >
-                {CONCORDAT_STANDINGS_COPY[column]}
-                {sort === column && (
-                  <ArrowIcon
-                    className={cn('ml-0.5 inline size-3', !isDesc && 'rotate-180')}
-                    aria-hidden="true"
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-          <ol className={CONCORDAT_HUD.standScroll}>
-            {rows.slice(0, LIST_LIMIT).map((row, index) => line(row, index))}
-          </ol>
-          {isPinned && (
-            <ol className={CONCORDAT_HUD.standPinned}>{line(rows[ownIndex], ownIndex)}</ol>
-          )}
+      <div className={CONCORDAT_HUD.standTable}>
+        <div className={CONCORDAT_HUD.standHead} style={{ gridTemplateColumns: template }}>
+          <span>{CONCORDAT_STANDINGS_COPY.rank}</span>
+          <span>{CONCORDAT_STANDINGS_COPY.name}</span>
+          {shown.map((column) => (
+            <button
+              key={column}
+              type="button"
+              className={CONCORDAT_HUD.standSortKey}
+              title={hintOf(column)}
+              onClick={() => sortStandings(column)}
+            >
+              {CONCORDAT_STANDINGS_COPY[column]}
+              {sort === column && (
+                <ArrowIcon
+                  className={cn('ml-0.5 inline size-3', !isDesc && 'rotate-180')}
+                  aria-hidden="true"
+                />
+              )}
+            </button>
+          ))}
         </div>
-      )}
+        <ol className={CONCORDAT_HUD.standScroll}>
+          {rows.slice(0, LIST_LIMIT).map((row, index) => line(row, index))}
+        </ol>
+        {isPinned && (
+          <ol className={CONCORDAT_HUD.standPinned}>{line(rows[ownIndex], ownIndex)}</ol>
+        )}
+      </div>
     </div>
   )
 }

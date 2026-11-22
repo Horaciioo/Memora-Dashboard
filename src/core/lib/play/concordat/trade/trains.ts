@@ -1,82 +1,52 @@
 import { isWorking } from '@/core/lib/play/concordat/buildings/rules'
 import { tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
-import { distanceBetween } from '@/core/lib/play/concordat/map'
 import { grossOf } from '@/core/lib/play/concordat/sim/economy'
 import { nextRandom } from '@/core/lib/play/concordat/sim/rng'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
+import { railsOf } from '@/core/lib/play/concordat/trade/rails'
 import { canShip } from '@/core/lib/play/concordat/trade/ships'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatBuilding, ConcordatShip, ConcordatState } from '@/types/concordat'
 import {
   ConcordatBuildingKinds,
   ConcordatShipKinds,
-  ConcordatTerrains,
   ConcordatTies,
 } from '@/utils/constants/concordat'
 
 const { trains } = CONCORDAT.trade
-
-// Tiles of a straight line from one tile to another, the start left out
-const lineBetween = (width: number, from: number, to: number): number[] => {
-  let x = from % width
-  let y = Math.floor(from / width)
-  const endX = to % width
-  const endY = Math.floor(to / width)
-  const stepX = Math.sign(endX - x)
-  const stepY = Math.sign(endY - y)
-  const dx = Math.abs(endX - x)
-  const dy = -Math.abs(endY - y)
-  let error = dx + dy
-  const tiles: number[] = []
-
-  while (x !== endX || y !== endY) {
-    const double = 2 * error
-    if (double >= dy) {
-      error += dy
-      x += stepX
-    }
-    if (double <= dx) {
-      error += dx
-      y += stepY
-    }
-    tiles.push(y * width + x)
-  }
-
-  return tiles
-}
-
-// Rails never cross water: every tile of the line is land
-const isRailable = (state: ConcordatState, line: number[]): boolean =>
-  line.every((tile) => state.map.terrain[tile] !== ConcordatTerrains.Sea)
 
 // Trains already running from a factory
 const runningFrom = (state: ConcordatState, factory: ConcordatBuilding): number =>
   state.ships.filter((ship) => ship.kind === ConcordatShipKinds.Train && ship.port === factory.id)
     .length
 
-// Station the train goes to: a market of mine, an ally or a nation at peace, within reach by rail
+// Rail the train takes: one of the factory rails to a market or port of mine, or an ally
 const stationFor = (
   state: ConcordatState,
   factory: ConcordatBuilding
 ): { station: ConcordatBuilding; line: number[] } | null => {
-  const { width } = state.map
   const stations = state.buildings.filter(
     (building) =>
-      building.kind === ConcordatBuildingKinds.Market &&
+      (building.kind === ConcordatBuildingKinds.Market ||
+        building.kind === ConcordatBuildingKinds.Port) &&
       isWorking(building, state.tick) &&
       state.players[building.owner - 1]?.alive &&
-      canShip(state, factory.owner, building.owner) &&
-      distanceBetween(factory.tile, building.tile, width) <= trains.range &&
-      building.tile !== factory.tile
+      canShip(state, factory.owner, building.owner)
   )
-  // A few tries at random, a line over water is dropped
-  for (let attempt = 0; attempt < trains.stationStep && stations.length; attempt++) {
-    const station = stations[Math.floor(nextRandom(state) * stations.length)]
-    const line = lineBetween(width, factory.tile, station.tile)
-    if (isRailable(state, line)) return { station, line }
-  }
+  const rails = railsOf(
+    state.map.terrain,
+    state.map.width,
+    factory.tile,
+    stations.map((building) => building.tile),
+    trains.range,
+    trains.links
+  )
+  if (!rails.length) return null
 
-  return null
+  const rail = rails[Math.floor(nextRandom(state) * rails.length)]
+  const station = stations.find((building) => building.tile === rail.station)
+
+  return station ? { station, line: rail.line } : null
 }
 
 /**

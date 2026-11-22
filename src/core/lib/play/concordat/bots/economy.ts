@@ -12,7 +12,6 @@ import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
 import {
   CONCORDAT_TECH_ORDER,
-  ConcordatBotLevels,
   ConcordatBuildingKinds,
   ConcordatTerrains,
 } from '@/utils/constants/concordat'
@@ -50,17 +49,28 @@ const siteFor = (
   return null
 }
 
-// The kind to raise next, ports first for a nation shut in
+// The kind to raise next, ports first while the nation has fewer than it wants
 const nextKind = (context: ConcordatBotContext, owned: number): ConcordatBuildingKind => {
-  const { profile, view, state } = context
-  const isShutIn = !view.freeContact && !view.neighbours.length
-  const hasPort = state.buildings.some(
+  const { profile, state, view } = context
+  const ports = state.buildings.filter(
     (b) => b.owner === view.me.id && b.kind === ConcordatBuildingKinds.Port
-  )
-  if (profile.sails && isShutIn && !hasPort) return ConcordatBuildingKinds.Port
+  ).length
+  // Income first: a market, then a second one, before anything else
+  const markets = state.buildings.filter(
+    (b) => b.owner === view.me.id && b.kind === ConcordatBuildingKinds.Market
+  ).length
+  if (markets < Math.min(2, 1 + owned)) return ConcordatBuildingKinds.Market
+  if (profile.sails && ports < profile.ports) return ConcordatBuildingKinds.Port
+  if (!profile.sails && ports < Math.min(profile.ports, 2) && owned >= 2) {
+    return ConcordatBuildingKinds.Port
+  }
 
   return profile.build[owned % profile.build.length]
 }
+
+// Buildings that pay gold, upgraded first
+const isIncome = (kind: ConcordatBuildingKind): boolean =>
+  kind === ConcordatBuildingKinds.Market || kind === ConcordatBuildingKinds.Port
 
 // Best upgrade within reach, null when none
 const upgradeMove = (context: ConcordatBotContext): ConcordatIntent | null => {
@@ -70,10 +80,14 @@ const upgradeMove = (context: ConcordatBotContext): ConcordatIntent | null => {
     .filter(
       (building) => building.owner === playerId && !upgradeRefusal(state, playerId, building.id)
     )
-    .sort((first, second) => upgradeCost(first) - upgradeCost(second))[0]
+    .sort(
+      (first, second) =>
+        Number(!isIncome(first.kind)) - Number(!isIncome(second.kind)) ||
+        upgradeCost(state, first) - upgradeCost(state, second)
+    )[0]
   const best = target ? buildingById(state, target.id) : null
 
-  return best && view.me.gold >= upgradeCost(best) * (1 + bots.gold.spareShare)
+  return best && view.me.gold >= upgradeCost(state, best) * (1 + bots.gold.spareShare)
     ? { kind: 'upgrade', playerId, id: best.id }
     : null
 }
@@ -89,8 +103,12 @@ const raiseMove = (
   const hasSilo = state.buildings.some(
     (building) => building.owner === playerId && building.kind === ConcordatBuildingKinds.Silo
   )
-  const wantsSilo = isRich && !hasSilo && profile.level !== ConcordatBotLevels.Recruit
-  const kinds = [...(wantsSilo ? [ConcordatBuildingKinds.Silo] : []), nextKind(context, owned)]
+  const wantsSilo = (isRich || context.pressure > 0.3) && !hasSilo
+  const kinds = [
+    ...(wantsSilo ? [ConcordatBuildingKinds.Silo] : []),
+    nextKind(context, owned),
+    profile.build[owned % profile.build.length],
+  ]
 
   for (const kind of kinds) {
     if (view.me.gold < buildCost(state, playerId, kind) * (1 + bots.gold.spareShare)) continue
@@ -129,7 +147,9 @@ const researchMove = (context: ConcordatBotContext): ConcordatIntent | null => {
   if (isCaretaker || !profile.researches) return null
 
   const playerId = view.me.id
-  const paths = [profile.techPath, ...CONCORDAT_TECH_ORDER.filter((p) => p !== profile.techPath)]
+  // Two economy tiers first, they pay for everything after
+  const lead = levelOf(state, playerId, 'economy') < 2 ? 'economy' : profile.techPath
+  const paths = [lead, ...CONCORDAT_TECH_ORDER.filter((p) => p !== lead)]
   const path = paths.find(
     (candidate) => levelOf(state, playerId, candidate) < tiersOf(candidate).length
   )

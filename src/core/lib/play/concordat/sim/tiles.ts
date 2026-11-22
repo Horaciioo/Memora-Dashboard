@@ -1,41 +1,12 @@
 import { settleBuildingOnCapture } from '@/core/lib/play/concordat/buildings/capture'
 import { neighborsOf, NEIGHBOR_SLOTS } from '@/core/lib/play/concordat/map'
-import { emit } from '@/core/lib/play/concordat/sim/emit'
-import { troopCap } from '@/core/lib/play/concordat/sim/economy'
 import { TERRAIN_INCOME } from '@/core/lib/play/concordat/sim/tables'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatState } from '@/types/concordat'
-import { ConcordatPhases, ConcordatTerrains } from '@/utils/constants/concordat'
+import { ConcordatTerrains } from '@/utils/constants/concordat'
 
 const near = new Int32Array(NEIGHBOR_SLOTS)
 const ring = new Int32Array(NEIGHBOR_SLOTS)
-
-// Zone ids stay under this, the gold rides above
-const ZONE_PACK = 4096
-
-// True while a save is replayed, no reward then
-let isReplaying = false
-
-// Troops and gold for a zone just won
-const rewardZone = (state: ConcordatState, playerId: number, province: number): void => {
-  const winner = state.players[playerId - 1]
-  // Fixed by the zone size, never by the purse, so retaking a zone cannot snowball
-  const gold = Math.round(
-    CONCORDAT.sim.zoneGoldMin + state.map.provinces[province - 1].tiles * CONCORDAT.sim.zoneGold
-  )
-  const cap = troopCap(winner)
-  winner.troops = Math.min(cap, winner.troops + cap * CONCORDAT.sim.zoneTroops)
-  winner.gold += gold
-
-  // Detail packs the zone, then the gold above it
-  emit(state, {
-    tick: state.tick,
-    kind: 'zoneWon',
-    actor: playerId,
-    victim: 0,
-    tile: province + gold * ZONE_PACK,
-  })
-}
 
 // Border flag of a tile
 const refreshFront = (state: ConcordatState, tile: number): void => {
@@ -73,16 +44,6 @@ const countProvince = (state: ConcordatState, player: number, tile: number, step
   state.players[player - 1].provincesHeld += isHeld ? 1 : -1
 }
 
-// A zone taken whole pays at the tile that completes it, from state alone so a restore pays nothing twice
-const checkZoneComplete = (state: ConcordatState, player: number, tile: number): void => {
-  const province = state.map.province[tile]
-  if (!province || isReplaying || state.phase !== ConcordatPhases.Playing) return
-
-  const stride = state.map.provinces.length + 1
-  if (state.provinceCounts[player * stride + province] === state.map.provinces[province - 1].tiles)
-    rewardZone(state, player, province)
-}
-
 /**
  * Give a tile to a player, zero for none
  * @param {ConcordatState} state - Game
@@ -114,7 +75,6 @@ export const transferTile = (state: ConcordatState, tile: number, to: number): v
     winner.tiles++
     winner.income += income
     countProvince(state, to, tile, 1)
-    checkZoneComplete(state, to, tile)
   }
 
   // Borders of the tile and around it
@@ -142,9 +102,7 @@ export const rebuildDerived = (state: ConcordatState): void => {
   }
 
   // Replay every owned tile
-  isReplaying = true
   for (let tile = 0; tile < layer.length; tile++)
     if (layer[tile]) transferTile(state, tile, layer[tile])
-  isReplaying = false
   state.changed.length = 0
 }

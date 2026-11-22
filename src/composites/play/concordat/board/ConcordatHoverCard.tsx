@@ -32,7 +32,6 @@ const CONCORDAT_HOVER_BUILDINGS = ['market', 'barracks', 'port', 'silo', 'sam'] 
 export interface ConcordatHoverCardProps {
   client: ConcordatClientState
   names: string[]
-  tile: number
   holder: number
 }
 
@@ -43,16 +42,14 @@ export interface ConcordatHoverCardProps {
  * @return {JSX.Element | null}
  */
 
-export const ConcordatHoverCard = ({ client, names, tile, holder }: ConcordatHoverCardProps) => {
-  const province = client.map.provinces[client.map.province[tile] - 1]
+export const ConcordatHoverCard = ({ client, names, holder }: ConcordatHoverCardProps) => {
   const player = client.players[holder - 1]
   if (!player) {
-    return province ? (
+    return (
       <div className={CONCORDAT_HOVER.card} data-hud="concordat">
         <span className={CONCORDAT_HOVER.name}>{CONCORDAT_HUD_COPY.free}</span>
-        <span className={CONCORDAT_HOVER.faint}>{province.name}</span>
       </div>
-    ) : null
+    )
   }
 
   const figure = client.systems.figures[holder - 1]
@@ -140,7 +137,6 @@ export const ConcordatHoverCard = ({ client, names, tile, holder }: ConcordatHov
           {fillPlayMessage(CONCORDAT_HUD_COPY.engageValue, {
             percent: landShareText(player.tiles, land),
           })}
-          {province ? ` · ${province.name}` : ''}
           {(client.systems.traitors[holder - 1] ?? 0) > client.tick &&
             ` · ${CONCORDAT_HOVER_COPY.traitor}`}
           {isOther &&

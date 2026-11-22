@@ -1,12 +1,17 @@
 import type { ConcordatIntent } from '@/types/concordat'
 import {
+  CONCORDAT_BOMBS,
   CONCORDAT_BUILDING_ORDER,
   CONCORDAT_OFFER_ORDER,
   CONCORDAT_TECH_ORDER,
   ConcordatIntents,
   ConcordatOfferKinds,
 } from '@/utils/constants/concordat'
-import type { ConcordatBuildingKind, ConcordatOfferKind } from '@/utils/constants/concordat'
+import type {
+  ConcordatBuildingKind,
+  ConcordatLaunchWeapon,
+  ConcordatOfferKind,
+} from '@/utils/constants/concordat'
 
 // Ask for a new board
 export const CONCORDAT_RESYNC = 'resync'
@@ -37,9 +42,9 @@ const systemIntent = (playerId: number, raw: Record<string, unknown>): Concordat
     return target === null ? null : { kind: 'upgrade', playerId, id: target }
   }
   if (type === ConcordatIntents.BuildShip) {
-    const port = id('port')
+    const tile = id('tile')
 
-    return port === null ? null : { kind: 'buildShip', playerId, port }
+    return tile === null ? null : { kind: 'buildShip', playerId, tile }
   }
   if (type === ConcordatIntents.MoveShip) {
     const ship = id('ship')
@@ -58,8 +63,11 @@ const systemIntent = (playerId: number, raw: Record<string, unknown>): Concordat
 
     // A strike is only fired with the second confirmation
     const weapon =
-      raw.weapon === 'shell' || raw.weapon === 'rocket' || raw.weapon === 'mirv'
-        ? raw.weapon
+      raw.weapon === 'shell' ||
+      raw.weapon === 'rocket' ||
+      raw.weapon === 'mirv' ||
+      CONCORDAT_BOMBS.some((bomb) => bomb === raw.weapon)
+        ? (raw.weapon as ConcordatLaunchWeapon)
         : undefined
 
     return silo === null || tile === null || raw.confirm !== true
@@ -98,14 +106,13 @@ const diplomacyIntent = (
       type === ConcordatIntents.OpenTrade
         ? ConcordatOfferKinds.Trade
         : CONCORDAT_OFFER_ORDER.find((kind) => kind === raw.offer)
-    if (peer === null || !offer || offer === ConcordatOfferKinds.Coalition) return null
+    if (peer === null || !offer) return null
 
     return {
       kind: 'propose',
       playerId,
       to: peer,
       offer,
-      minutes: whole(raw.minutes, 60) ?? 0,
       ask: whole(raw.ask, 3) ?? 0,
       about: whole(raw.about, 255) ?? 0,
     }

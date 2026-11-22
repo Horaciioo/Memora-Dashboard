@@ -14,7 +14,6 @@ export const CONCORDAT_STANDING_COLUMNS = [
   'trade',
   'troops',
   'maxTroops',
-  'zones',
   'stability',
   'allies',
   'betrayals',
@@ -97,18 +96,12 @@ export const standingRowsOf = (
           trade: figure?.trade ?? 0,
           troops: player.troops,
           maxTroops: figure?.maxTroops ?? 0,
-          zones: player.provincesHeld,
           stability: Math.round(player.stability),
           allies,
           betrayals,
           markets: countOf(client, player.id, ConcordatBuildingKinds.Market),
           barracks: countOf(client, player.id, ConcordatBuildingKinds.Barracks),
-          forts: countOf(
-            client,
-            player.id,
-            ConcordatBuildingKinds.Fortress,
-            ConcordatBuildingKinds.Post
-          ),
+          forts: countOf(client, player.id, ConcordatBuildingKinds.Post),
           ports: countOf(client, player.id, ConcordatBuildingKinds.Port),
           ships: client.ships.filter((ship) => ship.owner === player.id && ship.kind === 'war')
             .length,

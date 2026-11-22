@@ -1,4 +1,4 @@
-import { alliesOf, hasTreaty, tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
+import { alliesOf, tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
 import { tradeRefusal } from '@/core/lib/play/concordat/trade/open'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
@@ -28,11 +28,6 @@ const hasTwin = (state: ConcordatState, intent: Propose): boolean =>
 const kindRefusal = (state: ConcordatState, intent: Propose): string | null => {
   const tie = tieKindOf(state, intent.playerId, intent.to)
 
-  if (intent.offer === ConcordatOfferKinds.Peace) {
-    if (!(diplomacy.peaceMinutes as readonly number[]).includes(intent.minutes)) return 'badLength'
-
-    return hasTreaty(state, intent.playerId, intent.to) ? 'alreadyTied' : null
-  }
   if (intent.offer === ConcordatOfferKinds.Alliance) {
     if (tie === ConcordatTies.Alliance) return 'alreadyTied'
 
