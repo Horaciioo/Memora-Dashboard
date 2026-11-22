@@ -36,19 +36,21 @@ const requireTurn = ({ game, now }: SuspensTable, accountId: string): string => 
  * @param {string} move.kind - Move kind
  * @param {string | null} move.value - Letter or word tried
  * @param {string[]} [tried] - Letters tried once the move is played
+ * @param {number} [cost] - Errors the move costs
  * @return {Promise<EngineStep>} - Step
  */
 
 const fail = async (
   table: SuspensTable,
   move: { accountId: string; kind: string; value: string | null },
-  tried: string[] = table.game.tried
+  tried: string[] = table.game.tried,
+  cost = 1
 ): Promise<EngineStep> => {
   const { tx, session, settings, game } = table
   await tx.suspensMove.create({
     data: { sessionId: session.id, round: game.round, ...move, isHit: false },
   })
-  const errors = game.errors + 1
+  const errors = Math.min(game.errors + cost, settings.errors)
   if (errors >= settings.errors) {
     return endRound(table, { errors, isSolved: false, solverId: null }, { tried })
   }
@@ -93,6 +95,7 @@ export const guessLetter = (
     if (!cells) return fail(table, { accountId, kind: SuspensMoves.Letter, value: letter }, tried)
 
     const isSolve = hiddenCells(word, tried) === 0
+    const left = table.settings.errors - game.errors
     await tx.suspensMove.create({
       data: {
         sessionId: session.id,
@@ -102,7 +105,7 @@ export const guessLetter = (
         value: letter,
         isHit: true,
         cells,
-        points: findPoints(cells, isSolve),
+        points: findPoints(cells, isSolve, left),
       },
     })
     if (isSolve) {
@@ -147,7 +150,12 @@ export const guessWord = (
       throw invalidInput([{ field: 'word', message }], message)
     }
     if (entry.word !== word) {
-      return fail(table, { accountId, kind: SuspensMoves.Word, value: entry.word })
+      return fail(
+        table,
+        { accountId, kind: SuspensMoves.Word, value: entry.word },
+        game.tried,
+        SUSPENS_SETTINGS.wordPenalty
+      )
     }
 
     const cells = hiddenCells(word, game.tried)
@@ -160,7 +168,7 @@ export const guessWord = (
         value: entry.word,
         isHit: true,
         cells,
-        points: findPoints(cells, true),
+        points: findPoints(cells, true, table.settings.errors - game.errors),
       },
     })
 

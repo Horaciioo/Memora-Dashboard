@@ -29,6 +29,11 @@
     "messageMax": 500,
     "messagesShown": 60
   },
+  "friends": {
+    "max": 100,
+    "searchMin": 2,
+    "searchSize": 8
+  },
   "privateGames": {
     "codeLength": 6,
     "recentDays": 14,

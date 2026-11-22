@@ -6,6 +6,7 @@ import { readBodyMap } from '@/core/lib/play'
 import { after, countdownEnd, openingEnd } from '@/core/lib/play/clock'
 import { BaccalaureatPhases, drawLetter, roundPhase } from '@/core/lib/play/baccalaureat'
 import { BACCALAUREAT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
+import { IDLE_STEP } from '@/core/engines/play/steps'
 import type { EngineSession, EngineStep } from '@/types/play'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 
@@ -33,13 +34,18 @@ export const closingAt = (round: { endsAt: Date }): Date =>
  * @return {Promise<EngineStep>} - Step
  */
 
-export const openRound = async (session: EngineSession): Promise<EngineStep> => {
+export const openRound = async (
+  session: EngineSession,
+  expectedIndex?: number
+): Promise<EngineStep> => {
   const settings = baccalaureatSettingsOf(session.settings)
   const previous = await prisma.baccalaureatRound.findMany({
     where: { sessionId: session.id },
     select: { letter: true },
   })
 
+  // Another settle opened it first
+  if (expectedIndex !== undefined && previous.length !== expectedIndex) return IDLE_STEP
   // Last round played
   if (previous.length >= settings.rounds) return { changed: true, finished: true, deadline: null }
 

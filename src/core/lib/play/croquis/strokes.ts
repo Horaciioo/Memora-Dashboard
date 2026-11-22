@@ -6,12 +6,14 @@ import { CROQUIS_COLORS, CROQUIS_SETTINGS, CROQUIS_SIZES } from '@/declarations/
  * @property {number} c - Index of the pen
  * @property {number} w - Index of the nib
  * @property {number[]} p - Points x0, y0, x1, y1, ...
+ * @property {1} [f] - Set on a background change, the colour is the new paper
  */
 
 export interface CroquisStroke {
   c: number
   w: number
   p: number[]
+  f?: 1
 }
 
 /**
@@ -22,7 +24,7 @@ export interface CroquisStroke {
 
 export const readStroke = (raw: unknown): CroquisStroke | null => {
   if (typeof raw !== 'object' || raw === null) return null
-  const { c, w, p } = raw as Record<string, unknown>
+  const { c, w, p, f } = raw as Record<string, unknown>
   if (!Number.isInteger(c) || !Number.isInteger(w) || !Array.isArray(p)) return null
   if ((c as number) < 0 || (c as number) >= CROQUIS_COLORS.length) return null
   if ((w as number) < 0 || (w as number) >= CROQUIS_SIZES.length) return null
@@ -39,6 +41,7 @@ export const readStroke = (raw: unknown): CroquisStroke | null => {
   return {
     c: c as number,
     w: w as number,
+    ...(f === 1 ? { f: 1 as const } : {}),
     p: pairs.map((value, index) =>
       Math.round(Math.min(index % 2 ? height : width, Math.max(0, value)))
     ),

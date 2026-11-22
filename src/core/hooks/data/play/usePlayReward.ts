@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import { apiGet } from '@/core/lib/api/client'
+import { usePlayCelebrationStore } from '@/core/store/play/playCelebration'
 import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import type { PlayProfileView } from '@/types/play'
@@ -12,13 +13,11 @@ import type { PlayProfileView } from '@/types/play'
 const POLL_MS = 5000
 
 // How long a reward stays on screen
-const SHOWN_MS = 3200
+const SHOWN_MS = 5800
 
 export interface PlayReward {
   id: number
   gain: number
-  // Level reached, null when none
-  level: number | null
 }
 
 /**
@@ -37,6 +36,7 @@ export const usePlayReward = (profile: PlayProfileView): PlayReward | null => {
   })
   const known = useRef({ xp: profile.global.xp, level: profile.global.level.level })
   const [reward, setReward] = useState<PlayReward | null>(null)
+  const fire = usePlayCelebrationStore((state) => state.fire)
 
   // Compare with the last standing
   useEffect(() => {
@@ -44,8 +44,9 @@ export const usePlayReward = (profile: PlayProfileView): PlayReward | null => {
     const gain = xp - known.current.xp
     const climbed = level.level > known.current.level
     known.current = { xp, level: level.level }
-    if (gain > 0) setReward({ id: performance.now(), gain, level: climbed ? level.level : null })
-  }, [data])
+    if (gain > 0) setReward({ id: performance.now(), gain })
+    if (climbed) fire({ kind: 'level', level: level.level })
+  }, [data, fire])
 
   // Gone after a moment
   useEffect(() => {

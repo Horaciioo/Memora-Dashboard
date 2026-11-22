@@ -1,12 +1,14 @@
 import 'server-only'
 
+import { prisma } from '@/core/lib/db'
 import { endStatsOf } from '@/core/lib/play/endStats'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { engineOf } from '@/core/services/play/PlaySessionService'
 import { readPlayProfile } from '@/core/services/play/ProfileService'
 import { PLAY_END_LIMITS } from '@/declarations/play/end'
+import { PLAY_RARITY_LEVELS, PLAY_TROPHIES } from '@/declarations/play/trophies'
 import { PLAY_HISTORY_FACTS } from '@/declarations/play/history'
-import type { PlayEndAward, PlayEndReport } from '@/types/play'
+import type { PlayEndAward, PlayEndReport, PlayEndTrophy } from '@/types/play'
 import { PlayStatuses } from '@/utils/constants/play'
 
 /**
@@ -45,6 +47,34 @@ const awardsOf = async (session: LoadedSession, viewerId: string): Promise<PlayE
 }
 
 /**
+ * Trophies the viewer won while this game ended
+ * @param {LoadedSession} session - Game
+ * @param {string} viewerId - Reader
+ * @return {Promise<PlayEndTrophy[]>} - Trophies, rarest first
+ */
+
+const trophiesOf = async (session: LoadedSession, viewerId: string): Promise<PlayEndTrophy[]> => {
+  if (!session.startedAt) return []
+  const wins = await prisma.playTrophyWin.findMany({
+    where: { accountId: viewerId, createdAt: { gte: session.startedAt }, backfill: false },
+    select: { trophy: true },
+  })
+  const rank = (trophy: PlayEndTrophy) => PLAY_RARITY_LEVELS[trophy.rarity]
+
+  return wins
+    .flatMap(({ trophy }) => PLAY_TROPHIES.find((entry) => entry.key === trophy) ?? [])
+    .map(({ key, label, goal, icon, rarity }) => ({
+      key,
+      label,
+      goal,
+      icon,
+      rarity,
+      levels: PLAY_RARITY_LEVELS[rarity],
+    }))
+    .sort((left, right) => rank(right) - rank(left))
+}
+
+/**
  * Report of a finished game as one of its players reads it
  * @param {LoadedSession} session - Game
  * @param {string} viewerId - Reader
@@ -67,9 +97,10 @@ export const readEndReport = async (
   )
   const winner = seats.find((seat) => seat.rank === 1)
   const isHuman = seats.some((seat) => seat.accountId === viewerId && !seat.account.botKind)
-  const [awards, profile] = await Promise.all([
+  const [awards, profile, trophies] = await Promise.all([
     awardsOf(session, viewerId),
     isHuman ? readPlayProfile(viewerId) : null,
+    isHuman ? trophiesOf(session, viewerId) : [],
   ])
   const career = profile?.games.find((entry) => entry.game === session.game)
 
@@ -84,6 +115,7 @@ export const readEndReport = async (
       : null,
     stats,
     awards: awards.slice(0, PLAY_END_LIMITS.awards),
+    trophies,
     career: career
       ? {
           played: career.played,

@@ -67,9 +67,9 @@
       "max": 7000
     },
     "failRate": {
-      "EASY": 0.45,
-      "MEDIUM": 0.2,
-      "HARD": 0.04
+      "EASY": 0.55,
+      "MEDIUM": 0.3,
+      "HARD": 0.12
     }
   },
   "glitch": {
@@ -136,8 +136,8 @@
       "HARD": 0.005
     },
     "voteMs": {
-      "min": 1200,
-      "max": 4000
+      "min": 400,
+      "max": 1400
     }
   },
   "golf": {

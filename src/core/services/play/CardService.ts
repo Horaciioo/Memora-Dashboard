@@ -2,6 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
+import { readPlayRelation } from '@/core/services/play/FriendService'
 import { listPlayHistory } from '@/core/services/play/HistoryService'
 import { readPlayPresence, readPlayProfile } from '@/core/services/play/ProfileService'
 import { PLAY_ERRORS, PLAY_SETTINGS } from '@/declarations/play'
@@ -10,11 +11,12 @@ import type { PlayCardView } from '@/types/play'
 /**
  * Card of a player: portrait, level, figures and last games
  * @param {string} accountId - Player
+ * @param {string} viewerId - Viewer
  * @return {Promise<PlayCardView>} - Card
  */
 
-export const readPlayCard = async (accountId: string): Promise<PlayCardView> => {
-  const [account, profile, presence, stored, history] = await Promise.all([
+export const readPlayCard = async (accountId: string, viewerId: string): Promise<PlayCardView> => {
+  const [account, profile, presence, stored, history, relation] = await Promise.all([
     prisma.account.findUnique({
       where: { id: accountId },
       select: { displayName: true, avatarUrl: true, anonymisedAt: true, botKind: true },
@@ -23,6 +25,7 @@ export const readPlayCard = async (accountId: string): Promise<PlayCardView> => 
     readPlayPresence(accountId),
     prisma.playProfile.findUnique({ where: { accountId }, select: { lastSeenAt: true } }),
     listPlayHistory(accountId, { size: PLAY_SETTINGS.cardRecent }),
+    readPlayRelation(viewerId, accountId),
   ])
   if (!account || account.anonymisedAt || account.botKind) throw notFound(PLAY_ERRORS.unknownPlayer)
   const { global } = profile
@@ -39,6 +42,12 @@ export const readPlayCard = async (accountId: string): Promise<PlayCardView> => 
     bestStreak: global.bestStreak,
     lastSeenAt: stored?.lastSeenAt?.toISOString() ?? null,
     presence,
+    ...relation,
+    topGames: profile.games
+      .filter((entry) => entry.played > 0)
+      .sort((a, b) => b.played - a.played)
+      .slice(0, PLAY_SETTINGS.profileTopGames)
+      .map(({ game, played, level }) => ({ game, played, level: level.level })),
     recent: history.entries.map(({ sessionId, game, outcome, rank, players, finishedAt, xp }) => ({
       sessionId,
       game,

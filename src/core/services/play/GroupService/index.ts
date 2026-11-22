@@ -8,9 +8,13 @@ export {
   removeFromGroup,
   dissolvePlayGroup,
   listGroupCandidates,
+  listInvitablePeople,
+  transferPlayGroup,
 } from '@/core/services/play/GroupService/membership'
+export { startGroupQuest } from '@/core/services/play/GroupService/quests'
 export {
   proposeGroupGame,
   dropGroupProposal,
   launchGroupGame,
 } from '@/core/services/play/GroupService/proposals'
+export { readGroupOverview } from '@/core/services/play/GroupService/overview'

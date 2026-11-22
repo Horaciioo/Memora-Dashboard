@@ -208,6 +208,7 @@ export const baccalaureatBoards = async (session: EngineSession) => {
           ])
       ),
     })),
+    isOver: isComplete,
     recap: isComplete
       ? await baccalaureatRecap(
           session.id,

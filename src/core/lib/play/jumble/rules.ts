@@ -2,6 +2,7 @@ import { normalizeWord } from '@/core/lib/play/baccalaureat/words'
 import { JUMBLE_SETTINGS, JUMBLE_WORDS } from '@/declarations/play'
 import type { JumbleLevel } from '@/declarations/play/jumble/settings'
 import { SECOND_MS } from '@/utils/constants/time'
+import { DATE_LOCALE } from '@/declarations/ui/dates'
 
 /**
  * Word ready to be played
@@ -35,21 +36,44 @@ const POOL: JumbleWord[] = JUMBLE_WORDS.map((display) => ({
 export const letterKey = (word: string): string => [...word].sort().join('')
 
 /**
- * Letters mixed, never left in order
+ * Letters mixed fairly, never left in order nor nearly so
  * @param {string} answer - Comparable word
  * @param {() => number} [random] - Source in [0, 1)
  * @return {string} - Capital letters
  */
 
 export const scramble = (answer: string, random: () => number = Math.random): string => {
-  const letters = [...answer.toUpperCase()]
+  const source = [...answer.toUpperCase()]
+  const maxFixed = Math.floor(source.length / 3)
+  let mixed = source
 
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    const mixed = letters.toSorted(() => random() - 0.5).join('')
-    if (mixed !== answer.toUpperCase()) return mixed
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    // Fisher-Yates, unbiased
+    mixed = [...source]
+    for (let index = mixed.length - 1; index > 0; index -= 1) {
+      const other = Math.floor(random() * (index + 1))
+      ;[mixed[index], mixed[other]] = [mixed[other], mixed[index]]
+    }
+
+    const fixed = mixed.filter((letter, index) => letter === source[index]).length
+    if (fixed <= maxFixed && mixed.join('') !== source.join('')) return mixed.join('')
   }
 
-  return letters.toReversed().join('')
+  return mixed.join('') !== source.join('') ? mixed.join('') : source.toReversed().join('')
+}
+
+/**
+ * Time of a round, longer words get more
+ * @param {number} roundSeconds - Time chosen by the host
+ * @param {number} length - Letters of the word
+ * @return {number} - Seconds
+ */
+
+export const roundSecondsOf = (roundSeconds: number, length: number): number => {
+  const { paceLength, lengthSecondsStep, lengthSecondsFloor } = JUMBLE_SETTINGS
+  const share = Math.max(lengthSecondsFloor, 1 + (length - paceLength) * lengthSecondsStep)
+
+  return Math.round(roundSeconds * share)
 }
 
 /**
@@ -89,8 +113,18 @@ export const drawWord = (
   random: () => number = Math.random
 ): JumbleWord => {
   const target = targetLength(round, rounds, level)
+  const band = JUMBLE_SETTINGS.difficulties[level]
   const fresh = POOL.filter(({ answer }) => !used.has(answer))
   const pool = fresh.length ? fresh : POOL
+
+  // One letter of play around the target, kept in the level
+  const varied = pool.filter(
+    ({ answer }) =>
+      Math.abs(answer.length - target) <= 1 &&
+      answer.length >= band.min &&
+      answer.length <= band.max
+  )
+  if (varied.length) return varied[Math.floor(random() * varied.length)]
 
   // Widen the band until a word fits
   for (let reach = 0; reach <= JUMBLE_SETTINGS.lengths.max; reach += 1) {
@@ -130,6 +164,7 @@ export const isSolution = (guess: string, answer: string, known: Set<string>): b
  * @param {number} input.elapsedMs - Time since the round opened
  * @param {number} input.totalMs - Time of the round
  * @param {number} input.streak - Rounds won in a row, this one included
+ * @param {number} input.length - Letters of the word
  * @return {{ points: number, isFlash: boolean }} - Points and the flash mark
  */
 
@@ -137,19 +172,30 @@ export const pointsOf = ({
   elapsedMs,
   totalMs,
   streak,
+  length,
 }: {
   elapsedMs: number
   totalMs: number
   streak: number
+  length: number
 }): { points: number; isFlash: boolean } => {
-  const { base, speedBonus, flashRatio, flashBonus, streakStep, streakMax } =
-    JUMBLE_SETTINGS.scoring
+  const {
+    base,
+    speedBonus,
+    flashRatio,
+    flashBonus,
+    streakStep,
+    streakMax,
+    lengthBonus,
+    lengthFrom,
+  } = JUMBLE_SETTINGS.scoring
   const left = Math.min(1, Math.max(0, 1 - elapsedMs / totalMs))
   const isFlash = elapsedMs / totalMs <= flashRatio
   const run = Math.min(Math.max(streak - 1, 0), streakMax) * streakStep
+  const size = Math.max(length - lengthFrom, 0) * lengthBonus
 
   return {
-    points: base + Math.round(speedBonus * left) + (isFlash ? flashBonus : 0) + run,
+    points: base + Math.round(speedBonus * left) + (isFlash ? flashBonus : 0) + run + size,
     isFlash,
   }
 }
@@ -161,4 +207,7 @@ export const pointsOf = ({
  */
 
 export const secondsLabel = (ms: number): string =>
-  (ms / SECOND_MS).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+  (ms / SECOND_MS).toLocaleString(DATE_LOCALE, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  })

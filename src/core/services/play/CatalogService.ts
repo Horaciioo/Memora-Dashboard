@@ -10,7 +10,7 @@ import {
 } from '@/declarations/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { PLAY_ENGINES } from '@/core/engines/play'
-import { isFeatureOpen } from '@/core/services/features'
+import { isFeatureOn, isFeatureOpen } from '@/core/services/features'
 import { gameFeatureKey } from '@/declarations/features'
 
 /**
@@ -59,3 +59,17 @@ export const openGameOfSlug = (slug: string): PlayGameName | null => {
 
   return game && PLAY_GAMES.get(game).playable && Boolean(PLAY_ENGINES[game]) ? game : null
 }
+
+/**
+ * Every game with its state for the admin page
+ * @return {Promise<{ game: PlayGameName, isOpen: boolean, playable: boolean }[]>} - Games in catalogue order
+ */
+
+export const readAdminGames = async () =>
+  Promise.all(
+    PLAY_GAMES.keys.map(async (game) => ({
+      game,
+      isOpen: await isFeatureOn(gameFeatureKey(PLAY_GAMES.get(game).slug)),
+      playable: PLAY_GAMES.get(game).playable && Boolean(PLAY_ENGINES[game]),
+    }))
+  )

@@ -4,6 +4,7 @@ import type { PlayXpPartName } from '@/declarations/play/xp'
 import { outcomeXp } from '@/core/lib/play/levels'
 import { PlayOutcomes } from '@/utils/constants/play'
 import type { PlayOutcomeName } from '@/utils/constants/play'
+import type { PlayBoost } from '@/core/lib/play/boost'
 import type { PlayXpPart } from '@/types/play'
 
 /**
@@ -14,6 +15,7 @@ import type { PlayXpPart } from '@/types/play'
  * @property {boolean} isFirstWin - First win on this title
  * @property {number} winnerFactor - Winner multiplier of the game
  * @property {number} botRatio - Share kept beside bots, 1 without
+ * @property {PlayBoost[]} [boosts] - Live boosts of the game
  */
 
 export interface XpPartsInput {
@@ -22,6 +24,7 @@ export interface XpPartsInput {
   isFirstWin: boolean
   winnerFactor: number
   botRatio: number
+  boosts?: PlayBoost[]
 }
 
 /**
@@ -36,6 +39,7 @@ export const xpPartsOf = ({
   isFirstWin,
   winnerFactor,
   botRatio,
+  boosts = [],
 }: XpPartsInput): PlayXpPart[] => {
   const played = outcomeXp(PlayOutcomes.Loss)
   const total = outcomeXp(outcome)
@@ -60,6 +64,8 @@ export const xpPartsOf = ({
     scale(PlayXpParts.Mode, winnerFactor)
     if (isFirstWin) scale(PlayXpParts.FirstWin, 1 + PLAY_SETTINGS.xp.firstWinBonus)
   }
+  // Boosts widen what was earned, before the bots cut it
+  for (const boost of boosts) scale(boost.key, 1 + boost.percent / 100)
   scale(PlayXpParts.Bots, botRatio)
 
   return parts

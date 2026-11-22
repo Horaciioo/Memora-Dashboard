@@ -6,11 +6,13 @@
   "errors": { "default": 6, "min": 6, "max": 10 },
   "turnSeconds": { "default": 20, "min": 8, "max": 60 },
   "pickSeconds": { "default": 40, "min": 15, "max": 90 },
+  "wordPenalty": 2,
   "revealSeconds": 5,
   "wordLength": { "min": 4, "max": 14 },
   "scoring": {
     "cell": 2,
-    "solve": 6,
+    "solve": 4,
+    "solveLeft": 1,
     "setterPerError": 2,
     "setterHang": 8
   },

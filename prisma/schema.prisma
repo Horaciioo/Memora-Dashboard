@@ -409,6 +409,7 @@ model Account {
   playStats             PlayGameStat[]
   playProfile           PlayProfile?
   playTrophyWins        PlayTrophyWin[]
+  playQuestClaims       PlayQuestClaim[]
   baccalaureatAnswers   BaccalaureatAnswer[]
   baccalaureatVotes     BaccalaureatVote[]
   bombPlayers           BombPlayer[]
@@ -436,6 +437,8 @@ model Account {
   playGroupMembers      PlayGroupMember[]
   playGroupMessages     PlayGroupMessage[]
   playGroupInvites      PlayGroupInvite[]
+  playFriendsAsked      PlayFriendship[]         @relation("PlayFriendRequester")
+  playFriendsReceived   PlayFriendship[]         @relation("PlayFriendAddressee")
   playGroupProposals    PlayGroupProposal[]
   playNotices           PlayNotice[]
   activityAsSubject     ActivityLog[]            @relation("LogSubject")
@@ -3215,47 +3218,47 @@ model PlaySession {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  host           Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
-  tournament     PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  rematchOf      PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
-  rematch        PlaySession?        @relation("PlayRematch")
-  seats          PlaySeat[]
-  bacRounds      BaccalaureatRound[]
-  bombGame       BombGame?
-  bombSeats      BombPlayer[]
-  bombMoves      BombMove[]
-  jumbleGame     JumbleGame?
-  jumbleRounds   JumbleRound[]
-  echoGame       EchoGame?
-  echoFinds      EchoFind[]
-  glitchGame     GlitchGame?
-  glitchProgress GlitchProgress[]
-  croquisGame    CroquisGame?
-  croquisRounds  CroquisRound[]
-  croquisGuesses CroquisGuess[]
-  suspensGame    SuspensGame?
-  suspensMoves   SuspensMove[]
-  suspensRounds  SuspensRound[]
-  stopGoGame     StopGoGame?
-  stopGoPlayers  StopGoPlayer[]
-  stopGoMoves    StopGoMove[]
+  host             Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+  tournament       PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  rematchOf        PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
+  rematch          PlaySession?        @relation("PlayRematch")
+  seats            PlaySeat[]
+  bacRounds        BaccalaureatRound[]
+  bombGame         BombGame?
+  bombSeats        BombPlayer[]
+  bombMoves        BombMove[]
+  jumbleGame       JumbleGame?
+  jumbleRounds     JumbleRound[]
+  echoGame         EchoGame?
+  echoFinds        EchoFind[]
+  glitchGame       GlitchGame?
+  glitchProgress   GlitchProgress[]
+  croquisGame      CroquisGame?
+  croquisRounds    CroquisRound[]
+  croquisGuesses   CroquisGuess[]
+  suspensGame      SuspensGame?
+  suspensMoves     SuspensMove[]
+  suspensRounds    SuspensRound[]
+  stopGoGame       StopGoGame?
+  stopGoPlayers    StopGoPlayer[]
+  stopGoMoves      StopGoMove[]
   concordatGame    ConcordatGame?
   concordatPlayers ConcordatPlayer[]
   concordatEvents  ConcordatEvent[]
-  golfGame       GolfGame?
-  golfPlayers    GolfPlayer[]
-  golfMoves      GolfMove[]
-  ludoGame       LudoGame?
-  ludoPlayers    LudoPlayer[]
-  ludoMoves      LudoMove[]
-  navalGame      NavalGame?
-  navalPlayers   NavalPlayer[]
-  navalMatches   NavalMatch[]
-  navalShots     NavalShot[]
-  messages       PlayMessage[]
-  invites        PlayInvite[]
-  follows        PlayFollow[]
-  notices        PlayNotice[]
+  golfGame         GolfGame?
+  golfPlayers      GolfPlayer[]
+  golfMoves        GolfMove[]
+  ludoGame         LudoGame?
+  ludoPlayers      LudoPlayer[]
+  ludoMoves        LudoMove[]
+  navalGame        NavalGame?
+  navalPlayers     NavalPlayer[]
+  navalMatches     NavalMatch[]
+  navalShots       NavalShot[]
+  messages         PlayMessage[]
+  invites          PlayInvite[]
+  follows          PlayFollow[]
+  notices          PlayNotice[]
 
   @@index([status, game])
   @@index([tournamentId, tournamentIndex])
@@ -3409,6 +3412,8 @@ model PlayProfile {
   accountId         String    @id
   // XP given on the global line alone
   bonusXp           Int       @default(0)
+  // Group quest boost on every game XP, live until this moment
+  questBoostUntil   DateTime?
   bannedAt          DateTime?
   banReason         String?
   // Last time the member left Play, for "recently online"
@@ -3417,12 +3422,38 @@ model PlayProfile {
   trophiesClaimedAt DateTime?
   // Box announcing the back payment still to read
   trophyNotice      Boolean   @default(false)
+  // Trophies shown on the profile showcase, keys declared in code
+  pinnedTrophies    String[]  @default([])
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("play_profiles")
+}
+
+// Play settings the admins steer, one row
+model PlayConfig {
+  id                   String     @id @default("global")
+  // Games on the hub banner, five at most
+  featuredGames        PlayGame[] @default([])
+  // Extra XP paid on a featured game
+  featuredBoostOn      Boolean    @default(true)
+  featuredBoostPercent Int        @default(30)
+  featuredBoostUntil   DateTime?
+  // Extra XP paid on every game
+  globalBoostOn        Boolean    @default(false)
+  globalBoostPercent   Int        @default(20)
+  globalBoostUntil     DateTime?
+  // No new table while true
+  tablesPaused         Boolean    @default(false)
+  // Words shown on top of the hub
+  announcement         String?
+  announcementOn       Boolean    @default(false)
+  updatedById          String?
+  updatedAt            DateTime   @updatedAt
+
+  @@map("play_config")
 }
 
 // Trophy won once, its XP is the level it completed
@@ -3439,6 +3470,22 @@ model PlayTrophyWin {
 
   @@id([accountId, trophy])
   @@map("play_trophy_wins")
+}
+
+// Reward of a daily quest taken once, the key tells which slot
+model PlayQuestClaim {
+  accountId String
+  // Calendar day of the quest, YYYY-MM-DD
+  day       String
+  // Slot of the day, or the all-done bonus
+  slot      String
+  xp        Int
+  createdAt DateTime @default(now())
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([accountId, day, slot])
+  @@map("play_quest_claims")
 }
 
 // One letter of a Baccalaureat game, its phases read from the dates
@@ -4003,6 +4050,22 @@ model PageComment {
   @@map("page_comments")
 }
 
+// Friendship between two players, a request until accepted
+model PlayFriendship {
+  id          String    @id @default(cuid())
+  requesterId String
+  addresseeId String
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  requester Account @relation("PlayFriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee Account @relation("PlayFriendAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId])
+  @@map("play_friendships")
+}
+
 // A lasting circle of players, led by its host
 model PlayGroup {
   id        String   @id @default(cuid())
@@ -4016,6 +4079,7 @@ model PlayGroup {
   invites   PlayGroupInvite[]
   proposals PlayGroupProposal[]
   messages  PlayGroupMessage[]
+  quests    PlayGroupQuest[]
 
   @@index([hostId])
   @@map("play_groups")
@@ -4083,6 +4147,22 @@ model PlayGroupMessage {
 
   @@index([groupId, createdAt])
   @@map("play_group_messages")
+}
+
+// A quest the whole group works on, counted from its start
+model PlayGroupQuest {
+  id          String    @id @default(cuid())
+  groupId     String
+  // Template key, target and XP are read from code
+  key         String
+  startedAt   DateTime  @default(now())
+  // Set once, when the reward is paid to the members present at the start
+  completedAt DateTime?
+
+  group PlayGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, startedAt])
+  @@map("play_group_quests")
 }
 
 // A feature switched away from its default, one row per feature
@@ -4603,27 +4683,27 @@ model StopGoGame {
 
 // A car at the table with its hand
 model StopGoPlayer {
-  id             String    @id @default(cuid())
-  sessionId      String
-  accountId      String
+  id         String    @id @default(cuid())
+  sessionId  String
+  accountId  String
   // Seat colour on the track, red blue green yellow
-  slot           Int
-  km             Int       @default(0)
+  slot       Int
+  km         Int       @default(0)
   // Cards { id, key, isPicking? }, private to the player
-  hand           Json
+  hand       Json
   // Mystery cards { id, card, fromId, at }, read only by the mystery service
-  sealed         Json
-  isGreen        Boolean   @default(false)
+  sealed     Json
+  isGreen    Boolean   @default(false)
   // Attack keys suffered, one per type, the speed limit included
-  hazards        String[]
+  hazards    String[]
   // Safeties laid down for good, siren tank tyres ace
-  shields        String[]  @default([])
+  shields    String[]  @default([])
   // Last malus suffered, the same one cannot come twice in a row
-  lastHazard     String?
+  lastHazard String?
   // Turns missed in a row
-  strikes        Int       @default(0)
-  finishedAt     DateTime?
-  place          Int?
+  strikes    Int       @default(0)
+  finishedAt DateTime?
+  place      Int?
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
@@ -4656,7 +4736,7 @@ model StopGoMove {
 
 // Concordat table
 model ConcordatGame {
-  sessionId       String   @id
+  sessionId       String    @id
   seed            Int
   size            String
   style           String
@@ -4666,15 +4746,15 @@ model ConcordatGame {
   map             Bytes
   // Deflated snapshot of the live state
   snapshot        Bytes?
-  snapshotTick    Int      @default(0)
+  snapshotTick    Int       @default(0)
   // Bumped with each snapshot
-  rev             Int      @default(0)
+  rev             Int       @default(0)
   phase           String
   // Process running the loop
   ownerId         String?
   heartbeatAt     DateTime?
   startsAt        DateTime
-  updatedAt       DateTime @updatedAt
+  updatedAt       DateTime  @updatedAt
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
@@ -4683,16 +4763,16 @@ model ConcordatGame {
 
 // Nation of a player in a Concordat game
 model ConcordatPlayer {
-  id        String  @id @default(cuid())
+  id        String @id @default(cuid())
   sessionId String
   accountId String
   // Owner byte on the map
   nation    Int
-  tiles     Int     @default(0)
-  peakTiles Int     @default(0)
-  score     Int     @default(0)
+  tiles     Int    @default(0)
+  peakTiles Int    @default(0)
+  score     Int    @default(0)
   rank      Int?
-  provinces Int     @default(0)
+  provinces Int    @default(0)
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)

@@ -92,5 +92,5 @@ export const tournamentXp = (outcome: PlayOutcomeName, games: number): number =>
  * @return {number} - Percent
  */
 
-export const levelShare = ({ into, needed }: PlayLevel): number =>
+export const levelShare = ({ into, needed }: Pick<PlayLevel, 'into' | 'needed'>): number =>
   needed ? Math.min(100, (into / needed) * 100) : 100

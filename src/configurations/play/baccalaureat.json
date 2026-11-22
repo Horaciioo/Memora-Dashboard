@@ -21,12 +21,13 @@
   "customCategories": 4,
   "categoryLength": 32,
   "wordLength": 40,
-  "minWordLength": 3,
+  "minWordLength": 2,
   "stop": {
     "enabled": true
   },
   "submitGraceSeconds": 2,
   "reviewSeconds": 60,
+  "nextSeconds": 15,
   "points": {
     "unique": 10,
     "sharedRule": "half",

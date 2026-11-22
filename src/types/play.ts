@@ -6,7 +6,9 @@ import type {
   PlayMessageKindName,
   PlayStatusName,
 } from '@/utils/constants/play'
+import type { PlayTrophyRarity } from '@/declarations/play/trophies'
 import type { PlayXpPartName } from '@/declarations/play/xp'
+import type { IconName } from '@/declarations/ui/icons'
 import type { Prisma } from '@prisma/client'
 
 /**
@@ -174,7 +176,16 @@ export interface PlayProfileView {
     tournamentsPlayed: number
   }
   ban: { since: string; reason: string | null } | null
-  games: (PlayTileTotals & { game: PlayGameName })[]
+  // Trophy keys on the showcase
+  pins: string[]
+  // Day each trophy was won, by key
+  wonAt: Record<string, string>
+  games: (PlayTileTotals & {
+    game: PlayGameName
+    abandons: number
+    tournamentsPlayed: number
+    extra: Record<string, number>
+  })[]
   maxLevel: number
 }
 
@@ -256,6 +267,8 @@ export interface PlayInviteCandidate extends PlayCandidate {
   playedAt: number
   // Sat at a table lately
   isRecent: boolean
+  // Accepted friend of the caller
+  isFriend: boolean
 }
 
 /**
@@ -424,6 +437,28 @@ export interface PlayGroupView {
   invited: { accountId: string; name: string; avatarUrl: string | null }[]
   proposals: PlayGroupProposalView[]
   messages: PlayGroupMessageView[]
+  quest: PlayGroupQuestView | null
+}
+
+/**
+ * Quest of a group, counted over the members present at its start
+ * @typedef {Object} PlayGroupQuestView
+ */
+
+export interface PlayGroupQuestView {
+  id: string
+  key: string
+  title: string
+  hint: string
+  target: number
+  xp: number
+  done: number
+  isDone: boolean
+  // False for someone who arrived after the start
+  isEligible: boolean
+  // When the target was reached, null while running
+  completedAt: string | null
+  feats: { accountId: string; count: number }[]
 }
 
 /**
@@ -440,6 +475,45 @@ export interface PlayGroupMessageView {
   sessionId: string | null
   author: { accountId: string; name: string; avatarUrl: string | null }
   isMine: boolean
+}
+
+/**
+ * What the group did together, and what each member brought
+ * @typedef {Object} PlayGroupStatsView
+ */
+
+export interface PlayGroupStatsView {
+  // Finished tables shared by two members or more
+  together: number
+  played: number
+  wins: number
+  questsDone: number
+  favourite: PlayGameName | null
+  members: { accountId: string; played: number; wins: number; xp: number }[]
+}
+
+/**
+ * Line of the group journal
+ * @typedef {Object} PlayGroupActionView
+ */
+
+export interface PlayGroupActionView {
+  id: string
+  kind: 'joined' | 'quest' | 'questDone' | 'game'
+  at: string
+  who: string | null
+  // Quest title or game
+  what: string | null
+}
+
+/**
+ * Statistics and journal of a group
+ * @typedef {Object} PlayGroupOverview
+ */
+
+export interface PlayGroupOverview {
+  stats: PlayGroupStatsView
+  actions: PlayGroupActionView[]
 }
 
 /**
@@ -495,6 +569,8 @@ export interface PlayRewardView {
   parts: PlayXpPart[]
   game: PlayRewardLadder
   global: PlayRewardLadder
+  // Group quest boost still running for the reader
+  questBoost: { percent: number; until: string } | null
 }
 
 /**
@@ -537,6 +613,21 @@ export interface PlayEndCareer {
 }
 
 /**
+ * Trophy won as a game ended
+ * @typedef {Object} PlayEndTrophy
+ */
+
+export interface PlayEndTrophy {
+  key: string
+  label: string
+  goal: string
+  icon: IconName
+  rarity: PlayTrophyRarity
+  // Levels it paid
+  levels: number
+}
+
+/**
  * Everything the end page tells about a finished game
  * @typedef {Object} PlayEndReport
  */
@@ -546,6 +637,7 @@ export interface PlayEndReport {
   winner: { accountId: string; name: string; avatarUrl: string | null } | null
   stats: PlayEndStat[]
   awards: PlayEndAward[]
+  trophies: PlayEndTrophy[]
   career: PlayEndCareer | null
 }
 
@@ -596,6 +688,9 @@ export interface PlayCardView {
   bestStreak: number
   lastSeenAt: string | null
   presence: PlayPresence | null
+  relation: PlayRelation
+  requestId: string | null
+  topGames: { game: PlayGameName; played: number; level: number }[]
   recent: Pick<
     PlayHistoryEntry,
     'sessionId' | 'game' | 'outcome' | 'rank' | 'players' | 'finishedAt' | 'xp'
@@ -685,4 +780,81 @@ export interface PlayAdminStats {
   finishedWeek: number
   activeWeek: number
   games: { game: PlayGameName; finished: number; week: number }[]
+}
+
+/**
+ * Someone met in the friends
+ * @typedef {Object} PlayPerson
+ */
+
+export interface PlayPerson {
+  id: string
+  name: string
+  avatarUrl: string | null
+}
+
+/**
+ * Friend with the day they became one
+ * @typedef {Object} PlayFriendView
+ */
+
+export interface PlayFriendView extends PlayPerson {
+  lastSeenAt: string | null
+  since: string
+}
+
+/**
+ * Request waiting for an answer
+ * @typedef {Object} PlayFriendRequestView
+ */
+
+export interface PlayFriendRequestView extends PlayPerson {
+  requestId: string
+  createdAt: string
+}
+
+/**
+ * Friends, requests received and sent
+ * @typedef {Object} PlayFriendsState
+ */
+
+export interface PlayFriendsState {
+  friends: PlayFriendView[]
+  incoming: PlayFriendRequestView[]
+  outgoing: PlayFriendRequestView[]
+}
+
+/**
+ * Tie between the viewer and another player
+ * @typedef {'self' | 'none' | 'friend' | 'incoming' | 'outgoing'} PlayRelation
+ */
+
+export type PlayRelation = 'self' | 'none' | 'friend' | 'incoming' | 'outgoing'
+
+/**
+ * Player found by name with the tie to the viewer
+ * @typedef {Object} PlayFriendFound
+ */
+
+export interface PlayFriendFound extends PlayPerson {
+  relation: PlayRelation
+  requestId: string | null
+}
+
+/**
+ * Play settings the admins steer, dates as ISO text
+ * @typedef {Object} PlayConfigView
+ */
+
+export interface PlayConfigView {
+  featuredGames: PlayGameName[]
+  featuredBoostOn: boolean
+  featuredBoostPercent: number
+  featuredBoostUntil: string | null
+  globalBoostOn: boolean
+  globalBoostPercent: number
+  globalBoostUntil: string | null
+  tablesPaused: boolean
+  announcement: string | null
+  announcementOn: boolean
 }
