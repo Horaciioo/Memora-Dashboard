@@ -180,6 +180,8 @@ export const MODVIEW_USER_COPY = {
   messagesEmpty: 'Aucun message connu pour ce viewer.',
   historyOlder: 'Messages plus anciens',
   messageRemoved: 'Supprimé',
+  mergeHistory: 'Fusionner les messages et les sanctions dans la fiche',
+  sanctionBy: 'par {name}',
   imported: 'Importé',
   notesEmptyTitle: 'Aucune note sur ce viewer',
   notesEmptyAction: 'Écrire une première note',

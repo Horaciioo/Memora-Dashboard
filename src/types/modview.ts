@@ -259,6 +259,7 @@ export interface LiveEmotes {
  * @property {boolean} badges - Badges before each name
  * @property {boolean} deleted - Text of removed lines kept
  * @property {boolean} firstMessages - First lines framed
+ * @property {boolean} mergeHistory - Messages and sanctions in one list
  * @property {boolean} colouredNames - Names in their own colour
  * @property {'hover' | 'alt'} pauseMode - What stands the chat still
  * @property {'left' | 'hover' | 'right' | 'card'} toolsPosition - Where the gestures of a line show
@@ -283,6 +284,7 @@ export interface ModPreferences {
   badges: boolean
   deleted: boolean
   firstMessages: boolean
+  mergeHistory: boolean
   colouredNames: boolean
   pauseMode: 'hover' | 'alt'
   toolsPosition: 'left' | 'hover' | 'right' | 'card'
