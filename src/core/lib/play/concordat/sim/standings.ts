@@ -1,10 +1,5 @@
 import { sideOf } from '@/core/lib/play/concordat/modes/rules'
-import {
-  winningSides,
-  livingSides,
-  scoreRows,
-  sideScore,
-} from '@/core/lib/play/concordat/victory'
+import { winningSides, livingSides, scoreRows, sideScore } from '@/core/lib/play/concordat/victory'
 import type { ConcordatState } from '@/types/concordat'
 import { ConcordatPowers } from '@/utils/constants/concordat'
 

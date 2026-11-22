@@ -5,6 +5,7 @@
   "heartbeatSeconds": 15,
   "idleSeconds": 120,
   "staleSeconds": 60,
+  "modSlotMinutes": 15,
   "maxOpenLives": 12,
   "watchSyncSeconds": 30,
   "coverageMinGapSeconds": 60,

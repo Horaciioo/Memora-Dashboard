@@ -2122,11 +2122,13 @@ model ModViewPresence {
 
 // Stretch a member moderated a live, open until they say they stop or the live ends
 model LiveModStint {
-  id        String    @id @default(cuid())
-  liveId    String
-  accountId String
-  startedAt DateTime  @default(now())
-  stoppedAt DateTime?
+  id          String    @id @default(cuid())
+  liveId      String
+  accountId   String
+  startedAt   DateTime  @default(now())
+  stoppedAt   DateTime?
+  // Built from moderation gestures, one slot at a time, instead of from the Mod View
+  fromActions Boolean   @default(false)
 
   live    Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
   account Account @relation("ModStintAccount", fields: [accountId], references: [id], onDelete: Cascade)

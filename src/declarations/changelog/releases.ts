@@ -248,6 +248,30 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Amélioration de la feuille d’une journée sur téléphone, plus simple à lire dans « Calendrier ».',
       },
       {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.absences,
+        permission: Permissions.AbsenceRead,
+        text: 'Amélioration des « Absences » par prévenance : un membre en absence ne reçoit plus de notifications et est compté absent, sans être relancé, à l’appel d’un live.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Amélioration de la fiche d’un junior : ses lives de la période affichent présents, absents, absences déclarées et sans réponse.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Amélioration du temps de modération d’un live, calculé à partir des actions réalisées, sans compter deux fois les moments qui se chevauchent.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Ajout de l’onglet « Présences » dans la session de « Marsha Academy », pour voir ce que chaque junior a répondu sur ses lives.',
+      },
+      {
         tag: ChangelogTags.Fixed,
         page: ROUTES.calendar,
         permission: Permissions.CalendarRead,

@@ -3,7 +3,12 @@ import { refreshEffects } from '@/core/lib/play/concordat/buildings/effects'
 import { runWorld, applyWorldEffects } from '@/core/lib/play/concordat/events'
 import { runRotation } from '@/core/lib/play/concordat/modes'
 import { applyTechEffects, endFeints, finishResearch } from '@/core/lib/play/concordat/tech'
-import { endReason, runAbsorption, runDomination, runHegemony } from '@/core/lib/play/concordat/victory'
+import {
+  endReason,
+  runAbsorption,
+  runDomination,
+  runHegemony,
+} from '@/core/lib/play/concordat/victory'
 import { applyAirGuards, runAir } from '@/core/lib/play/concordat/air'
 import { applyWeaponUpkeep, runWeapons } from '@/core/lib/play/concordat/weapons'
 import { runEmbargoes } from '@/core/lib/play/concordat/diplomacy/embargo'

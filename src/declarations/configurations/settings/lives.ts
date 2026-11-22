@@ -32,7 +32,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, heldExpireMinutes: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, avatarCacheSeconds: number, avatarBatchMax: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number, chatFlushMs: number, chatBatchMax: number, chatBufferMax: number, chatPageSize: number, preferenceSaveMs: number, teamChatPageSize: number, teamChatMaxLength: number, teamChatBubbleSeconds: number, teamChatMentionAccountId: string, mobileStreamPercent: number, mobileFreezeSwipePx: number, mobileSuggestionTags: number }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, modSlotMinutes: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, heldExpireMinutes: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, avatarCacheSeconds: number, avatarBatchMax: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number, chatFlushMs: number, chatBatchMax: number, chatBufferMax: number, chatPageSize: number, preferenceSaveMs: number, teamChatPageSize: number, teamChatMaxLength: number, teamChatBubbleSeconds: number, teamChatMentionAccountId: string, mobileStreamPercent: number, mobileFreezeSwipePx: number, mobileSuggestionTags: number }}
  */
 
 export const LIVE_SETTINGS = {
@@ -233,6 +233,11 @@ export const LIVE_SETTINGS = {
     path: 'system/lives.staleSeconds',
     fallback: 60,
     min: 10,
+  }),
+  modSlotMinutes: readInteger(lives.modSlotMinutes, {
+    path: 'system/lives.modSlotMinutes',
+    fallback: 15,
+    min: 1,
   }),
   maxOpenLives: readInteger(lives.maxOpenLives, {
     path: 'system/lives.maxOpenLives',

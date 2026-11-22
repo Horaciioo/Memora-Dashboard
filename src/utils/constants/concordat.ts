@@ -220,11 +220,7 @@ export type ConcordatOfferKind = (typeof ConcordatOfferKinds)[keyof typeof Conco
  * @type {readonly ConcordatOfferKind[]}
  */
 
-export const CONCORDAT_OFFER_ORDER: readonly ConcordatOfferKind[] = [
-  'alliance',
-  'trade',
-  'request',
-]
+export const CONCORDAT_OFFER_ORDER: readonly ConcordatOfferKind[] = ['alliance', 'trade', 'request']
 
 // Short asks of a request
 export const ConcordatAsks = {

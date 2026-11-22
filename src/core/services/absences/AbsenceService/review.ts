@@ -3,6 +3,7 @@ import { encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
 import { forbidden, notFound } from '@/core/lib/errors'
 import { readText } from '@/core/lib/forms/values'
+import { settleMemberLeave } from '@/core/services/calendar/attendance/leave'
 import { readLedCreatorIds } from '@/core/services/auth/LeadService'
 import type { FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
@@ -147,6 +148,9 @@ export const reviewAbsence = async (
     },
     include: ABSENCE_INCLUDE,
   })
+
+  // A granted leave settles the coming roll-calls
+  if (status === AbsenceStatuses.Approved) await settleMemberLeave(row.accountId)
 
   return toAbsence(row, row.account.displayName)
 }

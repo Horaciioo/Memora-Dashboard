@@ -20,6 +20,7 @@ import {
 } from '@/core/services/lives/ChatStoreService'
 import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
 import { forgetSampling, sampleViewers } from '@/core/services/lives/LiveSampler'
+import { syncOpenActionStints } from '@/core/services/lives/ModStintService'
 import { sweepStalePresences } from '@/core/services/lives/PresenceService'
 import {
   beatWatchPeriod,
@@ -482,6 +483,8 @@ export const startLiveWatcher = (): void => {
     await syncLiveWatches()
     // Silent tabs closed at their last beat
     await sweepStalePresences().catch(() => null)
+    // Gestures count as moderation time, one slot at a time
+    await syncOpenActionStints().catch(() => null)
   }
   const run = () =>
     void tick().catch((error: unknown) =>

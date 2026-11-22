@@ -4,7 +4,6 @@ import { Checkbox } from '@/components/elements/forms/inputs/Toggle'
 import { Section } from '@/components/structures/page/Section'
 import { DoneCourses } from '@/composites/academy/junior/DoneCourses'
 import { JuniorAbsences } from '@/composites/academy/junior/JuniorAbsences'
-import { JuniorLives } from '@/composites/academy/junior/JuniorLives'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { GUIDE_BEACONS } from '@/declarations/academy/guides'
@@ -15,7 +14,7 @@ import { TrainingStatuses } from '@/utils/constants/hierarchy'
 import { formatDay } from '@/utils/format/time/dates'
 
 /**
- * Progression of the junior: finished courses on the left, past lives on the right
+ * Progression of the junior: finished courses and absences
  * @return {JSX.Element}
  */
 
@@ -31,7 +30,6 @@ export const ProgressionTab = () => {
         <div className="flex flex-col gap-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <DoneCourses courses={done} />
-            <JuniorLives />
             {/* The junior reads theirs on the Absences page */}
             {file.junior.accountId !== can.viewerId && (
               <div className="lg:col-span-2">

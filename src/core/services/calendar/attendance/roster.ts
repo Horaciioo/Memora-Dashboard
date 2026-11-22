@@ -11,6 +11,7 @@ import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import { functionTeamWhere, hoursOf, toPerson } from '@/core/services/calendar/attendance/shared'
 import type { AttendanceRow, RosterAudience } from '@/core/services/calendar/attendance/shared'
+import { settleEventLeave } from '@/core/services/calendar/attendance/leave'
 
 /**
  * Read the members a roll-call convenes
@@ -121,6 +122,9 @@ export const syncRoster = async (eventId: string, memberIds: string[]): Promise<
     data: memberIds.map((accountId) => ({ eventId, accountId })),
     skipDuplicates: true,
   })
+
+  // Live moderators on leave are never asked
+  await settleEventLeave(eventId)
 }
 
 /**

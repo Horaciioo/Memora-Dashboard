@@ -79,6 +79,7 @@ export const FSI_TABS = {
   notes: 'notes',
   objectives: 'objectives',
   reviews: 'reviews',
+  presences: 'presences',
 } as const
 
 const PIM_DESTINATION_MAP = {

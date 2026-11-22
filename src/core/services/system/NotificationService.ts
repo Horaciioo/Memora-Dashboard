@@ -7,7 +7,8 @@ import { queuePushes } from '@/core/services/push'
 import { NOTIFICATION_TOPICS } from '@/declarations/notifications/topics'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import type { NotificationTargetName } from '@/declarations/notifications/targets'
-import { NOTIFICATION_KINDS } from '@/utils/constants/notifications'
+import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService/shape'
+import { LEAVE_PROOF_KINDS, NOTIFICATION_KINDS } from '@/utils/constants/notifications'
 import type { NotificationKindName } from '@/utils/constants/notifications'
 import { toEntry } from '@/core/lib/notifications/entry'
 import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
@@ -50,6 +51,18 @@ export const notify = async (input: NotificationInput): Promise<void> => {
   )
 
   if (recipients.length === 0) return
+
+  // Members on approved leave are left in peace
+  if (!LEAVE_PROOF_KINDS.includes(input.kind)) {
+    const away = await prisma.absence.findMany({
+      where: { accountId: { in: recipients }, ...activeAbsenceFilter() },
+      select: { accountId: true },
+    })
+    const onLeave = new Set(away.map((row) => row.accountId))
+    recipients = recipients.filter((id) => !onLeave.has(id))
+
+    if (recipients.length === 0) return
+  }
 
   /*
    * An edit fires as often as it is saved. Under the once flag

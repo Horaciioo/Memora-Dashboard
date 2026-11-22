@@ -13,6 +13,7 @@ import {
 import { calendarFields, listEntries } from '@/core/services/calendar/CalendarService'
 import { commentFields } from '@/core/lib/forms'
 import { listSessionComments } from '@/core/services/academy/juniors/CommentService'
+import { sessionPresences } from '@/core/services/academy/parkour/PresenceService'
 import { readPeriods } from '@/core/services/academy/parkour/PeriodService'
 import { REVIEW_FIELDS } from '@/core/services/academy/AcademyService'
 import { MentionMarks } from '@/composites/notifications/MentionMarks'
@@ -70,24 +71,34 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
   const canReadLogs = access.can(Permissions.WorkLogRead)
   const canReadNotes = access.can(Permissions.AcademyNoteRead)
 
-  const [sessionForm, juniors, candidates, entries, calendarForm, periods, comments, activity] =
-    await Promise.all([
-      sessionFields(detail.summary.recruitment?.youtuberId),
-      juniorFields(id),
-      juniorCandidates(id),
-      listEntries({
-        from: new Date(from),
-        to: new Date(to),
-        viewerId: session.id,
-        access,
-        scope: await scope(),
-        sessionId: id,
-      }),
-      calendarFields(undefined, workViewer(session, access), academyScope(session, access)),
-      readPeriods(id),
-      canReadNotes ? listSessionComments(id, academyScope(session, access)) : Promise.resolve([]),
-      canReadLogs ? readSessionActivity(id, detail.juniors) : Promise.resolve([]),
-    ])
+  const [
+    sessionForm,
+    juniors,
+    candidates,
+    entries,
+    calendarForm,
+    periods,
+    presences,
+    comments,
+    activity,
+  ] = await Promise.all([
+    sessionFields(detail.summary.recruitment?.youtuberId),
+    juniorFields(id),
+    juniorCandidates(id),
+    listEntries({
+      from: new Date(from),
+      to: new Date(to),
+      viewerId: session.id,
+      access,
+      scope: await scope(),
+      sessionId: id,
+    }),
+    calendarFields(undefined, workViewer(session, access), academyScope(session, access)),
+    readPeriods(id),
+    sessionPresences(id, academyScope(session, access)),
+    canReadNotes ? listSessionComments(id, academyScope(session, access)) : Promise.resolve([]),
+    canReadLogs ? readSessionActivity(id, detail.juniors) : Promise.resolve([]),
+  ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
@@ -118,6 +129,7 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
         }}
         calendar={{ entries, anchor }}
         periods={periods}
+        presences={presences}
         comments={comments}
       />
     </div>

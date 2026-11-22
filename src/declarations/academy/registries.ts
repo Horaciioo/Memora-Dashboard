@@ -31,6 +31,9 @@ import type {
   ExerciseBlock,
 } from '@/declarations/academy/curriculum/types'
 import type { IconName } from '@/declarations/ui/icons'
+import type { Tone } from '@/declarations/ui/theme'
+import { PresenceOutcomes } from '@/utils/constants/workflow'
+import type { PresenceOutcomeName } from '@/utils/constants/workflow'
 
 /**
  * Labelled option carrying a colour token
@@ -225,3 +228,26 @@ const LEGACY_STATUS_MAP: Record<LegacyStatusName, AcademyOption> = {
 }
 
 export const LEGACY_STATUS_REGISTRY = createRegistry(LEGACY_STATUS_MAP)
+
+/**
+ * Outcome of a live for a junior as it reads on screen
+ * @typedef {Object} PresenceOutcomeOption
+ * @property {string} label - Display label
+ * @property {Tone} tone - Colour
+ * @property {IconName} icon - Glyph drawn beside it
+ */
+
+interface PresenceOutcomeOption {
+  label: string
+  tone: Tone
+  icon: IconName
+}
+
+const PRESENCE_OUTCOME_MAP: Record<PresenceOutcomeName, PresenceOutcomeOption> = {
+  [PresenceOutcomes.Present]: { label: 'Présent', tone: 'success', icon: 'check' },
+  [PresenceOutcomes.Absent]: { label: 'Absent', tone: 'danger', icon: 'cross' },
+  [PresenceOutcomes.Silent]: { label: 'Sans réponse', tone: 'neutral', icon: 'clock' },
+  [PresenceOutcomes.Excused]: { label: 'Absence déclarée', tone: 'info', icon: 'absences' },
+}
+
+export const PRESENCE_OUTCOME_REGISTRY = createRegistry(PRESENCE_OUTCOME_MAP)

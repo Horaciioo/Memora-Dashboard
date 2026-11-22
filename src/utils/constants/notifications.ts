@@ -57,5 +57,18 @@ export const NOTIFICATION_KINDS = createEnumeration({
   CreatorLive: { id: 47, label: 'Créateur en live' },
 })
 
+/**
+ * Kinds that still reach a member on leave
+ * @type {NotificationKindName[]}
+ */
+
+export const LEAVE_PROOF_KINDS: NotificationKindName[] = [
+  'AbsenceReviewed',
+  'AbsenceAcknowledged',
+  'AccessChanged',
+  'IdentityAlert',
+  'PushTrial',
+]
+
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids
 export type NotificationKindId = (typeof NOTIFICATION_KINDS.ids)[NotificationKindName]

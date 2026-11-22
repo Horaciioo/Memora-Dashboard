@@ -17,6 +17,7 @@ import {
   type JuniorSurroundings,
 } from '@/composites/academy/junior/JuniorFileContext'
 import { JuniorOverview } from '@/composites/academy/junior/JuniorOverview'
+import { JuniorLives } from '@/composites/academy/junior/JuniorLives'
 import { NotesTab } from '@/composites/academy/junior/NotesTab'
 import { ObjectivesTab } from '@/composites/academy/junior/ObjectivesTab'
 import { ProgressionTab } from '@/composites/academy/junior/ProgressionTab'
@@ -92,6 +93,12 @@ const JuniorBody = ({ activity }: { activity: ActivityEntry[] }) => {
             label: ACADEMY_COPY.progression,
             icon: 'academy',
             render: () => <ProgressionTab />,
+          },
+          {
+            value: FSI_TABS.presences,
+            label: ACADEMY_COPY.tabPresences,
+            icon: 'meetings',
+            render: () => <JuniorLives />,
           },
           {
             value: FSI_TABS.skills,

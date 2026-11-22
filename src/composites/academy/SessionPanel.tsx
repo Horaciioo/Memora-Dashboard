@@ -10,6 +10,7 @@ import { ReviewFlow } from '@/composites/academy/review/ReviewFlow'
 import { CalendarTab } from '@/composites/academy/session/CalendarTab'
 import { GlossaryTab } from '@/composites/academy/session/GlossaryTab'
 import { JuniorsTab } from '@/composites/academy/session/JuniorsTab'
+import { PresencesTab } from '@/composites/academy/session/PresencesTab'
 import { OverviewTab } from '@/composites/academy/session/OverviewTab'
 import { TimelineTab } from '@/composites/academy/session/TimelineTab'
 import { SessionDrawers } from '@/composites/academy/session/SessionDrawers'
@@ -29,7 +30,7 @@ import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { accentVars } from '@/declarations/ui/theme'
 import { FILE_HEAD } from '@/declarations/ui/variants'
-import type { PeriodView, SessionDetail } from '@/types/academy'
+import type { PeriodView, PresenceTally, SessionDetail } from '@/types/academy'
 import type { CommentView } from '@/types/comments'
 import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import { sessionTitle } from '@/utils/format/academy'
@@ -104,6 +105,12 @@ const SessionBody = ({ activity }: { activity: ActivityEntry[] }) => {
             render: () => <JuniorsTab />,
           },
           {
+            value: 'presences',
+            label: ACADEMY_COPY.tabPresences,
+            icon: 'checkbox',
+            render: () => <PresencesTab />,
+          },
+          {
             value: 'calendar',
             label: ACADEMY_COPY.tabCalendar,
             icon: 'meetings',
@@ -146,6 +153,7 @@ export interface SessionPanelProps {
   can: SessionRights
   calendar: SessionCalendar
   periods: PeriodView[]
+  presences: PresenceTally[]
   comments: CommentView[]
   hasCandidates: boolean
   activity: ActivityEntry[]
@@ -158,6 +166,7 @@ export interface SessionPanelProps {
  * @param {SessionRights} can - What the viewer may do
  * @param {SessionCalendar} calendar - Calendar window
  * @param {PeriodView[]} periods - Dated periods of the promotion
+ * @param {PresenceTally[]} presences - Answers of each junior on the lives
  * @param {CommentView[]} comments - Remarks left on the promotion
  * @param {boolean} hasCandidates - A moderator may still be taken in
  * @param {ActivityEntry[]} activity - Journal entries
@@ -170,6 +179,7 @@ export const SessionPanel = ({
   can,
   calendar,
   periods,
+  presences,
   comments,
   hasCandidates,
   activity,
@@ -180,6 +190,7 @@ export const SessionPanel = ({
     can={can}
     calendar={calendar}
     periods={periods}
+    presences={presences}
     comments={comments}
     hasCandidates={hasCandidates}
   >

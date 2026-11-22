@@ -2,7 +2,7 @@ import type { MaturityName } from '@/declarations/maturity/registries'
 import type { ParkourPhase } from '@/core/lib/academy/parkour'
 import type { LivePlatformName } from '@/utils/constants/lives'
 import type { RecruitmentStatusName } from '@/utils/constants/recruitment'
-import type { AbsenceStatusName, AttendanceStatusName } from '@/utils/constants/workflow'
+import type { AbsenceStatusName, PresenceOutcomeName } from '@/utils/constants/workflow'
 import type { MilestoneView } from '@/core/lib/academy/parkourTimeline'
 import type { CourseSurface, CourseTrack } from '@/declarations/academy/curriculum/types'
 import type { FormValues } from '@/types/forms'
@@ -667,14 +667,16 @@ export interface PeriodView {
 }
 
 /**
- * One live a junior was called on
+ * One live of a junior's period, with what they said about it
  * @typedef {Object} JuniorLiveView
  * @property {string} liveId - Live identifier
  * @property {string} title - Live title
  * @property {string} creator - Creator name
  * @property {LivePlatformName} platform - Platform
- * @property {string} startedAt - ISO start
- * @property {AttendanceStatusName} attendance - Present, absent, or not answered
+ * @property {string} startsAt - ISO start, real or planned
+ * @property {PresenceOutcomeName} outcome - Present, absent, on leave or silent
+ * @property {string | null} availableFrom - ISO start of their hours
+ * @property {string | null} availableTo - ISO end of their hours
  */
 
 export interface JuniorLiveView {
@@ -682,8 +684,28 @@ export interface JuniorLiveView {
   title: string
   creator: string
   platform: LivePlatformName
-  startedAt: string
-  attendance: AttendanceStatusName
+  startsAt: string
+  outcome: PresenceOutcomeName
+  availableFrom: string | null
+  availableTo: string | null
+}
+
+/**
+ * Presences of one junior over their period
+ * @typedef {Object} PresenceTally
+ * @property {string} juniorId - Junior seat
+ * @property {number} present - Lives answered present
+ * @property {number} absent - Lives answered absent
+ * @property {number} silent - Lives never answered
+ * @property {number} excused - Lives covered by a declared absence
+ */
+
+export interface PresenceTally {
+  juniorId: string
+  present: number
+  absent: number
+  silent: number
+  excused: number
 }
 
 /**

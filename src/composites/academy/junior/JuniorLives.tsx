@@ -4,12 +4,12 @@ import { DotMark } from '@/components/elements/display/Dotted'
 import { Status } from '@/components/elements/display/Status'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
-import { ATTENDANCE_STATUS_REGISTRY } from '@/declarations/calendar/registries'
+import { PRESENCE_OUTCOME_REGISTRY } from '@/declarations/academy/registries'
 import { LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { ACCOMPANIED_LIVES, LIST_STYLES } from '@/declarations/ui/variants'
-import { AttendanceStatuses } from '@/utils/constants/workflow'
-import { formatDay } from '@/utils/format/time/dates'
+import { PresenceOutcomes } from '@/utils/constants/workflow'
+import { formatDay, formatHourMark } from '@/utils/format/time/dates'
 
 /**
  * Lives the junior was called on since their PIM began, with who came and who did not
@@ -18,7 +18,7 @@ import { formatDay } from '@/utils/format/time/dates'
 
 export const JuniorLives = () => {
   const { lives } = useJuniorState()
-  const present = lives.filter((live) => live.attendance === AttendanceStatuses.Present).length
+  const count = (status: string) => lives.filter((live) => live.outcome === status).length
 
   return (
     <div className={ACCOMPANIED_LIVES.root}>
@@ -27,7 +27,12 @@ export const JuniorLives = () => {
         {lives.length > 0 && (
           <>
             <DotMark />
-            {ACADEMY_COPY.livesPresent(present, lives.length)}
+            {ACADEMY_COPY.livesTally(
+              count(PresenceOutcomes.Present),
+              count(PresenceOutcomes.Absent),
+              count(PresenceOutcomes.Silent),
+              count(PresenceOutcomes.Excused)
+            )}
           </>
         )}
       </span>
@@ -37,7 +42,7 @@ export const JuniorLives = () => {
         <ul className={LIST_STYLES.stack}>
           {lives.map((live) => {
             const Glyph = ICONS[LIVE_PLATFORM_REGISTRY.get(live.platform).icon]
-            const attendance = ATTENDANCE_STATUS_REGISTRY.get(live.attendance)
+            const outcome = PRESENCE_OUTCOME_REGISTRY.get(live.outcome)
 
             return (
               <li key={live.liveId} className={LIST_STYLES.item}>
@@ -46,8 +51,19 @@ export const JuniorLives = () => {
                   <span className={ACCOMPANIED_LIVES.creator}>{live.creator}</span>
                   <span className={ACCOMPANIED_LIVES.title}>{live.title}</span>
                 </span>
-                <span className={ACCOMPANIED_LIVES.date}>{formatDay(live.startedAt)}</span>
-                <Status label={attendance.label} tone={attendance.tone} icon={attendance.icon} />
+                <span className={ACCOMPANIED_LIVES.date}>
+                  {formatDay(live.startsAt)}
+                  {live.availableFrom && live.availableTo && (
+                    <>
+                      <DotMark />
+                      {ACADEMY_COPY.livesHours(
+                        formatHourMark(live.availableFrom),
+                        formatHourMark(live.availableTo)
+                      )}
+                    </>
+                  )}
+                </span>
+                <Status label={outcome.label} tone={outcome.tone} icon={outcome.icon} />
               </li>
             )
           })}

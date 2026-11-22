@@ -15,7 +15,7 @@ import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import type { MenuItem } from '@/managers/front-end'
-import type { JuniorView, PeriodView, SessionDetail } from '@/types/academy'
+import type { JuniorView, PeriodView, PresenceTally, SessionDetail } from '@/types/academy'
 import type { CalendarEntry } from '@/types/calendar'
 import type { CommentView } from '@/types/comments'
 import type { FieldDefinition } from '@/types/forms'
@@ -86,6 +86,7 @@ export interface SessionFileState {
   comments: CommentsState
   promotion: PromotionActions
   periods: PeriodView[]
+  presences: PresenceTally[]
   flow: SessionFlow
   setFlow: (flow: SessionFlow) => void
   fields: SessionFields
@@ -122,6 +123,7 @@ export interface SessionFileProviderProps {
   can: SessionRights
   calendar: SessionCalendar
   periods: PeriodView[]
+  presences: PresenceTally[]
   comments: CommentView[]
   hasCandidates: boolean
   children: ReactNode
@@ -134,6 +136,7 @@ export interface SessionFileProviderProps {
  * @param {SessionRights} can - What the viewer may do
  * @param {SessionCalendar} calendar - Calendar window
  * @param {PeriodView[]} periods - Dated periods of the promotion
+ * @param {PresenceTally[]} presences - Answers of each junior on the lives
  * @param {CommentView[]} comments - Remarks left on the promotion
  * @param {boolean} hasCandidates - A moderator may still be taken in
  * @param {ReactNode} children - Tabs and drawers
@@ -146,6 +149,7 @@ export const SessionFileProvider = ({
   can,
   calendar,
   periods,
+  presences,
   comments: initialComments,
   hasCandidates,
   children,
@@ -203,6 +207,7 @@ export const SessionFileProvider = ({
     comments,
     promotion,
     periods,
+    presences,
     flow,
     setFlow,
     fields,

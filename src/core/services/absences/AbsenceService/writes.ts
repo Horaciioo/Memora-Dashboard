@@ -15,6 +15,7 @@ import {
   absenceDay,
   toAbsence,
 } from '@/core/services/absences/AbsenceService/shape'
+import { settleMemberLeave } from '@/core/services/calendar/attendance/leave'
 import { canReviewAbsence } from '@/core/services/absences/AbsenceService/review'
 import type { AbsenceApproval } from '@/core/services/absences/AbsenceService/review'
 
@@ -150,6 +151,8 @@ export const createAbsence = async (
     include: ABSENCE_INCLUDE,
   })
 
+  if (row.status === AbsenceStatuses.Approved) await settleMemberLeave(row.accountId)
+
   return toAbsence(row, row.account.displayName)
 }
 
@@ -215,6 +218,8 @@ export const updateAbsence = async (
     },
     include: ABSENCE_INCLUDE,
   })
+
+  if (row.status === AbsenceStatuses.Approved) await settleMemberLeave(row.accountId)
 
   return toAbsence(row, row.account.displayName)
 }
