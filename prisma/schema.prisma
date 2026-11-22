@@ -3422,6 +3422,8 @@ model PlayProfile {
   trophiesClaimedAt DateTime?
   // Box announcing the back payment still to read
   trophyNotice      Boolean   @default(false)
+  // Box announcing the level ladder change still to read
+  levelNotice       Boolean   @default(false)
   // Trophies shown on the profile showcase, keys declared in code
   pinnedTrophies    String[]  @default([])
   createdAt         DateTime  @default(now())

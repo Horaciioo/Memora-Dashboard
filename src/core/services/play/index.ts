@@ -27,6 +27,11 @@ export {
   readTrophyRarity,
   setPinnedTrophies,
 } from '@/core/services/play/TrophyService'
+export {
+  dismissLevelNotice,
+  readLevelNotice,
+} from '@/core/services/play/LevelNoticeService'
+export type { LevelNotice } from '@/core/services/play/LevelNoticeService'
 export type { TrophyNotice } from '@/core/services/play/TrophyService'
 export { readPlaySheet } from '@/core/services/play/SheetService'
 export { readPlayCard } from '@/core/services/play/CardService'

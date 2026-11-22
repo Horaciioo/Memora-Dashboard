@@ -13,13 +13,14 @@ import type { PlayDockProps } from '@/composites/play/dock/PlayDock'
 
 import { PlayRoomBanner } from '@/composites/play/brand/PlayRoomBanner'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
+import { PlayLevelNotice } from '@/composites/play/hub/notices/PlayLevelNotice'
 import { PlayTrophyNotice } from '@/composites/play/hub/notices/PlayTrophyNotice'
 import { PlayReward } from '@/composites/play/hub/notices/PlayReward'
 import { PlayOnlineProvider } from '@/composites/play/mobile/PlayOnline'
 import { PlaySlide } from '@/composites/play/mobile/PlaySlide'
 import { PlayTabBar } from '@/composites/play/mobile/PlayTabBar'
 import { PlayInviteHost } from '@/composites/play/invites/PlayInviteHost'
-import type { TrophyNotice } from '@/core/services/play'
+import type { LevelNotice, TrophyNotice } from '@/core/services/play'
 import type { PlayFriendsState, PlayLobbyCard } from '@/types/play'
 import { usePlayMotionStore } from '@/core/store/play/playMotion'
 import { PlayCelebration } from '@/composites/play/celebration/PlayCelebration'
@@ -35,6 +36,7 @@ import { PLAY_SHELL } from '@/declarations/ui/variants'
  * @param {ReactNode} props.children - Play page
  * @param {PlayDockProps} props.dock - Bottom dock data
  * @param {TrophyNotice | null} props.trophyNotice - Trophy back payment to read
+ * @param {LevelNotice | null} props.levelNotice - Level ladder change to read
  * @param {PlayFriendsState} props.friends - Friends and requests
  * @param {PlayLobbyCard[]} props.tables - Open and running tables
  * @return {JSX.Element}
@@ -44,12 +46,14 @@ export const PlayShell = ({
   children,
   dock,
   trophyNotice,
+  levelNotice,
   friends,
   tables,
 }: {
   children: ReactNode
   dock: PlayDockProps
   trophyNotice: TrophyNotice | null
+  levelNotice: LevelNotice | null
   friends: PlayFriendsState
   tables: PlayLobbyCard[]
 }) => {
@@ -107,6 +111,7 @@ export const PlayShell = ({
         <PlayCelebration />
         <PlayCardHost />
         <PlayTrophyNotice notice={trophyNotice} />
+        <PlayLevelNotice notice={levelNotice} />
         <PlayInviteHost isPlay />
         <PlayBusyToast />
       </div>

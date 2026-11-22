@@ -78,9 +78,9 @@ const minGames = readInteger(tournament.minGames, {
 
 export const PLAY_SETTINGS = {
   xp: {
-    win: readInteger(xp.win, { path: 'play/play.xp.win', fallback: 80, min: 0 }),
-    draw: readInteger(xp.draw, { path: 'play/play.xp.draw', fallback: 40, min: 0 }),
-    loss: readInteger(xp.loss, { path: 'play/play.xp.loss', fallback: 20, min: 0 }),
+    win: readInteger(xp.win, { path: 'play/play.xp.win', fallback: 400, min: 0 }),
+    draw: readInteger(xp.draw, { path: 'play/play.xp.draw', fallback: 200, min: 0 }),
+    loss: readInteger(xp.loss, { path: 'play/play.xp.loss', fallback: 100, min: 0 }),
     firstGameMultiplier: readNumber(xp.firstGameMultiplier, {
       path: 'play/play.xp.firstGameMultiplier',
       fallback: 2,

@@ -9,6 +9,7 @@ import {
   readPlayGroup,
   readPlayPresence,
   readPlayProfile,
+  readLevelNotice,
   readTrophyNotice,
 } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -25,12 +26,13 @@ export default async function PlayLayout({ children }: { children: ReactNode }) 
   const { session, access } = await requirePermission(Permissions.PlayAccess)
   // Trophies won before they paid, once
   await claimTrophies(session.id)
-  const [profile, invites, presence, group, trophyNotice, friends, lobbies] = await Promise.all([
+  const [profile, invites, presence, group, trophyNotice, levelNotice, friends, lobbies] = await Promise.all([
     readPlayProfile(session.id),
     listNotices(session.id),
     readPlayPresence(session.id),
     readPlayGroup(session.id),
     readTrophyNotice(session.id),
+    readLevelNotice(session.id),
     readPlayFriends(session.id),
     listLobbies(session.id, null, access.can(Permissions.PlayManage)),
   ])
@@ -38,6 +40,7 @@ export default async function PlayLayout({ children }: { children: ReactNode }) 
   return (
     <PlayShell
       trophyNotice={trophyNotice}
+      levelNotice={trophyNotice ? null : levelNotice}
       friends={friends}
       tables={[...lobbies.running, ...lobbies.lobbies]}
       dock={{

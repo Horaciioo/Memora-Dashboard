@@ -1,8 +1,8 @@
 {
   "xp": {
-    "win": 80,
-    "draw": 40,
-    "loss": 20,
+    "win": 400,
+    "draw": 200,
+    "loss": 100,
     "firstGameMultiplier": 2,
     "firstWinBonus": 0.2
   },

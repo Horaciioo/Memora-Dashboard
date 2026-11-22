@@ -38,6 +38,21 @@ export const tierOf = (level: number): { tier: PlayTier; next: PlayTier | null }
 }
 
 /**
+ * Box announcing the trophy system rework
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_LEVEL_NOTICE = {
+  title: 'Refonte du système de trophées !',
+  text: 'Les jeux rapportent désormais 5 fois plus d’XP. Ton XP de jeu passée a été multipliée par 5 : voilà ce que ça te rapporte.',
+  level: 'niveau gagné',
+  levels: 'niveaux gagnés',
+  xp: 'XP en plus',
+  factor: 'd’XP par partie',
+  confirm: 'Super',
+} as const
+
+/**
  * Box announcing the trophies paid back
  * @type {Record<string, string>}
  */
