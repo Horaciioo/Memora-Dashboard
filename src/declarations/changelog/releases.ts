@@ -127,6 +127,29 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.15.0',
+    date: '2026-11-22',
+    title: 'Les lives suivent Twitch',
+    intro:
+      'Les lives reprennent le titre affiché sur Twitch, et le temps de modération compte enfin ta présence dans le chat.',
+    description:
+      'Les titres donnés à l’avance par les responsables s’éloignaient souvent de ceux de Twitch, ce qui compliquait la relecture des lives. Le temps de modération restait aussi proche de zéro pour les modérateurs présents sans geste à faire. Les deux suivent désormais ce qui se passe réellement pendant le direct.',
+    items: [
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de « Lives » : le titre d’un live devient celui affiché sur Twitch, mis à jour si le streamer le change en cours de direct.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui affichait moins d’une minute de modération pour un modérateur présent dans le chat Twitch sans geste de modération.',
+      },
+    ],
+  },
+  {
     version: '0.14.0',
     date: '2026-11-22',
     title: 'Memora Play prend de l’ampleur',
