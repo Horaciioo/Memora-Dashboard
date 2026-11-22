@@ -12,6 +12,7 @@ import {
   streakPercent,
 } from '@/core/lib/play/quests'
 import type { DailyQuest, FinishedSeat } from '@/core/lib/play/quests'
+import { noteGain } from '@/core/services/play/PlayActivityService'
 import { PLAY_GAMES } from '@/declarations/play/games'
 import {
   PLAY_QUEST_BONUS_KEY,
@@ -179,6 +180,7 @@ export const claimQuest = async (accountId: string, slot: string): Promise<numbe
         create: { accountId, bonusXp: xp },
         update: { bonusXp: { increment: xp } },
       })
+      await noteGain(tx, accountId, { kind: 'QUEST', xp, ref: slot })
     })
   } catch (error) {
     // Already taken by a second click

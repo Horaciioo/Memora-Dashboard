@@ -199,6 +199,22 @@ export interface PlayAdminState extends PlayProfileView {
 }
 
 /**
+ * One personal event of Play shown in the bell
+ * @typedef {Object} PlayActivityView
+ * @property {string} ref - Game, trophy or quest slot it speaks about
+ */
+
+export interface PlayActivityView {
+  id: string
+  kind: 'XP' | 'LEVEL' | 'QUEST' | 'TROPHY'
+  xp: number
+  level: number | null
+  ref: string | null
+  createdAt: string
+  isRead: boolean
+}
+
+/**
  * News waiting for a member: an invitation, a revenge, a followed game
  * @typedef {Object} PlayNoticeView
  */

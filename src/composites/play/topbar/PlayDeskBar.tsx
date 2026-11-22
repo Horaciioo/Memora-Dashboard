@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import AppLink from '@/components/elements/navigation/AppLink'
 import { playTabIndexOf, PLAY_TAB_ORDER } from '@/composites/play/mobile/tabs'
+import { PlayActivityKeys } from '@/composites/play/topbar/PlayActivityKeys'
 import { PlayAppMenu } from '@/composites/play/topbar/PlayAppMenu'
 import { PlayBrand } from '@/composites/play/topbar/PlayBrand'
 import {
@@ -144,6 +145,7 @@ export const PlayDeskBar = ({ invites, presence, groupCalls }: PlayDeskBarProps)
           </Fragment>
         ))}
       </div>
+      <PlayActivityKeys />
     </nav>
   )
 }

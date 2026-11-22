@@ -410,6 +410,7 @@ model Account {
   playProfile           PlayProfile?
   playTrophyWins        PlayTrophyWin[]
   playQuestClaims       PlayQuestClaim[]
+  playActivities        PlayActivity[]
   baccalaureatAnswers   BaccalaureatAnswer[]
   baccalaureatVotes     BaccalaureatVote[]
   bombPlayers           BombPlayer[]
@@ -3472,6 +3473,34 @@ model PlayTrophyWin {
 
   @@id([accountId, trophy])
   @@map("play_trophy_wins")
+}
+
+// What happened to a player on Play, read from the bell
+enum PlayActivityKind {
+  XP
+  LEVEL
+  QUEST
+  TROPHY
+}
+
+// One personal event of Play: XP earned, level reached, quest or trophy done
+model PlayActivity {
+  id        String           @id @default(cuid())
+  accountId String
+  kind      PlayActivityKind
+  // XP earned, 0 for a level
+  xp        Int              @default(0)
+  // Level reached, for a level
+  level     Int?
+  // Game, trophy or quest slot it speaks about
+  ref       String?
+  createdAt DateTime         @default(now())
+  readAt    DateTime?
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, createdAt])
+  @@map("play_activities")
 }
 
 // Reward of a daily quest taken once, the key tells which slot

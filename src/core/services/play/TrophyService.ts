@@ -4,6 +4,7 @@ import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { levelOf, readBodyList, trophiesOf } from '@/core/lib/play'
+import { noteGain } from '@/core/services/play/PlayActivityService'
 import { PLAY_PIN_MAX, PLAY_RARITY_LEVELS, PLAY_TROPHIES } from '@/declarations/play'
 
 /**
@@ -46,6 +47,7 @@ export const awardTrophies = async (
         paid += levelOf(Math.max(0, xp + paid)).needed ?? 0
 
       await tx.playTrophyWin.create({ data: { accountId, trophy: trophy.key, xp: paid, backfill } })
+      if (!backfill) await noteGain(tx, accountId, { kind: 'TROPHY', xp: paid, ref: trophy.key })
       xp += paid
     }
   }

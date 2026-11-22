@@ -16,7 +16,7 @@ export const PLAY_TOPBAR = {
   apps: 'relative shrink-0',
   appsMenu: '',
   chevron: 'size-4 text-[var(--play-ink-faint)]',
-  go: 'grid size-9 shrink-0 place-items-center rounded-full text-[var(--play-ink-soft)] transition-colors hover:bg-play-nest hover:text-[var(--play-ink)] focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
+  go: 'relative grid size-9 shrink-0 place-items-center rounded-full text-[var(--play-ink-soft)] transition-colors hover:bg-play-nest hover:text-[var(--play-ink)] focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
   goIcon: 'size-5',
   // Tabs sit in one strip, the pill glides behind the open one
   tabs: 'relative ml-2 flex min-w-0 items-center gap-1',
@@ -169,4 +169,26 @@ export const PLAY_ME_BOX = {
   fill: 'h-full rounded-full bg-[var(--play-key)] transition-[width] duration-500 motion-reduce:transition-none',
   xp: 'truncate text-micro leading-tight font-semibold text-[var(--play-ink-faint)] tabular-nums',
   menu: 'right-0 left-0 w-auto',
+} as const
+
+/**
+ * Bell and settings keys at the right end of the top bar
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_ACTIVITY = {
+  keys: 'ml-auto flex shrink-0 items-center gap-1',
+  host: 'relative',
+  badge: 'absolute top-0.5 right-0.5 size-2.5 rounded-full bg-[var(--play-alert)]',
+  panel:
+    'absolute top-full right-0 z-50 mt-2 flex max-h-[28rem] w-80 max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+  title: 'px-4 pt-3 pb-1 text-sm font-bold text-[var(--play-ink)]',
+  list: 'flex min-h-0 flex-col gap-0.5 overflow-y-auto overscroll-contain p-2',
+  row: 'flex items-center gap-3 rounded-xl px-2.5 py-2',
+  rowNew: 'bg-play-nest',
+  glyph: 'grid size-8 shrink-0 place-items-center rounded-lg bg-play-lift text-[var(--play-key)]',
+  glyphIcon: 'size-4',
+  text: 'flex min-w-0 flex-1 flex-col',
+  line: 'text-sm leading-tight font-bold text-[var(--play-ink)]',
+  note: 'text-micro leading-tight font-semibold text-[var(--play-ink-faint)] tabular-nums',
 } as const

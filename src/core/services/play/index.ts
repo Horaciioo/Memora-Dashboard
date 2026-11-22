@@ -27,10 +27,7 @@ export {
   readTrophyRarity,
   setPinnedTrophies,
 } from '@/core/services/play/TrophyService'
-export {
-  dismissLevelNotice,
-  readLevelNotice,
-} from '@/core/services/play/LevelNoticeService'
+export { dismissLevelNotice, readLevelNotice } from '@/core/services/play/LevelNoticeService'
 export type { LevelNotice } from '@/core/services/play/LevelNoticeService'
 export type { TrophyNotice } from '@/core/services/play/TrophyService'
 export { readPlaySheet } from '@/core/services/play/SheetService'
@@ -77,6 +74,10 @@ export {
   setPlayBan,
   setPlayLevel,
 } from '@/core/services/play/PlayAdminService'
+export {
+  markPlayActivitiesRead,
+  readPlayActivities,
+} from '@/core/services/play/PlayActivityService'
 export { readPlayActivity } from '@/core/services/play/PlayJournalService'
 export {
   announceInChat,
