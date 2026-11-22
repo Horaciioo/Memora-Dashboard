@@ -15,6 +15,7 @@ import {
   listReviews,
   readJunior,
 } from '@/core/services/academy/AcademyService'
+import { listJuniorAbsences } from '@/core/services/academy/juniors/absences'
 import { listJuniorComments } from '@/core/services/academy/juniors/CommentService'
 import { juniorCourses } from '@/core/services/academy/training/CurriculumService'
 import { juniorCandidate } from '@/core/services/academy/juniors/JuniorService'
@@ -110,6 +111,7 @@ export default async function JuniorPage({
     comments,
     activity,
     candidate,
+    absences,
   ] = await Promise.all([
     juniorFields(found.junior.sessionId),
     listJuniorSkills(juniorId, scope),
@@ -124,6 +126,8 @@ export default async function JuniorPage({
     canReadNotes ? listJuniorComments(juniorId, scope) : Promise.resolve([]),
     canReadLogs ? readRecordActivity('junior', juniorId) : Promise.resolve([]),
     access.can(Permissions.RecruitmentRead) ? juniorCandidate(juniorId) : Promise.resolve(null),
+    // Their own are on the Absences page
+    isOwnFile ? Promise.resolve([]) : listJuniorAbsences(juniorId, scope),
   ])
 
   return (
@@ -149,6 +153,7 @@ export default async function JuniorPage({
           parkour,
           lives,
           courses,
+          absences,
           recruitment: candidate
             ? { path: ROUTES.recruitment(candidate.sessionId), name: candidate.sessionName }
             : null,

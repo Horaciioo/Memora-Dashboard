@@ -124,6 +124,9 @@ export const ACADEMY_COPY = {
   livesPresent: (present: number, total: number) =>
     `${present} ${present > 1 ? 'présents' : 'présent'} sur ${total}`,
   livesEmpty: 'Aucun live terminé depuis le début de la PIM.',
+  absencesTitle: 'Absences',
+  absencesEmpty: 'Aucune absence déclarée depuis le début de la PIM.',
+  absencesUpcoming: (count: number) => `${count} à venir`,
 } as const
 
 /**

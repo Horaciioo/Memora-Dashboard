@@ -208,6 +208,10 @@ export const updateAbsence = async (
             reviewNote: null,
           }
         : {}),
+      // A responsable saving a pending request settles it
+      ...(!isOwner && current.status === AbsenceStatuses.Pending
+        ? { status: AbsenceStatuses.Approved, reviewerId, reviewedAt: new Date() }
+        : {}),
     },
     include: ABSENCE_INCLUDE,
   })

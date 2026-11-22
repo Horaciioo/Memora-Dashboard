@@ -16,6 +16,7 @@ import { FSI_TABS } from '@/declarations/academy/guides'
 import type {
   AcademyReviewView,
   CourseCard,
+  JuniorAbsenceView,
   JuniorLiveView,
   JuniorNoteView,
   JuniorObjectiveView,
@@ -76,6 +77,7 @@ export interface JuniorSurroundings {
   parkour: ParkourView | null
   lives: JuniorLiveView[]
   courses: CourseCard[]
+  absences: JuniorAbsenceView[]
   // Recruitment session the junior came from
   recruitment: { path: string; name: string } | null
 }

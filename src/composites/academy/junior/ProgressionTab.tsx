@@ -3,6 +3,7 @@
 import { Checkbox } from '@/components/elements/forms/inputs/Toggle'
 import { Section } from '@/components/structures/page/Section'
 import { DoneCourses } from '@/composites/academy/junior/DoneCourses'
+import { JuniorAbsences } from '@/composites/academy/junior/JuniorAbsences'
 import { JuniorLives } from '@/composites/academy/junior/JuniorLives'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
@@ -31,6 +32,12 @@ export const ProgressionTab = () => {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <DoneCourses courses={done} />
             <JuniorLives />
+            {/* The junior reads theirs on the Absences page */}
+            {file.junior.accountId !== can.viewerId && (
+              <div className="lg:col-span-2">
+                <JuniorAbsences />
+              </div>
+            )}
           </div>
 
           {manual.length > 0 && (
