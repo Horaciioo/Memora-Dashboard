@@ -500,6 +500,36 @@ export const readAvatars = async (
 }
 
 /**
+ * Identifiers of everyone connected to the chat, page after page
+ * @param {TwitchSeat} seat - Seat
+ * @return {Promise<Set<string>>} - Twitch user identifiers
+ */
+
+export const readChatterIds = async (seat: TwitchSeat): Promise<Set<string>> => {
+  const ids = new Set<string>()
+  let cursor: string | undefined
+  do {
+    const answer = await runHelix<{
+      data: { user_id: string }[]
+      pagination?: { cursor?: string }
+    }>(seat, {
+      method: 'GET',
+      path: HELIX_PATHS.chatters,
+      query: {
+        broadcaster_id: seat.broadcasterId,
+        moderator_id: seat.moderatorId,
+        first: String(TWITCH_LIMITS.chattersPage),
+        ...(cursor ? { after: cursor } : {}),
+      },
+    })
+    answer?.data.forEach((row) => ids.add(row.user_id))
+    cursor = answer?.pagination?.cursor
+  } while (cursor)
+
+  return ids
+}
+
+/**
  * Who sits in the chat
  * @param {TwitchSeat} seat - Seat
  * @return {Promise<{ moderators: Chatter[], vips: Chatter[], viewers: Chatter[] }>} - Community

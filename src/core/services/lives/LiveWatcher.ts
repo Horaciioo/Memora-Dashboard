@@ -21,7 +21,11 @@ import {
 } from '@/core/services/lives/ChatStoreService'
 import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
 import { forgetSampling, sampleViewers } from '@/core/services/lives/LiveSampler'
-import { syncOpenActionStints } from '@/core/services/lives/ModStintService'
+import {
+  forgetChatLook,
+  sampleChatPresence,
+  syncOpenActionStints,
+} from '@/core/services/lives/ModStintService'
 import { sweepStalePresences } from '@/core/services/lives/PresenceService'
 import {
   beatWatchPeriod,
@@ -319,6 +323,9 @@ const followStream = async (liveId: string, current: Watch): Promise<void> => {
 
   if (stream) {
     await sampleViewers(liveId, stream.viewers)
+    if (current.status === LiveStatuses.Live) {
+      void sampleChatPresence({ liveId, ...current }).catch(() => null)
+    }
     // Started before the watch or while the signal was lost
     if (current.status === LiveStatuses.Announced) {
       await handleSignal(liveId, {
@@ -404,6 +411,7 @@ const syncOnce = async (): Promise<void> => {
       watcher.refused.delete(liveId)
       forgetSampling(liveId)
       forgetLiveState(liveId)
+      forgetChatLook(liveId)
       await forgetLive(liveId)
       await closeRoom(liveId)
       continue

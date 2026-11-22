@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { readChatterIds } from '@/core/lib/platforms/twitch/helix'
+import { readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import { actionStints, foldStints, windowFit } from '@/core/lib/lives/stints'
 import type { StintRow } from '@/core/lib/lives/stints'
 import {
@@ -352,10 +354,22 @@ export const syncActionStints = async (liveId: string): Promise<void> => {
   })
   if (!live) return
 
-  const gestures = await prisma.moderationAction.findMany({
-    where: { liveId, actorAccountId: { not: null }, status: 'SUCCEEDED' },
-    select: { actorAccountId: true, occurredAt: true },
-  })
+  const [actions, presences] = await Promise.all([
+    prisma.moderationAction.findMany({
+      where: { liveId, actorAccountId: { not: null }, status: 'SUCCEEDED' },
+      select: { actorAccountId: true, occurredAt: true },
+    }),
+    prisma.liveChatPresence.findMany({
+      where: { liveId },
+      select: { accountId: true, seenAt: true },
+    }),
+  ])
+
+  // Sitting in the Twitch chat counts like a gesture
+  const gestures = [
+    ...actions,
+    ...presences.map((row) => ({ actorAccountId: row.accountId, occurredAt: row.seenAt })),
+  ]
 
   const range = {
     start: live.startedAt ?? live.plannedStartAt,
@@ -401,4 +415,60 @@ export const syncOpenActionStints = async (): Promise<void> => {
     lastSynced.set(id, now)
     await syncActionStints(id)
   }
+}
+
+// Last look at the chat of each live
+const lastLooked = new Map<string, number>()
+
+/**
+ * Note which members sit in the Twitch chat of a live, a few times per slot
+ * @param {Object} input - Live coordinates
+ * @param {string} input.liveId - Live
+ * @param {string} input.holderId - Member whose token reads
+ * @param {string} input.broadcasterId - Channel
+ * @return {Promise<void>} - Noted
+ */
+
+export const sampleChatPresence = async (input: {
+  liveId: string
+  holderId: string
+  broadcasterId: string
+}): Promise<void> => {
+  const gap = (LIVE_SETTINGS.modSlotMinutes * MINUTE_MS) / 3
+  const now = Date.now()
+  if (now - (lastLooked.get(input.liveId) ?? 0) < gap) return
+  lastLooked.set(input.liveId, now)
+
+  const seat = await readTwitchSeat(input.holderId).catch(() => null)
+  if (!seat?.ok) return
+
+  const ids = await readChatterIds({
+    accessToken: seat.accessToken,
+    moderatorId: seat.moderatorId,
+    broadcasterId: input.broadcasterId,
+  }).catch(() => null)
+  if (!ids || ids.size === 0) return
+
+  const linked = await prisma.platformAccount.findMany({
+    where: { platform: 'TWITCH', externalUserId: { in: [...ids] } },
+    select: { accountId: true },
+  })
+  if (linked.length === 0) return
+
+  await prisma.liveChatPresence.createMany({
+    data: [...new Set(linked.map((row) => row.accountId))].map((accountId) => ({
+      liveId: input.liveId,
+      accountId,
+    })),
+  })
+}
+
+/**
+ * Forget a closed live
+ * @param {string} liveId - Live
+ * @return {void}
+ */
+
+export const forgetChatLook = (liveId: string): void => {
+  lastLooked.delete(liveId)
 }

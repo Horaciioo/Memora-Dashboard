@@ -368,6 +368,7 @@ model Account {
   moderationActions     ModerationAction[]       @relation("ModerationActor")
   viewerComments        ViewerComment[]          @relation("ViewerCommentAuthor")
   modStints             LiveModStint[]           @relation("ModStintAccount")
+  chatPresences         LiveChatPresence[]       @relation("ChatPresenceAccount")
   moderationsOnBehalf   ModerationAction[]       @relation("ModerationOnBehalf")
   focusesWatching       ModViewFocus[]           @relation("FocusWatcher")
   focusesWatched        ModViewFocus[]           @relation("FocusTarget")
@@ -2010,6 +2011,7 @@ model Live {
   stints         LiveModStint[]
   watchPeriods   LiveWatchPeriod[]
   categories     LiveCategory[]
+  chatPresences  LiveChatPresence[]
   focuses        ModViewFocus[]
   samples        LiveSample[]
   chatMessages   LiveChatMessage[]
@@ -2152,6 +2154,20 @@ model LiveWatchPeriod {
 
   @@index([liveId, startedAt])
   @@map("live_watch_periods")
+}
+
+// Member seen in the platform chat of a live, one row per look
+model LiveChatPresence {
+  id        String   @id @default(cuid())
+  liveId    String
+  accountId String
+  seenAt    DateTime @default(now())
+
+  live    Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  account Account @relation("ChatPresenceAccount", fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, accountId, seenAt])
+  @@map("live_chat_presences")
 }
 
 // Category the stream showed, one row per switch
