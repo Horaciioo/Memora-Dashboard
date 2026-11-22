@@ -23,10 +23,7 @@ export const HOME_PLAY_COPY = {
  * @type {PlayGameName[]}
  */
 
-export const HOME_PLAY_NEW: PlayGameName[] = [
-  PlayGames.Concordat,
-  PlayGames.StopGo,
-]
+export const HOME_PLAY_NEW: PlayGameName[] = [PlayGames.Concordat, PlayGames.StopGo]
 
 /**
  * Rows listed in each Play block

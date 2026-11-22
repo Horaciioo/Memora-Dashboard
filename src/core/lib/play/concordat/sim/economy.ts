@@ -38,8 +38,7 @@ export const upkeepOf = (player: ConcordatPlayerState, cut = 0): number =>
  */
 
 export const grossOf = (player: ConcordatPlayerState): number =>
-  sim.baseGold +
-  sim.landGold * (player.income / INCOME_SCALE) ** sim.goldExponent
+  sim.baseGold + sim.landGold * (player.income / INCOME_SCALE) ** sim.goldExponent
 
 /**
  * Net troops per second, negative when over the ceiling

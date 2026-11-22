@@ -38,7 +38,8 @@ export const PLAY_LAUNCH = {
   poster:
     'play-hero-poster absolute top-[12%] right-24 hidden aspect-[3/4] w-60 overflow-hidden rounded-3xl ring-[0.3rem] ring-white/70 shadow-[0_2rem_4rem_rgb(0_0_0/0.55)] md:block 2xl:w-72',
   // Strip of the featured games, the open one fills its bar
-  strip: 'z-10 -mt-3 flex justify-center gap-2 md:absolute md:top-1/2 md:right-6 md:mt-0 md:-translate-y-1/2 md:flex-col',
+  strip:
+    'z-10 -mt-3 flex justify-center gap-2 md:absolute md:top-1/2 md:right-6 md:mt-0 md:-translate-y-1/2 md:flex-col',
   thumb:
     'group/thumb relative size-9 shrink-0 overflow-hidden rounded-lg opacity-60 ring-2 ring-transparent transition hover:opacity-90 focus-visible:outline-3 focus-visible:outline-[var(--play-key)] md:size-10',
   thumbOn: 'opacity-100 ring-white/80',

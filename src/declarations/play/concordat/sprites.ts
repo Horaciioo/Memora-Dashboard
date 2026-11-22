@@ -6,14 +6,7 @@ import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
  */
 
 export type ConcordatSpriteName =
-  | 'trade'
-  | 'transport'
-  | 'war'
-  | 'missile'
-  | 'heavy'
-  | 'fighter'
-  | 'heli'
-  | ConcordatBuildingKind
+  'trade' | 'transport' | 'war' | 'missile' | 'heavy' | 'fighter' | 'heli' | ConcordatBuildingKind
 
 // Fixed colours of the sprite pixels
 export const CONCORDAT_SPRITE_INK: Record<string, readonly number[]> = {

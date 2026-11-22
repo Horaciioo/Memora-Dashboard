@@ -33,7 +33,6 @@
   filter: grayscale(0.7) brightness(0.75);
 }
 
-
 .naval-callout {
   animation: naval-callout 1.6s ease-out forwards;
 }

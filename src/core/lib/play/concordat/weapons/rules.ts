@@ -4,10 +4,7 @@ import { reachOf } from '@/core/lib/play/concordat/sim/area'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatBuilding, ConcordatIntent, ConcordatState } from '@/types/concordat'
-import {
-  ConcordatBuildingKinds,
-  ConcordatTerrains,
-} from '@/utils/constants/concordat'
+import { ConcordatBuildingKinds, ConcordatTerrains } from '@/utils/constants/concordat'
 import type { ConcordatBombName, ConcordatStrikeKind } from '@/utils/constants/concordat'
 import { CONCORDAT_BOMBS } from '@/utils/constants/concordat'
 
