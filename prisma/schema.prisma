@@ -2009,6 +2009,7 @@ model Live {
   presences      ModViewPresence[]
   stints         LiveModStint[]
   watchPeriods   LiveWatchPeriod[]
+  categories     LiveCategory[]
   focuses        ModViewFocus[]
   samples        LiveSample[]
   chatMessages   LiveChatMessage[]
@@ -2151,6 +2152,21 @@ model LiveWatchPeriod {
 
   @@index([liveId, startedAt])
   @@map("live_watch_periods")
+}
+
+// Category the stream showed, one row per switch
+model LiveCategory {
+  id         String   @id @default(cuid())
+  liveId     String
+  externalId String
+  name       String
+  artUrl     String?
+  startedAt  DateTime @default(now())
+
+  live Live @relation(fields: [liveId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, startedAt])
+  @@map("live_categories")
 }
 
 // Private comment a member leaves on a viewer of a creator's channel

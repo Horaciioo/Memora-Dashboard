@@ -8,6 +8,7 @@ import {
   readPin,
   readStream,
 } from '@/core/lib/platforms/twitch/helix'
+import { syncStreamState } from '@/core/services/lives/LiveService'
 import { readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import type { PinnedMessage } from '@/types/modview'
 
@@ -22,6 +23,7 @@ const lastTold = new Map<
     pin: string | null | undefined
     category: string | null | undefined
     tags: string | undefined
+    title: string | undefined
   }
 >()
 
@@ -67,6 +69,7 @@ export const pollLiveState = async (input: {
     pin: undefined,
     category: undefined,
     tags: undefined,
+    title: undefined,
   }
 
   // An answer that failed stays silent
@@ -85,8 +88,11 @@ export const pollLiveState = async (input: {
 
   // The cover follows the category the streamer switches to
   const category = stream === undefined ? told.category : (stream?.categoryId ?? null)
+  const art =
+    category && category !== told.category
+      ? await readCategoryArt(holder, category).catch(() => null)
+      : null
   if (category !== told.category && stream !== undefined) {
-    const art = category ? await readCategoryArt(holder, category).catch(() => null) : null
     pushRoomEvent(input.liveId, {
       kind: 'stream',
       title: stream?.title,
@@ -95,13 +101,28 @@ export const pollLiveState = async (input: {
     })
   }
 
+  // Title and categories stay on what Twitch shows
+  if (stream && (category !== told.category || stream.title !== told.title)) {
+    void syncStreamState({
+      liveId: input.liveId,
+      title: stream.title,
+      category: category ? { id: category, name: stream.category ?? '', art } : null,
+    }).catch(() => null)
+  }
+
   // The tags follow what the streamer edits on Twitch
   const tagsKey = tags === undefined ? told.tags : JSON.stringify(tags)
   if (tags !== undefined && tagsKey !== told.tags) {
     pushRoomEvent(input.liveId, { kind: 'stream', tags })
   }
 
-  lastTold.set(input.liveId, { viewers, pin: key, category, tags: tagsKey })
+  lastTold.set(input.liveId, {
+    viewers,
+    pin: key,
+    category,
+    tags: tagsKey,
+    title: stream === undefined ? told.title : (stream?.title ?? told.title),
+  })
 
   return stream
 }

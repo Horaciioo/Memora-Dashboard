@@ -8,6 +8,7 @@ import { forgetLive, keepConnection } from '@/core/lib/lives/recent'
 import type { LiveConnection } from '@/core/lib/lives/recent'
 import { closeRoom, pushRoomEvent } from '@/core/lib/lives/room'
 import { logger } from '@/core/lib/logger'
+import { readRunningStreams } from '@/core/lib/platforms/twitch/helix'
 import { EventSubSession } from '@/core/lib/platforms/twitch/session'
 import type { TwitchSignal } from '@/core/lib/platforms/twitch/eventsub'
 import { moveLiveFromPlatform, openUnplannedLives } from '@/core/services/lives/LiveService'
@@ -133,7 +134,14 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
         clearTimeout(watch.offline)
         watch.offline = null
       }
-      await moveLiveFromPlatform(liveId, LiveStatuses.Live, signal.streamId)
+      // Twitch title, read once the stream runs
+      const running = watch ? await readRunningStreams([watch.broadcasterId]).catch(() => []) : []
+      await moveLiveFromPlatform(
+        liveId,
+        LiveStatuses.Live,
+        signal.streamId,
+        running.find((stream) => stream.id === signal.streamId)?.title
+      )
       return
     case 'offline':
       if (!watch || watch.offline) return
