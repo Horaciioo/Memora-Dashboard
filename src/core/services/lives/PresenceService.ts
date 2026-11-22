@@ -2,7 +2,12 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { isStale, tallyBeat } from '@/core/lib/lives/presence'
-import { closeLiveStints, ensureStint, stopStintAt } from '@/core/services/lives/ModStintService'
+import {
+  closeLiveStints,
+  ensureStint,
+  stopStintAt,
+  syncActionStints,
+} from '@/core/services/lives/ModStintService'
 import { channelAccess } from '@/core/services/lives/ModViewService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { FunctionNames } from '@/declarations/reference/fixed'
@@ -164,6 +169,8 @@ export const beatPresence = async (
 export const closeLivePresences = async (liveId: string): Promise<void> => {
   // Stretches first: they read the last beat of each member before it is closed
   await closeLiveStints(liveId)
+  // Last gestures counted up to the end
+  await syncActionStints(liveId).catch(() => null)
   const now = new Date()
   await prisma.modViewPresence.updateMany({
     where: { liveId, closedAt: null },

@@ -12,7 +12,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { MANIFEST_PATH } from '@/declarations/pwa/manifest'
 import { WORKER_FILE } from '@/declarations/pwa/worker'
 
-// Paths reachable, the worker and its fallback page included so they update signed out
+// Paths reachable
 const PUBLIC_PATHS: string[] = [
   ROUTES.login,
   ROUTES.welcome,
@@ -23,7 +23,7 @@ const PUBLIC_PATHS: string[] = [
   MANIFEST_PATH,
 ]
 
-// Short address of an event and its card picture, read by robots that never sign in
+// Short address of an event and its card picture
 const SHARE_PATH = new RegExp(
   `^/(opengraph-image.*|(${DEMO_EVENT_ID}|${EVENT_ID_PATTERN.source.slice(1, -1)})(/opengraph-image.*)?)$`
 )

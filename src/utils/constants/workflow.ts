@@ -81,6 +81,20 @@ export const AttendanceStatuses = {
 export type AttendanceStatusName = (typeof AttendanceStatuses)[keyof typeof AttendanceStatuses]
 
 /**
+ * What a live comes to for a member once gestures and leave are read
+ * @type {Record<string, string>}
+ */
+
+export const PresenceOutcomes = {
+  Present: 'PRESENT',
+  Absent: 'ABSENT',
+  Silent: 'SILENT',
+  Excused: 'EXCUSED',
+} as const
+
+export type PresenceOutcomeName = (typeof PresenceOutcomes)[keyof typeof PresenceOutcomes]
+
+/**
  * Function holding kinds
  * @type {Record<string, string>}
  */

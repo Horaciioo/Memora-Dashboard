@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { foldStints, windowFit } from '@/core/lib/lives/stints'
+import { actionStints, foldStints, windowFit } from '@/core/lib/lives/stints'
 import type { StintRow } from '@/core/lib/lives/stints'
 import {
   LIVE_FUNCTIONS,
@@ -13,7 +13,7 @@ import type { LiveModTime, LiveSpan } from '@/types/lives'
 import { LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import { LiveStatuses } from '@/utils/constants/lives'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
-import { SECOND_MS } from '@/utils/constants/time'
+import { MINUTE_MS, SECOND_MS } from '@/utils/constants/time'
 
 // Roles that supervise lives
 const LEAD_ROLES: string[] = LEADERSHIP_ROLES
@@ -307,23 +307,98 @@ export const readMemberSpans = async (
   )
   const ids = [...new Set([...liveIds, ...given.keys()])]
 
-  const rows = await prisma.liveModStint.findMany({
-    where: { accountId, liveId: { in: ids } },
-    select: { liveId: true, accountId: true, startedAt: true, stoppedAt: true },
-  })
+  const [rows, lives] = await Promise.all([
+    prisma.liveModStint.findMany({
+      where: { accountId, liveId: { in: ids } },
+      select: { liveId: true, accountId: true, startedAt: true, stoppedAt: true },
+    }),
+    prisma.live.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, status: true, endedAt: true },
+    }),
+  ])
   const byLive = Map.groupBy(rows, (row) => row.liveId)
+  const ends = new Map(lives.map((live) => [live.id, live]))
 
   return new Map(
     ids.flatMap((liveId) => {
       const seat = given.get(liveId)
+      const live = ends.get(liveId)
+      const isClosed = live?.status === LiveStatuses.Ended
       const span = toSpan({
         rows: byLive.get(liveId) ?? [],
         declared: seat ? (declaredHours([seat]).get(accountId) ?? null) : null,
-        cap: new Date(),
-        isClosed: seat?.event.live?.status === LiveStatuses.Ended,
+        // A stretch a crash left open stops with the live, not today
+        cap: isClosed && live?.endedAt ? live.endedAt : new Date(),
+        isClosed,
       })
 
       return span ? [[liveId, span] as const] : []
     })
   )
+}
+
+/**
+ * Rebuild the stretches a live's gestures draw, Twitch and Memora alike: one slot of
+ * moderation time for every slot holding a gesture of a member
+ * @param {string} liveId - Live
+ * @return {Promise<void>} - Rebuilt
+ */
+
+export const syncActionStints = async (liveId: string): Promise<void> => {
+  const live = await prisma.live.findUnique({
+    where: { id: liveId },
+    select: { startedAt: true, plannedStartAt: true, endedAt: true },
+  })
+  if (!live) return
+
+  const gestures = await prisma.moderationAction.findMany({
+    where: { liveId, actorAccountId: { not: null }, status: 'SUCCEEDED' },
+    select: { actorAccountId: true, occurredAt: true },
+  })
+
+  const range = {
+    start: live.startedAt ?? live.plannedStartAt,
+    end: live.endedAt ?? new Date(),
+    slotMs: LIVE_SETTINGS.modSlotMinutes * MINUTE_MS,
+  }
+  const built = [...Map.groupBy(gestures, (row) => row.actorAccountId as string)].flatMap(
+    ([accountId, rows]) =>
+      actionStints(
+        rows.map((row) => row.occurredAt),
+        range
+      ).map((stint) => ({ liveId, accountId, fromActions: true, ...stint }))
+  )
+
+  await prisma.$transaction([
+    prisma.liveModStint.deleteMany({ where: { liveId, fromActions: true } }),
+    prisma.liveModStint.createMany({ data: built }),
+  ])
+}
+
+// Last rebuild of each open live
+const lastSynced = new Map<string, number>()
+
+/**
+ * Rebuild the gesture stretches of every live in progress, once per slot
+ * @return {Promise<void>} - Rebuilt
+ */
+
+export const syncOpenActionStints = async (): Promise<void> => {
+  const lives = await prisma.live.findMany({
+    where: { status: LiveStatuses.Live },
+    select: { id: true },
+  })
+  const now = Date.now()
+  const open = new Set(lives.map((live) => live.id))
+  lastSynced.forEach((_at, id) => {
+    if (!open.has(id)) lastSynced.delete(id)
+  })
+
+  for (const { id } of lives) {
+    if (now - (lastSynced.get(id) ?? 0) < LIVE_SETTINGS.modSlotMinutes * MINUTE_MS) continue
+
+    lastSynced.set(id, now)
+    await syncActionStints(id)
+  }
 }

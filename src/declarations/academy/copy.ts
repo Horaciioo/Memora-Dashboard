@@ -40,6 +40,7 @@ export const ACADEMY_COPY = {
   tabJuniors: 'Juniors',
   tabTimeline: 'Timeline',
   tabCalendar: 'Calendrier',
+  tabPresences: 'Présences',
   juniorAdd: 'Ajouter un junior',
   awaitingTitle: 'En attente d’activation',
   awaitingTrail: 'Compte à activer',
@@ -118,12 +119,22 @@ export const ACADEMY_COPY = {
   quizQuestionCount: 'questions',
   quizQuestionCountOne: 'question',
   mandatoryPending: 'Une formation obligatoire n’est pas encore terminée.',
-  livesTitle: 'Lives passés',
+  livesTitle: 'Lives de la période',
   doneCoursesTitle: 'Formations réalisées',
   doneCoursesEmpty: 'Aucune formation terminée pour l’instant.',
-  livesPresent: (present: number, total: number) =>
-    `${present} ${present > 1 ? 'présents' : 'présent'} sur ${total}`,
-  livesEmpty: 'Aucun live terminé depuis le début de la PIM.',
+  livesTally: (present: number, absent: number, silent: number, excused: number) =>
+    [
+      `${present} ${present > 1 ? 'présents' : 'présent'}`,
+      `${absent} ${absent > 1 ? 'absents' : 'absent'}`,
+      excused > 0 ? `${excused} en absence déclarée` : null,
+      `${silent} sans réponse`,
+    ]
+      .filter(Boolean)
+      .join(', '),
+  livesEmpty: 'Aucun live sur la période.',
+  livesHours: (from: string, to: string) => `${from} à ${to}`,
+  presencesSessionLead:
+    'Ce que chaque junior a répondu sur les lives de sa période, actions de modération et absences déclarées comprises.',
   absencesTitle: 'Absences',
   absencesEmpty: 'Aucune absence déclarée depuis le début de la PIM.',
   absencesUpcoming: (count: number) => `${count} à venir`,
