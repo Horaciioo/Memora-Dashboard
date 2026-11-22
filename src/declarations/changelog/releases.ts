@@ -127,6 +127,147 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.14.0',
+    date: '2026-11-22',
+    title: 'Memora Play prend de l’ampleur',
+    intro:
+      'Memora Play gagne des quêtes, un profil avec trophées, de nouvelles règles pour Concordat et un hub entièrement redessiné, pendant que les lives et les bilans de modération s’affinent.',
+    description:
+      'Cette version donne plus de raisons de revenir jouer, avec des objectifs à accomplir et un profil à personnaliser. Elle simplifie aussi le suivi des lives, qui s’ouvrent seuls, et les bilans de modération, plus lisibles.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Quêtes » dans « Memora Play » : des objectifs à accomplir seul ou en groupe, pour gagner de l’XP.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Profil de joueur » dans « Memora Play » : trophées à gagner et badges à épingler sur ton profil.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de nouveaux cadres de laurier autour des avatars, qui évoluent avec ton niveau.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité de choisir la taille de la région de départ dans « Concordat », ou de la laisser au hasard (choix par défaut).',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de nouvelles règles de fin de partie dans « Concordat » : l’empire dominant est mis en avant, absorbe ses voisins et se rapproche d’une victoire qui se joue en alliance.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une cloche de notifications et d’un accès aux réglages de « Memora Play » dans la barre du haut.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de pages dans « Admin Play » pour régler les jeux, les boosts de points, les quêtes et la configuration.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.home,
+        text: 'Ajout de tuiles « Absences » et « Memora Play » sur l’accueil, pour voir qui est absent et reprendre une partie en un clic.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de l’ouverture automatique d’un live non planifié dès qu’il démarre, sans avoir à le créer à la main.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.modView,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de l’historique de l’automodération dans « Mod View », pour retrouver ce qui a été retenu ou bloqué.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.academy,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout des absences dans la fiche d’un junior, pour les voir à côté de sa progression.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration visuelle du hub de « Memora Play », des écrans de jeu, de leur interface et de la barre d’onglets sur téléphone.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de l’XP : elle est multipliée par cinq sur tous les jeux, avec un message qui prévient les joueurs.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration des attaques et de l’interface de « Concordat », plus claires à lire en pleine partie.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la page « Lives » : elle ouvre directement le live en cours quand il y en a un.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.modView,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration des discussions de suggestion dans « Mod View », plus lisibles.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration visuelle des bilans de modération et des bilans créateur.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle du menu latéral, du rail et des boutons partagés.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Amélioration de la feuille d’une journée sur téléphone, plus simple à lire dans « Calendrier ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction de bugs dans « Calendrier » qui affichaient mal certains événements.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.modView,
+        permission: Permissions.LiveRead,
+        text: 'Correction du mode lent qui ne s’affichait pas tout de suite dans « Mod View ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction du sélecteur d’invitation qui ouvrait un profil au lieu d’inviter le joueur.',
+      },
+    ],
+  },
+  {
     version: '0.13.3',
     date: '2026-11-17',
     title: "Les Joueurs se font un p'tit relooking",
