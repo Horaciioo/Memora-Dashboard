@@ -81,3 +81,35 @@ export const CONCORDAT_TEAMS = {
   min: CONCORDAT.teamCount.min,
   max: CONCORDAT.teamCount.max,
 }
+
+/**
+ * Regions that fit each map size, wide ones need a big map
+ * @type {Record<ConcordatSizeName, ConcordatStyleName[]>}
+ */
+
+export const CONCORDAT_SIZE_STYLES: Record<ConcordatSizeName, ConcordatStyleName[]> = {
+  [ConcordatSizes.Small]: [ConcordatStyles.Mediterranean, ConcordatStyles.Europe],
+  [ConcordatSizes.Medium]: [
+    ConcordatStyles.Europe,
+    ConcordatStyles.Africa,
+    ConcordatStyles.Oceania,
+    ConcordatStyles.Mediterranean,
+  ],
+  [ConcordatSizes.Large]: [
+    ConcordatStyles.World,
+    ConcordatStyles.Asia,
+    ConcordatStyles.Americas,
+    ConcordatStyles.Africa,
+  ],
+}
+
+/**
+ * Choices of the region picker for a size, random included
+ * @param {ConcordatSizeName} size - Map size
+ * @return {ConcordatStyleChoice[]} - Regions then random
+ */
+
+export const concordatStyleChoicesOf = (size: ConcordatSizeName): ConcordatStyleChoice[] => [
+  ...CONCORDAT_SIZE_STYLES[size],
+  CONCORDAT_RANDOM_STYLE,
+]

@@ -6,8 +6,9 @@ import {
   CONCORDAT_SETTINGS,
   CONCORDAT_START_TROOPS,
   CONCORDAT_TEAMS,
+  concordatStyleChoicesOf,
 } from '@/declarations/play/concordat/settings'
-import { CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
+import { CONCORDAT_RANDOM_STYLE, CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
 import type {
   ConcordatDifficultyName,
   ConcordatModeName,
@@ -98,9 +99,15 @@ export const readConcordatSettings = (
 ): Prisma.InputJsonObject => {
   const current = concordatSettingsOf(stored)
   const seed = 'seed' in raw ? readBodyInteger(raw, 'seed') : undefined
+  const size = pickOne(raw.size, CONCORDAT_SETTINGS.sizes, current.size)
   const settings: ConcordatGameSettings = {
-    size: pickOne(raw.size, CONCORDAT_SETTINGS.sizes, current.size),
-    style: pickOne(raw.style, CONCORDAT_SETTINGS.styleChoices, current.style),
+    size,
+    // A region must fit the size, else a draw
+    style: pickOne(
+      raw.style,
+      concordatStyleChoicesOf(size),
+      pickOne(current.style, concordatStyleChoicesOf(size), CONCORDAT_RANDOM_STYLE)
+    ),
     speed: pickOne(raw.speed, CONCORDAT_SETTINGS.speeds, current.speed),
     difficulty: pickOne(raw.difficulty, CONCORDAT_SETTINGS.difficulties, current.difficulty),
     durationMinutes: readDuration(readBodyInteger(raw, 'durationMinutes'), current.durationMinutes),

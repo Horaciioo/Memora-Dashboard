@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { ConcordatSizeArt } from '@/composites/play/concordat/ConcordatSetupArt'
+import { ConcordatRegionArt, ConcordatSizeArt } from '@/composites/play/concordat/ConcordatSetupArt'
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
 import {
@@ -20,14 +20,18 @@ import {
   CONCORDAT_MODE_LABELS,
   CONCORDAT_SETUP_COPY,
   CONCORDAT_SIZE_LABELS,
+  CONCORDAT_STYLE_CHOICE_LABELS,
 } from '@/declarations/play/concordat/copy'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 import {
   CONCORDAT_SETTINGS,
   CONCORDAT_START_TROOPS,
   CONCORDAT_TEAMS,
+  concordatStyleChoicesOf,
 } from '@/declarations/play/concordat/settings'
 import { CONCORDAT_SETUP } from '@/declarations/ui/variants'
+import { CONCORDAT_RANDOM_STYLE } from '@/utils/constants/concordat'
+import type { ConcordatSizeName } from '@/utils/constants/concordat'
 import { CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
 
 import { hasTeams } from '@/core/lib/play/concordat/modes/rules'
@@ -83,6 +87,20 @@ export const ConcordatSetupDrawer = ({
     <K extends keyof ConcordatGameSettings>(key: K) =>
     (value: ConcordatGameSettings[K]) =>
       setSettings((previous) => ({ ...previous, [key]: value }))
+  // A new size keeps the region only when it fits
+  const setSize = (size: ConcordatSizeName) =>
+    setSettings((previous) => ({
+      ...previous,
+      size,
+      style: concordatStyleChoicesOf(size).includes(previous.style)
+        ? previous.style
+        : CONCORDAT_RANDOM_STYLE,
+    }))
+  const styles = concordatStyleChoicesOf(settings.size).map((value) => ({
+    value,
+    label: CONCORDAT_STYLE_CHOICE_LABELS[value],
+    art: <ConcordatRegionArt style={value} />,
+  }))
   const isUnlimited = settings.durationMinutes === CONCORDAT_SETTINGS.unlimited
   const labels = { less: CONCORDAT_SETUP_COPY.less, more: CONCORDAT_SETUP_COPY.more }
 
@@ -157,7 +175,19 @@ export const ConcordatSetupDrawer = ({
                   styles={CONCORDAT_SETUP}
                   options={SIZES}
                   value={settings.size}
-                  onChange={set('size')}
+                  onChange={setSize}
+                />
+              </SetupSection>
+              <SetupSection
+                styles={CONCORDAT_SETUP}
+                title={CONCORDAT_SETUP_COPY.style}
+                hint={CONCORDAT_SETUP_COPY.styleHint}
+              >
+                <SetupArtCards
+                  styles={CONCORDAT_SETUP}
+                  options={styles}
+                  value={settings.style}
+                  onChange={set('style')}
                 />
               </SetupSection>
             </>

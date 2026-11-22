@@ -36,7 +36,7 @@ import {
 } from '@/core/services/play/concordat/ConcordatStore'
 import { CONCORDAT, CONCORDAT_ERRORS, CONCORDAT_REFUSALS } from '@/declarations/play'
 import { PLAY_ERRORS } from '@/declarations/play/copy'
-import { CONCORDAT_SETTINGS } from '@/declarations/play/concordat/settings'
+import { CONCORDAT_SIZE_STYLES } from '@/declarations/play/concordat/settings'
 import type { EngineSession, EngineStep } from '@/types/play'
 import type { ConcordatMap, ConcordatState } from '@/types/concordat'
 import { CONCORDAT_RANDOM_STYLE, ConcordatPhases } from '@/utils/constants/concordat'
@@ -79,7 +79,9 @@ const mapFor = (session: EngineSession): { map: ConcordatMap; seed: number } => 
     // A random region is drawn again on every attempt
     const style =
       settings.style === CONCORDAT_RANDOM_STYLE
-        ? CONCORDAT_SETTINGS.styles[randomInt(0, CONCORDAT_SETTINGS.styles.length)]
+        ? CONCORDAT_SIZE_STYLES[settings.size][
+            randomInt(0, CONCORDAT_SIZE_STYLES[settings.size].length)
+          ]
         : settings.style
     const seed = (firstSeed + attempt) % 2_000_000_000
     const map = generateMap({
