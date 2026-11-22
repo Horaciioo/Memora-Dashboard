@@ -18,7 +18,7 @@ export const COPY_VALUE = {
 export const BUTTON_STYLES = {
   base: 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 text-sm font-semibold md:min-h-0 transition-[background-color,border-color,color,filter] duration-[var(--motion-duration-fast)] disabled:pointer-events-none disabled:opacity-50',
   primary:
-    'rounded-[var(--radius-md)] md:rounded-full bg-[var(--color-brand-600)] px-4 py-2 text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
+    'glass-sunset rounded-[var(--radius-md)] md:rounded-full border px-4 py-2 text-[var(--color-on-sunset)] hover:brightness-105 active:brightness-95',
   secondary:
     'rounded-[var(--radius-md)] md:rounded-full border border-[var(--color-border-strong)] bg-[var(--color-background)] px-3 py-2 hover:bg-[var(--color-surface-sunken)]',
   ghost:
@@ -40,7 +40,7 @@ export const BUTTON_STYLES = {
   arcadeGhostSmall: 'play-key play-key-ghost px-3.5 py-1.5 text-sm! font-bold!',
   // No fill, no depth: text on the room
   arcadeText:
-    'rounded-full px-5 py-3 text-base! font-bold! text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
+    'rounded-xl px-5 py-3 text-base! font-bold! text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
   arcadeHero: 'play-key play-key-hero px-6 py-4 text-lg! font-extrabold!',
   arcadeOrange: 'play-key play-key-orange px-5 py-3 text-base! font-bold!',
   arcadeDanger: 'play-key play-key-danger px-5 py-3 text-base! font-bold!',
@@ -75,15 +75,19 @@ export const SEGMENTED_STYLES = {
 } as const
 
 /**
- * Segmented switch of Memora Play: one key per choice, the pick in colour
+ * Segmented switch of Memora Play: one nested group, the pick lifted
  * @type {Record<string, string>}
  */
 
 export const SEGMENTED_PLAY = {
-  group: 'flex w-full items-center gap-2 pb-1.5',
-  option: 'play-key min-h-11 flex-1 px-3 py-2 text-center text-sm whitespace-nowrap',
-  selected: '',
-  idle: 'play-key-ghost',
+  group: 'flex w-full items-center gap-1 rounded-[var(--radius-lg)] bg-play-nest p-1',
+  option:
+    'min-h-10 flex-1 rounded-[var(--radius-md)] px-3 py-1.5 text-center text-sm font-bold whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
+  // Hugs its content, glyph beside the label
+  groupInline: 'flex w-fit max-w-full overflow-x-auto',
+  optionInline: 'inline-flex items-center justify-center gap-2 px-5',
+  selected: 'bg-play-press text-[var(--play-ink)]',
+  idle: 'text-[var(--play-ink-soft)] hover:bg-play-nest hover:text-[var(--play-ink)]',
 } as const
 
 /**

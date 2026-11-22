@@ -4,9 +4,24 @@
   --play-baccalaureat-deep: #1c3b8f;
   --play-baccalaureat-glow: #8fb4ff;
   --play-baccalaureat-ink: #14275f;
+  /* Seyès exam sheet: paper, rulings, red margin */
+  --bac-paper: #fbf8ef;
+  --bac-rule: #c9d8f2;
+  --bac-rule-strong: #9bb3e6;
+  --bac-margin: #e0533f;
   --play-golf: #3f9d5c;
   --play-golf-deep: #1d5b33;
   --play-golf-glow: #a6e8a0;
+  /* Links at sunset: sky, dune layers, tracer */
+  --golf-dusk-top: #2b2350;
+  --golf-dusk-mid: #b85a6a;
+  --golf-dusk-low: #f6a65a;
+  --golf-sun: #ffd98a;
+  --golf-dune-far: #7a5577;
+  --golf-dune-mid: #4c3a62;
+  --golf-dune-near: #2c2847;
+  --golf-dune-front: #17162a;
+  --golf-tracer: #fff3c4;
   /* Golf courses, read by the 3D scene */
   --play-golf-randomtown-turf: #ff9a3d;
   --play-golf-randomtown-speck: #1fb8b0;
@@ -208,6 +223,9 @@
   --play-bomb-cap: #6d6578;
   --play-bomb-cap-deep: #34303d;
   --play-bomb-cord: #d8b77a;
+  /* Screen-print poster: black stock, two inks */
+  --play-bomb-stock: #171010;
+  --play-bomb-cream: #f4e4c4;
   --play-suspens: #a8702f;
   --play-suspens-deep: #5e3a17;
   --play-suspens-glow: #f5e1c4;
@@ -223,6 +241,11 @@
   --suspens-miss: #e5483f;
   --suspens-key: #f3e4c9;
   --suspens-key-ink: #3a2410;
+  /* Cabaret wall and neon tubes */
+  --suspens-brick: #2a1810;
+  --suspens-mortar: #120a06;
+  --suspens-neon: #ffb35c;
+  --suspens-neon-red: #ff4f5e;
   --play-concordat: #4a5bd0;
   --play-concordat-deep: #1b2268;
   --play-concordat-glow: #dfe3ff;
@@ -252,6 +275,16 @@
   --concordat-brass: #cfae5c;
   --concordat-hairline: rgb(220 213 182 / 0.18);
   --concordat-alarm: #d64c40;
+  --concordat-push: #5fa2e8;
+  --concordat-ok: #58c27d;
+  --concordat-warn: #f0bd45;
+  --concordat-trade: #3cc4c4;
+  --concordat-gold: #f6c443;
+  --concordat-ask: #b58cf0;
+  /* Staff map of the hub: three hatched factions */
+  --concordat-faction-a: #d64c40;
+  --concordat-faction-b: #cfae5c;
+  --concordat-faction-c: #6fb0c9;
   --play-stopgo: #d93c3c;
   --play-stopgo-deep: #6e1616;
   --play-stopgo-glow: #ffd9d2;
@@ -267,6 +300,12 @@
   --stopgo-grass-deep: #2f7a33;
   --stopgo-sky: #bfe3f4;
   --stopgo-gold: #f4c64a;
+  /* Road at dusk: sky, signs, lights */
+  --stopgo-dusk-top: #2a3550;
+  --stopgo-dusk-low: #e98b5a;
+  --stopgo-sign: #fbf6ef;
+  --stopgo-amber: #f4a63a;
+  --stopgo-go: #3fd87a;
   --stopgo-car-red: var(--play-ludo-red);
   --stopgo-car-blue: var(--play-ludo-blue);
   --stopgo-car-green: var(--play-ludo-green);
@@ -295,11 +334,29 @@
   --croquis-blue: #2f7be0;
   --croquis-purple: #8a5cf6;
   --croquis-brown: #8a5a36;
+  --croquis-pink: #f472b6;
+  --croquis-sky: #4cc9f0;
+  --croquis-teal: #1fa89a;
+  --croquis-lime: #9bd43a;
+  --croquis-navy: #1d3f8f;
+  --croquis-maroon: #8f1d2c;
+  --croquis-sand: #e3c08f;
+  --croquis-skin: #f2c29b;
+  --croquis-grey: #8b8793;
+  /* Spiral sketchbook: graphite, wire, smudges */
+  --croquis-graphite: #4a4652;
+  --croquis-graphite-soft: rgb(74 70 82 / 0.35);
+  --croquis-wire: #9aa0ab;
+  --croquis-desk: #e9e3d4;
   --play-echo: #11a6b5;
   --play-echo-deep: #0a5560;
   --play-echo-glow: #c9f3f7;
   --play-echo-night: #051f26;
   --play-echo-dusk: #0b4350;
+  /* Frosted glass lenses of the hub */
+  --echo-glass: rgb(255 255 255 / 0.07);
+  --echo-glass-edge: rgb(201 243 247 / 0.35);
+  --echo-etch: rgb(201 243 247 / 0.42);
   /* Echo card: cream face, soft edge */
   --echo-card: #fffaf0;
   --echo-card-edge: #cfe3e6;
@@ -330,6 +387,13 @@
   --play-jumble-tile: #fff4d6;
   --play-jumble-tile-deep: #d9b45a;
   --play-jumble-tile-ink: #2a1466;
+  /* Printer's type case and lead sorts */
+  --jumble-wood: #3b2a1f;
+  --jumble-wood-lit: #5b4230;
+  --jumble-wood-deep: #22180f;
+  --jumble-metal: #cfd2da;
+  --jumble-metal-deep: #80858f;
+  --jumble-metal-ink: #2a2d35;
   --play-glitch: #e0369b;
   --play-glitch-deep: #7d1457;
   --play-glitch-glow: #ffd3ec;
@@ -339,6 +403,10 @@
   --glitch-paper: #fff8f1;
   --glitch-edge: #f3c4de;
   --glitch-ink: #2b1432;
+  /* VHS tube: scanlines and colour split */
+  --glitch-red: #ff3b5c;
+  --glitch-cyan: #36e3f0;
+  --glitch-screen: #12060e;
   /* Palette of the shapes and figures */
   --glitch-c0: #e5484d;
   --glitch-c1: #ff8a2b;
@@ -365,6 +433,10 @@
   --play-naval-deep: #07253d;
   --play-naval-glow: #8fd8ff;
   --play-naval-night: #04111d;
+  /* Night sea chart engraved in brass, sonar trace */
+  --naval-brass: #d9b56a;
+  --naval-brass-faint: rgb(217 181 106 / 0.22);
+  --naval-sonar: #6ff0c4;
   --play-naval-sea: #0e4465;
   --play-naval-sea-deep: #072a45;
   --play-naval-wave: rgb(150 214 255 / 0.2);
@@ -408,6 +480,12 @@
   --play-ludo-teal-hole: #1f6c62;
   --play-ludo-board: #ffffff;
   --play-ludo-line: #e3e7eb;
+  /* Lacquered board on a wooden table */
+  --ludo-wood: #4a2f1d;
+  --ludo-wood-lit: #6b4529;
+  --ludo-wood-deep: #2c1b10;
+  --ludo-lacquer: #fbf7ee;
+  --ludo-board-side: #c9b48c;
   --play-ludo-star: #ecd9a0;
   --play-ludo-gold-light: #fff1b8;
   --play-ludo-gold: #e6b422;
@@ -459,10 +537,10 @@
   --play-seat-15: #bdee63;
   /* Arcade room, the same in light and dark */
   /* Fixed glow of the room, whatever the tone of the view */
-  --play-aurora: #7a4dff;
-  --play-night: #0e0a24;
-  --play-dusk: #1d1250;
-  --play-haze: #3a1d7a;
+  --play-aurora: #c9708f;
+  --play-night: #141518;
+  --play-dusk: #1e2024;
+  --play-haze: #2c2f36;
   --play-on-art: #ffffff;
   --play-panel: rgb(30 34 44 / 0.72);
   --play-panel-strong: rgb(44 49 62);
@@ -471,25 +549,16 @@
   --play-glass-solid: var(--play-night);
   --play-line: rgb(255 255 255 / 0.08);
   --play-ink: #ffffff;
-  /* Leaderboard medals, top to bottom of each box */
-  --play-medal-gold: #ffe58a, #e6b422;
-  --play-medal-silver: #f4f6fa, #aab2c0;
-  --play-medal-bronze: #f0bb8c, #b87238;
-  --play-ink-soft: rgb(236 232 255 / 0.68);
-  --play-ink-faint: rgb(236 232 255 / 0.42);
-  --play-key: #8f73e8;
-  --play-key-deep: #6d4fd0;
-  --play-key-ink: var(--play-on-art);
+  --play-ink-soft: rgb(255 255 255 / 0.68);
+  --play-ink-faint: rgb(255 255 255 / 0.44);
+  --play-key: #f08cab;
+  --play-key-deep: #c4607f;
+  --play-key-ink: #2b0f1a;
   --play-core: var(--play-night);
   --play-track: rgb(0 0 0 / 0.35);
   --play-chip: rgb(0 0 0 / 0.35);
   --play-ring: var(--play-dusk);
   --play-gold: #ffcf4a;
-  /* Podium boxes */
-  --play-medal-gold: #f6c744;
-  --play-medal-silver: #cdd3dc;
-  --play-medal-bronze: #d9985a;
-  --play-medal-ink: #1f1a12;
   /* Unread dot */
   --play-alert: #f0384a;
   --play-gold-deep: #b37a00;
@@ -508,6 +577,10 @@
   --play-bar-h: 3.5rem;
   /* One square of the notebook */
   --play-paper-cell: 1.5rem;
+  /* Trophy rarity: fill, then text */
+  --play-rarity-common: #c7d0dc;
+  --play-rarity-rare: #8fb4ff;
+  --play-rarity-legendary: #ffcf4a;
   /* Status scale */
   --play-tier-discovery: #c7d0dc;
   --play-tier-progress: #7fe3d6;
@@ -520,4 +593,17 @@
   --play-medal-third: #d08a52;
   /* Live tables */
   --play-live: #ff4f7b;
+  /* Hard drop under keys and cards, and the gloss above them */
+  --play-drop: rgb(0 0 0 / 0.3);
+  --play-gloss: rgb(255 255 255 / 0.4);
+  /* Pieces of the tab glyphs: navy outline, ivory, rose and gold faces over their lips */
+  --play-glyph-ink: #14213d;
+  --play-glyph-ivory: #f7f2e8;
+  --play-glyph-ivory-lip: #c8bca7;
+  --play-glyph-rose: #f08cab;
+  --play-glyph-rose-lip: #c4607f;
+  --play-glyph-gold: #f7c54f;
+  --play-glyph-gold-lip: #c98f1c;
+  /* Platinum plate of the last trophy */
+  --play-platinum: linear-gradient(145deg, #f4f1ea, #b9c2cf 55%, #e9edf3);
 }

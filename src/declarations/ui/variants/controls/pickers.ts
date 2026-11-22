@@ -15,12 +15,14 @@ export const SELECT_MENU_STYLES = {
     'flex min-w-0 items-center gap-2 rounded-[var(--radius-lg)] px-2 py-1.5 text-left text-sm text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)] disabled:pointer-events-none disabled:opacity-60',
   // Arcade field: chip fill like the other play inputs
   triggerPlay:
-    'flex min-h-11 w-full min-w-0 items-center gap-2 rounded-xl bg-[var(--play-chip)] px-3 text-left text-sm font-semibold text-[var(--play-ink)] transition-colors hover:bg-[var(--play-panel-strong)] focus-visible:outline-3 focus-visible:outline-[var(--play-key)] disabled:pointer-events-none disabled:opacity-60',
+    'flex min-h-11 w-full min-w-0 items-center gap-2 rounded-xl bg-play-lift px-3 text-left text-sm font-semibold text-[var(--play-ink)] transition-colors hover:bg-play-press focus-visible:outline-3 focus-visible:outline-[var(--play-key)] disabled:pointer-events-none disabled:opacity-60',
   chevronPlay: 'text-[var(--play-ink-faint)]',
   invalid: 'border-[var(--color-danger)]',
   // Chevron trails the text
   value: 'flex min-w-0 items-center gap-2 truncate',
   placeholder: `truncate ${EMPTY_VALUE}`,
+  // A real choice in Play, never an empty value
+  placeholderPlay: 'truncate',
   // Category heading inside the list
   group:
     'px-2.5 pt-5 pb-1.5 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',

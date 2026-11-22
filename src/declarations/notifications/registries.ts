@@ -203,6 +203,15 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     trail: '',
     addressed: true,
   },
+  JuniorAbsent: {
+    label: 'PIM',
+    tone: 'caution',
+    icon: 'absences',
+    lead: 'Ton Junior {subject} a',
+    verb: 'déclaré une absence',
+    trail: '',
+    addressed: true,
+  },
   PimReferentAssigned: {
     label: 'PIM',
     tone: 'info',

@@ -402,6 +402,8 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
   playNotice: { model: 'PlayNotice', exposure: 'full', display: 'id', search: [] },
   playGameStat: { model: 'PlayGameStat', exposure: 'full', display: 'id', search: [] },
   playTrophyWin: { model: 'PlayTrophyWin', exposure: 'full', display: 'trophy', search: [] },
+  playConfig: { model: 'PlayConfig', exposure: 'full', display: 'id', search: [] },
+  playFriendship: { model: 'PlayFriendship', exposure: 'full', display: 'id', search: [] },
   modUnbanRule: { model: 'ModUnbanRule', exposure: 'full', display: 'id', search: [] },
   unbanFormVersion: {
     model: 'UnbanFormVersion',

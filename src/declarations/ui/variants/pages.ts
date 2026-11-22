@@ -227,28 +227,25 @@ export const PAGE_RAIL_STYLES = {
   divider: 'mx-3 my-1 h-px border-0 bg-[var(--color-border)]',
   subhead:
     'px-3 pt-3 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  row: 'group/page flex items-center gap-0.5 rounded-[var(--radius-lg)] pr-1 transition-colors hover:bg-[var(--color-surface)]',
+  row: 'group/page flex items-center gap-0.5 rounded-[var(--radius-lg)] px-3 transition-colors hover:bg-[var(--color-surface)]',
   rowActive: 'bg-[var(--color-surface)] font-semibold',
   toggle:
     'flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  chevron: 'size-3.5 transition-transform duration-[var(--motion-duration-base)]',
   link: 'flex min-h-8 min-w-0 flex-1 items-center gap-2 py-1 text-caption font-medium text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   emoji: 'w-5 shrink-0 text-center leading-none',
   glyph: 'size-4 shrink-0',
   title: 'truncate',
   add: 'flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] opacity-100 hover:text-[var(--color-ink)] focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] md:opacity-0 md:group-hover/page:opacity-100',
-  children: 'flex flex-col gap-px',
   dragged: 'opacity-40',
   category: 'rounded-[var(--radius-lg)] transition-colors',
   // Same title-to-pages air as the destinations groups
   categoryGroup: 'flex flex-col gap-2',
   categories: 'flex flex-col gap-4',
   categoryOver: 'bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]',
-  categoryHead:
-    'group/page flex cursor-grab items-center gap-0.5 rounded-[var(--radius-lg)] pr-1 hover:bg-[var(--color-surface)]',
+  categoryHead: 'group/page flex cursor-grab items-center gap-1 pr-1 pl-3',
   categoryName:
-    'min-w-0 flex-1 truncate py-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  categoryEmpty: 'pl-9',
+    'min-w-0 flex-1 truncate pb-1 text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  categoryEmpty: 'pl-3',
   dropHint:
     'mx-3 my-1 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] px-2 py-2 text-center text-xs text-[var(--color-ink-subtle)]',
   empty: 'py-1 text-xs text-[var(--color-ink-subtle)] italic',

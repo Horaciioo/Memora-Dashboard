@@ -9,8 +9,12 @@
 @import './tokens/play.css';
 @import './tokens/skins.css';
 @import './play/arcade.css';
+@import './play/quests.css';
+@import './play/celebration.css';
+@import './play/surfaces.css';
 @import './play/laurel.css';
-@import './play/scroll.css';
+@import './play/entry.css';
+@import './play/medal.css';
 @import './play/croquis.css';
 @import './play/suspens.css';
 @import './play/stopgo.css';

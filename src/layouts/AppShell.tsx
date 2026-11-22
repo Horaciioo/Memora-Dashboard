@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { WindowFrame } from '@/components/structures/page/WindowFrame'
 import { MobileHold } from '@/components/structures/overlays/MobileHold'
+import { PlayEntry } from '@/composites/play/entry/PlayEntry'
 import { BrandSplash } from '@/composites/splash/BrandSplash'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { PlayInviteHost } from '@/composites/play/invites/PlayInviteHost'
@@ -77,6 +78,7 @@ export const AppShell = ({
     <NexusProvider isReady={isNexusReady}>
       <RailSlotProvider>
         <BrandSplash />
+        <PlayEntry />
         {/* A visit reset on the server starts over, a visit under way is left alone */}
         <TourProvider key={String(tour !== null && !tour.isIntroSeen)} initial={tour}>
           <AppShellFrame

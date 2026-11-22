@@ -35,6 +35,7 @@ export const QUERY_KEYS = {
   playLevels: ['play', 'levels'] as const,
   playAdminLogs: (filters: Record<string, string>) => ['play', 'admin', 'logs', filters] as const,
   playCard: (id: string) => ['play', 'card', id] as const,
+  playFriendSearch: (term: string) => ['play', 'friends', 'search', term] as const,
   liveBan: (liveId: string, viewerId: string) => ['lives', 'ban', liveId, viewerId] as const,
   liveViewer: (liveId: string, viewerId: string) => ['lives', 'viewer', liveId, viewerId] as const,
   liveViewerComments: (liveId: string, viewerId: string) =>

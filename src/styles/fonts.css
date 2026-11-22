@@ -6,5 +6,6 @@
     'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
   --font-display: var(--font-system);
   --font-body: var(--font-system);
+  --font-hand: 'Noteworthy', 'Bradley Hand', 'Segoe Print', cursive;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
 }

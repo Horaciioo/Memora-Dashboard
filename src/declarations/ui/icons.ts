@@ -199,6 +199,7 @@ import {
   Image,
   Lightbulb,
   FileText,
+  FileLock,
   ArrowUUpLeft,
   ArrowUUpRight,
   TextIndent,
@@ -611,6 +612,7 @@ export const ICONS = {
   image: phosphor(Image),
   callout: phosphor(Lightbulb),
   page: phosphor(FileText),
+  pagePrivate: phosphor(FileLock),
   pageCategoryAdd: phosphor(FolderSimplePlus),
   undo: phosphor(ArrowUUpLeft),
   redo: phosphor(ArrowUUpRight),
@@ -628,6 +630,39 @@ export const ICONS = {
 } as const satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof ICONS
+
+/**
+ * Solid versions of the trophy glyphs, worn once a trophy is won
+ * @type {Partial<Record<IconName, LucideIcon>>}
+ */
+
+export const FILLED_ICONS: Partial<Record<IconName, LucideIcon>> = {
+  actSkull: phosphor(Skull, PLAY_FILL),
+  callout: phosphor(Lightbulb, PLAY_FILL),
+  flash: phosphor(Lightning, PLAY_FILL),
+  golfFlag: phosphor(Flag, PLAY_FILL),
+  golfStroke: phosphor(Golf, PLAY_FILL),
+  objective: phosphor(Target, PLAY_FILL),
+  path: phosphor(Path, PLAY_FILL),
+  play: phosphor(GameController, PLAY_FILL),
+  playBracket: phosphor(TreeStructure, PLAY_FILL),
+  playChat: phosphor(ChatCircleText, PLAY_FILL),
+  playClock: phosphor(Clock, PLAY_FILL),
+  playCrown: phosphor(Crown, PLAY_FILL),
+  playFlame: phosphor(Fire, PLAY_FILL),
+  playHeart: phosphor(Heart, PLAY_FILL),
+  playLeave: phosphor(SignOut, PLAY_FILL),
+  playLetters: phosphor(TextAa, PLAY_FILL),
+  playPawn: phosphor(MapPin, PLAY_FILL),
+  playPlayers: phosphor(UsersThree, PLAY_FILL),
+  playTrophy: phosphor(Trophy, PLAY_FILL),
+  playWriting: phosphor(PencilSimpleLine, PLAY_FILL),
+  search: phosphor(MagnifyingGlass, PLAY_FILL),
+  skill: phosphor(Medal, PLAY_FILL),
+  spark: phosphor(Sparkle, PLAY_FILL),
+  sword: phosphor(Sword, PLAY_FILL),
+  vip: phosphor(Diamond, PLAY_FILL),
+}
 
 /**
  * Every icon key

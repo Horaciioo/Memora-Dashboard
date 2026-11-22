@@ -7,7 +7,7 @@ import { RailPageNode } from '@/composites/shell/rail/RailPageNode'
 import { CATEGORY_ORIGIN } from '@/core/hooks/data/pages'
 import type { PageCategories } from '@/core/hooks/data/pages'
 import type { DragAndDrop } from '@/core/hooks/interaction/gestures/useDragAndDrop'
-import type { PageTreeNode } from '@/core/lib/pages'
+import type { PageSummary } from '@/types/pages'
 import { useMenu } from '@/managers/front-end'
 import { PAGE_MENU_COPY, PAGES_COPY } from '@/declarations/pages/copy'
 import { PAGE_SETTINGS } from '@/declarations/configurations/pages'
@@ -19,11 +19,10 @@ import type { PageCategoryView } from '@/types/pages'
 
 export interface RailPageCategoryProps {
   category: PageCategoryView
-  nodes: PageTreeNode[]
+  pages: PageSummary[]
   dnd: DragAndDrop
   gestures: Pick<PageCategories, 'rename' | 'remove'>
   onAddPage: (categoryId: string) => void
-  onAddChild: (parentId: string) => void
 }
 
 /**
@@ -34,11 +33,10 @@ export interface RailPageCategoryProps {
 
 export const RailPageCategory = ({
   category,
-  nodes,
+  pages,
   dnd,
   gestures,
   onAddPage,
-  onAddChild,
 }: RailPageCategoryProps) => {
   const { contextMenu } = useMenu()
   const [isOpen, setOpen] = useState(true)
@@ -71,21 +69,6 @@ export const RailPageCategory = ({
         )}
         onContextMenu={contextMenu(menu)}
       >
-        <button
-          type="button"
-          aria-label={PAGES_COPY.railExpand}
-          aria-expanded={isOpen}
-          className={PAGE_RAIL_STYLES.toggle}
-          onClick={() => setOpen(!isOpen)}
-        >
-          <Chevron
-            className={cn(
-              PAGE_RAIL_STYLES.chevron,
-              !isOpen && LEFT_SIDEBAR.navGroupChevronCollapsed
-            )}
-            aria-hidden="true"
-          />
-        </button>
         <InlineText
           id={`page-category-${category.id}`}
           value={category.name}
@@ -103,19 +86,27 @@ export const RailPageCategory = ({
         >
           <AddIcon className={PAGE_RAIL_STYLES.glyph} aria-hidden="true" />
         </button>
+        <button
+          type="button"
+          aria-label={PAGES_COPY.railExpand}
+          aria-expanded={isOpen}
+          className={cn(PAGE_RAIL_STYLES.toggle, 'group')}
+          onClick={() => setOpen(!isOpen)}
+        >
+          <Chevron
+            className={cn(
+              LEFT_SIDEBAR.navGroupChevron,
+              !isOpen && LEFT_SIDEBAR.navGroupChevronCollapsed
+            )}
+            aria-hidden="true"
+          />
+        </button>
       </div>
       {isOpen &&
-        (nodes.length > 0 ? (
+        (pages.length > 0 ? (
           <ul className={LEFT_SIDEBAR.navGroupItems}>
-            {nodes.map((node, index) => (
-              <RailPageNode
-                key={node.page.id}
-                node={node}
-                depth={0}
-                onAddChild={onAddChild}
-                dnd={dnd}
-                dropIndex={index}
-              />
+            {pages.map((page, index) => (
+              <RailPageNode key={page.id} page={page} dnd={dnd} dropIndex={index} />
             ))}
           </ul>
         ) : (

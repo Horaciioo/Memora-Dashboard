@@ -518,7 +518,50 @@
   }
 }
 
+/* Completed legendary card: light sweeping across, then a long rest */
+.trophy-legend {
+  overflow: hidden;
+}
+
+.trophy-legend::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.22) 50%,
+    transparent 65%
+  );
+  opacity: 0;
+  animation: trophy-legend-sweep 4.5s ease-in-out infinite;
+}
+
+@keyframes trophy-legend-sweep {
+  0%,
+  45% {
+    opacity: 0;
+    translate: -100% 0;
+  }
+  55% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+    translate: 100% 0;
+  }
+  100% {
+    opacity: 0;
+    translate: 100% 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .trophy-legend::after {
+    animation: none;
+  }
+
   .glyph-twinkle {
     animation: none;
     opacity: 1;
