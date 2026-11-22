@@ -277,6 +277,7 @@ const syncEntryWithStatus = async (
  * @param {LiveStatusName} next - Next status
  * @param {string | null} actorId - Who moves it
  * @param {string} [streamExternalId] - Platform stream
+ * @param {string} [streamTitle] - Title shown on the platform
  * @return {Promise<void>} - Moved
  */
 
@@ -292,7 +293,8 @@ const applyLiveStatus = async (
   },
   next: LiveStatusName,
   actorId: string | null,
-  streamExternalId?: string
+  streamExternalId?: string,
+  streamTitle?: string
 ): Promise<void> => {
   // Allowed moves only
   const allowed: Record<LiveStatusName, LiveStatusName[]> = {
@@ -303,6 +305,9 @@ const applyLiveStatus = async (
   }
   if (!allowed[live.status].includes(next)) throw conflict()
 
+  // Only a started live takes the platform title
+  const title = next === LiveStatuses.Live ? streamTitle?.trim() : undefined
+
   // Only from the status read
   const now = new Date()
   const moved = await prisma.live.updateMany({
@@ -312,9 +317,18 @@ const applyLiveStatus = async (
       startedAt: next === LiveStatuses.Live ? now : undefined,
       endedAt: next === LiveStatuses.Ended || next === LiveStatuses.Cancelled ? now : undefined,
       ...(streamExternalId ? { streamExternalId } : {}),
+      ...(title ? { title } : {}),
     },
   })
   if (moved.count === 0) throw conflict()
+
+  // The platform title replaces the planned one
+  if (title) live.title = title
+  if (title && live.calendarEventId) {
+    await prisma.calendarEvent
+      .update({ where: { id: live.calendarEventId }, data: { title } })
+      .catch(() => null)
+  }
   await syncEntryWithStatus(live.calendarEventId, next, now)
 
   await publishLive(LIVE_TOPICS.lives, {
@@ -402,13 +416,15 @@ export const moveLive = async (
  * @param {string} id - Live identifier
  * @param {LiveStatusName} next - Next status
  * @param {string} [streamExternalId] - Platform stream
+ * @param {string} [streamTitle] - Title shown on the platform
  * @return {Promise<boolean>} - Moved
  */
 
 export const moveLiveFromPlatform = async (
   id: string,
   next: LiveStatusName,
-  streamExternalId?: string
+  streamExternalId?: string,
+  streamTitle?: string
 ): Promise<boolean> => {
   const live = await prisma.live.findUnique({
     where: { id },
@@ -417,7 +433,7 @@ export const moveLiveFromPlatform = async (
   if (!live || live.status === next) return false
 
   try {
-    await applyLiveStatus(live, next, null, streamExternalId)
+    await applyLiveStatus(live, next, null, streamExternalId, streamTitle)
 
     return true
   } catch {

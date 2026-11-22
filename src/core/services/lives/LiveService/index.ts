@@ -31,3 +31,4 @@ export {
   deleteLive,
 } from '@/core/services/lives/LiveService/lifecycle'
 export { openUnplannedLives } from '@/core/services/lives/LiveService/unplanned'
+export { syncStreamState } from '@/core/services/lives/LiveService/stream'
