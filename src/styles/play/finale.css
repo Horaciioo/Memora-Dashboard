@@ -1,0 +1,493 @@
+/* Finale of each game before the podium, pieces are the <i> of [data-finale] */
+.play-finale i {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  display: block;
+  translate: -50% -50%;
+}
+
+[data-finale-word] {
+  animation-delay: var(--w, 0s);
+}
+
+@keyframes finale-ring {
+  from {
+    opacity: 0.9;
+    scale: 0.1;
+  }
+  to {
+    opacity: 0;
+    scale: 1;
+  }
+}
+
+@keyframes finale-flash {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes finale-shake {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translate(-0.6rem, 0.3rem);
+  }
+  40% {
+    transform: translate(0.5rem, -0.4rem);
+  }
+  60% {
+    transform: translate(-0.3rem, -0.2rem);
+  }
+}
+
+/* Baccalauréat: stamp thumped on the sheet */
+[data-finale='baccalaureat'] i {
+  width: 28vmin;
+  height: 28vmin;
+  border-radius: 50%;
+  background: var(--end-tone);
+  animation: finale-ring 0.9s ease-out calc(var(--bit) * 0.12s + 0.55s) both;
+}
+
+[data-finale-word='baccalaureat'] {
+  --w: 0.5s;
+  rotate: -6deg;
+}
+
+/* Golf: ball drops into the hole */
+@keyframes finale-ball {
+  0% {
+    transform: translate(-14vmin, -42vmin);
+    scale: 1;
+  }
+  55% {
+    transform: translate(0, 2vmin);
+    scale: 1;
+  }
+  70% {
+    transform: translate(0, -4vmin);
+  }
+  100% {
+    transform: translate(0, 4vmin);
+    scale: 0.1;
+    opacity: 0;
+  }
+}
+
+[data-finale='golf'] i:nth-child(1) {
+  top: 50%;
+  width: 16vmin;
+  height: 5vmin;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.65);
+  box-shadow: 0 0 0 0.8vmin var(--end-tone);
+}
+
+[data-finale='golf'] i:nth-child(2) {
+  top: 50%;
+  width: 6vmin;
+  height: 6vmin;
+  border-radius: 50%;
+  background: #fff;
+  animation: finale-ball 1.1s cubic-bezier(0.5, 0, 0.7, 1) 0.2s both;
+}
+
+[data-finale='golf'] i:nth-child(3) {
+  top: 50%;
+  width: 40vmin;
+  height: 13vmin;
+  border-radius: 50%;
+  border: 0.5vmin solid var(--end-tone);
+  animation: finale-ring 0.9s ease-out 1.2s both;
+}
+
+[data-finale-word='golf'] {
+  --w: 1.2s;
+}
+
+/* Bomb: flash, then shock rings */
+[data-finale='bomb'] i:nth-child(1) {
+  inset: 0;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  translate: 0 0;
+  background: #fff;
+  animation: finale-flash 0.7s ease-out 0.5s both;
+}
+
+[data-finale='bomb'] i:nth-child(n + 2) {
+  width: 120vmin;
+  height: 120vmin;
+  border-radius: 50%;
+  border: 1.6vmin solid var(--end-tone);
+  animation: finale-ring 1.2s ease-out calc(var(--bit) * 0.18s + 0.4s) both;
+}
+
+[data-finale-word='bomb'] {
+  --w: 0.55s;
+  animation-name: play-end-slam, finale-shake;
+  animation-duration: 0.7s, 0.6s;
+  animation-delay: 0.55s, 1.2s;
+}
+
+/* Ludo: die tumbles in and settles */
+@keyframes finale-die {
+  0% {
+    transform: translateY(-60vmin) rotate(0);
+  }
+  60% {
+    transform: translateY(0) rotate(600deg);
+  }
+  75% {
+    transform: translateY(-6vmin) rotate(660deg);
+  }
+  100% {
+    transform: translateY(0) rotate(720deg);
+  }
+}
+
+[data-finale='ludo'] i:nth-child(1) {
+  width: 17vmin;
+  height: 17vmin;
+  border-radius: 3vmin;
+  background:
+    radial-gradient(circle at 25% 25%, #1c1d25 11%, transparent 12%),
+    radial-gradient(circle at 75% 25%, #1c1d25 11%, transparent 12%),
+    radial-gradient(circle at 50% 50%, #1c1d25 11%, transparent 12%),
+    radial-gradient(circle at 25% 75%, #1c1d25 11%, transparent 12%),
+    radial-gradient(circle at 75% 75%, #1c1d25 11%, transparent 12%), #fff;
+  box-shadow: 0 1.2vmin 0 rgb(0 0 0 / 0.25);
+  animation: finale-die 1.2s cubic-bezier(0.4, 0, 0.6, 1) 0.1s both;
+}
+
+[data-finale='ludo'] i:nth-child(2) {
+  width: 22vmin;
+  height: 22vmin;
+  border-radius: 50%;
+  border: 1vmin solid var(--end-tone);
+  animation: finale-ring 0.8s ease-out 1.2s both;
+}
+
+[data-finale-word='ludo'] {
+  --w: 1.2s;
+}
+
+/* Naval: hull goes under the waves */
+@keyframes finale-sink {
+  0% {
+    transform: rotate(0);
+  }
+  30% {
+    transform: rotate(-10deg);
+  }
+  100% {
+    transform: translateY(26vmin) rotate(-32deg);
+    opacity: 0;
+  }
+}
+
+@keyframes finale-rise {
+  from {
+    opacity: 0.9;
+    translate: -50% 0;
+  }
+  to {
+    opacity: 0;
+    translate: -50% -30vmin;
+  }
+}
+
+[data-finale='naval'] i:nth-child(1) {
+  top: 44%;
+  width: 30vmin;
+  height: 8vmin;
+  background: #cdd5e0;
+  clip-path: polygon(0 0, 100% 0, 84% 100%, 12% 100%);
+  animation: finale-sink 1.6s ease-in 0.2s both;
+}
+
+[data-finale='naval'] i:nth-child(2) {
+  top: 51%;
+  width: 100%;
+  height: 50%;
+  background: color-mix(in srgb, var(--end-tone) 70%, #05101c);
+  mask: radial-gradient(circle at 50% 0, #000 98%, transparent) 0 0 / 6vmin 3vmin repeat-x;
+  translate: -50% 0;
+}
+
+[data-finale='naval'] i:nth-child(3) {
+  top: 52%;
+  width: 36vmin;
+  height: 10vmin;
+  border-radius: 50%;
+  border: 0.7vmin solid #fff;
+  animation: finale-ring 1s ease-out 1.1s both;
+}
+
+[data-finale='naval'] i:nth-child(n + 4) {
+  top: 56%;
+  width: 2.4vmin;
+  height: 2.4vmin;
+  border-radius: 50%;
+  border: 0.4vmin solid #fff;
+  margin-left: calc((var(--bit) - 4) * 7vmin);
+  animation: finale-rise 1.2s ease-out calc(var(--bit) * 0.15s + 0.9s) both;
+}
+
+[data-finale-word='naval'] {
+  --w: 1.1s;
+}
+
+/* Jumble: tiles fly in and line up */
+@keyframes finale-tile {
+  from {
+    opacity: 0;
+    transform: translate(calc((var(--bit) - 2) * 26vmin), calc((var(--bit) % 2 * 2 - 1) * 40vmin))
+      rotate(240deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+[data-finale='jumble'] i {
+  top: 30%;
+  width: 11vmin;
+  height: 11vmin;
+  border-radius: 2vmin;
+  background: var(--end-tone);
+  box-shadow: inset 0 -1vmin 0 rgb(0 0 0 / 0.2);
+  margin-left: calc((var(--bit) - 2) * 13vmin);
+  animation: finale-tile 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.1) calc(var(--bit) * 0.14s + 0.1s) both;
+}
+
+[data-finale-word='jumble'] {
+  --w: 1s;
+}
+
+/* Echo: rings call back, the word fades in as an echo */
+[data-finale='echo'] i {
+  width: 90vmin;
+  height: 90vmin;
+  border-radius: 50%;
+  border: 0.8vmin solid var(--end-tone);
+  animation: finale-ring 1.5s ease-out calc(var(--bit) * 0.35s) both;
+}
+
+@keyframes finale-echo {
+  from {
+    opacity: 0;
+    filter: blur(1.2rem);
+    text-shadow: 0 0 0 transparent;
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    text-shadow:
+      0 0 0.5rem var(--end-tone),
+      0 0 1.6rem var(--end-tone);
+  }
+}
+
+[data-finale-word='echo'] {
+  animation: finale-echo 1.4s ease-out 0.8s both;
+}
+
+/* Glitch: slices tear the screen, the word splits in colours */
+@keyframes finale-slice {
+  0%,
+  30%,
+  60%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  45% {
+    opacity: 0.85;
+    transform: translateX(calc((var(--bit) - 2) * 3vmin));
+  }
+}
+
+[data-finale='glitch'] i {
+  left: 0;
+  width: 100%;
+  height: 3.5vmin;
+  translate: 0 0;
+  top: calc(18% + var(--bit) * 15%);
+  background: var(--end-tone);
+  animation: finale-slice 1.2s steps(6) calc(var(--bit) * 0.08s + 0.3s) both;
+}
+
+@keyframes finale-split {
+  0%,
+  100% {
+    text-shadow:
+      0.25rem 0 #ff2d6f,
+      -0.25rem 0 #2de2ff;
+  }
+  50% {
+    text-shadow:
+      -0.4rem 0 #ff2d6f,
+      0.4rem 0 #2de2ff;
+    transform: skewX(-8deg);
+  }
+}
+
+[data-finale-word='glitch'] {
+  --w: 0.9s;
+  animation-name: play-end-slam, finale-split;
+  animation-duration: 0.3s, 0.5s;
+  animation-delay: 0.9s, 1.2s;
+  animation-iteration-count: 1, 3;
+}
+
+/* Croquis: last pencil strokes drawn */
+@keyframes finale-draw {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+[data-finale='croquis'] i {
+  top: 58%;
+  width: 52vmin;
+  height: 1.6vmin;
+  border-radius: 1vmin;
+  background: var(--end-tone);
+  transform-origin: left;
+  rotate: calc(var(--bit) * 3deg - 2deg);
+  margin-top: calc(var(--bit) * 2.4vmin);
+  animation: finale-draw 0.7s ease-out calc(var(--bit) * 0.35s + 0.8s) both;
+}
+
+[data-finale-word='croquis'] {
+  --w: 0.2s;
+}
+
+/* Suspens: curtains close, then part on the word */
+@keyframes finale-curtain-l {
+  0% {
+    transform: translateX(-100%);
+  }
+  35%,
+  60% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes finale-curtain-r {
+  0% {
+    transform: translateX(100%);
+  }
+  35%,
+  60% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+[data-finale='suspens'] i {
+  top: 0;
+  width: 50%;
+  height: 100%;
+  translate: 0 0;
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--end-tone) 80%, #000) 0 4vmin,
+    color-mix(in srgb, var(--end-tone) 55%, #000) 4vmin 8vmin
+  );
+  animation: finale-curtain-l 2s ease-in-out 0.1s both;
+}
+
+[data-finale='suspens'] i:nth-child(1) {
+  left: 0;
+}
+
+[data-finale='suspens'] i:nth-child(2) {
+  left: 50%;
+  animation-name: finale-curtain-r;
+}
+
+[data-finale-word='suspens'] {
+  --w: 1.5s;
+}
+
+/* Stop & Go: chequered bands cross the finish */
+@keyframes finale-flag {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(110%);
+  }
+}
+
+[data-finale='stop_go'] i {
+  left: 0;
+  width: 100%;
+  height: 8vmin;
+  translate: 0 0;
+  top: calc(26% + var(--bit) * 40%);
+  background: conic-gradient(#fff 25%, #14151c 0 50%, #fff 0 75%, #14151c 0) 0 0 / 8vmin 8vmin;
+  animation: finale-flag 1.3s cubic-bezier(0.5, 0, 0.5, 1) calc(var(--bit) * 0.2s) both;
+}
+
+[data-finale='stop_go'] i:nth-child(2) {
+  animation-direction: reverse;
+}
+
+[data-finale-word='stop_go'] {
+  --w: 0.5s;
+}
+
+/* Concordat: territory bands sweep over the map */
+@keyframes finale-conquest {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  50%,
+  70% {
+    transform: translateX(0) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(120%) skewX(-18deg);
+  }
+}
+
+[data-finale='concordat'] i {
+  left: 0;
+  top: calc(var(--bit) * 34%);
+  width: 100%;
+  height: 34%;
+  translate: 0 0;
+  background: color-mix(in srgb, var(--end-tone) calc(100% - var(--bit) * 22%), #000);
+  animation: finale-conquest 1.6s ease-in-out calc(var(--bit) * 0.18s) both;
+}
+
+[data-finale-word='concordat'] {
+  --w: 0.9s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-finale-word] {
+    animation: none;
+  }
+}

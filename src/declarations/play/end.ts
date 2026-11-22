@@ -65,7 +65,7 @@ export const PLAY_END_CAREER = [
 ] as const
 
 // Wait before the page builds, the time of the announcement
-const INTRO_MS = 2600
+const INTRO_MS = 3400
 
 /**
  * Build-up of the end page, in milliseconds after the game ends

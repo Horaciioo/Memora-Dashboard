@@ -540,7 +540,7 @@
 }
 
 .play-end-winner {
-  animation: play-end-winner 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s both;
+  animation: play-end-winner 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s both;
 }
 
 /* Light sweeping once over a title card */

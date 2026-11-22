@@ -104,6 +104,7 @@ export const PLAY_END_PAGE = {
   awardValue: 'text-2xl leading-none font-black text-[var(--play-accent)] tabular-nums',
   intro:
     'play-end-intro pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-[clamp(1rem,4dvh,2rem)] bg-[radial-gradient(ellipse_at_50%_50%,color-mix(in_srgb,var(--end-tone)_35%,color-mix(in_srgb,var(--play-night)_92%,transparent)),color-mix(in_srgb,var(--play-night)_97%,transparent))]',
+  finale: 'play-finale pointer-events-none absolute inset-0 overflow-hidden',
   introTitle:
     'play-end-slam text-[clamp(2.5rem,11dvh,6rem)] leading-none font-black tracking-wide text-[var(--play-ink)] uppercase italic',
   introWinner: 'play-end-winner flex flex-col items-center gap-2',
