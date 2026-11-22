@@ -49,7 +49,7 @@ const MAX_SEED = 2_000_000_000
 
 export const concordatDefaults = (): ConcordatGameSettings => ({
   size: CONCORDAT_SETTINGS.initialSize,
-  style: CONCORDAT_SETTINGS.initialStyle,
+  style: CONCORDAT_SETTINGS.initialStyleChoice,
   speed: CONCORDAT_SETTINGS.initialSpeed,
   difficulty: CONCORDAT_SETTINGS.initialDifficulty,
   durationMinutes: CONCORDAT_SETTINGS.unlimited,

@@ -38,6 +38,7 @@ export const CONCORDAT_SETTINGS = {
   initialMode: ConcordatModes.Free as ConcordatModeName,
   initialSize: ConcordatSizes.Medium as ConcordatSizeName,
   initialStyle: ConcordatStyles.World as ConcordatStyleName,
+  initialStyleChoice: CONCORDAT_RANDOM_STYLE as ConcordatStyleChoice,
   initialSpeed: ConcordatSpeeds.Normal as ConcordatSpeedName,
   // Zero minutes means no time limit
   unlimited: 0,
