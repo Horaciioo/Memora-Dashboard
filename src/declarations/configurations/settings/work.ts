@@ -300,6 +300,11 @@ export const HOME_SETTINGS = {
     fallback: 5,
     min: 1,
   }),
+  awayMax: readInteger(home.awayMax, {
+    path: 'system/home.awayMax',
+    fallback: 5,
+    min: 1,
+  }),
   taskMax: readInteger(home.taskMax, {
     path: 'system/home.taskMax',
     fallback: 4,

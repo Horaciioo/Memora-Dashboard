@@ -35,7 +35,7 @@ export const HOME_FEATURES: HomeFeature[] = [
     key: 'pages',
     title: 'Pages privées',
     href: ROUTES.pages,
-    icon: 'page',
+    icon: 'pagePrivate',
     image: '/courses/general.jpg',
     position: '50% 65%',
   },

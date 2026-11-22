@@ -1,9 +1,12 @@
 import 'server-only'
 
 import type { AccessScope } from '@/core/services/auth/ScopeService'
+import { prisma } from '@/core/lib/db'
+import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService/shape'
+import { scopedWhere } from '@/core/services/auth/ScopeService'
 import { birthdaysBetween } from '@/core/services/calendar/projections'
 import { HOME_SETTINGS } from '@/declarations/configurations/settings'
-import type { HomeBirthday } from '@/types/personal'
+import type { HomeAway, HomeBirthday } from '@/types/personal'
 import { addDays, startOfDay } from '@/utils/format/time/days'
 
 /**
@@ -25,5 +28,26 @@ export const upcomingBirthdays = async (scope: AccessScope): Promise<HomeBirthda
     displayName: occurrence.displayName,
     avatarUrl: occurrence.avatarUrl,
     day: occurrence.day.toISOString(),
+  }))
+}
+
+/**
+ * Read the members away today
+ * @param {AccessScope} scope - Creator perimeter
+ * @return {Promise<HomeAway[]>} - Approved absences covering today
+ */
+
+export const awayToday = async (scope: AccessScope): Promise<HomeAway[]> => {
+  const rows = await prisma.absence.findMany({
+    where: { ...activeAbsenceFilter(), account: scopedWhere('account', scope, {}) },
+    include: { account: true },
+    orderBy: { endDate: 'asc' },
+    take: HOME_SETTINGS.awayMax,
+  })
+
+  return rows.map((row) => ({
+    accountId: row.accountId,
+    displayName: row.account.displayName,
+    until: row.endDate.toISOString(),
   }))
 }
