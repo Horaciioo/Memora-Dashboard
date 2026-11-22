@@ -23,12 +23,12 @@ export interface PlayGameChatBarProps {
   crowd?: { players: PlayFace[]; spectators: PlayFace[] }
   feed?: ReactNode
   // Game with its own HUD skin, the feed sheet wears it
-  game?: PlayGameName
+  game: PlayGameName
 }
 
 /**
  * Phone chat bar: bubbles above, hide key left, feed key right
- * @param {PlayGameChatBarProps} props - Chat, crowd and feed
+ * @param {PlayGameChatBarProps} props - Chat, crowd, feed and game
  * @return {JSX.Element}
  */
 
@@ -40,15 +40,17 @@ export const PlayGameChatBar = ({ chat, crowd, feed, game }: PlayGameChatBarProp
   const [isSheetOpen, setSheetOpen] = useState(false)
   const BubblesIcon = isShown ? ICONS.playChat : ICONS.hidden
   const FeedIcon = ICONS.playFeed
-  const skin = game ? PLAY_HUD_SKINS.get(game) : undefined
+  // The bar and its bubbles wear the game's HUD skin
+  const skin = PLAY_HUD_SKINS.get(game)
+  const hud = game.toLowerCase()
 
   return (
     <>
-      <div className={PLAY_GAME_BAR.bar}>
+      <div data-hud={hud} className={cn(PLAY_GAME_BAR.bar, skin)}>
         {isShown && bubbles.length > 0 && (
           <ul className={PLAY_GAME_BAR.bubbles} aria-live="polite">
             {bubbles.map((line) => (
-              <li key={line.id} className={PLAY_GAME_BAR.bubble}>
+              <li key={line.id} className={cn(PLAY_GAME_BAR.bubble, skin)}>
                 <PlayAvatar
                   accountId={line.author.id}
                   name={line.author.name}
@@ -94,7 +96,7 @@ export const PlayGameChatBar = ({ chat, crowd, feed, game }: PlayGameChatBarProp
         open={isSheetOpen}
         onClose={() => setSheetOpen(false)}
         title={PLAY_MOBILE_COPY.chatFeed}
-        hud={skin ? game?.toLowerCase() : undefined}
+        hud={skin ? hud : undefined}
       >
         <PlayChat
           {...chat}

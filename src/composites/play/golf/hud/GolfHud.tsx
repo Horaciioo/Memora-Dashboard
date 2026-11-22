@@ -8,6 +8,7 @@ import type { GolfFace } from '@/composites/play/golf/types'
 import { seatPaint } from '@/composites/play/golf/types'
 import { useGolfClockSound } from '@/composites/play/golf/useGolfClockSound'
 import { usePlayPrefsStore } from '@/core/store/play/playPrefs'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { useServerNow } from '@/core/hooks/interaction/state/time/useServerNow'
 import type { GolfBoardState } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -59,6 +60,8 @@ export const GolfHud = ({
   useGolfClockSound(left)
   const DoneIcon = ICONS.golfFlag
   const isHidden = usePlayPrefsStore((state) => state.isHudHidden)
+  // The clock never fits the phone row
+  const hasClock = !useIsMobileShell()
   const keys = (
     <GolfViewKeys
       isOverview={isOverview}
@@ -103,22 +106,24 @@ export const GolfHud = ({
                 {Number.isFinite(maxStrokes) ? `${strokes} / ${maxStrokes}` : strokes}
               </span>
             </div>
-            <span className={GOLF_BOARD.divider} aria-hidden="true" />
+            {hasClock && <span className={GOLF_BOARD.divider} aria-hidden="true" />}
           </>
         )}
-        <div className={GOLF_BOARD.holeBlock}>
-          <span className={GOLF_BOARD.caption}>{GOLF_BOARD_COPY.clock}</span>
-          <span
-            className={cn(
-              GOLF_BOARD.figure,
-              left > 0 && left <= GOLF_SETTINGS.clockLowSeconds && GOLF_BOARD.clockLow
-            )}
-          >
-            {formatCountdown(
-              phase === GolfPhases.Countdown ? (board.endsAt - board.startsAt) / SECOND_MS : left
-            )}
-          </span>
-        </div>
+        {hasClock && (
+          <div className={GOLF_BOARD.holeBlock}>
+            <span className={GOLF_BOARD.caption}>{GOLF_BOARD_COPY.clock}</span>
+            <span
+              className={cn(
+                GOLF_BOARD.figure,
+                left > 0 && left <= GOLF_SETTINGS.clockLowSeconds && GOLF_BOARD.clockLow
+              )}
+            >
+              {formatCountdown(
+                phase === GolfPhases.Countdown ? (board.endsAt - board.startsAt) / SECOND_MS : left
+              )}
+            </span>
+          </div>
+        )}
       </div>
 
       <ul className={GOLF_BOARD.players}>

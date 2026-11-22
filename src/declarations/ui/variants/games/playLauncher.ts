@@ -64,6 +64,9 @@ export const PLAY_FRIENDS = {
     'mr-2 inline-flex size-7 shrink-0 items-center justify-center rounded-lg opacity-0 transition-opacity hover:bg-play-press focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-[var(--play-key)] group-hover:opacity-100',
   column: 'relative z-20 flex w-[var(--col-w)] shrink-0 flex-col gap-3 max-lg:hidden',
   root: `flex min-h-0 flex-1 flex-col gap-4 ${COLUMN_BOX}`,
+  // Same box inside the phone sheet, the sheet scrolls
+  sheet: 'flex flex-col gap-4',
+  sheetBody: 'flex flex-col gap-5',
   title: 'px-1 text-lg font-bold tracking-tight text-[var(--play-ink)]',
   head: 'flex items-center justify-between gap-2 px-1',
   headKeys: 'flex items-center gap-2',
@@ -160,6 +163,8 @@ export const PLAY_HOME = {
 
 export const PLAY_ME_BOX = {
   host: 'relative rounded-2xl border border-[var(--play-line)] bg-play-shade p-3',
+  // Phone header, the box stretches between the edge and the keys
+  hostPhone: 'relative min-w-0 flex-1',
   root: 'flex w-full items-center gap-3 rounded-xl p-1 text-left focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
   text: 'flex min-w-0 flex-1 flex-col gap-1',
   head: 'flex items-baseline justify-between gap-2',
@@ -181,14 +186,16 @@ export const PLAY_ACTIVITY = {
   host: 'relative',
   badge: 'absolute top-0.5 right-0.5 size-2.5 rounded-full bg-[var(--play-alert)]',
   panel:
-    'absolute top-full right-0 z-50 mt-2 flex max-h-[28rem] w-80 max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
-  title: 'px-4 pt-3 pb-1 text-sm font-bold text-[var(--play-ink)]',
-  list: 'flex min-h-0 flex-col gap-0.5 overflow-y-auto overscroll-contain p-2',
-  row: 'flex items-center gap-3 rounded-xl px-2.5 py-2',
+    'absolute top-full right-0 z-50 mt-2 flex max-h-[28rem] w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+  title:
+    'shrink-0 border-b border-[var(--play-line)] px-4 py-3 text-sm font-bold text-[var(--play-ink)]',
+  list: 'flex min-h-0 flex-col overflow-y-auto overscroll-contain p-2',
+  // Inset rule above every row but the first
+  row: 'relative flex items-start gap-3 rounded-xl px-2.5 py-3 not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-px not-first:before:h-px not-first:before:bg-[var(--play-line)]',
   rowNew: 'bg-play-nest',
-  glyph: 'grid size-8 shrink-0 place-items-center rounded-lg bg-play-lift text-[var(--play-key)]',
+  glyph: 'grid size-9 shrink-0 place-items-center rounded-xl bg-play-lift text-[var(--play-key)]',
   glyphIcon: 'size-4',
-  text: 'flex min-w-0 flex-1 flex-col',
-  line: 'text-sm leading-tight font-bold text-[var(--play-ink)]',
+  text: 'flex min-w-0 flex-1 flex-col gap-0.5',
+  line: 'text-sm leading-snug font-bold text-[var(--play-ink)]',
   note: 'text-micro leading-tight font-semibold text-[var(--play-ink-faint)] tabular-nums',
 } as const

@@ -7,11 +7,11 @@ import { PANEL } from '@/declarations/ui/variants/games/play/shared'
 
 export const PLAY_PAGE = {
   // Data pages: stats, trophies, settings, profile, admin
-  frame: 'mx-auto flex w-full max-w-6xl flex-col gap-8',
+  frame: 'mx-auto flex w-full max-w-6xl flex-col gap-5 md:gap-8',
   // One column: ranking, feed, live, history, groups
-  reading: 'mx-auto flex w-full max-w-3xl flex-col gap-6',
+  reading: 'mx-auto flex w-full max-w-3xl flex-col gap-4 md:gap-6',
   // Panels side by side, stacked when narrow
-  grid: 'grid items-stretch gap-6 lg:grid-cols-2',
+  grid: 'grid items-stretch gap-4 md:gap-6 lg:grid-cols-2',
   cell: 'min-w-0',
   cellWide: 'min-w-0 lg:col-span-2',
 } as const
@@ -22,16 +22,16 @@ export const PLAY_PAGE = {
  */
 
 export const PLAY_HEAD = {
-  root: 'flex w-full flex-col gap-5',
-  top: 'flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pb-1',
-  text: 'flex min-w-0 flex-col gap-1',
-  title: 'text-3xl font-bold tracking-tight text-[var(--play-ink)] sm:text-4xl',
-  note: 'text-sm text-[var(--play-ink-soft)]',
-  aside: 'flex shrink-0 items-center gap-6',
+  root: 'flex w-full flex-col gap-3 md:gap-5',
+  top: 'flex items-end justify-between gap-x-4 gap-y-2 pb-0 sm:flex-wrap sm:gap-x-6 sm:pb-1',
+  text: 'flex min-w-0 flex-1 flex-col gap-1 sm:flex-none',
+  title: 'text-2xl font-bold tracking-tight text-[var(--play-ink)] sm:text-4xl',
+  note: 'text-xs text-[var(--play-ink-soft)] sm:text-sm',
+  aside: 'flex shrink-0 items-center gap-4 sm:gap-6',
   // Figure of the title row, value over a small label
   fig: 'flex flex-col items-end leading-tight',
-  figValue: 'text-2xl font-bold tabular-nums text-[var(--play-ink)]',
-  figLabel: 'text-xs font-bold tracking-wide text-[var(--play-ink-soft)] uppercase',
+  figValue: 'text-xl font-bold tabular-nums sm:text-2xl text-[var(--play-ink)]',
+  figLabel: 'text-micro font-bold sm:text-xs tracking-wide text-[var(--play-ink-soft)] uppercase',
   body: 'flex flex-col gap-4',
   // Panel: a title, then groups on nested cards
   panel: `${PANEL} flex h-full w-full flex-col gap-1.5 p-1.5 shadow-[var(--shadow-sm)]`,
@@ -63,7 +63,7 @@ export const PLAY_SHOWCASE = {
     'trophy-legend bg-[linear-gradient(135deg,color-mix(in_srgb,var(--rarity)_75%,transparent),color-mix(in_srgb,var(--rarity)_45%,transparent))] shadow-[0_0_1.5rem_-0.4rem_var(--rarity)]',
   glyphLegend: 'drop-shadow-[0_0_0.4rem_var(--rarity)]',
   cardIdle: 'opacity-55',
-  icon: 'relative grid size-14 shrink-0 place-items-center rounded-xl bg-play-lift text-[var(--play-ink-faint)]',
+  icon: 'relative grid size-11 shrink-0 md:size-14 place-items-center rounded-xl bg-play-lift text-[var(--play-ink-faint)]',
   // Won: dark box, glyph in the rarity colour
   iconOn: 'bg-[color-mix(in_srgb,var(--play-night)_55%,transparent)]! text-[var(--rarity)]',
   // Won: text turns white on the full rarity fill
@@ -90,8 +90,8 @@ export const PLAY_SHOWCASE = {
   common: '[--rarity:var(--play-rarity-common)]',
   rare: '[--rarity:var(--play-rarity-rare)]',
   legendary: '[--rarity:var(--play-rarity-legendary)]',
-  sections: 'flex flex-col gap-4',
-  boxes: 'flex flex-col gap-3',
+  sections: 'flex flex-col gap-3 md:gap-4',
+  boxes: 'flex flex-col gap-2 md:gap-3',
   section:
     'flex flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--play-panel)] p-3 ring-1 ring-[var(--play-line)] sm:p-4',
   sectionHead: 'flex items-center gap-3 px-1',

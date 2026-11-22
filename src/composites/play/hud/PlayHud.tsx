@@ -6,7 +6,9 @@ import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayHudKeys } from '@/composites/play/hud/PlayHudKeys'
 import { PlayHudPanel } from '@/composites/play/hud/PlayHudPanel'
 import type { PlayHudRow } from '@/composites/play/hud/PlayHudPanel'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { usePlayPref, usePlayPrefsStore } from '@/core/store/play/playPrefs'
+import { PLAY_HUD_PHONE_HIDDEN } from '@/declarations/play/hud'
 import { PLAY_HUD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -63,6 +65,7 @@ export const PlayHud = ({
 }: PlayHudProps) => {
   const isHidden = usePlayPrefsStore((state) => state.isHudHidden)
   const hasClock = usePlayPref(game, 'clock')
+  const isPhone = useIsMobileShell()
 
   // Only the keys stay, to bring the HUD back
   if (isHidden) {
@@ -75,7 +78,10 @@ export const PlayHud = ({
     )
   }
 
-  const shown = blocks.filter((block) => hasClock || block.key !== 'clock')
+  const shown = blocks.filter(
+    (block) =>
+      (hasClock || block.key !== 'clock') && !(isPhone && PLAY_HUD_PHONE_HIDDEN.has(block.key))
+  )
 
   return (
     <div className={PLAY_HUD.root} data-hud={game.toLowerCase()}>
@@ -126,7 +132,13 @@ export const PlayHud = ({
             ))}
           </div>
         )}
-        <PlayHudKeys game={game} sessionId={sessionId} isSeated={isSeated} isFlush={isFlush} />
+        <PlayHudKeys
+          game={game}
+          sessionId={sessionId}
+          isSeated={isSeated}
+          isFlush={isFlush}
+          scores={isCompact ? undefined : <PlayHudPanel rows={rows} isBare />}
+        />
       </div>
       {lead && <div className={PLAY_HUD.lead}>{lead}</div>}
       {!isCompact && (

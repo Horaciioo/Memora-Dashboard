@@ -18,7 +18,7 @@ export type PlayTabGlyphName =
   'group' | 'feed' | 'home' | 'quests' | 'live' | 'online' | 'ranking' | 'stats' | 'trophies'
 
 // Header keys, same style
-export type PlayKeyGlyphName = 'online' | 'live' | 'settings'
+export type PlayKeyGlyphName = 'online' | 'live' | 'bell' | 'settings'
 
 /**
  * Chunk props, one raised piece
@@ -219,6 +219,16 @@ const Stats = () => (
   </>
 )
 
+// Ivory bell with a rose clapper
+const Bell = () => (
+  <>
+    <Chunk d="M24 4a3 3 0 0 1 3 3v2.500h-6V7a3 3 0 0 1 3-3z" {...GOLD} border={3} />
+    <Chunk d="M24 9c8 0 12 6 12 14 0 5 2 8 4 10H8c2-2 4-5 4-10 0-8 4-14 12-14z" {...IVORY} />
+    <Chunk d="M19 37h10a5 5 0 0 1-10 0z" {...ROSE} border={3} />
+    <Gleam d="M17 17c1-3 3-5 5-6" />
+  </>
+)
+
 // Gold flame over a rose ember
 const Quests = () => (
   <>
@@ -240,6 +250,7 @@ const ART: Record<PlayTabGlyphName | PlayKeyGlyphName, () => ReactNode> = {
   trophies: Trophies,
   online: Online,
   live: Live,
+  bell: Bell,
   settings: Settings,
 }
 

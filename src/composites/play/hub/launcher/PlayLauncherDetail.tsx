@@ -93,7 +93,7 @@ export const PlayLauncherDetail = ({
           </div>
           <p className={PLAY_LAUNCH.panelText}>{meta.tagline}</p>
 
-          <section className="flex flex-col gap-3">
+          <section className={PLAY_LAUNCH.panelSection}>
             <h3 className={PLAY_LAUNCH.panelTitle}>{PLAY_LAUNCHER_COPY.howTo}</h3>
             <div className={PLAY_LAUNCH.panelSteps}>
               {PLAY_CONCEPT[game].map((step) => (
@@ -105,7 +105,7 @@ export const PlayLauncherDetail = ({
             </div>
           </section>
 
-          <section className="flex flex-col gap-3">
+          <section className={PLAY_LAUNCH.panelSection}>
             <h3 className={PLAY_LAUNCH.panelTitle}>{PLAY_LAUNCHER_COPY.tables}</h3>
             {tables.length === 0 ? (
               <p className={PLAY_LAUNCH.panelEmpty}>{PLAY_LAUNCHER_COPY.noTables}</p>
@@ -149,11 +149,13 @@ export const PlayLauncherDetail = ({
             <button
               type="button"
               aria-pressed={isFavorite}
-              aria-label={isFavorite ? PLAY_LAUNCHER_COPY.unfavorite : PLAY_LAUNCHER_COPY.favorite}
               className={cn(PLAY_LAUNCH.panelStar, isFavorite && PLAY_LAUNCH.panelStarOn)}
               onClick={onFavorite}
             >
               <StarIcon className={PLAY_LAUNCH.tileStarIcon} aria-hidden="true" />
+              <span className={PLAY_LAUNCH.panelStarLabel}>
+                {isFavorite ? PLAY_LAUNCHER_COPY.unfavorite : PLAY_LAUNCHER_COPY.favorite}
+              </span>
             </button>
           </div>
         </div>

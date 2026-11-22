@@ -83,9 +83,11 @@ export const SEGMENTED_PLAY = {
   group: 'flex w-full items-center gap-1 rounded-[var(--radius-lg)] bg-play-nest p-1',
   option:
     'min-h-10 flex-1 rounded-[var(--radius-md)] px-3 py-1.5 text-center text-sm font-bold whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
-  // Hugs its content, glyph beside the label
-  groupInline: 'flex w-fit max-w-full overflow-x-auto',
-  optionInline: 'inline-flex items-center justify-center gap-2 px-5',
+  // Phone: equal cells, glyph over the label. From md: hugs its content, glyph beside the label
+  groupInline: 'grid w-full auto-cols-fr grid-flow-col md:flex md:w-fit md:max-w-full',
+  optionInline:
+    'inline-flex min-w-0 flex-col items-center justify-center gap-1 md:flex-row md:gap-2 md:px-5',
+  inlineLabel: 'max-w-full truncate text-xs md:text-sm',
   selected: 'bg-play-press text-[var(--play-ink)]',
   idle: 'text-[var(--play-ink-soft)] hover:bg-play-nest hover:text-[var(--play-ink)]',
 } as const

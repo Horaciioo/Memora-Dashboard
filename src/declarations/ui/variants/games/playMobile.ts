@@ -7,27 +7,22 @@ const EASE = 'duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
  */
 
 export const PLAY_TABS = {
-  bar: `fixed inset-x-0 bottom-0 z-50 flex md:hidden items-center gap-1 border-t border-[color-mix(in_srgb,var(--play-key)_60%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--play-key)_32%,transparent),color-mix(in_srgb,var(--play-key-deep)_38%,transparent))] backdrop-blur-xl backdrop-saturate-150 px-1.5 pt-1 pb-[max(0.5rem,calc(env(safe-area-inset-bottom)*0.8))] shadow-[inset_0_1px_0_var(--play-gloss),0_-0.25rem_1.25rem_color-mix(in_srgb,var(--play-key-deep)_35%,transparent)] md:inset-x-auto md:bottom-4 md:left-1/2 md:w-[min(48rem,calc(100%-3rem))] md:-translate-x-1/2 md:rounded-3xl md:border md:pb-0.5`,
-  // Open tab keeps its box, only the glyph rises
-  tab: `group relative flex min-h-[2.5rem] min-w-0 flex-1 flex-col md:w-24 md:flex-none items-center justify-end pb-1 rounded-2xl after:absolute after:top-1/2 after:right-0 after:h-8 after:w-px after:-translate-y-1/2 after:bg-[color-mix(in_srgb,var(--play-key)_55%,transparent)] last:after:hidden active:scale-95 disabled:opacity-50`,
-  tabOn: '',
-  lift: `relative z-10 transition-transform ${EASE} group-aria-[current=page]:-translate-y-1 group-aria-expanded:-translate-y-1`,
-  icon: `size-10 transition-[scale,filter] ${EASE} group-hover:scale-115 group-active:scale-90`,
-  // Open: full colour and glow. Rest: smaller, muted
+  bar: `fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 items-end border-t border-[color-mix(in_srgb,var(--play-key)_60%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--play-key)_32%,transparent),color-mix(in_srgb,var(--play-key-deep)_38%,transparent))] backdrop-blur-md px-1 pt-1.5 pb-[max(0.5rem,calc(env(safe-area-inset-bottom)*0.8))] shadow-[inset_0_1px_0_var(--play-gloss),0_-0.25rem_1.25rem_color-mix(in_srgb,var(--play-key-deep)_35%,transparent)] md:hidden`,
+  // Five equal cells, the open glyph rises with its word
+  tab: `group relative flex min-h-[3.25rem] min-w-0 flex-col items-center justify-end gap-1 pb-0.5 rounded-2xl not-last:after:absolute not-last:after:top-1/2 not-last:after:right-0 not-last:after:h-7 not-last:after:w-px not-last:after:-translate-y-1/2 not-last:after:bg-[color-mix(in_srgb,var(--play-key)_45%,transparent)] active:scale-95`,
+  // Games tab, its glyph standing over the bar
+  tabHome: 'z-10',
+  lift: `relative z-10 transition-transform ${EASE} group-aria-[current=page]:-translate-y-1`,
+  liftHome: '-mt-8',
+  icon: `size-9 transition-[scale,filter] ${EASE} group-active:scale-90`,
+  iconHome: `size-[3.75rem] drop-shadow-[0_0.3rem_0.4rem_color-mix(in_srgb,var(--play-key-deep)_55%,transparent)] transition-[scale,filter] ${EASE} group-active:scale-90`,
+  // Open: full colour. Rest: smaller, muted
   iconOn: 'scale-110',
   iconRest: 'scale-90 saturate-[0.6]',
   badge:
     'absolute -top-0.5 -right-0.5 size-3 rounded-full bg-[var(--play-alert)] ring-2 ring-[var(--color-surface-raised)]',
-  // Member portrait standing in the middle tab
-  portrait: 'relative block shrink-0',
-  label: `relative z-10 max-h-4 text-micro leading-none font-bold tracking-wide text-[var(--color-ink)] uppercase transition-[max-height,opacity,translate] ${EASE}`,
+  label: `relative z-10 max-h-4 max-w-full truncate text-micro leading-none font-bold tracking-tight text-[var(--color-ink)] uppercase transition-[max-height,opacity,translate] ${EASE}`,
   labelRest: `relative z-10 max-h-0 tracking-wide text-[var(--color-ink)] uppercase translate-y-1 overflow-hidden text-micro leading-none font-bold opacity-0 transition-[max-height,opacity,translate] ${EASE}`,
-  tabDesktop: 'max-md:hidden',
-  // Halves around the portrait, so it sits dead centre
-  half: 'flex min-w-0 flex-1 items-center justify-center gap-1',
-  // Portrait button in the middle, its frame rising over the bar
-  meHost: 'relative z-10 -mt-14 -mb-6 flex shrink-0',
-  me: 'relative flex w-28 shrink-0 items-center justify-center rounded-full transition-transform active:scale-95',
   menu: 'absolute bottom-full left-1/2 z-50 mb-3 flex w-60 -translate-x-1/2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
   menuItem:
     'flex min-h-11 items-center gap-3 rounded-xl px-3 text-left text-sm font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
@@ -54,7 +49,9 @@ export const PLAY_HUB_BAR = {
   bar: 'mt-auto flex flex-col gap-3 rounded-3xl border border-[var(--play-on-art)]/40 bg-[var(--play-panel-strong)] p-4 shadow-[0_0.5rem_1.5rem_var(--play-drop),inset_0_2px_0_var(--play-gloss)] md:hidden',
   divider: 'h-px w-full border-0 bg-play-shade shadow-[0_1px_0_var(--play-gloss)]',
   strip: 'flex items-stretch gap-2',
-  segment: 'play-key group grid min-h-12 min-w-0 flex-1 place-items-center px-0 py-2',
+  segment:
+    'play-key group flex min-h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 px-0 py-2',
+  label: 'text-xs leading-none font-extrabold',
   icon: 'size-7 drop-shadow-[0_2px_0_var(--play-drop)] transition-transform duration-150 group-active:scale-90',
 } as const
 
@@ -64,15 +61,16 @@ export const PLAY_HUB_BAR = {
  */
 
 export const PLAY_TOP = {
-  bar: 'relative z-30 -mt-4 mb-1 flex items-center justify-between gap-2 md:hidden',
-  keys: 'flex items-center gap-2',
+  // Stays put above the page, the safe area kept clear
+  bar: 'relative z-30 flex shrink-0 items-center gap-2 px-4 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-1 md:hidden',
   // Same key as the red back key, in slate
-  key: 'play-key play-key-ghost relative grid size-11 min-h-0 place-items-center rounded-2xl p-0 transition-transform active:scale-95',
-  // Red back key, no words
-  back: 'play-key play-key-danger grid size-11 min-h-0 place-items-center rounded-2xl p-0 transition-transform active:scale-95',
-  backIcon: 'size-5',
+  key: 'play-key play-key-ghost relative grid size-11 min-h-0 shrink-0 place-items-center rounded-2xl p-0 transition-transform active:scale-95',
+  // Way back from a game hub, as wide as the own box
+  back: 'play-key play-key-ghost flex h-11 min-h-0 min-w-0 flex-1 items-center gap-2 rounded-2xl px-3.5 py-0 text-sm font-extrabold transition-transform active:scale-[0.98]',
+  backIcon: 'size-5 shrink-0',
+  alert: 'absolute top-1.5 right-1.5 size-2.5 rounded-full bg-[var(--play-alert)]',
   keyIcon: 'size-6',
-  dot: 'absolute top-1.5 right-1.5 size-2.5 rounded-full bg-[var(--color-success)] ring-2 ring-[var(--play-panel-strong)]',
+  sheet: 'flex flex-col gap-4',
   sheetTitle: 'text-lg font-bold',
 } as const
 
@@ -135,26 +133,6 @@ export const PLAY_LEADER_BLOCKS: Record<number, string> = {
 }
 
 /**
- * Online players, settings and history sheets
- * @type {Record<string, string>}
- */
-
-export const PLAY_ONLINE = {
-  list: 'flex flex-col gap-2',
-  row: 'flex flex-col overflow-hidden rounded-2xl bg-[var(--color-surface)] transition-colors',
-  rowOpen: 'bg-[var(--color-surface-sunken)]',
-  head: 'flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left active:scale-[0.99]',
-  who: 'flex min-w-0 flex-col',
-  name: 'truncate text-sm font-bold text-[var(--color-ink)]',
-  playing: 'text-xs font-bold text-[var(--color-ink-accent)]',
-  idle: 'text-xs text-[var(--color-ink-subtle)]',
-  actions: 'play-pop grid gap-2 px-3 pb-3',
-  primary: 'play-chunk flex min-h-11 items-center justify-center rounded-xl text-sm font-bold',
-  action:
-    'play-key play-key-ghost flex min-h-11 items-center justify-center rounded-xl border border-[var(--color-border)] text-sm font-bold text-[var(--color-ink)]',
-} as const
-
-/**
  * Stats sections and history rows
  * @type {Record<string, string>}
  */
@@ -200,11 +178,11 @@ export const PLAY_HISTORY = {
  */
 
 export const PLAY_HUB_TABS = {
-  root: 'relative z-10 flex min-h-0 flex-1 flex-col gap-4 pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:hidden',
+  root: 'relative z-10 flex min-h-0 flex-1 flex-col gap-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:hidden',
   sheet: 'flex flex-col gap-4',
   // Logo then the big button
   play: 'flex flex-1 flex-col items-center justify-center gap-6',
-  logo: 'size-56',
+  logo: 'size-[min(14rem,32dvh)]',
   // Same look as the hub strip keys
   playButton: 'play-pop w-full min-h-12 py-2!',
   section: 'play-glass flex flex-col gap-3 rounded-3xl p-4',
@@ -220,22 +198,21 @@ export const PLAY_HUB_TABS = {
 
 export const PLAY_GAME_BAR = {
   // Room kept clear of the bar and the gear
-  room: 'pb-[calc(3.75rem+env(safe-area-inset-bottom))]',
+  room: 'pb-[calc(4.5rem+env(safe-area-inset-bottom))]',
   roomKeys: 'pt-14',
   // Lobby page keeps its end clear of the bar
-  spacer: 'h-16 shrink-0',
+  spacer: 'h-20 shrink-0',
   gear: 'play-glass fixed top-[calc(0.75rem+env(safe-area-inset-top))] right-3 z-50 grid size-11 place-items-center rounded-2xl text-[var(--play-ink)] active:scale-90',
   gearIcon: 'size-5',
-  bar: 'fixed inset-x-0 bottom-0 z-50 flex items-center gap-2 border-t border-[var(--play-on-art)]/15 bg-[color-mix(in_oklab,var(--play-night)_88%,transparent)] px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-md',
-  key: 'grid size-11 shrink-0 place-items-center rounded-full bg-play-lift text-[var(--play-on-art)] active:scale-90',
+  bar: 'fixed inset-x-2 bottom-[calc(0.5rem+env(safe-area-inset-bottom))] z-50 flex items-center gap-1.5 p-1.5',
+  key: 'grid size-11 shrink-0 place-items-center rounded-full bg-[var(--play-chip)] text-[var(--play-ink)] transition-transform active:scale-90',
   keyOff: 'opacity-50',
-  keyIcon: 'size-8',
+  keyIcon: 'size-6',
   input:
-    'max-h-24 min-h-11 min-w-0 flex-1 resize-none rounded-full bg-play-lift px-4 py-2.5 text-base text-[var(--play-on-art)] outline-none placeholder:text-[var(--play-on-art)]/55 focus:bg-play-press',
+    'max-h-24 min-h-11 min-w-0 flex-1 resize-none rounded-full bg-[var(--play-chip)] px-4 py-2.5 text-base text-[var(--play-ink)] outline-none placeholder:text-[var(--play-ink-faint)] focus-visible:outline-2 focus-visible:outline-[var(--play-accent)]',
   bubbles:
-    'pointer-events-none absolute inset-x-3 bottom-full mb-2 flex flex-col items-start gap-1.5',
-  bubble:
-    'play-pop flex max-w-[85%] items-start gap-2 rounded-2xl bg-play-veil px-3 py-2 text-sm text-[var(--play-on-art)] backdrop-blur-sm',
+    'pointer-events-none absolute inset-x-1 bottom-full mb-2.5 flex flex-col items-start gap-1.5',
+  bubble: 'play-pop flex max-w-[85%] items-start gap-2 px-3 py-2 text-sm leading-snug',
   bubbleName: 'font-bold',
   sheet: 'flex flex-col gap-4',
   sheetTitle: 'text-lg font-bold',

@@ -1523,62 +1523,6 @@
   }
 }
 
-/* Featured game: each turn slides in, the poster settles */
-.play-feature-in {
-  animation: play-feature-in 600ms var(--motion-ease-out) both;
-}
-
-.play-feature-poster {
-  animation:
-    play-feature-poster 800ms var(--motion-ease-out) both,
-    play-feature-spin 10s ease-in-out 4s infinite;
-}
-
-@keyframes play-feature-in {
-  from {
-    opacity: 0;
-    transform: translateX(1.5rem);
-  }
-}
-
-@keyframes play-feature-poster {
-  from {
-    opacity: 0;
-    rotate: 12deg;
-    translate: 2rem 0;
-  }
-}
-
-.play-feature-flip {
-  transition: transform 500ms var(--motion-ease-out);
-}
-
-.play-feature-flip[data-flipped='true'] {
-  transform: rotateY(180deg);
-}
-
-/* Rare quick full turn, flat on the box */
-@keyframes play-feature-spin {
-  0% {
-    transform: perspective(1000px) rotateY(0);
-  }
-  5%,
-  100% {
-    transform: perspective(1000px) rotateY(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .play-feature-in,
-  .play-feature-poster {
-    animation: none;
-  }
-
-  .play-feature-flip {
-    transition: none;
-  }
-}
-
 /* Server busy: the brain hops and leans */
 .play-busy-in {
   animation: play-busy-in 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
@@ -1773,8 +1717,13 @@
   animation-play-state: paused;
 }
 
-.play-launch-panel {
+@utility play-launch-panel {
   animation: play-launch-panel 350ms var(--motion-ease-out) both;
+}
+
+/* Phone: the game sheet rises from the bottom */
+@utility play-launch-sheet {
+  animation: play-launch-sheet 350ms var(--motion-ease-out) both;
 }
 
 @keyframes play-hero-drift {
@@ -1811,11 +1760,19 @@
   }
 }
 
+@keyframes play-launch-sheet {
+  from {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .play-hero-drift,
   .play-hero-poster,
   .play-hero-bar,
-  .play-launch-panel {
+  .play-launch-panel,
+  .play-launch-sheet {
     animation: none;
   }
 }

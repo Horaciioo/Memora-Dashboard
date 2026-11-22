@@ -17,8 +17,8 @@ export const PLAY_SETUP = {
   close: 'absolute top-3 right-3 z-10 bg-black/40! text-white! hover:bg-black/60!',
   // Rule cards, one per setting
   card: 'flex min-w-0 flex-col gap-3 rounded-2xl bg-white/[0.045] p-4 ring-1 ring-white/10',
-  footer: 'flex items-center gap-2',
-  footerGap: 'flex-1',
+  footer: 'grid auto-cols-fr grid-flow-col items-center gap-2 sm:flex',
+  footerGap: 'hidden sm:block sm:flex-1',
   cancel: 'shrink-0',
-  main: 'min-w-0 flex-1 justify-center',
+  main: 'min-w-0 justify-center whitespace-nowrap sm:flex-1',
 } as const

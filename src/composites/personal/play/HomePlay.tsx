@@ -18,16 +18,7 @@ export const HomePlay = () => {
   const Next = ICONS.next
 
   return (
-    <Section
-      title={HOME_PLAY_COPY.title}
-      bare
-      action={
-        <Link href={ROUTES.play} className={STYLES.open}>
-          {HOME_PLAY_COPY.open}
-          <Next className={STYLES.moreGlyph} aria-hidden="true" />
-        </Link>
-      }
-    >
+    <Section title={HOME_PLAY_COPY.title} bare>
       <div className={STYLES.games}>
         {HOME_PLAY_NEW.map((game) => (
           <Link
@@ -44,6 +35,12 @@ export const HomePlay = () => {
             </span>
           </Link>
         ))}
+      </div>
+      <div className={STYLES.openRow}>
+        <Link href={ROUTES.play} className={STYLES.open}>
+          {HOME_PLAY_COPY.open}
+          <Next className={STYLES.moreGlyph} aria-hidden="true" />
+        </Link>
       </div>
     </Section>
   )

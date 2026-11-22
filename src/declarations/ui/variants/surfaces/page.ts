@@ -92,6 +92,10 @@ export const TABS_STYLES = {
   list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-[var(--radius-lg)] glass-soft p-1',
   // Strip centred over its panel from sm
   listCentered: 'sm:mx-auto',
+  // Phone: the strip spans the row, tabs share it evenly
+  listFull: 'max-sm:w-full',
+  tabFull: 'max-sm:flex-1',
+  contentFull: 'justify-center',
   tab: 'relative z-10 min-h-11 shrink-0 rounded-[calc(var(--radius-lg)-0.25rem)] px-3 py-1.5 text-sm font-medium sm:px-3.5 md:min-h-0 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // Open tab sits on the glass pill
   active:

@@ -24,7 +24,8 @@ export const BAC_BOARD = {
     'relative flex size-full flex-col items-center justify-center gap-[min(2dvh,1rem)] overflow-hidden px-4 pt-24 pb-28 max-md:pb-20 md:pr-[23rem]',
   // HUD figures: the letter, the clock bar
   hudLetter: 'text-3xl leading-none font-black text-[var(--play-ink-soft)]',
-  hudClockTrack: 'block h-2 w-24 overflow-hidden rounded-full bg-[var(--play-chip)]',
+  // Phone keeps the seconds alone, the bar would push the keys out
+  hudClockTrack: 'hidden h-2 w-24 overflow-hidden rounded-full bg-[var(--play-chip)] md:block',
   hudClockBar:
     'block h-full rounded-full bg-[var(--play-ink-soft)] transition-[width] duration-1000 ease-linear',
   hudClockLow: 'bg-[var(--color-danger)]',
@@ -190,7 +191,8 @@ export const BOMB_BOARD = {
   lastWord:
     'max-w-36 truncate rounded-lg bg-[var(--play-chip)] px-2 py-0.5 text-sm font-extrabold tracking-wide text-[var(--play-ink-soft)] uppercase',
   missReason: 'text-[0.7rem] font-bold text-[var(--color-danger)]',
-  form: 'flex w-full max-w-md items-center gap-2',
+  // Phone: the key under the field, full width
+  form: 'flex w-full max-w-md flex-col items-stretch gap-2 sm:flex-row sm:items-center',
   input:
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-4 py-3 text-center text-lg font-extrabold tracking-wide text-[var(--play-ink)] uppercase placeholder:font-normal placeholder:normal-case placeholder:text-[var(--play-ink-faint)] focus:bg-[var(--play-panel-strong)] focus:outline-none',
   // Final screen
@@ -397,15 +399,15 @@ export const setupStyles = (picked: string) =>
     letter:
       'grid size-9 place-items-center rounded-[var(--radius-md)] border border-transparent bg-[var(--color-border-strong)] text-sm font-semibold text-white transition-colors hover:brightness-95',
     letterOn: picked,
-    quick: 'flex gap-2',
+    quick: 'grid grid-cols-2 gap-2 sm:flex',
     quickButton:
       'rounded-full px-3 py-1.5 text-xs font-bold text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
-    // Preset chips
-    chips: 'flex flex-wrap gap-2',
-    chip: `${SETUP_TILE} min-h-11 px-3.5 text-sm font-semibold tabular-nums`,
+    // Preset chips, equal cells filling the row on a phone
+    chips: 'grid grid-cols-[repeat(auto-fit,minmax(6rem,1fr))] gap-2 sm:flex sm:flex-wrap',
+    chip: `${SETUP_TILE} min-h-11 px-3.5 text-center text-sm font-semibold tabular-nums`,
     chipOn: picked,
-    // Stepper
-    stepper: 'flex items-center gap-3',
+    // Stepper, its keys at both ends of the row on a phone
+    stepper: 'grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:flex',
     step: `${SETUP_TILE} grid size-11 place-items-center disabled:pointer-events-none disabled:opacity-40`,
     stepIcon: 'size-4',
     stepValue: 'min-w-10 text-center text-xl font-bold tabular-nums text-[var(--color-ink)]',

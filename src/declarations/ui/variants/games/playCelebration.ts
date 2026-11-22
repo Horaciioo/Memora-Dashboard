@@ -5,7 +5,7 @@
 
 export const PLAY_CELEBRATION_UI = {
   layer:
-    'play-cele pointer-events-none fixed inset-0 z-[70] grid place-items-center [background:radial-gradient(ellipse_at_50%_50%,color-mix(in_srgb,var(--play-panel-strong)_80%,transparent),transparent_70%)]',
+    'play-cele pointer-events-none fixed inset-0 z-[70] grid place-items-center backdrop-blur-md [background:radial-gradient(ellipse_at_50%_50%,color-mix(in_srgb,var(--play-panel-strong)_80%,transparent),transparent_70%)]',
   scene: 'relative grid place-items-center gap-[clamp(0.75rem,2.4dvh,1.5rem)] text-center',
   kicker:
     'play-cele-text text-[clamp(0.75rem,2dvh,1rem)] leading-none font-black tracking-[0.4em] text-[var(--play-gold)] uppercase',

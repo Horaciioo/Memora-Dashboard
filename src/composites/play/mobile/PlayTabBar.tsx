@@ -2,21 +2,16 @@
 
 import { usePathname } from 'next/navigation'
 
-import { PlayMeButton } from '@/composites/play/mobile/PlayMeButton'
 import { PlayNote } from '@/composites/play/hub/notices/PlayNote'
 import { usePlayNote } from '@/core/hooks/interaction/state/play/usePlayNote'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayTabGlyph } from '@/composites/play/mobile/PlayTabGlyphs'
-import { PLAY_TAB_LABELS, PLAY_TAB_ORDER, playTabIndexOf } from '@/composites/play/mobile/tabs'
-import type { PlayTab } from '@/composites/play/mobile/tabs'
-import { PLAY_MOBILE_COPY } from '@/declarations/play'
+import { PLAY_PHONE_TABS, PLAY_TAB_LABELS, playTabIndexOf } from '@/composites/play/mobile/tabs'
+import { isPlayGameHubPath, PLAY_MOBILE_COPY } from '@/declarations/play'
 import { PLAY_TABS } from '@/declarations/ui/variants'
 import { ROUTES } from '@/declarations/navigation'
 import type { PlayNoticeView, PlayPresence } from '@/types/play'
 import { cn } from '@/utils/classnames'
-
-// Pages where a game fills the screen
-const SESSION_PREFIX = ROUTES.playSession('')
 
 export interface PlayTabBarProps {
   invites: PlayNoticeView[]
@@ -25,74 +20,53 @@ export interface PlayTabBarProps {
 }
 
 /**
- * Phone tab bar: the open glyph lifts, the member portrait in the middle
- * @param {PlayTabBarProps} props - Feed data
+ * Phone tab bar: the desktop pages, the games raised in the middle
+ * @param {PlayTabBarProps} props - Waiting calls
  * @return {JSX.Element | null}
  */
 
 export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) => {
   const path = usePathname()
   const { note } = usePlayNote()
-  if (path.startsWith(SESSION_PREFIX)) return null
+  // Games and their hubs fill the screen
+  if (path.startsWith(ROUTES.playSession('')) || isPlayGameHubPath(path)) return null
 
-  const current = playTabIndexOf(path)
-  const isCalling = Boolean(presence) || invites.length > 0
-  const hasDot: Partial<Record<PlayTab['key'], boolean>> = {
-    feed: isCalling,
-    group: groupCalls > 0,
-  }
-
-  const body = (tab: PlayTab, isOn: boolean) => (
-    <>
-      <span className={PLAY_TABS.lift}>
-        <PlayTabGlyph
-          name={tab.key}
-          isOn={isOn}
-          className={cn(PLAY_TABS.icon, isOn ? PLAY_TABS.iconOn : PLAY_TABS.iconRest)}
-        />
-        {hasDot[tab.key] && <span className={PLAY_TABS.badge} aria-hidden="true" />}
-      </span>
-      <span className={isOn ? PLAY_TABS.label : PLAY_TABS.labelRest}>
-        {PLAY_TAB_LABELS[tab.key]}
-      </span>
-    </>
-  )
-
-  const link = (tab: PlayTab, index: number) => {
-    const isOn = index === current
-
-    return (
-      <AppLink
-        key={tab.key}
-        href={tab.href}
-        aria-current={isOn ? 'page' : undefined}
-        className={cn(
-          PLAY_TABS.tab,
-          isOn && PLAY_TABS.tabOn,
-          (tab.isDesktopOnly || tab.isHidden) && PLAY_TABS.tabDesktop
-        )}
-      >
-        {body(tab, isOn)}
-      </AppLink>
-    )
-  }
-
-  // Tabs of the bar, as many each side of the portrait
-  const shown = PLAY_TAB_ORDER.map((tab, index) => ({ tab, index })).filter(
-    ({ tab }) => !tab.isHidden
-  )
-  const middle = Math.ceil(shown.length / 2)
+  const current = playTabIndexOf(path, PLAY_PHONE_TABS)
+  const hasCall = Boolean(presence) || invites.length > 0 || groupCalls > 0
 
   return (
     <>
       <nav aria-label={PLAY_MOBILE_COPY.tabs} className={PLAY_TABS.bar}>
-        <div className={PLAY_TABS.half}>
-          {shown.slice(0, middle).map(({ tab, index }) => link(tab, index))}
-        </div>
-        <PlayMeButton />
-        <div className={PLAY_TABS.half}>
-          {shown.slice(middle).map(({ tab, index }) => link(tab, index))}
-        </div>
+        {PLAY_PHONE_TABS.map((tab, index) => {
+          const isOn = index === current
+          const isHome = tab.key === 'home'
+
+          return (
+            <AppLink
+              key={tab.key}
+              href={tab.href}
+              aria-current={isOn ? 'page' : undefined}
+              className={cn(PLAY_TABS.tab, isHome && PLAY_TABS.tabHome)}
+            >
+              <span className={cn(PLAY_TABS.lift, isHome && PLAY_TABS.liftHome)}>
+                <PlayTabGlyph
+                  name={tab.key}
+                  isOn={isOn}
+                  className={cn(
+                    isHome ? PLAY_TABS.iconHome : PLAY_TABS.icon,
+                    isOn ? PLAY_TABS.iconOn : PLAY_TABS.iconRest
+                  )}
+                />
+                {tab.key === 'group' && hasCall && (
+                  <span className={PLAY_TABS.badge} aria-hidden="true" />
+                )}
+              </span>
+              <span className={isOn || isHome ? PLAY_TABS.label : PLAY_TABS.labelRest}>
+                {PLAY_TAB_LABELS[tab.key]}
+              </span>
+            </AppLink>
+          )
+        })}
       </nav>
       <PlayNote text={note} />
     </>

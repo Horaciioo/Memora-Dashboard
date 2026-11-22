@@ -196,6 +196,7 @@ export const HOME_BOARD = {
 
 export const HOME_PLAY = {
   stack: 'flex flex-col gap-4',
+  openRow: 'flex justify-center',
   open: 'inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-ink-accent)] hover:underline',
   more: 'mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-bold text-[var(--color-ink-accent)] hover:underline',
   moreGlyph: 'h-4 w-4 shrink-0',

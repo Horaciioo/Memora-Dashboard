@@ -7,6 +7,7 @@ import { PlayAdminRoom } from '@/composites/play/admin/PlayAdminRoom'
 import { PlayCardHost } from '@/composites/play/card/PlayCardHost'
 import { PlayFriendsPanel } from '@/composites/play/friends/PlayFriendsPanel'
 import { PlayDeskBar } from '@/composites/play/topbar/PlayDeskBar'
+import { PlayOnly } from '@/composites/play/shared/PlayOnly'
 import { PlayBusyToast } from '@/composites/play/loading/PlayBusyToast'
 
 import type { PlayDockProps } from '@/composites/play/dock/PlayDock'
@@ -19,6 +20,7 @@ import { PlayReward } from '@/composites/play/hub/notices/PlayReward'
 import { PlayOnlineProvider } from '@/composites/play/mobile/PlayOnline'
 import { PlaySlide } from '@/composites/play/mobile/PlaySlide'
 import { PlayTabBar } from '@/composites/play/mobile/PlayTabBar'
+import { PlayTopBar } from '@/composites/play/mobile/PlayTopBar'
 import { PlayInviteHost } from '@/composites/play/invites/PlayInviteHost'
 import type { LevelNotice, TrophyNotice } from '@/core/services/play'
 import type { PlayFriendsState, PlayLobbyCard } from '@/types/play'
@@ -74,11 +76,21 @@ export const PlayShell = ({
         ) : (
           <>
             <PlayRoomBanner />
-            <PlayDeskBar
-              invites={dock.invites}
-              presence={dock.presence}
-              groupCalls={dock.groupCalls}
-            />
+            <PlayOnly on="phone">
+              <PlayTopBar
+                friends={friends}
+                tables={tables}
+                presence={dock.presence}
+                isLocked={Boolean(dock.profile.ban)}
+              />
+            </PlayOnly>
+            <PlayOnly on="desk">
+              <PlayDeskBar
+                invites={dock.invites}
+                presence={dock.presence}
+                groupCalls={dock.groupCalls}
+              />
+            </PlayOnly>
             <div className={PLAY_SHELL.body}>
               <div className={PLAY_SHELL.content}>
                 {isHub ? (
@@ -89,23 +101,27 @@ export const PlayShell = ({
                   <PlaySlide>{children}</PlaySlide>
                 )}
               </div>
-              <PlayFriendsPanel
-                state={friends}
-                tables={tables}
-                presence={dock.presence}
-                isLocked={Boolean(dock.profile.ban)}
-              />
+              <PlayOnly on="desk">
+                <PlayFriendsPanel
+                  state={friends}
+                  tables={tables}
+                  presence={dock.presence}
+                  isLocked={Boolean(dock.profile.ban)}
+                />
+              </PlayOnly>
             </div>
           </>
         )}
         <PlaySignal topic={PLAY_TOPICS.notices} />
         <PlaySignal topic={PLAY_TOPICS.groups} />
         {!isAdmin && (
-          <PlayTabBar
-            invites={dock.invites}
-            presence={dock.presence}
-            groupCalls={dock.groupCalls}
-          />
+          <PlayOnly on="phone">
+            <PlayTabBar
+              invites={dock.invites}
+              presence={dock.presence}
+              groupCalls={dock.groupCalls}
+            />
+          </PlayOnly>
         )}
         <PlayReward reward={reward} />
         <PlayCelebration />

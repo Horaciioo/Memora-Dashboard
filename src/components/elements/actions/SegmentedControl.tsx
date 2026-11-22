@@ -84,7 +84,11 @@ export const SegmentedControl = <TValue extends string>({
           }
         >
           {Icon ? <Icon className={isInline ? 'size-5' : 'size-6'} aria-hidden="true" /> : null}
-          {isInline || !Icon ? option.label : null}
+          {isInline ? (
+            <span className={SEGMENTED_PLAY.inlineLabel}>{option.label}</span>
+          ) : !Icon ? (
+            option.label
+          ) : null}
         </button>
       )
     })}

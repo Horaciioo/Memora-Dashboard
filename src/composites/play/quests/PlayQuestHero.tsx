@@ -31,19 +31,21 @@ export const PlayQuestHero = ({ board }: { board: QuestBoard }) => {
     <section className={PLAY_QUESTS.hero} aria-label={PLAY_QUEST_COPY.streakTitle}>
       <div className={PLAY_QUESTS.streak}>
         <div className={PLAY_QUESTS.streakTop}>
-          <div>
+          <div className={PLAY_QUESTS.streakHead}>
             <span className={PLAY_QUESTS.streakValue}>{streak}</span>
-            <p className={PLAY_QUESTS.streakLabel}>
-              {streak > 1 ? PLAY_QUEST_COPY.streakDays : PLAY_QUEST_COPY.streakDay}
-            </p>
-            <p className={PLAY_QUESTS.streakBonus}>
-              {streak
-                ? fillPlayMessage(PLAY_QUEST_COPY.streakBonus, { percent: board.percent })
-                : fillPlayMessage(PLAY_QUEST_COPY.streakBonusNone, {
-                    step: PLAY_QUEST_RULES.streakStep,
-                    cap: PLAY_QUEST_RULES.streakCap,
-                  })}
-            </p>
+            <div>
+              <p className={PLAY_QUESTS.streakLabel}>
+                {streak > 1 ? PLAY_QUEST_COPY.streakDays : PLAY_QUEST_COPY.streakDay}
+              </p>
+              <p className={PLAY_QUESTS.streakBonus}>
+                {streak
+                  ? fillPlayMessage(PLAY_QUEST_COPY.streakBonus, { percent: board.percent })
+                  : fillPlayMessage(PLAY_QUEST_COPY.streakBonusNone, {
+                      step: PLAY_QUEST_RULES.streakStep,
+                      cap: PLAY_QUEST_RULES.streakCap,
+                    })}
+              </p>
+            </div>
           </div>
         </div>
         <div className={PLAY_QUESTS.track}>
@@ -82,7 +84,7 @@ export const PlayQuestHero = ({ board }: { board: QuestBoard }) => {
             />
           ))}
         </div>
-        <p className={PLAY_QUESTS.note}>
+        <p className={PLAY_QUESTS.chestNote}>
           {fillPlayMessage(PLAY_QUEST_COPY.bonusText, { total: bonus.total })}
         </p>
         <span className={PLAY_QUESTS.chestReward}>

@@ -18,7 +18,6 @@ export { PLAY_PANEL } from '@/declarations/ui/variants/games/play/shared'
 export {
   PLAY_CHAT_BUBBLE,
   PLAY_NOTICE,
-  PLAY_CROSS,
   PLAY_FEATURE,
   PLAY_DOCK,
   PLAY_ROOM,

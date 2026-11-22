@@ -43,3 +43,6 @@ export type PlayLauncherFilter = (typeof PLAY_LAUNCHER_FILTERS)[number]['key']
 
 // Seconds a banner stays on screen
 export const PLAY_LAUNCHER_SLIDE_SECONDS = 9
+
+// Finger travel that turns the banner on a phone
+export const PLAY_LAUNCHER_SWIPE_PX = 40

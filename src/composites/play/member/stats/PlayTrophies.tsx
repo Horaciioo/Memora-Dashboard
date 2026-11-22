@@ -2,6 +2,7 @@
 
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { PlayTrophyCard } from '@/composites/play/member/stats/PlayTrophyCard'
+import { PlayTrophyShelf } from '@/composites/play/member/stats/PlayTrophyShelf'
 import { PlayTrophyPlatinum } from '@/composites/play/member/stats/PlayTrophyPlatinum'
 import { trophiesOf } from '@/core/lib/play'
 import { useTrophyPinning } from '@/core/hooks/data/play/useTrophyPinning'
@@ -50,20 +51,27 @@ export const PlayTrophies = ({ games, wonAt, pins, canPin = false }: PlayTrophie
           const count = group.filter((trophy) => trophy.reached).length
 
           return (
-            <section key={key} className={PLAY_SHOWCASE.section}>
-              <h3 className={PLAY_SHOWCASE.sectionHead}>
-                {game && <PlayGameLogo game={game} className={PLAY_SHOWCASE.sectionIcon} />}
-                <span className={PLAY_SHOWCASE.sectionName}>{label}</span>
-                <span className={PLAY_SHOWCASE.sectionRule} aria-hidden="true" />
-                <span
-                  className={cn(
-                    PLAY_SHOWCASE.sectionMeta,
-                    count === group.length && PLAY_SHOWCASE.sectionMetaDone
-                  )}
-                >
-                  {fillPlayMessage(PLAY_HEAD_COPY.rarityCount, { won: count, total: group.length })}
-                </span>
-              </h3>
+            <PlayTrophyShelf
+              key={key}
+              head={
+                <>
+                  {game && <PlayGameLogo game={game} className={PLAY_SHOWCASE.sectionIcon} />}
+                  <span className={PLAY_SHOWCASE.sectionName}>{label}</span>
+                  <span className={PLAY_SHOWCASE.sectionRule} aria-hidden="true" />
+                  <span
+                    className={cn(
+                      PLAY_SHOWCASE.sectionMeta,
+                      count === group.length && PLAY_SHOWCASE.sectionMetaDone
+                    )}
+                  >
+                    {fillPlayMessage(PLAY_HEAD_COPY.rarityCount, {
+                      won: count,
+                      total: group.length,
+                    })}
+                  </span>
+                </>
+              }
+            >
               <ul className={PLAY_SHOWCASE.grid}>
                 {group.map((trophy) => (
                   <PlayTrophyCard
@@ -74,7 +82,7 @@ export const PlayTrophies = ({ games, wonAt, pins, canPin = false }: PlayTrophie
                   />
                 ))}
               </ul>
-            </section>
+            </PlayTrophyShelf>
           )
         })}
       </div>

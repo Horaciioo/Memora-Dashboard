@@ -32,6 +32,8 @@ export interface TabsProps {
   emphasis?: boolean
   // Dressed for Memora Play, the pill violet
   isPlay?: boolean
+  // Phone: spans the row, tabs sharing it evenly
+  isFull?: boolean
 }
 
 // Last box drawn per strip, survives a remount
@@ -50,6 +52,7 @@ const EMPHASIS_FACTOR = 1.5
  * @param {boolean} [inBanner] - Sits under the banner
  * @param {boolean} [emphasis] - Slow glide with pulse
  * @param {boolean} [isPlay] - Memora Play colours
+ * @param {boolean} [isFull] - Spans the row on a phone
  * @return {JSX.Element}
  */
 
@@ -62,6 +65,7 @@ export const Tabs = ({
   inBanner,
   emphasis,
   isPlay,
+  isFull,
 }: TabsProps) => {
   const styles = isPlay ? TABS_PLAY : TABS_STYLES
   const host = useBannerHost(PAGE_TABS_HOST_ID)
@@ -144,7 +148,7 @@ export const Tabs = ({
   const strip = (
     <div
       ref={listRef}
-      className={cn(styles.list, centered && styles.listCentered)}
+      className={cn(styles.list, centered && styles.listCentered, isFull && TABS_STYLES.listFull)}
       role="tablist"
       aria-label={label}
     >
@@ -166,12 +170,13 @@ export const Tabs = ({
             onClick={() => onChange(item.value)}
             className={cn(
               styles.tab,
+              isFull && TABS_STYLES.tabFull,
               isActive && (item.danger ? styles.activeDanger : styles.active),
               item.danger && !isActive && styles.danger,
               item.flagged && !isActive && !item.danger && styles.flagged
             )}
           >
-            <span className={styles.content}>
+            <span className={cn(styles.content, isFull && TABS_STYLES.contentFull)}>
               {Icon && (
                 <Icon
                   className={cn(

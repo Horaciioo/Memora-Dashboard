@@ -276,19 +276,23 @@
     0 0 0 0.16rem var(--stopgo-kerb-white), 0.3rem 0.4rem 0 0.16rem var(--play-stopgo-deep);
 }
 
-/* Concordat: dark staff-map plate, squared and hairline, quiet over the board */
+/* Concordat: olive war plate, brass figures, a signal red edge on top */
 [data-hud='concordat'] {
-  --hud-bg: linear-gradient(180deg, rgb(31 43 44 / 0.86), rgb(24 33 34 / 0.9));
-  --hud-ink: var(--concordat-khaki);
-  --hud-value: var(--concordat-brass);
-  --hud-faint: var(--concordat-khaki-faint);
-  --hud-line: var(--concordat-hairline);
-  --hud-chip: rgb(220 213 182 / 0.08);
-  --hud-solid: var(--concordat-plate-lit);
+  --hud-bg: linear-gradient(180deg, rgb(58 64 38 / 0.92), rgb(36 40 24 / 0.94));
+  --hud-deco: linear-gradient(var(--concordat-war), var(--concordat-war)) top / 100% 0.14rem
+    no-repeat;
+  --hud-ink: #ece4c4;
+  --hud-value: var(--concordat-gold);
+  --hud-faint: rgb(236 228 196 / 0.6);
+  --hud-line: rgb(236 228 196 / 0.16);
+  --hud-chip: rgb(236 228 196 / 0.1);
+  --hud-head: rgb(0 0 0 / 0.22);
+  --hud-mine: rgb(246 196 67 / 0.14);
+  --hud-solid: #4a5230;
   --hud-radius: 0.2rem;
   --hud-shadow:
-    0 0 0 0.07rem var(--concordat-hairline), inset 0 0.07rem 0 rgb(255 255 255 / 0.06),
-    0 0.3rem 0.8rem rgb(8 16 18 / 0.4);
+    0 0 0 0.07rem rgb(0 0 0 / 0.5), inset 0 0 0 0.07rem rgb(236 228 196 / 0.1),
+    0 0.35rem 0.9rem rgb(10 12 4 / 0.45);
 }
 
 [data-hud='concordat'].play-hud-block,

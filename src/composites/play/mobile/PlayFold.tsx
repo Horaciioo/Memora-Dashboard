@@ -14,17 +14,19 @@ export interface PlayFoldProps {
   children: ReactNode
   // Spans both columns of the page grid
   isWide?: boolean
+  // Starts folded on a phone
+  isClosed?: boolean
 }
 
 /**
  * Stats section: a panel of the page, foldable on a phone only
- * @param {PlayFoldProps} props - Heading, body and width
+ * @param {PlayFoldProps} props - Heading, body, width and start state
  * @return {JSX.Element}
  */
 
-export const PlayFold = ({ title, children, isWide }: PlayFoldProps) => {
+export const PlayFold = ({ title, children, isWide, isClosed }: PlayFoldProps) => {
   const isMobile = useIsMobileShell()
-  const [isOpen, setOpen] = useState(true)
+  const [isOpen, setOpen] = useState(!isClosed)
   const ChevronIcon = ICONS.expand
 
   if (!isMobile) {

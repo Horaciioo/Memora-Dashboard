@@ -116,7 +116,7 @@ export const PlaySetupDrawer = ({
         tabs.length > 1 && (
           <div className={DRAWER_STYLES.subheaderRow}>
             <div className={DRAWER_STYLES.subheaderTabs}>
-              <Tabs items={tabs} value={tab} onChange={setTab} label={copy.tabs} emphasis />
+              <Tabs items={tabs} value={tab} onChange={setTab} label={copy.tabs} emphasis isFull />
             </div>
           </div>
         )

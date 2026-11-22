@@ -1,11 +1,5 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
-import {
-  HEADING,
-  LIFT,
-  NOTE,
-  PANEL,
-  PLAY_GOLD_TILE,
-} from '@/declarations/ui/variants/games/play/shared'
+import { HEADING, NOTE, PANEL, PLAY_GOLD_TILE } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Play blocks of a moderator file
@@ -60,9 +54,9 @@ export const PLAY_SHELL = {
   body: 'relative z-10 flex min-h-0 w-full flex-1 md:gap-3 md:px-3 md:pb-3',
   // Hub page, the profile card floats at the bottom
   withAside: 'flex min-h-full flex-col',
-  // Pages scroll here, the room itself never does
+  // Pages scroll here, the room itself never does; phone: top edge fades under the header
   content:
-    'relative z-10 flex min-h-0 min-w-0 flex-1 flex-col gap-8 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pt-8 pb-36 sm:px-8 md:rounded-2xl md:border md:border-[var(--play-line)] md:bg-play-shade md:pb-10 xl:px-12',
+    'relative z-10 flex min-h-0 min-w-0 flex-1 flex-col gap-5 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pt-5 pb-24 max-md:[mask-image:linear-gradient(to_bottom,transparent,black_1.5rem)] md:gap-8 md:pt-8 sm:px-8 md:rounded-2xl md:border md:border-[var(--play-line)] md:bg-play-shade md:pb-10 xl:px-12',
 } as const
 
 /**
@@ -108,19 +102,6 @@ export const PLAY_HUB = {
     'absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgb(13_16_51/0.55),rgb(13_16_51/0.15)_70%)]',
   // Game cards
   games: 'grid gap-5 sm:grid-cols-2 2xl:grid-cols-4',
-  // Phone: a poster tile, two to a row, name under the art
-  // Trading card from md: game-coloured frame, inner keyline, plate under the art
-  card: `play-card relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-3xl text-[var(--play-on-art)] ${LIFT} ring-2 ring-[var(--play-on-art)]/20 transition-transform duration-200 active:scale-[0.98] max-md:aspect-[4/5] max-md:rounded-3xl md:rounded-2xl md:ring-[0.3rem] md:ring-[var(--game)] md:hover:-translate-y-2 md:hover:-rotate-1 md:after:pointer-events-none md:after:absolute md:after:inset-2 md:after:rounded-[1.1rem] md:after:border md:after:border-[var(--play-on-art)]/40 md:after:content-['']`,
-  cardShade:
-    'absolute inset-0 bg-linear-to-t from-[var(--play-night)] from-5% via-[var(--play-night)]/55 via-35% to-transparent to-65%',
-  cardLink:
-    'absolute inset-0 z-10 rounded-3xl max-md:rounded-3xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
-  cardBody:
-    'relative flex flex-col items-center gap-2 p-7 text-center max-md:items-start max-md:gap-0.5 max-md:p-2 max-md:text-left md:mx-2 md:mb-2 md:gap-0.5 md:rounded-xl md:bg-[var(--play-night)]/80 md:p-2',
-  cardName:
-    'truncate text-3xl font-bold tracking-tight uppercase max-md:max-w-full max-md:text-micro max-md:leading-tight max-md:whitespace-normal md:text-sm',
-  // Seat count, the card's one figure
-  cardSeats: 'text-xs font-bold tabular-nums text-[var(--game)] max-md:hidden',
   skeleton:
     'min-h-64 animate-pulse rounded-3xl bg-[var(--play-panel-strong)] motion-reduce:animate-none',
   // Game hub, centred and fitted to the room: logo | divider | actions, never scrolling

@@ -20,11 +20,15 @@ export interface PlayHudRow {
  * Score card, always open
  * @param {Object} props - Panel
  * @param {PlayHudRow[]} props.rows - Players, best first
+ * @param {boolean} [props.isBare] - Inside a box already, no frame of its own
  * @return {JSX.Element}
  */
 
-export const PlayHudPanel = ({ rows }: { rows: PlayHudRow[] }) => (
-  <aside className={PLAY_HUD.panel} aria-label={PLAY_HUD_COPY.scorecard}>
+export const PlayHudPanel = ({ rows, isBare }: { rows: PlayHudRow[]; isBare?: boolean }) => (
+  <aside
+    className={isBare ? PLAY_HUD.panelBare : PLAY_HUD.panel}
+    aria-label={PLAY_HUD_COPY.scorecard}
+  >
     <h2 className={PLAY_HUD.title}>{PLAY_HUD_COPY.scorecard}</h2>
     <ol className={PLAY_HUD.rows}>
       {rows.map((row, index) => (

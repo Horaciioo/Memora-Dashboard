@@ -106,7 +106,15 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
 
     const width = window.innerWidth
     const dismiss = (event: Event) => {
-      if (event.type === 'scroll' && panelRef.current?.contains(event.target as Node)) return
+      if (event.type === 'scroll') {
+        const target = event.target as Node
+
+        // Only a scroller carrying the trigger moves the anchor
+        const isAnchorMoving =
+          target === document || Boolean(triggerRef.current && target.contains(triggerRef.current))
+
+        if (!isAnchorMoving || panelRef.current?.contains(target)) return
+      }
       // A keyboard opening must not close the panel it opened for
       if (isKeyboardShift(event, width)) return
 

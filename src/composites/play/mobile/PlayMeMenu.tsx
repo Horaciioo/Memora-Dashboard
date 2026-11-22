@@ -18,18 +18,18 @@ import { Permissions } from '@/utils/constants/permissions'
  * Box under the portrait, three groups: status and admin, own pages, way out
  * @param {Object} props - Menu
  * @param {() => void} props.onClose - Fold the menu
- * @param {boolean} [props.isTop] - Opens under the top bar
+ * @param {boolean} [props.hasLeave] - Way back to the dashboard, the phone has no app switch
  * @param {string} [props.menuClassName] - Placement override
  * @return {JSX.Element}
  */
 
 export const PlayMeMenu = ({
   onClose,
-  isTop,
+  hasLeave,
   menuClassName,
 }: {
   onClose: () => void
-  isTop?: boolean
+  hasLeave?: boolean
   menuClassName?: string
 }) => {
   const { can, session } = useAuthContext()
@@ -38,13 +38,10 @@ export const PlayMeMenu = ({
   const LeaveIcon = ICONS.playLeave
 
   return (
-    <div
-      role="menu"
-      className={cn(isTop ? PLAY_TOPBAR.menu : PLAY_TABS.menu, NESTED_BOX.frame, menuClassName)}
-    >
+    <div role="menu" className={cn(PLAY_TOPBAR.menu, NESTED_BOX.frame, menuClassName)}>
       <div className={NESTED_BOX.group}>
-        {isTop && <p className={PLAY_TABS.menuHeading}>{PLAY_ME_COPY.account}</p>}
-        {isTop && session && (
+        <p className={PLAY_TABS.menuHeading}>{PLAY_ME_COPY.account}</p>
+        {session && (
           <>
             <button
               type="button"
@@ -77,7 +74,7 @@ export const PlayMeMenu = ({
       </div>
 
       <div className={NESTED_BOX.group}>
-        {isTop && <p className={PLAY_TABS.menuHeading}>{PLAY_ME_COPY.space}</p>}
+        <p className={PLAY_TABS.menuHeading}>{PLAY_ME_COPY.space}</p>
         <AppLink
           role="menuitem"
           href={ROUTES.playStats}
@@ -87,17 +84,15 @@ export const PlayMeMenu = ({
           <PlayTabGlyph name="stats" className={PLAY_TABS.menuIcon} />
           {PLAY_ME_COPY.stats}
         </AppLink>
-        {isTop && (
-          <AppLink
-            role="menuitem"
-            href={ROUTES.playFeed}
-            onClick={onClose}
-            className={PLAY_TABS.menuItem}
-          >
-            <PlayTabGlyph name="feed" className={PLAY_TABS.menuIcon} />
-            {PLAY_TAB_LABELS.feed}
-          </AppLink>
-        )}
+        <AppLink
+          role="menuitem"
+          href={ROUTES.playFeed}
+          onClick={onClose}
+          className={PLAY_TABS.menuItem}
+        >
+          <PlayTabGlyph name="feed" className={PLAY_TABS.menuIcon} />
+          {PLAY_TAB_LABELS.feed}
+        </AppLink>
         <AppLink
           role="menuitem"
           href={ROUTES.playSettings}
@@ -109,7 +104,7 @@ export const PlayMeMenu = ({
         </AppLink>
       </div>
 
-      {!isTop && (
+      {hasLeave && (
         <div className={NESTED_BOX.group}>
           <AppLink
             role="menuitem"

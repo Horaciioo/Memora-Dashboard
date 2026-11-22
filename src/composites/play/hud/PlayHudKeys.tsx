@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 
 import { PlayPrefSwitches } from '@/composites/play/prefs/PlayPrefSwitches'
 import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
@@ -25,6 +26,8 @@ export interface PlayHudKeysProps {
   isSeated: boolean
   // Squared against the right edge
   isFlush?: boolean
+  // Score card opened by a key, phones only
+  scores?: ReactNode
 }
 
 /**
@@ -33,13 +36,20 @@ export interface PlayHudKeysProps {
  * @return {JSX.Element}
  */
 
-export const PlayHudKeys = ({ game, sessionId, isSeated, isFlush = false }: PlayHudKeysProps) => {
-  const [panel, setPanel] = useState<'settings' | 'exit' | null>(null)
+export const PlayHudKeys = ({
+  game,
+  sessionId,
+  isSeated,
+  isFlush = false,
+  scores,
+}: PlayHudKeysProps) => {
+  const [panel, setPanel] = useState<'settings' | 'exit' | 'scores' | null>(null)
   const { isScreen, isChatOpen, toggleScreen, toggleChat } = usePlayStageStore()
   const ExitIcon = ICONS.playLeave
   const SettingsIcon = ICONS.settingsLine
   const FullscreenIcon = isScreen ? ICONS.playWindowed : ICONS.playFullscreen
   const ChatIcon = ICONS.playChat
+  const ScoresIcon = ICONS.playStats
   const RecenterIcon = ICONS.playRecenter
   const MeterIcon = ICONS.gauge
   const isMeterOn = useConcordatMeterStore((state) => state.isOpen)
@@ -88,6 +98,17 @@ export const PlayHudKeys = ({ game, sessionId, isSeated, isFlush = false }: Play
             <RecenterIcon className={PLAY_HUD.keyIcon} aria-hidden="true" />
           </button>
         )}
+        {scores && (
+          <button
+            type="button"
+            className={cn(PLAY_HUD.key, PLAY_HUD.keyPhone, panel === 'scores' && PLAY_HUD.keyOn)}
+            aria-label={PLAY_HUD_COPY.scorecard}
+            aria-expanded={panel === 'scores'}
+            onClick={() => setPanel(panel === 'scores' ? null : 'scores')}
+          >
+            <ScoresIcon className={PLAY_HUD.keyIcon} aria-hidden="true" />
+          </button>
+        )}
         <button
           type="button"
           className={cn(PLAY_HUD.key, panel === 'settings' && PLAY_HUD.keyOn)}
@@ -117,7 +138,7 @@ export const PlayHudKeys = ({ game, sessionId, isSeated, isFlush = false }: Play
         </button>
         <button
           type="button"
-          className={cn(PLAY_HUD.key, panel === 'exit' && PLAY_HUD.keyOn)}
+          className={cn(PLAY_HUD.key, PLAY_HUD.keyDesktop, panel === 'exit' && PLAY_HUD.keyOn)}
           aria-label={PLAY_HUD_COPY.exit}
           title={PLAY_HUD_COPY.exit}
           aria-expanded={panel === 'exit'}
@@ -126,6 +147,15 @@ export const PlayHudKeys = ({ game, sessionId, isSeated, isFlush = false }: Play
           <ExitIcon className={PLAY_HUD.keyIcon} aria-hidden="true" />
         </button>
       </div>
+      {panel === 'scores' && (
+        <div
+          className={cn(PLAY_HUD.settings, PLAY_HUD.keyPhone)}
+          role="dialog"
+          aria-label={PLAY_HUD_COPY.scorecard}
+        >
+          {scores}
+        </div>
+      )}
       {panel === 'settings' && (
         <div className={PLAY_HUD.settings} role="dialog" aria-label={PLAY_HUD_COPY.settings}>
           <div className={PLAY_HUD.soundRow}>
@@ -133,6 +163,17 @@ export const PlayHudKeys = ({ game, sessionId, isSeated, isFlush = false }: Play
           </div>
           <div className={PLAY_HUD.rule} role="separator" />
           <PlayPrefSwitches game={game} isHud />
+          <div className={cn(PLAY_HUD.phoneOnly, 'flex-col gap-0.5')}>
+            <div className={PLAY_HUD.rule} role="separator" />
+            <PlayGameActions
+              sessionId={sessionId}
+              gameSlug={PLAY_GAMES.get(game).slug}
+              isSeated={isSeated}
+              hasSettings={false}
+              itemClass={PLAY_HUD.action}
+              iconClass={PLAY_HUD.keyIcon}
+            />
+          </div>
         </div>
       )}
       {panel === 'exit' && (

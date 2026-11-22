@@ -67,8 +67,10 @@ export const PLAY_BOX = {
  */
 
 export const PLAY_SETTINGS = {
-  layout: 'grid items-start gap-6 lg:grid-cols-[15rem_minmax(0,1fr)]',
-  nav: 'flex gap-1 overflow-x-auto lg:sticky lg:top-4 lg:flex-col lg:overflow-visible',
+  layout: 'grid items-start gap-4 md:gap-6 lg:grid-cols-[15rem_minmax(0,1fr)]',
+  nav: 'hidden flex-wrap gap-1 md:flex lg:sticky lg:top-4 lg:flex-col',
+  // Phone: one menu instead of the list
+  pick: 'md:hidden',
   item: 'flex min-h-11 shrink-0 items-center gap-3 rounded-xl px-3 text-left text-sm font-bold text-[var(--play-ink-soft)] transition-colors hover:bg-play-nest hover:text-[var(--play-ink)] focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
   itemOn: 'bg-play-nest text-[var(--play-ink)]',
   logo: 'size-6 shrink-0',
@@ -80,5 +82,5 @@ export const PLAY_SETTINGS = {
   title: 'px-3 pt-1.5 pb-1 text-xs font-bold tracking-wide text-[var(--play-ink-faint)] uppercase',
   slot: 'px-3 py-2',
   reset:
-    'mx-3 my-1.5 min-h-10 self-start rounded-xl bg-play-lift px-4 text-sm font-bold text-[var(--play-ink)] transition-colors hover:bg-play-nest focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
+    'mx-3 my-1.5 min-h-11 rounded-xl bg-play-lift px-4 text-sm font-bold text-[var(--play-ink)] transition-colors hover:bg-play-nest focus-visible:outline-2 focus-visible:outline-[var(--play-key)] md:min-h-10 md:self-start',
 } as const

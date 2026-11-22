@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import AppLink from '@/components/elements/navigation/AppLink'
+import { PlayFold } from '@/composites/play/mobile/PlayFold'
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PlayCareerPanels } from '@/composites/play/member/stats/PlayCareerPanels'
@@ -71,14 +72,9 @@ export default async function PlayStatsPage({ searchParams }: PlayStatsPageProps
           </PlayPageTitle>
         )}
         {!game && (
-          <PlayPageTitle
-            heading="h2"
-            className={PLAY_PAGE.cellWide}
-            isGrouped
-            body={<PlayMastery games={profile.games} />}
-          >
-            {PLAY_HUB_COPY.sectionMastery}
-          </PlayPageTitle>
+          <PlayFold title={PLAY_HUB_COPY.sectionMastery} isWide isClosed>
+            <PlayMastery games={profile.games} />
+          </PlayFold>
         )}
       </div>
     </div>

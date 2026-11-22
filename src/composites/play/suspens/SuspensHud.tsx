@@ -49,7 +49,7 @@ export const SuspensHud = ({
       key: 'clock',
       caption: SUSPENS_HUD_COPY.clock,
       figure: (
-        <span className="block w-32 max-w-full">
+        <span className="block w-32 max-w-full max-md:w-14">
           {isReveal || !clock.endsAt ? (
             <span className={SUSPENS_BOARD.clockTrack} />
           ) : (

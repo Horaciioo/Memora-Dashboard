@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { GolfPrefToggles } from '@/composites/play/prefs/GolfPrefToggles'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { NavalAutoZoomToggle } from '@/composites/play/naval/NavalAutoZoomToggle'
@@ -45,6 +46,18 @@ export const PlaySettings = () => {
 
   return (
     <div className={PLAY_SETTINGS.layout}>
+      <div className={PLAY_SETTINGS.pick}>
+        <SelectMenu
+          isPlay
+          label={PLAY_HUB_COPY.settingsNav}
+          options={[
+            { value: GENERAL, label: PLAY_HUB_COPY.settingsGeneral, icon: 'settings' },
+            ...GAMES.map((game) => ({ value: game, label: PLAY_GAMES.label(game) })),
+          ]}
+          value={section}
+          onChange={(value) => setSection(value as PlayGameName | typeof GENERAL)}
+        />
+      </div>
       <nav aria-label={PLAY_HUB_COPY.settingsNav} className={PLAY_SETTINGS.nav}>
         <button
           type="button"

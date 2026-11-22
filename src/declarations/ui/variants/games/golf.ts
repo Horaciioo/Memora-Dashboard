@@ -20,7 +20,7 @@ export const GOLF_BOARD = {
   stageFull: 'h-auto! min-h-0! flex-1 rounded-none! border-b-0! ring-0!',
   boardFull: 'min-h-0 flex-1 pb-0!',
   // Top row: hole card, players, view keys
-  top: 'golf-block-drop pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-3 md:inset-x-5 md:top-4 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:pr-[3.75rem]',
+  top: 'golf-block-drop pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-3 max-md:items-stretch md:inset-x-5 md:top-4 max-md:top-[calc(0.75rem+env(safe-area-inset-top))] max-md:pr-[3.75rem]',
   hole: `${GLASS} pointer-events-auto flex w-[32rem] max-w-full items-center gap-3 px-5 py-2.5 max-md:w-auto max-md:flex-1 max-md:gap-2 max-md:px-3 max-md:py-2.5 md:order-2`,
   holeBlock:
     'flex min-w-0 flex-1 basis-0 items-baseline justify-center gap-2 max-md:flex-col max-md:items-center max-md:gap-1',
@@ -37,7 +37,8 @@ export const GOLF_BOARD = {
   // Phone: the gear and the chat bar hold these
   viewDesktop: 'max-md:hidden',
   // Keys and the settings card hanging under them
-  keys: 'pointer-events-auto relative max-md:ml-auto md:order-3',
+  // Phone: as tall as the hole card beside it
+  keys: 'pointer-events-auto relative flex max-md:ml-auto md:order-3',
   settings: `${GLASS} absolute top-full right-0 z-10 mt-2 flex w-64 max-w-[calc(100vw-1.5rem)] flex-col gap-0.5 p-2.5`,
   setting:
     'flex items-center justify-between gap-3 px-1 py-1.5 text-left text-base font-extrabold text-[var(--play-ink)]',

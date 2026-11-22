@@ -34,55 +34,13 @@ export const PLAY_NOTICE = {
 } as const
 
 /**
- * Featured game banner over the row
+ * Faces of the players sitting at a game
  * @type {Record<string, string>}
  */
 
 export const PLAY_FEATURE = {
-  root: 'grid w-full gap-4 pt-3 @5xl:grid-cols-2 md:pt-6',
-  // One slide at a time, the poster leans out of the top
-  carousel:
-    'flex w-full snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-2 pt-12 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
-  slideItem: 'w-full shrink-0 snap-center @5xl:w-[calc(50%-0.75rem)]',
-  item: 'relative min-w-0',
-  slide:
-    'play-feature-in relative flex min-h-48 items-end overflow-hidden rounded-3xl ring-[0.3rem] ring-[var(--game)] md:h-72 md:rounded-3xl md:ring-[0.4rem] lg:h-80',
-  backdrop: 'scale-125 blur-md',
-  shade:
-    'absolute inset-0 bg-linear-to-r from-[var(--play-night)] from-10% via-[var(--play-night)]/70 via-45% to-transparent',
-  body: 'relative flex max-w-[calc(100%-8.5rem)] flex-col pt-5 md:max-w-[calc(100%-17rem)] md:pt-0 lg:max-w-[calc(100%-20rem)] @5xl:max-w-[calc(100%-13rem)] items-start gap-2 pb-5 pl-5 text-[var(--play-on-art)] md:pb-8 md:pl-10',
-  name: 'text-3xl leading-none font-extrabold tracking-tight uppercase md:text-5xl @5xl:text-4xl',
-  seats: 'text-xs font-extrabold tabular-nums text-[var(--game)]',
-  actions: 'mt-2 flex items-center gap-5',
-  // Players sitting at this game now
   faces: 'flex items-center -space-x-2',
   face: 'ring-2 ring-[var(--play-night)]',
-  play: 'rounded-2xl bg-[var(--game)] px-8 py-3.5 text-base font-extrabold text-[var(--play-night)] shadow-[0_0.3rem_0_rgb(0_0_0/0.35)] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
-  poster:
-    'play-feature-poster absolute z-20 -top-3 right-3 aspect-[3/4] w-28 rotate-3 md:-top-8 md:right-8 md:w-48 cursor-pointer [transform-style:preserve-3d] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[var(--play-key)] lg:w-56 @5xl:w-40',
-  flip: 'play-feature-flip absolute inset-0 block [transform-style:preserve-3d]',
-  front:
-    'absolute inset-0 block overflow-hidden rounded-3xl ring-[0.3rem] ring-white/70 shadow-[0_1.5rem_3rem_rgb(0_0_0/0.45)] [backface-visibility:hidden]',
-  back: 'absolute inset-0 flex flex-col justify-start gap-1.5 overflow-y-auto overscroll-contain rounded-3xl bg-[var(--play-night)] p-3.5 text-left [scrollbar-width:none] [&::-webkit-scrollbar]:hidden text-[var(--play-on-art)] ring-[0.3rem] ring-[var(--game)] shadow-[0_1.5rem_3rem_rgb(0_0_0/0.45)] [backface-visibility:hidden] [transform:rotateY(180deg)]',
-  backTitle: 'text-sm font-extrabold tracking-tight text-[var(--game)] uppercase',
-  backStep:
-    'block text-micro leading-tight text-[var(--play-on-art)]/85 [&>strong]:block [&>strong]:text-[var(--play-on-art)]',
-} as const
-
-/**
- * Game choice stage
- * @type {Record<string, string>}
- */
-
-export const PLAY_CROSS = {
-  stage: 'mx-auto flex w-full max-w-[120rem] flex-col gap-4 pb-28',
-  games: 'flex min-w-0 flex-col items-center gap-6',
-  // Featured game on top, then every game as a poster
-  wall: '@container flex w-full flex-col gap-3',
-  wallTitle: 'text-sm font-extrabold tracking-[0.2em] text-[var(--play-ink-soft)] uppercase',
-  tiles:
-    'grid w-full grid-cols-4 gap-2 sm:grid-cols-4 md:grid-cols-6 md:gap-4 xl:grid-cols-7 2xl:grid-cols-9',
-  tile: 'w-full',
 } as const
 
 /**
@@ -141,7 +99,7 @@ export const PLAY_ROOM = {
   main: 'relative flex min-w-0 flex-col gap-4 lg:fixed lg:top-[var(--play-lobby-top)] lg:left-0 lg:h-[var(--play-lobby-h)] lg:right-[var(--play-side-open)] lg:px-8',
   head: 'flex flex-col items-center gap-3 md:flex-row md:items-start md:justify-between md:gap-4',
   center: 'min-h-0 lg:flex lg:flex-1 lg:justify-center',
-  logo: 'size-28 sm:size-32 md:ml-12 xl:ml-8 lg:max-xl:hidden xl:absolute xl:top-0 xl:left-8',
+  logo: 'size-20 sm:size-32 md:ml-12 xl:ml-8 lg:max-xl:hidden xl:absolute xl:top-0 xl:left-8',
   watch: 'flex flex-wrap items-center gap-3 rounded-2xl bg-[var(--play-chip)] px-4 py-2',
   watchLabel: 'text-xs font-extrabold tracking-wider text-[var(--play-ink)] uppercase',
   watchFaces: 'flex items-center gap-1.5',
@@ -149,11 +107,12 @@ export const PLAY_ROOM = {
   lost: 'fixed top-3 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[var(--play-panel-strong)] px-4 py-1.5 text-xs font-bold text-[var(--play-ink-soft)] shadow-lg',
   back: 'inline-flex shrink-0 items-center gap-1.5 text-xs font-extrabold tracking-wider text-[var(--play-ink-soft)] uppercase hover:text-[var(--play-ink)]',
   // Players and gestures, centred
-  middle: 'mx-auto flex w-full max-w-2xl flex-col items-center gap-6 lg:h-full lg:min-h-0 lg:gap-4',
+  middle:
+    'mx-auto flex w-full max-w-2xl flex-col items-center gap-4 sm:gap-6 lg:h-full lg:min-h-0 lg:gap-4',
   // Title block: label, waiting line, one sentence
   lobbyHead: 'flex flex-col items-center gap-2 text-center',
   lobbyTitle:
-    'text-3xl font-extrabold tracking-tight text-balance text-[var(--play-ink)] sm:text-4xl',
+    'text-2xl font-extrabold tracking-tight text-balance text-[var(--play-ink)] sm:text-4xl',
   lobbySub: 'text-sm font-semibold text-balance text-[var(--play-ink-soft)] sm:text-base',
   // Line under the title: access and rules
   summary:
@@ -161,10 +120,10 @@ export const PLAY_ROOM = {
   summaryLink:
     'rounded-xl bg-[var(--play-chip)] px-3 py-1.5 font-extrabold text-[var(--play-ink)] transition-colors hover:bg-[var(--play-panel-strong)] focus-visible:outline-3 focus-visible:outline-[var(--play-key)] disabled:cursor-default disabled:hover:bg-[var(--play-chip)]',
   summaryEnd: 'ml-auto',
-  // The table: one card per seat, two across on a phone
+  // The table: one card per seat, three across on a phone so the room never scrolls
   table:
-    'grid w-full grid-cols-2 justify-center gap-3 py-1 sm:grid-cols-[repeat(var(--cols),9rem)] md:gap-4',
-  seat: `play-seat ${PANEL} relative flex min-w-0 flex-col items-center gap-1.5 px-2 pt-6 pb-4 text-center transition-[opacity,box-shadow] duration-300 rounded-3xl`,
+    'grid w-full grid-cols-3 justify-center gap-2 py-1 sm:grid-cols-[repeat(var(--cols),9rem)] sm:gap-3 md:gap-4',
+  seat: `play-seat ${PANEL} relative flex min-w-0 flex-col items-center gap-1 px-1.5 pt-5 pb-3 text-center sm:gap-1.5 sm:px-2 sm:pt-6 sm:pb-4 transition-[opacity,box-shadow] duration-300 rounded-3xl`,
   seatReady: 'shadow-[var(--shadow-md)]',
   seatIdle: 'opacity-75',
   seatMine: 'ring-2 ring-[var(--play-key)]',
@@ -182,8 +141,8 @@ export const PLAY_ROOM = {
   seatKickIcon: 'size-3.5',
   seatAction: 'mt-1.5 w-full',
   // Empty seat, one tap opens the picker
-  slot: 'flex min-h-40 lg:min-h-36 w-full flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-[var(--play-line)] text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
-  slotIcon: 'grid size-12 place-items-center rounded-full bg-[var(--play-chip)]',
+  slot: 'flex min-h-28 sm:min-h-40 lg:min-h-36 w-full flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-[var(--play-line)] text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
+  slotIcon: 'grid size-10 place-items-center rounded-full bg-[var(--play-chip)] sm:size-12',
   slotIconSvg: 'size-5',
   slotLabel: 'text-xs font-extrabold tracking-wider uppercase',
   // Share row of a public game, always in reach
@@ -196,9 +155,10 @@ export const PLAY_ROOM = {
   shareText: 'flex min-w-0 flex-1 flex-col items-center gap-1 sm:items-start',
   shareLabel: 'text-micro font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
   shareCode: 'text-3xl font-extrabold tracking-[0.35em] text-[var(--play-ink)] sm:text-4xl',
-  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 rounded-3xl p-5 sm:p-8 lg:gap-4 lg:p-6`,
+  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-4 rounded-3xl p-4 sm:gap-5 sm:p-8 lg:gap-4 lg:p-6`,
   // Same boxes in the game's own skin: the block class brings fill, radius and shadow
-  boxSkinned: 'play-lobby-skin flex w-full flex-col items-center gap-5 p-5 sm:p-8 lg:gap-4 lg:p-6',
+  boxSkinned:
+    'play-lobby-skin flex w-full flex-col items-center gap-4 p-4 sm:gap-5 sm:p-8 lg:gap-4 lg:p-6',
   shareSkinned:
     'play-lobby-skin flex w-full flex-col items-center gap-4 p-5 text-center sm:flex-row sm:text-left',
   // Plain column, flows under the players

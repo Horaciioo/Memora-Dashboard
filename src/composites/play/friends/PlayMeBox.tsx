@@ -13,10 +13,12 @@ import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 
 /**
  * Own player box: framed portrait, level, XP and progress, opens the member menu
+ * @param {Object} props - Box
+ * @param {boolean} [props.isPhone] - Phone header
  * @return {JSX.Element | null}
  */
 
-export const PlayMeBox = () => {
+export const PlayMeBox = ({ isPhone }: { isPhone?: boolean }) => {
   const { session } = useAuthContext()
   const level = usePlayProfile()?.global.level
   const [isOpen, setOpen] = useState(false)
@@ -31,7 +33,7 @@ export const PlayMeBox = () => {
   const xp = needed ? `${into} / ${needed} XP` : fillPlayMessage(PLAY_CARD_COPY.xp, { xp: into })
 
   return (
-    <div ref={boundary} className={PLAY_ME_BOX.host}>
+    <div ref={boundary} className={isPhone ? PLAY_ME_BOX.hostPhone : PLAY_ME_BOX.host}>
       <button
         type="button"
         aria-haspopup="menu"
@@ -44,14 +46,17 @@ export const PlayMeBox = () => {
           level={level?.level ?? 0}
           name={session.displayName}
           src={session.avatarUrl}
-          size="md"
+          size={isPhone ? 'sm' : 'md'}
         />
         <span className={PLAY_ME_BOX.text}>
           <span className={PLAY_ME_BOX.head}>
             <span className={PLAY_ME_BOX.name}>{session.displayName}</span>
-            <span className={PLAY_ME_BOX.level}>
-              {fillPlayMessage(PLAY_CARD_COPY.level, { level: level?.level ?? 0 })}
-            </span>
+            {/* Phone: badge carries the level */}
+            {!isPhone && (
+              <span className={PLAY_ME_BOX.level}>
+                {fillPlayMessage(PLAY_CARD_COPY.level, { level: level?.level ?? 0 })}
+              </span>
+            )}
           </span>
           <span className={PLAY_ME_BOX.track} aria-hidden="true">
             <span className={PLAY_ME_BOX.fill} style={{ width: `${Math.round(ratio * 100)}%` }} />
@@ -60,7 +65,11 @@ export const PlayMeBox = () => {
         </span>
       </button>
       {isOpen && (
-        <PlayMeMenu isTop menuClassName={PLAY_ME_BOX.menu} onClose={() => setOpen(false)} />
+        <PlayMeMenu
+          hasLeave={isPhone}
+          menuClassName={isPhone ? undefined : PLAY_ME_BOX.menu}
+          onClose={() => setOpen(false)}
+        />
       )}
     </div>
   )
