@@ -21,9 +21,9 @@ import type { PlayRematchState, PlayTournamentStep } from '@/composites/play/ses
 import type { PlayEndReport, PlayRewardView } from '@/types/play'
 import { usePlayCrowd } from '@/core/hooks/data/play/usePlayCrowd'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
+import { useHeightVar } from '@/core/hooks/interaction/layout/measure/useHeightVar'
 import { usePlaySessionLoad } from '@/core/hooks/interaction/state/play/usePlaySessionLoad'
 import { usePlayFullscreen } from '@/core/hooks/interaction/state/play/usePlayFullscreen'
-import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { usePlaySessionLoadStore } from '@/core/store/play/playSessionLoad'
 import { usePlayStageStore } from '@/core/store/play/playStage'
 import {
@@ -97,11 +97,10 @@ export const PlaySessionRoom = ({
     [players, crowd.away]
   )
   const { isChatOpen, toggleChat } = usePlayStageStore()
+  const chatRef = useHeightVar('--play-chat-h')
   usePlayFullscreen()
   // Every game opens on the whole page
   useEffect(() => usePlayStageStore.getState().enter(), [])
-  // Score boxes start hidden at each table
-  useEffect(() => usePlayScoreStore.getState().close, [])
   // These games keep their keys and chat in their own HUD
   const isHud = PLAY_HUD_GAMES.has(game)
   const hasKeys = !isHud
@@ -185,7 +184,12 @@ export const PlaySessionRoom = ({
               {children}
             </section>
             {replay && (
-              <PlayEndFacts game={game} stats={report?.stats ?? []} awards={report?.awards ?? []} />
+              <PlayEndFacts
+                game={game}
+                stats={report?.stats ?? []}
+                awards={report?.awards ?? []}
+                trophies={report?.trophies ?? []}
+              />
             )}
           </div>
         </div>
@@ -218,6 +222,7 @@ export const PlaySessionRoom = ({
       ) : isHud ? (
         // Last lines only, in the HUD corner, kept mounted so the lines keep coming
         <div
+          ref={chatRef}
           data-hud={game.toLowerCase()}
           className={cn(BAC_SESSION.hudChat, PLAY_HUD_SKINS.get(game), !isChatOpen && 'hidden')}
         >

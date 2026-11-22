@@ -18,14 +18,14 @@ export const ECHO_BOARD = {
   table:
     'play-echo-stage relative flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:items-start sm:gap-14',
   slot: 'flex flex-col items-center gap-3',
-  slotMine: 'w-[min(80vw,27rem,36dvh)] md:w-[min(27rem,40dvh,calc((100vw-28rem)/2))]',
+  slotMine: 'w-[min(70vw,20rem,26dvh)] md:w-[min(20rem,29dvh,calc((100vw-28rem)/2))]',
   // The center card is the smaller one on a phone
-  slotCenter: 'w-[min(46vw,19dvh)] md:w-[min(27rem,40dvh,calc((100vw-28rem)/2))]',
+  slotCenter: 'w-[min(40vw,14dvh)] md:w-[min(20rem,29dvh,calc((100vw-28rem)/2))]',
   caption: 'text-sm font-black tracking-[0.18em] whitespace-nowrap uppercase',
   captionCenter: 'text-[var(--echo-rim-center)]',
   captionMine: 'text-[var(--echo-rim-mine)]',
-  // Round card and its symbols
-  card: 'play-echo-card relative aspect-square w-full rounded-full',
+  // Playing card and its symbols
+  card: 'play-echo-card relative w-full rounded-[8%/5.7%]',
   cardSmall: 'play-echo-card-small',
   cardCenter: 'play-echo-card-center',
   cardMine: 'play-echo-card-mine',

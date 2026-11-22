@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import { InfoHint } from '@/components/elements/feedback/InfoHint'
 import { ICONS } from '@/declarations/ui/icons'
-import { FIELD_STYLES } from '@/declarations/ui/variants'
+import { FIELD_STYLES, PLAY_SETUP } from '@/declarations/ui/variants'
 import type { PlaySetupStyles } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -32,7 +32,7 @@ export const SetupSection = ({
   aside?: ReactNode
   children?: ReactNode
 }) => (
-  <section className={FIELD_STYLES.wrapper}>
+  <section className={PLAY_SETUP.card}>
     <div className={styles.head}>
       <span className={FIELD_STYLES.labelRow}>
         <span className={FIELD_STYLES.label}>{title}</span>

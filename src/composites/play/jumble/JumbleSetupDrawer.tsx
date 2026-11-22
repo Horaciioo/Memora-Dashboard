@@ -9,6 +9,7 @@ import { jumbleSettingsOf } from '@/core/lib/play/jumble/settings'
 import type { JumbleGameSettings } from '@/core/lib/play/jumble/settings'
 import { JUMBLE_SETTINGS, JUMBLE_SETUP_COPY, fillPlayMessage } from '@/declarations/play'
 import { JUMBLE_SETUP } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 // Difficulty, rounds and hints are voted at launch
 const TABS = [{ value: 'speed', label: JUMBLE_SETUP_COPY.tabSpeed, icon: 'playClock' as const }]
@@ -33,6 +34,7 @@ export const JumbleSetupDrawer = ({
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Jumble}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit

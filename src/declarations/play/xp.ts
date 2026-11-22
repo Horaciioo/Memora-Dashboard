@@ -13,6 +13,9 @@ export const PlayXpParts = {
   FirstWin: 'firstWin',
   Mode: 'mode',
   Bots: 'bots',
+  Featured: 'featured',
+  Event: 'event',
+  Quest: 'quest',
 } as const
 
 export type PlayXpPartName = (typeof PlayXpParts)[keyof typeof PlayXpParts]
@@ -27,8 +30,12 @@ export const PLAY_XP_COPY = {
   game: 'XP de jeu',
   global: 'XP globale',
   gain: '+{xp} XP',
+  cut: '{xp} XP',
   progress: '{into} / {needed} XP',
   maxed: 'Niveau maximum',
+  boost: '+{percent} % de boosts d’XP pendant {time}',
+  boostHours: '{n} h',
+  boostMinutes: '{n} min',
   levelUp: 'Niveau {level}',
   total: 'Total',
   next: 'Continuer',
@@ -44,6 +51,9 @@ export const PLAY_XP_PART_LABELS: Record<PlayXpPartName, string> = {
   [PlayXpParts.FirstWin]: 'Première victoire',
   [PlayXpParts.Mode]: 'Bonus de victoire',
   [PlayXpParts.Bots]: 'Bots à la table',
+  [PlayXpParts.Featured]: 'Jeu en vedette',
+  [PlayXpParts.Event]: 'Boost du moment',
+  [PlayXpParts.Quest]: 'Quête de groupe',
 }
 
 /**

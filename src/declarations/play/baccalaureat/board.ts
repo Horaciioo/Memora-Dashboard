@@ -24,6 +24,7 @@ export const BAC_BOARD_COPY = {
   yourWord: 'Ton mot',
   duplicate: 'Même mot',
   wrongLetter: 'Pas la bonne lettre',
+  unknownWord: 'Hors dictionnaire',
   accepted: 'Validé',
   refused: 'Refusé',
   undecided: 'Pas encore jugé',
@@ -38,7 +39,6 @@ export const BAC_BOARD_COPY = {
   equals: '=',
   words: 'Les mots',
   next: 'Manche suivante',
-  finish: 'Classement final',
   points: '{points} pts',
   bonus: '+{bonus} stop',
   final: 'Classement final',
@@ -47,7 +47,7 @@ export const BAC_BOARD_COPY = {
   playersProgress: 'Avancement des joueurs',
   watchWriting: 'Les joueurs écrivent leurs meilleurs mots…',
   watchPatience: 'Patience…',
-  waitingHost: 'L’hôte lance la suite.',
+  waitingHost: 'La manche suivante arrive.',
 } as const
 
 /**

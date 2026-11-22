@@ -58,6 +58,22 @@
   animation: concordat-zone-pop 2.6s cubic-bezier(0.2, 1.2, 0.4, 1) both;
 }
 
+/* Offer card slides in from the right */
+.concordat-offer-in {
+  animation: concordat-offer-in 0.35s cubic-bezier(0.2, 1, 0.4, 1) both;
+}
+
+@keyframes concordat-offer-in {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @keyframes concordat-zone-pop {
   0% {
     opacity: 0;
@@ -128,7 +144,8 @@
     animation: none;
   }
 
-  .concordat-zone-pop {
+  .concordat-zone-pop,
+  .concordat-offer-in {
     animation: none;
   }
 

@@ -24,42 +24,6 @@
     );
 }
 
-/* A hub letter rises, spins a little, fades out */
-.play-jumble-float {
-  position: absolute;
-  bottom: -4rem;
-  left: var(--x);
-  display: grid;
-  width: var(--size);
-  height: var(--size);
-  place-items: center;
-  border-radius: 22%;
-  background: var(--play-jumble-tile);
-  color: var(--play-jumble-tile-ink);
-  font-size: calc(var(--size) * 0.6);
-  font-weight: 900;
-  box-shadow: 0 0.25rem 0 var(--play-jumble-tile-deep);
-  opacity: 0;
-  animation: play-jumble-float var(--rise) linear var(--delay) infinite;
-}
-
-@keyframes play-jumble-float {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(var(--tilt));
-  }
-  12% {
-    opacity: 0.8;
-  }
-  80% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
-  }
-}
-
 /* Countdown in the violet glow */
 .play-figure-jumble {
   color: var(--play-jumble-glow);
@@ -290,7 +254,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .play-jumble-float,
   .play-jumble-tile,
   .play-jumble-flip,
   .play-jumble-slot,

@@ -3,30 +3,40 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 
+import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { ICONS } from '@/declarations/ui/icons'
-import { PLAY_FOLD, PLAY_STATS } from '@/declarations/ui/variants'
+import { PLAY_FOLD, PLAY_PAGE, PLAY_STATS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
+export interface PlayFoldProps {
+  title: string
+  children: ReactNode
+  // Spans both columns of the page grid
+  isWide?: boolean
+}
+
 /**
- * Stats section, foldable on a phone only
- * @param {Object} props - Section
- * @param {string} props.title - Heading
- * @param {ReactNode} props.children - Body
+ * Stats section: a panel of the page, foldable on a phone only
+ * @param {PlayFoldProps} props - Heading, body and width
  * @return {JSX.Element}
  */
 
-export const PlayFold = ({ title, children }: { title: string; children: ReactNode }) => {
+export const PlayFold = ({ title, children, isWide }: PlayFoldProps) => {
   const isMobile = useIsMobileShell()
   const [isOpen, setOpen] = useState(true)
   const ChevronIcon = ICONS.expand
 
   if (!isMobile) {
     return (
-      <section className={PLAY_STATS.section}>
-        <h2 className={PLAY_STATS.heading}>{title}</h2>
-        {children}
-      </section>
+      <PlayPageTitle
+        heading="h2"
+        isGrouped
+        className={isWide ? PLAY_PAGE.cellWide : PLAY_PAGE.cell}
+        body={children}
+      >
+        {title}
+      </PlayPageTitle>
     )
   }
 

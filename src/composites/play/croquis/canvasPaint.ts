@@ -46,6 +46,15 @@ const paintStroke = (ctx: CanvasRenderingContext2D, stroke: CroquisStroke, color
 }
 
 /**
+ * Colour index of the paper, the last background change wins
+ * @param {CroquisStroke[]} strokes - Strokes in order
+ * @return {number} - Colour index
+ */
+
+export const backgroundOf = (strokes: CroquisStroke[]): number =>
+  strokes.findLast((stroke) => stroke.f)?.c ?? CROQUIS_PAPER
+
+/**
  * Whole drawing painted on the paper
  * @param {HTMLCanvasElement} canvas - Surface
  * @param {CroquisStroke[]} strokes - Strokes in order
@@ -63,9 +72,14 @@ export const paintDrawing = (canvas: HTMLCanvasElement, strokes: CroquisStroke[]
   const { width, height } = CROQUIS_SETTINGS.canvas
 
   ctx.setTransform(CROQUIS_PEN.scale, 0, 0, CROQUIS_PEN.scale, 0, 0)
-  ctx.fillStyle = colorOf(CROQUIS_PAPER)
+  const paper = backgroundOf(strokes)
+  ctx.fillStyle = colorOf(paper)
   ctx.fillRect(0, 0, width, height)
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
-  for (const stroke of strokes) paintStroke(ctx, stroke, colorOf(stroke.c))
+  for (const stroke of strokes) {
+    if (stroke.f) continue
+    // The eraser follows the paper
+    paintStroke(ctx, stroke, colorOf(stroke.c === CROQUIS_PAPER ? paper : stroke.c))
+  }
 }

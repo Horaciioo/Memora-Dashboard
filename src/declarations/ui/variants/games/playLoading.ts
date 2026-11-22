@@ -27,7 +27,7 @@ export const PLAY_LOADING_STYLES = {
   name: 'text-4xl font-black tracking-tight sm:text-5xl',
   footer: 'relative flex w-full max-w-md flex-col items-center gap-4',
   meter: 'flex w-full items-center gap-3',
-  track: 'h-3 flex-1 overflow-hidden rounded-full bg-white/20',
+  track: 'h-3 flex-1 overflow-hidden rounded-full bg-play-press',
   bar: 'h-full rounded-full bg-white transition-[width] duration-200 ease-out',
   percent: 'w-12 text-right text-sm font-extrabold tabular-nums',
   tip: 'play-loading-step min-h-10 max-w-sm text-center text-sm font-bold text-balance text-white/80',

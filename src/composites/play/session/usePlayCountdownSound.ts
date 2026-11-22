@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react'
 
 import { playSound, preloadSounds } from '@/core/lib/play/sounds'
+import { usePlayPrefsStore } from '@/core/store/play/playPrefs'
 import { playLevelOf } from '@/core/store/play/playSound'
-import { PLAY_COUNTDOWN_SOUNDS } from '@/declarations/play/sounds'
+import { PLAY_COUNTDOWN_SOUNDS, PLAY_VOLUME } from '@/declarations/play/sounds'
 import type { PlayGameName } from '@/utils/constants/play'
 
 /**
@@ -15,16 +16,18 @@ import type { PlayGameName } from '@/utils/constants/play'
 
 export const usePlayCountdownSound = (
   seconds: number,
-  isSilent: boolean,
+  isSilentGame: boolean,
   game: PlayGameName
 ): void => {
   const last = useRef(seconds)
+  const isOff = usePlayPrefsStore((state) => state.isCountdownOff)
+  const isSilent = isSilentGame || isOff
 
   useEffect(() => preloadSounds(Object.values(PLAY_COUNTDOWN_SOUNDS)), [])
 
   useEffect(() => {
     last.current = seconds
-    if (!isSilent) playSound(PLAY_COUNTDOWN_SOUNDS.tick, playLevelOf(game) * 0.8)
+    if (!isSilent) playSound(PLAY_COUNTDOWN_SOUNDS.tick, playLevelOf(game) * PLAY_VOLUME.tick)
   }, [seconds, isSilent, game])
 
   // The count leaves the screen after its last number

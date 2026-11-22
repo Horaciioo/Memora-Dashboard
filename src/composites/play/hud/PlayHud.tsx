@@ -7,7 +7,6 @@ import { PlayHudKeys } from '@/composites/play/hud/PlayHudKeys'
 import { PlayHudPanel } from '@/composites/play/hud/PlayHudPanel'
 import type { PlayHudRow } from '@/composites/play/hud/PlayHudPanel'
 import { usePlayPref, usePlayPrefsStore } from '@/core/store/play/playPrefs'
-import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { PLAY_HUD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -64,8 +63,6 @@ export const PlayHud = ({
 }: PlayHudProps) => {
   const isHidden = usePlayPrefsStore((state) => state.isHudHidden)
   const hasClock = usePlayPref(game, 'clock')
-  // Score card hidden by default, the trophy key beside the settings opens it
-  const isScoreOpen = usePlayScoreStore((state) => state.isOpen)
 
   // Only the keys stay, to bring the HUD back
   if (isHidden) {
@@ -132,7 +129,7 @@ export const PlayHud = ({
         <PlayHudKeys game={game} sessionId={sessionId} isSeated={isSeated} isFlush={isFlush} />
       </div>
       {lead && <div className={PLAY_HUD.lead}>{lead}</div>}
-      {!isCompact && isScoreOpen && (
+      {!isCompact && (
         <div className={PLAY_HUD.corner}>
           <PlayHudPanel rows={rows} />
         </div>

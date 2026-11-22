@@ -15,8 +15,7 @@ import { PlayLiveTables } from '@/composites/play/hub/lobby/PlayLiveTables'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PlayHubTabs } from '@/composites/play/mobile/PlayHubTabs'
 import { PlayTopBar } from '@/composites/play/mobile/PlayTopBar'
-import { PlayPlayerCard } from '@/composites/play/member/stats/PlayPlayerCard'
-import { PlayStatTiles } from '@/composites/play/member/stats/PlayStatTiles'
+import { PlayHubStats } from '@/composites/play/hub/PlayHubStats'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
 import {
   listLobbies,
@@ -127,13 +126,12 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
           }
           panels={{
             concept: <PlayConcept game={game} />,
-            leaders: <PlayLeaderboard leaders={leaders} meId={session.id} />,
-            stats: (
-              <>
-                <PlayPlayerCard totals={totals} player={player} />
-                <PlayStatTiles totals={totals} />
-              </>
+            leaders: (
+              <div className={PLAY_HUB.sheetGroup}>
+                <PlayLeaderboard leaders={leaders} meId={session.id} />
+              </div>
             ),
+            stats: <PlayHubStats totals={totals} player={player} />,
           }}
         />
       </div>
@@ -166,8 +164,7 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
         panels={{
           stats: (
             <>
-              <PlayPlayerCard totals={totals} player={player} />
-              <PlayStatTiles totals={totals} />
+              <PlayHubStats totals={totals} player={player} />
               <section className={PLAY_HUB_TABS.section}>
                 <h2 className={PLAY_HUB_TABS.sectionTitle}>{PLAY_MOBILE_COPY.hubRanking}</h2>
                 <PlayLeaderboard leaders={leaders} meId={session.id} />

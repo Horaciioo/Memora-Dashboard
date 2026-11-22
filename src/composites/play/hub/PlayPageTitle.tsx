@@ -1,57 +1,69 @@
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
-import { PLAY_SCROLL } from '@/declarations/ui/variants'
+import { PLAY_HEAD_PAGES } from '@/declarations/play'
+import type { PlayHeadPage } from '@/declarations/play'
+import { PLAY_HEAD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 export interface PlayPageTitleProps {
   children: string
-  // Game whose colour dyes the ribbon, Memora pink without
-  game?: string
-  // Box unrolled under the ribbon, narrower than it
+  // Page, giving the line under the title
+  page?: PlayHeadPage
+  // Figures on the right of the title row
+  aside?: ReactNode
+  // Content under the title: flat under a page, in a showcase panel under a section
   body?: ReactNode
   className?: string
-  // Section ribbon under a page title
+  // Section panel under a page title
   heading?: 'h1' | 'h2'
+  // Right of a panel bar
+  action?: ReactNode
+  // Body already made of nested cards, no group around it
+  isGrouped?: boolean
+  // Game name, kept for callers that tint a section
+  game?: string
 }
 
-// Two folded layers per end, mirrored on the right
-const RibbonTail = ({ side }: { side: 'left' | 'right' }) => (
-  <svg
-    viewBox="0 0 80 70"
-    preserveAspectRatio="none"
-    className={cn(PLAY_SCROLL.tail, side === 'left' ? PLAY_SCROLL.tailLeft : PLAY_SCROLL.tailRight)}
-    aria-hidden="true"
-  >
-    <path className={PLAY_SCROLL.tailBack} d="M76 12 L8 2 L24 20 L6 36 L76 42 Z" />
-    <path className={PLAY_SCROLL.tailBody} d="M76 24 L20 20 L34 42 L16 64 L76 68 Z" />
-    <path className={PLAY_SCROLL.tailLip} d="M16 64 L76 68" />
-  </svg>
-)
-
 /**
- * Ribbon title, with an optional scroll box tucked under it
- * @param {PlayPageTitleProps} props - Title, game colour, box content
+ * Plain page title with its figures, or a showcase panel with a title bar
+ * @param {PlayPageTitleProps} props - Title, line, figures, content
  * @return {JSX.Element}
  */
 
 export const PlayPageTitle = ({
   children,
-  game,
+  page,
+  aside,
   body,
   className,
+  action,
+  isGrouped,
   heading: Heading = 'h1',
-}: PlayPageTitleProps) => (
-  <div
-    className={cn(PLAY_SCROLL.root, className)}
-    style={game ? ({ '--scroll-tone': `var(--play-${game})` } as CSSProperties) : undefined}
-  >
-    <div className={PLAY_SCROLL.ribbon}>
-      <RibbonTail side="left" />
-      <RibbonTail side="right" />
-      <div className={PLAY_SCROLL.plate}>
-        <Heading className={PLAY_SCROLL.title}>{children}</Heading>
-      </div>
+}: PlayPageTitleProps) => {
+  if (Heading === 'h2') {
+    return (
+      <section className={cn(PLAY_HEAD.panel, className)}>
+        <div className={PLAY_HEAD.panelBar}>
+          <Heading className={PLAY_HEAD.panelTitle}>{children}</Heading>
+          {action}
+        </div>
+        {body !== undefined && (
+          <div className={isGrouped ? PLAY_HEAD.panelBody : PLAY_HEAD.panelGroup}>{body}</div>
+        )}
+      </section>
+    )
+  }
+
+  return (
+    <div className={cn(PLAY_HEAD.root, className)}>
+      <header className={PLAY_HEAD.top}>
+        <div className={PLAY_HEAD.text}>
+          <Heading className={PLAY_HEAD.title}>{children}</Heading>
+          {page && <p className={PLAY_HEAD.note}>{PLAY_HEAD_PAGES[page]}</p>}
+        </div>
+        {aside && <div className={PLAY_HEAD.aside}>{aside}</div>}
+      </header>
+      {body !== undefined && <div className={PLAY_HEAD.body}>{body}</div>}
     </div>
-    {body !== undefined && <div className={PLAY_SCROLL.box}>{body}</div>}
-  </div>
-)
+  )
+}

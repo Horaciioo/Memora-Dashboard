@@ -8,9 +8,11 @@ import { splitPlayGames } from '@/core/lib/play/hubGames'
 import type { PlayHubGame } from '@/core/lib/play/hubGames'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_CROSS } from '@/declarations/ui/variants'
+import type { PlayGameName } from '@/utils/constants/play'
 
 export interface PlayGameGridProps {
   games: PlayHubGame[]
+  featured: PlayGameName[]
 }
 
 /**
@@ -19,10 +21,10 @@ export interface PlayGameGridProps {
  * @return {JSX.Element}
  */
 
-export const PlayGameGrid = ({ games }: PlayGameGridProps) => {
+export const PlayGameGrid = ({ games, featured: chosen }: PlayGameGridProps) => {
   const { note, show } = usePlayNote()
   const onLocked = () => show(PLAY_HUB_COPY.mysterySoon)
-  const { featured, rest } = splitPlayGames(games)
+  const { featured, rest } = splitPlayGames(games, chosen)
 
   return (
     <div className={PLAY_CROSS.wall}>

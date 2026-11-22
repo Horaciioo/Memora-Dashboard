@@ -18,9 +18,11 @@ export interface PlayTab {
 
 export const PLAY_TAB_ORDER: PlayTab[] = [
   { key: 'group', href: ROUTES.playGroup },
+  { key: 'trophies', href: ROUTES.playTrophies },
   { key: 'feed', href: ROUTES.playFeed },
   { key: 'online', href: ROUTES.playOnline, isDesktopOnly: true },
   { key: 'live', href: ROUTES.playLive, isDesktopOnly: true },
+  { key: 'quests', href: ROUTES.playQuests },
   { key: 'home', href: ROUTES.play },
   { key: 'ranking', href: ROUTES.playRanking() },
   { key: 'stats', href: ROUTES.playStats, isHidden: true },
@@ -32,8 +34,10 @@ export const PLAY_PHONE_TABS = PLAY_TAB_ORDER.filter((tab) => !tab.isDesktopOnly
 // Words of each tab
 export const PLAY_TAB_LABELS: Record<PlayTabGlyphName, string> = {
   group: PLAY_MOBILE_COPY.tabGroup,
+  trophies: PLAY_MOBILE_COPY.tabTrophies,
   feed: PLAY_MOBILE_COPY.tabFeed,
   home: PLAY_MOBILE_COPY.tabHome,
+  quests: PLAY_MOBILE_COPY.tabQuests,
   live: PLAY_MOBILE_COPY.tabLive,
   online: PLAY_MOBILE_COPY.tabOnline,
   ranking: PLAY_MOBILE_COPY.tabRanking,

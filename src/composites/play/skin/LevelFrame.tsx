@@ -25,7 +25,7 @@ export interface LevelFrameProps {
   src: string | null
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   className?: string
-  // Keeps the footprint of the plain portrait, the wreath spills around it
+  // Keeps the height of the plain portrait, the wreath takes its width and spills only above and below
   bleed?: boolean
 }
 
@@ -46,7 +46,7 @@ export const LevelFrame = ({ level, name, src, size, className, bleed }: LevelFr
     <span
       data-skin={skinOf(level).key}
       className={cn(LEVEL_FRAME_VIEW.root, className)}
-      style={bleed ? { width: face, height: face } : { width: box, height: box }}
+      style={{ width: box, height: bleed ? face : box }}
     >
       <Avatar name={name} src={src} size={size} className={LEVEL_FRAME_VIEW.face} />
       <svg

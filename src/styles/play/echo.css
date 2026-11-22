@@ -13,46 +13,18 @@
     );
 }
 
-/* A hub symbol rises, spins a little, fades out */
-.play-echo-float {
-  position: absolute;
-  bottom: -5rem;
-  left: var(--x);
-  width: var(--size);
-  height: var(--size);
-  opacity: 0;
-  animation: play-echo-float var(--rise) linear var(--delay) infinite;
-}
-
-@keyframes play-echo-float {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(var(--tilt));
-  }
-  12% {
-    opacity: 0.85;
-  }
-  80% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
-  }
-}
-
 /* Countdown in the teal glow */
 .play-figure-echo {
   color: var(--play-echo-glow);
   --play-key: var(--play-echo);
 }
 
-/* Round card: cream disc, inner ring, soft depth, coloured rim */
+/* Playing card: cream face, inner ring, soft depth, coloured rim */
 .play-echo-card {
   --rim: var(--echo-card-edge);
   --rim-deep: #9fbfc4;
   background:
-    radial-gradient(circle at 50% 50%, transparent 78%, rgb(160 120 60 / 0.1) 100%),
+    radial-gradient(ellipse at 50% 50%, transparent 78%, rgb(160 120 60 / 0.1) 100%),
     radial-gradient(circle at 32% 26%, #ffffff, var(--echo-card) 55%, var(--echo-card-shade));
   box-shadow:
     0 0 0 0.3rem var(--echo-card),
@@ -213,7 +185,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .play-echo-float,
   .play-echo-card,
   .play-echo-symbol,
   .play-echo-answer,

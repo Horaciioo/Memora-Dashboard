@@ -49,7 +49,7 @@ export const PlayLobbyLink = ({
         </p>
       </div>
       <Button variant="arcadeHero" onClick={copy}>
-        <CopyIcon className="size-5" aria-hidden="true" />
+        <CopyIcon className={PLAY_ROOM.linkGlyph} aria-hidden="true" />
         {PLAY_HUB_COPY.copyLink}
       </Button>
     </div>

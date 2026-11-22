@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { LudoChaosGlyph } from '@/composites/play/ludo/LudoChaosGlyph'
 import { LudoHomeCount } from '@/composites/play/ludo/LudoHomeCount'
 import { LudoJokerChip } from '@/composites/play/ludo/LudoJokerChip'
@@ -16,6 +16,7 @@ import { cn } from '@/utils/classnames'
  */
 
 export interface LudoPlateFace {
+  accountId: string
   name: string
   avatarUrl: string | null
   hasLeft: boolean
@@ -52,7 +53,7 @@ export const LudoPlate = ({
   effects,
   isStalled,
 }: LudoPlateProps) => {
-  const { name, avatarUrl, hasLeft, place } = face
+  const { accountId, name, avatarUrl, hasLeft, place } = face
 
   return (
     <div
@@ -68,7 +69,13 @@ export const LudoPlate = ({
         className={cn(LUDO_PLATE.ring, turn?.isAlert && LUDO_PLATE.ringAlert)}
         style={{ '--left': turn?.clock ?? 0 } as CSSProperties}
       >
-        <Avatar name={name} src={avatarUrl} size="lg" className={LUDO_PLATE.face} />
+        <PlayAvatar
+          accountId={accountId}
+          name={name}
+          src={avatarUrl}
+          size="lg"
+          className={LUDO_PLATE.face}
+        />
       </span>
       <span className={LUDO_PLATE.chaosRow}>
         <LudoHomeCount colour={colour} count={home} />

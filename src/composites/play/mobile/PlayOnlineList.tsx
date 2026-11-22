@@ -7,6 +7,7 @@ import AppLink from '@/components/elements/navigation/AppLink'
 import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { presenceSentence } from '@/composites/play/mobile/presenceSentence'
 import { readPlayPlace } from '@/core/lib/play/presenceState'
+import { PlayEmpty } from '@/composites/play/shared/PlayEmpty'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_MOBILE_COPY } from '@/declarations/play'
 import { PLAY_ONLINE } from '@/declarations/ui/variants'
@@ -26,7 +27,7 @@ export const PlayOnlineList = ({ tables }: { tables: PlayLobbyCard[] }) => {
   const [openId, setOpenId] = useState<string | null>(null)
 
   if (members.length === 0)
-    return <p className={PLAY_ONLINE.empty}>{PLAY_MOBILE_COPY.onlineEmpty}</p>
+    return <PlayEmpty icon="playPlayers">{PLAY_MOBILE_COPY.onlineEmpty}</PlayEmpty>
 
   return (
     <ul className={PLAY_ONLINE.list}>

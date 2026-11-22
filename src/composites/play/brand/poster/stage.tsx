@@ -72,3 +72,18 @@ export const Stage = ({ tone }: { tone: string }) => (
     <ellipse cx={HERO.x} cy={HERO.y + 130} rx="104" ry="14" fill="black" opacity="0.3" />
   </>
 )
+
+/**
+ * Hero of a game not announced yet
+ * @type {JSX.Element}
+ */
+
+export const MYSTERY_SCENE = (
+  <>
+    <circle r="110" {...tint('--play-night')} />
+    <text y="56" textAnchor="middle" fontSize="170" fontWeight="900" fill="white" opacity="0.9">
+      ?
+    </text>
+    <Sheen radius={110} />
+  </>
+)

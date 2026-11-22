@@ -17,34 +17,6 @@
     );
 }
 
-/* A hub scribble rises, spins a little, fades out */
-.play-croquis-float {
-  position: absolute;
-  bottom: -5rem;
-  left: var(--x);
-  width: var(--size);
-  height: var(--size);
-  opacity: 0;
-  animation: play-croquis-float var(--rise) linear var(--delay) infinite;
-}
-
-@keyframes play-croquis-float {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(var(--tilt));
-  }
-  12% {
-    opacity: 0.85;
-  }
-  80% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
-  }
-}
-
 /* Countdown in the amber glow */
 .play-figure-croquis {
   color: var(--play-croquis-glow);
@@ -200,7 +172,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .play-croquis-float,
   .play-croquis-clock::after,
   .play-croquis-shake,
   .play-croquis-word,

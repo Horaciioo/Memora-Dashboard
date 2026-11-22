@@ -4,17 +4,18 @@ import { useId } from 'react'
 import type { ReactNode } from 'react'
 
 // Dark navy outline, like the game's chunky borders
-const INK = '#14213d'
+const INK = 'var(--play-glyph-ink)'
 
 // Raised height of a face over its lip
 const LIFT = 2
 
-// One material, one accent: ivory pieces, violet details, a touch of gold
-const IVORY = { face: '#f7f2e8', lip: '#c8bca7' }
-const VIOLET = { face: '#9b7fe8', lip: '#6a4cc9' }
-const GOLD = { face: '#f7c54f', lip: '#c98f1c' }
+// One material, one accent: ivory pieces, rose details, a touch of gold
+const IVORY = { face: 'var(--play-glyph-ivory)', lip: 'var(--play-glyph-ivory-lip)' }
+const ROSE = { face: 'var(--play-glyph-rose)', lip: 'var(--play-glyph-rose-lip)' }
+const GOLD = { face: 'var(--play-glyph-gold)', lip: 'var(--play-glyph-gold-lip)' }
 
-export type PlayTabGlyphName = 'group' | 'feed' | 'home' | 'live' | 'online' | 'ranking' | 'stats'
+export type PlayTabGlyphName =
+  'group' | 'feed' | 'home' | 'quests' | 'live' | 'online' | 'ranking' | 'stats' | 'trophies'
 
 // Header keys, same style
 export type PlayKeyGlyphName = 'online' | 'live' | 'settings'
@@ -71,7 +72,7 @@ const Gleam = ({ d }: { d: string }) => (
   <path
     d={d}
     fill="none"
-    stroke="#fff"
+    stroke="var(--play-on-art)"
     strokeOpacity="0.75"
     strokeWidth="2"
     strokeLinecap="round"
@@ -88,7 +89,7 @@ const Group = () => (
     <Chunk d="M24 5 38 9.500v12c0 9-5.500 15-14 19-8.500-4-14-10-14-19v-12z" {...IVORY} />
     <Chunk
       d="M24 14 31.500 17v5c0 5-3 8-7.500 10.500-4.500-2.500-7.500-5.500-7.500-10.500v-5z"
-      {...VIOLET}
+      {...ROSE}
       border={2.6}
     />
   </>
@@ -106,7 +107,7 @@ const Feed = () => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    <Chunk d={dot(24, 26.5, 4.5)} {...VIOLET} border={2.6} />
+    <Chunk d={dot(24, 26.5, 4.5)} {...ROSE} border={2.6} />
   </>
 )
 
@@ -119,7 +120,7 @@ const Pad = ({ face, lip }: { face: string; lip: string }) => (
       lip={lip}
     />
     <path d="M13 22.500v6M10 25.500h6" stroke={INK} strokeWidth="2.800" strokeLinecap="round" />
-    <Chunk d={dot(33.5, 23, 2.2)} {...VIOLET} border={2} />
+    <Chunk d={dot(33.5, 23, 2.2)} {...ROSE} border={2} />
     <Chunk d={dot(37.5, 27.5, 2.2)} {...GOLD} border={2} />
   </>
 )
@@ -130,13 +131,13 @@ const Home = () => <Pad {...IVORY} />
 const Live = () => (
   <>
     <Chunk d="M12 42v-3c0-3 2-5 5-5h14c3 0 5 2 5 5v3z" {...IVORY} />
-    <Chunk d="M18 34c0-6 3-10 4-14h4c1 4 4 8 4 14z" {...VIOLET} />
+    <Chunk d="M18 34c0-6 3-10 4-14h4c1 4 4 8 4 14z" {...ROSE} />
     <Chunk
       d="M18 21h12a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H18a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"
       {...IVORY}
       border={2.6}
     />
-    <Chunk d={dot(24, 12, 7)} {...VIOLET} />
+    <Chunk d={dot(24, 12, 7)} {...ROSE} />
     <Gleam d="M20.500 9.500a4.500 4.500 0 0 1 3-2" />
   </>
 )
@@ -148,8 +149,8 @@ const Online = () => (
     <Chunk d="M3 37v-3c0-5 4-8 9-8s9 3 9 8v3z" {...IVORY} border={3} />
     <Chunk d={dot(36, 17, 5)} {...IVORY} border={3} />
     <Chunk d="M27 37v-3c0-5 4-8 9-8s9 3 9 8v3z" {...IVORY} border={3} />
-    <Chunk d={dot(24, 15, 6.5)} {...VIOLET} />
-    <Chunk d="M11 43v-4c0-6 5-10 13-10s13 4 13 10v4z" {...VIOLET} />
+    <Chunk d={dot(24, 15, 6.5)} {...ROSE} />
+    <Chunk d="M11 43v-4c0-6 5-10 13-10s13 4 13 10v4z" {...ROSE} />
   </>
 )
 
@@ -164,7 +165,7 @@ const GEAR = Array.from({ length: 32 }, (_, i) => {
 const Settings = () => (
   <>
     <Chunk d={`M${GEAR.join('L')}z`} {...IVORY} />
-    <Chunk d={dot(24, 24, 6)} {...VIOLET} border={3} />
+    <Chunk d={dot(24, 24, 6)} {...ROSE} border={3} />
   </>
 )
 
@@ -195,12 +196,37 @@ const Ranking = () => (
   </>
 )
 
+// Gold medal hanging from a violet ribbon
+const Trophies = () => (
+  <>
+    <Chunk d="M13 5h9l4 14h-9z" {...ROSE} border={3} />
+    <Chunk d="M35 5h-9l-4 14h9z" {...IVORY} border={3} />
+    <Chunk d={dot(24, 30, 12)} {...GOLD} />
+    <Chunk
+      d="M24 23.500l2 4 4.500.600-3.300 3 .900 4.400-4.100-2.300-4.100 2.300.900-4.400-3.300-3 4.500-.600z"
+      {...ROSE}
+      border={2}
+    />
+  </>
+)
+
 // Podium of three steps, winner in violet
 const Stats = () => (
   <>
     <Chunk d="M4 25h10v16H4z" {...IVORY} border={3.6} />
-    <Chunk d="M19 14h10v27H19z" {...VIOLET} border={3.6} />
+    <Chunk d="M19 14h10v27H19z" {...ROSE} border={3.6} />
     <Chunk d="M34 29h10v12H34z" {...IVORY} border={3.6} />
+  </>
+)
+
+// Gold flame over a rose ember
+const Quests = () => (
+  <>
+    <Chunk
+      d="M24 5c2 8 11 12 11 23a11 11 0 0 1-22 0c0-5 3-8 5-11 1 3 2 4 4 4-1-6 0-11 2-16z"
+      {...GOLD}
+    />
+    <Chunk d="M24 25c1 4 5 6 5 11a5 5 0 0 1-10 0c0-3 2-5 3-7 1 1 1 1 2 1z" {...ROSE} border={3} />
   </>
 )
 
@@ -208,8 +234,10 @@ const ART: Record<PlayTabGlyphName | PlayKeyGlyphName, () => ReactNode> = {
   group: Group,
   feed: Feed,
   home: Home,
+  quests: Quests,
   ranking: Ranking,
   stats: Stats,
+  trophies: Trophies,
   online: Online,
   live: Live,
   settings: Settings,

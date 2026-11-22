@@ -41,7 +41,7 @@ export const NAVAL_HUD = {
   crew: 'play-hud-block pointer-events-auto absolute top-3 left-3 flex items-center gap-2.5 rounded-lg! px-2.5 py-1 backdrop-blur-md md:top-4 md:left-5',
   captain: 'flex items-center gap-1.5',
   captainOut: 'opacity-40 grayscale',
-  face: 'overflow-hidden rounded-full',
+  face: 'overflow-hidden rounded-[13%]',
   sunk: 'text-sm font-black tabular-nums text-[var(--play-ink-faint)]',
   sunkMine: 'text-[var(--play-ink-soft)]',
   bridge:
@@ -167,17 +167,6 @@ export const NAVAL_SETUP = setupStyles(
 )
 
 /**
- * Hub ground, a fleet on a burning sea
- * @type {Record<string, string>}
- */
-
-export const NAVAL_HUB = {
-  scene: 'pointer-events-none fixed inset-0 z-0 overflow-hidden',
-  photo: 'object-cover',
-  veil: 'naval-hub-veil absolute inset-0',
-} as const
-
-/**
  * Canvas sea
  * @type {Record<string, string>}
  */
@@ -185,7 +174,7 @@ export const NAVAL_HUB = {
 export const NAVAL_OCEAN = {
   box: 'naval-ocean relative aspect-square w-full touch-none select-none',
   dim: 'naval-ocean-dim',
-  canvas: 'naval-ocean-canvas block size-full rounded-[1rem]',
+  canvas: 'naval-ocean-canvas block size-full rounded-2xl',
 } as const
 
 /**

@@ -17,6 +17,8 @@ export const PLAY_END_COPY = {
   levelUp: 'Niveau {level} !',
   tableTitle: 'La table',
   awardsTitle: 'Distinctions',
+  trophiesTitle: 'Trophée débloqué !',
+  trophiesMany: '{count} trophées débloqués !',
   careerTitle: 'Ta carrière ici',
   wins: 'Victoires',
   played: 'Parties',
@@ -42,7 +44,25 @@ export const PLAY_END_COPY = {
 export const PLAY_END_LIMITS = {
   // Titles shown, the game's best counters first
   awards: 3,
+  // Trophies shown, the rarest first
+  trophies: 3,
+  // Places that get a medal
+  podium: 3,
+  // Win rate is stored as a share
+  percent: 100,
 } as const
+
+/**
+ * Career cells under the result, in order
+ * @type {ReadonlyArray<{ key: 'played' | 'wins' | 'winRate' | 'streak'; label: string }>}
+ */
+
+export const PLAY_END_CAREER = [
+  { key: 'played', label: PLAY_END_COPY.played },
+  { key: 'wins', label: PLAY_END_COPY.wins },
+  { key: 'winRate', label: PLAY_END_COPY.winRate },
+  { key: 'streak', label: PLAY_END_COPY.streak },
+] as const
 
 // Wait before the page builds, the time of the announcement
 const INTRO_MS = 2600
@@ -61,6 +81,9 @@ export const PLAY_END_TIMING = {
   // Cards of the side columns, one after the other
   card: INTRO_MS + 400,
   cardStep: 260,
+  // Awards and table figures of a card, one after the other
+  awardStep: 380,
+  tileStep: 140,
   // Ranks 4 and after, then the buttons
   rest: INTRO_MS + 1700,
   actions: INTRO_MS + 2000,
@@ -68,4 +91,9 @@ export const PLAY_END_TIMING = {
   confetti: INTRO_MS + 1600,
   // Count of the XP and fill of its bars
   count: INTRO_MS + 900,
+  // Time the count of the XP takes
+  countMs: 1200,
+  // Letters of the title, one after the other
+  letterStep: 45,
+  careerStep: 90,
 } as const

@@ -10,7 +10,7 @@ import { requirePermission } from '@/core/wrappers/requireUser'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_GAMES, PLAY_HISTORY_COPY, playGameOfSlug } from '@/declarations/play'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
-import { PLAY_HISTORY, PLAY_HUB } from '@/declarations/ui/variants'
+import { PLAY_HISTORY, PLAY_PAGE } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: PLAY_HISTORY_COPY.title }
@@ -35,9 +35,9 @@ export default async function PlayHistoryPage({ searchParams }: PlayHistoryPageP
   const { entries, nextCursor } = await listPlayHistory(session.id, { game, cursor })
 
   return (
-    <div className={PLAY_HUB.main}>
+    <div className={PLAY_PAGE.reading}>
       <PlaySignal topic={PLAY_TOPICS.lobbies} />
-      <PlayPageTitle>{PLAY_HISTORY_COPY.title}</PlayPageTitle>
+      <PlayPageTitle page="history">{PLAY_HISTORY_COPY.title}</PlayPageTitle>
       <PlayHistoryFilter game={game} />
       <PlayHistory entries={entries} isFiltered={game !== null} />
       {cursor && (

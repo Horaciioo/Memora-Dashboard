@@ -457,6 +457,35 @@
   display: none;
 }
 
+/* Title letters rise one by one, the XP figure beats once its count is done */
+@keyframes play-end-letter {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em) rotate(-8deg) scale(0.6);
+  }
+}
+
+@keyframes play-end-beat {
+  40% {
+    transform: scale(1.18);
+  }
+}
+
+.play-end-letter {
+  animation: play-end-letter 0.5s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+
+.play-end-beat {
+  animation: play-end-beat 0.7s ease-in-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-end-letter,
+  .play-end-beat {
+    animation: none;
+  }
+}
+
 /* Announcement: title slams in, winner rises, then the whole veil lifts onto the page */
 @keyframes play-end-intro {
   0%,

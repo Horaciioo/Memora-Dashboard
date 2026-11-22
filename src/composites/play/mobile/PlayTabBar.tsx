@@ -2,8 +2,6 @@
 
 import { usePathname } from 'next/navigation'
 
-import { skinOf } from '@/core/lib/play/skins'
-import { usePlayLevel } from '@/core/hooks/data/play/usePlayLevel'
 import { PlayMeButton } from '@/composites/play/mobile/PlayMeButton'
 import { PlayNote } from '@/composites/play/hub/notices/PlayNote'
 import { usePlayNote } from '@/core/hooks/interaction/state/play/usePlayNote'
@@ -35,7 +33,6 @@ export interface PlayTabBarProps {
 export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) => {
   const path = usePathname()
   const { note } = usePlayNote()
-  const level = usePlayLevel()
   if (path.startsWith(SESSION_PREFIX)) return null
 
   const current = playTabIndexOf(path)
@@ -88,11 +85,7 @@ export const PlayTabBar = ({ invites, presence, groupCalls }: PlayTabBarProps) =
 
   return (
     <>
-      <nav
-        aria-label={PLAY_MOBILE_COPY.tabs}
-        data-skin={skinOf(level ?? 0).key}
-        className={PLAY_TABS.bar}
-      >
+      <nav aria-label={PLAY_MOBILE_COPY.tabs} className={PLAY_TABS.bar}>
         <div className={PLAY_TABS.half}>
           {shown.slice(0, middle).map(({ tab, index }) => link(tab, index))}
         </div>

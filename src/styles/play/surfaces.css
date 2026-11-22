@@ -1,0 +1,102 @@
+/* Play surfaces: ink mixed into the panel, every skin and theme follows */
+@utility bg-play-nest {
+  background-color: color-mix(
+    in srgb,
+    var(--play-ink) calc(var(--nest-strength) * 1.6),
+    transparent
+  );
+}
+
+@utility bg-play-lift {
+  background-color: color-mix(
+    in srgb,
+    var(--play-ink) calc(var(--nest-strength) * 2.4),
+    transparent
+  );
+}
+
+@utility bg-play-press {
+  background-color: color-mix(
+    in srgb,
+    var(--play-ink) calc(var(--nest-strength) * 3.4),
+    transparent
+  );
+}
+
+/* Column and page ground, darker than the room */
+@utility bg-play-shade {
+  background-color: color-mix(in srgb, var(--play-night) 45%, transparent);
+}
+
+/* Veil under a dialog or an overlay */
+@utility bg-play-veil {
+  background-color: color-mix(in srgb, var(--play-night) 72%, transparent);
+}
+
+/* Raised card of a panel: ink mixed into the panel, tinted by the game when asked */
+.play-raised {
+  border-radius: var(--radius-lg);
+  background: color-mix(
+    in srgb,
+    var(--nest-tone, var(--play-ink)) calc(var(--nest-strength) * 1.6),
+    transparent
+  );
+}
+
+/* Window over a hub: thick glass, lit rim, inner halo, no hairline box */
+.play-pane {
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgb(255 255 255 / 0.1), transparent 60%),
+    var(--play-glass);
+  backdrop-filter: blur(var(--glass-thick-blur)) saturate(var(--glass-thick-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-thick-blur)) saturate(var(--glass-thick-saturate));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    inset 0 0 0 1px rgb(255 255 255 / 0.1),
+    inset 0 0 28px rgb(255 255 255 / 0.05),
+    0 1.25rem 3rem rgb(0 0 0 / 0.38);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .play-pane {
+    background: var(--play-glass-solid, var(--play-night));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Hub banner finish: a lit corner drifting slowly, vignette, film grain */
+.play-finish-light {
+  background: radial-gradient(
+    60% 60% at var(--finish-x) var(--finish-y),
+    color-mix(in srgb, var(--finish-light) calc(var(--finish-share) * 100%), transparent),
+    transparent 70%
+  );
+  mix-blend-mode: soft-light;
+  animation: play-finish-drift 18s ease-in-out infinite alternate;
+}
+
+.play-finish-vignette {
+  background: radial-gradient(
+    120% 100% at 50% 45%,
+    transparent 45%,
+    rgb(0 0 0 / calc(var(--finish-vignette) * 0.85)) 100%
+  );
+}
+
+.play-finish-grain {
+  opacity: calc(var(--finish-grain) * 0.32);
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.4 -0.2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
+}
+
+@keyframes play-finish-drift {
+  from {
+    transform: translate3d(-3%, -2%, 0);
+  }
+
+  to {
+    transform: translate3d(3%, 2%, 0);
+  }
+}

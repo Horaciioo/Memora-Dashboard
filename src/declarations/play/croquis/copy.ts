@@ -13,6 +13,15 @@ export const CROQUIS_COLORS = [
   { key: 'blue', label: 'Bleu', token: '--croquis-blue' },
   { key: 'purple', label: 'Violet', token: '--croquis-purple' },
   { key: 'brown', label: 'Marron', token: '--croquis-brown' },
+  { key: 'pink', label: 'Rose', token: '--croquis-pink' },
+  { key: 'sky', label: 'Bleu ciel', token: '--croquis-sky' },
+  { key: 'teal', label: 'Turquoise', token: '--croquis-teal' },
+  { key: 'lime', label: 'Vert clair', token: '--croquis-lime' },
+  { key: 'navy', label: 'Bleu nuit', token: '--croquis-navy' },
+  { key: 'maroon', label: 'Bordeaux', token: '--croquis-maroon' },
+  { key: 'sand', label: 'Sable', token: '--croquis-sand' },
+  { key: 'skin', label: 'Chair', token: '--croquis-skin' },
+  { key: 'grey', label: 'Gris', token: '--croquis-grey' },
 ] as const
 
 // Place of the paper colour, the eraser draws with it
@@ -26,7 +35,19 @@ export const CROQUIS_FIRST_PEN = 1
  * @type {readonly number[]}
  */
 
-export const CROQUIS_SIZES = [5, 11, 22] as const
+export const CROQUIS_SIZES = [5, 11, 22, 3, 38] as const
+
+// Tools of the drawer, shapes are sent as plain strokes
+export const CROQUIS_TOOLS = [
+  { key: 'pen', label: 'Crayon' },
+  { key: 'line', label: 'Ligne' },
+  { key: 'rect', label: 'Rectangle' },
+  { key: 'ellipse', label: 'Ovale' },
+  { key: 'eraser', label: 'Gomme' },
+  { key: 'background', label: 'Fond' },
+] as const
+
+export type CroquisTool = (typeof CROQUIS_TOOLS)[number]['key']
 
 /**
  * Copy of the Croquis table
@@ -55,6 +76,7 @@ export const CROQUIS_BOARD_COPY = {
   toolPen: 'Crayon',
   toolEraser: 'Gomme',
   sizes: 'Épaisseur',
+  tools: 'Outils',
   undo: 'Annuler',
   clear: 'Tout effacer',
   palette: 'Couleurs',

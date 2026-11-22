@@ -3,7 +3,7 @@ import { PLAY_HUB } from '@/declarations/ui/variants'
 
 export interface PlayHubSceneryProps {
   // Set key, also the tone suffix
-  set: 'echo' | 'croquis' | 'glitch' | 'jumble' | 'suspens' | 'stopgo'
+  set: 'stopgo'
 }
 
 /**

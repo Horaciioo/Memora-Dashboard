@@ -23,7 +23,7 @@ export const SUSPENS_BOARD_COPY = {
   guessWord: 'Proposer le mot',
   guessPlaceholder: 'Le mot entier',
   guessSubmit: 'Proposer',
-  guessHint: 'Un mot faux compte comme une erreur.',
+  guessHint: 'Un mot faux compte comme deux erreurs.',
   solved: '{name} complète le mot',
   hanged: 'Le bonhomme est pendu',
   itWas: 'C’était',
@@ -86,11 +86,12 @@ export const SUSPENS_RULES_COPY = {
   turnSeconds: 'Temps par tour',
   pickSeconds: 'Temps pour choisir le mot',
   guess: 'Mot entier',
-  guessValue: 'Un mot faux compte comme une erreur',
+  guessValue: 'Un mot faux compte comme {count} erreurs',
   timeout: 'Tour dépassé',
   timeoutValue: 'Compte comme une erreur',
   scoring: 'Points des devineurs',
-  scoringValue: '{cell} par lettre dévoilée, {solve} pour celui qui complète le mot',
+  scoringValue:
+    '{cell} par lettre dévoilée, {solve} pour celui qui complète le mot, plus {left} par erreur restante',
   setter: 'Points du meneur',
   setterValue: '{error} par erreur provoquée, {hang} si le bonhomme est pendu',
 } as const

@@ -6,8 +6,10 @@
 export const PLAY_MOBILE_COPY = {
   tabs: 'Navigation de Play',
   tabGroup: 'Groupe',
-  tabFeed: 'Feed',
+  tabTrophies: 'Trophées',
+  tabFeed: 'Historiques',
   tabHome: 'Jeux',
+  tabQuests: 'Quêtes',
   tabLive: 'En partie',
   tabOnline: 'En ligne',
   tabMe: 'Mon compte',
@@ -21,9 +23,6 @@ export const PLAY_MOBILE_COPY = {
   rankingGames: 'Choisir un jeu',
   rankingGame: 'Jeu',
   feedOpen: 'Ouvrir le fil',
-  feedTabHistory: 'Dernières parties',
-  feedTabInvites: 'Sessions',
-  feedTabs: 'Rubriques du feed',
   feedInvitesEmpty: 'Aucune session ni invitation pour le moment.',
   online: 'Joueurs en ligne',
   onlineEmpty: 'Personne d’autre n’est dans Memora Play pour le moment.',
@@ -91,5 +90,20 @@ export const PLAY_ME_COPY = {
   stats: 'Afficher mes stats',
   settings: 'Paramètres',
   leave: 'Quitter Memora Play',
+  account: 'Compte',
+  space: 'Mon espace',
+  admin: 'Administration',
+} as const
+
+/**
+ * Sections of Play, each grouping a few pages
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_SECTION_COPY = {
+  play: 'Jouer',
+  compete: 'Compétition',
+  social: 'Social',
   trophies: 'Trophées',
+  admin: 'Administration',
 } as const

@@ -23,8 +23,8 @@ import { BAC_BOARD } from '@/declarations/ui/variants'
 import { RESULT } from '@/declarations/ui/variants/games/play/shared'
 import { PlayGames } from '@/utils/constants/play'
 
-// Server settles first
-const DEADLINE_REFRESH_MS = 1200
+// Read again until the server has moved on, grace included
+const DEADLINE_REFRESH_MS = 2500
 
 export interface BaccalaureatBoardProps {
   sessionId: string
@@ -67,9 +67,9 @@ export const BaccalaureatBoard = ({
   // The server moves on at the deadline, read it again then
   useEffect(() => {
     if (left !== 0) return
-    const timer = window.setTimeout(() => router.refresh(), DEADLINE_REFRESH_MS)
+    const timer = window.setInterval(() => router.refresh(), DEADLINE_REFRESH_MS)
 
-    return () => window.clearTimeout(timer)
+    return () => window.clearInterval(timer)
   }, [left, router])
 
   if (!round) return null
@@ -99,7 +99,7 @@ export const BaccalaureatBoard = ({
     />
   )
 
-  if (board.recap) {
+  if (board.isOver) {
     return (
       <div className={RESULT}>
         <h2 className={BAC_BOARD.stageLead}>{BAC_BOARD_COPY.final}</h2>
@@ -147,7 +147,6 @@ export const BaccalaureatBoard = ({
   }
 
   const isScored = phase === BaccalaureatPhases.Scored
-  const isLastRound = round.index + 1 >= board.roundsTotal
   const review = (
     <BacReview
       sessionId={sessionId}
@@ -188,11 +187,7 @@ export const BaccalaureatBoard = ({
             isLoading={isSaving}
             onClick={() => void act({ type: isScored ? 'next' : 'count' })}
           >
-            {isScored
-              ? isLastRound
-                ? BAC_BOARD_COPY.finish
-                : BAC_BOARD_COPY.next
-              : BAC_BOARD_COPY.count}
+            {isScored ? BAC_BOARD_COPY.next : BAC_BOARD_COPY.count}
           </Button>
         )}
         {!me.isHost && isScored && (

@@ -73,10 +73,6 @@ export const ECHO_RULES_COPY = {
 
 export const ECHO_HUB = {
   ground: 'play-echo',
-  // Symbols floating, by deck key
-  floaters: ['star', 'heart', 'bolt', 'crown', 'gem', 'ghost', 'moon', 'shield', 'flame', 'bell'],
-  rise: 14,
-  gap: 1.4,
 } as const
 
 /**

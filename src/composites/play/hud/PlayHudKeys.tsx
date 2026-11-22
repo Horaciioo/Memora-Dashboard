@@ -9,7 +9,6 @@ import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOu
 import { useConcordatMeterStore } from '@/core/store/play/concordatMeter'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
 import { useStopGoCameraStore } from '@/core/store/play/stopgoCamera'
-import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { usePlayStageStore } from '@/core/store/play/playStage'
 import { PLAY_GAMES, PLAY_HUD_COPY } from '@/declarations/play'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
@@ -41,13 +40,10 @@ export const PlayHudKeys = ({ game, sessionId, isSeated, isFlush = false }: Play
   const SettingsIcon = ICONS.settingsLine
   const FullscreenIcon = isScreen ? ICONS.playWindowed : ICONS.playFullscreen
   const ChatIcon = ICONS.playChat
-  const ScoreIcon = ICONS.trophy
   const RecenterIcon = ICONS.playRecenter
   const MeterIcon = ICONS.gauge
   const isMeterOn = useConcordatMeterStore((state) => state.isOpen)
   const toggleMeter = useConcordatMeterStore((state) => state.toggle)
-  const isScoreOn = usePlayScoreStore((state) => state.isOpen)
-  const toggleScore = usePlayScoreStore((state) => state.toggle)
   const recenter = useStopGoCameraStore((state) => state.recenter)
   const recenterConcordat = useConcordatViewStore((state) => state.recenter)
 
@@ -92,16 +88,6 @@ export const PlayHudKeys = ({ game, sessionId, isSeated, isFlush = false }: Play
             <RecenterIcon className={PLAY_HUD.keyIcon} aria-hidden="true" />
           </button>
         )}
-        <button
-          type="button"
-          className={cn(PLAY_HUD.key, isScoreOn && PLAY_HUD.keyOn)}
-          aria-label={PLAY_HUD_COPY.scorecard}
-          title={PLAY_HUD_COPY.scorecard}
-          aria-pressed={isScoreOn}
-          onClick={toggleScore}
-        >
-          <ScoreIcon className={PLAY_HUD.keyIcon} aria-hidden="true" />
-        </button>
         <button
           type="button"
           className={cn(PLAY_HUD.key, panel === 'settings' && PLAY_HUD.keyOn)}

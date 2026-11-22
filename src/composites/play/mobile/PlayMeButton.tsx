@@ -4,7 +4,6 @@ import { useRef, useState } from 'react'
 
 import { LevelFrame } from '@/composites/play/skin/LevelFrame'
 import { PlayMeMenu } from '@/composites/play/mobile/PlayMeMenu'
-import { PlayTrophiesDialog } from '@/composites/play/mobile/PlayTrophiesDialog'
 import { usePlayLevel } from '@/core/hooks/data/play/usePlayLevel'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { PLAY_ME_COPY } from '@/declarations/play'
@@ -20,7 +19,6 @@ export const PlayMeButton = () => {
   const { session } = useAuthContext()
   const level = usePlayLevel()
   const [isOpen, setIsOpen] = useState(false)
-  const [hasTrophies, setHasTrophies] = useState(false)
   const boundary = useRef<HTMLDivElement>(null)
   useOutsideDismiss(isOpen, boundary, () => setIsOpen(false))
 
@@ -46,16 +44,7 @@ export const PlayMeButton = () => {
         </span>
       </button>
 
-      {isOpen && (
-        <PlayMeMenu
-          onClose={() => setIsOpen(false)}
-          onTrophies={() => {
-            setIsOpen(false)
-            setHasTrophies(true)
-          }}
-        />
-      )}
-      {hasTrophies && <PlayTrophiesDialog onClose={() => setHasTrophies(false)} />}
+      {isOpen && <PlayMeMenu onClose={() => setIsOpen(false)} />}
     </div>
   )
 }

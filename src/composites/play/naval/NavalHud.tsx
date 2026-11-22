@@ -5,7 +5,6 @@ import type { ReactNode } from 'react'
 import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { NavalClock } from '@/composites/play/naval/NavalClock'
 import type { NavalCaptainView } from '@/composites/play/naval/setup/captains'
-import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { PlayHudKeys } from '@/composites/play/hud/PlayHudKeys'
 import { usePlayPrefsStore } from '@/core/store/play/playPrefs'
 import { NavalCodes } from '@/core/lib/play/naval/state'
@@ -44,13 +43,12 @@ export const NavalHud = ({
   actions,
 }: NavalHudProps) => {
   const isHidden = usePlayPrefsStore((state) => state.isHudHidden)
-  const isScoreOpen = usePlayScoreStore((state) => state.isOpen)
   const sunk = (seat: number) =>
     board.shots.filter((shot) => shot[2] === seat && shot[6] === NavalCodes.Sunk).length
 
   return (
     <div className={NAVAL_HUD.root} data-hud={PlayGames.Naval.toLowerCase()}>
-      {!isHidden && isScoreOpen && (
+      {!isHidden && (
         <ul className={NAVAL_HUD.crew} aria-label={NAVAL_HUD_COPY.crew}>
           {captains.map((captain) => (
             <li

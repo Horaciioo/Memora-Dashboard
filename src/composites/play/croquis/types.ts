@@ -25,4 +25,5 @@ export interface CroquisFace extends CroquisSeatView {
 export interface CroquisPen {
   color: number
   size: number
+  shape?: 'line' | 'rect' | 'ellipse'
 }

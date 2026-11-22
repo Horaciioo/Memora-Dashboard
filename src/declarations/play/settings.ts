@@ -56,6 +56,7 @@ const tournament = readNode(play.tournament, 'play/play.tournament')
 const rewards = readNode(play.rewards, 'play/play.rewards')
 const privateGames = readNode(play.privateGames, 'play/play.privateGames')
 const group = readNode(play.group, 'play/play.group')
+const friends = readNode(play.friends, 'play/play.friends')
 const admin = readNode(play.admin, 'play/play.admin')
 const idle = readNode(play.idle, 'play/play.idle')
 const stop = readNode(baccalaureat.stop, 'play/baccalaureat.stop')
@@ -146,6 +147,19 @@ export const PLAY_SETTINGS = {
       path: 'play/play.group.messagesShown',
       fallback: 60,
       min: 10,
+    }),
+  },
+  friends: {
+    max: readInteger(friends.max, { path: 'play/play.friends.max', fallback: 100, min: 1 }),
+    searchMin: readInteger(friends.searchMin, {
+      path: 'play/play.friends.searchMin',
+      fallback: 2,
+      min: 1,
+    }),
+    searchSize: readInteger(friends.searchSize, {
+      path: 'play/play.friends.searchSize',
+      fallback: 8,
+      min: 1,
     }),
   },
   privateGames: {
@@ -339,6 +353,11 @@ export const BACCALAUREAT_SETTINGS = {
     path: 'play/baccalaureat.reviewSeconds',
     fallback: 60,
     min: 5,
+  }),
+  nextSeconds: readInteger(baccalaureat.nextSeconds, {
+    path: 'play/baccalaureat.nextSeconds',
+    fallback: 15,
+    min: 3,
   }),
   points: {
     unique: readInteger(points.unique, {

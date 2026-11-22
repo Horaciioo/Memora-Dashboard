@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Tip } from '@/components/elements/feedback/Tip'
+import { PlayLoadingLabel } from '@/composites/play/loading/PlayLoadingLabel'
 import { PLAY_SETUP_DRAWERS } from '@/composites/play/registry'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
@@ -48,7 +49,7 @@ export const PlaySoloButton = ({
       isLoading={moves.isSaving}
       onClick={() => (Setup ? setSetting(true) : void moves.solo(game))}
     >
-      {PLAY_HUB_COPY.solo}
+      <PlayLoadingLabel isLoading={moves.isSaving}>{PLAY_HUB_COPY.solo}</PlayLoadingLabel>
     </Button>
   )
 

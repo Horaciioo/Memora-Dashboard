@@ -14,7 +14,7 @@ import { cn } from '@/utils/classnames'
 import { PlayGames } from '@/utils/constants/play'
 
 // Pause before a draft is saved
-const SAVE_DELAY_MS = 600
+const SAVE_DELAY_MS = 250
 
 export interface BacWritingProps {
   sessionId: string

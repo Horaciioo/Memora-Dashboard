@@ -3,6 +3,7 @@
 import type { CSSProperties } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { PlayGameArt } from '@/composites/play/brand/PlayGameArt'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { PlayInviteSentence } from '@/composites/play/invites/PlayInviteSentence'
 import { usePlayNoticeAnswer } from '@/core/hooks/data/play/usePlayNoticeAnswer'
@@ -60,9 +61,12 @@ export const PlayInviteBubble = ({
             aria-hidden="true"
           />
         )}
-        <PlayGameLogo game={invite.game} className={PLAY_INVITE_CALL.logo} />
-        <div className={PLAY_INVITE_CALL.body}>
-          <span className={PLAY_INVITE_CALL.eyebrow}>{PLAY_INVITE_COPY.eyebrow}</span>
+        <PlayGameArt game={invite.game} className={PLAY_INVITE_CALL.art} />
+        <div className={PLAY_INVITE_CALL.content}>
+          <div className={PLAY_INVITE_CALL.head}>
+            <PlayGameLogo game={invite.game} className={PLAY_INVITE_CALL.logo} />
+            <span className={PLAY_INVITE_CALL.eyebrow}>{PLAY_INVITE_COPY.eyebrow}</span>
+          </div>
           <p className={PLAY_INVITE_CALL.text}>
             <PlayInviteSentence notice={invite} nameClassName={PLAY_INVITE_CALL.name} />
           </p>

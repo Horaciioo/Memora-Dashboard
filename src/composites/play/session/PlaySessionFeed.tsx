@@ -31,6 +31,8 @@ export interface PlayFeedLine {
   values: Record<string, number | string>
   // Gesture offered under the line
   action?: ReactNode
+  // Hides the clock
+  isTimeless?: boolean
 }
 
 /**
@@ -102,7 +104,11 @@ export const PlayFeedRow = ({
         )}
         {entry.action && <span className={BAC_SESSION.feedAction}>{entry.action}</span>}
       </span>
-      <span className={BAC_SESSION.feedTime}>{formatClock(new Date(entry.at).toISOString())}</span>
+      {!entry.isTimeless && (
+        <span className={BAC_SESSION.feedTime}>
+          {formatClock(new Date(entry.at).toISOString())}
+        </span>
+      )}
     </li>
   )
 }

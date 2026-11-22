@@ -72,7 +72,7 @@ export const BacAnswerCard = ({
         <div className={BAC_BOARD.ballots}>
           <button
             type="button"
-            disabled={isSaving}
+            disabled={isSaving || answer.myVote !== null}
             aria-label={BAC_BOARD_COPY.accept}
             aria-pressed={answer.myVote === true}
             className={cn(
@@ -87,7 +87,7 @@ export const BacAnswerCard = ({
           </button>
           <button
             type="button"
-            disabled={isSaving}
+            disabled={isSaving || answer.myVote !== null}
             aria-label={BAC_BOARD_COPY.reject}
             aria-pressed={answer.myVote === false}
             className={cn(

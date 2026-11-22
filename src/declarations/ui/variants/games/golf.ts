@@ -54,7 +54,7 @@ export const GOLF_BOARD = {
   // Players strip
   players: `${GLASS} pointer-events-auto hidden items-center gap-2.5 px-2.5 py-1.5 md:order-1 md:flex`,
   player: 'relative flex flex-col items-center gap-1',
-  playerFace: 'overflow-hidden rounded-full ring-[3px]',
+  playerFace: 'overflow-hidden rounded-[13%] ring-[3px]',
   playerStrokes: 'text-sm font-black tabular-nums text-[var(--play-ink)]',
   playerMark:
     'absolute -top-1 -right-1 grid size-5 place-items-center bg-[var(--play-golf-bonus)] text-[var(--play-on-art)] ring-2 ring-[var(--play-golf-hud-deep)]',

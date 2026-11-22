@@ -10,7 +10,9 @@ import type { PlayEndSummary } from '@/core/lib/play/endStats'
 import {
   fillPlayMessage,
   lobbySkinOf,
+  PLAY_END_CAREER,
   PLAY_END_COPY,
+  PLAY_END_LIMITS,
   PLAY_END_TIMING,
   PLAY_XP_COPY,
   PLAY_XP_PART_LABELS,
@@ -20,11 +22,6 @@ import { PLAY_END_PAGE, PLAY_XP } from '@/declarations/ui/variants'
 import type { PlayEndCareer, PlayRewardView } from '@/types/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
-
-// Time the count of the XP takes
-const COUNT_MS = 1200
-const PODIUM_SIZE = 3
-const PERCENT = 100
 
 export interface PlayEndMeProps {
   game: PlayGameName
@@ -40,7 +37,7 @@ export interface PlayEndMeProps {
  */
 
 export const PlayEndMe = ({ game, reward, place, career }: PlayEndMeProps) => {
-  const gained = usePlayCountUp(reward?.gained ?? 0, PLAY_END_TIMING.count, COUNT_MS)
+  const gained = usePlayCountUp(reward?.gained ?? 0, PLAY_END_TIMING.count, PLAY_END_TIMING.countMs)
   if (!place && !reward) return null
   const hasLeveled = (reward?.game.after.level ?? 0) > (reward?.game.before.level ?? 0)
   const label = place
@@ -62,7 +59,7 @@ export const PlayEndMe = ({ game, reward, place, career }: PlayEndMeProps) => {
     >
       {place && label && (
         <div className={PLAY_END_PAGE.placeRow}>
-          {place.rank <= PODIUM_SIZE ? (
+          {place.rank <= PLAY_END_LIMITS.podium ? (
             <PlayMedal place={place.rank as 1 | 2 | 3} size="lg" />
           ) : (
             <span className={PLAY_END_PAGE.rankBadge}>{place.rank}</span>
@@ -85,7 +82,10 @@ export const PlayEndMe = ({ game, reward, place, career }: PlayEndMeProps) => {
             <PlayEndRing ladder={reward.game} caption={PLAY_XP_COPY.game} />
             <div className={PLAY_END_PAGE.xpHero}>
               <span className={PLAY_END_PAGE.kicker}>{PLAY_XP_COPY.title}</span>
-              <span className={PLAY_END_PAGE.xpFigure}>
+              <span
+                className={PLAY_END_PAGE.xpFigure}
+                style={{ animationDelay: `${PLAY_END_TIMING.count + PLAY_END_TIMING.countMs}ms` }}
+              >
                 {fillPlayMessage(PLAY_XP_COPY.gain, { xp: gained })}
               </span>
               <span className={PLAY_END_PAGE.xpProgress}>
@@ -103,14 +103,21 @@ export const PlayEndMe = ({ game, reward, place, career }: PlayEndMeProps) => {
               )}
             </div>
           </div>
-          <PlayXpBar title={PLAY_XP_COPY.global} ladder={reward.global} gained={reward.gained} />
+          <PlayXpBar
+            title={PLAY_XP_COPY.global}
+            ladder={reward.global}
+            gained={reward.gained}
+            boost={reward.questBoost}
+          />
           {reward.parts.length > 0 && (
             <ul className={PLAY_END_PAGE.tickets}>
               {reward.parts.map((part, index) => (
                 <li key={part.key} className={PLAY_END_PAGE.ticket} style={at(6 + index)}>
                   <span className={PLAY_XP.boxLabel}>{PLAY_XP_PART_LABELS[part.key]}</span>
                   <span className={cn(PLAY_XP.boxValue, part.xp < 0 && PLAY_XP.boxCut)}>
-                    {fillPlayMessage(PLAY_XP_COPY.gain, { xp: part.xp })}
+                    {fillPlayMessage(part.xp < 0 ? PLAY_XP_COPY.cut : PLAY_XP_COPY.gain, {
+                      xp: part.xp,
+                    })}
                   </span>
                 </li>
               ))}
@@ -121,20 +128,21 @@ export const PlayEndMe = ({ game, reward, place, career }: PlayEndMeProps) => {
 
       {owned && (
         <dl className={PLAY_END_PAGE.career} aria-label={PLAY_END_COPY.careerTitle}>
-          {[
-            { key: 'played', label: PLAY_END_COPY.played, value: String(owned.played) },
-            { key: 'wins', label: PLAY_END_COPY.wins, value: String(owned.wins) },
-            {
-              key: 'rate',
-              label: PLAY_END_COPY.winRate,
-              value: fillPlayMessage(PLAY_END_COPY.percent, {
-                value: Math.round(owned.winRate * PERCENT),
-              }),
-            },
-            { key: 'streak', label: PLAY_END_COPY.streak, value: String(owned.streak) },
-          ].map(({ key, label: caption, value }) => (
-            <div key={key} className={PLAY_END_PAGE.careerCell}>
-              <dd className={PLAY_END_PAGE.careerValue}>{value}</dd>
+          {PLAY_END_CAREER.map(({ key, label: caption }, index) => (
+            <div
+              key={key}
+              className={PLAY_END_PAGE.careerCell}
+              style={{
+                animationDelay: `${PLAY_END_TIMING.card + 2 * PLAY_XP_TIMING.boxStaggerMs + index * PLAY_END_TIMING.careerStep}ms`,
+              }}
+            >
+              <dd className={PLAY_END_PAGE.careerValue}>
+                {key === 'winRate'
+                  ? fillPlayMessage(PLAY_END_COPY.percent, {
+                      value: Math.round(owned.winRate * PLAY_END_LIMITS.percent),
+                    })
+                  : owned[key]}
+              </dd>
               <dt className={PLAY_XP.boxLabel}>{caption}</dt>
             </div>
           ))}

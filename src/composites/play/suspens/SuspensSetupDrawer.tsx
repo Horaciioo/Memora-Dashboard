@@ -9,6 +9,7 @@ import { suspensSettingsOf } from '@/core/lib/play/suspens/settings'
 import type { SuspensGameSettings } from '@/core/lib/play/suspens/settings'
 import { fillPlayMessage, SUSPENS_SETTINGS, SUSPENS_SETUP_COPY } from '@/declarations/play'
 import { SUSPENS_SETUP } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 // Laps and errors are voted at launch
 const TABS = [{ value: 'rules', label: SUSPENS_SETUP_COPY.tabRules, icon: 'playRules' as const }]
@@ -38,6 +39,7 @@ export const SuspensSetupDrawer = ({
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Suspens}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit

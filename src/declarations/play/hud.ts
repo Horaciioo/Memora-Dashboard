@@ -58,8 +58,6 @@ export const PLAY_HUD_COPY = {
   settings: 'Paramètres',
   exit: 'Quitter',
   scorecard: 'Scores',
-  collapse: 'Réduire',
-  expand: 'Développer',
   windowed: 'Quitter le plein écran',
   fullscreen: 'Plein écran',
   showChat: 'Afficher le chat',

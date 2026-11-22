@@ -8,7 +8,6 @@ import type { NavalModeName, NavalWeaponName } from '@/utils/constants/play'
 
 export const NAVAL_SEA = {
   ground: 'play-sea',
-  photo: '/play/naval/mer-crepuscule.jpg',
 } as const
 
 /**

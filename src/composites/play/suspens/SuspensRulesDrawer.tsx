@@ -22,7 +22,7 @@ export interface SuspensRulesDrawerProps {
  */
 
 export const SuspensRulesDrawer = ({ open, onClose, settings }: SuspensRulesDrawerProps) => {
-  const { cell, solve, setterPerError, setterHang } = SUSPENS_SETTINGS.scoring
+  const { cell, solve, solveLeft, setterPerError, setterHang } = SUSPENS_SETTINGS.scoring
   const seconds = (count: number) => fillPlayMessage(SUSPENS_SETUP_COPY.seconds, { seconds: count })
   const rows = [
     {
@@ -32,11 +32,16 @@ export const SuspensRulesDrawer = ({ open, onClose, settings }: SuspensRulesDraw
     { label: SUSPENS_RULES_COPY.errors, value: String(settings.errors) },
     { label: SUSPENS_RULES_COPY.turnSeconds, value: seconds(settings.turnSeconds) },
     { label: SUSPENS_RULES_COPY.pickSeconds, value: seconds(settings.pickSeconds) },
-    { label: SUSPENS_RULES_COPY.guess, value: SUSPENS_RULES_COPY.guessValue },
+    {
+      label: SUSPENS_RULES_COPY.guess,
+      value: fillPlayMessage(SUSPENS_RULES_COPY.guessValue, {
+        count: SUSPENS_SETTINGS.wordPenalty,
+      }),
+    },
     { label: SUSPENS_RULES_COPY.timeout, value: SUSPENS_RULES_COPY.timeoutValue },
     {
       label: SUSPENS_RULES_COPY.scoring,
-      value: fillPlayMessage(SUSPENS_RULES_COPY.scoringValue, { cell, solve }),
+      value: fillPlayMessage(SUSPENS_RULES_COPY.scoringValue, { cell, solve, left: solveLeft }),
     },
     {
       label: SUSPENS_RULES_COPY.setter,

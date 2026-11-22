@@ -213,13 +213,6 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
 })
 
 /**
- * Featured games, the banner on top of the hub
- * @type {PlayGameName[]}
- */
-
-export const PLAY_FEATURED_GAMES: PlayGameName[] = [PlayGames.StopGo, PlayGames.Concordat]
-
-/**
  * Game behind a URL segment
  * @param {string} slug - URL segment
  * @return {PlayGameName | null} - Game or nothing
@@ -227,6 +220,19 @@ export const PLAY_FEATURED_GAMES: PlayGameName[] = [PlayGames.StopGo, PlayGames.
 
 export const playGameOfSlug = (slug: string): PlayGameName | null =>
   PLAY_GAMES.keys.find((game) => PLAY_GAMES.get(game).slug === slug) ?? null
+
+/**
+ * Path of a game hub
+ * @param {string} path - Pathname
+ * @return {boolean} - Hub or not
+ */
+
+export const isPlayGameHubPath = (path: string): boolean => {
+  const [, root, slug, ...deeper] = path.split('/')
+  return (
+    root === 'play' && deeper.length === 0 && slug !== undefined && playGameOfSlug(slug) !== null
+  )
+}
 
 /**
  * Keys painted in a game's colour

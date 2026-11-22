@@ -7,7 +7,7 @@ export const PLAY_PANEL = PANEL
 // Lift of the main boxes, as on the Memora sections
 export const LIFT = 'shadow-[var(--shadow-sm)]'
 
-export const HEADING = 'text-xl font-extrabold tracking-tight text-[var(--play-ink)] sm:text-2xl'
+export const HEADING = 'text-xl font-bold tracking-tight text-[var(--play-ink)] sm:text-2xl'
 
 // Final screen: fills the room, content centred
 export const RESULT = 'flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-6'
@@ -26,31 +26,31 @@ export const SETUP_TILE =
 
 // Picked in the game colour
 export const SETUP_BLUE =
-  'border-[var(--play-baccalaureat)] bg-[var(--play-baccalaureat)] text-white hover:border-[var(--play-baccalaureat)]'
+  'border-[var(--play-baccalaureat)] bg-[var(--play-baccalaureat)] text-[var(--play-on-art)] hover:border-[var(--play-baccalaureat)]'
 
 export const SETUP_TEAL =
-  'border-[var(--play-echo)] bg-[var(--play-echo)] text-white hover:border-[var(--play-echo)]'
+  'border-[var(--play-echo)] bg-[var(--play-echo)] text-[var(--play-on-art)] hover:border-[var(--play-echo)]'
 
 export const SETUP_PINK =
-  'border-[var(--play-glitch)] bg-[var(--play-glitch)] text-white hover:border-[var(--play-glitch)]'
+  'border-[var(--play-glitch)] bg-[var(--play-glitch)] text-[var(--play-on-art)] hover:border-[var(--play-glitch)]'
 
 export const SETUP_VIOLET =
-  'border-[var(--play-jumble)] bg-[var(--play-jumble)] text-white hover:border-[var(--play-jumble)]'
+  'border-[var(--play-jumble)] bg-[var(--play-jumble)] text-[var(--play-on-art)] hover:border-[var(--play-jumble)]'
 
 export const SETUP_WOOD =
-  'border-[var(--play-suspens)] bg-[var(--play-suspens)] text-white hover:border-[var(--play-suspens)]'
+  'border-[var(--play-suspens)] bg-[var(--play-suspens)] text-[var(--play-on-art)] hover:border-[var(--play-suspens)]'
 
 export const SETUP_ROAD =
-  'border-[var(--play-stopgo)] bg-[var(--play-stopgo)] text-white hover:border-[var(--play-stopgo)]'
+  'border-[var(--play-stopgo)] bg-[var(--play-stopgo)] text-[var(--play-on-art)] hover:border-[var(--play-stopgo)]'
 
 export const SETUP_INDIGO =
-  'border-[var(--play-concordat)] bg-[var(--play-concordat)] text-white hover:border-[var(--play-concordat)]'
+  'border-[var(--play-concordat)] bg-[var(--play-concordat)] text-[var(--play-on-art)] hover:border-[var(--play-concordat)]'
 
 export const SETUP_AMBER =
   'border-[var(--play-croquis)] bg-[var(--play-croquis)] text-[var(--play-croquis-night)] hover:border-[var(--play-croquis)]'
 
 export const SETUP_FIRE =
-  'border-[var(--play-bomb)] bg-[var(--play-bomb)] text-white hover:border-[var(--play-bomb)]'
+  'border-[var(--play-bomb)] bg-[var(--play-bomb)] text-[var(--play-on-art)] hover:border-[var(--play-bomb)]'
 
 /**
  * Gold tile of a won trophy, black glyph, relief and glow
@@ -58,4 +58,4 @@ export const SETUP_FIRE =
  */
 
 export const PLAY_GOLD_TILE =
-  'relative bg-[linear-gradient(150deg,color-mix(in_oklab,var(--play-gold)_60%,white),var(--play-gold)_40%,var(--play-gold-deep))] text-[var(--play-night)]! shadow-[inset_0_2px_0_rgb(255_255_255/0.6),inset_0_-3px_0_color-mix(in_oklab,var(--play-gold-deep)_70%,black)] ring-2 ring-[color-mix(in_oklab,var(--play-gold-deep)_80%,black)]'
+  'relative bg-[linear-gradient(150deg,color-mix(in_oklab,var(--play-gold)_60%,white),var(--play-gold)_40%,var(--play-gold-deep))] text-[var(--play-night)]! shadow-[inset_0_2px_0_var(--play-gloss),inset_0_-3px_0_color-mix(in_oklab,var(--play-gold-deep)_70%,black)] ring-2 ring-[color-mix(in_oklab,var(--play-gold-deep)_80%,black)]'

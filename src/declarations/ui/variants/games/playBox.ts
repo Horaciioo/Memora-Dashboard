@@ -1,13 +1,39 @@
 import { PLAY_PANEL } from '@/declarations/ui/variants/games/play'
 
 /**
+ * Empty state of a Play box: glyph over one line
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_EMPTY = {
+  root: 'flex flex-col items-center gap-3 rounded-[var(--radius-lg)] bg-play-nest px-6 py-8 text-center',
+  // Inside a card that already is a box
+  compact: 'bg-transparent px-2 py-4',
+  icon: 'text-[var(--play-ink-faint)]',
+  glyph: 'size-8',
+  text: 'max-w-sm text-sm text-[var(--play-ink-soft)]',
+} as const
+
+/**
+ * Setting rows of Play: groups on the panel, rows with a switch on the right
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_PREF = {
+  group: 'flex flex-col gap-0.5 rounded-[var(--radius-lg)] bg-play-nest p-1.5',
+  title: 'px-3 pt-1.5 pb-1 text-xs font-bold tracking-wide text-[var(--play-ink-faint)] uppercase',
+  row: 'flex min-h-12 items-center justify-between gap-4 rounded-xl px-3 py-2 transition-colors hover:bg-play-lift',
+  text: 'flex min-w-0 flex-col gap-0.5',
+  label: 'text-sm font-bold text-[var(--play-ink)]',
+  hint: 'text-xs text-[var(--play-ink-soft)]',
+} as const
+
+/**
  * Play box: every block of a page sits in one
  * @type {Record<string, string>}
  */
 
 export const PLAY_BOX = {
-  stack: 'mx-auto flex w-full max-w-2xl flex-col gap-4',
-  groupStack: 'mx-auto flex w-full max-w-2xl flex-col gap-4',
   groupGrid: 'grid w-full grid-cols-1 gap-3',
   root: `${PLAY_PANEL} flex flex-col gap-4 p-4 shadow-[var(--shadow-sm)] sm:p-5`,
   // Content already inside a scroll box
@@ -16,39 +42,43 @@ export const PLAY_BOX = {
   add: 'w-full',
   addIcon: 'size-5',
   // Folded group, the whole box is the button
-  summary: `${PLAY_PANEL} flex w-full items-center gap-3 p-4 text-left shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--play-panel-strong)] focus-visible:outline-3 focus-visible:outline-[var(--play-key)] sm:p-5`,
+  summary:
+    'flex w-full items-center gap-3 rounded-[var(--radius-lg)] bg-play-nest p-4 text-left transition-colors hover:bg-play-lift focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
   summaryNote: 'text-xs font-semibold text-[var(--play-ink-soft)]',
   summaryText: 'flex min-w-0 flex-1 flex-col',
-  summaryName: 'truncate text-xl font-extrabold tracking-tight text-[var(--play-ink)] sm:text-2xl',
+  summaryName: 'truncate text-xl font-bold tracking-tight text-[var(--play-ink)] sm:text-2xl',
   keys: 'flex items-center justify-end gap-2',
   keyIcon: 'size-4',
-  divider: 'h-px w-full bg-[var(--play-line)]',
   title: 'min-w-0',
   body: 'flex min-h-40 flex-col gap-3',
   search: 'relative',
   searchIcon:
     'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[var(--play-ink-faint)]',
   searchInput:
-    'min-h-11 w-full rounded-xl bg-[var(--play-chip)] pr-3 pl-9 text-sm text-[var(--play-ink)] outline-none placeholder:text-[var(--play-ink-faint)]',
+    'min-h-11 w-full rounded-xl bg-play-lift pr-3 pl-9 text-sm text-[var(--play-ink)] outline-none placeholder:text-[var(--play-ink-faint)]',
   input:
-    'min-h-11 w-full rounded-xl bg-[var(--play-chip)] px-3 text-sm text-[var(--play-ink)] outline-none placeholder:text-[var(--play-ink-faint)]',
-  hint: 'text-sm text-[var(--play-ink-soft)] italic',
-  chat: 'flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto',
-  line: 'flex items-start gap-2',
-  lineMine: 'flex-row-reverse',
-  bubble: 'flex max-w-[80%] flex-col gap-0.5 rounded-2xl bg-[var(--play-chip)] px-3 py-2',
-  bubbleMine: 'bg-[var(--play-panel-strong)]',
-  lineName: 'text-xs font-extrabold text-[var(--play-ink-soft)]',
-  lineText: 'text-sm break-words text-[var(--play-ink)]',
-  compose: 'flex items-center gap-2',
-  composeGame: 'size-11! p-0!',
-  // Group page: chat fills the column
-  room: `${PLAY_PANEL} flex h-[calc(100dvh-19rem)] min-h-96 flex-col gap-3 lg:h-[calc(100dvh-16rem)] p-4 shadow-[var(--shadow-sm)] sm:p-5`,
-  roomStack: 'flex w-full flex-col gap-4',
-  roomGrid: 'grid min-h-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_24rem]',
-  roomHead: 'flex items-center gap-3',
-  roomBack: 'shrink-0',
-  // Side column scrolls by itself, its boxes never shrink
-  roomSide:
-    'flex min-w-0 flex-col gap-5 lg:max-h-[calc(100dvh-16rem)] lg:overflow-y-auto [&>*]:shrink-0',
+    'min-h-11 w-full rounded-xl bg-play-lift px-3 text-sm text-[var(--play-ink)] outline-none placeholder:text-[var(--play-ink-faint)]',
+  hint: 'text-sm text-[var(--play-ink-soft)]',
+} as const
+
+/**
+ * Settings page of Play: section list beside one panel of nested groups
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_SETTINGS = {
+  layout: 'grid items-start gap-6 lg:grid-cols-[15rem_minmax(0,1fr)]',
+  nav: 'flex gap-1 overflow-x-auto lg:sticky lg:top-4 lg:flex-col lg:overflow-visible',
+  item: 'flex min-h-11 shrink-0 items-center gap-3 rounded-xl px-3 text-left text-sm font-bold text-[var(--play-ink-soft)] transition-colors hover:bg-play-nest hover:text-[var(--play-ink)] focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
+  itemOn: 'bg-play-nest text-[var(--play-ink)]',
+  logo: 'size-6 shrink-0',
+  icon: 'size-5 shrink-0',
+  divider: 'my-1 h-6 w-px shrink-0 self-center bg-play-nest lg:h-px lg:w-full',
+  panel: `${PLAY_PANEL} flex min-w-0 flex-col gap-1.5 p-1.5 shadow-[var(--shadow-sm)]`,
+  head: 'px-3.5 pt-3 pb-1.5 text-xl font-bold tracking-tight text-[var(--play-ink)]',
+  group: 'flex flex-col gap-0.5 rounded-[var(--radius-lg)] bg-play-nest p-1.5',
+  title: 'px-3 pt-1.5 pb-1 text-xs font-bold tracking-wide text-[var(--play-ink-faint)] uppercase',
+  slot: 'px-3 py-2',
+  reset:
+    'mx-3 my-1.5 min-h-10 self-start rounded-xl bg-play-lift px-4 text-sm font-bold text-[var(--play-ink)] transition-colors hover:bg-play-nest focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
 } as const

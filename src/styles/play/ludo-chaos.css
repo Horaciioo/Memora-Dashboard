@@ -333,7 +333,7 @@
   aspect-ratio: 5 / 7;
   padding: 1.6rem 1.1rem 1.2rem;
   overflow: hidden;
-  border-radius: 1rem;
+  border-radius: var(--radius-xl);
   border: 1px solid #d8d8e0;
   background: #fff;
   color: var(--play-ludo-felt);

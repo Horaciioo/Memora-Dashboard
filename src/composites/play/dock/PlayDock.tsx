@@ -73,7 +73,7 @@ export const PlayDock = ({ profile, player, invites, presence }: PlayDockProps) 
     trophies: {
       title: PLAY_HUB_COPY.dockTrophies,
       page: ROUTES.playTrophies,
-      body: <PlayDockTrophies global={profile.global} />,
+      body: <PlayDockTrophies games={profile.games} />,
     },
     stats: {
       title: PLAY_HUB_COPY.dockStats,

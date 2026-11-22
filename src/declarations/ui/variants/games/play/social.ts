@@ -1,11 +1,4 @@
-import {
-  BUBBLE,
-  HEADING,
-  LIFT,
-  NOTE,
-  PANEL,
-  SOLID,
-} from '@/declarations/ui/variants/games/play/shared'
+import { BUBBLE, LIFT, NOTE, PANEL, SOLID } from '@/declarations/ui/variants/games/play/shared'
 
 /**
  * Lobby chat bubble stuck to the right edge, vertically centred
@@ -23,21 +16,21 @@ export const PLAY_CHAT_BUBBLE = {
 } as const
 
 /**
- * Play invitation hung under the rail shortcut
+ * Sunset box under the rail shortcuts
  * @type {Record<string, string>}
  */
 
 export const PLAY_NOTICE = {
-  wrap: 'relative mx-4 pt-3 pb-1',
-  caret: 'pointer-events-none absolute top-1.5 h-3 w-3 rotate-45 rounded-sm bg-[var(--play-dusk)]',
+  wrap: 'shrink-0 px-4 pt-2',
   bubble:
-    'play-sky rail-reset relative z-10 block rounded-[var(--radius-lg)] p-3.5 pr-10 shadow-[var(--shadow-md)] ring-1 ring-[var(--play-gold)]/50',
-  titleRow: 'flex flex-wrap items-center gap-2',
-  title: 'block text-sm font-extrabold text-[var(--play-gold-ink)]',
-  lead: 'mt-0.5 block text-sm font-semibold text-[var(--play-ink)]',
-  dismiss:
-    'absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full text-[var(--play-ink-soft)] transition-colors hover:bg-white/15 hover:text-[var(--play-ink)]',
-  dismissIcon: 'h-3.5 w-3.5',
+    'play-notice relative flex items-center justify-center gap-3 overflow-hidden rounded-md border-2 px-3.5 py-3 text-white',
+  bubbleCompact: 'h-11 justify-center px-0 py-0',
+  icon: 'h-6 w-6 shrink-0',
+  text: 'min-w-0',
+  logo: 'flex w-full items-center justify-center gap-3',
+  brandMark: 'h-8 w-auto shrink-0',
+  title: 'flex min-w-0 items-center',
+  brandName: 'h-4 w-auto max-w-full',
 } as const
 
 /**
@@ -46,33 +39,34 @@ export const PLAY_NOTICE = {
  */
 
 export const PLAY_FEATURE = {
-  root: 'grid w-full gap-4 pt-3 md:grid-cols-2 md:pt-6',
+  root: 'grid w-full gap-4 pt-3 @5xl:grid-cols-2 md:pt-6',
+  // One slide at a time, the poster leans out of the top
+  carousel:
+    'flex w-full snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-2 pt-12 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+  slideItem: 'w-full shrink-0 snap-center @5xl:w-[calc(50%-0.75rem)]',
   item: 'relative min-w-0',
   slide:
-    'play-feature-in relative flex min-h-44 items-end overflow-hidden rounded-3xl ring-[0.3rem] ring-[var(--game)] md:h-56 md:rounded-[2rem] md:ring-[0.4rem] lg:h-60',
+    'play-feature-in relative flex min-h-48 items-end overflow-hidden rounded-3xl ring-[0.3rem] ring-[var(--game)] md:h-72 md:rounded-3xl md:ring-[0.4rem] lg:h-80',
   backdrop: 'scale-125 blur-md',
   shade:
     'absolute inset-0 bg-linear-to-r from-[var(--play-night)] from-10% via-[var(--play-night)]/70 via-45% to-transparent',
-  body: 'relative flex max-w-[calc(100%-8.5rem)] flex-col pt-5 md:max-w-[calc(100%-15rem)] md:pt-0 lg:max-w-[calc(100%-16.5rem)] items-start gap-1.5 pb-5 pl-5 text-[var(--play-on-art)] md:pb-6 md:pl-8',
-  // Corner window matching the ring's outer curve, the sash is cut by it so it wraps the card
-  badgeClip:
-    'pointer-events-none absolute max-md:hidden -top-[0.4rem] -left-[0.4rem] z-10 size-28 overflow-hidden rounded-tl-[2.4rem]',
-  badge:
-    'play-feature-badge absolute top-[2.35rem] left-[2.35rem] flex h-6 w-32 -translate-x-1/2 -translate-y-1/2 -rotate-45 items-center justify-center text-[0.6rem] font-extrabold tracking-[0.2em] text-[var(--play-night)] uppercase shadow-[0_0.2rem_0.5rem_rgb(0_0_0/0.4),inset_0_0.1rem_0_rgb(255_255_255/0.5)] [text-shadow:0_1px_0_rgb(255_255_255/0.45)]',
-  pill: 'rounded-full bg-[var(--play-gold)] px-3 py-1 text-[0.65rem] font-extrabold tracking-[0.2em] text-[var(--play-night)] uppercase md:hidden',
-  name: 'text-2xl font-extrabold md:text-3xl tracking-tight uppercase',
-  tagline: 'line-clamp-3 text-xs text-[var(--play-on-art)]/85 md:line-clamp-2',
+  body: 'relative flex max-w-[calc(100%-8.5rem)] flex-col pt-5 md:max-w-[calc(100%-17rem)] md:pt-0 lg:max-w-[calc(100%-20rem)] @5xl:max-w-[calc(100%-13rem)] items-start gap-2 pb-5 pl-5 text-[var(--play-on-art)] md:pb-8 md:pl-10',
+  name: 'text-3xl leading-none font-extrabold tracking-tight uppercase md:text-5xl @5xl:text-4xl',
   seats: 'text-xs font-extrabold tabular-nums text-[var(--game)]',
-  play: 'mt-2 rounded-2xl bg-[var(--game)] px-6 py-2.5 text-sm font-extrabold text-[var(--play-night)] shadow-[0_0.3rem_0_rgb(0_0_0/0.35)] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
+  actions: 'mt-2 flex items-center gap-5',
+  // Players sitting at this game now
+  faces: 'flex items-center -space-x-2',
+  face: 'ring-2 ring-[var(--play-night)]',
+  play: 'rounded-2xl bg-[var(--game)] px-8 py-3.5 text-base font-extrabold text-[var(--play-night)] shadow-[0_0.3rem_0_rgb(0_0_0/0.35)] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
   poster:
-    'play-feature-poster absolute z-20 -top-3 right-3 aspect-[3/4] w-28 rotate-3 md:-top-6 md:right-6 md:w-40 cursor-pointer [transform-style:preserve-3d] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[var(--play-key)] lg:w-44',
+    'play-feature-poster absolute z-20 -top-3 right-3 aspect-[3/4] w-28 rotate-3 md:-top-8 md:right-8 md:w-48 cursor-pointer [transform-style:preserve-3d] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[var(--play-key)] lg:w-56 @5xl:w-40',
   flip: 'play-feature-flip absolute inset-0 block [transform-style:preserve-3d]',
   front:
     'absolute inset-0 block overflow-hidden rounded-3xl ring-[0.3rem] ring-white/70 shadow-[0_1.5rem_3rem_rgb(0_0_0/0.45)] [backface-visibility:hidden]',
   back: 'absolute inset-0 flex flex-col justify-start gap-1.5 overflow-y-auto overscroll-contain rounded-3xl bg-[var(--play-night)] p-3.5 text-left [scrollbar-width:none] [&::-webkit-scrollbar]:hidden text-[var(--play-on-art)] ring-[0.3rem] ring-[var(--game)] shadow-[0_1.5rem_3rem_rgb(0_0_0/0.45)] [backface-visibility:hidden] [transform:rotateY(180deg)]',
   backTitle: 'text-sm font-extrabold tracking-tight text-[var(--game)] uppercase',
   backStep:
-    'block text-[0.68rem] leading-tight text-[var(--play-on-art)]/85 [&>strong]:block [&>strong]:text-[var(--play-on-art)]',
+    'block text-micro leading-tight text-[var(--play-on-art)]/85 [&>strong]:block [&>strong]:text-[var(--play-on-art)]',
 } as const
 
 /**
@@ -83,15 +77,12 @@ export const PLAY_FEATURE = {
 export const PLAY_CROSS = {
   stage: 'mx-auto flex w-full max-w-[120rem] flex-col gap-4 pb-28',
   games: 'flex min-w-0 flex-col items-center gap-6',
-  heading: `${HEADING} text-center max-md:sr-only sm:text-3xl`,
   // Featured game on top, then every game as a poster
-  wall: 'flex w-full flex-col gap-3',
+  wall: '@container flex w-full flex-col gap-3',
   wallTitle: 'text-sm font-extrabold tracking-[0.2em] text-[var(--play-ink-soft)] uppercase',
   tiles:
     'grid w-full grid-cols-4 gap-2 sm:grid-cols-4 md:grid-cols-6 md:gap-4 xl:grid-cols-7 2xl:grid-cols-9',
   tile: 'w-full',
-  live: 'min-h-0 shrink',
-  online: 'min-h-0 shrink-0',
 } as const
 
 /**
@@ -113,7 +104,6 @@ export const PLAY_DOCK = {
   icon: 'size-5 transition-transform duration-200',
   avatarButton:
     'group relative mx-1 -my-6 rounded-full transition-transform hover:-translate-y-0.5',
-  avatarRing: 'rounded-full ring-4 ring-[var(--play-panel-strong)]',
   level:
     'absolute -right-1 -bottom-1 grid min-w-7 place-items-center rounded-full bg-[var(--play-gold)] px-1.5 py-0.5 text-xs font-extrabold tabular-nums text-[var(--play-night)] ring-2 ring-[var(--play-panel-strong)]',
   split: 'h-6 w-px bg-[var(--play-line)]',
@@ -126,10 +116,10 @@ export const PLAY_DOCK = {
   title: 'text-sm font-extrabold tracking-wide uppercase',
   open: 'grid size-8 place-items-center rounded-full text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
   openIcon: 'size-4',
-  rows: 'flex max-h-96 flex-col divide-y divide-[var(--play-line)] overflow-y-auto',
-  row: 'flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0',
+  rows: 'flex max-h-96 flex-col divide-y divide-[var(--play-line)] overflow-y-auto rounded-[var(--radius-lg)] bg-play-nest px-4',
+  row: 'flex flex-col gap-1.5 py-3',
   // Own game, a row of the sessions list
-  resume: 'flex items-center gap-4 py-5 first:pt-1 last:pb-1',
+  resume: 'flex items-center gap-4 py-4',
   resumeActions: 'flex shrink-0 items-center gap-2',
   resumeLogo: 'size-16 shrink-0',
   resumeText: 'min-w-0 flex-1 text-base font-extrabold text-[var(--play-ink)]',
@@ -139,10 +129,6 @@ export const PLAY_DOCK = {
   rowValue: 'text-sm font-extrabold tabular-nums text-[var(--play-accent)]',
   rowNote: NOTE,
   rowActions: 'flex items-center gap-2 pt-1 pb-1.5',
-  empty: 'py-2 text-sm italic text-[var(--play-ink-faint)]',
-  // Nothing in the feed, glyph over the line
-  void: 'flex flex-col items-center gap-2 py-4 text-center text-sm font-bold text-[var(--play-ink-soft)]',
-  voidIcon: 'size-9 text-[var(--play-ink-faint)]',
 } as const
 
 /**
@@ -156,7 +142,6 @@ export const PLAY_ROOM = {
   head: 'flex flex-col items-center gap-3 md:flex-row md:items-start md:justify-between md:gap-4',
   center: 'min-h-0 lg:flex lg:flex-1 lg:justify-center',
   logo: 'size-28 sm:size-32 md:ml-12 xl:ml-8 lg:max-xl:hidden xl:absolute xl:top-0 xl:left-8',
-  game: NOTE,
   watch: 'flex flex-wrap items-center gap-3 rounded-2xl bg-[var(--play-chip)] px-4 py-2',
   watchLabel: 'text-xs font-extrabold tracking-wider text-[var(--play-ink)] uppercase',
   watchFaces: 'flex items-center gap-1.5',
@@ -188,7 +173,7 @@ export const PLAY_ROOM = {
   seatCrown: 'absolute -top-4 left-1/2 size-5 -translate-x-1/2 text-[var(--play-gold)]',
   seatBadgeIcon: 'size-3',
   seatName: 'w-full truncate text-sm font-extrabold',
-  seatRole: 'text-[0.6rem] font-extrabold tracking-wider text-[var(--play-gold-ink)] uppercase',
+  seatRole: 'text-micro font-extrabold tracking-wider text-[var(--play-gold-ink)] uppercase',
   seatState:
     'play-rise-item inline-flex items-center gap-1 text-xs font-extrabold tracking-wider text-[var(--play-ink)] uppercase',
   seatStateIdle: 'text-[var(--play-ink-faint)]',
@@ -204,15 +189,14 @@ export const PLAY_ROOM = {
   // Share row of a public game, always in reach
   link: 'flex w-full max-w-sm items-center gap-3 rounded-2xl bg-[var(--play-chip)] px-4 py-3 text-left text-sm font-bold text-[var(--play-ink-soft)] hover:text-[var(--play-ink)]',
   linkMain: 'mr-auto truncate',
-  linkCode: 'text-lg font-extrabold tracking-[0.5em] text-[var(--play-ink)]',
+  linkGlyph: 'size-5',
   linkCopy: 'shrink-0 text-xs font-extrabold text-[var(--play-ink)]',
   // Share card of a private game, at the centre of the room
   share: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-4 rounded-3xl p-5 text-center sm:flex-row sm:text-left`,
   shareText: 'flex min-w-0 flex-1 flex-col items-center gap-1 sm:items-start',
-  shareLabel:
-    'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
+  shareLabel: 'text-micro font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
   shareCode: 'text-3xl font-extrabold tracking-[0.35em] text-[var(--play-ink)] sm:text-4xl',
-  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 rounded-[2rem] p-5 sm:p-8 lg:gap-4 lg:p-6`,
+  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 rounded-3xl p-5 sm:p-8 lg:gap-4 lg:p-6`,
   // Same boxes in the game's own skin: the block class brings fill, radius and shadow
   boxSkinned: 'play-lobby-skin flex w-full flex-col items-center gap-5 p-5 sm:p-8 lg:gap-4 lg:p-6',
   shareSkinned:
@@ -230,7 +214,6 @@ export const PLAY_ROOM = {
  */
 
 export const PLAY_CHAT_UI = {
-  headActions: 'flex items-center gap-1',
   panel: `${PANEL} ${LIFT} flex h-full flex-col overflow-hidden lg:rounded-r-none`,
   // Laid over a table: last lines only, no head, no scroll
   panelHud: 'flex max-h-80 flex-col justify-end',
@@ -255,10 +238,9 @@ export const PLAY_CHAT_UI = {
   // Who is there, one compact row
   people: 'flex items-center gap-3 border-b border-[var(--play-line)] px-4 py-2.5',
   peopleGroup: 'flex min-w-0 items-center gap-2',
-  peopleLabel:
-    'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
+  peopleLabel: 'text-micro font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
   peopleStack: 'flex min-w-0 items-center -space-x-2',
-  peopleFace: 'rounded-full ring-2 ring-[var(--play-ring)]',
+  peopleFace: 'rounded-[13%]! ring-2 ring-[var(--play-ring)]',
   peopleAway: 'opacity-40 grayscale',
   peopleSplit: 'h-5 w-px shrink-0 bg-[var(--play-line)]',
   list: 'flex flex-1 flex-col overflow-y-auto px-2 py-3',
@@ -271,7 +253,7 @@ export const PLAY_CHAT_UI = {
   body: 'flex min-w-0 flex-col',
   meta: 'flex items-baseline gap-2',
   author: 'truncate text-sm font-extrabold',
-  time: 'text-[0.7rem] font-semibold tabular-nums text-[var(--play-ink-faint)]',
+  time: 'text-micro font-semibold tabular-nums text-[var(--play-ink-faint)]',
   text: 'text-sm break-words whitespace-pre-wrap text-[var(--play-ink)]',
   composer: 'relative flex items-end gap-2 border-t border-[var(--play-line)] p-3',
   invite:
@@ -289,26 +271,22 @@ export const PLAY_CHAT_UI = {
 
 export const PLAY_INVITE = {
   anchor: 'relative',
-  panel: `${SOLID} absolute top-full left-0 z-30 mt-3 flex w-96 flex-col gap-2 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-[80] max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
+  panel: `${SOLID} absolute top-full left-0 z-30 mt-3 flex w-96 flex-col gap-2 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-80 max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
   // Phone: a centred modal, so side anchors do nothing
   panelEnd: 'right-0 left-auto',
   panelCentered: 'left-1/2 right-auto -translate-x-1/2',
   // Dim page behind the phone modal
-  scrim: 'fixed inset-0 z-[79] bg-[var(--color-scrim)]/40 md:hidden',
+  scrim: 'fixed inset-0 z-79 bg-[var(--color-scrim)]/40 md:hidden',
   // Over the composer, as wide as it so the chat never clips it
   panelDock: `${SOLID} absolute inset-x-3 bottom-full z-30 mb-2 flex flex-col gap-3 p-3 text-[var(--play-ink)]`,
   // Opens in the seats grid, never clipped
   anchorInline: 'contents',
   // Full screen sheet on a phone
-  panelInline: `${SOLID} relative col-span-full mx-auto mt-2 flex w-full max-w-md flex-col gap-2 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-[80] max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
+  panelInline: `${SOLID} relative col-span-full mx-auto mt-2 flex w-full max-w-md flex-col gap-2 p-3 text-[var(--play-ink)] max-md:fixed max-md:inset-auto max-md:top-1/2 max-md:left-1/2 max-md:z-80 max-md:mt-0 max-md:w-[calc(100vw-2rem)] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:max-h-[85dvh] max-md:overflow-y-auto`,
   // Tip aimed at the trigger above
   arrow:
     'absolute -top-1.5 left-[var(--arrow-x,50%)] size-3 max-md:hidden -translate-x-1/2 rotate-45 bg-[var(--play-panel-strong)] ring-1 ring-[var(--play-line)] [clip-path:polygon(0_0,100%_0,0_100%)]',
-  // Quiet row under the list, label left and state right
-  choice:
-    'flex w-full flex-wrap items-center gap-x-3 gap-y-2 rounded-xl px-3 py-1.5 text-left text-xs font-extrabold md:py-2 md:text-sm text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)] disabled:opacity-50',
   choiceIcon: 'size-5 shrink-0',
-  choiceText: 'mr-auto whitespace-nowrap',
   level:
     'rounded-lg bg-[var(--play-chip)] px-2.5 py-1 text-xs font-extrabold text-[var(--play-ink)] hover:bg-[var(--play-line)] disabled:opacity-50',
   foot: 'flex flex-col gap-2 border-t border-[var(--play-line)] pt-3',
@@ -319,8 +297,7 @@ export const PLAY_INVITE = {
   // Bots on one line, label then levels
   botsRow: 'flex flex-wrap items-center gap-2 px-1',
   botsLabel:
-    'mr-auto text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
-  footGroup: 'flex flex-col border-t border-[var(--play-line)] pt-1',
+    'mr-auto text-micro font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
   search:
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-3 py-2 text-sm font-semibold md:py-2.5 placeholder:text-[var(--play-ink-faint)] focus:outline-none',
   head: 'flex items-center gap-2',
@@ -331,7 +308,7 @@ export const PLAY_INVITE = {
   closeIcon: 'size-4',
   section: 'flex flex-col',
   sectionTitle:
-    'px-2 pt-2 pb-1 text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
+    'px-2 pt-2 pb-1 text-micro font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
   people: 'flex flex-col max-md:flex-1',
   // Search results can run long, only they scroll
   peopleSearch: 'max-h-48 overflow-y-auto max-md:max-h-none',
@@ -342,11 +319,9 @@ export const PLAY_INVITE = {
   faceAvatar: 'relative',
   faceBadge:
     'absolute -right-0.5 -bottom-0.5 grid size-4 place-items-center rounded-full bg-[var(--play-ink)] text-[var(--play-panel-strong)] ring-2 ring-[var(--play-panel-strong)]',
-  faceName: 'w-full truncate text-center text-[0.65rem] font-bold md:text-xs',
+  faceName: 'w-full truncate text-center text-micro font-bold md:text-xs',
   stateIcon: 'size-2.5',
-  check: 'ml-auto size-4 text-[var(--play-ink)]',
   empty: 'px-2 py-2 text-sm italic text-[var(--play-ink-faint)]',
-  codeInline: 'text-base font-extrabold tracking-[0.3em] text-[var(--play-ink)]',
   // Join with a code from the hub
   entry: 'flex w-full flex-col gap-2',
   entryInput:
@@ -401,4 +376,22 @@ export const PLAY_FEED_VERBS: Record<string, string> = {
   DISCARD: 'text-[var(--play-ink-faint)]',
   TIMEOUT: 'text-[var(--play-heart)]',
   SHUFFLE: 'text-[var(--play-ink-faint)]',
+  // Concordat: red strikes, green binds, teal trades, purple scouts, gold takes
+  capitalTaken: 'text-[var(--concordat-alarm)]',
+  eliminated: 'text-[var(--concordat-alarm)]',
+  betrayal: 'text-[var(--concordat-alarm)]',
+  broken: 'text-[var(--concordat-ask)]',
+  landed: 'text-[var(--concordat-alarm)]',
+  landedFree: 'text-[var(--concordat-alarm)]',
+  launched: 'text-[var(--concordat-alarm)]',
+  impact: 'text-[var(--concordat-alarm)]',
+  sortie: 'text-[var(--concordat-alarm)]',
+  warshipSunk: 'text-[var(--concordat-alarm)]',
+  shotDown: 'text-[var(--concordat-alarm)]',
+  threat: 'text-[var(--concordat-alarm)]',
+  treaty: 'text-[var(--concordat-ok)]',
+  captured: 'text-[var(--concordat-brass)]',
+  researched: 'text-[var(--concordat-trade)]',
+  built: 'text-[var(--concordat-trade)]',
+  domination: 'text-[var(--concordat-brass)]',
 }

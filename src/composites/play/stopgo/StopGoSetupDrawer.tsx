@@ -6,22 +6,14 @@ import { InfoHint } from '@/components/elements/feedback/InfoHint'
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
-import { SetupChips, SetupSection, SetupStepper } from '@/composites/play/setup/PlaySetupFields'
 import { stopGoSettingsOf } from '@/core/lib/play/stopgo/settings'
 import type { StopGoGameSettings } from '@/core/lib/play/stopgo/settings'
-import { fillPlayMessage } from '@/declarations/play/copy'
 import { STOPGO_SETUP_COPY } from '@/declarations/play/stopgo/copy'
-import { STOPGO_SETTINGS } from '@/declarations/play/stopgo/settings'
 import { FIELD_STYLES, STOPGO_SETUP } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
-// Distance and clock are voted at launch too
+// Distance and clock are voted at launch
 const TABS = [{ value: 'rules', label: STOPGO_SETUP_COPY.tabRules, icon: 'playRules' as const }]
-
-// Distance chips in reading order
-const TARGETS = STOPGO_SETTINGS.targets.map((km) => ({
-  value: km,
-  label: fillPlayMessage(STOPGO_SETUP_COPY.km, { km }),
-}))
 
 /**
  * Distance and clock of a turn, picked before a Stop & Go race opens
@@ -47,6 +39,7 @@ export const StopGoSetupDrawer = ({
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.StopGo}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit
@@ -57,35 +50,6 @@ export const StopGoSetupDrawer = ({
     >
       {() => (
         <div className={STOPGO_SETUP.body}>
-          <SetupSection
-            styles={STOPGO_SETUP}
-            title={STOPGO_SETUP_COPY.target}
-            hint={STOPGO_SETUP_COPY.targetHint}
-          >
-            <SetupChips
-              styles={STOPGO_SETUP}
-              options={TARGETS}
-              value={settings.target}
-              onChange={set('target')}
-            />
-          </SetupSection>
-          <SetupSection
-            styles={STOPGO_SETUP}
-            title={STOPGO_SETUP_COPY.turnSeconds}
-            hint={STOPGO_SETUP_COPY.turnSecondsHint}
-          >
-            <SetupStepper
-              styles={STOPGO_SETUP}
-              value={settings.turnSeconds}
-              range={STOPGO_SETTINGS.turnSeconds}
-              step={STOPGO_SETTINGS.turnStep}
-              display={fillPlayMessage(STOPGO_SETUP_COPY.seconds, {
-                seconds: settings.turnSeconds,
-              })}
-              onChange={set('turnSeconds')}
-              labels={{ less: STOPGO_SETUP_COPY.less, more: STOPGO_SETUP_COPY.more }}
-            />
-          </SetupSection>
           <div className={STOPGO_SETUP.switchRow}>
             <span className={FIELD_STYLES.labelRow}>
               <span className={STOPGO_SETUP.switchLabel}>{STOPGO_SETUP_COPY.safeties}</span>

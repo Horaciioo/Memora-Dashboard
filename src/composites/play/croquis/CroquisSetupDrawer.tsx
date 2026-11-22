@@ -15,6 +15,7 @@ import {
   fillPlayMessage,
 } from '@/declarations/play'
 import { CROQUIS_SETUP } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 // Laps are voted at launch
 const TABS = [{ value: 'words', label: CROQUIS_SETUP_COPY.tabWords, icon: 'playLetters' as const }]
@@ -53,6 +54,7 @@ export const CroquisSetupDrawer = ({
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Croquis}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit

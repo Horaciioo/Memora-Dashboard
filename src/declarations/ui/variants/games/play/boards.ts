@@ -1,4 +1,4 @@
-import { PROPERTY_LABEL, PROPERTY_SPACING } from '@/declarations/ui/variants/controls'
+import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 import {
   LIFT,
   NOTE,
@@ -384,10 +384,11 @@ export const BAC_SESSION = {
 
 export const setupStyles = (picked: string) =>
   ({
-    body: `flex flex-col ${PROPERTY_SPACING.rows}`,
+    body: 'flex flex-col gap-3',
     head: 'flex items-center justify-between gap-4',
     // Label left, switch right
-    switchRow: 'flex min-h-11 items-center justify-between gap-4',
+    switchRow:
+      'flex min-h-14 items-center justify-between gap-4 rounded-2xl bg-white/[0.045] px-4 ring-1 ring-white/10',
     switchLabel: 'text-sm font-medium text-[var(--color-ink)]',
     count: 'shrink-0 text-sm font-bold tabular-nums text-[var(--color-ink-subtle)]',
     value: 'text-sm font-semibold text-[var(--color-ink)]',

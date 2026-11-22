@@ -14,6 +14,7 @@ import { LUDO_RULE_COPY, LUDO_SETUP_COPY } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import type { LudoRuleName } from '@/declarations/play/ludo/settings'
 import { FIELD_STYLES, LUDO_SETUP } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 // Tabs of the drawer
 const TABS = [{ value: 'rules', label: LUDO_SETUP_COPY.tabRules, icon: 'playRules' as const }]
@@ -42,6 +43,7 @@ export const LudoSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Ludo}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit
