@@ -13,6 +13,7 @@
   "roomMessages": 200,
   "roomActs": 200,
   "roomHeld": 150,
+  "heldExpireMinutes": 5,
   "feedSlowKilobytes": 2048,
   "logConcurrency": 4,
   "logQueueMax": 5000,

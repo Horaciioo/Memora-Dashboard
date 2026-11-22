@@ -119,6 +119,12 @@ const ACT_MAP: Record<ModActKind, ModActOption> = {
   unban: { label: 'Débannissement', icon: 'modUnban', verb: 'Débanni', tone: 'success' },
   automodApprove: { label: 'AutoMod accepté', icon: 'automod', verb: 'accepté', tone: 'success' },
   automodDeny: { label: 'AutoMod refusé', icon: 'automod', verb: 'refusé', tone: 'danger' },
+  automodExpire: {
+    label: 'AutoMod rejeté d’office',
+    icon: 'automod',
+    verb: 'rejeté',
+    tone: 'caution',
+  },
   termAdd: { label: 'Terme bloqué', icon: 'blockedTerms', verb: 'ajouté', tone: 'info' },
   termRemove: { label: 'Terme retiré', icon: 'blockedTerms', verb: 'retiré', tone: 'info' },
   mode: { label: 'Mode', icon: 'modeSlow', verb: 'changé', tone: 'info' },

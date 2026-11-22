@@ -98,7 +98,7 @@ export interface ChatMessage {
 
 /**
  * Kind of moderation act
- * @typedef {'delete' | 'warn' | 'timeout' | 'ban' | 'unban' | 'automodApprove' | 'automodDeny' | 'termAdd' | 'termRemove' | 'mode' | 'unbanRequest' | 'role' | 'warnAck'} ModActKind
+ * @typedef {'delete' | 'warn' | 'timeout' | 'ban' | 'unban' | 'automodApprove' | 'automodDeny' | 'automodExpire' | 'termAdd' | 'termRemove' | 'mode' | 'unbanRequest' | 'role' | 'warnAck'} ModActKind
  */
 
 export type ModActKind =
@@ -109,6 +109,7 @@ export type ModActKind =
   | 'unban'
   | 'automodApprove'
   | 'automodDeny'
+  | 'automodExpire'
   | 'termAdd'
   | 'termRemove'
   | 'mode'
@@ -261,7 +262,6 @@ export interface LiveEmotes {
  * @property {boolean} colouredNames - Names in their own colour
  * @property {'hover' | 'alt'} pauseMode - What stands the chat still
  * @property {'left' | 'hover' | 'right' | 'card'} toolsPosition - Where the gestures of a line show
- * @property {boolean} keepResolved - Handled held messages stay in the queue
  * @property {string[]} repeatWords - Words whose repeated lines are counted
  * @property {ModBadword[]} badwords - Personal words caught in the queue
  * @property {ModActionConfig[]} actions - Sanction buttons, in order
@@ -286,7 +286,6 @@ export interface ModPreferences {
   colouredNames: boolean
   pauseMode: 'hover' | 'alt'
   toolsPosition: 'left' | 'hover' | 'right' | 'card'
-  keepResolved: boolean
   repeatWords: string[]
   badwords: ModBadword[]
   actions: ModActionConfig[]

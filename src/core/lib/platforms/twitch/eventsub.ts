@@ -417,9 +417,14 @@ export const translateTwitchEvent = (
     case 'automod.message.update': {
       const status = text(event.status)
       const author = userOf(event, 'user')
+      const heldId = text(event.message_id)
+
+      // Twitch let it lapse, the room keeps it as rejected
+      if (status === 'Expired')
+        return [scene({ kind: 'expire', heldId, by: TWITCH_EVENT_COPY.twitch, at: meta.at })]
 
       return [
-        scene({ kind: 'release', heldId: text(event.message_id) }),
+        scene({ kind: 'release', heldId }),
         ...(status === 'Approved' || status === 'Denied'
           ? [
               scene({
@@ -431,6 +436,7 @@ export const translateTwitchEvent = (
                   meta.at,
                   {
                     target: author.name || author.login,
+                    targetId: author.id,
                     quote: text(child(event, 'message').text) || null,
                   }
                 ),

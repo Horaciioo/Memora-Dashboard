@@ -6,6 +6,7 @@
  * @property {string} viewerLogin - Chatter login
  * @property {string} body - Message text
  * @property {string} sentAt - When it was sent
+ * @property {boolean} [blocked] - Held by the automod
  */
 
 export interface ChatRecord {
@@ -14,6 +15,7 @@ export interface ChatRecord {
   viewerLogin: string
   body: string
   sentAt: string
+  blocked?: boolean
 }
 
 // Read a string field
@@ -32,6 +34,21 @@ export const chatRecordOf = (
   event: Record<string, unknown>,
   at: string
 ): ChatRecord | null => {
+  // Held by the automod, never reaches the chat
+  if (type === 'automod.message.hold') {
+    const held = event.message as { text?: unknown } | undefined
+    const blocked = {
+      externalId: text(event.message_id),
+      platformUserId: text(event.user_id),
+      viewerLogin: text(event.user_login),
+      body: text(held?.text),
+      sentAt: text(event.held_at) || at,
+      blocked: true,
+    }
+
+    return blocked.externalId && blocked.platformUserId && blocked.body ? blocked : null
+  }
+
   if (type !== 'channel.chat.message') return null
 
   const message = event.message as { text?: unknown } | undefined

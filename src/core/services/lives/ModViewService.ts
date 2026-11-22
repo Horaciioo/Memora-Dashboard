@@ -517,6 +517,11 @@ export const actOnLive = async (input: {
     }
   }
 
+  // A handled message leaves every queue at once, Twitch's echo files it in the history
+  if (input.intent.kind === 'automod') {
+    pushRoomEvent(input.liveId, { kind: 'release', heldId: input.intent.heldId })
+  }
+
   // The poll shows at once
   if (input.intent.kind === 'poll') {
     void announceLivePoll(input.liveId, seat, found.memberLogin).catch(() => null)

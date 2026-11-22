@@ -34,7 +34,7 @@ import { useWatchlist } from '@/core/hooks/interaction/state/moderation/useWatch
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { colourLookup } from '@/core/lib/modview/chatterColours'
 import { windowsOf } from '@/core/lib/modview/gate'
-import { sanctionsOn } from '@/core/lib/modview/viewer'
+import { actsOn, sanctionsOn } from '@/core/lib/modview/viewer'
 import { profileOfPermissions } from '@/core/lib/modview/profile'
 import type { Suggestion } from '@/core/lib/modview/suggest'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
@@ -318,6 +318,7 @@ export const ModView = ({
             hasWatch={!isWorkspace}
             watchlist={watchlist}
             onPick={setPicked}
+            onPickAct={pickByAct}
             colourOf={colourOf}
           />
         )
@@ -417,6 +418,7 @@ export const ModView = ({
       chatter={shownCard}
       messages={pickedLines}
       liveSanctions={sanctionsOn(state.acts, shownCard).length}
+      actCount={actsOn(state.acts, shownCard).length}
       gate={gate}
       onAct={act}
       isDocked={isWorkspace && !isMobile}

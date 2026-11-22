@@ -5,6 +5,7 @@
 
 export const MODVIEW_WATCH_COPY = {
   queue: 'File d’attente de l’AutoMod',
+  history: 'Historique',
   watch: 'Surveillance',
   tabs: 'Vue de la fenêtre',
   emptyTitle: 'Personne sous surveillance',

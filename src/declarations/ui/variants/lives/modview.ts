@@ -128,6 +128,8 @@ export const MODVIEW_FEED = {
     'ml-1.5 rounded-[var(--radius-xs)] bg-[color-mix(in_oklab,var(--color-apple-green)_62%,var(--color-surface-raised))] px-1 py-px align-middle text-[0.625rem] leading-none font-bold tracking-wide text-white uppercase',
   count: 'px-3 pt-2 text-xs font-bold text-[var(--color-ink-subtle)]',
   list: 'flex flex-col',
+  // Row holding the filter of a list
+  filter: 'border-b border-[var(--color-border)] px-3 py-2',
   item: 'relative flex gap-2.5 px-3 py-2.5 after:absolute after:inset-x-3 after:bottom-0 after:h-px after:bg-[color-mix(in_oklab,var(--color-ink)_22%,transparent)] last:after:hidden',
   itemPending: 'opacity-60',
   icon: 'mt-0.5 h-5 w-5 shrink-0',
@@ -453,6 +455,7 @@ export const MODVIEW_USER = {
   sanction:
     'relative flex flex-col gap-1 py-3 after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-[color-mix(in_oklab,var(--color-ink)_14%,transparent)] last:after:hidden',
   sanctionHead: 'flex items-baseline justify-between gap-3',
+  sanctionBy: 'flex shrink-0 items-center gap-2',
   sanctionDate: 'shrink-0 text-xs font-bold tabular-nums text-[var(--twitch-muted)]',
   sanctionTag: 'min-w-0 text-sm font-bold',
   sanctionReason: 'text-sm leading-snug break-words',

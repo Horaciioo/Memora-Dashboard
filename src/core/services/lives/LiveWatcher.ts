@@ -13,7 +13,11 @@ import type { TwitchSignal } from '@/core/lib/platforms/twitch/eventsub'
 import { moveLiveFromPlatform } from '@/core/services/lives/LiveService'
 import { liveconLevelOf, logPlatformGesture } from '@/core/services/lives/ModerationLogService'
 import { chatRecordOf } from '@/core/lib/platforms/twitch/chatRecord'
-import { markChatDeleted, recordChatMessage } from '@/core/services/lives/ChatStoreService'
+import {
+  markChatDeleted,
+  markChatReleased,
+  recordChatMessage,
+} from '@/core/services/lives/ChatStoreService'
 import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
 import { forgetSampling, sampleViewers } from '@/core/services/lives/LiveSampler'
 import { sweepStalePresences } from '@/core/services/lives/PresenceService'
@@ -160,6 +164,13 @@ const keepChat = (
   const record = chatRecordOf(type, event, at)
   if (record) {
     recordChatMessage({ ...record, youtuberId: live.youtuberId, liveId: live.id })
+    return
+  }
+
+  // Approved by a moderator, the message is back
+  if (type === 'automod.message.update' && event.status === 'Approved') {
+    if (typeof event.message_id === 'string')
+      void markChatReleased(live.youtuberId, event.message_id).catch(() => null)
     return
   }
 

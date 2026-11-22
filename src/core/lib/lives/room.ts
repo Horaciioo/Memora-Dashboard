@@ -4,12 +4,13 @@ import { publishLive } from '@/core/lib/lives/bus'
 import { logger } from '@/core/lib/logger'
 import { applySceneBatch, blankModView, shedChatBurst } from '@/core/lib/modview/feed'
 import type { SceneEvent } from '@/core/lib/modview/scene'
+import { APP_NAME } from '@/declarations/app'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_STREAM_EVENTS, LIVE_TOPICS } from '@/declarations/lives/topics'
 import { runtime } from '@/managers/infrastructure/Core/runtime'
-import type { ModViewState } from '@/types/modview'
+import type { HeldMessage, ModViewState } from '@/types/modview'
 import { LivePlatforms } from '@/utils/constants/lives'
-import { HOUR_SECONDS, SECOND_MS } from '@/utils/constants/time'
+import { HOUR_SECONDS, MINUTE_MS, SECOND_MS } from '@/utils/constants/time'
 
 // A live's memory outlives it this long at most
 const ROOM_TTL_SECONDS = LIVE_SETTINGS.memoryHours * HOUR_SECONDS
@@ -178,6 +179,27 @@ const markFirst = (room: LiveRoom, event: SceneEvent): SceneEvent => {
 }
 
 /**
+ * Reject a held message nobody handled in time
+ * @param {string} liveId - Live
+ * @param {string} heldId - Held message
+ * @return {void}
+ */
+
+const scheduleExpiry = (liveId: string, heldId: string): void => {
+  setTimeout(() => {
+    // Handled by then, or the live is over
+    const held: HeldMessage[] = rooms.get(liveId)?.view.held ?? []
+    if (!held.some((entry) => entry.id === heldId)) return
+    pushRoomEvent(liveId, {
+      kind: 'expire',
+      heldId,
+      by: APP_NAME,
+      at: new Date().toISOString(),
+    })
+  }, LIVE_SETTINGS.heldExpireMinutes * MINUTE_MS)
+}
+
+/**
  * Gather one Mod View event
  * @param {string} liveId - Live
  * @param {SceneEvent} event - Event
@@ -187,6 +209,7 @@ const markFirst = (room: LiveRoom, event: SceneEvent): SceneEvent => {
 export const pushRoomEvent = (liveId: string, event: SceneEvent): void => {
   const room = roomOf(liveId)
   room.queue.push(markFirst(room, event))
+  if (event.kind === 'hold') scheduleExpiry(liveId, event.held.id)
 
   // A stalled flush never piles up
   if (room.queue.length > LIVE_SETTINGS.roomMessages * QUEUE_FACTOR) {

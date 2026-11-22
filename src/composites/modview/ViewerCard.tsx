@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Avatar } from '@/components/elements/display/Avatar'
@@ -20,6 +21,7 @@ import { useBanDetail } from '@/core/hooks/data/lives/useBanDetail'
 import { useViewerChat } from '@/core/hooks/data/lives/useViewerChat'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { useViewerDossier } from '@/core/hooks/data/lives/useViewerDossier'
+import { QUERY_KEYS } from '@/core/lib/api/keys'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_MOBILE, MODVIEW_USER } from '@/declarations/ui/variants'
@@ -35,6 +37,8 @@ export interface ViewerCardProps {
   messages: ChatMessage[]
   // Sanctions the viewer got on this live
   liveSanctions: number
+  // Acts aimed at the viewer on this live, any kind, a change reloads their record
+  actCount?: number
   gate: GateCheck
   onAct: ActRunner
   onClose: () => void
@@ -65,6 +69,7 @@ export const ViewerCard = ({
   chatter,
   messages,
   liveSanctions,
+  actCount = 0,
   gate,
   onAct,
   onClose,
@@ -81,6 +86,16 @@ export const ViewerCard = ({
   const [list, setList] = useState<ListTab>(isMobile ? 'sanctions' : 'messages')
   const liveId = dossier?.liveId ?? null
   const { history } = useViewerDossier(liveId, chatter.id)
+  const queryClient = useQueryClient()
+  const seenActs = useRef(actCount)
+
+  // A gesture from anyone lands in the record at once
+  useEffect(() => {
+    if (!liveId || seenActs.current === actCount) return
+    seenActs.current = actCount
+    void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.liveViewer(liveId, chatter.id) })
+    void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.liveViewerChat(liveId, chatter.id) })
+  }, [actCount, liveId, chatter.id, queryClient])
   const chat = useViewerChat(liveId, chatter.id)
   const lastLine = [...messages].reverse().find((message) => !message.deletedBy)
   const { detail } = useBanDetail(liveId, chatter.id)
