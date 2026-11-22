@@ -3469,6 +3469,8 @@ model PlayTrophyWin {
   xp        Int
   // Paid at once for a trophy reached before they paid
   backfill  Boolean  @default(false)
+  // Cheered on screen once, then never again
+  seen      Boolean  @default(false)
   createdAt DateTime @default(now())
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)

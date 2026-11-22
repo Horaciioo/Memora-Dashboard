@@ -26,6 +26,7 @@ export const MODVIEW_PREFERENCES = {
   badges: { kind: 'toggle', default: true },
   deleted: { kind: 'toggle', default: true },
   firstMessages: { kind: 'toggle', default: true },
+  mergeHistory: { kind: 'toggle', default: false },
   colouredNames: { kind: 'toggle', default: true },
   pauseMode: { kind: 'choice', options: ['hover', 'alt'], default: 'hover' },
   toolsPosition: { kind: 'choice', options: ['left', 'hover', 'right', 'card'], default: 'left' },

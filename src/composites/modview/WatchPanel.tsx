@@ -76,16 +76,14 @@ export const WatchPanel = ({ watchlist, gate, onAct, onPick }: WatchPanelProps) 
                 </button>
                 {': '}
                 <FlaggedText text={line.text} flagged={line.flagged} />
-                {!line.deletedBy && (
-                  <span className={MODVIEW_WATCH.tools}>
-                    <ModActionTools
-                      target={{ chatterId: line.author.id, messageId: line.id }}
-                      name={line.author.name}
-                      gate={gate}
-                      onAct={onAct}
-                    />
-                  </span>
-                )}
+                <span className={MODVIEW_WATCH.tools}>
+                  <ModActionTools
+                    target={{ chatterId: line.author.id, messageId: line.id }}
+                    name={line.author.name}
+                    gate={gate}
+                    onAct={onAct}
+                  />
+                </span>
               </li>
             )
           })}

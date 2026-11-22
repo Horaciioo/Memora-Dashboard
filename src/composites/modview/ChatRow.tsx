@@ -117,17 +117,20 @@ const ChatLineBody = ({
   const ReplyIcon = ICONS.reply
   const isInCard = toolsPosition === 'card'
 
-  const toolsNode = !isDeleted && (
+  // A removed line keeps its sanctions, only the reply goes
+  const toolsNode = (
     <span className={MODVIEW_CHAT[TOOLS_CLASS[toolsPosition]]}>
-      <button
-        type="button"
-        className={MODVIEW_CHAT.tool}
-        title={MODVIEW_COPY.reply}
-        aria-label={MODVIEW_COPY.reply}
-        onClick={() => onReply(message)}
-      >
-        <ReplyIcon className={MODVIEW_CHAT.toolIcon} aria-hidden="true" />
-      </button>
+      {!isDeleted && (
+        <button
+          type="button"
+          className={MODVIEW_CHAT.tool}
+          title={MODVIEW_COPY.reply}
+          aria-label={MODVIEW_COPY.reply}
+          onClick={() => onReply(message)}
+        >
+          <ReplyIcon className={MODVIEW_CHAT.toolIcon} aria-hidden="true" />
+        </button>
+      )}
       {!isInCard && <ModActionBar actions={actions} target={target} gate={gate} run={runAction} />}
     </span>
   )

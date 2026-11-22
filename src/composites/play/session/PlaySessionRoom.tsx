@@ -159,7 +159,7 @@ export const PlaySessionRoom = ({
           {replay && (
             <>
               <PlayEndBackdrop />
-              <PlayEndIntro winner={report?.winner ?? null} />
+              <PlayEndIntro game={game} winner={report?.winner ?? null} />
               <PlayEndHeader game={game} />
             </>
           )}

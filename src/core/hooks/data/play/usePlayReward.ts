@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
+import { claimTrophyCheersAction } from '@/app/(dashboard)/play/actions'
 import { apiGet } from '@/core/lib/api/client'
 import { usePlayCelebrationStore } from '@/core/store/play/playCelebration'
 import { QUERY_KEYS } from '@/core/lib/api/keys'
@@ -47,6 +48,23 @@ export const usePlayReward = (profile: PlayProfileView): PlayReward | null => {
     if (gain > 0) setReward({ id: performance.now(), gain })
     if (climbed) fire({ kind: 'level', level: level.level })
   }, [data, fire])
+
+  // Trophies not cheered yet, at the first visit then whenever XP moves
+  const isClaiming = useRef(false)
+  const xp = data.global.xp
+  useEffect(() => {
+    if (isClaiming.current) return
+    isClaiming.current = true
+    void claimTrophyCheersAction()
+      .then((trophies) =>
+        trophies.forEach(({ label, goal, icon, rarity }) =>
+          fire({ kind: 'trophy', label, goal, icon, rarity })
+        )
+      )
+      .finally(() => {
+        isClaiming.current = false
+      })
+  }, [xp, fire])
 
   // Gone after a moment
   useEffect(() => {

@@ -6,7 +6,7 @@ import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
 import { MODVIEW_ACTION_COPY } from '@/declarations/modview/actionCopy'
-import { MODVIEW_COPY } from '@/declarations/modview/copy'
+import { MODVIEW_COPY, MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import {
   CHAT_OPTIONS,
   DENSITIES,
@@ -69,6 +69,9 @@ export const PreferencesPanel = () => {
             )}
           </Fragment>
         ))}
+        {toggle(MODVIEW_USER_COPY.mergeHistory, preferences.mergeHistory, (mergeHistory) =>
+          preview({ mergeHistory })
+        )}
         {toggle(MODVIEW_ACTION_COPY.confirmHarsh, preferences.confirmHarsh, (confirmHarsh) =>
           preview({ confirmHarsh })
         )}

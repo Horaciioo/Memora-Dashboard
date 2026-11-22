@@ -449,6 +449,8 @@ export const MODVIEW_USER = {
   // Hour on the left, aligned with the first row of text
   lineTime:
     'shrink-0 pt-px font-[family-name:var(--font-mono)] text-micro text-[var(--twitch-muted)] tabular-nums',
+  // Sanction among the messages, plain text
+  lineSanction: 'font-bold text-[var(--twitch-muted)]',
   lineTag: 'ml-1.5 text-xs font-bold text-[var(--twitch-muted)]',
   more: 'mx-auto my-2 block text-xs font-bold text-[var(--color-ink-accent)] hover:underline',
   note: 'pb-2 text-xs text-[var(--twitch-muted)]',

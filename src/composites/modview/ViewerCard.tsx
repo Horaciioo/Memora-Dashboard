@@ -21,6 +21,7 @@ import { useBanDetail } from '@/core/hooks/data/lives/useBanDetail'
 import { useViewerChat } from '@/core/hooks/data/lives/useViewerChat'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { useViewerDossier } from '@/core/hooks/data/lives/useViewerDossier'
+import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
 import { QUERY_KEYS } from '@/core/lib/api/keys'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
@@ -82,6 +83,7 @@ export const ViewerCard = ({
 }: ViewerCardProps) => {
   const [tab, setTab] = useState<ViewerTab>('sanctions')
   const isMobile = useIsMobileShell()
+  const { preferences } = useModPreferences()
   // Timeouts first on a phone
   const [list, setList] = useState<ListTab>(isMobile ? 'sanctions' : 'messages')
   const liveId = dossier?.liveId ?? null
@@ -192,8 +194,17 @@ export const ViewerCard = ({
 
             <p className={MODVIEW_USER.listsTitle}>{MODVIEW_USER_COPY.historyTitle}</p>
             <section className={MODVIEW_USER.lists}>
-              <ViewerTabs isBold tabs={lists} value={list} onChange={setList} />
-              {list === 'messages' ? (
+              {!preferences.mergeHistory && (
+                <ViewerTabs isBold tabs={lists} value={list} onChange={setList} />
+              )}
+              {preferences.mergeHistory ? (
+                <ViewerChatHistory
+                  liveId={liveId}
+                  chatterId={chatter.id}
+                  liveMessages={messages}
+                  sanctions={history}
+                />
+              ) : list === 'messages' ? (
                 <ViewerChatHistory liveId={liveId} chatterId={chatter.id} liveMessages={messages} />
               ) : (
                 <ViewerSanctionList history={history} />

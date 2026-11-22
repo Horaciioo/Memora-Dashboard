@@ -128,75 +128,20 @@ const lossScale = (state: ConcordatState, corps: ConcordatCorps): number => {
   return scale
 }
 
-// Tiles between a tile and the aim, straight line
-const gapTo = (state: ConcordatState, tile: number, aim: number): number => {
-  const { width } = state.map
-
-  return Math.hypot(
-    (tile % width) - (aim % width),
-    Math.floor(tile / width) - Math.floor(aim / width)
-  )
-}
-
-// Province the push works on: the one under the aim, else the one the nation holds most of
-const focusProvince = (
-  state: ConcordatState,
-  corps: ConcordatCorps,
-  contact: { tiles: number[] }
-): number => {
-  const { province, provinces } = state.map
-  const stride = provinces.length + 1
-  const wanted = corps.aim === undefined ? 0 : province[corps.aim]
-  let best = 0
-  let bestShare = -1
-
-  // Aimed province first when the front touches it
-  for (const tile of contact.tiles) {
-    const id = province[tile]
-    if (!id) continue
-    if (id === wanted) return id
-
-    const share = state.provinceCounts[corps.owner * stride + id] / provinces[id - 1].tiles
-    if (share > bestShare || (share === bestShare && id < best)) {
-      bestShare = share
-      best = id
-    }
-  }
-
-  return best
-}
-
-// Contact tiles in the order the front takes them: the focus province whole, holes first, then smooth, noisy, drawn to the aim
+// Contact tiles in the order the front takes them: holes first, then pure chance so the whole front moves, never a finger
 const rankContact = (
   state: ConcordatState,
   corps: ConcordatCorps,
   contact: { tiles: number[]; own: number[] }
 ): number[] => {
-  const focus = focusProvince(state, corps, contact)
   const scores = new Float64Array(contact.tiles.length)
-  const leads = new Float64Array(contact.tiles.length)
-  let nearest = Infinity
-  let farthest = 0
 
-  // Distance to the aim, when the push heads somewhere
-  if (corps.aim !== undefined) {
-    for (let index = 0; index < scores.length; index++) {
-      leads[index] = gapTo(state, contact.tiles[index], corps.aim)
-      nearest = Math.min(nearest, leads[index])
-      farthest = Math.max(farthest, leads[index])
-    }
-  }
-  const spread = Math.max(1, farthest - nearest)
-
-  // Score of each tile, lowest goes first
   for (let index = 0; index < scores.length; index++) {
-    const own = Math.min(contact.own[index], sim.enclaveNeighbors)
+    const hole = contact.own[index] >= sim.enclaveNeighbors ? 1 : 0
     const noise =
       front.noiseBase +
       front.noiseSpread * tileNoise(contact.tiles[index], corps.id * 7919 + state.tick)
-    const pull = corps.aim === undefined ? 0 : (front.aimCap * (leads[index] - nearest)) / spread
-    const isFocus = focus > 0 && state.map.province[contact.tiles[index]] === focus
-    scores[index] = noise * (1 - front.holeBonus * own) + pull - (isFocus ? front.provinceFirst : 0)
+    scores[index] = noise * (1 - front.holeBonus * hole)
   }
 
   return Array.from(scores.keys()).sort(
@@ -251,13 +196,20 @@ const capture = (
 }
 
 // Pockets of the target touching a tile just taken
-const claimAround = (state: ConcordatState, corps: ConcordatCorps, tile: number): void => {
+const claimAround = (
+  state: ConcordatState,
+  corps: ConcordatCorps,
+  tile: number,
+  spared: Set<number>
+): void => {
   if (!corps.target || !state.players[corps.target - 1].alive) return
 
   const count = neighborsOf(tile, state.map.width, state.map.height, near)
   for (let slot = 0; slot < count; slot++) {
     const next = near[slot]
-    if (state.owner[next] === corps.target) claimPocket(state, corps.owner, corps.target, next)
+    if (state.owner[next] === corps.target) {
+      claimPocket(state, corps.owner, corps.target, next, spared)
+    }
   }
 }
 
@@ -279,9 +231,6 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
   const contact = gatherContact(state, corps)
   if (!contact.tiles.length) return disband(state, corps, 0)
 
-  // Budget follows the length of the front
-  const density = Math.max(0.01, defenseDensity(state, corps.owner, corps.target, corps.guard))
-  const frontage = Math.max(1, Math.min(contact.tiles.length, corps.troops / density))
   const pace = (front.driveMin + (front.driveMax - front.driveMin) * (corps.drive ?? 0.5)) / 1.5
   // Tired corps slow down little by little instead of stopping dead
   const fade = Math.min(1, Math.max(front.fadeFloor, corps.troops / front.fadeTroops))
@@ -315,26 +264,28 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
     if (taken >= sim.maxTilesPerTick || corps.troops < 1) break
 
     const isEnclave = contact.own[index] >= sim.enclaveNeighbors
-    if (!isEnclave && corps.progress < 1) break
+    // A rough tile eats more progress, a cheaper one may still fit
+    const weight = TERRAIN_DEFENSE[state.map.terrain[contact.tiles[index]]]
+    if (!isEnclave && corps.progress < weight) continue
 
     const tile = contact.tiles[index]
     if (state.owner[tile] !== corps.target) continue
 
     const cost = tileCost(state, corps, tile, contact.own[index], factor)
-    const isThin = corps.target > 0 && corps.troops / frontage < cost
-    if (isThin || corps.troops < cost * sim.attackerLoss * scale) {
+    if (corps.troops < cost * sim.attackerLoss * scale) {
       blocked++
       continue
     }
 
     capture(state, corps, tile, cost, scale)
-    if (!isEnclave) corps.progress -= 1
+    if (!isEnclave) corps.progress -= weight
     taken++
     if (corps.target && taken <= sim.pocketChecks) sealed.push(tile)
   }
 
   // Land walled in by the tiles just taken falls with them
-  for (const tile of sealed) claimAround(state, corps, tile)
+  const spared = new Set<number>()
+  for (const tile of sealed) claimAround(state, corps, tile, spared)
 
   // A stalled push bleeds
   if (!taken && blocked) {

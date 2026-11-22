@@ -1,15 +1,12 @@
 'use client'
 
 import type { CSSProperties } from 'react'
-import { useEffect } from 'react'
 
 import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
-import { usePlayCelebrationStore } from '@/core/store/play/playCelebration'
 import type { PlayEndStat, PlayEndTrophy } from '@/types/play'
 import {
   fillPlayMessage,
   lobbySkinOf,
-  PLAY_CELEBRATION,
   PLAY_END_COPY,
   PLAY_END_LIMITS,
   PLAY_END_TIMING,
@@ -35,22 +32,6 @@ export interface PlayEndFactsProps {
  */
 
 export const PlayEndFacts = ({ game, stats, awards, trophies }: PlayEndFactsProps) => {
-  const fire = usePlayCelebrationStore((state) => state.fire)
-
-  // Each trophy is cheered once its card is up
-  useEffect(() => {
-    const timers = trophies
-      .slice(0, PLAY_END_LIMITS.trophies)
-      .map(({ label, goal, icon, rarity }, index) =>
-        window.setTimeout(
-          () => fire({ kind: 'trophy', label, goal, icon, rarity }),
-          PLAY_CELEBRATION.trophyDelayMs + index * PLAY_CELEBRATION.trophyStepMs
-        )
-      )
-
-    return () => timers.forEach(window.clearTimeout)
-  }, [trophies, fire])
-
   if (stats.length === 0 && awards.length === 0 && trophies.length === 0) return null
   const skin = cn(PLAY_END_PAGE.facts, lobbySkinOf(game))
   const at = (step: number): CSSProperties => ({

@@ -5,7 +5,13 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { levelOf, readBodyList, trophiesOf } from '@/core/lib/play'
 import { noteGain } from '@/core/services/play/PlayActivityService'
-import { PLAY_PIN_MAX, PLAY_RARITY_LEVELS, PLAY_TROPHIES } from '@/declarations/play'
+import {
+  PLAY_CELEBRATION,
+  PLAY_PIN_MAX,
+  PLAY_RARITY_LEVELS,
+  PLAY_TROPHIES,
+} from '@/declarations/play'
+import type { PlayTrophy } from '@/declarations/play/trophies'
 
 /**
  * Pay the trophies newly reached, each worth as many whole levels as its rarity
@@ -46,7 +52,9 @@ export const awardTrophies = async (
       for (let step = 0; step < PLAY_RARITY_LEVELS[trophy.rarity]; step++)
         paid += levelOf(Math.max(0, xp + paid)).needed ?? 0
 
-      await tx.playTrophyWin.create({ data: { accountId, trophy: trophy.key, xp: paid, backfill } })
+      await tx.playTrophyWin.create({
+        data: { accountId, trophy: trophy.key, xp: paid, backfill, seen: backfill },
+      })
       if (!backfill) await noteGain(tx, accountId, { kind: 'TROPHY', xp: paid, ref: trophy.key })
       xp += paid
     }
@@ -179,4 +187,31 @@ export const setPinnedTrophies = async (
     create: { accountId, pinnedTrophies: pins },
     update: { pinnedTrophies: pins },
   })
+}
+
+/**
+ * Trophies won and not cheered yet, claimed once so no screen shows them twice
+ * @param {string} accountId - Player
+ * @return {Promise<PlayTrophy[]>} - Rarest first, capped to what one visit can show
+ */
+
+export const claimTrophyCheers = async (accountId: string): Promise<PlayTrophy[]> => {
+  const unseen = await prisma.playTrophyWin.findMany({
+    where: { accountId, seen: false },
+    select: { trophy: true },
+  })
+  const claimed: PlayTrophy[] = []
+
+  for (const { trophy } of unseen) {
+    const { count } = await prisma.playTrophyWin.updateMany({
+      where: { accountId, trophy, seen: false },
+      data: { seen: true },
+    })
+    const found = PLAY_TROPHIES.find((entry) => entry.key === trophy)
+    if (count > 0 && found) claimed.push(found)
+  }
+
+  return claimed
+    .sort((left, right) => PLAY_RARITY_LEVELS[right.rarity] - PLAY_RARITY_LEVELS[left.rarity])
+    .slice(0, PLAY_CELEBRATION.visitMax)
 }
