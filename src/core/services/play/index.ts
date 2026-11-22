@@ -22,6 +22,7 @@ export {
 } from '@/core/services/play/LobbyService'
 export {
   claimTrophies,
+  claimTrophyCheers,
   dismissTrophyNotice,
   readTrophyNotice,
   readTrophyRarity,
