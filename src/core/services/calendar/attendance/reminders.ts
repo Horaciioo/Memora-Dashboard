@@ -152,9 +152,16 @@ export const notifyConvened = async (
 ): Promise<void> => {
   if (recipients.length === 0) return
 
+  // Whoever was settled absent is not asked
+  const waiting = await prisma.eventAttendance.findMany({
+    where: { eventId: event.id, accountId: { in: recipients }, status: AttendanceStatuses.Pending },
+    select: { accountId: true },
+  })
+  if (waiting.length === 0) return
+
   await notify({
     ...NOTIFY,
-    recipients,
+    recipients: waiting.map((row) => row.accountId),
     actorId: event.ownerId,
     targetId: event.id,
     subject: event.title,

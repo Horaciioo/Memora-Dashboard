@@ -22,7 +22,7 @@ import type { LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { Permissions } from '@/utils/constants/permissions'
 import type { LiveInput } from '@/core/services/lives/LiveService/forms'
-import { convene } from '@/core/services/lives/LiveService/convene'
+import { conveneWithLeave } from '@/core/services/lives/LiveService/convene'
 import { assertCoordinators } from '@/core/services/lives/LiveService/coordinators'
 import { readLive } from '@/core/services/lives/LiveService/reads'
 
@@ -50,7 +50,7 @@ export const openLive = async ({
   // Planned end is the one typed, none is invented, closing the live stays manual
   const { endsAt } = entry
 
-  const convened = await convene({
+  const { convened, onLeave } = await conveneWithLeave({
     youtuberId: input.youtuberId,
     picked: input.pickedIds,
     startsAt: entry.startsAt,
@@ -59,6 +59,8 @@ export const openLive = async ({
   })
   const memberIds = [...new Set([...input.coordinatorIds, ...convened])]
   await syncRoster(entry.id, memberIds)
+  // Moderators on leave sit in the roll as absent, never asked
+  await syncRoster(entry.id, onLeave)
 
   const live = await prisma.live.create({
     data: {
