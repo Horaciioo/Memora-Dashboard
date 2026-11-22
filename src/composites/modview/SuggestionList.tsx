@@ -1,17 +1,22 @@
 'use client'
 
+import { useState } from 'react'
+
 import { Button } from '@/components/elements/actions/Button'
 import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { WindowEmpty } from '@/composites/modview/ModWindow'
+import { SuggestionThread } from '@/composites/modview/SuggestionThread'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import type { Suggestion } from '@/core/lib/modview/suggest'
 import { MODVIEW_SUGGESTION_COPY as COPY, measureTag } from '@/declarations/modview/suggestions'
 import { MODVIEW_SUGGEST, MODVIEW_VERDICT } from '@/declarations/ui/variants'
-import type { Chatter, ModViewIntent } from '@/types/modview'
+import type { ChatMessage, Chatter, ModViewIntent } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 
 export interface SuggestionListProps {
   suggestions: Suggestion[]
+  // Chat of the live, for the conversation around a message
+  messages: ChatMessage[]
   gate: GateCheck
   onAct: ActRunner
   // Put a line in the chat box
@@ -29,6 +34,7 @@ export interface SuggestionListProps {
 
 export const SuggestionList = ({
   suggestions,
+  messages,
   gate,
   onAct,
   onUse,
@@ -36,6 +42,10 @@ export const SuggestionList = ({
   onWatch,
   onDismiss,
 }: SuggestionListProps) => {
+  const [openThreads, setOpenThreads] = useState<string[]>([])
+  const toggleThread = (id: string) =>
+    setOpenThreads((open) => (open.includes(id) ? open.filter((one) => one !== id) : [...open, id]))
+
   return (
     <>
       {suggestions.length === 0 ? (
@@ -99,9 +109,22 @@ export const SuggestionList = ({
                   offense && <p className={MODVIEW_SUGGEST.none}>{COPY.noCommand}</p>
                 )}
 
+                {openThreads.includes(id) && (
+                  <SuggestionThread messages={messages} source={source} />
+                )}
+
                 <div className={MODVIEW_SUGGEST.divider} role="separator" />
 
                 <div className={MODVIEW_SUGGEST.actions}>
+                  <Button
+                    variant="ghost"
+                    icon="chat"
+                    className={MODVIEW_SUGGEST.talk}
+                    aria-label={COPY.conversation}
+                    aria-pressed={openThreads.includes(id)}
+                    title={openThreads.includes(id) ? COPY.hideConversation : COPY.conversation}
+                    onClick={() => toggleThread(id)}
+                  />
                   <Button
                     variant="ghost"
                     icon="visible"

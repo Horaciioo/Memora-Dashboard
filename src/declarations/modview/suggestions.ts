@@ -83,7 +83,15 @@ export const MODVIEW_SUGGESTION_COPY = {
   fromChat: 'Chat',
   watch: 'Surveiller',
   dossier: 'Dossier',
+  conversation: 'Voir la conversation',
+  hideConversation: 'Masquer la conversation',
+  threadEmpty: 'Aucun autre message autour de celui-ci.',
+  olderLines: 'Messages précédents',
+  newerLines: 'Messages suivants',
 } as const
+
+// Lines of chat shown around a message, and added by each press
+export const THREAD_CONTEXT = 8
 
 // Short label by measure kind
 const MEASURE_TAG: Partial<Record<SanctionKindName, string>> = {

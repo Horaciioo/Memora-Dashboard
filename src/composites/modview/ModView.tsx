@@ -456,6 +456,7 @@ export const ModView = ({
           render={windowFor}
           suggest={{
             suggestions,
+            messages: state.messages,
             gate,
             onAct: act,
             onUse: useSuggestion,
@@ -632,6 +633,7 @@ export const ModView = ({
               isWorkspace
                 ? {
                     suggestions,
+                    messages: state.messages,
                     gate,
                     onAct: act,
                     onUse: useSuggestion,

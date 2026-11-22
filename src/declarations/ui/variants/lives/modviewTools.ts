@@ -56,10 +56,21 @@ export const MODVIEW_SUGGEST = {
   command:
     'font-[family-name:var(--font-mono)] text-xs text-[var(--twitch-muted)] break-words select-all',
   none: 'text-xs text-[var(--color-ink-subtle)] italic',
-  actions: 'grid grid-cols-3 gap-1',
+  actions: 'grid grid-cols-4 gap-1',
+  talk: 'h-7 min-h-0 w-full',
   watch: 'h-7 min-h-0 w-full',
   accept: 'h-7 min-h-0 w-full !text-[var(--color-success)]',
   refuse: 'h-7 min-h-0 w-full !text-[var(--color-danger)]',
+  // Chat around the message, as Twitch shows it
+  thread:
+    'flex max-h-64 flex-col overflow-y-auto rounded-[var(--radius-md)] bg-[var(--color-surface)] py-1',
+  more: 'cursor-pointer px-3 py-1 text-left text-xs font-semibold text-[var(--twitch-muted)] hover:underline',
+  line: 'px-3 py-0.5 text-sm leading-relaxed [overflow-wrap:anywhere]',
+  lineLit: 'bg-[color-mix(in_oklab,var(--color-caution)_18%,transparent)]',
+  lineTime: 'mr-1.5 text-xs text-[var(--twitch-muted)] tabular-nums',
+  lineName: 'font-bold',
+  lineGone: 'text-[var(--color-ink-subtle)] line-through',
+  threadEmpty: 'px-3 py-1 text-xs text-[var(--color-ink-subtle)] italic',
 } as const
 
 /**
