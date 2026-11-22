@@ -197,6 +197,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une scène d’ouverture propre à chaque jeu de « Memora Play » à la fin d’une partie, avant l’annonce du gagnant.',
+      },
+      {
+        tag: ChangelogTags.Added,
         page: ROUTES.academy,
         audience: ChangelogAudiences.Responsables,
         text: 'Ajout des absences dans la fiche d’un junior, pour les voir à côté de sa progression.',
@@ -288,6 +294,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
         text: 'Correction du sélecteur d’invitation qui ouvrait un profil au lieu d’inviter le joueur.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction des trophées gagnés en jeu qui pouvaient être fêtés plusieurs fois ou ne pas l’être du tout à la fin d’une partie.',
       },
     ],
   },
