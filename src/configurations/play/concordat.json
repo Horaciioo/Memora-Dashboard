@@ -19,7 +19,7 @@
     "step": 500
   },
   "protectionMinutes": {
-    "default": 3,
+    "default": 0,
     "min": 0,
     "max": 10
   },
@@ -158,10 +158,14 @@
     "noiseBase": 10,
     "noiseSpread": 16,
     "holeBonus": 0.3,
-    "aimWeight": 0.15,
     "aimBoost": 0.6,
-    "aimCap": 12,
-    "provinceFirst": 1000,
+    "aimCap": 14,
+    "frontPower": 0.8,
+    "slowMinutes": 20,
+    "slowFloor": 0.5,
+    "botBoost": 1.6,
+    "aimMerge": 14,
+    "provinceFirst": 3,
     "giantTiles": 15000,
     "giantLoss": 0.5,
     "giantDefense": 0.7,

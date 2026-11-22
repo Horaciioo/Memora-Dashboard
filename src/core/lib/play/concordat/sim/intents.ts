@@ -44,7 +44,7 @@ import { launchRefusal, launchStrike } from '@/core/lib/play/concordat/weapons'
 import { isTileBlocked } from '@/core/lib/play/concordat/zones'
 import { closeTrade } from '@/core/lib/play/concordat/trade'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
-import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
+import type { ConcordatCorps, ConcordatIntent, ConcordatState } from '@/types/concordat'
 import { ConcordatPhases, ConcordatTerrains } from '@/utils/constants/concordat'
 
 const { sim } = CONCORDAT
@@ -104,6 +104,28 @@ const landingRefusal = (
   return isTileBlocked(state, move.tile, 'blocksSea') ? 'storm' : sailRefusal(state, move)
 }
 
+// Corps an order joins: same target, and the same spot when it names one, else any push there
+const corpsFor = (
+  state: ConcordatState,
+  intent: Extract<ConcordatIntent, { kind: 'engage' }>
+): ConcordatCorps | undefined => {
+  const mine = state.corps.filter(
+    (corps) => corps.owner === intent.playerId && corps.target === intent.target && !corps.feint
+  )
+  if (intent.tile === undefined) return mine[0]
+
+  const { width } = state.map
+  const gap = (corps: ConcordatCorps): number =>
+    corps.aim === undefined
+      ? 0
+      : Math.hypot(
+          (corps.aim % width) - (intent.tile! % width),
+          Math.floor(corps.aim / width) - Math.floor(intent.tile! / width)
+        )
+
+  return mine.find((corps) => gap(corps) <= CONCORDAT.front.aimMerge)
+}
+
 // Reason an engagement is refused
 const engageRefusal = (
   state: ConcordatState,
@@ -123,18 +145,16 @@ const engageRefusal = (
   if (Math.floor((me.troops * intent.percent) / 100) < sim.minEngage) return 'tooFew'
   if (isByWater(state, intent)) {
     // Same landmass but no common border: nothing to sail, say so
-    const aim = intent.tile ?? (intent.target ? aimTileOf(state, intent.playerId, intent.target) : -1)
+    const aim =
+      intent.tile ?? (intent.target ? aimTileOf(state, intent.playerId, intent.target) : -1)
     const reachable = aim >= 0 && !isOverseas(state, intent.playerId, aim)
     return intent.target && reachable && !touches(state, me.id, intent.target)
       ? 'noContact'
       : landingRefusal(state, intent)
   }
 
-  const existing = state.corps.some(
-    (corps) => corps.owner === me.id && corps.target === intent.target && !corps.feint
-  )
-
-  return !existing && state.corps.filter((corps) => corps.owner === me.id).length >= sim.maxCorps
+  return !corpsFor(state, intent) &&
+    state.corps.filter((corps) => corps.owner === me.id).length >= sim.maxCorps
     ? 'tooManyCorps'
     : null
 }
@@ -208,9 +228,7 @@ const engage = (
   }
 
   // Reinforce the corps already pushing
-  const corps = state.corps.find(
-    (other) => other.owner === me.id && other.target === intent.target && !other.feint
-  )
+  const corps = corpsFor(state, intent)
   if (corps) {
     corps.drive =
       ((corps.drive ?? drive) * corps.troops + drive * amount) / (corps.troops + amount || 1)

@@ -82,23 +82,21 @@ export const CONCORDAT_HUD = {
   row: 'flex items-center gap-3 max-md:gap-2',
   minimap: `${BLOCK} pointer-events-auto relative overflow-hidden p-1.5`,
   minimapCanvas: 'block cursor-pointer rounded-[0.1rem]',
-  // Top left: standings sidebar, keys row then the table
+  // Top right: clock under the keys
+  clock: `${BLOCK} pointer-events-none absolute top-[4.75rem] right-5 z-20 flex items-baseline gap-3 px-4 py-2`,
+  clockCaption: 'text-[0.6rem] font-black tracking-[0.2em] text-[var(--play-ink-faint)] uppercase',
+  clockFigure: 'text-2xl leading-none font-black tabular-nums text-[var(--play-accent)]',
+  // Top left: standings table
   standings:
     'pointer-events-none absolute top-4 left-5 z-20 flex max-w-[calc(100vw-2.5rem)] flex-col gap-1.5 max-md:hidden',
-  standKeys: 'pointer-events-auto flex items-center gap-1',
-  standKey: `${BLOCK} grid size-9 place-items-center text-[var(--play-ink)] transition-transform hover:-translate-y-0.5`,
-  standKeyOn: `${BLOCK} grid size-9 place-items-center text-[var(--play-accent)]`,
-  standPicker: `${BLOCK} pointer-events-auto flex w-44 flex-col gap-0.5 p-1.5`,
-  standPick:
-    'flex items-center justify-between gap-2 rounded-[0.15rem] px-2 py-1 text-left text-xs font-bold text-[var(--play-ink)] hover:bg-[var(--play-chip)]',
   standTable: `${BLOCK} pointer-events-auto flex flex-col overflow-hidden`,
   standScroll: 'max-h-[11rem] overflow-y-auto overscroll-contain',
   standRow:
     'grid cursor-pointer items-center gap-x-2.5 px-2.5 py-1 text-xs tabular-nums text-[var(--play-ink)] transition-colors hover:bg-[var(--play-chip)]',
   standHead:
-    'grid items-center gap-x-2.5 border-b border-[var(--play-line)] px-2.5 py-1.5 text-[0.6rem] font-black tracking-[0.12em] uppercase text-[var(--play-ink-faint)]',
+    'grid items-center gap-x-2.5 border-b border-[var(--play-line)] bg-[var(--hud-head)] px-2.5 py-1.5 text-[0.6rem] font-black tracking-[0.12em] uppercase text-[var(--play-ink-faint)]',
   standSortKey: 'cursor-pointer text-right hover:text-[var(--play-ink)]',
-  standMine: 'font-black',
+  standMine: 'bg-[var(--hud-mine)] font-black',
   standPinned: 'border-t border-[var(--play-line)] bg-[var(--play-chip)]',
   standName: 'flex min-w-0 items-center gap-1.5 font-bold',
   standCell: 'text-right',
@@ -132,8 +130,7 @@ export const CONCORDAT_HUD = {
     'pointer-events-none fixed top-0 left-0 z-40 flex size-12 items-center justify-center rounded-[0.2rem] bg-[var(--play-accent)] text-[var(--concordat-plate)] opacity-90 shadow-lg',
   armCount:
     'pointer-events-none absolute top-0.5 right-1 text-[0.6rem] leading-none font-extrabold tabular-nums',
-  armNote:
-    'text-[0.6rem] max-md:text-[0.5rem] leading-none font-bold tabular-nums opacity-70',
+  armNote: 'text-[0.6rem] max-md:text-[0.5rem] leading-none font-bold tabular-nums opacity-70',
   toolBar: `${BLOCK} pointer-events-auto flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-[var(--play-ink)]`,
   // Under the keys, top right
   meter: `${BLOCK} pointer-events-none absolute top-[4.25rem] right-5 z-[5] flex w-44 flex-col gap-1 px-3 py-2 max-md:top-[calc(4.5rem+env(safe-area-inset-top))] max-md:right-3`,

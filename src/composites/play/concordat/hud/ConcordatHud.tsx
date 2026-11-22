@@ -12,6 +12,7 @@ import { ConcordatZones } from '@/composites/play/concordat/hud/ConcordatZones'
 import { ConcordatPill } from '@/composites/play/concordat/hud/ConcordatPill'
 import { ConcordatNotices } from '@/composites/play/concordat/hud/ConcordatNotices'
 import { PlayHud } from '@/composites/play/hud/PlayHud'
+import { usePlayPref } from '@/core/store/play/playPrefs'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
 import {
@@ -65,10 +66,8 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
     (isCountingUp ? client.tick - client.pickEnd : lastTick - client.tick) /
     CONCORDAT_TICKS_PER_SECOND
 
-  // No clock on a phone, the keys alone sit flush right
-  const blocks = isMobile
-    ? []
-    : [{ key: 'clock', caption: CONCORDAT_HUD_COPY.time, figure: clockText(seconds) }]
+  // Clock under the keys, never on a phone
+  const hasClock = usePlayPref(PlayGames.Concordat, 'clock') && !isMobile
   const economy = client.systems.figures[client.me - 1]
 
   // A jump of gold well above the income, spoils or a gift, pops for two seconds
@@ -160,12 +159,18 @@ export const ConcordatHud = ({ sessionId, client, names, act, isSeated }: Concor
       game={PlayGames.Concordat}
       sessionId={sessionId}
       isSeated={isSeated}
-      blocks={blocks}
+      blocks={[]}
       rows={rows}
       hasStrip={false}
       isCompact
       isFlush={isMobile}
     >
+      {hasClock && (
+        <div className={CONCORDAT_HUD.clock}>
+          <span className={CONCORDAT_HUD.clockCaption}>{CONCORDAT_HUD_COPY.time}</span>
+          <span className={CONCORDAT_HUD.clockFigure}>{clockText(seconds)}</span>
+        </div>
+      )}
       <ConcordatNotices client={client} isSeated={isSeated} />
       {isPlaying && <ConcordatAlerts client={client} act={act} />}
       {isPlaying && <ConcordatOffers client={client} names={names} act={act} />}

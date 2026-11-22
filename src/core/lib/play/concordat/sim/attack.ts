@@ -176,14 +176,17 @@ const rankContact = (
   const scores = new Float64Array(contact.tiles.length)
   const leads = new Float64Array(contact.tiles.length)
   let nearest = Infinity
+  let farthest = 0
 
   // Distance to the aim, when the push heads somewhere
   if (corps.aim !== undefined) {
     for (let index = 0; index < scores.length; index++) {
       leads[index] = gapTo(state, contact.tiles[index], corps.aim)
       nearest = Math.min(nearest, leads[index])
+      farthest = Math.max(farthest, leads[index])
     }
   }
+  const spread = Math.max(1, farthest - nearest)
 
   // Score of each tile, lowest goes first
   for (let index = 0; index < scores.length; index++) {
@@ -191,10 +194,7 @@ const rankContact = (
     const noise =
       front.noiseBase +
       front.noiseSpread * tileNoise(contact.tiles[index], corps.id * 7919 + state.tick)
-    const pull =
-      corps.aim === undefined
-        ? 0
-        : Math.min(front.aimCap, (leads[index] - nearest) * front.aimWeight)
+    const pull = corps.aim === undefined ? 0 : (front.aimCap * (leads[index] - nearest)) / spread
     const isFocus = focus > 0 && state.map.province[contact.tiles[index]] === focus
     scores[index] = noise * (1 - front.holeBonus * own) + pull - (isFocus ? front.provinceFirst : 0)
   }
@@ -261,6 +261,17 @@ const claimAround = (state: ConcordatState, corps: ConcordatCorps, tile: number)
   }
 }
 
+// Tiles the front counts for the pace: a long front gains less than its length, an old game less than a young one, a country catches up
+const reach = (state: ConcordatState, corps: ConcordatCorps, length: number): number => {
+  const base = Math.max(length, front.minFront)
+  const long = front.minFront * (base / front.minFront) ** front.frontPower
+  const minutes = (state.tick * TICK_SECONDS * state.speed) / 60
+  const age = Math.max(front.slowFloor, 1 / (1 + minutes / front.slowMinutes))
+  const boost = state.players[corps.owner - 1].kind === ConcordatPowers.Country ? front.botBoost : 1
+
+  return long * age * boost
+}
+
 // One corps for one tick: the whole contact advances, faster the longer it is
 const push = (state: ConcordatState, corps: ConcordatCorps): void => {
   // A corps acts every other tick, with the time of both
@@ -288,7 +299,7 @@ const push = (state: ConcordatState, corps: ConcordatCorps): void => {
   if (corps.aim !== undefined && state.owner[corps.aim] === corps.owner) corps.aim = undefined
   const lead = corps.aim === undefined ? 1 : 1 + front.aimBoost
   corps.progress +=
-    Math.max(contact.tiles.length, front.minFront) * rate * pace * fade * shame * lead * seconds
+    reach(state, corps, contact.tiles.length) * rate * pace * fade * shame * lead * seconds
 
   // Not enough progress for a tile and no hole to fill: skip the ranking sort
   if (corps.progress < 1 && !contact.own.some((mine) => mine >= sim.enclaveNeighbors)) return

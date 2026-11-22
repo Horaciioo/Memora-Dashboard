@@ -1,8 +1,7 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 
-import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import {
   CONCORDAT_STANDING_COLUMNS,
   compactFigure,
@@ -34,6 +33,16 @@ const LIST_LIMIT = 60
 const RANK_WIDTH = '1.5rem'
 const NAME_WIDTH = 'minmax(6.5rem, 9rem)'
 const CELL_WIDTH = 'minmax(2.6rem, auto)'
+
+// Colour of a figure: land green, gold gold, troops red
+const COLUMN_TONES: Partial<Record<ConcordatStandingColumn, string>> = {
+  tiles: 'var(--concordat-ok)',
+  gold: 'var(--concordat-gold)',
+  income: 'var(--concordat-gold)',
+  troops: 'var(--concordat-war)',
+  maxTroops: 'var(--concordat-war-faint)',
+  trade: 'var(--concordat-trade)',
+}
 
 export interface ConcordatPanelsProps {
   client: ConcordatClientState
@@ -74,14 +83,8 @@ export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) =
   const isDesc = useConcordatViewStore((state) => state.standDesc)
   const columns = useConcordatViewStore((state) => state.standColumns)
   const sortStandings = useConcordatViewStore((state) => state.sortStandings)
-  const toggleColumn = useConcordatViewStore((state) => state.toggleColumn)
   const jumpTo = useConcordatViewStore((state) => state.jumpTo)
-  const [isPicking, setPicking] = useState(false)
-  const root = useRef<HTMLDivElement>(null)
-  const GearIcon = ICONS.settingsLine
   const ArrowIcon = ICONS.expand
-
-  useOutsideDismiss(isPicking, root, () => setPicking(false))
 
   // Refreshed every second, the sort is cheap but the eye needs no more
   const second = Math.floor(client.tick / CONCORDAT_TICKS_PER_SECOND)
@@ -113,7 +116,11 @@ export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) =
           <span className="truncate">{names[row.id]}</span>
         </span>
         {shown.map((column) => (
-          <span key={column} className={CONCORDAT_HUD.standCell}>
+          <span
+            key={column}
+            className={CONCORDAT_HUD.standCell}
+            style={{ color: COLUMN_TONES[column] }}
+          >
             {figureText(column, row.figures[column])}
           </span>
         ))}
@@ -122,35 +129,7 @@ export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) =
   }
 
   return (
-    <div ref={root} className={CONCORDAT_HUD.standings}>
-      <div className={CONCORDAT_HUD.standKeys}>
-        <button
-          type="button"
-          className={isPicking ? CONCORDAT_HUD.standKeyOn : CONCORDAT_HUD.standKey}
-          aria-pressed={isPicking}
-          aria-label={CONCORDAT_STANDINGS_COPY.columns}
-          title={CONCORDAT_STANDINGS_COPY.columns}
-          onClick={() => setPicking((open) => !open)}
-        >
-          <GearIcon className="size-4" />
-        </button>
-      </div>
-      {isPicking && (
-        <div className={CONCORDAT_HUD.standPicker}>
-          {CONCORDAT_STANDING_COLUMNS.map((column) => (
-            <button
-              key={column}
-              type="button"
-              className={CONCORDAT_HUD.standPick}
-              aria-pressed={columns.includes(column)}
-              onClick={() => toggleColumn(column)}
-            >
-              <span>{CONCORDAT_STANDINGS_COPY[column]}</span>
-              <span aria-hidden="true">{columns.includes(column) ? '●' : '○'}</span>
-            </button>
-          ))}
-        </div>
-      )}
+    <div className={CONCORDAT_HUD.standings}>
       <div className={CONCORDAT_HUD.standTable}>
         <div className={CONCORDAT_HUD.standHead} style={{ gridTemplateColumns: template }}>
           <span>{CONCORDAT_STANDINGS_COPY.rank}</span>
