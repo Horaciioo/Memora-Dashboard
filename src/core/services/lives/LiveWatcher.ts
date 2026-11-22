@@ -10,7 +10,7 @@ import { closeRoom, pushRoomEvent } from '@/core/lib/lives/room'
 import { logger } from '@/core/lib/logger'
 import { EventSubSession } from '@/core/lib/platforms/twitch/session'
 import type { TwitchSignal } from '@/core/lib/platforms/twitch/eventsub'
-import { moveLiveFromPlatform } from '@/core/services/lives/LiveService'
+import { moveLiveFromPlatform, openUnplannedLives } from '@/core/services/lives/LiveService'
 import { liveconLevelOf, logPlatformGesture } from '@/core/services/lives/ModerationLogService'
 import { chatRecordOf } from '@/core/lib/platforms/twitch/chatRecord'
 import {
@@ -477,6 +477,8 @@ export const startLiveWatcher = (): void => {
   const tick = async () => {
     if (!(await holdsWatchLease())) return releaseWatches()
 
+    // A stream nobody planned opens its own live
+    await openUnplannedLives().catch(() => null)
     await syncLiveWatches()
     // Silent tabs closed at their last beat
     await sweepStalePresences().catch(() => null)

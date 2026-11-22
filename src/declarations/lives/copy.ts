@@ -171,3 +171,6 @@ export const LIVE_COORDINATION_COPY = {
   seatAccepted: 'De {from} à {to}',
   seatDeclined: 'A refusé',
 } as const
+
+// Title of a live whose stream has none
+export const LIVE_UNPLANNED_TITLE = 'Live'

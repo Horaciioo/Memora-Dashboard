@@ -116,6 +116,7 @@ export const PUSH_CATEGORY_OF_KIND: Record<NotificationKindName, PushCategoryNam
   AbsenceAcknowledged: 'absences',
   LiveAnnounced: 'lives',
   LiveStarted: 'lives',
+  CreatorLive: 'lives',
   LiveCancelled: 'lives',
   LiveReportReady: 'lives',
   LiveCoordinatorAsked: 'lives',

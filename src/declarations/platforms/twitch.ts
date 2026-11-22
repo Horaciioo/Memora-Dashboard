@@ -137,6 +137,8 @@ export const TWITCH_SEAT_REVOCATIONS: readonly string[] = [
  */
 
 export const TWITCH_LIMITS = {
+  // Channels read in one streams call
+  streamsBatch: 100,
   // Seconds left to subscribe once the welcome arrived
   subscribeWindowSeconds: 10,
   // Longest timeout Twitch accepts

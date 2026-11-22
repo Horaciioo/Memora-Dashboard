@@ -186,6 +186,15 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     trail: '',
     addressed: true,
   },
+  CreatorLive: {
+    label: 'Live',
+    tone: 'danger',
+    icon: 'liveDot',
+    lead: '{subject}',
+    verb: 'est en Live !',
+    trail: '',
+    addressed: true,
+  },
   LiveCancelled: {
     label: 'Live',
     tone: 'neutral',
