@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { NEW_MARKS } from '@/composites/play/brand/logo/marks'
+import { DIRECTION_MARKS } from '@/composites/play/brand/logo/directionMarks'
 import { PLAY_GAMES } from '@/declarations/play/games'
 import { PLAY_BRAND } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -16,168 +16,51 @@ const tint = (token: string) => ({ style: { fill: `var(${token})` } })
 
 // Pictogram of each logo key, drawn on a 64 grid
 const MARKS: Record<string, ReactNode> = {
-  playBaccalaureat: (
-    <g fontWeight="900" fontSize="30" textAnchor="middle">
-      <text x="14" y="42" {...tint('--play-baccalaureat')} transform="rotate(-10 14 32)">
-        A
-      </text>
-      <text x="32" y="38" {...tint('--play-gold')}>
-        B
-      </text>
-      <text x="50" y="42" {...tint('--play-baccalaureat-deep')} transform="rotate(10 50 32)">
-        C
-      </text>
-    </g>
-  ),
-  playGolf: (
-    <>
-      <ellipse
-        className="play-bounce-shadow"
-        cx="32"
-        cy="55"
-        rx="15"
-        ry="4"
-        fill="black"
-        opacity="0.28"
-      />
-      <g className="play-bounce">
-        <circle cx="32" cy="28" r="17" fill="white" />
-        <circle
-          cx="32"
-          cy="28"
-          r="17"
-          fill="none"
-          stroke="black"
-          strokeOpacity="0.14"
-          strokeWidth="2"
-        />
-        <g fill="black" opacity="0.13">
-          <circle cx="26" cy="30" r="1.9" />
-          <circle cx="34" cy="34" r="1.9" />
-          <circle cx="38" cy="26" r="1.9" />
-          <circle cx="30" cy="38" r="1.7" />
-          <circle cx="40" cy="33" r="1.5" />
-        </g>
-        <ellipse cx="25" cy="20" rx="5" ry="3" fill="white" transform="rotate(-35 25 20)" />
-        <path
-          d="M23 18a11 11 0 0 1 6-4"
-          stroke="black"
-          strokeOpacity="0.1"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-        />
-      </g>
-    </>
-  ),
   playBomb: (
     <>
-      <circle cx="29" cy="38" r="17" {...tint('--play-bomb-shell')} />
-      <circle cx="23" cy="31" r="4.5" fill="white" opacity="0.4" />
-      <rect
-        x="33"
-        y="14"
-        width="11"
-        height="8"
-        rx="2.5"
-        {...tint('--play-bomb-cap')}
-        transform="rotate(35 38 19)"
+      <circle cx="31" cy="40" r="18" {...tint('--play-bomb')} />
+      <circle cx="29" cy="38" r="18" {...tint('--play-bomb-stock')} />
+      <g {...tint('--play-bomb-cream')}>
+        <circle cx="21" cy="30" r="2.6" />
+        <circle cx="27" cy="27" r="1.9" />
+        <circle cx="19" cy="37" r="1.9" />
+        <circle cx="25" cy="33" r="1.4" />
+        <circle cx="31" cy="25" r="1.1" />
+        <circle cx="17" cy="43" r="1.1" />
+      </g>
+      <circle
+        cx="29"
+        cy="38"
+        r="18"
+        fill="none"
+        stroke="var(--play-bomb-cream)"
+        strokeWidth="1.2"
       />
+      <g transform="rotate(35 38 19)">
+        <rect x="34" y="15" width="11" height="8" rx="2" {...tint('--play-bomb')} />
+        <rect
+          x="33"
+          y="14"
+          width="11"
+          height="8"
+          rx="2"
+          {...tint('--play-bomb-stock')}
+          stroke="var(--play-bomb-cream)"
+          strokeWidth="1.2"
+        />
+      </g>
       <path
-        d="M42 15c3-5 7-6 10-4"
+        d="M42 14c3-6 8-8 12-5"
         stroke="var(--play-bomb-cord)"
         strokeWidth="3"
         fill="none"
         strokeLinecap="round"
       />
-      <path
-        d="m54 4 1.8 4.8L60.6 10.6l-4.8 1.8L54 17.2l-1.8-4.8L47.4 10.6l4.8-1.8z"
-        {...tint('--play-bomb-glow')}
-      />
+      <circle cx="55" cy="8" r="7" {...tint('--play-bomb')} opacity="0.45" />
+      <path d="M55 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" {...tint('--play-bomb-glow')} />
     </>
   ),
-  ...NEW_MARKS,
-  playLudo: (
-    <>
-      <defs>
-        <linearGradient id="play-ludo-trail" x1="0.1" y1="0" x2="0.8" y2="1">
-          <stop offset="0" stopColor="white" stopOpacity="0" />
-          <stop offset="1" stopColor="white" stopOpacity="0.9" />
-        </linearGradient>
-      </defs>
-      {/* Shadow waiting on the ground */}
-      <ellipse cx="43" cy="58" rx="12" ry="2.6" fill="black" opacity="0.28" />
-      {/* Bounce coming down from the top, widening as it falls */}
-      <path d="M3 5Q30 0 44 36L34 40Q26 5 3 5Z" fill="url(#play-ludo-trail)" />
-      {/* Speed lines along the fall */}
-      <path
-        d="M22 24l5 10M47 15l4 9"
-        stroke="white"
-        strokeOpacity="0.7"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M18 31l3 6"
-        stroke="white"
-        strokeOpacity="0.45"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      {/* Pawn tipped by the fall */}
-      <g transform="rotate(22 41 42)">
-        <path d="M28 39v6a13 9.5 0 0 0 26 0v-6z" {...tint('--play-ludo-pawn-side')} />
-        <path
-          d="M28 39v6a13 9.5 0 0 0 26 0v-6"
-          fill="none"
-          stroke="var(--play-ludo-pawn-rim)"
-          strokeWidth="0.8"
-        />
-        <ellipse cx="41" cy="39" rx="13" ry="9.5" {...tint('--play-ludo-pawn')} />
-        <ellipse cx="41" cy="39" rx="7" ry="5.1" {...tint('--play-ludo-red-deep')} />
-        <ellipse cx="41" cy="38.4" rx="6.3" ry="4.5" {...tint('--play-ludo-red')} />
-        <ellipse cx="37.6" cy="36.6" rx="2.3" ry="1.2" fill="white" opacity="0.55" />
-      </g>
-    </>
-  ),
-  playNaval: (
-    <>
-      {/* Splash of a shell in the water */}
-      <path d="M44 38c2-8 1-13-1-17 5 3 8 9 6 17z" fill="white" opacity="0.9" />
-      <circle cx="46" cy="40" r="4" fill="white" opacity="0.9" />
-      <circle cx="52" cy="35" r="1.8" fill="white" opacity="0.8" />
-      {/* Warship, bow to the left */}
-      <path d="M5 38h42l-6 9H12z" {...tint('--play-naval-hull')} />
-      <path d="M12 47h29l-1.5 3H14z" {...tint('--play-naval-hull-deep')} />
-      <rect x="20" y="30" width="14" height="8" rx="1.5" {...tint('--play-naval-mine')} />
-      <rect x="24" y="24" width="7" height="6" rx="1" {...tint('--play-naval-mine-deep')} />
-      <rect x="27" y="17" width="1.8" height="7" {...tint('--play-naval-hull-deep')} />
-      <rect x="9" y="33" width="9" height="5" rx="1.5" {...tint('--play-naval-mine-deep')} />
-      <path
-        d="M4 34l10 2"
-        stroke="var(--play-naval-hull-deep)"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-      {/* Waves */}
-      <path
-        d="M3 55c4-3 8-3 12 0s8 3 12 0 8-3 12 0 8 3 12 0 6-2 8-1"
-        fill="none"
-        stroke="white"
-        strokeOpacity="0.85"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-      />
-      <path
-        d="M9 60c4-2 7-2 11 0s7 2 11 0 7-2 11 0"
-        fill="none"
-        stroke="white"
-        strokeOpacity="0.45"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </>
-  ),
+  ...DIRECTION_MARKS,
 }
 
 // Logos drawn bare, without their tile

@@ -6,7 +6,10 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { isFeatureOn } from '@/core/services/features'
 import { rankScores, xpPartsOf } from '@/core/lib/play'
+import { boostsOf, questBoostOf } from '@/core/lib/play/boost'
+import type { PlayBoost } from '@/core/lib/play/boost'
 import { PLAY_JOURNAL, PLAY_OUTCOME_LABELS, PLAY_SETTINGS, PlayXpParts } from '@/declarations/play'
+import { readPlayConfig } from '@/core/services/play/PlayConfigService'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
 import type { PlayJournalInput } from '@/core/services/play/PlayJournalService'
 import { humanResults } from '@/core/services/play/bots/BotRewardService'
@@ -112,6 +115,21 @@ const writeResults = async (
   const winnerFactor = engineOf(session.game).winnerMultiplier?.(session.settings) ?? 1
   const bots = new Set(seats.filter((seat) => seat.account.botKind).map((seat) => seat.accountId))
   const botRatio = bots.size ? PLAY_SETTINGS.rewards.botXpRatio : 1
+  // Featured and event boosts live at the end of the game
+  const boosts = boostsOf(await readPlayConfig(), session.game)
+  // A finished group quest boosts its members everywhere
+  const profiles = await tx.playProfile.findMany({
+    where: { accountId: { in: standings.map((entry) => entry.accountId) } },
+    select: { accountId: true, questBoostUntil: true },
+  })
+  const questBoosts = new Map(
+    profiles.map((profile) => [profile.accountId, questBoostOf(profile.questBoostUntil)])
+  )
+  const mine = (accountId: string): PlayBoost[] => {
+    const quest = questBoosts.get(accountId)
+
+    return quest ? [...boosts, quest] : boosts
+  }
   const partsOf = new Map(
     standings.map((standing) => [
       standing.accountId,
@@ -122,6 +140,7 @@ const writeResults = async (
             isFirstWin: !winners.has(standing.accountId),
             winnerFactor,
             botRatio,
+            boosts: mine(standing.accountId),
           })
         : [],
     ])

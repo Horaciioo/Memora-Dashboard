@@ -1,9 +1,10 @@
+import { OriginMark } from '@/composites/lives/bilan/OriginMark'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { AreaChart } from '@/components/structures/charts/AreaChart'
 import { RankBars } from '@/components/structures/charts/RankBars'
 import { Section } from '@/components/structures/page/Section'
 import { BilanLog } from '@/composites/lives/bilan/BilanLog'
-import { FigureCards } from '@/composites/lives/bilan/moderation/FigureCards'
+import { FigureGrid } from '@/composites/lives/bilan/FigureGrid'
 import { ModSpan } from '@/composites/lives/ModSpan'
 import { ReinforcementTag } from '@/composites/lives/coordination/ReinforcementTag'
 import type { ModStat } from '@/core/lib/lives/modStats'
@@ -15,7 +16,13 @@ import type { LiveLogLine, LiveModTime } from '@/types/lives'
 import { formatClock, formatSpan } from '@/utils/format/modview'
 
 export interface ModeratorDetailProps {
-  member: { key: string; name: string; avatar: string | null; time: LiveModTime | null }
+  member: {
+    key: string
+    name: string
+    avatar: string | null
+    isMember: boolean
+    time: LiveModTime | null
+  }
   stat: ModStat
   lines: LiveLogLine[]
   presence: LiveReport['moderators'][number] | null
@@ -42,6 +49,7 @@ export const ModeratorDetail = ({ member, stat, lines, presence, axis }: Moderat
         <div className={LIVE_REPORT.detailWho}>
           <h3 className={LIVE_REPORT.detailName}>
             {member.name}
+            <OriginMark onMemora={member.isMember} />
             {time?.reinforcement && <ReinforcementTag />}
           </h3>
           {time?.reinforcement?.requestedBy && (
@@ -54,33 +62,25 @@ export const ModeratorDetail = ({ member, stat, lines, presence, axis }: Moderat
         </div>
       </section>
 
-      <FigureCards
+      <FigureGrid
         title={BILAN_COPY.detailActions}
-        row={LIVE_REPORT.figureRow}
+        columns={LIVE_REPORT.figureRow}
         items={[
           {
             label: BILAN_COPY.detailActions,
             value: String(stat.actions),
-            icon: 'shield',
-            tone: 'info',
           },
           {
             label: BILAN_COPY.detailPerHour,
             value: oneDecimal(stat.perHour),
-            icon: 'liveDot',
-            tone: 'danger',
           },
           {
             label: BILAN_COPY.detailTargets,
             value: String(stat.targets),
-            icon: 'viewer',
-            tone: 'mauve',
           },
           {
             label: BILAN_COPY.detailFailed,
             value: String(stat.failed),
-            icon: 'warning',
-            tone: 'caution',
           },
           {
             label: BILAN_COPY.detailGap,
@@ -88,26 +88,18 @@ export const ModeratorDetail = ({ member, stat, lines, presence, axis }: Moderat
               stat.gapSeconds === null
                 ? none
                 : BILAN_COPY.gapValue.replace('{seconds}', String(Math.round(stat.gapSeconds))),
-            icon: 'clock',
-            tone: 'brand',
           },
           {
             label: BILAN_COPY.detailFirst,
             value: stat.firstAt ? formatClock(stat.firstAt) : none,
-            icon: 'clock',
-            tone: 'success',
           },
           {
             label: BILAN_COPY.detailLast,
             value: stat.lastAt ? formatClock(stat.lastAt) : none,
-            icon: 'clock',
-            tone: 'danger',
           },
           {
             label: BILAN_COPY.detailActive,
             value: presence ? formatSpan(presence.activeSeconds) : none,
-            icon: 'clock',
-            tone: 'info',
           },
         ]}
       />

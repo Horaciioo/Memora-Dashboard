@@ -33,10 +33,6 @@
   filter: grayscale(0.7) brightness(0.75);
 }
 
-/* Hub photo, darkened under the cards */
-.naval-hub-veil {
-  background: linear-gradient(180deg, rgb(4 17 29 / 0.25) 0%, rgb(4 17 29 / 0.75) 100%);
-}
 
 .naval-callout {
   animation: naval-callout 1.6s ease-out forwards;

@@ -23,7 +23,8 @@ export interface JumbleRulesDrawerProps {
  */
 
 export const JumbleRulesDrawer = ({ open, onClose, settings }: JumbleRulesDrawerProps) => {
-  const { base, speedBonus, flashBonus, streakStep, streakMax } = JUMBLE_SETTINGS.scoring
+  const { base, speedBonus, flashBonus, streakStep, streakMax, lengthBonus, lengthFrom } =
+    JUMBLE_SETTINGS.scoring
   const rows = [
     {
       label: JUMBLE_RULES_COPY.rounds,
@@ -44,6 +45,8 @@ export const JumbleRulesDrawer = ({ open, onClose, settings }: JumbleRulesDrawer
         base,
         speed: speedBonus,
         flash: flashBonus,
+        length: lengthBonus,
+        from: lengthFrom,
       }),
     },
     {

@@ -150,11 +150,15 @@ export const partsShown = (errors: number, allowed: number): number =>
  * Points of a find
  * @param {number} cells - Cells uncovered
  * @param {boolean} isSolve - The word is complete
+ * @param {number} [left] - Errors still allowed, a quick finish pays more
  * @return {number} - Points
  */
 
-export const findPoints = (cells: number, isSolve: boolean): number =>
-  cells * SUSPENS_SETTINGS.scoring.cell + (isSolve ? SUSPENS_SETTINGS.scoring.solve : 0)
+export const findPoints = (cells: number, isSolve: boolean, left = 0): number => {
+  const { cell, solve, solveLeft } = SUSPENS_SETTINGS.scoring
+
+  return cells * cell + (isSolve ? solve + Math.max(left, 0) * solveLeft : 0)
+}
 
 /**
  * Points of the setter for a round

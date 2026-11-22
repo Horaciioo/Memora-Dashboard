@@ -81,7 +81,7 @@ export const LUDO_PLATE = {
   // Avatar inside the turn clock, in the colour of the player
   ring: 'ludo-ring grid size-12 shrink-0 place-items-center rounded-full p-[0.25rem]',
   ringAlert: 'ludo-ring-alert',
-  face: '!size-full rounded-full text-xs',
+  face: '!size-full rounded-[13%]! text-xs',
   chaosRow: 'flex w-max max-w-[6.5rem] flex-wrap items-center justify-center gap-1',
   place:
     'w-max rounded-full bg-[var(--play-ludo-crown)] px-2 py-0.5 text-xs font-black text-[var(--play-ludo-felt)]',

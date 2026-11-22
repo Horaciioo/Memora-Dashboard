@@ -3,11 +3,12 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
-import { levelOf } from '@/core/lib/play'
-import { PLAY_TROPHIES, trophiesOf } from '@/declarations/play'
+import { levelOf, readBodyList, trophiesOf } from '@/core/lib/play'
+import { noteGain } from '@/core/services/play/PlayActivityService'
+import { PLAY_PIN_MAX, PLAY_RARITY_LEVELS, PLAY_TROPHIES } from '@/declarations/play'
 
 /**
- * Pay the trophies newly reached, each worth the whole level it completes
+ * Pay the trophies newly reached, each worth as many whole levels as its rarity
  * @param {Prisma.TransactionClient} tx - Transaction
  * @param {string[]} accountIds - Players to check
  * @param {boolean} [backfill] - Trophies reached before they paid
@@ -26,20 +27,8 @@ export const awardTrophies = async (
       tx.playTrophyWin.findMany({ where: { accountId } }),
     ])
     const won = new Set(wins.map((win) => win.trophy))
-    const sum = (field: 'played' | 'wins' | 'draws' | 'losses') =>
-      stats.reduce((total, stat) => total + stat[field], 0)
-    const global = {
-      played: sum('played'),
-      wins: sum('wins'),
-      draws: sum('draws'),
-      losses: sum('losses'),
-      bestStreak: Math.max(0, ...stats.map((stat) => stat.bestStreak)),
-      tournamentsPlayed: stats.reduce((total, stat) => total + stat.tournamentsPlayed, 0),
-      tournamentsWon: stats.reduce((total, stat) => total + stat.tournamentsWon, 0),
-      playSeconds: stats.reduce((total, stat) => total + stat.playSeconds, 0),
-    }
     const reached = new Set(
-      trophiesOf(global)
+      trophiesOf(stats)
         .filter((trophy) => trophy.reached)
         .map((trophy) => trophy.key)
     )
@@ -52,10 +41,13 @@ export const awardTrophies = async (
     for (const trophy of PLAY_TROPHIES) {
       if (!reached.has(trophy.key) || won.has(trophy.key)) continue
 
-      // Whole bar of the current level, whatever is already filled
-      const paid = levelOf(Math.max(0, xp)).needed ?? 0
+      // Whole bar of each level crossed, whatever is already filled
+      let paid = 0
+      for (let step = 0; step < PLAY_RARITY_LEVELS[trophy.rarity]; step++)
+        paid += levelOf(Math.max(0, xp + paid)).needed ?? 0
 
       await tx.playTrophyWin.create({ data: { accountId, trophy: trophy.key, xp: paid, backfill } })
+      if (!backfill) await noteGain(tx, accountId, { kind: 'TROPHY', xp: paid, ref: trophy.key })
       xp += paid
     }
   }
@@ -141,4 +133,50 @@ export const readTrophyNotice = async (accountId: string): Promise<TrophyNotice 
 
 export const dismissTrophyNotice = async (accountId: string): Promise<void> => {
   await prisma.playProfile.updateMany({ where: { accountId }, data: { trophyNotice: false } })
+}
+
+/**
+ * Share of players who won each trophy, in percent
+ * @return {Promise<Record<string, number>>} - Percent per trophy key
+ */
+
+export const readTrophyRarity = async (): Promise<Record<string, number>> => {
+  const [players, wins] = await Promise.all([
+    prisma.playGameStat.groupBy({ by: ['accountId'] }).then((rows) => rows.length),
+    prisma.playTrophyWin.groupBy({ by: ['trophy'], _count: { _all: true } }),
+  ])
+  const owners = new Map(wins.map((row) => [row.trophy, row._count._all]))
+
+  return Object.fromEntries(
+    PLAY_TROPHIES.map((trophy) => [
+      trophy.key,
+      players ? Math.min(100, Math.round(((owners.get(trophy.key) ?? 0) / players) * 100)) : 0,
+    ])
+  )
+}
+
+/**
+ * Showcase of a player: won trophies only, in the order given
+ * @param {string} accountId - Player
+ * @param {Record<string, unknown>} raw - Body with the trophy keys
+ * @return {Promise<void>} - Saved
+ */
+
+export const setPinnedTrophies = async (
+  accountId: string,
+  raw: Record<string, unknown>
+): Promise<void> => {
+  const asked = readBodyList(raw, 'pins') ?? []
+  const won = new Set(
+    (await prisma.playTrophyWin.findMany({ where: { accountId }, select: { trophy: true } })).map(
+      (win) => win.trophy
+    )
+  )
+  const pins = [...new Set(asked)].filter((key) => won.has(key)).slice(0, PLAY_PIN_MAX)
+
+  await prisma.playProfile.upsert({
+    where: { accountId },
+    create: { accountId, pinnedTrophies: pins },
+    update: { pinnedTrophies: pins },
+  })
 }

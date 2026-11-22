@@ -61,6 +61,12 @@ export const SUSPENS_SETTINGS = {
     min: 15,
     max: 90,
   }),
+  // Errors a wrong whole word costs
+  wordPenalty: readInteger(suspens.wordPenalty, {
+    path: 'play/suspens.wordPenalty',
+    fallback: 2,
+    min: 1,
+  }),
   revealSeconds: readInteger(suspens.revealSeconds, {
     path: 'play/suspens.revealSeconds',
     fallback: 5,
@@ -73,7 +79,13 @@ export const SUSPENS_SETTINGS = {
   }),
   scoring: {
     cell: readInteger(scoring.cell, { path: 'play/suspens.scoring.cell', fallback: 2, min: 0 }),
-    solve: readInteger(scoring.solve, { path: 'play/suspens.scoring.solve', fallback: 6, min: 0 }),
+    solve: readInteger(scoring.solve, { path: 'play/suspens.scoring.solve', fallback: 4, min: 0 }),
+    // Bonus per error left when the word is completed
+    solveLeft: readInteger(scoring.solveLeft, {
+      path: 'play/suspens.scoring.solveLeft',
+      fallback: 1,
+      min: 0,
+    }),
     setterPerError: readInteger(scoring.setterPerError, {
       path: 'play/suspens.scoring.setterPerError',
       fallback: 2,

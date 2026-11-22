@@ -1,12 +1,20 @@
-import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
+import type { ConcordatBombName, ConcordatBuildingKind } from '@/utils/constants/concordat'
 
 /**
  * Weapons and aircraft with a pictogram of their own
- * @typedef {'missile' | 'heavy' | 'mirv' | 'shell' | 'rocket' | 'heli' | 'fighter'} ConcordatWeaponGlyph
+ * @typedef {'missile' | 'heavy' | 'mirv' | 'shell' | 'rocket' | 'heli' | 'fighter' | 'warship' | 'bombSmall' | 'bombLarge' | 'bombHuge'} ConcordatWeaponGlyph
  */
 
 export type ConcordatWeaponGlyph =
-  'missile' | 'heavy' | 'mirv' | 'shell' | 'rocket' | 'heli' | 'fighter'
+  | 'missile'
+  | 'heavy'
+  | 'mirv'
+  | 'shell'
+  | 'rocket'
+  | 'heli'
+  | 'fighter'
+  | 'warship'
+  | ConcordatBombName
 
 // Aircraft seen from above, nose up
 const PLANE_PATH =
@@ -35,6 +43,26 @@ export const CONCORDAT_WEAPON_GLYPHS: Record<ConcordatWeaponGlyph, { path: strin
       path: 'M2 4.5 H22 V6.3 H13 V8.6 C16.6 8.6 19 10.8 19 13.6 V14.4 H22 V16.6 H17.6 C16.8 16.6 16.1 16.2 15.8 15.6 H9 C6 15.6 3.5 13.6 3.5 11.8 C3.5 10 6 8.6 11 8.6 V6.3 H2 Z M4 19.5 H18 V21.3 H4 Z M8 16.5 H9.6 V19.5 H8 Z M13 16.5 H14.6 V19.5 H13 Z',
     },
     fighter: { turn: 0, path: PLANE_PATH },
+    // Warship seen from the side: hull, deck house, bridge and gun
+    warship: {
+      turn: 0,
+      path: 'M2 15.5 H22 L19.5 20 H5 Z M6 11.5 H16 V14.5 H6 Z M10 8 H13 V11 H10 Z M17 12.2 H22 V13.6 H17 Z',
+    },
+    // Small round bomb with a fuse
+    bombSmall: {
+      turn: 0,
+      path: 'M12 8 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 Z M11 1.5 H13.5 V4 H11 Z M13.5 2 L18 1 V2.8 L13.5 3.6 Z M7 16 H17 L15.5 22 H8.5 Z',
+    },
+    // Dropped bomb with fins
+    bombLarge: {
+      turn: 0,
+      path: 'M12 2 C16 3.5 17.5 7 17.5 11 C17.5 15 15 17 12 17 C9 17 6.5 15 6.5 11 C6.5 7 8 3.5 12 2 Z M8.5 16 H15.5 V19 H8.5 Z M5 17 L8.5 18 V22 L5 22 Z M19 17 L15.5 18 V22 L19 22 Z M10.5 19 H13.5 V23 H10.5 Z',
+    },
+    // Fat bomb with a blast ring
+    bombHuge: {
+      turn: 0,
+      path: 'M12 1.5 C17.5 3 20.5 7 20.5 12 C20.5 16 17.5 18.5 12 18.5 C6.5 18.5 3.5 16 3.5 12 C3.5 7 6.5 3 12 1.5 Z M12 12 m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 Z M7 19 H17 V21 H7 Z M3 19 L7 20 V23 H3 Z M21 19 L17 20 V23 H21 Z M9 21 H15 V23 H9 Z',
+    },
     // Slim rocket flying up and right
     missile: {
       turn: 45,
@@ -69,11 +97,6 @@ export const CONCORDAT_GLYPHS: Record<ConcordatBuildingKind, { path: string; isS
       isStroke: false,
       path: 'M2 21 L12 8 L22 21 Z M10 21 L12 14 L14 21 Z M11.3 2 H12.7 V9 H11.3 Z M12.7 2.5 H18 L16 4.7 L18 6.9 H12.7 Z',
     },
-    // Crenellated tower with a gate
-    fortress: {
-      isStroke: false,
-      path: 'M4 5 H8 V8 H10 V5 H14 V8 H16 V5 H20 V21 H4 Z M10.5 21 V15.5 A1.5 1.5 0 0 1 13.5 15.5 V21 Z',
-    },
     // Anchor
     port: {
       isStroke: true,
@@ -83,11 +106,6 @@ export const CONCORDAT_GLYPHS: Record<ConcordatBuildingKind, { path: string; isS
     silo: {
       isStroke: false,
       path: 'M12 2 C15 5 16 9 16 13 V17 H8 V13 C8 9 9 5 12 2 Z M8 14 L4.5 19 V21 L8 19.5 Z M16 14 L19.5 19 V21 L16 19.5 Z M10.5 18 H13.5 L12 22 Z M12 7 m-1.7 0 a1.7 1.7 0 1 0 3.4 0 a1.7 1.7 0 1 0 -3.4 0',
-    },
-    // Dome with a slit
-    observatory: {
-      isStroke: false,
-      path: 'M3.5 21 V14 A8.5 8.5 0 0 1 20.5 14 V21 Z M11 5.5 H13 V13 H11 Z',
     },
     // Shield with a cross cut out
     post: {

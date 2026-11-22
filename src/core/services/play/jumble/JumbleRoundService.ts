@@ -8,13 +8,19 @@ import { readBodyText } from '@/core/lib/play'
 import { normalizeWord } from '@/core/lib/play/baccalaureat/words'
 import { after, openingEnd } from '@/core/lib/play/clock'
 import { frenchWords } from '@/core/lib/play/dictionary'
-import { drawWord, isSolution, jumbleSettingsOf, pointsOf, scramble } from '@/core/lib/play/jumble'
+import {
+  drawWord,
+  isSolution,
+  jumbleSettingsOf,
+  pointsOf,
+  roundSecondsOf,
+  scramble,
+} from '@/core/lib/play/jumble'
 import type { JumbleGameSettings } from '@/core/lib/play/jumble'
 import { IDLE_STEP } from '@/core/engines/play/steps'
 import { holdSession } from '@/core/services/play/PlaySessionService'
 import { JUMBLE_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
 import type { EngineSession, EngineStep } from '@/types/play'
-import { SECOND_MS } from '@/utils/constants/time'
 
 // Locked table of a game
 interface JumbleTable {
@@ -29,14 +35,19 @@ interface JumbleTable {
  * Clock of a round opening at a moment
  * @param {JumbleGameSettings} settings - Game settings
  * @param {Date} startsAt - Opening
+ * @param {number} length - Letters of the word
  * @return {{ startsAt: Date, endsAt: Date, hintAt: Date }} - Round clock
  */
 
-const clockOf = (settings: JumbleGameSettings, startsAt: Date) => ({
-  startsAt,
-  endsAt: after(startsAt, settings.roundSeconds),
-  hintAt: after(startsAt, settings.roundSeconds * JUMBLE_SETTINGS.hintRatio),
-})
+const clockOf = (settings: JumbleGameSettings, startsAt: Date, length: number) => {
+  const seconds = roundSecondsOf(settings.roundSeconds, length)
+
+  return {
+    startsAt,
+    endsAt: after(startsAt, seconds),
+    hintAt: after(startsAt, seconds * JUMBLE_SETTINGS.hintRatio),
+  }
+}
 
 /**
  * Next moment the table has to move
@@ -101,7 +112,11 @@ const playedWords = async (
 export const openTable = async (session: EngineSession): Promise<EngineStep> => {
   const settings = jumbleSettingsOf(session.settings)
   const { answer, display } = drawWord(1, settings.rounds, new Set(), settings.difficulty)
-  const clock = clockOf(settings, openingEnd(new Date(), JUMBLE_SETTINGS.countdownSeconds))
+  const clock = clockOf(
+    settings,
+    openingEnd(new Date(), JUMBLE_SETTINGS.countdownSeconds),
+    answer.length
+  )
   const game = await prisma.jumbleGame.create({
     data: {
       sessionId: session.id,
@@ -190,7 +205,7 @@ const nextRound = async (table: JumbleTable): Promise<EngineStep> => {
       solverId: null,
       solvedAt: null,
       revealUntil: null,
-      ...clockOf(settings, now),
+      ...clockOf(settings, now, answer.length),
     },
   })
 
@@ -261,7 +276,7 @@ export const guessWord = (
   const guess = normalizeWord(typed)
 
   return withTable(session, async (table) => {
-    const { game, settings, now } = table
+    const { game, now } = table
     // Late guesses fall silently
     if (now < game.startsAt || game.revealUntil || now >= game.endsAt) return IDLE_STEP
     if (!isSolution(guess, game.answer, await frenchWords())) return IDLE_STEP
@@ -271,8 +286,9 @@ export const guessWord = (
     const streak = await streakOf(table, accountId)
     const { points } = pointsOf({
       elapsedMs: ms,
-      totalMs: settings.roundSeconds * SECOND_MS,
+      totalMs: game.endsAt.getTime() - game.startsAt.getTime(),
       streak,
+      length: game.answer.length,
     })
 
     return endRound(

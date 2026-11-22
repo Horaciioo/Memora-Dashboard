@@ -39,23 +39,35 @@ export const castVote = async (
     throw conflict(PLAY_ERRORS.notReviewing)
   if (answer.accountId === accountId) throw forbidden(PLAY_ERRORS.ownAnswer)
 
-  // Vote can be changed until the count
-  const accepted = raw.accepted !== false
+  // A vote is locked once cast
+  const voteKey = { answerId_voterId: { answerId, voterId: accountId } }
+  if (await prisma.baccalaureatVote.findUnique({ where: voteKey }))
+    throw conflict(PLAY_ERRORS.alreadyVoted)
   await prisma.baccalaureatVote.upsert({
-    where: { answerId_voterId: { answerId, voterId: accountId } },
-    create: { answerId, voterId: accountId, accepted },
-    update: { accepted },
+    where: voteKey,
+    create: { answerId, voterId: accountId, accepted: raw.accepted !== false },
+    update: {},
   })
+  await scoreIfJudged(session, answer.roundId)
 
-  // Everyone voted, count now
+  return { changed: true, finished: false, deadline: null }
+}
+
+/**
+ * Count the round once nobody has anything left to judge
+ * @param {EngineSession} session - Game
+ * @param {string} roundId - Round
+ * @return {Promise<boolean>} - Counted by this call
+ */
+
+export const scoreIfJudged = async (session: EngineSession, roundId: string): Promise<boolean> => {
   const answers = await prisma.baccalaureatAnswer.findMany({
-    where: { roundId: answer.roundId },
+    where: { roundId },
     select: { accountId: true, votes: { select: { voterId: true } } },
   })
   const isComplete = finishedVoters(answers, session.players).length === session.players.length
-  if (isComplete) await scoreRound(session, answer.roundId)
 
-  return { changed: true, finished: false, deadline: null }
+  return isComplete ? scoreRound(session, roundId) : false
 }
 
 /**
@@ -81,7 +93,9 @@ export const scoreRound = async (session: EngineSession, roundId: string): Promi
 
     // Verdict of the others still seated
     const judged = round.answers.map((answer) => {
-      const votes = answer.votes.filter((vote) => vote.voterId !== answer.accountId)
+      const votes = answer.votes.filter(
+        (vote) => vote.voterId !== answer.accountId && session.players.includes(vote.voterId)
+      )
       const rejects = votes.filter((vote) => !vote.accepted).length
 
       return {

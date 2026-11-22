@@ -94,6 +94,7 @@ export const HOME_PLAN = {
   chevron:
     'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform group-hover:translate-x-0.5',
   more: 'mt-2 flex items-center justify-center gap-1.5 rounded-[var(--radius-md)] px-3 py-2 text-sm font-bold text-[var(--color-ink-accent)] transition-colors hover:bg-[var(--color-hover)]',
+  awayUntil: 'shrink-0 text-xs text-[var(--color-ink-subtle)]',
   birthdayDate: 'shrink-0 text-sm font-bold',
   birthdayName: 'min-w-0 flex-1 truncate font-semibold',
 } as const
@@ -184,19 +185,37 @@ export const HOME_BOARD = {
   card: 'card-surface grid grid-cols-1 rounded-[var(--radius-xl)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] xl:grid-cols-3',
   // The vertical divider stops short of the top and the bottom edges
   col: 'relative flex min-w-0 flex-col border-t border-[var(--color-border)] px-4 py-6 first:border-t-0 xl:border-t-0 sm:px-5 xl:px-6 xl:py-8 xl:before:absolute xl:before:inset-y-8 xl:before:left-0 xl:before:w-px xl:before:bg-[var(--color-border)] xl:first:before:hidden',
+  // Second box of a column, split from the first by a divider that keeps the column padding
+  split: 'mt-6 flex-1 border-t border-[var(--color-border)] pt-6 xl:mt-8 xl:pt-8',
 } as const
 
 /**
- * Favorites box above the home board
+ * Play news of the home: latest games, tables, own games, leaders
  * @type {Record<string, string>}
  */
 
-export const HOME_FAVORITES_STYLES = {
-  // Lines fill a column of three, the rest goes to the side
-  lines: 'grid grid-flow-col auto-cols-[minmax(0,1fr)] gap-x-6',
-  // Pulled out by its padding so the glyph starts under the first letter of the title
-  row: '-mx-2 group flex min-w-0 items-center gap-3 rounded-[var(--radius-md)] px-2 py-3 text-body transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
-  glyph: 'h-6 w-6 shrink-0',
-  title:
-    'min-w-0 flex-1 truncate font-semibold group-hover:underline group-focus-visible:underline',
+export const HOME_PLAY = {
+  stack: 'flex flex-col gap-4',
+  openRow: 'flex justify-center',
+  open: 'inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-ink-accent)] hover:underline',
+  more: 'mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-bold text-[var(--color-ink-accent)] hover:underline',
+  moreGlyph: 'h-4 w-4 shrink-0',
+  games: 'grid grid-cols-1 gap-4 md:grid-cols-2',
+  game: 'group relative isolate flex h-40 flex-col justify-end overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] p-5 text-[var(--color-on-media)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-[var(--motion-duration-panel)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  gameArt: 'absolute inset-0 -z-10 h-full w-full object-cover',
+  gameShade: 'absolute inset-0 -z-10 bg-gradient-to-t from-black/60 via-black/10 to-transparent',
+  gameBody: 'flex min-w-0 flex-col gap-1',
+  gameName: 'text-lg leading-tight font-bold tracking-tight',
+  gameTagline: 'line-clamp-2 text-sm text-[var(--color-on-media)]/85',
+  board: 'grid grid-cols-1 gap-4 xl:grid-cols-3',
+  block:
+    'card-surface flex min-w-0 flex-col rounded-[var(--radius-xl)] border border-[var(--color-border)] p-5 shadow-[var(--shadow-sm)]',
+  heading: 'pb-3 text-lg font-bold tracking-tight',
+  rows: 'flex flex-col gap-1',
+  empty: 'py-2 text-sm text-[var(--color-ink-subtle)]',
+  row: '-mx-2 group flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
+  rowLogo: 'h-10 w-10 shrink-0',
+  rowBody: 'flex min-w-0 flex-1 flex-col',
+  rowTitle: 'truncate font-semibold',
+  rowMeta: 'truncate text-xs text-[var(--color-ink-subtle)]',
 } as const

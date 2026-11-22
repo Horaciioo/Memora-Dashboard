@@ -1,5 +1,6 @@
 'use client'
 
+import { OriginMark } from '@/composites/lives/bilan/OriginMark'
 import { Dotted } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 
@@ -84,6 +85,7 @@ export const BilanLog = ({ log, moderators }: BilanLogProps) => {
                 <time className={LIVE_REPORT.lineTime}>{formatClock(line.occurredAt)}</time>
                 <span className={line.isMember ? LIVE_REPORT.lineActor : LIVE_REPORT.rowNameMuted}>
                   {line.actorName}
+                  <OriginMark onMemora={line.origin === 'MEMORA'} />
                 </span>
                 <span className={LIVE_REPORT.lineBody}>
                   <span className={LIVE_REPORT.lineWhat}>

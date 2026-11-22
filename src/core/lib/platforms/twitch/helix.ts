@@ -1,6 +1,6 @@
 import type { HelixPoll } from '@/core/lib/modview/poll'
 import { PlatformError, platformRequest } from '@/core/lib/platforms/http'
-import { helixHeaders } from '@/core/lib/platforms/twitch/oauth'
+import { helixHeaders, readTwitchAppToken } from '@/core/lib/platforms/twitch/oauth'
 import { HELIX_PATHS, TWITCH_ENDPOINTS, TWITCH_LIMITS } from '@/declarations/platforms/twitch'
 import { fragmentsOf } from '@/core/lib/platforms/twitch/fragments'
 import type {
@@ -586,6 +586,38 @@ export const readStream = async (
         viewers: row.viewer_count ?? 0,
       }
     : null
+}
+
+/**
+ * Streams running now among channels, with the application token
+ * @param {string[]} channelIds - Twitch channels, 100 at most
+ * @return {Promise<{ channelId: string, id: string, title: string, startedAt: string }[]>} - Running streams
+ */
+
+export const readRunningStreams = async (
+  channelIds: string[]
+): Promise<{ channelId: string; id: string; title: string; startedAt: string }[]> => {
+  if (channelIds.length === 0) return []
+
+  const answer = await runHelix<{
+    data: { id: string; user_id: string; title: string; started_at: string; type: string }[]
+  }>(
+    { accessToken: await readTwitchAppToken(), moderatorId: 'app' },
+    {
+      method: 'GET',
+      path: HELIX_PATHS.streams,
+      query: { user_id: channelIds, first: String(channelIds.length) },
+    }
+  )
+
+  return (answer?.data ?? [])
+    .filter((row) => row.type === 'live')
+    .map((row) => ({
+      channelId: row.user_id,
+      id: row.id,
+      title: row.title,
+      startedAt: row.started_at,
+    }))
 }
 
 /**

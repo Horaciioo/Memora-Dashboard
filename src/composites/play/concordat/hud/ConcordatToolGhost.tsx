@@ -44,9 +44,11 @@ export const ConcordatToolGhost = () => {
         kind={
           tool.kind === 'build'
             ? tool.building
-            : tool.kind === 'sortie'
-              ? tool.air
-              : (tool.weapon ?? (tool.isHeavy ? 'heavy' : 'missile'))
+            : tool.kind === 'fleet'
+              ? 'warship'
+              : tool.kind === 'sortie'
+                ? tool.air
+                : (tool.weapon ?? (tool.isHeavy ? 'heavy' : 'missile'))
         }
         size={32}
       />

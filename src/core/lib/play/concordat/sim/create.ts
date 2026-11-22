@@ -1,5 +1,5 @@
 import { emit } from '@/core/lib/play/concordat/sim/emit'
-import { distanceBetween, startTerritory } from '@/core/lib/play/concordat/map'
+import { distanceBetween, startTerritory, warmRegions } from '@/core/lib/play/concordat/map'
 import { modeRules, openMode } from '@/core/lib/play/concordat/modes'
 import { difficultyOf, placePowers } from '@/core/lib/play/concordat/powers'
 import type { ConcordatPowerSpec } from '@/core/lib/play/concordat/powers'
@@ -184,6 +184,8 @@ export const createGame = (request: ConcordatGameRequest): ConcordatState => {
       )
     )
   )
+
+  warmRegions(map)
 
   return state
 }

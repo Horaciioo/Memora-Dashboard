@@ -14,9 +14,7 @@ import { PlayLeaderboard } from '@/composites/play/hub/leaderboard/PlayLeaderboa
 import { PlayLiveTables } from '@/composites/play/hub/lobby/PlayLiveTables'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
 import { PlayHubTabs } from '@/composites/play/mobile/PlayHubTabs'
-import { PlayTopBar } from '@/composites/play/mobile/PlayTopBar'
-import { PlayPlayerCard } from '@/composites/play/member/stats/PlayPlayerCard'
-import { PlayStatTiles } from '@/composites/play/member/stats/PlayStatTiles'
+import { PlayHubStats } from '@/composites/play/hub/PlayHubStats'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
 import {
   listLobbies,
@@ -26,7 +24,6 @@ import {
   readPlayProfile,
 } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
-import { ROUTES } from '@/declarations/navigation'
 import { PLAY_CONCEPT_COPY } from '@/declarations/play/concept'
 import {
   fillPlayMessage,
@@ -83,19 +80,6 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
   return (
     <div className={cn(PLAY_HUB.page, meta.ground)} style={playKeysOf(game)}>
       {GroundLayer && <GroundLayer />}
-      <PlayTopBar
-        back={{ href: ROUTES.play, label: PLAY_MOBILE_COPY.hubBack, icon: 'playPrevious' }}
-        tables={[...tables.running, ...tables.lobbies]}
-        live={
-          <PlayLiveTables
-            title={PLAY_HUB_COPY.inGameTitle}
-            empty={PLAY_HUB_COPY.inGameEmpty}
-            tables={[...tables.running, ...tables.lobbies]}
-            mineId={presence?.sessionId}
-            isLocked={isLocked}
-          />
-        }
-      />
       <PlaySignal topic={PLAY_TOPICS.lobbies} />
       {game === PlayGames.Golf && access.can(Permissions.PlayManage) && <GolfFlyButton />}
       <PlayCallouts isBanned={Boolean(profile.ban)} />
@@ -127,13 +111,12 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
           }
           panels={{
             concept: <PlayConcept game={game} />,
-            leaders: <PlayLeaderboard leaders={leaders} meId={session.id} />,
-            stats: (
-              <>
-                <PlayPlayerCard totals={totals} player={player} />
-                <PlayStatTiles totals={totals} />
-              </>
+            leaders: (
+              <div className={PLAY_HUB.sheetGroup}>
+                <PlayLeaderboard leaders={leaders} meId={session.id} />
+              </div>
             ),
+            stats: <PlayHubStats totals={totals} player={player} />,
           }}
         />
       </div>
@@ -166,8 +149,7 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
         panels={{
           stats: (
             <>
-              <PlayPlayerCard totals={totals} player={player} />
-              <PlayStatTiles totals={totals} />
+              <PlayHubStats totals={totals} player={player} />
               <section className={PLAY_HUB_TABS.section}>
                 <h2 className={PLAY_HUB_TABS.sectionTitle}>{PLAY_MOBILE_COPY.hubRanking}</h2>
                 <PlayLeaderboard leaders={leaders} meId={session.id} />

@@ -6,6 +6,8 @@ import { PlayBars, PlayLine } from '@/composites/play/admin/stats/PlayCharts'
 import { PlayStatCard } from '@/composites/play/admin/stats/PlayStatCard'
 import type { IconName } from '@/declarations/ui/icons'
 import { PLAY_HEALTH } from '@/declarations/ui/variants'
+import { formatNumber } from '@/utils/format/numbers'
+import { DATE_LOCALE } from '@/declarations/ui/dates'
 
 export interface PlayMetricCardProps {
   label: string
@@ -30,7 +32,7 @@ export interface PlayMetricCardProps {
  */
 
 export const shortDay = (date: string): string =>
-  new Date(`${date}T12:00:00`).toLocaleDateString('fr-FR', {
+  new Date(`${date}T12:00:00`).toLocaleDateString(DATE_LOCALE, {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -65,7 +67,7 @@ export const PlayMetricCard = ({
       label={label}
       icon={icon}
       tone={tone}
-      value={shown.toLocaleString('fr-FR')}
+      value={formatNumber(shown)}
       unit={unit}
       caption={active === null ? restCaption : shortDay(dates[active])}
       className={className}

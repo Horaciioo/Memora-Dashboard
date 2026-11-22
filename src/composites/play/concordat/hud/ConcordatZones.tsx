@@ -8,8 +8,6 @@ import { fillPlayMessage } from '@/declarations/play/copy'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 
-// Packing of a zone event, zone ids stay under it
-const ZONE_PACK = 4096
 // Time a banner stays up
 const BANNER_MS = 2600
 
@@ -20,7 +18,7 @@ interface Banner {
 }
 
 /**
- * Banner of each zone the reader just won, with its gold
+ * Banner of each nation the reader just eliminated, with its gold
  * @param {Object} props - Game
  * @param {ConcordatClientState} props.client - Live game
  * @return {JSX.Element}
@@ -41,21 +39,13 @@ export const ConcordatZones = ({
   useEffect(() => {
     const fresh = client.log.slice(seen.current)
     seen.current = client.log.length
-    const won = fresh.filter(
-      (event) =>
-        (event.kind === 'zoneWon' || event.kind === 'eliminated') && event.actor === client.me
-    )
+    const won = fresh.filter((event) => event.kind === 'eliminated' && event.actor === client.me)
     if (!won.length) return
 
     const added = won.map((event) => ({
       id: next.current++,
-      title:
-        event.kind === 'zoneWon'
-          ? fillPlayMessage(CONCORDAT_HUD_COPY.zoneWon, {
-              zone: client.map.provinces[(event.tile % ZONE_PACK) - 1]?.name ?? '',
-            })
-          : fillPlayMessage(CONCORDAT_HUD_COPY.killed, { name: names[event.victim] ?? '' }),
-      gold: event.kind === 'zoneWon' ? Math.floor(event.tile / ZONE_PACK) : Math.max(0, event.tile),
+      title: fillPlayMessage(CONCORDAT_HUD_COPY.killed, { name: names[event.victim] ?? '' }),
+      gold: Math.max(0, event.tile),
     }))
     setBanners((current) => [...current, ...added].slice(-3))
     const ids = new Set(added.map((banner) => banner.id))
@@ -63,7 +53,7 @@ export const ConcordatZones = ({
       () => setBanners((current) => current.filter((banner) => !ids.has(banner.id))),
       BANNER_MS
     )
-  }, [client.log, client.me, client.map.provinces, names])
+  }, [client.log, client.me, names])
 
   return (
     <div className={CONCORDAT_HUD.zones} role="status">

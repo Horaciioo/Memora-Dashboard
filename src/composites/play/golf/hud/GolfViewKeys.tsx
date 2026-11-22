@@ -5,7 +5,6 @@ import { useCallback, useRef, useState } from 'react'
 import { PlayGameActions } from '@/composites/play/mobile/PlayGameActions'
 import { GolfSettings } from '@/composites/play/golf/hud/GolfSettings'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
-import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { usePlayStageStore } from '@/core/store/play/playStage'
 import { PLAY_GAMES, PLAY_HUD_COPY } from '@/declarations/play'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
@@ -42,9 +41,6 @@ export const GolfViewKeys = ({
   const { isScreen, isChatOpen, toggleScreen, toggleChat } = usePlayStageStore()
   const FullscreenIcon = isScreen ? ICONS.playWindowed : ICONS.playFullscreen
   const ChatIcon = ICONS.playChat
-  const ScoreIcon = ICONS.trophy
-  const isScoreOn = usePlayScoreStore((state) => state.isOpen)
-  const toggleScore = usePlayScoreStore((state) => state.toggle)
 
   const keysRef = useRef<HTMLDivElement>(null)
   const fold = useCallback(() => setPanel(null), [])
@@ -61,16 +57,6 @@ export const GolfViewKeys = ({
           onClick={onOverview}
         >
           <ViewIcon className={GOLF_BOARD.viewIcon} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          className={cn(GOLF_BOARD.view, isScoreOn && GOLF_BOARD.viewOn)}
-          aria-label={GOLF_BOARD_COPY.scorecard}
-          title={GOLF_BOARD_COPY.scorecard}
-          aria-pressed={isScoreOn}
-          onClick={toggleScore}
-        >
-          <ScoreIcon className={GOLF_BOARD.viewIcon} aria-hidden="true" />
         </button>
         <button
           type="button"

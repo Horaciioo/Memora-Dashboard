@@ -1,5 +1,6 @@
 import { GLITCH_SETTINGS } from '@/declarations/play'
 import { SECOND_MS } from '@/utils/constants/time'
+import { DATE_LOCALE } from '@/declarations/ui/dates'
 
 /**
  * Points of a difference found
@@ -40,4 +41,7 @@ export const finishPoints = ({
  */
 
 export const secondsLabel = (ms: number): string =>
-  (ms / SECOND_MS).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+  (ms / SECOND_MS).toLocaleString(DATE_LOCALE, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  })

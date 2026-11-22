@@ -27,7 +27,6 @@ type SystemsFields = Pick<
   | 'relations'
   | 'offers'
   | 'routes'
-  | 'coalitions'
   | 'trust'
   | 'embargoes'
   | 'traitors'
@@ -60,7 +59,6 @@ export const emptyEffects = (): ConcordatEffects => ({
   intercept: 0,
   shipSpeed: 0,
   trustGain: 0,
-  peace: 0,
   blockade: 0,
   upkeepCut: 0,
   canFeint: false,
@@ -110,7 +108,6 @@ export const freshSystems = (players: number): SystemsFields => ({
   relations: [],
   offers: [],
   routes: [],
-  coalitions: [],
   trust: Array.from({ length: players }, () => CONCORDAT.diplomacy.trustStart),
   embargoes: [],
   traitors: Array.from({ length: players }, () => 0),

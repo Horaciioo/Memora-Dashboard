@@ -48,7 +48,10 @@ export const readPlayProfile = cache(async (accountId: string) => {
   const [stats, profile, trophyWins] = await Promise.all([
     prisma.playGameStat.findMany({ where: { accountId } }),
     prisma.playProfile.findUnique({ where: { accountId } }),
-    prisma.playTrophyWin.aggregate({ where: { accountId }, _sum: { xp: true } }),
+    prisma.playTrophyWin.findMany({
+      where: { accountId },
+      select: { trophy: true, xp: true, createdAt: true },
+    }),
   ])
   const byGame = new Map(stats.map((stat) => [stat.game, stat]))
 
@@ -58,7 +61,7 @@ export const readPlayProfile = cache(async (accountId: string) => {
   ) as Record<(typeof TOTAL_FIELDS)[number], number>
   // Global XP also holds its own bonus and the trophies
   const bonusXp = profile?.bonusXp ?? 0
-  totals.xp = Math.max(0, totals.xp + bonusXp + (trophyWins._sum.xp ?? 0))
+  totals.xp = Math.max(0, totals.xp + bonusXp + trophyWins.reduce((sum, win) => sum + win.xp, 0))
 
   return {
     global: {
@@ -68,6 +71,9 @@ export const readPlayProfile = cache(async (accountId: string) => {
       level: levelOf(totals.xp),
       bonusXp,
     },
+    pins: profile?.pinnedTrophies ?? [],
+    // Day each trophy was won
+    wonAt: Object.fromEntries(trophyWins.map((win) => [win.trophy, win.createdAt.toISOString()])),
     ban: profile?.bannedAt
       ? { since: profile.bannedAt.toISOString(), reason: profile.banReason }
       : null,
@@ -89,7 +95,7 @@ export const readPlayProfile = cache(async (accountId: string) => {
         tournamentsPlayed: stat?.tournamentsPlayed ?? 0,
         tournamentsWon: stat?.tournamentsWon ?? 0,
         winRate: winRate({ wins: stat?.wins ?? 0, played: stat?.played ?? 0 }),
-        extra: stat?.extra ?? {},
+        extra: (stat?.extra ?? {}) as Record<string, number>,
       }
     }),
     maxLevel: PLAY_SETTINGS.levels.max,

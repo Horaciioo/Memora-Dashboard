@@ -18,6 +18,9 @@ export const PLAY_LOADING = {
   tickMs: 120,
 } as const
 
+// Button label while a hub loads
+export const PLAY_HUB_LOADING = 'Chargement du Hub de partie…'
+
 // Gesture waiting on the server, shown with the moving logo
 export const PLAY_BUSY = {
   delayMs: 180,

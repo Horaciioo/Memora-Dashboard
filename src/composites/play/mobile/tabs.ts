@@ -10,30 +10,31 @@ import type { PlayTabGlyphName } from '@/composites/play/mobile/PlayTabGlyphs'
 export interface PlayTab {
   key: PlayTabGlyphName
   href: string
-  // Left out of the phone bar
-  isDesktopOnly?: boolean
   // Left out of the phone bar, reached through the portrait menu
   isHidden?: boolean
 }
 
+// Same five pages as the desktop bar, the games in the middle
 export const PLAY_TAB_ORDER: PlayTab[] = [
-  { key: 'group', href: ROUTES.playGroup },
-  { key: 'feed', href: ROUTES.playFeed },
-  { key: 'online', href: ROUTES.playOnline, isDesktopOnly: true },
-  { key: 'live', href: ROUTES.playLive, isDesktopOnly: true },
-  { key: 'home', href: ROUTES.play },
+  { key: 'quests', href: ROUTES.playQuests },
   { key: 'ranking', href: ROUTES.playRanking() },
+  { key: 'home', href: ROUTES.play },
+  { key: 'group', href: ROUTES.playGroup },
+  { key: 'trophies', href: ROUTES.playTrophies },
   { key: 'stats', href: ROUTES.playStats, isHidden: true },
+  { key: 'feed', href: ROUTES.playFeed, isHidden: true },
 ]
 
-// Tabs of the phone bar
-export const PLAY_PHONE_TABS = PLAY_TAB_ORDER.filter((tab) => !tab.isDesktopOnly)
+// Tabs of the phone bar, the swipe walks through them
+export const PLAY_PHONE_TABS = PLAY_TAB_ORDER.filter((tab) => !tab.isHidden)
 
 // Words of each tab
 export const PLAY_TAB_LABELS: Record<PlayTabGlyphName, string> = {
   group: PLAY_MOBILE_COPY.tabGroup,
+  trophies: PLAY_MOBILE_COPY.tabTrophies,
   feed: PLAY_MOBILE_COPY.tabFeed,
   home: PLAY_MOBILE_COPY.tabHome,
+  quests: PLAY_MOBILE_COPY.tabQuests,
   live: PLAY_MOBILE_COPY.tabLive,
   online: PLAY_MOBILE_COPY.tabOnline,
   ranking: PLAY_MOBILE_COPY.tabRanking,
@@ -41,18 +42,18 @@ export const PLAY_TAB_LABELS: Record<PlayTabGlyphName, string> = {
 }
 
 /**
- * Tab index a page belongs to, stats and history sharing the last tab
+ * Tab index a page belongs to, stats and history sharing one tab
  * @param {string} path - Current path
  * @param {PlayTab[]} [order] - Tabs to search
- * @return {number} - Index in the order
+ * @return {number} - Index in the order, -1 off the tabs
  */
 
 export const playTabIndexOf = (path: string, order: PlayTab[] = PLAY_TAB_ORDER): number => {
-  if (path.startsWith(ROUTES.playHistory())) return order.findIndex((tab) => tab.key === 'stats')
-
+  const target = path.startsWith(ROUTES.playHistory()) ? ROUTES.playStats : path
   const index = order.findIndex(
-    (tab) => tab.href !== ROUTES.play && path.startsWith(tab.href.split('?')[0])
+    (tab) => tab.href !== ROUTES.play && target.startsWith(tab.href.split('?')[0])
   )
+  if (index !== -1) return index
 
-  return index === -1 ? order.findIndex((tab) => tab.key === 'home') : index
+  return target === ROUTES.play ? order.findIndex((tab) => tab.key === 'home') : -1
 }

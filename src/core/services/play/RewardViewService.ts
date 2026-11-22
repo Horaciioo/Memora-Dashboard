@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { levelOf } from '@/core/lib/play'
+import { questBoostOf } from '@/core/lib/play/boost'
+import { prisma } from '@/core/lib/db'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { readPlayProfile } from '@/core/services/play/ProfileService'
 import { PLAY_XP_TIMING } from '@/declarations/play/xp'
@@ -37,6 +39,12 @@ export const readReward = async (
   if (session.status !== PlayStatuses.Finished || !seat || !seat.xp || !isRecent) return null
 
   const profile = await readPlayProfile(viewerId)
+  const boosted = await prisma.playProfile.findUnique({
+    where: { accountId: viewerId },
+    select: { questBoostUntil: true },
+  })
+  const until = boosted?.questBoostUntil ?? null
+  const boost = questBoostOf(until)
   const gameXp = profile.games.find((entry) => entry.game === session.game)?.xp ?? 0
 
   return {
@@ -44,5 +52,6 @@ export const readReward = async (
     parts: (seat.xpParts ?? []) as unknown as PlayXpPart[],
     game: ladderOf(gameXp, seat.xp),
     global: ladderOf(profile.global.xp, seat.xp),
+    questBoost: boost && until ? { percent: boost.percent, until: until.toISOString() } : null,
   }
 }

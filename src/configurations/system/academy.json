@@ -33,6 +33,7 @@
   "secondPeriodLives": 6,
   "maxObjectives": 2,
   "juniorLivesLimit": 60,
+  "juniorAbsencesLimit": 30,
   "formJuniorsLimit": 200,
   "thirdPeriodMinDays": 3,
   "thirdPeriodMaxDays": 30

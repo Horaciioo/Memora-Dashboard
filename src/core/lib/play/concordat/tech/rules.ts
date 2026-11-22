@@ -22,7 +22,6 @@ export interface ConcordatTier {
   ships?: number
   calm?: number
   trustGain?: number
-  peace?: number
   blockade?: number
   upkeepCut?: number
   feint?: number

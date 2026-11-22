@@ -24,34 +24,6 @@
     );
 }
 
-/* A hub shape rises, spins a little, fades out */
-.play-glitch-float {
-  position: absolute;
-  bottom: -5rem;
-  left: var(--x);
-  width: var(--size);
-  height: var(--size);
-  opacity: 0;
-  animation: play-glitch-float var(--rise) linear var(--delay) infinite;
-}
-
-@keyframes play-glitch-float {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(var(--tilt));
-  }
-  12% {
-    opacity: 0.85;
-  }
-  80% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
-  }
-}
-
 /* Countdown in the magenta glow */
 .play-figure-glitch {
   color: var(--play-glitch-glow);
@@ -61,7 +33,7 @@
 /* Picture: warm paper with a soft edge, dealt in */
 .play-glitch-picture {
   aspect-ratio: 4 / 3;
-  border-radius: 1rem;
+  border-radius: var(--radius-xl);
   background: var(--glitch-paper);
   box-shadow:
     0 0 0 0.3rem var(--glitch-edge),
@@ -254,7 +226,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .play-glitch-float,
   .play-glitch-picture,
   .play-glitch-item,
   .play-glitch-ring,

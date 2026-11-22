@@ -1,6 +1,7 @@
 {
   "birthdayWindowDays": 30,
   "birthdayMax": 5,
+  "awayMax": 5,
   "taskMax": 4,
   "plannedWindowDays": 30,
   "plannedMax": 5

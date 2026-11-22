@@ -1,3 +1,4 @@
+import { drawSprite, spriteWidth } from '@/composites/play/concordat/board/draw/pixelSprite'
 import { centreOf, isOutside, pointOf } from '@/composites/play/concordat/board/draw/project'
 import type { ConcordatScene } from '@/composites/play/concordat/board/draw/types'
 import { strikePoint, strikeProgress } from '@/composites/play/concordat/board/draw/warState'
@@ -12,45 +13,19 @@ const { war, frame } = CONCORDAT_ART
 const { plane, missile } = war
 const { air } = CONCORDAT
 
-// Delta wing seen from above, nose to the right
-const drawFighter = (context: CanvasRenderingContext2D, size: number): void => {
-  context.beginPath()
-  context.moveTo(size, 0)
-  context.lineTo(-size * 0.35, size * 0.9)
-  context.lineTo(-size * 0.1, size * 0.14)
-  context.lineTo(-size * 0.85, size * 0.34)
-  context.lineTo(-size * 0.7, 0)
-  context.lineTo(-size * 0.85, -size * 0.34)
-  context.lineTo(-size * 0.1, -size * 0.14)
-  context.lineTo(-size * 0.35, -size * 0.9)
-  context.closePath()
-}
-
-// Helicopter body, tail boom and the turning rotor
-const drawHeli = (context: CanvasRenderingContext2D, size: number, now: number): void => {
-  context.beginPath()
-  context.ellipse(0, 0, size * 0.6, size * 0.4, 0, 0, Math.PI * 2)
-  context.fill()
-  context.stroke()
-  context.fillRect(-size * 1.15, -size * 0.07, size * 0.7, size * 0.14)
-  context.fillRect(-size * 1.2, -size * 0.3, size * 0.1, size * 0.6)
-
-  const spin = now * plane.rotor
+// Two thin turning blades over a helicopter, hard lines
+const drawRotor = (context: CanvasRenderingContext2D, size: number, now: number): void => {
   context.save()
-  context.rotate(spin)
-  context.strokeStyle = 'rgba(30,34,40,0.85)'
-  context.lineWidth = Math.max(1.5, size * 0.1)
+  context.rotate(now * plane.rotor)
+  context.strokeStyle = 'rgba(30,34,40,0.9)'
+  context.lineWidth = Math.max(2, Math.round(size * 0.12))
   context.beginPath()
-  context.moveTo(-size * 1.15, 0)
-  context.lineTo(size * 1.15, 0)
-  context.moveTo(0, -size * 1.15)
-  context.lineTo(0, size * 1.15)
+  context.moveTo(-size * 1.1, 0)
+  context.lineTo(size * 1.1, 0)
+  context.moveTo(0, -size * 1.1)
+  context.lineTo(0, size * 1.1)
   context.stroke()
   context.restore()
-  context.fillStyle = 'rgba(255,255,255,0.14)'
-  context.beginPath()
-  context.arc(0, 0, size * 1.15, 0, Math.PI * 2)
-  context.fill()
 }
 
 // Straight shot from a tile to a point of the sky: smoke behind, a bright head in front
@@ -65,19 +40,19 @@ const drawShot = (
     from[0] + (to[0] - from[0]) * share,
     from[1] + (to[1] - from[1]) * share,
   ]
-  const gradient = context.createLinearGradient(from[0], from[1], head[0], head[1])
-  gradient.addColorStop(0, rgbText(rgb, 0))
-  gradient.addColorStop(1, rgbText(rgb, 0.85))
-  context.strokeStyle = gradient
+  // Hard streak, the last third of the way, then a square head
+  const tail: [number, number] = [
+    head[0] - (head[0] - from[0]) * 0.35,
+    head[1] - (head[1] - from[1]) * 0.35,
+  ]
+  context.strokeStyle = rgbText(rgb, 0.9)
   context.lineWidth = 2
   context.beginPath()
-  context.moveTo(from[0], from[1])
+  context.moveTo(tail[0], tail[1])
   context.lineTo(head[0], head[1])
   context.stroke()
   context.fillStyle = rgbText(frame.rgb)
-  context.beginPath()
-  context.arc(head[0], head[1], 2.4, 0, Math.PI * 2)
-  context.fill()
+  context.fillRect(Math.round(head[0] - 2), Math.round(head[1] - 2), 4, 4)
 }
 
 // Smoke behind a damaged aircraft, and fire when one hit is left
@@ -96,9 +71,13 @@ const drawDamage = (
     const [x, y] = pointOf(scene, back.x, back.y)
     const wobble = Math.sin(scene.now * 0.01 + step) * size * 0.12
     context.fillStyle = `rgba(28,24,24,${0.5 - step * 0.06})`
-    context.beginPath()
-    context.arc(x + wobble, y - step * size * 0.08, size * (0.18 + step * 0.05), 0, Math.PI * 2)
-    context.fill()
+    const puff = Math.round(size * (0.3 + step * 0.1))
+    context.fillRect(
+      Math.round(x + wobble - puff / 2),
+      Math.round(y - step * size * 0.08),
+      puff,
+      puff
+    )
   }
   if (row.hp <= 1) {
     const [x, y] = pointOf(
@@ -108,9 +87,8 @@ const drawDamage = (
     )
     const flicker = 0.6 + 0.4 * Math.sin(scene.now * 0.04)
     context.fillStyle = rgbText(war.fire.mid, 0.8 * flicker)
-    context.beginPath()
-    context.arc(x, y, size * 0.32 * flicker, 0, Math.PI * 2)
-    context.fill()
+    const flame = Math.max(3, Math.round(size * 0.55 * flicker))
+    context.fillRect(Math.round(x - flame / 2), Math.round(y - flame / 2), flame, flame)
   }
 }
 
@@ -136,14 +114,12 @@ const drawOne = (
   // Guard disc of a helicopter on station
   if (isHeli && point.isOrbit) {
     const [cx, cy] = centreOf(scene, row.tile)
-    context.fillStyle = rgbText(rgb, 0.07)
-    context.strokeStyle = rgbText(rgb, 0.55)
+    context.strokeStyle = rgbText(rgb, 0.7)
     context.lineWidth = 1.6
     context.setLineDash([6, 6])
     context.lineDashOffset = -now * 0.012
     context.beginPath()
     context.arc(cx, cy, air.heli.guard * camera.scale, 0, Math.PI * 2)
-    context.fill()
     context.stroke()
     context.setLineDash([])
   }
@@ -154,40 +130,25 @@ const drawOne = (
       const back = airPoint(row, tick - step * plane.trailStep, width)
       const [bx, by] = pointOf(scene, back.x, back.y)
       context.fillStyle = `rgba(255,255,255,${0.42 * (1 - step / (plane.trail + 1))})`
-      context.beginPath()
-      context.arc(bx, by, size * 0.22 * (1 - step / (plane.trail + 2)) + 1, 0, Math.PI * 2)
-      context.fill()
+      const dot = Math.max(2, Math.round(size * 0.3 * (1 - step / (plane.trail + 2))))
+      context.fillRect(Math.round(bx - dot / 2), Math.round(by - dot / 2), dot, dot)
     }
   }
 
-  // Shadow on the ground, then the machine
+  // Hard shadow on the ground, then the pixel machine
+  const sprite = isHeli ? 'heli' : 'fighter'
+  const pixel = Math.max(2, Math.round((size * 2) / spriteWidth(sprite)))
   context.save()
-  context.translate(x + size * 0.7, y + size * 1.1)
-  context.rotate(point.angle)
-  context.fillStyle = `rgba(10,12,16,${plane.shadow})`
+  context.globalAlpha = plane.shadow * 1.6
+  drawSprite(context, sprite, [10, 12, 16], x + size * 0.7, y + size * 1.1, pixel, point.angle)
+  context.restore()
+  drawSprite(context, sprite, rgb, x, y, pixel, point.angle)
   if (isHeli) {
-    context.beginPath()
-    context.ellipse(0, 0, size * 0.7, size * 0.45, 0, 0, Math.PI * 2)
-    context.fill()
-  } else {
-    drawFighter(context, size)
-    context.fill()
+    context.save()
+    context.translate(x, y)
+    drawRotor(context, size, now)
+    context.restore()
   }
-  context.restore()
-
-  context.save()
-  context.translate(x, y)
-  context.rotate(point.angle)
-  context.fillStyle = rgbText(rgb)
-  context.strokeStyle = rgbText(frame.rgb)
-  context.lineWidth = Math.max(1.4, size * 0.1)
-  if (isHeli) drawHeli(context, size, now)
-  else {
-    drawFighter(context, size)
-    context.fill()
-    context.stroke()
-  }
-  context.restore()
 
   drawDamage(context, scene, row, size)
 
@@ -209,9 +170,13 @@ const drawOne = (
     )
     if (sinceShot < 2.5) {
       context.fillStyle = rgbText(war.fire.core, 0.9)
-      context.beginPath()
-      context.arc(from[0], from[1], Math.max(4, camera.scale), 0, Math.PI * 2)
-      context.fill()
+      const flash = Math.round(Math.max(6, camera.scale * 1.6))
+      context.fillRect(
+        Math.round(from[0] - flash / 2),
+        Math.round(from[1] - flash / 2),
+        flash,
+        flash
+      )
     }
   }
 }
@@ -236,9 +201,13 @@ const drawInterceptors = (context: CanvasRenderingContext2D, scene: ConcordatSce
     drawShot(context, from, target, share, war.interceptor)
     if (age < 3) {
       context.fillStyle = rgbText(war.fire.core, 0.9)
-      context.beginPath()
-      context.arc(from[0], from[1], Math.max(5, scene.camera.scale * 1.4), 0, Math.PI * 2)
-      context.fill()
+      const flash = Math.round(Math.max(8, scene.camera.scale * 2.2))
+      context.fillRect(
+        Math.round(from[0] - flash / 2),
+        Math.round(from[1] - flash / 2),
+        flash,
+        flash
+      )
     }
   }
 }

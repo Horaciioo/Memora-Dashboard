@@ -38,8 +38,8 @@ export const GROUP_OF_KIND: Record<ModerationKind, ReportGroup> = {
  */
 
 export const REPORT_GROUP_META: Record<ReportGroup, { label: string; colour: string }> = {
-  delete: { label: 'Suppressions', colour: 'var(--color-sky-500)' },
-  timeout: { label: 'Timeouts et avertissements', colour: 'var(--color-apple-orange)' },
-  ban: { label: 'Bannissements', colour: 'var(--color-apple-red)' },
-  other: { label: 'Autres actions de Mod.', colour: 'var(--color-mauve-400)' },
+  delete: { label: 'Suppressions', colour: 'var(--color-border-strong)' },
+  timeout: { label: 'Timeouts et avertissements', colour: 'var(--color-brand-300)' },
+  ban: { label: 'Bannissements', colour: 'var(--color-brand-700)' },
+  other: { label: 'Autres actions de Mod.', colour: 'var(--color-ink-subtle)' },
 }

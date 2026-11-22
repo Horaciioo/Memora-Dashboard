@@ -24,7 +24,6 @@ export const CreatorHero = ({ creator, start }: CreatorHeroProps) => {
         <img src={backdrop} alt="" className={CREATOR_BILAN.backdrop} />
       )}
       <div className={CREATOR_BILAN.wash} aria-hidden="true" />
-      <div className={CREATOR_BILAN.halo} aria-hidden="true" />
       <div className={CREATOR_BILAN.heroRow}>
         <Avatar
           name={creator.name}

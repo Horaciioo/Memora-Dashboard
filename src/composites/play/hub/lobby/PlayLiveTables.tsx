@@ -6,6 +6,7 @@ import { Button } from '@/components/elements/actions/Button'
 import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
+import { PlayEmpty } from '@/composites/play/shared/PlayEmpty'
 import { ROUTES } from '@/declarations/navigation'
 import { fillPlayMessage, PLAY_FOLLOW_COPY, PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_LIVE } from '@/declarations/ui/variants'
@@ -57,7 +58,7 @@ export const PlayLiveTables = ({
         </header>
       )}
 
-      {tables.length === 0 && <p className={PLAY_LIVE.empty}>{empty}</p>}
+      {tables.length === 0 && <PlayEmpty icon="playPawn">{empty}</PlayEmpty>}
       <div className={PLAY_LIVE.list}>
         {tables.map((table) => {
           const isMine = table.id === mineId

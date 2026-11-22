@@ -1,5 +1,6 @@
 'use client'
 
+import { troopFigure } from '@/core/lib/play/concordat'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
@@ -7,12 +8,17 @@ import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 
 const { engage } = CONCORDAT_ART
 
+export interface ConcordatEngageProps {
+  reserve: number
+}
+
 /**
- * Engagement share and slider
+ * Engagement share, troops sent and slider
+ * @param {ConcordatEngageProps} props - Troops at hand
  * @return {JSX.Element}
  */
 
-export const ConcordatEngage = () => {
+export const ConcordatEngage = ({ reserve }: ConcordatEngageProps) => {
   const percent = useConcordatViewStore((state) => state.percent)
   const setPercent = useConcordatViewStore((state) => state.setPercent)
 
@@ -30,6 +36,9 @@ export const ConcordatEngage = () => {
           onChange={(event) => setPercent(Math.round(Number(event.target.value)) || engage.min)}
         />
         %
+        <span className={CONCORDAT_HUD.percentSent}>
+          ({troopFigure(Math.floor((reserve * percent) / 100))})
+        </span>
       </label>
       <input
         type="range"

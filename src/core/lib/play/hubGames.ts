@@ -1,4 +1,4 @@
-import { PLAY_FEATURED_GAMES, PLAY_GAMES } from '@/declarations/play'
+import { PLAY_GAMES } from '@/declarations/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 export interface PlayHubGame {
@@ -9,13 +9,15 @@ export interface PlayHubGame {
 /**
  * Games of the hub split in featured and the rest, playable first then by name
  * @param {PlayHubGame[]} games - Catalogue
+ * @param {PlayGameName[]} chosen - Games the admins put on the banner
  * @return {{ featured: PlayGameName[], rest: PlayHubGame[] }} - Banner games and cards
  */
 
-export const splitPlayGames = (games: PlayHubGame[]) => {
-  const featured = games
-    .filter((entry) => entry.playable && PLAY_FEATURED_GAMES.includes(entry.game))
-    .map((entry) => entry.game)
+export const splitPlayGames = (games: PlayHubGame[], chosen: PlayGameName[]) => {
+  // Banner follows the order the admins chose
+  const featured = chosen.filter((game) =>
+    games.some((entry) => entry.game === game && entry.playable)
+  )
   const rest = games
     .filter((entry) => !featured.includes(entry.game))
     .sort(

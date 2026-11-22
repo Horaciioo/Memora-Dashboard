@@ -29,6 +29,7 @@ export interface ConcordatNoticesProps {
 export const ConcordatNotices = ({ client, isSeated }: ConcordatNoticesProps) => {
   const isPicking = client.phase === ConcordatPhases.Picking
   const tool = useConcordatViewStore((state) => state.tool)
+  const fleetShip = useConcordatViewStore((state) => state.fleetShip)
   const setTool = useConcordatViewStore((state) => state.setTool)
   const [isLocked, setIsLocked] = useState(false)
   const isPlaying = client.phase === ConcordatPhases.Playing
@@ -99,20 +100,24 @@ export const ConcordatNotices = ({ client, isSeated }: ConcordatNoticesProps) =>
               ? fillPlayMessage(CONCORDAT_HUD_COPY.toolBuild, {
                   name: CONCORDAT_BUILDING_LABELS[tool.building],
                 })
-              : tool.kind === 'sortie'
-                ? fillPlayMessage(
-                    tool.air === 'heli'
-                      ? CONCORDAT_HUD_COPY.toolGuard
-                      : CONCORDAT_HUD_COPY.toolSortie,
-                    { name: CONCORDAT_HUD_COPY[tool.air] }
-                  )
-                : fillPlayMessage(CONCORDAT_HUD_COPY.toolLaunch, {
-                    name: tool.weapon
-                      ? CONCORDAT_HUD_COPY[tool.weapon]
-                      : tool.isHeavy
-                        ? CONCORDAT_HUD_COPY.heavy
-                        : CONCORDAT_HUD_COPY.missile,
-                  })}
+              : tool.kind === 'fleet'
+                ? fleetShip === null
+                  ? CONCORDAT_HUD_COPY.toolFleetBuy
+                  : CONCORDAT_HUD_COPY.toolFleetMove
+                : tool.kind === 'sortie'
+                  ? fillPlayMessage(
+                      tool.air === 'heli'
+                        ? CONCORDAT_HUD_COPY.toolGuard
+                        : CONCORDAT_HUD_COPY.toolSortie,
+                      { name: CONCORDAT_HUD_COPY[tool.air] }
+                    )
+                  : fillPlayMessage(CONCORDAT_HUD_COPY.toolLaunch, {
+                      name: tool.weapon
+                        ? CONCORDAT_HUD_COPY[tool.weapon]
+                        : tool.isHeavy
+                          ? CONCORDAT_HUD_COPY.heavy
+                          : CONCORDAT_HUD_COPY.missile,
+                    })}
           </span>
           <button type="button" className={CONCORDAT_HUD.retreat} onClick={() => setTool(null)}>
             {CONCORDAT_HUD_COPY.cancel}

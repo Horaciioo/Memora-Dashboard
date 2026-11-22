@@ -29,7 +29,6 @@ export const MODVIEW_PREFERENCES = {
   colouredNames: { kind: 'toggle', default: true },
   pauseMode: { kind: 'choice', options: ['hover', 'alt'], default: 'hover' },
   toolsPosition: { kind: 'choice', options: ['left', 'hover', 'right', 'card'], default: 'left' },
-  keepResolved: { kind: 'toggle', default: false },
   repeatWords: { kind: 'words', max: MODVIEW_PERSONAL.maxRepeatWords, default: [] },
   badwords: { kind: 'badwords', max: MODVIEW_PERSONAL.maxBadwords, default: [] },
   actions: { kind: 'actions', default: MODVIEW_DEFAULT_ACTIONS },

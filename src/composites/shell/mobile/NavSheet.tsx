@@ -5,14 +5,11 @@ import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { BottomSheet } from '@/components/structures/overlays/BottomSheet'
-import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { RailNav } from '@/composites/shell/rail/RailNav'
 import { RailShortcuts } from '@/composites/shell/rail/RailShortcuts'
-import { RoleSwitch } from '@/composites/shell/RoleSwitch'
-import { SimulationBanner } from '@/composites/shell/SimulationBanner'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
 import { ROUTES } from '@/declarations/navigation'
-import { NAV_SHEET, SEARCH_LAUNCHER } from '@/declarations/ui/blocks'
+import { NAV_SHEET } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { BOTTOM_SHEET } from '@/declarations/ui/variants'
@@ -31,8 +28,7 @@ export interface NavSheetProps {
 }
 
 /**
- * The rail's pages in a sheet rising from the bottom: level switch first, then the search,
- * the shortcuts and every group
+ * The rail's pages in a sheet rising from the bottom: account, the shortcuts and every group
  * @param {boolean} open - Sheet is mounted
  * @param {ViewContext} viewContext - View resolved server-side
  * @param {number} unreadCount - Unopened notifications resolved server-side
@@ -101,13 +97,6 @@ export const NavSheet = ({
             {unreadCount > 0 && <span className={NAV_SHEET.dot} aria-hidden="true" />}
           </Link>
         </div>
-        {viewContext.switchable && (
-          <div className={NAV_SHEET.switch}>
-            <SimulationBanner viewContext={viewContext} />
-            <RoleSwitch viewContext={viewContext} />
-          </div>
-        )}
-        <SearchLauncher expanded className={SEARCH_LAUNCHER.sheetBar} onOpen={onClose} />
         <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
         <RailNav
           groups={groups}

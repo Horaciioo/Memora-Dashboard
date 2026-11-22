@@ -49,11 +49,11 @@ export const PlayHubTabs = ({ play, action, panels }: PlayHubTabsProps) => {
               key={entry.key}
               type="button"
               aria-haspopup="dialog"
-              aria-label={entry.label}
               className={PLAY_HUB_BAR.segment}
               onClick={() => setSheet(entry.key)}
             >
               <PlayTabGlyph name={entry.glyph} className={PLAY_HUB_BAR.icon} />
+              <span className={PLAY_HUB_BAR.label}>{entry.label}</span>
             </button>
           ))}
         </div>

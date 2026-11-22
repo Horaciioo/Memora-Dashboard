@@ -77,6 +77,7 @@ const writeBatch = async (items: StoredChat[]): Promise<void> => {
         sentAt: new Date(item.sentAt),
         liveId: item.liveId,
         source: ChatSources.Live,
+        deletedAt: item.blocked ? new Date(item.sentAt) : null,
       })),
       skipDuplicates: true,
     }),
@@ -163,5 +164,21 @@ export const markChatDeleted = async (input: {
       ...(input.chatterId ? { platformUserId: input.chatterId } : {}),
     },
     data: { deletedAt: new Date() },
+  })
+}
+
+/**
+ * Give back a message the automod released
+ * @param {string} youtuberId - Creator
+ * @param {string} messageId - Message released
+ * @return {Promise<void>} - Restored
+ */
+
+export const markChatReleased = async (youtuberId: string, messageId: string): Promise<void> => {
+  await flushChatMessages()
+
+  await prisma.liveChatMessage.updateMany({
+    where: { youtuberId, platform: LivePlatforms.Twitch, externalId: messageId },
+    data: { deletedAt: null },
   })
 }

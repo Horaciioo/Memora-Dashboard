@@ -2,7 +2,7 @@ import 'server-only'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
-import { readBodyList } from '@/core/lib/play'
+import { readBodyList, readBodyText } from '@/core/lib/play'
 import { logger } from '@/core/lib/logger'
 import { signalGroups } from '@/core/lib/play/signal'
 import { notify } from '@/core/services/system/NotificationService'
@@ -22,6 +22,7 @@ import {
   tellGroup,
   toView,
 } from '@/core/services/play/GroupService/shared'
+import { readGroupQuest } from '@/core/services/play/GroupService/quests'
 
 /**
  * Groups and invitations of a member
@@ -44,7 +45,12 @@ export const readPlayGroup = async (accountId: string): Promise<PlayGroupState> 
   ])
 
   return {
-    groups: groups.map((group) => toView(group, accountId)),
+    groups: await Promise.all(
+      groups.map(async (group) => ({
+        ...toView(group, accountId),
+        quest: await readGroupQuest(group.id, group.members, accountId),
+      }))
+    ),
     invitations: invitations.map((invite) => ({
       id: invite.id,
       groupName: invite.group.name,
@@ -57,13 +63,13 @@ export const readPlayGroup = async (accountId: string): Promise<PlayGroupState> 
  * Open a group led by a member
  * @param {string} accountId - Future host
  * @param {Record<string, unknown>} raw - Body, optional name
- * @return {Promise<void>} - Created
+ * @return {Promise<{ id: string }>} - Created group
  */
 
 export const createPlayGroup = async (
   accountId: string,
   raw: Record<string, unknown>
-): Promise<void> => {
+): Promise<{ id: string }> => {
   const me = await prisma.account.findUniqueOrThrow({
     where: { id: accountId },
     select: { displayName: true },
@@ -75,10 +81,35 @@ export const createPlayGroup = async (
       ? nameOf(raw)
       : fillPlayMessage(PLAY_GROUP_COPY.defaultName, { name: me.displayName })
 
-  await prisma.playGroup.create({
+  const { id } = await prisma.playGroup.create({
     data: { name, hostId: accountId, members: { create: { accountId } } },
+    select: { id: true },
   })
   await signalGroups([accountId])
+
+  return { id }
+}
+
+/**
+ * Hand the group over to another member
+ * @param {string} accountId - Current host
+ * @param {string} groupId - Group
+ * @param {Record<string, unknown>} raw - Body with the new host
+ * @return {Promise<void>} - Handed over
+ */
+
+export const transferPlayGroup = async (
+  accountId: string,
+  groupId: string,
+  raw: Record<string, unknown>
+): Promise<void> => {
+  const group = await requireHostGroup(accountId, groupId)
+  const nextId = readBodyText(raw, 'accountId', PLAY_GROUP_ERRORS.notMember)
+  if (nextId === group.hostId || !group.members.some((member) => member.accountId === nextId)) {
+    throw conflict(PLAY_GROUP_ERRORS.notMember)
+  }
+  await prisma.playGroup.update({ where: { id: group.id }, data: { hostId: nextId } })
+  await tellGroup(group)
 }
 
 /**
@@ -228,6 +259,19 @@ export const dissolvePlayGroup = async (accountId: string, groupId: string): Pro
   await prisma.playGroup.delete({ where: { id: group.id } })
   await tellGroup(group)
 }
+
+/**
+ * Everyone a new group can call, the viewer left out
+ * @param {string} accountId - Viewer
+ * @return {Promise<{ id: string; displayName: string; avatarUrl: string | null }[]>} - People
+ */
+
+export const listInvitablePeople = (accountId: string) =>
+  prisma.account.findMany({
+    where: { leftAt: null, anonymisedAt: null, frozenAt: null, id: { not: accountId } },
+    select: { id: true, displayName: true, avatarUrl: true },
+    orderBy: { displayName: 'asc' },
+  })
 
 /**
  * Members a host can still call into each of the groups they lead

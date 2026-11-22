@@ -156,6 +156,14 @@ export const useConcordatLayers = (
   invalidate: () => void
 ) => {
   const held = useRef<Held | null>(null)
+  const trailing = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(
+    () => () => {
+      if (trailing.current) clearTimeout(trailing.current)
+    },
+    []
+  )
 
   useEffect(() => {
     if (!client) return
@@ -193,6 +201,17 @@ export const useConcordatLayers = (
     if (isFresh || (touched.length > 0 && isStale)) {
       current.places = placesOf(client.owner, client.map.width, client.players.length)
       current.placesAt = performance.now()
+    } else if (touched.length > 0) {
+      // Last change inside the window: refresh once it ends
+      if (trailing.current) clearTimeout(trailing.current)
+      trailing.current = setTimeout(
+        () => {
+          current.places = placesOf(client.owner, client.map.width, client.players.length)
+          current.placesAt = performance.now()
+          invalidate()
+        },
+        Math.max(0, labelMs - (performance.now() - current.placesAt)) + 50
+      )
     }
     // A wash outlives the tiles under it
     if (current.washed && isBulk) washLayer(current, current.washed)

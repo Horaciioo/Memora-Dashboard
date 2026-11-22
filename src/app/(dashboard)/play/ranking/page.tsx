@@ -7,7 +7,7 @@ import { readCatalog, readLeaderboards } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_MOBILE_COPY, playGameOfSlug } from '@/declarations/play'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
-import { PLAY_BOX } from '@/declarations/ui/variants'
+import { PLAY_PAGE } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: PLAY_MOBILE_COPY.rankingTitle }
@@ -34,9 +34,10 @@ export default async function PlayRankingPage({ searchParams }: PlayRankingPageP
   const leaders = await readLeaderboards(game)
 
   return (
-    <div className={PLAY_BOX.stack}>
+    <div className={PLAY_PAGE.reading}>
       <PlaySignal topic={PLAY_TOPICS.lobbies} />
       <PlayPageTitle
+        page="ranking"
         body={<PlayRankingBox games={games} game={game} leaders={leaders} meId={session.id} />}
       >
         {PLAY_MOBILE_COPY.rankingTitle}

@@ -9,6 +9,7 @@ import { echoSettingsOf } from '@/core/lib/play/echo/settings'
 import type { EchoGameSettings } from '@/core/lib/play/echo/settings'
 import { ECHO_SETTINGS, ECHO_SETUP_COPY, fillPlayMessage } from '@/declarations/play'
 import { ECHO_SETUP } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 // Rounds are voted at launch
 const TABS = [{ value: 'speed', label: ECHO_SETUP_COPY.tabSpeed, icon: 'playClock' as const }]
@@ -27,6 +28,7 @@ export const EchoSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Echo}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit

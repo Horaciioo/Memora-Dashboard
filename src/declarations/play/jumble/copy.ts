@@ -47,7 +47,7 @@ export const JUMBLE_SETUP_COPY = {
   tabs: 'Réglages de la partie',
   tabSpeed: 'Rythme',
   roundSeconds: 'Temps par manche',
-  roundSecondsHint: 'Plus la réponse est rapide, plus elle rapporte.',
+  roundSecondsHint: 'Pour un mot de 5 lettres, les mots plus longs ont plus de temps.',
   hintOn: 'Avec indice',
   hintOff: 'Sans indice',
   seconds: '{seconds} s',
@@ -82,7 +82,8 @@ export const JUMBLE_RULES_COPY = {
   roundSeconds: 'Temps par manche',
   hint: 'Indice',
   scoring: 'Points',
-  scoringValue: '{base} de base, jusqu’à {speed} de rapidité, {flash} pour un éclair',
+  scoringValue:
+    '{base} de base, jusqu’à {speed} de rapidité, {flash} pour un éclair, +{length} par lettre au-delà de {from}',
   streak: 'Série',
   streakValue: '+{step} par manche gagnée d’affilée, jusqu’à +{max}',
 } as const

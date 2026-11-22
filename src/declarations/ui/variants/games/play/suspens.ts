@@ -45,7 +45,8 @@ export const SUSPENS_BOARD = {
   keyHit: 'play-suspens-key-hit',
   keyMiss: 'play-suspens-key-miss',
   // Fields: secret word and whole-word guess
-  form: 'flex w-full max-w-md items-center gap-2',
+  // Phone: the key under the field, full width
+  form: 'flex w-full max-w-md flex-col items-stretch gap-2 sm:flex-row sm:items-center',
   input:
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-4 py-3 text-center text-lg font-extrabold tracking-widest text-[var(--play-ink)] uppercase placeholder:font-normal placeholder:tracking-normal placeholder:normal-case placeholder:text-[var(--play-ink-faint)] focus:bg-[var(--play-panel-strong)] focus:outline-none',
   pick: 'play-hud-block flex w-full max-w-md flex-col items-center gap-3 p-4',

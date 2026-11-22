@@ -1,18 +1,20 @@
 import type { Metadata } from 'next'
 
+import AppLink from '@/components/elements/navigation/AppLink'
+import { PlayFold } from '@/composites/play/mobile/PlayFold'
 import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
 import { PlaySignal } from '@/composites/play/hub/notices/PlaySignal'
-import { PlayCareerCounters } from '@/composites/play/member/stats/PlayCareerCounters'
+import { PlayCareerPanels } from '@/composites/play/member/stats/PlayCareerPanels'
 import { PlayCareerHero } from '@/composites/play/member/stats/PlayCareerHero'
-import { PlayCareerRecord } from '@/composites/play/member/stats/PlayCareerRecord'
 import { PlayGamePicker } from '@/composites/play/member/stats/PlayGamePicker'
 import { PlayMastery } from '@/composites/play/member/stats/PlayMastery'
 import { PlayPinnedTrophies } from '@/composites/play/member/stats/PlayPinnedTrophies'
 import { readPlayProfile } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
-import { PLAY_HUB_COPY, playGameOfSlug } from '@/declarations/play'
+import { ROUTES } from '@/declarations/navigation'
+import { PLAY_HEAD_COPY, PLAY_HUB_COPY, playGameOfSlug } from '@/declarations/play'
 import { PLAY_TOPICS } from '@/declarations/play/topics'
-import { PLAY_CAREER } from '@/declarations/ui/variants'
+import { PLAY_HEAD, PLAY_PAGE } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: PLAY_HUB_COPY.statsTitle }
@@ -39,54 +41,40 @@ export default async function PlayStatsPage({ searchParams }: PlayStatsPageProps
   const player = { name: session.displayName, avatarUrl: session.avatarUrl }
 
   return (
-    <div className={PLAY_CAREER.page}>
+    <div className={PLAY_PAGE.frame}>
       <PlaySignal topic={PLAY_TOPICS.lobbies} />
       <PlayPageTitle
+        page="stats"
+        aside={null}
         body={
           <>
             <PlayGamePicker current={game} games={profile.games} />
-            <PlayCareerHero
-              totals={totals}
-              player={player}
-              games={game ? undefined : profile.games}
-            />
+            <PlayCareerHero totals={totals} player={player} />
           </>
         }
       >
         {PLAY_HUB_COPY.statsTitle}
       </PlayPageTitle>
-      <div className={PLAY_CAREER.grid}>
-        <PlayPageTitle
-          heading="h2"
-          className={PLAY_CAREER.cell}
-          body={<PlayCareerCounters totals={totals} />}
-        >
-          {PLAY_HUB_COPY.sectionFigures}
-        </PlayPageTitle>
-        <PlayPageTitle
-          heading="h2"
-          className={PLAY_CAREER.cell}
-          body={<PlayCareerRecord totals={totals} />}
-        >
-          {PLAY_HUB_COPY.sectionRecord}
-        </PlayPageTitle>
+      <div className={PLAY_PAGE.grid}>
+        <PlayCareerPanels totals={totals} />
         {!game && (
           <PlayPageTitle
             heading="h2"
-            className={PLAY_CAREER.cellWide}
-            body={<PlayPinnedTrophies global={profile.global} />}
+            className={PLAY_PAGE.cellWide}
+            action={
+              <AppLink href={ROUTES.playTrophies} className={PLAY_HEAD.panelLink}>
+                {PLAY_HEAD_COPY.manage}
+              </AppLink>
+            }
+            body={<PlayPinnedTrophies pins={profile.pins} />}
           >
-            {PLAY_HUB_COPY.pinnedTrophies}
+            {PLAY_HEAD_COPY.pinsTitle}
           </PlayPageTitle>
         )}
         {!game && (
-          <PlayPageTitle
-            heading="h2"
-            className={PLAY_CAREER.cellWide}
-            body={<PlayMastery games={profile.games} />}
-          >
-            {PLAY_HUB_COPY.sectionMastery}
-          </PlayPageTitle>
+          <PlayFold title={PLAY_HUB_COPY.sectionMastery} isWide isClosed>
+            <PlayMastery games={profile.games} />
+          </PlayFold>
         )}
       </div>
     </div>

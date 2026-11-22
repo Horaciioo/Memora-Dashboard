@@ -58,8 +58,6 @@ export const PLAY_HUD_COPY = {
   settings: 'Paramètres',
   exit: 'Quitter',
   scorecard: 'Scores',
-  collapse: 'Réduire',
-  expand: 'Développer',
   windowed: 'Quitter le plein écran',
   fullscreen: 'Plein écran',
   showChat: 'Afficher le chat',
@@ -199,3 +197,6 @@ export const voteSkinOf = (
   leader: string
 ): string | undefined =>
   game === PlayGames.Naval ? (vote.step === 'map' ? leader : vote.chosen.map) : undefined
+
+// Time blocks left out of the HUD on a phone, they never fit the top row
+export const PLAY_HUD_PHONE_HIDDEN: ReadonlySet<string> = new Set(['clock', 'fuse', 'time'])

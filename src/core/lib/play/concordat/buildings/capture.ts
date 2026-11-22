@@ -5,7 +5,7 @@ import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatState } from '@/types/concordat'
 
 /**
- * A tile changed hands: its buildings are damaged, or razed when it was a first level
+ * A tile changed hands: its buildings pass to the new owner whole, after a short repair, or fall when nobody takes it
  * @param {ConcordatState} state - Game
  * @param {number} tile - Tile
  * @param {number} from - Previous owner, zero for none
@@ -24,13 +24,12 @@ export const settleBuildingOnCapture = (
 
   state.isSystemsDirty = true
   for (const building of stack) {
-    building.level -= CONCORDAT.buildings.capturedLevelLoss
-    if (!to || building.level < 1) {
+    if (!to) {
       state.buildings = state.buildings.filter((other) => other !== building)
-    } else {
-      building.owner = to
-      building.readyAt = state.tick + ticksOf(CONCORDAT.buildings.repairSeconds)
+      continue
     }
+    building.owner = to
+    building.readyAt = state.tick + ticksOf(CONCORDAT.buildings.repairSeconds)
   }
   emit(state, { tick: state.tick, kind: 'built', actor: to, victim: from, tile })
 }

@@ -1,12 +1,12 @@
+import { OriginMark } from '@/composites/lives/bilan/OriginMark'
 import { Avatar } from '@/components/elements/display/Avatar'
+import { Dotted } from '@/components/elements/display/Dotted'
 import { Section } from '@/components/structures/page/Section'
 import type { ModeratorOption } from '@/composites/lives/bilan/moderation/ModeratorPicker'
 import type { ModStat } from '@/core/lib/lives/modStats'
 import { BILAN_COPY } from '@/declarations/lives/bilan'
 import { MODERATION_KINDS } from '@/declarations/lives/moderation'
-import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
 
 export interface SanctionRankingProps {
   options: ModeratorOption[]
@@ -51,38 +51,22 @@ export const SanctionRanking = ({ options, stats }: SanctionRankingProps) => {
       {rows.length === 0 ? (
         <p className={LIVE_REPORT.empty}>{BILAN_COPY.whoSanctionedEmpty}</p>
       ) : (
-        <ol className={LIVE_REPORT.rankGrid}>
+        <ol className={LIVE_REPORT.rankList}>
           {rows.map((row, index) => (
-            <li
-              key={row.option.key}
-              className={cn(LIVE_REPORT.rankCard, index === 0 && LIVE_REPORT.rankTop)}
-            >
+            <li key={row.option.key} className={LIVE_REPORT.rankRow}>
               <span className={LIVE_REPORT.rankPlace}>{index + 1}</span>
               <span className={LIVE_REPORT.rankWho}>
                 <Avatar name={row.option.name} src={row.option.avatar} size="md" />
                 {row.option.name}
+                <OriginMark onMemora={row.option.isMember} />
               </span>
-              <div>
-                <span className={LIVE_REPORT.rankCount}>{row.total}</span>
-                <p className={LIVE_REPORT.rankCountLabel}>
-                  {row.total === 1
-                    ? BILAN_COPY.sanctionsOne
-                    : BILAN_COPY.sanctionsCount.replace('{count}', String(row.total))}
-                </p>
-              </div>
-              <div className={LIVE_REPORT.rankKinds}>
-                {row.kinds.map((kind) => {
-                  const Icon = ICONS[MODERATION_KINDS[kind.kind].icon]
-
-                  return (
-                    <span key={kind.kind} className={LIVE_REPORT.rankKind}>
-                      <Icon className={LIVE_REPORT.rankKindGlyph} aria-hidden="true" />
-                      {MODERATION_KINDS[kind.kind].label}
-                      <strong>{kind.count}</strong>
-                    </span>
-                  )
-                })}
-              </div>
+              <Dotted
+                className={LIVE_REPORT.rankKinds}
+                items={row.kinds.map(
+                  (kind) => `${MODERATION_KINDS[kind.kind].label} ${kind.count}`
+                )}
+              />
+              <span className={LIVE_REPORT.rankCount}>{row.total}</span>
             </li>
           ))}
         </ol>

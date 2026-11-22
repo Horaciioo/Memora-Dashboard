@@ -40,7 +40,7 @@ export const tieKindOf = (
     : (tieBetween(state, first, second)?.kind ?? null)
 
 /**
- * Peace or alliance holds between two nations
+ * Alliance holds between two nations
  * @param {ConcordatState} state - Game
  * @param {number} first - Nation
  * @param {number} second - Nation
@@ -50,7 +50,7 @@ export const tieKindOf = (
 export const hasTreaty = (state: ConcordatState, first: number, second: number): boolean => {
   const kind = tieKindOf(state, first, second)
 
-  return kind === ConcordatTies.Peace || kind === ConcordatTies.Alliance
+  return kind === ConcordatTies.Alliance
 }
 
 /**
@@ -60,7 +60,7 @@ export const hasTreaty = (state: ConcordatState, first: number, second: number):
  * @param {number} tie.a - Nation
  * @param {number} tie.b - Nation
  * @param {ConcordatTieKind} tie.kind - Kind
- * @param {number} [tie.until] - End of a peace
+ * @param {number} [tie.until] - End tick
  * @return {void}
  */
 

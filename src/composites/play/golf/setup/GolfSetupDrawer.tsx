@@ -15,6 +15,7 @@ import { GOLF_POWERS } from '@/declarations/play/golf/powers'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GOLF_SETUP_TABS } from '@/declarations/play/golf/setup'
 import { GOLF_SETUP } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 // Tabs of the drawer
 const TABS = [...GOLF_SETUP_TABS]
@@ -57,6 +58,7 @@ export const GolfSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
     <>
       <PlaySetupDrawer
         open={open}
+        game={PlayGames.Golf}
         isSaving={isSaving}
         isEditing={Boolean(current)}
         canSubmit

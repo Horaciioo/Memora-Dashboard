@@ -82,6 +82,20 @@ export const JUMBLE_SETTINGS = {
     fallback: 5,
     min: 1,
   }),
+  // Extra share of the round time per letter above the pace length
+  lengthSecondsStep: readNumber(jumble.lengthSecondsStep, {
+    path: 'play/jumble.lengthSecondsStep',
+    fallback: 0.08,
+    min: 0,
+    max: 0.5,
+  }),
+  // Smallest share of the round time a short word keeps
+  lengthSecondsFloor: readNumber(jumble.lengthSecondsFloor, {
+    path: 'play/jumble.lengthSecondsFloor',
+    fallback: 0.7,
+    min: 0.1,
+    max: 1,
+  }),
   difficulties: LEVEL_LENGTHS,
   difficulty: readChoice<JumbleLevel>(jumble.difficulty, {
     path: 'play/jumble.difficulty',
@@ -119,6 +133,17 @@ export const JUMBLE_SETTINGS = {
       path: 'play/jumble.scoring.streakMax',
       fallback: 3,
       min: 0,
+    }),
+    // Points per letter from this length on
+    lengthBonus: readInteger(scoring.lengthBonus, {
+      path: 'play/jumble.scoring.lengthBonus',
+      fallback: 1,
+      min: 0,
+    }),
+    lengthFrom: readInteger(scoring.lengthFrom, {
+      path: 'play/jumble.scoring.lengthFrom',
+      fallback: 4,
+      min: 1,
     }),
   },
   wordLength: readInteger(jumble.wordLength, {

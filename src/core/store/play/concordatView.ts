@@ -5,7 +5,7 @@ import { create } from 'zustand'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
 import { CONCORDAT_STANDING_DEFAULTS } from '@/core/lib/play/concordat/view/standings'
 import type { ConcordatStandingColumn } from '@/core/lib/play/concordat/view/standings'
-import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
+import type { ConcordatBuildingKind, ConcordatLaunchWeapon } from '@/utils/constants/concordat'
 
 /**
  * Tool armed on the map: a building to set down or a missile to aim
@@ -14,8 +14,9 @@ import type { ConcordatBuildingKind } from '@/utils/constants/concordat'
 
 export type ConcordatTool =
   | { kind: 'build'; building: ConcordatBuildingKind }
-  | { kind: 'launch'; isHeavy: boolean; weapon?: 'shell' | 'rocket' | 'mirv' }
+  | { kind: 'launch'; isHeavy: boolean; weapon?: ConcordatLaunchWeapon }
   | { kind: 'sortie'; air: 'heli' | 'fighter' }
+  | { kind: 'fleet' }
 
 /**
  * Click echo on the map: a ripple, and for an expansion the tile it heads for
@@ -41,6 +42,8 @@ export interface ConcordatMark {
 interface ConcordatViewStore {
   percent: number
   tool: ConcordatTool | null
+  fleetShip: number | null
+  setFleetShip: (ship: number | null) => void
   marks: ConcordatMark[]
   standSort: ConcordatStandingColumn
   standDesc: boolean
@@ -59,6 +62,8 @@ interface ConcordatViewStore {
 export const useConcordatViewStore = create<ConcordatViewStore>()((set) => ({
   percent: CONCORDAT_ART.engage.initial,
   tool: null,
+  fleetShip: null,
+  setFleetShip: (fleetShip) => set({ fleetShip }),
   marks: [],
   standSort: 'tiles',
   standDesc: true,

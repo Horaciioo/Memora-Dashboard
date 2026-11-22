@@ -1,43 +1,55 @@
 /**
- * Player card: a night panel tinted by the tier, the portrait over its band
+ * Player card: one plain panel, the same for every player
  * @type {Record<string, string>}
  */
 
 export const PLAY_CARD = {
-  layer: 'fixed inset-0 z-[80] grid place-items-center bg-black/55 p-4 backdrop-blur-sm',
-  card: 'play-card-in relative flex max-h-[90dvh] w-full max-w-sm flex-col overflow-y-auto rounded-3xl bg-[color-mix(in_oklab,var(--tier)_16%,var(--play-night))] text-[var(--play-ink)] shadow-[0_24px_60px_rgb(0_0_0/0.55),0_0_48px_color-mix(in_oklab,var(--tier)_35%,transparent)]',
-  band: 'h-24 shrink-0 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--tier)_80%,black),color-mix(in_oklab,var(--tier)_30%,var(--play-night)))]',
+  layer: 'fixed inset-0 z-80 grid place-items-center bg-play-veil p-4 backdrop-blur-sm',
+  card: 'play-card-in play-card-sheet relative flex max-h-[92dvh] w-full max-w-2xl flex-col gap-7 overflow-y-auto rounded-3xl bg-[var(--play-night)] p-6 sm:p-10 text-[var(--play-ink)] shadow-[0_24px_60px_var(--play-drop)] ring-1 ring-[var(--play-line)]',
   close:
-    'absolute top-3 right-3 grid size-9 place-items-center rounded-full bg-black/35 text-[var(--play-ink)] transition-colors hover:bg-black/55 focus-visible:outline-3 focus-visible:outline-[var(--play-key)]',
+    'absolute top-4 right-4 z-10 grid size-9 place-items-center rounded-full text-[var(--play-ink-soft)] transition-colors hover:bg-play-lift hover:text-[var(--play-ink)] focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
   closeIcon: 'size-5',
-  portrait: '-mt-14 flex justify-center',
-  body: 'flex flex-col gap-4 px-6 pt-3 pb-6',
-  who: 'flex flex-col items-center gap-1 text-center',
-  name: 'max-w-full truncate text-2xl font-extrabold tracking-tight',
-  tier: 'text-xs font-bold tracking-widest text-[var(--tier)] uppercase',
-  track: 'h-2.5 overflow-hidden rounded-full bg-black/40',
-  fill: 'block h-full rounded-full bg-[var(--tier)]',
-  caption: 'text-center text-xs font-semibold text-[var(--play-ink-soft)]',
-  figures: 'grid grid-cols-3 gap-2',
-  figure: 'flex flex-col items-center gap-0.5 rounded-2xl bg-[var(--play-chip)] px-2 py-3',
-  figureValue: 'text-xl font-extrabold tabular-nums',
-  figureLabel: 'text-[0.65rem] font-bold tracking-wider text-[var(--play-ink-faint)] uppercase',
-  presence: 'flex items-center justify-center gap-2 text-sm font-bold text-[var(--play-ink-soft)]',
-  presenceOn: 'text-[var(--play-ink)]',
-  dot: 'size-2 rounded-full bg-[var(--play-ink-faint)]',
-  dotOn: 'bg-[var(--play-gold)]',
-  section: 'text-xs font-bold tracking-widest text-[var(--play-ink-faint)] uppercase',
-  recent: 'flex flex-col gap-1.5',
-  game: 'flex items-center gap-3 rounded-2xl bg-[var(--play-chip)] px-3 py-2',
-  logo: 'size-9 shrink-0',
+  // Portrait centred over a glow in the tier colour
+  head: 'play-raised rounded-b-none relative flex flex-col items-center gap-5 px-6 py-6 text-center sm:flex-row sm:gap-7 sm:px-8 sm:text-left',
+  who: 'flex min-w-0 flex-1 flex-col items-center gap-1.5 sm:items-start',
+  name: 'max-w-full truncate text-4xl font-bold tracking-tight sm:text-5xl',
+  tier: 'text-sm font-bold tracking-[0.2em] text-[var(--tier)] uppercase',
+  level: 'text-base font-semibold text-[var(--play-ink-soft)] tabular-nums',
+  presence: 'truncate text-base text-[var(--play-ink-faint)]',
+  presenceOn: 'font-semibold text-[var(--play-gold-ink)]',
+  // One raised group, plain cells inside
+  // Flush under the portrait box, split by a hairline
+  figures:
+    '-mt-7 play-raised grid grid-cols-3 gap-1.5 rounded-t-none border-t border-[var(--play-line)] p-1.5',
+  figure: 'flex flex-col items-center gap-1 rounded-xl bg-play-nest px-2 py-5',
+  figureValue: 'text-4xl leading-none font-bold tabular-nums',
+  figureLabel: 'text-xs font-bold tracking-wide text-[var(--play-ink-faint)] uppercase',
+  figureNote: 'text-micro font-semibold text-[var(--play-gold-ink)]',
+  block: 'flex flex-col gap-3',
+  section: 'text-xs font-bold tracking-wide text-[var(--play-ink-faint)] uppercase',
+  // Favourite games: one raised group, a cell per game
+  collection: 'play-raised grid grid-cols-3 gap-1.5 p-1.5',
+  collect:
+    'relative isolate flex flex-col items-center gap-1 overflow-hidden rounded-xl bg-play-nest px-2 py-6 text-center',
+  collectArt: '-z-20',
+  collectShade: 'absolute inset-0 -z-10 bg-[var(--color-media-shade)]/55',
+  collectName: 'w-full truncate text-sm font-bold text-[var(--play-on-art)]',
+  collectLevel: 'text-xs font-bold text-[var(--play-gold)] tabular-nums',
+  collectMeta: 'text-micro text-[var(--play-on-art)]/70',
+  // Last games: one raised group, rows split by hairlines
+  list: 'play-raised flex flex-col gap-0.5 p-1.5',
+  game: 'flex items-center gap-4 rounded-xl px-3 py-2.5',
+  rule: 'mx-2 h-px bg-[var(--play-line)]',
+  logo: 'size-11 shrink-0',
   gameText: 'flex min-w-0 flex-1 flex-col',
-  gameName: 'truncate text-sm font-extrabold',
-  gameMeta: 'truncate text-xs text-[var(--play-ink-soft)]',
-  win: 'shrink-0 text-xs font-extrabold text-[var(--play-gold)]',
-  draw: 'shrink-0 text-xs font-extrabold text-[var(--play-ink-soft)]',
-  loss: 'shrink-0 text-xs font-extrabold text-[var(--play-alert)]',
-  empty: 'py-2 text-center text-sm text-[var(--play-ink-soft)] italic',
-  actions: 'flex flex-wrap justify-center gap-2',
-  key: 'play-key inline-flex items-center px-5 py-2.5 text-sm font-bold',
-  keyGhost: 'play-key play-key-ghost inline-flex items-center px-5 py-2.5 text-sm font-bold',
+  gameName: 'truncate text-base font-bold',
+  gameMeta: 'truncate text-sm text-[var(--play-ink-faint)]',
+  // Last games as a strip of tiles, one per result
+  win: 'shrink-0 text-xs font-bold text-[var(--play-gold-ink)]',
+  draw: 'shrink-0 text-xs font-bold text-[var(--play-ink-soft)]',
+  loss: 'shrink-0 text-xs font-bold text-[var(--play-alert)]',
+  empty: 'py-1 text-base text-[var(--play-ink-faint)]',
+  actions: 'flex flex-wrap gap-3 [&>*]:flex-1 [&>*]:justify-center',
+  key: 'play-key inline-flex min-h-12 items-center px-6 text-base font-bold',
+  keyGhost: 'play-key play-key-ghost inline-flex min-h-12 items-center px-6 text-base font-bold',
 } as const

@@ -50,10 +50,11 @@ export const BilanModeration = ({
         key: member.accountId,
         name: member.name,
         avatar: member.avatar,
+        isMember: true,
       })),
       ...report.moderators
         .filter((row) => !seen.has(row.key))
-        .map((row) => ({ key: row.key, name: row.name, avatar: null })),
+        .map((row) => ({ key: row.key, name: row.name, avatar: null, isMember: row.isMember })),
     ]
   }, [team, report.moderators])
 

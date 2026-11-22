@@ -13,7 +13,7 @@ import {
   usePageTree,
 } from '@/core/hooks/data/pages'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { buildPageTree, canOwnPages } from '@/core/lib/pages'
+import { canOwnPages } from '@/core/lib/pages'
 import { ROUTES } from '@/declarations/navigation'
 import { PAGES_COPY } from '@/declarations/pages/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -40,12 +40,14 @@ export const RailPrivatePages = () => {
   const AddIcon = ICONS.add
   const CategoryIcon = ICONS.pageCategoryAdd
 
-  const tree = buildPageTree(pages)
-  const own = tree.filter((node) => node.page.isOwn)
-  const loose = own.filter((node) => !node.page.categoryId)
-  const byCategory = Map.groupBy(own, (node) => node.page.categoryId)
-  const shared = tree.filter((node) => !node.page.isOwn)
-  const addChild = (parentId: string) => void create({ parentId })
+  // Flat rail, no nesting
+  const flat = pages.toSorted(
+    (left, right) => left.position - right.position || left.title.localeCompare(right.title)
+  )
+  const own = flat.filter((page) => page.isOwn)
+  const loose = own.filter((page) => !page.categoryId)
+  const byCategory = Map.groupBy(own, (page) => page.categoryId)
+  const shared = flat.filter((page) => !page.isOwn)
   const addToCategory = (categoryId: string) => void create({ categoryId })
 
   if (!canOwn && shared.length === 0) return null
@@ -63,12 +65,12 @@ export const RailPrivatePages = () => {
           type="button"
           aria-label={PAGES_COPY.railExpand}
           aria-expanded={!isCollapsed}
-          className={PAGE_RAIL_STYLES.toggle}
+          className={cn(PAGE_RAIL_STYLES.toggle, 'group')}
           onClick={() => setCollapsed(!isCollapsed)}
         >
           <Chevron
             className={cn(
-              PAGE_RAIL_STYLES.chevron,
+              LEFT_SIDEBAR.navGroupChevron,
               isCollapsed && LEFT_SIDEBAR.navGroupChevronCollapsed
             )}
             aria-hidden="true"
@@ -98,7 +100,7 @@ export const RailPrivatePages = () => {
               <span className={LEFT_SIDEBAR.navLabel}>{PAGES_COPY.railNewCategory}</span>
             </button>
           )}
-          {canOwn && tree.length > 0 && <hr className={PAGE_RAIL_STYLES.divider} />}
+          {canOwn && flat.length > 0 && <hr className={PAGE_RAIL_STYLES.divider} />}
           <ul
             {...dnd.containerProps(LOOSE_CONTAINER)}
             className={cn(
@@ -107,15 +109,8 @@ export const RailPrivatePages = () => {
               dnd.over === LOOSE_CONTAINER && PAGE_RAIL_STYLES.categoryOver
             )}
           >
-            {loose.map((node, index) => (
-              <RailPageNode
-                key={node.page.id}
-                node={node}
-                depth={0}
-                onAddChild={addChild}
-                dnd={dnd}
-                dropIndex={index}
-              />
+            {loose.map((page, index) => (
+              <RailPageNode key={page.id} page={page} dnd={dnd} dropIndex={index} />
             ))}
             {loose.length === 0 && dnd.dragged && categories.length > 0 && (
               <li className={PAGE_RAIL_STYLES.dropHint}>{PAGES_COPY.railDropRoot}</li>
@@ -127,11 +122,10 @@ export const RailPrivatePages = () => {
                 <RailPageCategory
                   key={category.id}
                   category={category}
-                  nodes={byCategory.get(category.id) ?? []}
+                  pages={byCategory.get(category.id) ?? []}
                   dnd={dnd}
                   gestures={categoryGestures}
                   onAddPage={addToCategory}
-                  onAddChild={addChild}
                 />
               ))}
             </ul>
@@ -140,8 +134,8 @@ export const RailPrivatePages = () => {
             <>
               <p className={PAGE_RAIL_STYLES.subhead}>{PAGES_COPY.railShared}</p>
               <ul className={LEFT_SIDEBAR.navGroupItems}>
-                {shared.map((node) => (
-                  <RailPageNode key={node.page.id} node={node} depth={0} onAddChild={addChild} />
+                {shared.map((page) => (
+                  <RailPageNode key={page.id} page={page} />
                 ))}
               </ul>
             </>

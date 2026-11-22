@@ -22,8 +22,6 @@ export const CALENDAR_COPY = {
   day: 'Jour',
   threeDays: '3 jours',
   viewsTitle: 'Affichage',
-  creatorPicker: 'YouTubeur affiché',
-  allCreators: 'Tous',
   moreEntries: 'Voir la journée',
   // Pointer mode
   gridMode: 'Geste sur la grille',

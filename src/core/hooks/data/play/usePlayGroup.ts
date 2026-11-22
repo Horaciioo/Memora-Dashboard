@@ -29,7 +29,15 @@ export const usePlayGroup = () => {
 
   return {
     isSaving,
-    create: (name?: string) => again(() => apiPost(API_ROUTES.playGroup, { name })),
+    create: (name: string, accountIds: string[] = []) =>
+      again(async () => {
+        const { id } = await apiPost<{ id: string }>(API_ROUTES.playGroup, { name })
+        if (accountIds.length > 0) {
+          await apiPost(API_ROUTES.playGroupMembers(id), { accountIds })
+        }
+      }),
+    transfer: (groupId: string, accountId: string) =>
+      again(() => apiPost(API_ROUTES.playGroupHost(groupId), { accountId })),
     rename: (groupId: string, name: string) =>
       again(() => apiPatch(API_ROUTES.playGroupOf(groupId), { name })),
     dissolve: (groupId: string) => again(() => apiDelete(API_ROUTES.playGroupOf(groupId))),
@@ -48,6 +56,8 @@ export const usePlayGroup = () => {
       again(() => apiDelete(API_ROUTES.playGroupProposal(groupId, proposalId))),
     say: (groupId: string, body: string) =>
       again(() => apiPost(API_ROUTES.playGroupMessages(groupId), { body })),
+    startQuest: (groupId: string, key: string) =>
+      again(() => apiPost(API_ROUTES.playGroupQuests(groupId), { key })),
     launch: (groupId: string, game: PlayGameName) =>
       again(
         () => apiPost<{ id: string }>(API_ROUTES.playGroupLaunch(groupId), { game }),

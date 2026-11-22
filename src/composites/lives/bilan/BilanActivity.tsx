@@ -78,7 +78,7 @@ export const BilanActivity = ({ insights, levels, start, end }: BilanActivityPro
           <AreaChart
             title={BILAN_COPY.viewersTitle}
             unit={BILAN_COPY.viewersUnit}
-            colour="var(--color-sky-500)"
+            colour="var(--color-ink)"
             axis={[formatClock(sampled[0]!.at), formatClock(sampled.at(-1)!.at)]}
             points={sampled.map((slice) => ({
               label: formatClock(slice.at),

@@ -1,13 +1,12 @@
-import { isWorking } from '@/core/lib/play/concordat/buildings/rules'
 import { addKill, runWarships } from '@/core/lib/play/concordat/navy/combat'
 import { escortsOf, foesOf, landShip } from '@/core/lib/play/concordat/navy/land'
-import { settleCargo } from '@/core/lib/play/concordat/trade/ships'
+import { settleCargo, warshipsOf } from '@/core/lib/play/concordat/trade/ships'
 import { settleTrain } from '@/core/lib/play/concordat/trade/trains'
 import { emit } from '@/core/lib/play/concordat/sim/emit'
-import { ticksOf, TICK_SECONDS } from '@/core/lib/play/concordat/sim/tables'
+import { TICK_SECONDS } from '@/core/lib/play/concordat/sim/tables'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatShip, ConcordatState } from '@/types/concordat'
-import { ConcordatBuildingKinds, ConcordatShipKinds } from '@/utils/constants/concordat'
+import { ConcordatShipKinds } from '@/utils/constants/concordat'
 
 const { navy } = CONCORDAT
 
@@ -44,7 +43,7 @@ const sailOn = (state: ConcordatState, ship: ConcordatShip): void => {
 const isIntercepted = (state: ConcordatState, ship: ConcordatShip): boolean => {
   const foes = foesOf(state, ship)
   const guards = escortsOf(state, ship.owner)
-  const warships = state.ships.filter((other) => other.kind === ConcordatShipKinds.War)
+  const warships = warshipsOf(state)
 
   const isGuarded = warships.some(
     (other) =>
@@ -56,26 +55,6 @@ const isIntercepted = (state: ConcordatState, ship: ConcordatShip): boolean => {
     (other) =>
       foes.includes(other.owner) && reach(state, other.tile, ship.tile) <= navy.interceptRadius
   )
-}
-
-// Warships without a port wear away
-const wearOrphans = (state: ConcordatState): void => {
-  for (const ship of state.ships) {
-    if (ship.kind !== ConcordatShipKinds.War) continue
-
-    const hasPort = state.buildings.some(
-      (building) =>
-        building.owner === ship.owner &&
-        building.kind === ConcordatBuildingKinds.Port &&
-        isWorking(building, state.tick)
-    )
-    ship.ttl = hasPort ? ticksOf(navy.orphanSeconds) : ship.ttl - 1
-  }
-  const kept = state.ships.filter((ship) => ship.kind !== ConcordatShipKinds.War || ship.ttl > 0)
-  if (kept.length !== state.ships.length) {
-    state.ships = kept
-    state.isSystemsDirty = true
-  }
 }
 
 /**
@@ -118,5 +97,4 @@ export const runNavy = (state: ConcordatState): void => {
     }
   }
   runWarships(state)
-  wearOrphans(state)
 }

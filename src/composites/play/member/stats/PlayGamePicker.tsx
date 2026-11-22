@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
+import { PlayGameSelect } from '@/composites/play/shared/PlayGameSelect'
 import { ROUTES } from '@/declarations/navigation'
-import { PLAY_GAMES, PLAY_HUB_COPY, PLAY_MOBILE_COPY } from '@/declarations/play'
+import { PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_CAREER } from '@/declarations/ui/variants'
 import type { PlayProfileView } from '@/types/play'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -49,24 +50,7 @@ export const PlayGamePicker = ({
 
   return (
     <div className={PLAY_CAREER.pickBar}>
-      <SelectMenu
-        isPlay
-        label={PLAY_MOBILE_COPY.rankingGame}
-        mark="playGame"
-        emptyLabel={PLAY_MOBILE_COPY.gameAll}
-        options={PLAY_GAMES.keys
-          .filter((game) => PLAY_GAMES.get(game).playable)
-          .map((game) => ({
-            value: PLAY_GAMES.get(game).slug,
-            label: PLAY_GAMES.label(game),
-            icon: game,
-          }))}
-        value={current ? PLAY_GAMES.get(current).slug : ''}
-        onChange={(slug) => {
-          setFilter('')
-          open(slug)
-        }}
-      />
+      <PlayGameSelect current={current} page="stats" onPick={() => setFilter('')} />
       <SelectMenu
         isPlay
         label={PLAY_HUB_COPY.pickFilter}

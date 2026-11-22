@@ -27,6 +27,7 @@ export const PLAY_ERRORS = {
   roundClosed: 'La manche est terminée.',
   roundMissing: 'Aucune manche en cours.',
   notReviewing: 'Les votes sont fermés.',
+  alreadyVoted: 'Ton vote est déjà posé.',
   ownAnswer: 'Tu ne votes pas sur tes propres mots.',
   stopIncomplete: 'Remplis toutes les catégories avant de dire stop.',
   stopDisabled: 'Le stop est désactivé dans cette partie.',

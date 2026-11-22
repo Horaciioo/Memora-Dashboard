@@ -4,7 +4,7 @@ import { Button } from '@/components/elements/actions/Button'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { usePlayGroup } from '@/core/hooks/data/play/usePlayGroup'
 import { fillPlayMessage, PLAY_GROUP_COPY } from '@/declarations/play'
-import { PLAY_BOX, PLAY_GROUP } from '@/declarations/ui/variants'
+import { PLAY_GROUP } from '@/declarations/ui/variants'
 import type { PlayGroupInvitationView } from '@/types/play'
 
 /**
@@ -23,11 +23,15 @@ export const PlayGroupInvitations = ({
   if (invitations.length === 0) return null
 
   return (
-    <section className={PLAY_BOX.root}>
+    <section className={PLAY_GROUP.invites}>
       <h2 className={PLAY_GROUP.heading}>{PLAY_GROUP_COPY.invitations}</h2>
       <ul className={PLAY_GROUP.list}>
-        {invitations.map((invitation) => (
-          <li key={invitation.id} className={PLAY_GROUP.row}>
+        {invitations.map((invitation, index) => (
+          <li
+            key={invitation.id}
+            className={PLAY_GROUP.invite}
+            style={{ animationDelay: `${index * 80}ms` }}
+          >
             <Avatar name={invitation.host.name} src={invitation.host.avatarUrl} size="md" />
             <span className={PLAY_GROUP.rowText}>
               <span className={PLAY_GROUP.rowName}>

@@ -2,6 +2,20 @@ import type { ReactNode } from 'react'
 import type { IconName } from '@/declarations/ui/icons'
 
 /**
+ * Absent member shown on the home page
+ * @typedef {Object} HomeAway
+ * @property {string} accountId - Member identifier
+ * @property {string} displayName - Member name
+ * @property {string} until - ISO last day of the absence
+ */
+
+export interface HomeAway {
+  accountId: string
+  displayName: string
+  until: string
+}
+
+/**
  * Birthday shown on the home page
  * @typedef {Object} HomeBirthday
  * @property {string} accountId - Member identifier

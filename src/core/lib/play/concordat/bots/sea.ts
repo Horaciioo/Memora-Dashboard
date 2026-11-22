@@ -6,7 +6,13 @@ import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent } from '@/types/concordat'
 import { ConcordatTerrains } from '@/utils/constants/concordat'
 
-const { bots, navy } = CONCORDAT
+const { bots } = CONCORDAT
+
+// Share of decisions that try a landing while land is left
+const LATE_CHANCE = 0.08
+const LATE_SAMPLES = 4
+const SEA_SAMPLES = 10
+const SEA_CHANCE = 0.3
 
 // Share of the troops a landing carries
 const LANDING_PERCENT = 40
@@ -18,8 +24,14 @@ const LANDING_PERCENT = 40
  */
 
 export const seaMoves = (context: ConcordatBotContext): ConcordatIntent[] => {
-  const { state, profile, view, isCaretaker } = context
-  if (isCaretaker || !profile.sails || view.freeContact || view.neighbours.length) return []
+  const { state, profile, view, isCaretaker, pressure } = context
+  if (isCaretaker || !profile.sails) return []
+  // Late in the game a landing is tried even with land left to push on
+  // A search over the water is dear, tried now and then
+  if (context.roll(79) > SEA_CHANCE) return []
+
+  const isBusy = view.freeContact || view.neighbours.length > 0
+  if (isBusy && (pressure < 0.5 || context.roll(73) > LATE_CHANCE)) return []
 
   const playerId = view.me.id
   const [home] = state.players[playerId - 1].front
@@ -28,9 +40,9 @@ export const seaMoves = (context: ConcordatBotContext): ConcordatIntent[] => {
   const { width, height, terrain } = state.map
   const cx = home % width
   const cy = Math.floor(home / width)
-  const range = navy.sailRange
+  const range = bots.scoutRange
 
-  for (let sample = 0; sample < bots.samples; sample++) {
+  for (let sample = 0; sample < (isBusy ? LATE_SAMPLES : SEA_SAMPLES); sample++) {
     const seed = playerId * 6007 + sample
     const x = Math.min(
       width - 1,

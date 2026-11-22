@@ -1,3 +1,14 @@
+/* Play corners, tight like a desktop launcher: every rounded-* in the room, and its portaled modals, reads these */
+:root:has(.play-room, .play-sky),
+.play-room,
+.play-sky {
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.5rem;
+  --radius-3xl: 0.625rem;
+}
+
 /* Memora Play room: night sky, neon haze, a floor grid running to the horizon, whatever the theme */
 .play-sky,
 .play-room {
@@ -50,7 +61,7 @@
 
 /* Chunky key with its own depth */
 .play-key {
-  border-radius: 1rem;
+  border-radius: var(--radius-xl);
   background: var(--play-key);
   color: var(--play-key-ink);
   box-shadow:
@@ -173,22 +184,9 @@
   }
 }
 
-/* Play boxes worn by the classic Memora pages, outside the room: these follow the theme */
-.play-classic {
-  --play-ink: var(--color-ink);
-  --play-ink-soft: var(--color-ink-subtle);
-  --play-ink-faint: var(--color-ink-subtle);
-  --play-panel: color-mix(in srgb, var(--color-surface) 58%, transparent);
-  --play-panel-strong: color-mix(in srgb, var(--color-surface) 72%, transparent);
-  --play-line: color-mix(in srgb, white 55%, transparent);
-  --play-core: var(--color-surface-sunken);
-  --play-track: var(--color-track-off);
-  --play-chip: var(--color-surface-sunken);
-  --play-accent: var(--color-ink-accent);
-}
-
-/* A hub on squared paper: dark ink, no sky */
-.play-room:has(.play-paper) {
+/* A hub on paper: dark ink, no sky */
+.play-room:has(.play-paper),
+.play-room:has(.play-ground-sheet) {
   --play-ink: var(--play-night);
   --play-ink-soft: rgb(14 10 36 / 0.66);
   --play-ink-faint: rgb(14 10 36 / 0.45);
@@ -203,6 +201,9 @@
   --play-ring: var(--play-paper);
   --play-gold-ink: #86560a;
   --play-blue-ink: #2f5fc2;
+  --play-rarity-common: #8d97a8;
+  --play-rarity-rare: #5b86e0;
+  --play-rarity-legendary: #e0a21a;
   background-color: var(--play-paper);
   background-image:
     radial-gradient(
@@ -748,56 +749,47 @@
   }
 }
 
-/* XP won floats up and fades the higher it goes */
+/* XP won drifts up slowly, sways a little and fades the higher it goes */
 .play-xp {
-  animation: play-xp 2600ms ease-out backwards;
+  animation:
+    play-xp 5600ms cubic-bezier(0.25, 0.6, 0.3, 1) backwards,
+    play-xp-sway 2800ms ease-in-out infinite;
   translate: -50% 0;
 }
 
 @keyframes play-xp {
   0% {
     opacity: 0;
-    transform: translateY(0) scale(0.7);
+    transform: translateY(1.5rem) scale(0.6);
   }
-  12% {
+  14% {
     opacity: 1;
-    transform: translateY(-1rem) scale(1.1);
+    transform: translateY(0) scale(1.12);
   }
-  100% {
-    opacity: 0;
-    transform: translateY(-9rem) scale(1);
+  24% {
+    transform: translateY(-0.5rem) scale(1);
   }
-}
-
-/* Level up bursts in, holds, then fades */
-.play-level {
-  animation: play-level 3200ms var(--motion-ease-out) backwards;
-}
-
-@keyframes play-level {
-  0% {
-    opacity: 0;
-    transform: scale(0.3) rotate(-10deg);
-  }
-  18% {
-    opacity: 1;
-    transform: scale(1.25) rotate(3deg);
-  }
-  30% {
-    transform: scale(1) rotate(0deg);
-  }
-  80% {
+  72% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: scale(1.1) translateY(-2rem);
+    transform: translateY(-7rem) scale(0.96);
+  }
+}
+
+@keyframes play-xp-sway {
+  50% {
+    rotate: 1.5deg;
+  }
+  0%,
+  100% {
+    rotate: -1.5deg;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .play-xp,
-  .play-level {
+  .play-xp {
     animation-duration: 1ms;
   }
 }
@@ -857,24 +849,6 @@
   .golf-orb[data-power='flash'] {
     animation: none;
   }
-}
-
-/* A word written in blue pen, its baseline on a line of the squares */
-.play-pen {
-  align-self: end;
-  justify-self: start;
-  grid-column: var(--col);
-  grid-row: var(--row);
-  translate: 0 0.2em;
-  rotate: var(--tilt);
-  transform-origin: left bottom;
-  font-size: calc(var(--play-paper-cell) * 0.95);
-  font-style: italic;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--play-blue-ink);
-  opacity: 0.78;
 }
 
 /* The STOP shout lands hard */
@@ -946,39 +920,28 @@
     );
 }
 
-/* A syllable rises like an ember, glows, then burns out */
-.play-ember {
+/* Écho hub: a sound ring spreading from the pointer */
+.echo-ripple {
   position: absolute;
-  bottom: -4rem;
+  top: var(--y);
   left: var(--x);
-  font-size: var(--size);
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  color: var(--play-bomb-glow);
-  text-shadow:
-    0 0 0.4em var(--play-bomb),
-    0 0 1.2em var(--play-bomb-deep);
-  opacity: 0;
-  animation: play-ember var(--rise) linear var(--delay) infinite;
+  width: 22rem;
+  height: 22rem;
+  margin: -11rem 0 0 -11rem;
+  border: 1.5px solid var(--play-echo-glow);
+  border-radius: 50%;
+  box-shadow: 0 0 1.5rem color-mix(in srgb, var(--play-echo) 40%, transparent);
+  animation: echo-ripple 1.8s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
 }
 
-@keyframes play-ember {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  12% {
-    opacity: 0.75;
-  }
-  45% {
-    opacity: 0.45;
-  }
-  55% {
+@keyframes echo-ripple {
+  from {
     opacity: 0.7;
+    transform: scale(0.04);
   }
-  100% {
+  to {
     opacity: 0;
-    transform: translate3d(var(--drift), -115vh, 0) scale(0.55);
+    transform: scale(1);
   }
 }
 
@@ -1478,28 +1441,6 @@
   }
 }
 
-/* Big bomb of the hub, its spark breathing */
-.play-bomb-banner {
-  opacity: 0.55;
-}
-
-.play-bomb-spark-glow {
-  filter: drop-shadow(0 0 0.6rem var(--play-bomb-glow));
-  animation: play-bomb-breath 1.6s ease-in-out infinite;
-}
-
-@keyframes play-bomb-breath {
-  50% {
-    opacity: 0.45;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .play-bomb-spark-glow {
-    animation: none;
-  }
-}
-
 /* Phone tab change: the page slides from the tab side */
 @utility play-slide-right {
   --play-slide-from: 30%;
@@ -1579,62 +1520,6 @@
   .play-scenery-bob,
   .play-scenery-sway {
     animation: none;
-  }
-}
-
-/* Featured game: each turn slides in, the poster settles */
-.play-feature-in {
-  animation: play-feature-in 600ms var(--motion-ease-out) both;
-}
-
-.play-feature-poster {
-  animation:
-    play-feature-poster 800ms var(--motion-ease-out) both,
-    play-feature-spin 10s ease-in-out 4s infinite;
-}
-
-@keyframes play-feature-in {
-  from {
-    opacity: 0;
-    transform: translateX(1.5rem);
-  }
-}
-
-@keyframes play-feature-poster {
-  from {
-    opacity: 0;
-    rotate: 12deg;
-    translate: 2rem 0;
-  }
-}
-
-.play-feature-flip {
-  transition: transform 500ms var(--motion-ease-out);
-}
-
-.play-feature-flip[data-flipped='true'] {
-  transform: rotateY(180deg);
-}
-
-/* Rare quick full turn, flat on the box */
-@keyframes play-feature-spin {
-  0% {
-    transform: perspective(1000px) rotateY(0);
-  }
-  5%,
-  100% {
-    transform: perspective(1000px) rotateY(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .play-feature-in,
-  .play-feature-poster {
-    animation: none;
-  }
-
-  .play-feature-flip {
-    transition: none;
   }
 }
 
@@ -1792,24 +1677,6 @@
   }
 }
 
-/* Soft rainbow sash of a featured game, slow drift plus a light sweep */
-.play-feature-badge {
-  background:
-    linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.7) 50%, transparent 65%) 0 0 / 250%
-      100%,
-    linear-gradient(90deg, #ff8fb0, #ffb26b, #ffe066, #7fe3a0, #6cc6ff, #a893ff, #ff8fb0) 0 0 / 100%
-      100%;
-  animation: play-feature-rainbow 4s linear infinite;
-}
-
-@keyframes play-feature-rainbow {
-  to {
-    background-position:
-      -250% 0,
-      -100% 0;
-  }
-}
-
 /* Player card pops in */
 .play-card-in {
   animation: play-card-in 220ms var(--motion-ease-out) backwards;
@@ -1829,6 +1696,106 @@
 
 @media (prefers-reduced-motion: reduce) {
   .play-card-in {
+    animation: none;
+  }
+}
+
+.play-hero-drift {
+  animation: play-hero-drift 24s ease-in-out infinite alternate;
+}
+
+.play-hero-poster {
+  animation: play-hero-poster 7s ease-in-out infinite alternate;
+}
+
+.play-hero-bar {
+  animation: play-hero-bar var(--hero-seconds, 9s) linear both;
+}
+
+.group\/hero:hover .play-hero-bar,
+.group\/hero:focus-within .play-hero-bar {
+  animation-play-state: paused;
+}
+
+@utility play-launch-panel {
+  animation: play-launch-panel 350ms var(--motion-ease-out) both;
+}
+
+/* Phone: the game sheet rises from the bottom */
+@utility play-launch-sheet {
+  animation: play-launch-sheet 350ms var(--motion-ease-out) both;
+}
+
+@keyframes play-hero-drift {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.16) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+@keyframes play-hero-poster {
+  from {
+    transform: rotate(2deg);
+  }
+  to {
+    transform: translateY(-4%) rotate(-2deg);
+  }
+}
+
+@keyframes play-hero-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes play-launch-panel {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+}
+
+@keyframes play-launch-sheet {
+  from {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-hero-drift,
+  .play-hero-poster,
+  .play-hero-bar,
+  .play-launch-panel,
+  .play-launch-sheet {
+    animation: none;
+  }
+}
+
+/* Memora Play own loader: the pixel brain beats while a hub loads */
+.play-brain-load {
+  animation: play-brain-beat 0.9s ease-in-out infinite;
+}
+
+@keyframes play-brain-beat {
+  0%,
+  100% {
+    transform: scale(0.88);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-brain-load {
     animation: none;
   }
 }

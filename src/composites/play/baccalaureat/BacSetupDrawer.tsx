@@ -25,6 +25,7 @@ import {
 import type { BaccalaureatCategoryKey, BaccalaureatSharingKey } from '@/declarations/play'
 import { BAC_SETUP, FIELD_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+import { PlayGames } from '@/utils/constants/play'
 
 // Choice meaning a single game
 const NO_TOURNAMENT = 0
@@ -105,10 +106,11 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
   const [stop, setStop] = useState(start.stop)
   const [autoStop, setAutoStop] = useState(start.autoStop)
   const [seconds, setSeconds] = useState(start.roundSeconds)
+  const rounds = start.rounds
   const [games, setGames] = useState(current?.tournamentGames ?? NO_TOURNAMENT)
 
   const isTournament = games !== NO_TOURNAMENT
-  const played = isTournament ? tournament.rounds : start.rounds
+  const played = isTournament ? tournament.rounds : rounds
   const isShort = letters.length < played
   const submit = () =>
     onSubmit({
@@ -139,6 +141,7 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: P
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Baccalaureat}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit={!isShort && total >= min && total <= max}

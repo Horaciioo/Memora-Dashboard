@@ -1,6 +1,7 @@
 import { normalizeWord } from '@/core/lib/play/baccalaureat/words'
 import { CROQUIS_SETTINGS, CROQUIS_WORDS } from '@/declarations/play'
 import type { CroquisLevel } from '@/declarations/play'
+import { DATE_LOCALE } from '@/declarations/ui/dates'
 
 /**
  * Word ready to be played
@@ -144,4 +145,4 @@ export const drawerPointsOf = (solvers: number, guessers: number): number => {
  */
 
 export const secondsLabel = (ms: number): string =>
-  (ms / 1000).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+  (ms / 1000).toLocaleString(DATE_LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 })

@@ -2,8 +2,8 @@
 
 import { PlayDockNotice } from '@/composites/play/dock/PlayDockNotice'
 import { PlayResumeCallout } from '@/composites/play/dock/PlayResumeCallout'
-import { ICONS } from '@/declarations/ui/icons'
-import { PLAY_HUB_COPY } from '@/declarations/play'
+import { PlayEmpty } from '@/composites/play/shared/PlayEmpty'
+import { PLAY_MOBILE_COPY } from '@/declarations/play'
 import { PLAY_DOCK } from '@/declarations/ui/variants'
 import type { PlayNoticeView, PlayPresence } from '@/types/play'
 
@@ -22,16 +22,8 @@ export const PlayDockFeed = ({
   presence: PlayPresence | null
   invites: PlayNoticeView[]
 }) => {
-  if (!presence && invites.length === 0) {
-    const VoidIcon = ICONS.playFeed
-
-    return (
-      <p className={PLAY_DOCK.void}>
-        <VoidIcon className={PLAY_DOCK.voidIcon} aria-hidden="true" />
-        {PLAY_HUB_COPY.feedEmpty}
-      </p>
-    )
-  }
+  if (!presence && invites.length === 0)
+    return <PlayEmpty icon="playFeed">{PLAY_MOBILE_COPY.feedInvitesEmpty}</PlayEmpty>
 
   return (
     <div className={PLAY_DOCK.rows}>

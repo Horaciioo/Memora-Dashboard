@@ -24,12 +24,14 @@ export const refreshEffects = (state: ConcordatState): void => {
     effects.intercept = 0
     effects.shipSpeed = 0
     effects.trustGain = 0
-    effects.peace = 0
     effects.blockade = 0
     effects.upkeepCut = 0
     effects.canFeint = false
     effects.malus = 0
   }
+
+  // Buildings of a kind already counted per owner, each extra one yields less
+  const rank = new Map<string, number>()
 
   for (const building of state.buildings) {
     const effects = state.effects[building.owner - 1]
@@ -38,9 +40,14 @@ export const refreshEffects = (state: ConcordatState): void => {
     // A building under work only costs
     if (!isWorking(building, state.tick)) continue
 
-    effects.gold += level.gold
-    effects.cap += level.cap
-    effects.growth += level.growth
+    const key = `${building.owner}:${building.kind}`
+    const seen = rank.get(key) ?? 0
+    rank.set(key, seen + 1)
+    const yieldShare = CONCORDAT.buildings.yieldDecay ** seen
+
+    effects.gold += level.gold * yieldShare
+    effects.cap += level.cap * yieldShare
+    effects.growth += level.growth * yieldShare
     effects.calm += level.calm
     effects.ships += level.ships
     if (level.defense) {

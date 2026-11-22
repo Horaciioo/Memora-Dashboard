@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation'
 
 import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
-import { PlayBoxSummary } from '@/composites/play/box/PlayBoxSummary'
 import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { ROUTES } from '@/declarations/navigation'
 import { fillPlayMessage, PLAY_GROUP_COPY } from '@/declarations/play'
@@ -11,7 +10,7 @@ import { PLAY_GROUP } from '@/declarations/ui/variants'
 import type { PlayGroupView } from '@/types/play'
 
 /**
- * Folded group, opens its own page
+ * Group card: name, faces and who is online, opens its own page
  * @param {Object} props - Group
  * @param {PlayGroupView} props.group - Group
  * @return {JSX.Element}
@@ -27,16 +26,25 @@ export const PlayGroupBox = ({ group }: { group: PlayGroupView }) => {
       : fillPlayMessage(PLAY_GROUP_COPY.memberCount, { count: group.members.length })
 
   return (
-    <PlayBoxSummary
-      title={group.name}
-      note={fillPlayMessage(PLAY_GROUP_COPY.groupDetails, {
-        members: memberCount,
-        online: fillPlayMessage(PLAY_GROUP_COPY.onlineCount, { count: onlineCount }),
-      })}
-      label={`${PLAY_GROUP_COPY.open} ${group.name}`}
-      showExpandIcon={false}
-      onOpen={() => router.push(ROUTES.playGroupRoom(group.id))}
-      aside={
+    <button
+      type="button"
+      className={PLAY_GROUP.card}
+      aria-label={`${PLAY_GROUP_COPY.open} ${group.name}`}
+      onClick={() => router.push(ROUTES.playGroupRoom(group.id))}
+    >
+      <span className={PLAY_GROUP.cardHead}>
+        <span className={PLAY_GROUP.rowText}>
+          <span className={PLAY_GROUP.cardName}>{group.name}</span>
+          <span className={PLAY_GROUP.rowNote}>
+            {fillPlayMessage(PLAY_GROUP_COPY.groupDetails, {
+              members: memberCount,
+              online: fillPlayMessage(PLAY_GROUP_COPY.onlineCount, { count: onlineCount }),
+            })}
+          </span>
+        </span>
+        <span className={PLAY_GROUP.cardOpen}>{PLAY_GROUP_COPY.open}</span>
+      </span>
+      <span className={PLAY_GROUP.cardFoot}>
         <span className={PLAY_GROUP.faces}>
           {group.members.map((member) => (
             <PlayAvatar
@@ -48,7 +56,7 @@ export const PlayGroupBox = ({ group }: { group: PlayGroupView }) => {
             />
           ))}
         </span>
-      }
-    />
+      </span>
+    </button>
   )
 }

@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import type { CSSProperties } from 'react'
 
 import { ECHO_ART } from '@/composites/play/echo/EchoSymbols'
-import { layoutCard } from '@/core/lib/play/echo/layout'
+import { ECHO_CARD_RATIO, layoutCard } from '@/core/lib/play/echo/layout'
 import { ECHO_SYMBOLS } from '@/declarations/play'
 import { ECHO_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -23,7 +23,7 @@ export interface EchoCardProps {
 }
 
 /**
- * Round card with its symbols at their own size and tilt
+ * Playing card with its symbols at their own size and tilt
  * @param {EchoCardProps} props - Card and handlers
  * @return {JSX.Element}
  */
@@ -47,6 +47,7 @@ export const EchoCard = ({
         tone === 'center' && ECHO_BOARD.cardCenter,
         tone === 'mine' && ECHO_BOARD.cardMine
       )}
+      style={{ aspectRatio: ECHO_CARD_RATIO }}
     >
       {placements.map(({ symbol, x, y, radius, angle }, index) => {
         const { key, label } = ECHO_SYMBOLS[symbol]

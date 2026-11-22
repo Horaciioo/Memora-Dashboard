@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link, { useLinkStatus } from 'next/link'
 import { useState, type ComponentProps } from 'react'
 
 /**
@@ -40,3 +40,6 @@ export default function AppLink({
     />
   )
 }
+
+// Navigation state of the enclosing AppLink
+export const useAppLinkStatus = useLinkStatus

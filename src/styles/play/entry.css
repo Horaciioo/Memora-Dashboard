@@ -1,0 +1,183 @@
+/* Arcade entry: square logo drops in block by block in steps, a bar fills, blocks pop away */
+.play-entry {
+  --px: min(2vw, 1.55vmin);
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: calc(var(--px) * 2.5);
+  background:
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.18) 0 2px, transparent 2px 4px),
+    var(--color-background);
+  animation:
+    play-entry-ground-in 300ms steps(3) both,
+    play-entry-ground-out 600ms steps(6) 2500ms forwards;
+}
+
+.play-entry-stage {
+  position: relative;
+  width: calc(var(--cols) * var(--px));
+  height: calc(var(--rows) * var(--px));
+}
+
+/* One bevelled block */
+.play-entry-pixel {
+  position: absolute;
+  left: calc(var(--x) * var(--px));
+  top: calc(var(--y) * var(--px));
+  width: var(--px);
+  height: var(--px);
+  background: var(--color-brand-500);
+  box-shadow:
+    inset calc(var(--px) * 0.14) calc(var(--px) * 0.14) 0 rgb(255 255 255 / 0.45),
+    inset calc(var(--px) * -0.14) calc(var(--px) * -0.14) 0 rgb(0 0 0 / 0.28);
+  animation:
+    play-entry-drop 520ms steps(7) var(--in) both,
+    play-entry-pop 520ms steps(5) calc(2300ms + var(--out)) forwards;
+}
+
+.play-entry-pixel[data-tone='brain'][data-shade='0'] {
+  background: var(--color-brand-300);
+}
+
+.play-entry-pixel[data-tone='brain'][data-shade='1'] {
+  background: var(--color-brand-400);
+}
+
+.play-entry-pixel[data-tone='brain'][data-shade='2'] {
+  background: var(--color-brand-500);
+}
+
+.play-entry-pixel[data-tone='brain'][data-shade='3'] {
+  background: var(--color-brand-600);
+}
+
+.play-entry-pixel[data-tone='word'][data-shade='0'] {
+  filter: brightness(1.15);
+}
+
+.play-entry-pixel[data-tone='word'][data-shade='2'] {
+  filter: brightness(0.82);
+}
+
+@keyframes play-entry-drop {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--px) * -60));
+  }
+  80% {
+    transform: translateY(calc(var(--px) * 0.35));
+  }
+}
+
+@keyframes play-entry-pop {
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--dx) * var(--px) * 3), calc(var(--dy) * var(--px) * 3)) scale(0);
+  }
+}
+
+@keyframes play-entry-ground-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes play-entry-ground-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Loading bar of squares */
+.play-entry-bar {
+  display: flex;
+  gap: calc(var(--px) * 0.35);
+}
+
+.play-entry-cell {
+  width: calc(var(--px) * 0.8);
+  height: calc(var(--px) * 0.8);
+  background: color-mix(in srgb, var(--color-brand-500) 22%, transparent);
+  animation: play-entry-fill 1ms linear calc(1300ms + var(--i) * 85ms) forwards;
+}
+
+@keyframes play-entry-fill {
+  to {
+    background: var(--color-brand-500);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-entry,
+  .play-entry-pixel,
+  .play-entry-cell {
+    animation: none;
+  }
+}
+
+/* Rail box: arcade bevel, scanlines, squares trailing the pointer */
+.play-notice {
+  background:
+    radial-gradient(
+      circle at 20% 0%,
+      color-mix(in srgb, var(--color-brand-500) 45%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(180deg, #2a1838, #170d22);
+  border-color: color-mix(in srgb, var(--color-brand-600) 70%, black);
+  border-radius: 4px;
+  box-shadow:
+    inset 3px 3px 0 rgb(255 255 255 / 0.18),
+    inset -3px -3px 0 rgb(0 0 0 / 0.35),
+    0 3px 0 color-mix(in srgb, var(--color-brand-600) 70%, black);
+  transition: transform 120ms steps(2);
+}
+
+.play-notice::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.1) 0 2px, transparent 2px 4px);
+}
+
+.play-notice:hover {
+  transform: translateY(-1px);
+}
+
+.play-notice:active {
+  transform: translateY(2px);
+}
+
+.play-notice-spark {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--color-brand-400);
+  box-shadow: inset -2px -2px 0 rgb(0 0 0 / 0.25);
+  animation: play-notice-spark 700ms steps(5) both;
+}
+
+.play-notice-spark[data-tone='1'] {
+  background: #fff4e0;
+}
+
+.play-notice-spark[data-tone='2'] {
+  background: #b9e06a;
+}
+
+@keyframes play-notice-spark {
+  to {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-notice-spark {
+    display: none;
+  }
+}

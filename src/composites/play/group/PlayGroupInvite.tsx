@@ -12,23 +12,22 @@ import { PLAY_BOX, PLAY_GROUP } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { foldText } from '@/utils/format/strings'
 
-export interface PlayGroupInviteProps {
-  groupId: string
+export interface PlayGroupPeopleProps {
   candidates: { id: string; displayName: string; avatarUrl: string | null }[]
+  picked: string[]
+  onChange: (picked: string[]) => void
 }
 
 /**
- * Search field: nobody listed until something is typed, tick several, one send
- * @param {PlayGroupInviteProps} props - Group and people who can be called
+ * Search field: nobody listed until something is typed, tick several
+ * @param {PlayGroupPeopleProps} props - People who can be called and the ticked ones
  * @return {JSX.Element}
  */
 
-export const PlayGroupInvite = ({ groupId, candidates }: PlayGroupInviteProps) => {
-  const actions = usePlayGroup()
+export const PlayGroupPeople = ({ candidates, picked, onChange }: PlayGroupPeopleProps) => {
   const SearchIcon = ICONS.search
   const onlineIds = new Set(usePlayOnline().map((member) => member.accountId))
   const [query, setQuery] = useState('')
-  const [picked, setPicked] = useState<string[]>([])
   const needle = foldText(query)
 
   const shown = useMemo(
@@ -44,7 +43,7 @@ export const PlayGroupInvite = ({ groupId, candidates }: PlayGroupInviteProps) =
   )
 
   return (
-    <div className={PLAY_GROUP.section}>
+    <>
       <div className={PLAY_BOX.search}>
         <SearchIcon className={PLAY_BOX.searchIcon} aria-hidden="true" />
         <input
@@ -71,7 +70,7 @@ export const PlayGroupInvite = ({ groupId, candidates }: PlayGroupInviteProps) =
                 aria-pressed={isOn}
                 className={cn(PLAY_GROUP.pickRow, isOn && PLAY_GROUP.pickRowOn)}
                 onClick={() =>
-                  setPicked(isOn ? picked.filter((id) => id !== person.id) : [...picked, person.id])
+                  onChange(isOn ? picked.filter((id) => id !== person.id) : [...picked, person.id])
                 }
               >
                 <PlayAvatar
@@ -89,6 +88,28 @@ export const PlayGroupInvite = ({ groupId, candidates }: PlayGroupInviteProps) =
           })}
         </div>
       )}
+    </>
+  )
+}
+
+export interface PlayGroupInviteProps {
+  groupId: string
+  candidates: PlayGroupPeopleProps['candidates']
+}
+
+/**
+ * Invite from a group: pick several, one send
+ * @param {PlayGroupInviteProps} props - Group and people who can be called
+ * @return {JSX.Element}
+ */
+
+export const PlayGroupInvite = ({ groupId, candidates }: PlayGroupInviteProps) => {
+  const actions = usePlayGroup()
+  const [picked, setPicked] = useState<string[]>([])
+
+  return (
+    <div className={PLAY_GROUP.section}>
+      <PlayGroupPeople candidates={candidates} picked={picked} onChange={setPicked} />
       {picked.length > 0 && (
         <Button
           variant="arcade"

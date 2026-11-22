@@ -26,10 +26,13 @@ const borderTileOf = (front: Set<number>, roll: number): number => {
 
 export const strikeMoves = (context: ConcordatBotContext): ConcordatIntent[] => {
   const { state, profile, view, isCaretaker, roll } = context
-  if (isCaretaker || profile.level === ConcordatBotLevels.Recruit) return []
-  if (view.me.gold < weapons.missileCost * bots.strike.goldRatio) return []
+  const { pressure } = context
+  if (isCaretaker || (profile.level === ConcordatBotLevels.Recruit && pressure < 0.5)) return []
+  if (view.me.gold < weapons.missileCost * (1 + (bots.strike.goldRatio - 1) * (1 - pressure)))
+    return []
   if (state.arms[view.me.id - 1].missiles < 1) return []
-  if (roll(17) > bots.strike.chance * Math.min(1.5, profile.aggression)) return []
+  if (roll(17) > Math.max(bots.strike.chance * Math.min(1.5, profile.aggression), pressure))
+    return []
 
   const silo = silosOf(state, view.me.id)[0]
   if (!silo) return []
@@ -39,7 +42,7 @@ export const strikeMoves = (context: ConcordatBotContext): ConcordatIntent[] => 
     .toSorted(
       (first, second) => state.players[second.id - 1].troops - state.players[first.id - 1].troops
     )
-  for (const { id } of rivals.slice(0, 2)) {
+  for (const { id } of rivals.slice(0, 2 + Math.floor(pressure * 4))) {
     const front = state.players[id - 1].front
     if (!front.size) continue
 

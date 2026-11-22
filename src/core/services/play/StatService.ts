@@ -2,6 +2,7 @@ import 'server-only'
 
 import type { Prisma } from '@prisma/client'
 
+import { noteGain } from '@/core/services/play/PlayActivityService'
 import { awardTrophies } from '@/core/services/play/TrophyService'
 import { PlayOutcomes } from '@/utils/constants/play'
 import type { PlayGameName, PlayOutcomeName } from '@/utils/constants/play'
@@ -104,6 +105,7 @@ export const recordResults = async (
       create: { accountId: entry.accountId, game, ...counters },
       update: counters,
     })
+    await noteGain(tx, entry.accountId, { kind: 'XP', xp: entry.xp, ref: game })
   }
 
   await awardTrophies(

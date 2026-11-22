@@ -1,8 +1,8 @@
 {
   "xp": {
-    "win": 80,
-    "draw": 40,
-    "loss": 20,
+    "win": 400,
+    "draw": 200,
+    "loss": 100,
     "firstGameMultiplier": 2,
     "firstWinBonus": 0.2
   },
@@ -28,6 +28,11 @@
     "perPlayerMax": 5,
     "messageMax": 500,
     "messagesShown": 60
+  },
+  "friends": {
+    "max": 100,
+    "searchMin": 2,
+    "searchSize": 8
   },
   "privateGames": {
     "codeLength": 6,

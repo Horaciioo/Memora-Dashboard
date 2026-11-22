@@ -25,6 +25,7 @@ import { CROQUIS_SETTINGS } from '@/declarations/play/croquis/settings'
 import type { IconName } from '@/declarations/ui/icons'
 import { NavalModes, PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
+import { formatNumber } from '@/utils/format/numbers'
 
 /**
  * One card of a launch vote
@@ -135,7 +136,7 @@ export const PLAY_VOTE_STEPS: Partial<Record<PlayGameName, PlayVoteStepSpec[]>> 
       choices: (Object.keys(BOMB_SETTINGS.wordsPerPrompt) as BombLevel[]).map((level, index) => ({
         key: level,
         label: BOMB_SETUP_COPY[level],
-        hint: `Des syllabes présentes dans +${BOMB_SETTINGS.wordsPerPrompt[level].toLocaleString('fr-FR')} mots.`,
+        hint: `Des syllabes présentes dans +${formatNumber(BOMB_SETTINGS.wordsPerPrompt[level])} mots.`,
         icon: BOMB_LEVEL_ICONS[index],
       })),
     },

@@ -1,0 +1,155 @@
+/* Celebrations: quest seal, trophy medal, level shockwave */
+@keyframes play-cele-life {
+  0% {
+    opacity: 0;
+  }
+  8%,
+  86% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes play-cele-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2.6) rotate(-26deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.9) rotate(4deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes play-cele-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@keyframes play-cele-spark {
+  from {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(-3.5rem) scaleY(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(-8.5rem) scaleY(1.2);
+  }
+}
+
+@keyframes play-cele-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+@keyframes play-cele-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-16rem) rotate(14deg) scale(1.3);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0.9rem) rotate(-3deg) scale(1);
+  }
+  70% {
+    transform: translateY(-0.8rem) rotate(1deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes play-cele-sweep {
+  to {
+    transform: translateX(520%) skewX(-18deg);
+  }
+}
+
+@keyframes play-cele-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes play-cele-wave {
+  from {
+    opacity: 0.85;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+
+@keyframes play-cele-number {
+  0% {
+    opacity: 0;
+    filter: blur(1rem);
+    transform: scale(3) translateY(2rem);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.play-cele {
+  animation: play-cele-life var(--cele-ms, 4400ms) ease-in-out both;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .play-cele-seal {
+    animation: play-cele-stamp 0.9s cubic-bezier(0.2, 1.3, 0.4, 1) 0.15s both;
+  }
+
+  .play-cele-ring {
+    animation: play-cele-ring 1.7s ease-out calc(0.55s + var(--i, 0) * 0.4s) both;
+  }
+
+  .play-cele-spark {
+    animation: play-cele-spark 1.3s ease-out 0.6s both;
+  }
+
+  .play-cele-text {
+    animation: play-cele-rise 0.7s ease-out 0.7s both;
+  }
+
+  .play-cele-drop {
+    animation: play-cele-drop 1.2s cubic-bezier(0.3, 0.9, 0.4, 1) 0.1s both;
+  }
+
+  .play-cele-shine {
+    transform: skewX(-18deg);
+    animation: play-cele-sweep 1s ease-out 1.3s both;
+  }
+
+  .play-cele-rays {
+    animation: play-cele-turn 30s linear infinite;
+  }
+
+  .play-cele-wave {
+    animation: play-cele-wave 1.9s ease-out calc(0.35s + var(--i, 0) * 0.35s) both;
+  }
+
+  .play-cele-number {
+    animation: play-cele-number 1s cubic-bezier(0.2, 0.9, 0.25, 1) 0.2s both;
+  }
+}

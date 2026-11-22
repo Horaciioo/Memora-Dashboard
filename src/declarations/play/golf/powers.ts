@@ -4,6 +4,7 @@ import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import type { IconName } from '@/declarations/ui/icons'
 import { GolfPowers } from '@/utils/constants/play'
 import type { GolfPowerName } from '@/utils/constants/play'
+import { formatNumber } from '@/utils/format/numbers'
 
 /**
  * Who a power lands on
@@ -118,7 +119,7 @@ export const GOLF_POWERS = createRegistry<GolfPowerName, GolfPowerMeta>({
     label: 'Balle géante',
     effect: fillPlayMessage(
       'Au prochain tir des autres, leur balle est {scale} fois plus grosse et entre mal dans le trou.',
-      { scale: GOLF_SETTINGS.powers.giant.scale.toLocaleString('fr-FR') }
+      { scale: formatNumber(GOLF_SETTINGS.powers.giant.scale) }
     ),
     isBonus: false,
     target: GolfPowerTargets.Others,

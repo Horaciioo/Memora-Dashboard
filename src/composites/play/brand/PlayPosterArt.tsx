@@ -1,5 +1,5 @@
-import { MYSTERY_SCENE, SCENES } from '@/composites/play/brand/poster/scenes'
-import { HERO, Stage } from '@/composites/play/brand/poster/stage'
+import { GAME_ARTS } from '@/composites/play/brand/gameArts'
+import { HERO, MYSTERY_SCENE, Stage } from '@/composites/play/brand/poster/stage'
 import { PLAY_GAMES } from '@/declarations/play'
 import { PLAY_BRAND } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -22,6 +22,20 @@ export const PlayPosterArt = ({ game, isHidden, className }: PlayPosterArtProps)
   const meta = PLAY_GAMES.get(game)
   const tone = isHidden ? '--play-mystery' : meta.tone
   const id = isHidden ? 'play-poster-mystery' : `play-poster-${meta.slug}`
+  const CardArt = isHidden ? undefined : GAME_ARTS[game]
+
+  if (CardArt) {
+    return (
+      <svg
+        viewBox="0 0 360 480"
+        preserveAspectRatio="xMidYMid slice"
+        className={cn(PLAY_BRAND.art, className)}
+        aria-hidden="true"
+      >
+        <CardArt frame="card" />
+      </svg>
+    )
+  }
 
   return (
     <svg
@@ -39,9 +53,7 @@ export const PlayPosterArt = ({ game, isHidden, className }: PlayPosterArtProps)
       </defs>
       <rect width="360" height="480" fill={`url(#${id})`} />
       <Stage tone={tone} />
-      <g transform={`translate(${HERO.x} ${HERO.y})`}>
-        {isHidden ? MYSTERY_SCENE : SCENES[meta.backdrop]?.(meta.tone)}
-      </g>
+      <g transform={`translate(${HERO.x} ${HERO.y})`}>{MYSTERY_SCENE}</g>
     </svg>
   )
 }

@@ -1,4 +1,5 @@
 import { PLAY_CONCEPT, PLAY_CONCEPT_COPY } from '@/declarations/play/concept'
+import { playKeysOf } from '@/declarations/play/games'
 import { GOLF_POWERS } from '@/declarations/play/golf/powers'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_CONCEPT_UI } from '@/declarations/ui/variants'
@@ -55,11 +56,18 @@ const GolfPowerList = () => (
  */
 
 export const PlayConcept = ({ game }: { game: PlayGameName }) => (
-  <div className={PLAY_CONCEPT_UI.root}>
+  <div className={PLAY_CONCEPT_UI.root} style={playKeysOf(game)}>
     <ol className={PLAY_CONCEPT_UI.list}>
       {PLAY_CONCEPT[game].map((step, at) => (
         <li key={step.title} className={PLAY_CONCEPT_UI.step}>
-          <span className={PLAY_CONCEPT_UI.stepNumber}>{at + 1}</span>
+          <span className={PLAY_CONCEPT_UI.rail}>
+            <span className={at > 0 ? PLAY_CONCEPT_UI.stepLine : 'flex-1'} aria-hidden="true" />
+            <span className={PLAY_CONCEPT_UI.stepNumber}>{at + 1}</span>
+            <span
+              className={at < PLAY_CONCEPT[game].length - 1 ? PLAY_CONCEPT_UI.stepLine : 'flex-1'}
+              aria-hidden="true"
+            />
+          </span>
           <span className={PLAY_CONCEPT_UI.stepBody}>
             <span className={PLAY_CONCEPT_UI.stepTitle}>{step.title}</span>
             <span className={PLAY_CONCEPT_UI.stepText}>{step.text}</span>

@@ -89,7 +89,7 @@ export const BilanBreakdown = ({ insights, byKind, withDetail }: BilanBreakdownP
               rows={insights.repeatTargets.map((target) => ({
                 label: target.login,
                 value: target.count,
-                colour: 'var(--color-danger)',
+                colour: 'var(--color-brand-700)',
               }))}
             />
           </Section>

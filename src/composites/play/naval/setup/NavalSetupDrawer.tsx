@@ -15,6 +15,7 @@ import { NAVAL_SETTINGS } from '@/declarations/play/naval/settings'
 import type { NavalRuleName } from '@/declarations/play/naval/settings'
 import { FIELD_STYLES } from '@/declarations/ui/variants'
 import { NAVAL_SETUP } from '@/declarations/ui/variants/games/naval'
+import { PlayGames } from '@/utils/constants/play'
 
 // Tabs of the drawer
 const TABS = [{ value: 'game', label: NAVAL_SETUP_COPY.tabGame, icon: 'playPawn' as const }]
@@ -49,6 +50,7 @@ export const NavalSetupDrawer = ({
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Naval}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit

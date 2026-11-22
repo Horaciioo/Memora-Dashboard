@@ -20,7 +20,6 @@ import {
   CONCORDAT_MODE_LABELS,
   CONCORDAT_SETUP_COPY,
   CONCORDAT_SIZE_LABELS,
-  CONCORDAT_SPEED_LABELS,
   CONCORDAT_STYLE_CHOICE_LABELS,
 } from '@/declarations/play/concordat/copy'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
@@ -28,11 +27,16 @@ import {
   CONCORDAT_SETTINGS,
   CONCORDAT_START_TROOPS,
   CONCORDAT_TEAMS,
+  concordatStyleChoicesOf,
 } from '@/declarations/play/concordat/settings'
 import { CONCORDAT_SETUP } from '@/declarations/ui/variants'
+import { CONCORDAT_RANDOM_STYLE } from '@/utils/constants/concordat'
+import type { ConcordatSizeName } from '@/utils/constants/concordat'
 import { CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
 
 import { hasTeams } from '@/core/lib/play/concordat/modes/rules'
+import { DATE_LOCALE } from '@/declarations/ui/dates'
+import { PlayGames } from '@/utils/constants/play'
 
 const TABS = [
   { value: 'game', label: CONCORDAT_SETUP_COPY.tabGame, icon: 'playPlayers' as const },
@@ -50,11 +54,6 @@ const SIZES = CONCORDAT_SETTINGS.sizes.map((value) => ({
   label: CONCORDAT_SIZE_LABELS[value],
   art: <ConcordatSizeArt size={value} />,
 }))
-const STYLES = CONCORDAT_SETTINGS.styleChoices.map((value) => ({
-  value,
-  label: CONCORDAT_STYLE_CHOICE_LABELS[value],
-  art: <ConcordatRegionArt style={value} />,
-}))
 const DIFFICULTIES = CONCORDAT_SETTINGS.difficulties.map((value) => ({
   value,
   label: CONCORDAT_DIFFICULTY_LABELS[value],
@@ -67,13 +66,9 @@ const LIMITS = [
   { value: 'unlimited', label: CONCORDAT_SETUP_COPY.unlimited },
   { value: 'limited', label: CONCORDAT_SETUP_COPY.limited },
 ]
-const SPEEDS = CONCORDAT_SETTINGS.speeds.map((value) => ({
-  value,
-  label: CONCORDAT_SPEED_LABELS[value],
-}))
 
 /**
- * Map, speed and clock, picked before a Concordat game opens
+ * Map, clock and weapons, picked before a Concordat game opens
  * @param {PlaySetupProps} props - Drawer state and handlers
  * @return {JSX.Element}
  */
@@ -92,12 +87,27 @@ export const ConcordatSetupDrawer = ({
     <K extends keyof ConcordatGameSettings>(key: K) =>
     (value: ConcordatGameSettings[K]) =>
       setSettings((previous) => ({ ...previous, [key]: value }))
+  // A new size keeps the region only when it fits
+  const setSize = (size: ConcordatSizeName) =>
+    setSettings((previous) => ({
+      ...previous,
+      size,
+      style: concordatStyleChoicesOf(size).includes(previous.style)
+        ? previous.style
+        : CONCORDAT_RANDOM_STYLE,
+    }))
+  const styles = concordatStyleChoicesOf(settings.size).map((value) => ({
+    value,
+    label: CONCORDAT_STYLE_CHOICE_LABELS[value],
+    art: <ConcordatRegionArt style={value} />,
+  }))
   const isUnlimited = settings.durationMinutes === CONCORDAT_SETTINGS.unlimited
   const labels = { less: CONCORDAT_SETUP_COPY.less, more: CONCORDAT_SETUP_COPY.more }
 
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Concordat}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit
@@ -158,18 +168,6 @@ export const ConcordatSetupDrawer = ({
             <>
               <SetupSection
                 styles={CONCORDAT_SETUP}
-                title={CONCORDAT_SETUP_COPY.style}
-                hint={CONCORDAT_SETUP_COPY.styleHint}
-              >
-                <SetupArtCards
-                  styles={CONCORDAT_SETUP}
-                  options={STYLES}
-                  value={settings.style}
-                  onChange={set('style')}
-                />
-              </SetupSection>
-              <SetupSection
-                styles={CONCORDAT_SETUP}
                 title={CONCORDAT_SETUP_COPY.size}
                 hint={CONCORDAT_SETUP_COPY.sizeHint}
               >
@@ -177,25 +175,25 @@ export const ConcordatSetupDrawer = ({
                   styles={CONCORDAT_SETUP}
                   options={SIZES}
                   value={settings.size}
-                  onChange={set('size')}
+                  onChange={setSize}
+                />
+              </SetupSection>
+              <SetupSection
+                styles={CONCORDAT_SETUP}
+                title={CONCORDAT_SETUP_COPY.style}
+                hint={CONCORDAT_SETUP_COPY.styleHint}
+              >
+                <SetupArtCards
+                  styles={CONCORDAT_SETUP}
+                  options={styles}
+                  value={settings.style}
+                  onChange={set('style')}
                 />
               </SetupSection>
             </>
           )}
           {tab === 'pace' && (
             <>
-              <SetupSection
-                styles={CONCORDAT_SETUP}
-                title={CONCORDAT_SETUP_COPY.speed}
-                hint={CONCORDAT_SETUP_COPY.speedHint}
-              >
-                <SetupChips
-                  styles={CONCORDAT_SETUP}
-                  options={SPEEDS}
-                  value={settings.speed}
-                  onChange={set('speed')}
-                />
-              </SetupSection>
               <SetupSection
                 styles={CONCORDAT_SETUP}
                 title={CONCORDAT_SETUP_COPY.duration}
@@ -238,7 +236,7 @@ export const ConcordatSetupDrawer = ({
                   range={CONCORDAT_START_TROOPS}
                   step={CONCORDAT_START_TROOPS.step}
                   display={fillPlayMessage(CONCORDAT_SETUP_COPY.troopsValue, {
-                    troops: (settings.startTroops / 1000).toLocaleString('fr-FR'),
+                    troops: (settings.startTroops / 1000).toLocaleString(DATE_LOCALE),
                   })}
                   onChange={set('startTroops')}
                   labels={labels}

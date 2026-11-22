@@ -1,6 +1,7 @@
 import {
   placeBuilding,
   placeRefusal,
+  placeTileOf,
   upgradeBuilding,
   upgradeRefusal,
 } from '@/core/lib/play/concordat/buildings'
@@ -24,14 +25,14 @@ import {
   sendAid,
   sendGift,
 } from '@/core/lib/play/concordat/diplomacy'
-import { tieKindOf } from '@/core/lib/play/concordat/diplomacy/ties'
-import { neighborsOf, NEIGHBOR_SLOTS } from '@/core/lib/play/concordat/map'
+import { landmassesOf, neighborsOf, NEIGHBOR_SLOTS } from '@/core/lib/play/concordat/map'
 import { startRefusal } from '@/core/lib/play/concordat/sim/create'
 import {
   buildShip,
   buildShipRefusal,
   moveShip,
   moveShipRefusal,
+  aimTileOf,
   sail,
   sailRefusal,
 } from '@/core/lib/play/concordat/navy'
@@ -43,8 +44,8 @@ import { launchRefusal, launchStrike } from '@/core/lib/play/concordat/weapons'
 import { isTileBlocked } from '@/core/lib/play/concordat/zones'
 import { closeTrade } from '@/core/lib/play/concordat/trade'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
-import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
-import { ConcordatPhases, ConcordatTerrains, ConcordatTies } from '@/utils/constants/concordat'
+import type { ConcordatCorps, ConcordatIntent, ConcordatState } from '@/types/concordat'
+import { ConcordatPhases, ConcordatTerrains } from '@/utils/constants/concordat'
 
 const { sim } = CONCORDAT
 const near = new Int32Array(NEIGHBOR_SLOTS)
@@ -64,6 +65,67 @@ const touches = (state: ConcordatState, playerId: number, target: number): boole
   return false
 }
 
+// The clicked tile lies on a landmass none of my border touches, only a boat gets there
+const isOverseas = (state: ConcordatState, playerId: number, tile: number): boolean => {
+  const lands = landmassesOf(state.map)
+  for (const edge of state.players[playerId - 1].front)
+    if (lands[edge] === lands[tile]) return false
+
+  return true
+}
+
+// The push crosses the water: no border with the target, or a tile named on another landmass
+const isByWater = (
+  state: ConcordatState,
+  intent: Extract<ConcordatIntent, { kind: 'engage' }>
+): boolean =>
+  !touches(state, intent.playerId, intent.target) ||
+  (intent.tile !== undefined && isOverseas(state, intent.playerId, intent.tile))
+
+// Landing order of a push over the water, aimed at the tile named or at the nation
+const landingMove = (
+  state: ConcordatState,
+  intent: Extract<ConcordatIntent, { kind: 'engage' }>
+): Extract<ConcordatIntent, { kind: 'sail' }> => ({
+  kind: 'sail',
+  playerId: intent.playerId,
+  tile: intent.tile ?? aimTileOf(state, intent.playerId, intent.target),
+  percent: intent.percent,
+})
+
+// Reason a landing is refused
+const landingRefusal = (
+  state: ConcordatState,
+  intent: Extract<ConcordatIntent, { kind: 'engage' }>
+): string | null => {
+  const move = landingMove(state, intent)
+  if (move.tile < 0) return 'noContact'
+
+  return isTileBlocked(state, move.tile, 'blocksSea') ? 'storm' : sailRefusal(state, move)
+}
+
+// Corps an order joins: same target, and the same spot when it names one, else any push there
+const corpsFor = (
+  state: ConcordatState,
+  intent: Extract<ConcordatIntent, { kind: 'engage' }>
+): ConcordatCorps | undefined => {
+  const mine = state.corps.filter(
+    (corps) => corps.owner === intent.playerId && corps.target === intent.target && !corps.feint
+  )
+  if (intent.tile === undefined) return mine[0]
+
+  const { width } = state.map
+  const gap = (corps: ConcordatCorps): number =>
+    corps.aim === undefined
+      ? 0
+      : Math.hypot(
+          (corps.aim % width) - (intent.tile! % width),
+          Math.floor(corps.aim / width) - Math.floor(intent.tile! / width)
+        )
+
+  return mine.find((corps) => gap(corps) <= CONCORDAT.front.aimMerge)
+}
+
 // Reason an engagement is refused
 const engageRefusal = (
   state: ConcordatState,
@@ -80,15 +142,19 @@ const engageRefusal = (
   if (intent.target && (!target || !target.alive)) return 'badTarget'
   if (target && state.tick < target.protectedUntil) return 'protected'
   if (target && areTeamMates(state, me.id, target.id)) return 'teamMate'
-  if (target && tieKindOf(state, me.id, target.id) === ConcordatTies.Peace) return 'treaty'
   if (Math.floor((me.troops * intent.percent) / 100) < sim.minEngage) return 'tooFew'
-  if (!touches(state, intent.playerId, intent.target)) return 'noContact'
+  if (isByWater(state, intent)) {
+    // Same landmass but no common border: nothing to sail, say so
+    const aim =
+      intent.tile ?? (intent.target ? aimTileOf(state, intent.playerId, intent.target) : -1)
+    const reachable = aim >= 0 && !isOverseas(state, intent.playerId, aim)
+    return intent.target && reachable && !touches(state, me.id, intent.target)
+      ? 'noContact'
+      : landingRefusal(state, intent)
+  }
 
-  const existing = state.corps.some(
-    (corps) => corps.owner === me.id && corps.target === intent.target && !corps.feint
-  )
-
-  return !existing && state.corps.filter((corps) => corps.owner === me.id).length >= sim.maxCorps
+  return !corpsFor(state, intent) &&
+    state.corps.filter((corps) => corps.owner === me.id).length >= sim.maxCorps
     ? 'tooManyCorps'
     : null
 }
@@ -100,6 +166,7 @@ const feintRefusal = (
 ): string | null => {
   if (!state.effects[intent.playerId - 1].canFeint) return 'noFeint'
   if (!intent.target) return 'badTarget'
+  if (!touches(state, intent.playerId, intent.target)) return 'noContact'
   if (state.corps.filter((corps) => corps.owner === intent.playerId).length >= sim.maxCorps)
     return 'tooManyCorps'
 
@@ -161,14 +228,12 @@ const engage = (
   }
 
   // Reinforce the corps already pushing
-  const corps = state.corps.find(
-    (other) => other.owner === me.id && other.target === intent.target && !other.feint
-  )
+  const corps = corpsFor(state, intent)
   if (corps) {
     corps.drive =
       ((corps.drive ?? drive) * corps.troops + drive * amount) / (corps.troops + amount || 1)
     corps.troops += amount
-    corps.aim = undefined
+    corps.aim = intent.tile ?? corps.aim
     corps.zone = undefined
   } else {
     state.corps.push({
@@ -178,6 +243,7 @@ const engage = (
       troops: amount,
       progress: 0,
       drive,
+      aim: intent.tile,
     })
   }
 }
@@ -186,7 +252,7 @@ const engage = (
 const systemRefusal = (state: ConcordatState, intent: ConcordatIntent): string | null => {
   switch (intent.kind) {
     case 'build':
-      return placeRefusal(state, intent.playerId, intent.building, intent.tile)
+      return placeRefusal(state, intent.playerId, intent.building, placeTileOf(state, intent))
     case 'upgrade':
       return upgradeRefusal(state, intent.playerId, intent.id)
     case 'buildShip':
@@ -231,7 +297,7 @@ const systemRefusal = (state: ConcordatState, intent: ConcordatIntent): string |
 const applySystem = (state: ConcordatState, intent: ConcordatIntent): void => {
   switch (intent.kind) {
     case 'build':
-      return placeBuilding(state, intent.playerId, intent.building, intent.tile)
+      return placeBuilding(state, intent.playerId, intent.building, placeTileOf(state, intent))
     case 'upgrade':
       return upgradeBuilding(state, intent.playerId, intent.id)
     case 'buildShip':
@@ -299,15 +365,10 @@ export const intentRefusal = (state: ConcordatState, intent: ConcordatIntent): s
 
 // A push with no way by land crosses the water instead, from the nearest own coast
 const landing = (state: ConcordatState, intent: ConcordatIntent): string | null => {
-  if (intent.kind !== 'engage' || intent.tile === undefined) return 'noContact'
+  if (intent.kind !== 'engage') return 'noContact'
 
-  const move: ConcordatIntent = {
-    kind: 'sail',
-    playerId: intent.playerId,
-    tile: intent.tile,
-    percent: intent.percent,
-  }
-  const refusal = systemRefusal(state, move)
+  const move = landingMove(state, intent)
+  const refusal = landingRefusal(state, intent)
   if (refusal) return refusal
   applySystem(state, move)
 
@@ -323,8 +384,10 @@ const landing = (state: ConcordatState, intent: ConcordatIntent): string | null 
 
 export const applyIntent = (state: ConcordatState, intent: ConcordatIntent): string | null => {
   const refusal = intentRefusal(state, intent)
-  if (refusal === 'noContact') return landing(state, intent)
   if (refusal) return refusal
+  if (intent.kind === 'engage' && isByWater(state, intent)) {
+    return landing(state, intent)
+  }
 
   // One handler per kind
   if (intent.kind === 'placeStart') state.players[intent.playerId - 1].start = intent.tile

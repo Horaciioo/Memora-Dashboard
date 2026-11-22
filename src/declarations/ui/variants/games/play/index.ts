@@ -6,7 +6,6 @@ export {
   PLAY_BRAND,
   PLAY_HUB,
   PLAY_STATS,
-  PLAY_PLAYER,
   PLAY_VOLUME_UI,
   PLAY_PROFILE,
   PLAY_GROUP,
@@ -14,11 +13,11 @@ export {
   PLAY_LEAVE_UI,
   PLAY_TROPHY_UI,
 } from '@/declarations/ui/variants/games/play/hub'
+export { PLAY_SETUP } from '@/declarations/ui/variants/games/play/setup'
 export { PLAY_PANEL } from '@/declarations/ui/variants/games/play/shared'
 export {
   PLAY_CHAT_BUBBLE,
   PLAY_NOTICE,
-  PLAY_CROSS,
   PLAY_FEATURE,
   PLAY_DOCK,
   PLAY_ROOM,

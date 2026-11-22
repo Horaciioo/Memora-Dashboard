@@ -27,6 +27,7 @@ export type SceneEvent =
   | { kind: 'act'; act: ModAct; deleteMessageId?: string }
   | { kind: 'hold'; held: HeldMessage }
   | { kind: 'release'; heldId: string }
+  | { kind: 'expire'; heldId: string; by: string; at: string }
   | { kind: 'join'; group: keyof ModViewState['community']; chatter: Chatter }
   | { kind: 'leave'; group: keyof ModViewState['community']; chatterId: string }
   | { kind: 'modes'; modes: Partial<ModViewState['modes']> }
@@ -197,6 +198,26 @@ export const applySceneEvent = (
         ...state,
         view: { ...view, held: view.held.filter((held) => held.id !== event.heldId) },
       }
+    case 'expire': {
+      const held = view.held.find((entry) => entry.id === event.heldId)
+      if (!held) return state
+
+      // Rejected unhandled, kept in the history with its author
+      const released = applySceneEvent(state, { kind: 'release', heldId: held.id })
+
+      return applySceneEvent(released, {
+        kind: 'act',
+        act: {
+          id: `expire-${held.id}`,
+          kind: 'automodExpire',
+          target: held.author.name,
+          targetId: held.author.id,
+          moderator: event.by,
+          at: event.at,
+          quote: held.text,
+        },
+      })
+    }
     case 'join': {
       const group = view.community[event.group]
       if (group.some((chatter) => chatter.id === event.chatter.id)) return state
@@ -430,6 +451,7 @@ export const applySceneIntent = (
         act: act({
           kind: intent.approve ? 'automodApprove' : 'automodDeny',
           target: held?.author.name ?? null,
+          targetId: held?.author.id,
           quote: held?.text,
         }),
       })

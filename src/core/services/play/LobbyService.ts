@@ -10,6 +10,8 @@ import { pickSeatColor, readBodyInteger, readBodyText, seatBoundsOf } from '@/co
 import { clearSessionTimers } from '@/core/lib/play/timers'
 import { signalNotices, signalLobbies, signalPlay } from '@/core/lib/play/signal'
 import { PLAY_ERRORS, PLAY_GAMES, PLAY_JOURNAL, PLAY_SETTINGS } from '@/declarations/play'
+import { PLAY_CONFIG_COPY } from '@/declarations/play/config'
+import { readPlayConfig } from '@/core/services/play/PlayConfigService'
 import { isFeatureOn, isFeatureOpen } from '@/core/services/features'
 import { gameFeatureKey } from '@/declarations/features'
 import { announceInChat } from '@/core/services/play/PlayChatService'
@@ -111,6 +113,8 @@ const openSession = async (accountId: string, raw: Record<string, unknown>, isAd
   if (!(await isFeatureOpen(gameFeatureKey(PLAY_GAMES.get(game).slug), isAdmin))) {
     throw forbidden(PLAY_ERRORS.unplayable)
   }
+  // A paused room opens no table, admins excepted
+  if (!isAdmin && (await readPlayConfig()).tablesPaused) throw forbidden(PLAY_CONFIG_COPY.paused)
   const settings = engineOf(game).readSettings(settingsOf(raw), null)
   const games = (await isFeatureOn('play.tournaments')) ? tournamentLength(raw) : null
   const isPrivate = raw.visibility === PlayVisibilities.Private

@@ -11,40 +11,28 @@ const { fire } = war
 
 const sprites = new Map<string, HTMLCanvasElement>()
 
-// Soot disc with a ragged rim, painted once per kind
+// Crater in hard pixels, a dark core and a ragged scorched rim, painted once per kind
+const SCAR_PIXELS = 28
+
 const scarSprite = (kind: 'blast' | 'wreck'): HTMLCanvasElement => {
   const cached = sprites.get(kind)
   if (cached) return cached
-  const size = war.scar.sprite
   const layer = document.createElement('canvas')
-  layer.width = size
-  layer.height = size
+  layer.width = SCAR_PIXELS
+  layer.height = SCAR_PIXELS
   const context = layer.getContext('2d')
   if (!context) return layer
 
-  const half = size / 2
-  const soot = (x: number, y: number, radius: number, alpha: number) => {
-    const gradient = context.createRadialGradient(x, y, 0, x, y, radius)
-    gradient.addColorStop(0, `rgba(10,8,8,${alpha})`)
-    gradient.addColorStop(0.5, `rgba(26,20,18,${alpha * 0.8})`)
-    gradient.addColorStop(0.8, `rgba(46,36,30,${alpha * 0.4})`)
-    gradient.addColorStop(1, 'rgba(60,48,40,0)')
-    context.fillStyle = gradient
-    context.beginPath()
-    context.arc(x, y, radius, 0, Math.PI * 2)
-    context.fill()
-  }
-  soot(half, half, half * (kind === 'blast' ? 0.82 : 0.9), 0.95)
-  const blobs = kind === 'blast' ? 9 : 4
-  for (let index = 0; index < blobs; index++) {
-    const angle = hashOf(index, 11) * Math.PI * 2
-    const reach = half * (0.35 + hashOf(index, 23) * 0.4)
-    soot(
-      half + Math.cos(angle) * reach,
-      half + Math.sin(angle) * reach,
-      half * (0.2 + hashOf(index, 37) * 0.25),
-      0.5
-    )
+  const half = SCAR_PIXELS / 2
+  for (let y = 0; y < SCAR_PIXELS; y++) {
+    for (let x = 0; x < SCAR_PIXELS; x++) {
+      const reach = Math.hypot(x + 0.5 - half, y + 0.5 - half) / half
+      const ragged = reach + (hashOf(x * 31 + y, 11) - 0.5) * 0.34
+      if (ragged > (kind === 'blast' ? 0.95 : 0.8)) continue
+      context.fillStyle =
+        ragged < 0.45 ? 'rgb(22,18,18)' : ragged < 0.72 ? 'rgb(44,36,32)' : 'rgb(72,60,50)'
+      context.fillRect(x, y, 1, 1)
+    }
   }
   sprites.set(kind, layer)
 
@@ -69,6 +57,7 @@ export const drawScars = (context: CanvasRenderingContext2D, scene: ConcordatSce
 
     const isBlast = scar.kind === ConcordatScarKinds.Blast
     context.globalAlpha = war.scar.alpha * (isBlast ? 1 : 0.75)
+    context.imageSmoothingEnabled = false
     context.drawImage(
       scarSprite(isBlast ? 'blast' : 'wreck'),
       x - radius,
@@ -77,19 +66,24 @@ export const drawScars = (context: CanvasRenderingContext2D, scene: ConcordatSce
       radius * 2
     )
     context.globalAlpha = 1
+    context.imageSmoothingEnabled = true
 
     // Young scars still burn
     const age = tick - scar.at
     if (age < 0 || age > war.scar.burnTicks) continue
     const heat = (1 - age / war.scar.burnTicks) * pulse
-    const glow = context.createRadialGradient(x, y, 0, x, y, radius * 0.7)
-    glow.addColorStop(0, rgbText(fire.mid, 0.55 * heat))
-    glow.addColorStop(0.6, rgbText(fire.edge, 0.22 * heat))
-    glow.addColorStop(1, rgbText(fire.edge, 0))
-    context.fillStyle = glow
-    context.beginPath()
-    context.arc(x, y, radius * 0.7, 0, Math.PI * 2)
-    context.fill()
+    for (let index = 0; index < 6; index++) {
+      if (hashOf(scar.tile, index + Math.floor(now / 260)) > heat) continue
+      const angle = hashOf(scar.tile, index * 5) * Math.PI * 2
+      const reach = radius * 0.55 * hashOf(scar.tile, index * 7 + 1)
+      context.fillStyle = rgbText(index % 2 ? fire.mid : fire.edge)
+      context.fillRect(
+        Math.round(x + Math.cos(angle) * reach),
+        Math.round(y + Math.sin(angle) * reach),
+        3,
+        3
+      )
+    }
   }
 }
 
@@ -132,15 +126,17 @@ const drawBurst = (
   if (life < 0.5) {
     const fade = life < 0.18 ? 1 : 1 - (life - 0.18) / 0.32
     const size = radius * (0.35 + 0.65 * grow)
-    const ball = context.createRadialGradient(x, y, 0, x, y, size)
-    ball.addColorStop(0, rgbText(fire.core, fade))
-    ball.addColorStop(0.35, rgbText(fire.mid, 0.95 * fade))
-    ball.addColorStop(0.75, rgbText(fire.edge, 0.7 * fade))
-    ball.addColorStop(1, rgbText(fire.edge, 0))
-    context.fillStyle = ball
-    context.beginPath()
-    context.arc(x, y, size, 0, Math.PI * 2)
-    context.fill()
+    const rings: [number, readonly number[]][] = [
+      [1, fire.edge],
+      [0.7, fire.mid],
+      [0.4, fire.core],
+    ]
+    for (const [share, rgb] of rings) {
+      context.fillStyle = rgbText(rgb, fade)
+      context.beginPath()
+      context.arc(x, y, size * share, 0, Math.PI * 2)
+      context.fill()
+    }
   }
 
   // Smoke puffs rise and spread
@@ -153,42 +149,38 @@ const drawBurst = (
     const py = y + Math.sin(angle) * spread * 0.45 - rise
     const size = radius * (0.22 + 0.4 * smokeLife) * (0.7 + hashOf(burst.seed, index) * 0.6)
     context.fillStyle = rgbText(fire.smoke, 0.55 * (1 - smokeLife) ** 1.4)
-    context.beginPath()
-    context.arc(px, py, size, 0, Math.PI * 2)
-    context.fill()
+    context.fillRect(
+      Math.round(px - size),
+      Math.round(py - size),
+      Math.round(size * 2),
+      Math.round(size * 2)
+    )
   }
 
   // Mushroom cap on the heavy blast
   if (burst.kind === 'heavy' && life > 0.12) {
     const cap = Math.min(1, (life - 0.12) / 0.5)
     context.fillStyle = rgbText(fire.smoke, 0.5 * (1 - life))
-    context.beginPath()
-    context.ellipse(
-      x,
-      y - radius * (0.7 + cap * 0.6),
-      radius * (0.35 + cap * 0.5),
-      radius * 0.28 * cap + 2,
-      0,
-      0,
-      Math.PI * 2
+    const capWidth = radius * (0.7 + cap)
+    const capHeight = radius * 0.3 * cap + 4
+    context.fillRect(
+      Math.round(x - capWidth / 2),
+      Math.round(y - radius * (0.7 + cap * 0.6)),
+      Math.round(capWidth),
+      Math.round(capHeight)
     )
-    context.fill()
   }
 
   // Sparks and debris with a little gravity
   if (life < 0.45) {
     const t = life / 0.45
-    context.lineWidth = 1.6
     for (let index = 0; index < spec.sparks; index++) {
       const angle = hashOf(burst.seed, index + 50) * Math.PI * 2
       const speed = radius * (0.6 + hashOf(burst.seed, index + 80) * 1.1)
       const px = x + Math.cos(angle) * speed * t
       const py = y + Math.sin(angle) * speed * t + radius * 0.5 * t * t
-      context.strokeStyle = rgbText(fire.mid, 1 - t)
-      context.beginPath()
-      context.moveTo(px, py)
-      context.lineTo(px - Math.cos(angle) * 5, py - Math.sin(angle) * 5)
-      context.stroke()
+      context.fillStyle = rgbText(fire.mid, 1 - t)
+      context.fillRect(Math.round(px), Math.round(py), 3, 3)
     }
   }
 }
@@ -208,13 +200,15 @@ export const drawBlasts = (context: CanvasRenderingContext2D, scene: ConcordatSc
     if (life < 0 || life > 1) continue
     const [x, y] = pointOf(scene, flash.x, flash.y)
     const size = Math.max(10, scene.camera.scale * 3) * (1 + life)
-    const glow = context.createRadialGradient(x, y, 0, x, y, size)
-    glow.addColorStop(0, rgbText(fire.core, 0.9 * (1 - life)))
-    glow.addColorStop(0.5, rgbText(fire.mid, 0.5 * (1 - life)))
-    glow.addColorStop(1, rgbText(fire.edge, 0))
-    context.fillStyle = glow
-    context.beginPath()
-    context.arc(x, y, size, 0, Math.PI * 2)
-    context.fill()
+    for (const [share, rgb] of [
+      [1, fire.edge],
+      [0.65, fire.mid],
+      [0.3, fire.core],
+    ] as [number, readonly number[]][]) {
+      context.fillStyle = rgbText(rgb, 0.9 * (1 - life))
+      context.beginPath()
+      context.arc(x, y, size * share, 0, Math.PI * 2)
+      context.fill()
+    }
   }
 }

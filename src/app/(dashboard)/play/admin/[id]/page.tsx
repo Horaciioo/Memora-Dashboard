@@ -2,11 +2,9 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { PlayAdminFile } from '@/composites/play/admin/PlayAdminFile'
-import { PlayPageTitle } from '@/composites/play/hub/PlayPageTitle'
-import { readPlayActivity, readPlayAdmin, readPlayAdminPlayer } from '@/core/services/play'
+import { readPlayAdmin, readPlayAdminPlayer } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_BOARD_ADMIN_COPY } from '@/declarations/play/admin'
-import { PLAY_ADMIN } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
 interface PlayAdminPlayerProps {
@@ -27,7 +25,7 @@ export async function generateMetadata({ params }: PlayAdminPlayerProps): Promis
 }
 
 /**
- * File of one player: progression, access and journal
+ * File of one player: rank card, figures, gestures and journal
  * @param {PlayAdminPlayerProps} props - Route context
  * @return {Promise<JSX.Element>} - File page
  */
@@ -38,12 +36,7 @@ export default async function PlayAdminPlayerPage({ params }: PlayAdminPlayerPro
   const player = await readPlayAdminPlayer(id)
   if (!player) notFound()
 
-  const [state, journal] = await Promise.all([readPlayAdmin(id), readPlayActivity(id)])
+  const state = await readPlayAdmin(id)
 
-  return (
-    <div className={PLAY_ADMIN.page}>
-      <PlayPageTitle>{player.name}</PlayPageTitle>
-      <PlayAdminFile player={player} state={state} journal={journal} />
-    </div>
-  )
+  return <PlayAdminFile player={player} state={state} />
 }

@@ -1,6 +1,7 @@
 import type { ConcordatBoardPlayer } from '@/core/lib/play/concordat/wire/board'
 import { ConcordatPowers } from '@/utils/constants/concordat'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
+import { DATE_LOCALE } from '@/declarations/ui/dates'
 
 /**
  * Nations, living first then by land then by id
@@ -45,7 +46,7 @@ export const landShareText = (tiles: number, land: number): string => {
   const share = (tiles / Math.max(1, land)) * 100
   const digits = share < 1 ? 2 : share < 10 ? 1 : 0
 
-  return share.toLocaleString('fr-FR', {
+  return share.toLocaleString(DATE_LOCALE, {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   })
@@ -84,10 +85,10 @@ export const compactFigure = (value: number): string => {
   if (value >= 1_000_000) {
     const millions = value / 1_000_000
 
-    return `${millions.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} M`
+    return `${millions.toLocaleString(DATE_LOCALE, { maximumFractionDigits: 1 })}M`
   }
   const thousands = value / 1000
   const digits = thousands < 100 ? 1 : 0
 
-  return `${thousands.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: digits })} K`
+  return `${thousands.toLocaleString(DATE_LOCALE, { minimumFractionDigits: 0, maximumFractionDigits: digits })}K`
 }

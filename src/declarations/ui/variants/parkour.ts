@@ -49,6 +49,19 @@ export const ACCOMPANIED_LIVES = {
 } as const
 
 /**
+ * Absences a junior declared, read by their referent
+ * @type {Record<string, string>}
+ */
+
+export const JUNIOR_ABSENCES = {
+  root: 'flex flex-col gap-2',
+  label: PROPERTY_LABEL,
+  empty: 'text-sm text-[var(--color-ink-subtle)] italic',
+  dates: 'min-w-0 flex-1 text-sm font-bold',
+  duration: 'shrink-0 text-xs text-[var(--color-ink-subtle)]',
+} as const
+
+/**
  * Compact rows of the courses a junior finished
  * @type {Record<string, string>}
  */

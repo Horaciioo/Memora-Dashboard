@@ -201,8 +201,6 @@ export const SEARCH_LAUNCHER = {
 
 export const NAV_SHEET = {
   stack: 'nav-sheet flex flex-col gap-4',
-  // Level switch sits first
-  switch: 'w-full',
   // Boxed account left, bare bell right
   accountRow: 'flex items-center justify-between gap-3',
   notifications:

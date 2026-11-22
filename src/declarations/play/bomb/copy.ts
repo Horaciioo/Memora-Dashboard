@@ -99,14 +99,10 @@ export const BOMB_RULES_COPY = {
 } as const
 
 /**
- * Syllables drifting up the hub like embers
+ * Ground class of the Bomb Party hub
  * @type {Object}
  */
 
 export const BOMB_EMBERS = {
   ground: 'play-fuse',
-  syllables: ['ON', 'TRA', 'ENT', 'QU', 'ER', 'ILL', 'CH', 'OU', 'ANT', 'ES', 'PR', 'AIN'],
-  // Seconds of one rise, and the gap between two embers
-  rise: 14,
-  gap: 1.2,
 } as const

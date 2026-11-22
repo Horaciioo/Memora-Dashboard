@@ -36,6 +36,9 @@ import { cn } from '@/utils/classnames'
 // Empty seats drawn at most
 const EMPTY_SEATS_MAX = 8
 
+// Columns of the table of seats
+const PLAY_ROOM_COLUMNS = { min: 2, max: 4 } as const
+
 /**
  * Seat shown in the lobby
  * @typedef {Object} PlayLobbySeat
@@ -134,7 +137,10 @@ export const PlayLobby = ({
   const hasChosen = isConfigured || !Setup
   const canStart = hasChosen && present.length >= minPlayers && waiting === 0
   const freeSeats = Math.max(0, Math.min(maxPlayers, EMPTY_SEATS_MAX) - present.length)
-  const columns = Math.min(4, Math.max(2, seats.length + (me.isSeated ? freeSeats : 0)))
+  const columns = Math.min(
+    PLAY_ROOM_COLUMNS.max,
+    Math.max(PLAY_ROOM_COLUMNS.min, seats.length + (me.isSeated ? freeSeats : 0))
+  )
   const subtitle =
     present.length < minPlayers
       ? null

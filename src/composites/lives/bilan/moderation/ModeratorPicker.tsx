@@ -1,5 +1,6 @@
 'use client'
 
+import { OriginMark } from '@/composites/lives/bilan/OriginMark'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { BILAN_COPY } from '@/declarations/lives/bilan'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
@@ -12,6 +13,7 @@ export interface ModeratorOption {
   key: string
   name: string
   avatar: string | null
+  isMember: boolean
 }
 
 export interface ModeratorPickerProps {
@@ -30,7 +32,10 @@ export interface ModeratorPickerProps {
 
 export const ModeratorPicker = ({ options, value, onChange }: ModeratorPickerProps) => (
   <div className={LIVE_REPORT.picker} role="radiogroup" aria-label={BILAN_COPY.pickLabel}>
-    {[{ key: EVERYONE, name: BILAN_COPY.pickEveryone, avatar: null }, ...options].map((option) => (
+    {[
+      { key: EVERYONE, name: BILAN_COPY.pickEveryone, avatar: null, isMember: true },
+      ...options,
+    ].map((option) => (
       <button
         key={option.key}
         type="button"
@@ -41,6 +46,7 @@ export const ModeratorPicker = ({ options, value, onChange }: ModeratorPickerPro
       >
         {option.key !== EVERYONE && <Avatar name={option.name} src={option.avatar} size="xs" />}
         {option.name}
+        {option.key !== EVERYONE && <OriginMark onMemora={option.isMember} />}
       </button>
     ))}
   </div>

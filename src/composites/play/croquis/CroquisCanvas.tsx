@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import type { PointerEvent } from 'react'
 
 import { paintDrawing } from '@/composites/play/croquis/canvasPaint'
+import { shapePoints } from '@/composites/play/croquis/shapes'
 import type { CroquisPen } from '@/composites/play/croquis/types'
 import type { CroquisStroke } from '@/core/lib/play/croquis/strokes'
 import {
@@ -35,7 +36,9 @@ const pointsIn = (strokes: CroquisStroke[]): number =>
 
 export const CroquisCanvas = ({ strokes, pen, onStroke }: CroquisCanvasProps) => {
   const canvas = useRef<HTMLCanvasElement>(null)
-  const current = useRef<{ index: number; stroke: CroquisStroke } | null>(null)
+  const current = useRef<{ index: number; stroke: CroquisStroke; from: [number, number] } | null>(
+    null
+  )
   const { width, height } = CROQUIS_SETTINGS.canvas
 
   useEffect(() => {
@@ -57,7 +60,7 @@ export const CroquisCanvas = ({ strokes, pen, onStroke }: CroquisCanvasProps) =>
     event.currentTarget.setPointerCapture(event.pointerId)
     const [x, y] = pointOf(event)
     const started = { c: pen.color, w: pen.size, p: [x, y] }
-    current.current = { index: strokes.length, stroke: started }
+    current.current = { index: strokes.length, stroke: started, from: [x, y] }
     onStroke(strokes.length, started, false)
   }
 
@@ -65,6 +68,12 @@ export const CroquisCanvas = ({ strokes, pen, onStroke }: CroquisCanvasProps) =>
     const live = current.current
     if (!live || !onStroke) return
     const [x, y] = pointOf(event)
+    if (pen?.shape) {
+      live.stroke = { ...live.stroke, p: shapePoints(pen.shape, live.from, [x, y]) }
+      onStroke(live.index, live.stroke, false)
+
+      return
+    }
     const { p } = live.stroke
     const gap = Math.hypot(x - p[p.length - 2], y - p[p.length - 1])
     if (gap < CROQUIS_PEN.minStep) return

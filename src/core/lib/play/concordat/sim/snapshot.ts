@@ -1,10 +1,10 @@
+import { warmRegions } from '@/core/lib/play/concordat/map'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import { CONCORDAT_WEAPONS, ConcordatModes, ConcordatPowers } from '@/utils/constants/concordat'
 import { rebuildDerived } from '@/core/lib/play/concordat/sim/tiles'
 import { emptyArms, emptyEffects, emptyTech } from '@/core/lib/play/concordat/sim/fresh'
 import type {
   ConcordatBuilding,
-  ConcordatCoalition,
   ConcordatCorps,
   ConcordatEvent,
   ConcordatOffer,
@@ -64,7 +64,6 @@ export interface ConcordatSnapshot {
   relations?: ConcordatRelation[]
   offers?: ConcordatOffer[]
   routes?: ConcordatRoute[]
-  coalitions?: ConcordatCoalition[]
   trust?: number[]
   embargoes?: ConcordatEmbargo[]
   traitors?: number[]
@@ -119,7 +118,6 @@ export const exportState = (state: ConcordatState): ConcordatSnapshot => ({
   relations: structuredClone(state.relations),
   offers: structuredClone(state.offers),
   routes: structuredClone(state.routes),
-  coalitions: structuredClone(state.coalitions),
   trust: structuredClone(state.trust),
   embargoes: structuredClone(state.embargoes),
   traitors: [...state.traitors],
@@ -185,7 +183,6 @@ export const importState = (map: ConcordatMap, snapshot: ConcordatSnapshot): Con
     relations: snapshot.relations ?? [],
     offers: snapshot.offers ?? [],
     routes: snapshot.routes ?? [],
-    coalitions: snapshot.coalitions ?? [],
     trust: snapshot.trust ?? snapshot.players.map(() => CONCORDAT.diplomacy.trustStart),
     embargoes: snapshot.embargoes ?? [],
     traitors: snapshot.traitors ?? snapshot.players.map(() => 0),
@@ -213,6 +210,7 @@ export const importState = (map: ConcordatMap, snapshot: ConcordatSnapshot): Con
     isOffersDirty: true,
   }
   rebuildDerived(state)
+  warmRegions(map)
 
   return state
 }

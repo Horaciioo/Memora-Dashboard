@@ -1,169 +1,8 @@
-import type { ReactNode } from 'react'
-
-import { LudoBoardArt } from '@/composites/play/brand/LudoBoardArt'
-import { MARK_SCENES } from '@/composites/play/brand/banner/markScenes'
-import { StopGoCarShape } from '@/composites/play/stopgo/art/StopGoCarShape'
-import { StopGoRoadStrip } from '@/composites/play/stopgo/art/StopGoRoadStrip'
+import { GAME_ARTS } from '@/composites/play/brand/gameArts'
 import { PLAY_GAMES } from '@/declarations/play'
 import { PLAY_BRAND } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
-
-/**
- * Fill from a colour token
- * @param {string} token - Colour token
- * @param {number} [opacity] - Opacity
- * @return {object} - Style prop
- */
-
-const tint = (token: string, opacity = 1) => ({ style: { fill: `var(${token})`, opacity } })
-
-// Letter tiles thrown on the notebook
-const TILES = [
-  { x: 360, y: 70, r: -12, letter: 'A', size: 74 },
-  { x: 470, y: 130, r: 9, letter: 'M', size: 92 },
-  { x: 560, y: 40, r: -4, letter: 'Z', size: 60 },
-  { x: 410, y: 210, r: 14, letter: 'R', size: 64 },
-  { x: 540, y: 220, r: -10, letter: 'E', size: 54 },
-]
-
-// Sparks around the fuse
-const SPARKS = [
-  [600, 66, 11],
-  [624, 92, 6],
-  [584, 40, 6],
-  [628, 46, 5],
-  [566, 64, 4],
-]
-
-// Scene of each backdrop key, drawn on a 640 × 320 canvas
-const SCENES: Record<string, (tone: string) => ReactNode> = {
-  'double-grid': (tone) => (
-    <>
-      <g {...tint(`${tone}-glow`, 0.16)}>
-        {Array.from({ length: 16 }, (_, index) => (
-          <rect key={`v${index}`} x={index * 40} y="0" width="1.5" height="320" />
-        ))}
-        {Array.from({ length: 8 }, (_, index) => (
-          <rect key={`h${index}`} x="0" y={index * 40} width="640" height="1.5" />
-        ))}
-      </g>
-      {TILES.map((tile) => (
-        <g key={tile.letter} transform={`rotate(${tile.r} ${tile.x} ${tile.y})`}>
-          <rect
-            x={tile.x - tile.size / 2}
-            y={tile.y - tile.size / 2 + 8}
-            width={tile.size}
-            height={tile.size}
-            rx={tile.size / 5}
-            {...tint(`${tone}-deep`, 0.6)}
-          />
-          <rect
-            x={tile.x - tile.size / 2}
-            y={tile.y - tile.size / 2}
-            width={tile.size}
-            height={tile.size}
-            rx={tile.size / 5}
-            fill="white"
-          />
-          <text
-            x={tile.x}
-            y={tile.y + tile.size * 0.22}
-            textAnchor="middle"
-            fontSize={tile.size * 0.62}
-            fontWeight="800"
-            {...tint(`${tone}-deep`)}
-          >
-            {tile.letter}
-          </text>
-        </g>
-      ))}
-    </>
-  ),
-  road: () => (
-    <>
-      <path d="M0 250C140 214 300 232 640 196V320H0z" {...tint('--stopgo-grass')} />
-      <path d="M0 290C200 262 400 280 640 250V320H0z" {...tint('--stopgo-grass-deep')} />
-      <g transform="translate(0 6) scale(1 0.9)">
-        <StopGoRoadStrip path="M250 420V250A70 70 0 0 1 320 180H700" width={74} />
-        <g transform="translate(400 180) rotate(90) scale(1.1)">
-          <StopGoCarShape color="red" />
-        </g>
-      </g>
-    </>
-  ),
-  turf: (tone) => (
-    <>
-      <circle cx="520" cy="70" r="46" {...tint('--play-gold', 0.9)} />
-      <path
-        d="M0 230C120 170 240 200 340 180s220-60 300-30v170H0z"
-        {...tint(`${tone}-glow`, 0.5)}
-      />
-      <path d="M0 260c140-50 260-20 380-40s180-30 260-10v110H0z" {...tint(tone)} />
-      <ellipse cx="470" cy="244" rx="40" ry="10" {...tint(`${tone}-deep`)} />
-      <path d="M472 244V120" stroke="white" strokeWidth="5" strokeLinecap="round" />
-      <path d="M474 122h56l-16 18 16 18h-56z" {...tint('--play-ludo')} />
-      <circle cx="380" cy="262" r="11" fill="white" />
-    </>
-  ),
-  fuse: (tone) => (
-    <>
-      <circle cx="470" cy="210" r="210" {...tint(`${tone}-glow`, 0.18)} />
-      <circle cx="470" cy="210" r="96" {...tint('--play-night')} />
-      <circle cx="430" cy="172" r="22" fill="white" opacity="0.18" />
-      <rect
-        x="490"
-        y="96"
-        width="44"
-        height="34"
-        rx="8"
-        {...tint('--play-night')}
-        transform="rotate(30 512 113)"
-      />
-      <path
-        d="M528 98c20-40 60-50 70-26"
-        stroke="white"
-        strokeWidth="6"
-        fill="none"
-        strokeLinecap="round"
-      />
-      {SPARKS.map(([x, y, r]) => (
-        <circle key={`${x}-${y}`} cx={x} cy={y} r={r} {...tint('--play-gold')} />
-      ))}
-    </>
-  ),
-  sea: (tone) => (
-    <>
-      <circle cx="500" cy="96" r="150" {...tint('--play-naval-fire', 0.22)} />
-      <circle cx="500" cy="96" r="54" {...tint('--play-naval-fire', 0.55)} />
-      <path d="M0 200h640v120H0z" {...tint(`${tone}-deep`, 0.85)} />
-      <path
-        d="M0 200c80-8 140 8 220 0s140-8 200 0 140 8 220 0v14H0z"
-        {...tint(`${tone}-glow`, 0.35)}
-      />
-      {/* Warships on the horizon */}
-      <g {...tint('--play-naval-night', 0.9)}>
-        <path d="M330 200h150l-14 22H348z" />
-        <rect x="380" y="176" width="46" height="24" rx="3" />
-        <rect x="396" y="150" width="12" height="26" />
-        <path d="M110 205h90l-8 14H120z" />
-        <rect x="140" y="188" width="26" height="17" rx="2" />
-      </g>
-      <path d="M360 190l-30-44M372 188l-6-60" stroke="white" strokeOpacity="0.5" strokeWidth="3" />
-      <circle cx="330" cy="140" r="16" {...tint('--play-naval-hit', 0.9)} />
-      <circle cx="330" cy="140" r="8" fill="white" opacity="0.85" />
-      <path d="M452 230c4-30 2-52-6-68 18 14 28 40 22 68z" fill="white" opacity="0.75" />
-    </>
-  ),
-  board: (tone) => (
-    <LudoBoardArt
-      tone={tone}
-      board={{ x: 486, y: 168, size: 230, angle: -10 }}
-      die={{ x: 340, y: 96, size: 56, angle: -14 }}
-    />
-  ),
-  ...MARK_SCENES,
-}
 
 // Question marks scattered over a secret game
 const MYSTERY_MARKS = [
@@ -215,6 +54,7 @@ export const PlayGameArt = ({ game, isHidden, className }: PlayGameArtProps) => 
   const meta = PLAY_GAMES.get(game)
   const tone = isHidden ? '--play-mystery' : meta.tone
   const id = isHidden ? 'play-art-mystery' : `play-art-${meta.slug}`
+  const TileArt = isHidden ? undefined : GAME_ARTS[game]
 
   return (
     <svg
@@ -230,8 +70,14 @@ export const PlayGameArt = ({ game, isHidden, className }: PlayGameArtProps) => 
           <stop offset="1" style={{ stopColor: `var(${tone}-glow)` }} />
         </linearGradient>
       </defs>
-      <rect width="640" height="320" fill={`url(#${id})`} />
-      {isHidden ? mysteryScene() : SCENES[meta.backdrop]?.(meta.tone)}
+      {TileArt ? (
+        <TileArt frame="tile" />
+      ) : (
+        <>
+          <rect width="640" height="320" fill={`url(#${id})`} />
+          {mysteryScene()}
+        </>
+      )}
     </svg>
   )
 }

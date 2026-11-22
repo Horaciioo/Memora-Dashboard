@@ -59,8 +59,8 @@ export const CHART = {
   versusMark: 'absolute -inset-y-1 w-0.5 -translate-x-1/2 rounded-full bg-[var(--color-ink)]',
   versusValue: 'text-right text-base font-bold tabular-nums',
   versusDelta: 'text-right text-sm font-semibold tabular-nums',
-  versusUp: 'text-[var(--color-success)]',
-  versusDown: 'text-[var(--color-danger)]',
+  versusUp: 'text-[var(--color-ink)]',
+  versusDown: 'text-[var(--color-ink-subtle)]',
   versusFlat: 'text-[var(--color-ink-subtle)]',
   versusNote: 'text-xs text-[var(--color-ink-subtle)]',
   // Section of figures

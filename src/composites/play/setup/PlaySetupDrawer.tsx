@@ -3,14 +3,17 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 
+import { Button } from '@/components/elements/actions/Button'
 import { Tabs } from '@/components/elements/navigation/Tabs'
 import { useTabSlide } from '@/core/hooks/interaction/layout/useTabSlide'
 import type { TabItem } from '@/components/elements/navigation/Tabs'
 import { Drawer } from '@/components/structures/overlays/Drawer'
-import { PLAY_HUB_COPY } from '@/declarations/play'
+import { PlayGameArt } from '@/composites/play/brand/PlayGameArt'
+import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
+import { PLAY_GAMES, PLAY_HUB_COPY, playKeysOf } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
-import { DRAWER_ACTIONS, DRAWER_STYLES } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
+import { DRAWER_STYLES, PLAY_SETUP } from '@/declarations/ui/variants'
+import type { PlayGameName } from '@/utils/constants/play'
 
 /**
  * Words of a setup drawer
@@ -26,6 +29,8 @@ export interface PlaySetupCopy {
 
 export interface PlaySetupDrawerProps {
   open: boolean
+  // Game being set up, dresses the sheet
+  game: PlayGameName
   isSaving: boolean
   // Rules of a waiting game, not a new one
   isEditing: boolean
@@ -44,46 +49,14 @@ export interface PlaySetupDrawerProps {
 }
 
 /**
- * Footer button of the last tab
- * @param {Object} props - Button
- * @return {JSX.Element}
- */
-
-const FooterLine = ({
-  label,
-  disabled,
-  tone,
-  onClick,
-  icon,
-  base = DRAWER_ACTIONS.line,
-}: {
-  base?: string
-  label: string
-  disabled: boolean
-  tone: string
-  onClick: () => void
-  icon: ReactNode
-}) => (
-  <button
-    type="button"
-    disabled={disabled}
-    onClick={onClick}
-    aria-label={label}
-    className={cn(base, tone)}
-  >
-    {icon}
-    <span className={DRAWER_ACTIONS.lineLabel}>{label}</span>
-  </button>
-)
-
-/**
- * Drawer of a game's rules: tabs on top, ‹ › steps, then create and cancel on the last tab
- * @param {PlaySetupDrawerProps} props - Drawer state, tabs and body
+ * Sheet of a game's rules: the game's scene on top, one card per setting, then steps and create
+ * @param {PlaySetupDrawerProps} props - Sheet state, tabs and body
  * @return {JSX.Element}
  */
 
 export const PlaySetupDrawer = ({
   open,
+  game,
   isSaving,
   isEditing,
   canSubmit,
@@ -99,34 +72,12 @@ export const PlaySetupDrawer = ({
   const BackIcon = ICONS.playPrevious
   const NextIcon = ICONS.playNext
   const SaveIcon = ICONS.playTick
-  const CancelIcon = ICONS.playClose
+  const meta = PLAY_GAMES.get(game)
   const index = tabs.findIndex((entry) => entry.value === tab)
   const slide = useTabSlide(index)
-  const steps = [
-    { entry: tabs[index - 1], tone: DRAWER_ACTIONS.stepBack, Icon: BackIcon },
-    { entry: tabs[index + 1], tone: DRAWER_ACTIONS.stepNext, Icon: NextIcon },
-  ]
-  const isLast = !tabs[index + 1]
-  const stepButtons = steps.map(
-    ({ entry, tone, Icon }) =>
-      entry && (
-        <button
-          key={entry.value}
-          type="button"
-          onClick={() => setTab(entry.value)}
-          aria-label={entry.label}
-          className={cn(DRAWER_ACTIONS.step, tone)}
-        >
-          {tone === DRAWER_ACTIONS.stepBack && (
-            <Icon className={DRAWER_ACTIONS.stepIcon} aria-hidden="true" />
-          )}
-          <span className={DRAWER_ACTIONS.stepLabel}>{entry.label}</span>
-          {tone === DRAWER_ACTIONS.stepNext && (
-            <Icon className={DRAWER_ACTIONS.stepIcon} aria-hidden="true" />
-          )}
-        </button>
-      )
-  )
+  const back = tabs[index - 1]
+  const next = tabs[index + 1]
+  const isSubmit = !next || isCompact
   const saveLabel = submitLabel ?? (isEditing ? PLAY_HUB_COPY.saveRules : copy.create)
 
   return (
@@ -134,67 +85,79 @@ export const PlaySetupDrawer = ({
       open={open}
       onClose={onClose}
       isFullScreen
-      title={isEditing ? PLAY_HUB_COPY.rulesHost : copy.title}
+      title={meta.label}
       icon="play"
+      skin={{ className: PLAY_SETUP.panel, style: playKeysOf(game) }}
+      hero={({ titleId, onClose: close }) => (
+        <div className={PLAY_SETUP.hero}>
+          <PlayGameArt game={game} className={PLAY_SETUP.art} />
+          <Button
+            variant="icon"
+            icon="close"
+            onClick={close}
+            aria-label={copy.cancel}
+            className={PLAY_SETUP.close}
+          />
+          <div className={PLAY_SETUP.head}>
+            <PlayGameLogo game={game} className={PLAY_SETUP.logo} />
+            <div className={PLAY_SETUP.titles}>
+              <span className={PLAY_SETUP.eyebrow}>
+                {isEditing ? PLAY_HUB_COPY.setupEditEyebrow : PLAY_HUB_COPY.setupEyebrow}
+              </span>
+              <h2 id={titleId} className={PLAY_SETUP.title}>
+                {meta.label}
+              </h2>
+              <span className={PLAY_SETUP.note}>{meta.tagline}</span>
+            </div>
+          </div>
+        </div>
+      )}
       subheader={
         tabs.length > 1 && (
           <div className={DRAWER_STYLES.subheaderRow}>
             <div className={DRAWER_STYLES.subheaderTabs}>
-              <Tabs items={tabs} value={tab} onChange={setTab} label={copy.tabs} emphasis />
+              <Tabs items={tabs} value={tab} onChange={setTab} label={copy.tabs} emphasis isFull />
             </div>
           </div>
         )
       }
       footer={
-        isCompact ? (
-          <div className={DRAWER_ACTIONS.compactStack}>
-            <div className={DRAWER_ACTIONS.compactSteps}>{stepButtons}</div>
-            <FooterLine
-              label={saveLabel}
-              disabled={isSaving || !canSubmit}
-              base={DRAWER_ACTIONS.compactLine}
-              tone={DRAWER_ACTIONS.save}
-              onClick={onSubmit}
-              icon={<SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />}
-            />
-            <FooterLine
-              label={copy.cancel}
+        <div className={PLAY_SETUP.footer}>
+          {back && (
+            <Button variant="arcadeText" onClick={() => setTab(back.value)} aria-label={back.label}>
+              <BackIcon className="size-4" aria-hidden="true" />
+              {back.label}
+            </Button>
+          )}
+          <span className={PLAY_SETUP.footerGap} />
+          {isSubmit && (
+            <Button
+              variant="arcadeText"
               disabled={isSaving}
-              base={DRAWER_ACTIONS.compactLine}
-              tone={DRAWER_ACTIONS.cancel}
               onClick={onClose}
-              icon={<CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />}
-            />
-          </div>
-        ) : (
-          <div className={DRAWER_ACTIONS.stack}>
-            {tabs.length > 1 && <div className={DRAWER_ACTIONS.steps}>{stepButtons}</div>}
-            {isLast && (
-              <div className={DRAWER_ACTIONS.pair}>
-                <FooterLine
-                  label={saveLabel}
-                  disabled={isSaving || !canSubmit}
-                  tone={DRAWER_ACTIONS.save}
-                  onClick={onSubmit}
-                  icon={
-                    submitLabel ? (
-                      <NextIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
-                    ) : (
-                      <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
-                    )
-                  }
-                />
-                <FooterLine
-                  label={copy.cancel}
-                  disabled={isSaving}
-                  tone={DRAWER_ACTIONS.cancel}
-                  onClick={onClose}
-                  icon={<CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />}
-                />
-              </div>
-            )}
-          </div>
-        )
+              className={PLAY_SETUP.cancel}
+            >
+              {copy.cancel}
+            </Button>
+          )}
+          {isSubmit ? (
+            <Button
+              variant="arcade"
+              isLoading={isSaving}
+              disabled={!canSubmit}
+              onClick={onSubmit}
+              className={PLAY_SETUP.main}
+            >
+              <SaveIcon className="size-5" aria-hidden="true" />
+              {saveLabel}
+            </Button>
+          ) : (
+            <Button variant="arcade" onClick={() => setTab(next.value)} className={PLAY_SETUP.main}>
+              {next.label}
+              <NextIcon className="size-5" aria-hidden="true" />
+            </Button>
+          )}
+        </div>
       }
     >
       <div key={tab} className={slide}>

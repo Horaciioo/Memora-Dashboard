@@ -24,40 +24,6 @@
     );
 }
 
-/* A hub letter rises, spins a little, fades out */
-.play-suspens-float {
-  position: absolute;
-  bottom: -4rem;
-  left: var(--x);
-  display: grid;
-  width: var(--size);
-  height: var(--size);
-  place-items: center;
-  color: var(--suspens-chalk);
-  font-size: calc(var(--size) * 0.8);
-  font-weight: 900;
-  text-shadow: 0 0.15rem 0 var(--play-suspens-deep);
-  opacity: 0;
-  animation: play-suspens-float var(--rise) linear var(--delay) infinite;
-}
-
-@keyframes play-suspens-float {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(var(--tilt));
-  }
-  12% {
-    opacity: 0.8;
-  }
-  80% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--drift), -115vh, 0) rotate(calc(var(--tilt) * -2));
-  }
-}
-
 /* Countdown in the wood glow */
 .play-figure-suspens {
   color: var(--play-suspens-glow);
@@ -251,7 +217,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .play-suspens-hang,
-  .play-suspens-float,
   .play-suspens-part-in,
   .play-suspens-eyes,
   .play-suspens-swing,

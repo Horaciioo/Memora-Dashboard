@@ -9,6 +9,7 @@ import { glitchSettingsOf } from '@/core/lib/play/glitch/settings'
 import type { GlitchGameSettings } from '@/core/lib/play/glitch/settings'
 import { GLITCH_SETTINGS, GLITCH_SETUP_COPY, fillPlayMessage } from '@/declarations/play'
 import { GLITCH_SETUP } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 // Rounds and differences are voted at launch
 const TABS = [{ value: 'speed', label: GLITCH_SETUP_COPY.tabSpeed, icon: 'playClock' as const }]
@@ -33,6 +34,7 @@ export const GlitchSetupDrawer = ({
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Glitch}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit

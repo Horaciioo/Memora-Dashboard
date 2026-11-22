@@ -3,8 +3,10 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { deflateSync } from 'node:zlib'
 
+import { repairSeams } from './seams.mjs'
+
 const [landPath, lakesPath, outPath] = process.argv.slice(2)
-const PPD = 12
+const PPD = 36
 const LON_MIN = -180
 const LAT_MAX = 84
 const LAT_MIN = -58
@@ -56,6 +58,8 @@ for (const feature of JSON.parse(readFileSync(lakesPath)).features) {
   if ((feature.properties.scalerank ?? 9) > 1) continue
   for (const rings of polygonsOf(feature.geometry)) fill(rings, 0)
 }
+
+repairSeams(mask, width, height)
 
 // Alternating runs, sea first, as varints
 const bytes = []

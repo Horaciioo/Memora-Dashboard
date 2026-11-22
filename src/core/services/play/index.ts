@@ -1,4 +1,4 @@
-export { openGameOfSlug, readCatalog } from '@/core/services/play/CatalogService'
+export { openGameOfSlug, readAdminGames, readCatalog } from '@/core/services/play/CatalogService'
 export {
   actInSession,
   readSession,
@@ -24,10 +24,22 @@ export {
   claimTrophies,
   dismissTrophyNotice,
   readTrophyNotice,
+  readTrophyRarity,
+  setPinnedTrophies,
 } from '@/core/services/play/TrophyService'
+export { dismissLevelNotice, readLevelNotice } from '@/core/services/play/LevelNoticeService'
+export type { LevelNotice } from '@/core/services/play/LevelNoticeService'
 export type { TrophyNotice } from '@/core/services/play/TrophyService'
 export { readPlaySheet } from '@/core/services/play/SheetService'
 export { readPlayCard } from '@/core/services/play/CardService'
+export {
+  answerPlayFriend,
+  readPlayFriends,
+  readPlayRelation,
+  removePlayFriend,
+  requestPlayFriend,
+  searchPlayPlayers,
+} from '@/core/services/play/FriendService'
 export {
   readLeaderboards,
   readPlayPlayer,
@@ -62,6 +74,10 @@ export {
   setPlayBan,
   setPlayLevel,
 } from '@/core/services/play/PlayAdminService'
+export {
+  markPlayActivitiesRead,
+  readPlayActivities,
+} from '@/core/services/play/PlayActivityService'
 export { readPlayActivity } from '@/core/services/play/PlayJournalService'
 export {
   announceInChat,
@@ -88,9 +104,20 @@ export {
   dropGroupProposal,
   invitePlayGroup,
   listGroupCandidates,
+  listInvitablePeople,
+  transferPlayGroup,
   launchGroupGame,
   proposeGroupGame,
+  startGroupQuest,
+  readGroupOverview,
   readPlayGroup,
   removeFromGroup,
   renamePlayGroup,
 } from '@/core/services/play/GroupService'
+export {
+  readPlayConfig,
+  setGameOpen,
+  updatePlayConfig,
+} from '@/core/services/play/PlayConfigService'
+export { claimQuest, readQuestBoard } from '@/core/services/play/QuestService'
+export type { QuestBoard, QuestState } from '@/core/services/play/QuestService'

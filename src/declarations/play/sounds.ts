@@ -22,6 +22,8 @@ export const PLAY_VOLUME = {
   step: 0.05,
   // Trim on every sound out, the slider at full stays gentle
   output: 0.4,
+  // Share of the game level kept by the countdown tick
+  tick: 0.8,
 }
 
 /**

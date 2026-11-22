@@ -85,11 +85,6 @@ export const PlaySeatCard = ({
           src={seat.avatarUrl}
           size={isMobile ? 'md' : 'lg'}
         />
-        {isReady && (
-          <span key="tick" className={PLAY_ROOM.seatBadge}>
-            <TickIcon className={PLAY_ROOM.seatBadgeIcon} aria-hidden="true" />
-          </span>
-        )}
       </div>
       <p className={PLAY_ROOM.seatName} style={{ color: `var(--play-${seat.color})` }}>
         {seat.name}
@@ -100,6 +95,7 @@ export const PlaySeatCard = ({
           key={`${seat.isReady}-${isConfiguring}`}
           className={cn(PLAY_ROOM.seatState, !isReady && PLAY_ROOM.seatStateIdle)}
         >
+          {isReady && <TickIcon className={PLAY_ROOM.seatBadgeIcon} aria-hidden="true" />}
           {isConfiguring
             ? PLAY_HUB_COPY.configuring
             : seat.isReady

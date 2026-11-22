@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 
-import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import {
   CONCORDAT_STANDING_COLUMNS,
   compactFigure,
@@ -18,7 +17,6 @@ import type {
   ConcordatStandingRow,
 } from '@/core/lib/play/concordat'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
-import { usePlayScoreStore } from '@/core/store/play/playScore'
 import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
 import { CONCORDAT_STANDINGS_COPY } from '@/declarations/play/concordat/hudCopy'
 import { CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
@@ -26,7 +24,6 @@ import { fillPlayMessage } from '@/declarations/play/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { ConcordatPhases } from '@/utils/constants/concordat'
 
 // Rows seen at once before the list scrolls, the player's own row hangs below beyond them
 const WINDOW_ROWS = 5
@@ -36,6 +33,16 @@ const LIST_LIMIT = 60
 const RANK_WIDTH = '1.5rem'
 const NAME_WIDTH = 'minmax(6.5rem, 9rem)'
 const CELL_WIDTH = 'minmax(2.6rem, auto)'
+
+// Colour of a figure: land green, gold gold, troops red
+const COLUMN_TONES: Partial<Record<ConcordatStandingColumn, string>> = {
+  tiles: 'var(--concordat-ok)',
+  gold: 'var(--concordat-gold)',
+  income: 'var(--concordat-gold)',
+  troops: 'var(--concordat-war)',
+  maxTroops: 'var(--concordat-war-faint)',
+  trade: 'var(--concordat-trade)',
+}
 
 export interface ConcordatPanelsProps {
   client: ConcordatClientState
@@ -72,45 +79,12 @@ const hintOf = (column: ConcordatStandingColumn): string => {
  */
 
 export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) => {
-  const isOpen = usePlayScoreStore((state) => state.isOpen)
-  const toggle = usePlayScoreStore((state) => state.toggle)
   const sort = useConcordatViewStore((state) => state.standSort)
   const isDesc = useConcordatViewStore((state) => state.standDesc)
   const columns = useConcordatViewStore((state) => state.standColumns)
   const sortStandings = useConcordatViewStore((state) => state.sortStandings)
-  const toggleColumn = useConcordatViewStore((state) => state.toggleColumn)
   const jumpTo = useConcordatViewStore((state) => state.jumpTo)
-  const [isPicking, setPicking] = useState(false)
-  const root = useRef<HTMLDivElement>(null)
-  const isGreeted = useRef(false)
-  const TrophyIcon = ICONS.trophy
-  const GearIcon = ICONS.settingsLine
   const ArrowIcon = ICONS.expand
-  const isPlaying = client.phase === ConcordatPhases.Playing
-
-  // Open once the game starts, like a leaderboard that is there from the first minute
-  useEffect(() => {
-    if (!isPlaying || isGreeted.current) return
-    isGreeted.current = true
-    if (!usePlayScoreStore.getState().isOpen) toggle()
-  }, [isPlaying, toggle])
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null
-      if (event.metaKey || event.ctrlKey || event.altKey) return
-      if (target?.closest('input:not([type="range"]), textarea, [contenteditable="true"]')) return
-      if (event.key === 'Tab') {
-        event.preventDefault()
-        toggle()
-      }
-    }
-    window.addEventListener('keydown', onKey)
-
-    return () => window.removeEventListener('keydown', onKey)
-  }, [toggle])
-
-  useOutsideDismiss(isPicking, root, () => setPicking(false))
 
   // Refreshed every second, the sort is cheap but the eye needs no more
   const second = Math.floor(client.tick / CONCORDAT_TICKS_PER_SECOND)
@@ -142,7 +116,11 @@ export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) =
           <span className="truncate">{names[row.id]}</span>
         </span>
         {shown.map((column) => (
-          <span key={column} className={CONCORDAT_HUD.standCell}>
+          <span
+            key={column}
+            className={CONCORDAT_HUD.standCell}
+            style={{ color: COLUMN_TONES[column] }}
+          >
             {figureText(column, row.figures[column])}
           </span>
         ))}
@@ -151,78 +129,36 @@ export const ConcordatPanels = ({ client, names, land }: ConcordatPanelsProps) =
   }
 
   return (
-    <div ref={root} className={CONCORDAT_HUD.standings}>
-      <div className={CONCORDAT_HUD.standKeys}>
-        <button
-          type="button"
-          className={isOpen ? CONCORDAT_HUD.standKeyOn : CONCORDAT_HUD.standKey}
-          aria-pressed={isOpen}
-          aria-label={isOpen ? CONCORDAT_STANDINGS_COPY.hide : CONCORDAT_STANDINGS_COPY.show}
-          title={`${CONCORDAT_STANDINGS_COPY.title} (Tab)`}
-          onClick={toggle}
-        >
-          <TrophyIcon className="size-4" />
-        </button>
-        {isOpen && (
-          <button
-            type="button"
-            className={isPicking ? CONCORDAT_HUD.standKeyOn : CONCORDAT_HUD.standKey}
-            aria-pressed={isPicking}
-            aria-label={CONCORDAT_STANDINGS_COPY.columns}
-            title={CONCORDAT_STANDINGS_COPY.columns}
-            onClick={() => setPicking((open) => !open)}
-          >
-            <GearIcon className="size-4" />
-          </button>
-        )}
-      </div>
-      {isOpen && isPicking && (
-        <div className={CONCORDAT_HUD.standPicker}>
-          {CONCORDAT_STANDING_COLUMNS.map((column) => (
+    <div className={CONCORDAT_HUD.standings}>
+      <div className={CONCORDAT_HUD.standTable}>
+        <div className={CONCORDAT_HUD.standHead} style={{ gridTemplateColumns: template }}>
+          <span>{CONCORDAT_STANDINGS_COPY.rank}</span>
+          <span>{CONCORDAT_STANDINGS_COPY.name}</span>
+          {shown.map((column) => (
             <button
               key={column}
               type="button"
-              className={CONCORDAT_HUD.standPick}
-              aria-pressed={columns.includes(column)}
-              onClick={() => toggleColumn(column)}
+              className={CONCORDAT_HUD.standSortKey}
+              title={hintOf(column)}
+              onClick={() => sortStandings(column)}
             >
-              <span>{CONCORDAT_STANDINGS_COPY[column]}</span>
-              <span aria-hidden="true">{columns.includes(column) ? '●' : '○'}</span>
+              {CONCORDAT_STANDINGS_COPY[column]}
+              {sort === column && (
+                <ArrowIcon
+                  className={cn('ml-0.5 inline size-3', !isDesc && 'rotate-180')}
+                  aria-hidden="true"
+                />
+              )}
             </button>
           ))}
         </div>
-      )}
-      {isOpen && (
-        <div className={CONCORDAT_HUD.standTable}>
-          <div className={CONCORDAT_HUD.standHead} style={{ gridTemplateColumns: template }}>
-            <span>{CONCORDAT_STANDINGS_COPY.rank}</span>
-            <span>{CONCORDAT_STANDINGS_COPY.name}</span>
-            {shown.map((column) => (
-              <button
-                key={column}
-                type="button"
-                className={CONCORDAT_HUD.standSortKey}
-                title={hintOf(column)}
-                onClick={() => sortStandings(column)}
-              >
-                {CONCORDAT_STANDINGS_COPY[column]}
-                {sort === column && (
-                  <ArrowIcon
-                    className={cn('ml-0.5 inline size-3', !isDesc && 'rotate-180')}
-                    aria-hidden="true"
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-          <ol className={CONCORDAT_HUD.standScroll}>
-            {rows.slice(0, LIST_LIMIT).map((row, index) => line(row, index))}
-          </ol>
-          {isPinned && (
-            <ol className={CONCORDAT_HUD.standPinned}>{line(rows[ownIndex], ownIndex)}</ol>
-          )}
-        </div>
-      )}
+        <ol className={CONCORDAT_HUD.standScroll}>
+          {rows.slice(0, LIST_LIMIT).map((row, index) => line(row, index))}
+        </ol>
+        {isPinned && (
+          <ol className={CONCORDAT_HUD.standPinned}>{line(rows[ownIndex], ownIndex)}</ol>
+        )}
+      </div>
     </div>
   )
 }

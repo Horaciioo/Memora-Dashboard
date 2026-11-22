@@ -167,7 +167,7 @@ export const TeamChatPanel = ({
           })}
         </div>
       )}
-      <div className={STYLES.list}>
+      <div className={STYLES.list} data-keep-menu>
         {chat.hasOlder(scope) && (
           <button type="button" className={STYLES.older} onClick={() => void chat.loadOlder(scope)}>
             {COPY.older}

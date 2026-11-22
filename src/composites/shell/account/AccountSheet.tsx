@@ -6,6 +6,8 @@ import { BottomSheet } from '@/components/structures/overlays/BottomSheet'
 import { logout } from '@/app/login/actions'
 import { CreatorPicker } from '@/composites/shell/creator/CreatorPicker'
 import { AvailabilityMenu } from '@/composites/shell/account/AvailabilityMenu'
+import { RoleSwitch } from '@/composites/shell/RoleSwitch'
+import { SimulationBanner } from '@/composites/shell/SimulationBanner'
 import { AccountBadges } from '@/composites/shell/account/AccountBadges'
 import { ROUTES } from '@/declarations/navigation'
 import { ACCOUNT_SHEET, NESTED_BOX } from '@/declarations/ui/blocks'
@@ -52,6 +54,12 @@ export const AccountSheet = ({ open, viewContext, displayName, onClose }: Accoun
       }
     >
       <div className={ACCOUNT_SHEET.sheet}>
+        {viewContext.switchable && (
+          <div className={NESTED_BOX.group}>
+            <SimulationBanner viewContext={viewContext} />
+            <RoleSwitch viewContext={viewContext} />
+          </div>
+        )}
         {viewContext.creators.length > 0 && (
           <CreatorPicker
             creators={viewContext.creators}

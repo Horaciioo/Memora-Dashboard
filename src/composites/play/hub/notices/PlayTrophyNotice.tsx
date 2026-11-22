@@ -11,9 +11,10 @@ import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_HUB, PLAY_TROPHY_UI } from '@/declarations/ui/variants'
 import type { TrophyNotice } from '@/core/services/play'
 import { cn } from '@/utils/classnames'
+import { formatNumber } from '@/utils/format/numbers'
 
 // French digits grouping
-const format = (value: number): string => value.toLocaleString('fr-FR')
+const format = (value: number): string => formatNumber(value)
 
 /**
  * Box telling what the trophy change paid

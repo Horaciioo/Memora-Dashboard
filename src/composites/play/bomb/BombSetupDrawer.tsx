@@ -9,6 +9,7 @@ import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
 import type { BombGameSettings } from '@/core/lib/play/bomb/settings'
 import { BOMB_SETTINGS, BOMB_SETUP_COPY, fillPlayMessage, PLAY_ERRORS } from '@/declarations/play'
 import { BOMB_SETUP, FIELD_STYLES } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 // Dictionary, lives and turn length are voted at launch
 const TABS = [{ value: 'rules', label: BOMB_SETUP_COPY.tabRules, icon: 'playRules' as const }]
@@ -32,6 +33,7 @@ export const BombSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: 
   return (
     <PlaySetupDrawer
       open={open}
+      game={PlayGames.Bomb}
       isSaving={isSaving}
       isEditing={Boolean(current)}
       canSubmit={settings.bonusAlphabet.length > 0}

@@ -4,6 +4,7 @@ import { PlayRulesDrawer } from '@/composites/play/rules/PlayRulesDrawer'
 import { wordsNeeded } from '@/core/lib/play/bomb/settings'
 import type { BombGameSettings } from '@/core/lib/play/bomb/settings'
 import { BOMB_RULES_COPY, BOMB_SETUP_COPY, fillPlayMessage } from '@/declarations/play'
+import { DATE_LOCALE } from '@/declarations/ui/dates'
 
 export interface BombRulesDrawerProps {
   open: boolean
@@ -22,7 +23,7 @@ export const BombRulesDrawer = ({ open, onClose, settings }: BombRulesDrawerProp
     { label: BOMB_RULES_COPY.dictionary, value: BOMB_SETUP_COPY.dictionaryValue },
     {
       label: BOMB_RULES_COPY.difficulty,
-      value: `${BOMB_SETUP_COPY[settings.difficulty]} - ${fillPlayMessage(BOMB_SETUP_COPY.wordsPerPrompt, { count: wordsNeeded(settings).toLocaleString('fr-FR') })}`,
+      value: `${BOMB_SETUP_COPY[settings.difficulty]} - ${fillPlayMessage(BOMB_SETUP_COPY.wordsPerPrompt, { count: wordsNeeded(settings).toLocaleString(DATE_LOCALE) })}`,
     },
     {
       label: BOMB_RULES_COPY.lives,

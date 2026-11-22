@@ -1,79 +1,52 @@
-'use client'
-
-import { useState } from 'react'
-
 import { PlayGoldSparkles } from '@/composites/play/member/stats/PlayGoldSparkles'
-import { PlayTrophies } from '@/composites/play/member/stats/PlayTrophies'
-import { PLAY_HUB_COPY, trophiesOf } from '@/declarations/play'
+import { PlayEmpty } from '@/composites/play/shared/PlayEmpty'
+import { PLAY_HEAD_COPY, PLAY_PIN_MAX, PLAY_TROPHIES } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
-import { PLAY_CAREER } from '@/declarations/ui/variants'
-import type { PlayProfileView } from '@/types/play'
+import { PLAY_SHOWCASE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
-// Trophies pinned on the profile
-const PINNED = 8
-
 /**
- * Whole collection, folded under the pins
- * @param {Object} props - Totals
- * @param {PlayProfileView['global']} props.global - Global totals
+ * Showcase of a profile: the pinned trophies, empty slots up to the maximum
+ * @param {Object} props - Pins
+ * @param {string[]} props.pins - Pinned trophy keys
  * @return {JSX.Element}
  */
 
-const Collection = ({ global }: { global: PlayProfileView['global'] }) => {
-  const [isOpen, setOpen] = useState(false)
+export const PlayPinnedTrophies = ({ pins }: { pins: string[] }) => {
+  const shown = pins
+    .map((key) => PLAY_TROPHIES.find((trophy) => trophy.key === key))
+    .filter((trophy) => trophy !== undefined)
+
+  if (shown.length === 0)
+    return (
+      <PlayEmpty icon="playTrophy" isCompact>
+        {PLAY_HEAD_COPY.pinsEmpty}
+      </PlayEmpty>
+    )
 
   return (
-    <>
-      <button
-        type="button"
-        aria-expanded={isOpen}
-        className={PLAY_CAREER.pinMore}
-        onClick={() => setOpen((value) => !value)}
-      >
-        {isOpen ? PLAY_HUB_COPY.hideCollection : PLAY_HUB_COPY.showCollection}
-      </button>
-      {isOpen && <PlayTrophies global={global} isBare />}
-    </>
-  )
-}
+    <ul className={PLAY_SHOWCASE.pins}>
+      {Array.from({ length: PLAY_PIN_MAX }, (_, slot) => {
+        const trophy = shown[slot]
+        const Icon = trophy ? ICONS[trophy.icon] : undefined
 
-/**
- * Eight trophies on show, won first then the closest, the whole collection one tap away
- * @param {Object} props - Totals
- * @param {PlayProfileView['global']} props.global - Global totals
- * @return {JSX.Element}
- */
-
-export const PlayPinnedTrophies = ({ global }: { global: PlayProfileView['global'] }) => {
-  const pins = trophiesOf(global)
-    .sort((left, right) => Number(right.reached) - Number(left.reached) || right.share - left.share)
-    .slice(0, PINNED)
-
-  return (
-    <>
-      <ul className={PLAY_CAREER.pins}>
-        {pins.map((trophy) => {
-          const Icon = ICONS[trophy.icon]
-
-          return (
-            <li
-              key={trophy.label}
-              className={cn(
-                PLAY_CAREER.pin,
-                !trophy.reached && !trophy.share && PLAY_CAREER.pinIdle
-              )}
-            >
-              <span className={cn(PLAY_CAREER.pinIcon, trophy.reached && PLAY_CAREER.pinIconOn)}>
-                <Icon className={PLAY_CAREER.pinGlyph} aria-hidden="true" />
-                {trophy.reached && <PlayGoldSparkles />}
+        return (
+          <li
+            key={trophy?.key ?? `slot-${slot}`}
+            className={cn(PLAY_SHOWCASE.pin, trophy && PLAY_SHOWCASE[trophy.rarity])}
+          >
+            {Icon ? (
+              <span className={PLAY_SHOWCASE.pinIcon}>
+                <Icon className={PLAY_SHOWCASE.glyph} aria-hidden="true" />
+                <PlayGoldSparkles />
               </span>
-              <span className={PLAY_CAREER.pinName}>{trophy.label}</span>
-            </li>
-          )
-        })}
-      </ul>
-      <Collection global={global} />
-    </>
+            ) : (
+              <span className={PLAY_SHOWCASE.pinSlot} />
+            )}
+            {trophy && <span className={PLAY_SHOWCASE.pinName}>{trophy.label}</span>}
+          </li>
+        )
+      })}
+    </ul>
   )
 }

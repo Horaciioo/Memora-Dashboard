@@ -2,7 +2,7 @@ import { AttendanceCompare } from '@/composites/lives/bilan/moderation/Attendanc
 import { NotesBoxes } from '@/composites/lives/bilan/moderation/NotesBoxes'
 import { SanctionRanking } from '@/composites/lives/bilan/moderation/SanctionRanking'
 import type { ModeratorOption } from '@/composites/lives/bilan/moderation/ModeratorPicker'
-import { FigureCards } from '@/composites/lives/bilan/moderation/FigureCards'
+import { FigureGrid } from '@/composites/lives/bilan/FigureGrid'
 import { BilanLog } from '@/composites/lives/bilan/BilanLog'
 import { BilanModerators } from '@/composites/lives/bilan/BilanModerators'
 import { BilanTeam } from '@/composites/lives/bilan/BilanTeam'
@@ -48,58 +48,42 @@ export const ModerationOverview = ({
 
   return (
     <>
-      <FigureCards
+      <FigureGrid
         title={BILAN_COPY.teamFiguresTitle}
-        row={LIVE_REPORT.figureRow}
+        columns={LIVE_REPORT.figureRow}
         items={[
           {
             label: BILAN_COPY.figModerators,
             value: String(figures.moderators),
-            icon: 'members',
-            tone: 'brand',
           },
           {
             label: BILAN_COPY.figTeamTime,
             value: formatSpan(figures.totalSeconds),
-            icon: 'clock',
-            tone: 'info',
           },
           {
             label: BILAN_COPY.figAverageTime,
             value: formatSpan(figures.averageSeconds),
-            icon: 'clock',
-            tone: 'mauve',
           },
           {
             label: BILAN_COPY.figAverageActions,
             value: String(figures.averageActions),
-            icon: 'shield',
-            tone: 'success',
           },
           {
             label: BILAN_COPY.figTop,
             value: top ? top.name : BILAN_COPY.none,
             onClick: top ? () => onPick(top.accountId) : undefined,
-            icon: 'coordinator',
-            tone: 'caution',
           },
           {
             label: BILAN_COPY.figExtra,
             value: formatSpan(figures.extraSeconds),
-            icon: 'clock',
-            tone: 'success',
           },
           {
             label: BILAN_COPY.figAbsent,
             value: String(figures.absent),
-            icon: 'failure',
-            tone: 'danger',
           },
           {
             label: BILAN_COPY.figReinforcements,
             value: String(figures.reinforcements),
-            icon: 'members',
-            tone: 'info',
           },
         ]}
       />

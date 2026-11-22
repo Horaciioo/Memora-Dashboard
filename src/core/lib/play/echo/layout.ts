@@ -2,12 +2,12 @@ import { seededRng } from '@/core/lib/play/seeded'
 import { ECHO_SETTINGS } from '@/declarations/play'
 
 /**
- * Symbol placed on a card, in card radius units from the center
+ * Symbol placed on a card, offsets in half card sizes from the center
  * @typedef {Object} EchoPlacement
  * @property {number} symbol - Symbol id
  * @property {number} x - Offset to the right, -1 to 1
  * @property {number} y - Offset down, -1 to 1
- * @property {number} radius - Size, 0 to 1
+ * @property {number} radius - Size in half card widths, 0 to 1
  * @property {number} angle - Tilt in degrees
  */
 
@@ -19,17 +19,23 @@ export interface EchoPlacement {
   angle: number
 }
 
+// Card width over height, playing card proportions
+export const ECHO_CARD_RATIO = 5 / 7
+
+// Card height in half widths
+const HEIGHT = 1 / ECHO_CARD_RATIO
+
 // Edge gap, spacing and tries before the symbols shrink
-const EDGE = 0.05
+const EDGE = 0.07
 const GAP = 0.035
 const TRIES = 48
 const SHRINK = 0.97
-const START_RADIUS = 0.52
+const START_RADIUS = 0.62
 // Tilt stays readable
 const TILT = 65
 
 /**
- * Place the circles without overlap, each one where the room is widest
+ * Place the circles in the card without overlap, each one where the room is widest
  * @param {number[]} radii - Radii, largest first
  * @param {() => number} random - Source in [0, 1)
  * @return {{ x: number, y: number }[] | null} - Centers, null when stuck
@@ -39,16 +45,16 @@ const settle = (radii: number[], random: () => number): { x: number; y: number }
   const centers: { x: number; y: number }[] = []
 
   for (const radius of radii) {
-    const reach = 1 - EDGE - radius
+    const reachX = 1 - EDGE - radius
+    const reachY = HEIGHT - EDGE - radius
     let best: { x: number; y: number } | undefined
     let room = GAP
 
     for (let attempt = 0; attempt < TRIES; attempt += 1) {
-      const angle = random() * Math.PI * 2
-      const distance = Math.sqrt(random()) * reach
-      const candidate = { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance }
+      const candidate = { x: (random() * 2 - 1) * reachX, y: (random() * 2 - 1) * reachY }
       const clearance = Math.min(
-        reach - distance,
+        reachX - Math.abs(candidate.x),
+        reachY - Math.abs(candidate.y),
         ...centers.map(
           (other, index) =>
             Math.hypot(other.x - candidate.x, other.y - candidate.y) - radius - radii[index]
@@ -93,7 +99,8 @@ export const layoutCard = (symbols: number[], seed: number): EchoPlacement[] => 
         symbol,
         angle,
         radius: radii[index],
-        ...centers[index],
+        x: centers[index].x,
+        y: centers[index].y / HEIGHT,
       }))
     }
   }

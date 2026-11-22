@@ -5,7 +5,7 @@ import { buildingById } from '@/core/lib/play/concordat/buildings/rules'
 import { reachOf } from '@/core/lib/play/concordat/sim/area'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import { emit } from '@/core/lib/play/concordat/sim/emit'
-import { flightTicks, mirvPrice } from '@/core/lib/play/concordat/weapons/rules'
+import { flightTicks, isBomb, mirvPrice } from '@/core/lib/play/concordat/weapons/rules'
 import { CONCORDAT } from '@/declarations/play/concordat/rules'
 import type { ConcordatIntent, ConcordatState } from '@/types/concordat'
 import { ConcordatTies } from '@/utils/constants/concordat'
@@ -38,6 +38,9 @@ export const launchStrike = (
     me.gold -= kind === 'shell' ? air.battery.shellCost : air.battery.rocketCost
     const cooldown = air.battery.cooldown[Math.min(silo.level, air.battery.cooldown.length) - 1]
     silo.coolAt = state.tick + ticksOf(cooldown)
+  } else if (isBomb(kind)) {
+    me.gold -= weapons.bombs[kind].cost
+    silo.coolAt = state.tick + ticksOf(weapons.bombs[kind].cooldownSeconds)
   } else if (kind === 'mirv') {
     me.gold -= mirvPrice(state.mirvs)
     state.mirvs++
@@ -54,11 +57,13 @@ export const launchStrike = (
     adjustTrust(
       state,
       me.id,
-      -(kind === 'mirv'
-        ? weapons.mirv.trust
-        : kind === 'heavy'
-          ? weapons.heavyTrust
-          : weapons.strikeTrust)
+      -(isBomb(kind)
+        ? weapons.bombs[kind].trust
+        : kind === 'mirv'
+          ? weapons.mirv.trust
+          : kind === 'heavy'
+            ? weapons.heavyTrust
+            : weapons.strikeTrust)
     )
 
   state.strikes.push({

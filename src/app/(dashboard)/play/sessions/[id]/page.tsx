@@ -222,6 +222,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
 
         <PlayChatBubble
           chat={{ ...chat, feed: lobbyFeed, initialTab: 'feed' }}
+          game={game.game}
           skin={lobbySkin}
           above={
             <AppLink href={ROUTES.playGame(meta.slug)} className={PLAY_ROOM.back}>

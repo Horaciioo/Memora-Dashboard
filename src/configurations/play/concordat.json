@@ -19,7 +19,7 @@
     "step": 500
   },
   "protectionMinutes": {
-    "default": 3,
+    "default": 0,
     "min": 0,
     "max": 10
   },
@@ -30,15 +30,15 @@
   },
   "sizes": {
     "small": {
-      "ppd": 7,
+      "ppd": 12,
       "provinces": 400
     },
     "medium": {
-      "ppd": 9,
+      "ppd": 13,
       "provinces": 1300
     },
     "large": {
-      "ppd": 11,
+      "ppd": 14,
       "provinces": 2000
     }
   },
@@ -99,15 +99,15 @@
     "startTroops": 14,
     "troopBaseline": 100,
     "troopUnit": 250,
-    "startGold": 150000,
+    "startGold": 250000,
     "capBase": 450,
     "capPerTile": 10,
     "capExponent": 0.6,
     "growthBase": 0.8,
     "growthRate": 0.12,
     "growthPower": 0.73,
-    "baseGold": 160,
-    "landGold": 2.4,
+    "baseGold": 1300,
+    "landGold": 19,
     "goldExponent": 0.75,
     "plunderGold": 0.5,
     "plunderTroops": 0.3,
@@ -119,16 +119,12 @@
     "killTroops": 0.2,
     "tribeKillTroops": 0.35,
     "overCapDecay": 0.02,
-    "provinceGold": 10,
     "provinceHeldShare": 0.5,
-    "zoneTroops": 0.12,
-    "zoneGold": 90,
-    "zoneGoldMin": 6000,
-    "upkeepPerTile": 0.03,
+    "upkeepPerTile": 0.24,
     "upkeepScale": 1000000,
     "neutralDensity": 0.25,
-    "humanFreeLoss": 0.5,
-    "maxTilesPerTick": 600,
+    "humanFreeLoss": 0.2,
+    "maxTilesPerTick": 100,
     "attackerLoss": 0.42,
     "defenderLoss": 0.35,
     "guardWeight": 1.5,
@@ -151,21 +147,31 @@
     "intentQueue": 40
   },
   "front": {
-    "speed": 12,
+    "speed": 9,
+    "freeSpeed": 7,
+    "ratioMin": 0.82,
+    "ratioMax": 7.5,
+    "hopeless": 20,
     "driveMin": 0.6,
     "driveMax": 2.4,
     "maxContact": 2500,
     "noiseBase": 10,
     "noiseSpread": 16,
     "holeBonus": 0.3,
-    "aimWeight": 0.15,
-    "aimCap": 12,
-    "provinceFirst": 1000,
+    "aimBoost": 0.6,
+    "aimCap": 14,
+    "frontPower": 0.8,
+    "slowMinutes": 20,
+    "slowFloor": 0.5,
+    "botBoost": 1.6,
+    "aimMerge": 14,
+    "provinceFirst": 3,
     "giantTiles": 15000,
     "giantLoss": 0.5,
     "giantDefense": 0.7,
-    "fadeTroops": 4,
-    "fadeFloor": 0.2
+    "fadeTroops": 60,
+    "fadeFloor": 0.06,
+    "minFront": 70
   },
   "powers": {
     "difficulties": {
@@ -226,8 +232,6 @@
       "market": 0,
       "barracks": 1,
       "port": 1,
-      "fortress": 2,
-      "observatory": 3,
       "silo": 6,
       "post": 0,
       "sam": 2,
@@ -351,14 +355,12 @@
           {
             "cost": 600000,
             "seconds": 90,
-            "trustGain": 0.5,
-            "peace": 0.25
+            "trustGain": 0.5
           },
           {
             "cost": 1000000,
             "seconds": 120,
-            "trustGain": 0.5,
-            "peace": 0.5
+            "trustGain": 0.5
           }
         ]
       }
@@ -387,25 +389,28 @@
     }
   },
   "weapons": {
-    "unlockMinutes": 15,
+    "unlockMinutes": 0,
     "range": 210,
-    "missileCost": 250000,
+    "missileCost": 180000,
     "heavyCost": 1000000,
     "heavyLevel": 3,
     "heavyMax": 1,
-    "stockSeconds": 90,
+    "stockSeconds": 50,
     "stockPerLevel": 1,
     "stockUpkeep": 2,
-    "flightMin": 30,
-    "flightMax": 60,
-    "heavyExtra": 20,
+    "flightMin": 5,
+    "flightMax": 12,
+    "heavyExtra": 3,
     "radius": {
       "missile": 8,
       "heavy": 17,
       "shell": 4,
       "rocket": 6,
       "mirv": 1,
-      "warhead": 5
+      "warhead": 5,
+      "bombSmall": 5,
+      "bombLarge": 12,
+      "bombHuge": 24
     },
     "lossFactor": {
       "missile": 1,
@@ -413,7 +418,10 @@
       "shell": 0.45,
       "rocket": 0.75,
       "mirv": 0,
-      "warhead": 0.4
+      "warhead": 0.4,
+      "bombSmall": 0.7,
+      "bombLarge": 1.2,
+      "bombHuge": 1.6
     },
     "falloutFactor": {
       "missile": 1,
@@ -421,7 +429,33 @@
       "shell": 0.2,
       "rocket": 0.35,
       "mirv": 0,
-      "warhead": 0.3
+      "warhead": 0.3,
+      "bombSmall": 0.5,
+      "bombLarge": 1,
+      "bombHuge": 1.5
+    },
+    "bombs": {
+      "bombSmall": {
+        "cost": 80000,
+        "siloLevel": 1,
+        "cooldownSeconds": 20,
+        "extraSeconds": 0,
+        "trust": 15
+      },
+      "bombLarge": {
+        "cost": 600000,
+        "siloLevel": 2,
+        "cooldownSeconds": 45,
+        "extraSeconds": 1,
+        "trust": 30
+      },
+      "bombHuge": {
+        "cost": 3000000,
+        "siloLevel": 3,
+        "cooldownSeconds": 120,
+        "extraSeconds": 4,
+        "trust": 60
+      }
     },
     "troopLoss": 2,
     "maxLoss": 0.25,
@@ -435,19 +469,19 @@
       "extraPerLaunch": 2500000,
       "siloLevel": 3,
       "zones": 18,
-      "unlockMinutes": 20,
+      "unlockMinutes": 0,
       "warheads": 9,
       "spread": 22,
       "warheadSeconds": 5,
-      "extraSeconds": 12,
+      "extraSeconds": 4,
       "cooldownSeconds": 90,
       "samShare": 0.8,
       "trust": 60
     }
   },
   "air": {
-    "unlockMinutes": 6,
-    "samLeadSeconds": 5,
+    "unlockMinutes": 0,
+    "samLeadSeconds": 4,
     "interceptSeconds": 2,
     "samMissile": [0.45, 0.6, 0.75],
     "samHeavy": 0.5,
@@ -472,7 +506,7 @@
     "fighter": {
       "cost": 160000,
       "hp": 2,
-      "speed": 12,
+      "speed": 2,
       "stay": 10,
       "orbit": 3,
       "strafe": 5,
@@ -492,8 +526,8 @@
       "cooldown": [18, 13, 9],
       "shellCost": 25000,
       "rocketCost": 60000,
-      "shellFlight": 7,
-      "rocketFlight": 5
+      "shellFlight": 3,
+      "rocketFlight": 2
     },
     "scars": {
       "cap": 420,
@@ -518,11 +552,35 @@
     "tensionTrust": 18,
     "collapseWarn": 35,
     "collapseBelow": 12,
+    "crumbleCooldownSeconds": 90,
+    "refoundAt": 70,
     "collapseRestore": 45
   },
   "victory": {
     "dominationShare": 0.8,
     "dominationSeconds": 0,
+    "dominationEndShare": 0.25,
+    "rampShare": 0.85,
+    "dominationHoldSeconds": 45,
+    "rampStartMinutes": 6,
+    "rampFallbackMinutes": 20,
+    "hegemon": {
+      "share": 0.14,
+      "endShare": 0.06,
+      "lead": 1.35,
+      "startMinutes": 5,
+      "drain": 0.5,
+      "floor": 30
+    },
+    "annex": {
+      "startMinutes": 7,
+      "everySeconds": 5,
+      "dwarfShare": 0.005,
+      "dwarfEndShare": 0.03,
+      "maxPerPass": 3,
+      "seconds": 30,
+      "ratio": 3
+    },
     "weights": {
       "territory": 50,
       "economy": 25,
@@ -594,18 +652,19 @@
   "buildings": {
     "minGap": 0,
     "repairSeconds": 60,
-    "capturedLevelLoss": 1,
-    "upgradeFactor": 1.4,
+    "snapSteps": 8,
+    "upgradeFactor": 1,
+    "yieldDecay": 0.5,
     "priceCap": 1000000,
     "kinds": {
       "market": {
-        "cost": 40000,
-        "growth": 1.7,
+        "cost": 125000,
+        "step": 1,
         "buildSeconds": 20,
         "needsCoast": 0,
         "levels": [
           {
-            "gold": 400,
+            "gold": 200,
             "cap": 0,
             "growth": 0,
             "defense": 0,
@@ -615,7 +674,7 @@
             "upkeep": 6
           },
           {
-            "gold": 900,
+            "gold": 450,
             "cap": 0,
             "growth": 0,
             "defense": 0,
@@ -625,7 +684,7 @@
             "upkeep": 12
           },
           {
-            "gold": 1600,
+            "gold": 800,
             "cap": 0,
             "growth": 0,
             "defense": 0,
@@ -637,8 +696,8 @@
         ]
       },
       "barracks": {
-        "cost": 55000,
-        "growth": 1.7,
+        "cost": 150000,
+        "step": 1,
         "buildSeconds": 25,
         "needsCoast": 0,
         "levels": [
@@ -674,85 +733,47 @@
           }
         ]
       },
-      "fortress": {
-        "cost": 80000,
-        "growth": 1.7,
-        "buildSeconds": 35,
-        "needsCoast": 0,
-        "levels": [
-          {
-            "gold": 0,
-            "cap": 0,
-            "growth": 0,
-            "defense": 0.6,
-            "radius": 4,
-            "calm": 0,
-            "ships": 0,
-            "upkeep": 15
-          },
-          {
-            "gold": 0,
-            "cap": 0,
-            "growth": 0,
-            "defense": 1.1,
-            "radius": 5,
-            "calm": 0,
-            "ships": 0,
-            "upkeep": 30
-          },
-          {
-            "gold": 0,
-            "cap": 0,
-            "growth": 0,
-            "defense": 1.8,
-            "radius": 7,
-            "calm": 0,
-            "ships": 0,
-            "upkeep": 48
-          }
-        ]
-      },
       "port": {
-        "cost": 60000,
-        "growth": 1.7,
+        "cost": 125000,
+        "step": 1,
         "buildSeconds": 30,
         "needsCoast": 1,
         "levels": [
           {
-            "gold": 0,
+            "gold": 150,
             "cap": 0,
             "growth": 0,
             "defense": 0,
             "radius": 0,
             "calm": 0,
-            "ships": 1,
+            "ships": 0,
             "upkeep": 9
           },
           {
-            "gold": 0,
+            "gold": 350,
             "cap": 0,
             "growth": 0,
             "defense": 0,
             "radius": 0,
             "calm": 0,
-            "ships": 2,
+            "ships": 0,
             "upkeep": 18
           },
           {
-            "gold": 0,
+            "gold": 650,
             "cap": 0,
             "growth": 0,
             "defense": 0,
             "radius": 0,
             "calm": 0,
-            "ships": 3,
+            "ships": 0,
             "upkeep": 30
           }
         ]
       },
       "silo": {
-        "cost": 400000,
-        "growth": 1.5,
+        "cost": 650000,
+        "step": 1,
         "buildSeconds": 60,
         "needsCoast": 0,
         "levels": [
@@ -788,47 +809,9 @@
           }
         ]
       },
-      "observatory": {
-        "cost": 70000,
-        "growth": 1.7,
-        "buildSeconds": 30,
-        "needsCoast": 0,
-        "levels": [
-          {
-            "gold": 0,
-            "cap": 0,
-            "growth": 0,
-            "defense": 0,
-            "radius": 0,
-            "calm": 0.2,
-            "ships": 0,
-            "upkeep": 9
-          },
-          {
-            "gold": 0,
-            "cap": 0,
-            "growth": 0,
-            "defense": 0,
-            "radius": 0,
-            "calm": 0.4,
-            "ships": 0,
-            "upkeep": 18
-          },
-          {
-            "gold": 0,
-            "cap": 0,
-            "growth": 0,
-            "defense": 0,
-            "radius": 0,
-            "calm": 0.7,
-            "ships": 0,
-            "upkeep": 30
-          }
-        ]
-      },
       "post": {
-        "cost": 25000,
-        "growth": 1.5,
+        "cost": 50000,
+        "step": 1,
         "buildSeconds": 12,
         "needsCoast": 0,
         "levels": [
@@ -865,8 +848,8 @@
         ]
       },
       "sam": {
-        "cost": 150000,
-        "growth": 1.7,
+        "cost": 400000,
+        "step": 1,
         "buildSeconds": 40,
         "needsCoast": 0,
         "levels": [
@@ -903,8 +886,8 @@
         ]
       },
       "airbase": {
-        "cost": 180000,
-        "growth": 1.7,
+        "cost": 500000,
+        "step": 1,
         "buildSeconds": 45,
         "needsCoast": 0,
         "levels": [
@@ -941,8 +924,8 @@
         ]
       },
       "battery": {
-        "cost": 120000,
-        "growth": 1.7,
+        "cost": 350000,
+        "step": 1,
         "buildSeconds": 35,
         "needsCoast": 0,
         "levels": [
@@ -979,8 +962,8 @@
         ]
       },
       "factory": {
-        "cost": 90000,
-        "growth": 1.7,
+        "cost": 250000,
+        "step": 1,
         "buildSeconds": 25,
         "needsCoast": 0,
         "levels": [
@@ -1019,12 +1002,15 @@
     }
   },
   "navy": {
-    "sailRange": 70,
-    "pathLimit": 12000,
+    "pathLimit": 250000,
+    "starts": 16,
+    "shoreSteps": 20000,
+    "shoreCandidates": 8,
+    "aimGoals": 8,
     "transportCost": 30000,
     "warCost": 250000,
     "warZones": 3,
-    "transportSpeed": 3.2,
+    "transportSpeed": 9.6,
     "warSpeed": 4.2,
     "maxTransports": 3,
     "landingTiles": 8,
@@ -1033,6 +1019,10 @@
     "escortRadius": 6,
     "interceptLoss": 0.9,
     "warUpkeep": 4,
+    "maxWar": 5,
+    "bombardRadius": 7,
+    "bombardSeconds": 4,
+    "bombardLoss": 80,
     "orphanSeconds": 60,
     "blockadeRadius": 8,
     "warHp": 1000,
@@ -1049,14 +1039,12 @@
   "diplomacy": {
     "offerSeconds": 40,
     "maxOffersOut": 4,
-    "peaceMinutes": [3, 5, 8],
     "maxAllies": 3,
     "breakNoticeSeconds": 30,
     "hostileSeconds": 45,
     "trustStart": 60,
     "trustMax": 100,
     "trustPerMinute": 1.5,
-    "peaceBreak": 12,
     "allianceBreak": 15,
     "surprise": 8,
     "betrayal": 35,
@@ -1068,14 +1056,11 @@
     "emojiCount": 8,
     "traitorSeconds": 30,
     "traitorDefense": 0.5,
-    "traitorSpeed": 0.8,
+    "traitorSpeed": 0.6,
     "embargoAttackSeconds": 300,
     "embargoBetrayalSeconds": 120,
-    "coalitionBelow": 25,
-    "coalitionSeconds": 240,
-    "coalitionBonus": 0.3,
+    "condemnedBelow": 25,
     "jointBonus": 0.15,
-    "allianceRenewMinutes": 0,
     "giftMax": 0.25,
     "giftMinimum": 2000,
     "giftCooldownSeconds": 20
@@ -1086,7 +1071,7 @@
     "seaRange": 220,
     "rampSeconds": 90,
     "rampStart": 0.4,
-    "base": 110,
+    "base": 880,
     "refDistance": 60,
     "maxDistanceFactor": 2.5,
     "capShare": 0.7,
@@ -1107,31 +1092,32 @@
       "aidTrust": 1
     },
     "ships": {
+      "pathLimit": 12000,
       "checkTicks": 20,
-      "spawnSeconds": 25,
-      "maxPerPort": 2,
-      "maxSpawns": 3,
+      "spawnSeconds": 7,
+      "maxPerPort": 6,
+      "maxSpawns": 8,
       "minLength": 12,
       "speed": 2.6,
-      "goldBase": 1000,
-      "goldPerTile": 35,
-      "goldCap": 9000,
+      "goldBase": 8000,
+      "goldPerTile": 280,
+      "goldCap": 72000,
       "partnerShare": 1,
       "captureShare": 0.5,
       "pirateRadius": 6
     },
     "trains": {
       "checkSeconds": 30,
-      "range": 90,
+      "range": 45,
       "speed": 8,
       "maxPerLevel": 1,
-      "stationStep": 3,
+      "links": 20,
       "seconds": {
         "self": 6,
         "other": 15,
         "ally": 21
       },
-      "minGold": 2000,
+      "minGold": 16000,
       "partnerShare": 0.5
     }
   },
@@ -1140,8 +1126,10 @@
     "aidReserve": 0.6,
     "aidNeedRatio": 0.4,
     "aidPercent": 25,
+    "scoutRange": 100,
     "samples": 40,
     "maxIntents": 4,
+    "allyBetrayChance": 0.0015,
     "levelShare": {
       "recruit": 0.4,
       "strategist": 0.4,
@@ -1149,51 +1137,57 @@
     },
     "levels": {
       "recruit": {
-        "thinkSeconds": [2, 3],
+        "thinkSeconds": [1.5, 2.5],
         "freePercent": 35,
         "attackPercent": 30,
-        "needRatio": 4,
+        "needRatio": 2.6,
         "reserve": 0.3,
-        "trigger": 0.45,
-        "maxBuildings": 3,
+        "trigger": 0.35,
+        "maxBuildings": 5,
         "researches": 0,
         "answers": 1,
         "betrays": 0,
         "sails": 0,
-        "opportunity": 0
+        "opportunity": 0,
+        "ports": 2,
+        "warships": 0
       },
       "strategist": {
-        "thinkSeconds": [1.5, 2.5],
+        "thinkSeconds": [1, 2],
         "freePercent": 40,
         "attackPercent": 45,
-        "needRatio": 1.8,
+        "needRatio": 1.3,
         "reserve": 0.4,
-        "trigger": 0.35,
-        "maxBuildings": 8,
+        "trigger": 0.28,
+        "maxBuildings": 10,
         "researches": 1,
         "answers": 0.8,
         "betrays": 0,
         "sails": 1,
-        "opportunity": 0
+        "opportunity": 0,
+        "ports": 3,
+        "warships": 2
       },
       "raptor": {
-        "thinkSeconds": [1, 2],
+        "thinkSeconds": [0.8, 1.6],
         "freePercent": 45,
         "attackPercent": 60,
-        "needRatio": 1.3,
+        "needRatio": 1,
         "reserve": 0.25,
-        "trigger": 0.3,
-        "maxBuildings": 14,
+        "trigger": 0.24,
+        "maxBuildings": 16,
         "researches": 1,
         "answers": 0.6,
         "betrays": 1,
         "sails": 1,
-        "opportunity": 1
+        "opportunity": 1,
+        "ports": 4,
+        "warships": 4
       }
     },
     "personalities": {
       "merchant": {
-        "build": ["market", "port", "factory", "barracks", "observatory"],
+        "build": ["market", "port", "factory", "barracks"],
         "techPath": "economy",
         "aggression": 0.7,
         "trade": 1,
@@ -1202,7 +1196,7 @@
         "alliance": 0.5
       },
       "fortress": {
-        "build": ["fortress", "market", "observatory", "barracks"],
+        "build": ["post", "market", "barracks"],
         "techPath": "defense",
         "aggression": 0.5,
         "trade": 0.4,
@@ -1211,7 +1205,7 @@
         "alliance": 0.4
       },
       "conqueror": {
-        "build": ["barracks", "market", "fortress", "port"],
+        "build": ["barracks", "market", "post", "port"],
         "techPath": "army",
         "aggression": 1.4,
         "trade": 0.2,
@@ -1220,7 +1214,7 @@
         "alliance": 0.2
       },
       "loyal": {
-        "build": ["market", "barracks", "factory", "fortress", "port"],
+        "build": ["market", "barracks", "factory", "post", "port"],
         "techPath": "diplomacy",
         "aggression": 0.7,
         "trade": 0.7,
@@ -1229,7 +1223,7 @@
         "alliance": 1
       },
       "opportunist": {
-        "build": ["market", "barracks", "port", "fortress"],
+        "build": ["market", "barracks", "port", "post"],
         "techPath": "navy",
         "aggression": 1,
         "trade": 0.5,
@@ -1245,7 +1239,6 @@
     },
     "weakRatio": 0.8,
     "stableBelow": 50,
-    "peaceMinutes": 5,
     "gold": {
       "spareShare": 0.25,
       "techSpare": 30000
@@ -1255,6 +1248,10 @@
       "maxExtra": 30,
       "upgradeChance": 0.5
     },
+    "pressureMinutes": 6,
+    "lateBetray": 0.12,
+    "hegemonBreak": 0.5,
+    "lateAlliance": 0.6,
     "strike": {
       "goldRatio": 2,
       "chance": 0.6,
@@ -1263,7 +1260,6 @@
   },
   "score": {
     "perTile": 1,
-    "perProvince": 25,
     "perKill": 0
   }
 }

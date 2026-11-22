@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { PlayRecord } from '@/composites/play/member/PlayRecord'
+import { levelShare } from '@/core/lib/play'
 import { fillPlayMessage, PLAY_GAMES } from '@/declarations/play'
 import { PLAY_ADMIN_TARGETS, PLAY_MEMBER_COPY } from '@/declarations/play/admin'
 import { PLAY_MEMBER } from '@/declarations/ui/variants'
@@ -50,10 +51,10 @@ const Card = ({
 
 const LevelBar = ({ totals }: { totals: PlayTotalsView }) => {
   const { level, into, needed } = totals.level
-  const share = needed ? Math.min(100, (into / needed) * 100) : 100
+  const share = levelShare(totals.level)
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className={PLAY_MEMBER.bar}>
       <div className={PLAY_MEMBER.track}>
         <div className={PLAY_MEMBER.fill} style={{ width: `${share}%` }} />
       </div>

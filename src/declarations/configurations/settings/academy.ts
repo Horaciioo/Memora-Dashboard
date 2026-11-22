@@ -87,6 +87,11 @@ export const ACADEMY_SETTINGS = {
     fallback: 60,
     min: 1,
   }),
+  juniorAbsencesLimit: readInteger(academy.juniorAbsencesLimit, {
+    path: 'system/academy.juniorAbsencesLimit',
+    fallback: 30,
+    min: 1,
+  }),
   maxObjectives: readInteger(academy.maxObjectives, {
     path: 'system/academy.maxObjectives',
     fallback: 2,

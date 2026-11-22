@@ -1,4 +1,9 @@
-/* Level skins, set by data-skin: a light, a mid, a dark, a highlight and a gem */
+/* Level skins, set by data-skin: badge colours then the laurel palette */
+:root {
+  --laurel-shine: #ffffff;
+  --laurel-band: var(--laurel-shine);
+}
+
 [data-skin='bronze'] {
   --skin-a: #f0b184;
   --skin-b: #a2623a;
@@ -8,6 +13,13 @@
   --skin-to: var(--skin-b);
   --skin-ink: var(--skin-c);
   --skin-gem: #ffb070;
+  --laurel-a: #d9f2b8;
+  --laurel-b: #8fcf62;
+  --laurel-c: #3f7a2e;
+  --laurel-hi: #f2ffe0;
+  --laurel-gem: #ffe27a;
+  --laurel-vein: #3f7a2e;
+  --laurel-sheen: 0.16;
 }
 [data-skin='silver'] {
   --skin-a: #f7f9fc;
@@ -18,6 +30,13 @@
   --skin-to: var(--skin-b);
   --skin-ink: var(--skin-c);
   --skin-gem: #e8f0ff;
+  --laurel-a: #eef5ea;
+  --laurel-b: #a6c2ae;
+  --laurel-c: #5a7a68;
+  --laurel-hi: #ffffff;
+  --laurel-gem: #e8f0ff;
+  --laurel-vein: #5a7a68;
+  --laurel-sheen: 0.21;
 }
 [data-skin='gold'] {
   --skin-a: #fff0b5;
@@ -28,6 +47,13 @@
   --skin-to: var(--skin-b);
   --skin-ink: var(--skin-c);
   --skin-gem: #fff3b0;
+  --laurel-a: #fff0b5;
+  --laurel-b: #e2b445;
+  --laurel-c: #85601a;
+  --laurel-hi: #fffbe0;
+  --laurel-gem: #fff3b0;
+  --laurel-vein: #85601a;
+  --laurel-sheen: 0.26;
 }
 [data-skin='platinum'] {
   --skin-a: #eafcff;
@@ -38,6 +64,13 @@
   --skin-to: var(--skin-b);
   --skin-ink: var(--skin-c);
   --skin-gem: #8ff0ff;
+  --laurel-a: #eafcff;
+  --laurel-b: #85d6e3;
+  --laurel-c: #2f7c8c;
+  --laurel-hi: #ffffff;
+  --laurel-gem: #8ff0ff;
+  --laurel-vein: #2f7c8c;
+  --laurel-sheen: 0.31;
 }
 [data-skin='emerald'] {
   --skin-a: #d2ffe0;
@@ -48,6 +81,13 @@
   --skin-to: var(--skin-b);
   --skin-ink: var(--skin-c);
   --skin-gem: #7dffb0;
+  --laurel-a: #b8f0cc;
+  --laurel-b: #2fae68;
+  --laurel-c: #145232;
+  --laurel-hi: #eafff2;
+  --laurel-gem: #ff9ec4;
+  --laurel-vein: #145232;
+  --laurel-sheen: 0.36;
 }
 [data-skin='diamond'] {
   --skin-a: #e8ebff;
@@ -58,6 +98,13 @@
   --skin-to: var(--skin-b);
   --skin-ink: var(--skin-c);
   --skin-gem: #b9c2ff;
+  --laurel-a: #e8ebff;
+  --laurel-b: #8191ff;
+  --laurel-c: #3138a0;
+  --laurel-hi: #ffffff;
+  --laurel-gem: #ffffff;
+  --laurel-vein: #3138a0;
+  --laurel-sheen: 0.41;
 }
 [data-skin='master'] {
   --skin-a: #f4e2ff;
@@ -68,6 +115,14 @@
   --skin-to: var(--skin-b);
   --skin-ink: var(--skin-c);
   --skin-gem: #e3a8ff;
+  --laurel-a: #ffd6ec;
+  --laurel-b: #ee6fa1;
+  --laurel-c: #8b2a5b;
+  --laurel-hi: #fff0f8;
+  --laurel-gem: #ffe27a;
+  --laurel-vein: #8b2a5b;
+  --laurel-sheen: 0.46;
+  --laurel-band: #ffd6ec;
 }
 [data-skin='legend'] {
   --skin-a: #ff8f9b;
@@ -78,6 +133,14 @@
   --skin-to: var(--skin-b);
   --skin-ink: var(--skin-c);
   --skin-gem: #ffd34d;
+  --laurel-a: #ff4d5e;
+  --laurel-b: #8c1226;
+  --laurel-c: #1a0309;
+  --laurel-hi: #ff9aa6;
+  --laurel-gem: #ff3b52;
+  --laurel-vein: #ff7a89;
+  --laurel-sheen: 0.5;
+  --laurel-band: #ff9aa6;
 }
 
 .skin-badge {
@@ -88,75 +151,4 @@
 [data-skin='master'] .skin-badge,
 [data-skin='legend'] .skin-badge {
   color: var(--skin-hi);
-}
-
-/* Frame art, soft shadow then a glow that grows with the effects tier */
-.skin-art {
-  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35));
-}
-.skin-art[data-fx='1'] {
-  filter: drop-shadow(0 0 4px var(--skin-b));
-}
-.skin-art[data-fx='2'],
-.skin-art[data-fx='3'],
-.skin-art[data-fx='4'] {
-  filter: drop-shadow(0 0 6px var(--skin-b));
-}
-
-.skin-spark {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-.skin-spark {
-  opacity: 0;
-  transform: scale(0.2);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .skin-sweep {
-    animation: skin-sweep 3.6s ease-in-out infinite;
-  }
-  .skin-spark {
-    animation: skin-twinkle 2.4s ease-in-out infinite;
-  }
-  .skin-halo {
-    animation: skin-breathe 3.2s ease-in-out infinite;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .skin-spark {
-    opacity: 1;
-    transform: scale(0.7);
-  }
-}
-
-@keyframes skin-sweep {
-  0%,
-  35% {
-    transform: translateX(-140px);
-  }
-  80%,
-  100% {
-    transform: translateX(300px);
-  }
-}
-@keyframes skin-twinkle {
-  0%,
-  100% {
-    transform: scale(0.2);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-@keyframes skin-breathe {
-  0%,
-  100% {
-    opacity: 0.65;
-  }
-  50% {
-    opacity: 1;
-  }
 }

@@ -1,6 +1,7 @@
 import { PlayAvatar } from '@/composites/play/skin/PlayAvatar'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { PlayHistoryTable } from '@/composites/play/mobile/PlayHistoryTable'
+import { PlayEmpty } from '@/composites/play/shared/PlayEmpty'
 import { ICONS } from '@/declarations/ui/icons'
 import {
   fillPlayMessage,
@@ -39,9 +40,9 @@ export const PlayHistory = ({
 
   if (entries.length === 0)
     return (
-      <p className={PLAY_HISTORY.empty}>
+      <PlayEmpty icon="playHistory">
         {isFiltered ? PLAY_HISTORY_COPY.emptyGame : PLAY_MOBILE_COPY.historyEmpty}
-      </p>
+      </PlayEmpty>
     )
 
   return (

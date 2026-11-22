@@ -12,6 +12,9 @@ export const PLAY_CARD_COPY = {
   played: 'Parties',
   wins: 'Victoires',
   streak: 'Meilleure série',
+  topGames: 'Jeux préférés',
+  gameStat: '{count} parties · niveau {level}',
+  myStats: 'Mes statistiques',
   recent: 'Dernières parties',
   recentEmpty: 'Aucune partie terminée pour l’instant.',
   profile: 'Profil',
@@ -20,4 +23,6 @@ export const PLAY_CARD_COPY = {
   failed: 'Cette carte ne s’ouvre pas.',
   rank: '{rank}e sur {players}',
   online: 'En ligne',
+  played2: '{count} parties',
+  winRate: '{rate} %',
 } as const

@@ -4,6 +4,7 @@ import { tileNoise } from '@/core/lib/play/concordat/sim/rng'
 import { ticksOf } from '@/core/lib/play/concordat/sim/tables'
 import { economyMoves } from '@/core/lib/play/concordat/bots/economy'
 import { betrayalMove, militaryMoves } from '@/core/lib/play/concordat/bots/military'
+import { fleetMoves } from '@/core/lib/play/concordat/bots/fleet'
 import { strikeMoves } from '@/core/lib/play/concordat/bots/strike'
 import { botProfileOf } from '@/core/lib/play/concordat/bots/profile'
 import { seaMoves } from '@/core/lib/play/concordat/bots/sea'
@@ -75,6 +76,7 @@ export const decideBot = (
     view: botViewOf(state, playerId),
     isCaretaker,
     roll: (salt) => tileNoise(playerId * 104729 + salt, state.tick),
+    pressure: Math.min(1, state.tick / ticksOf(bots.pressureMinutes * 60)),
   }
 
   const betrayal = betrayalMove(context)
@@ -84,6 +86,7 @@ export const decideBot = (
     ...(betrayal ? [betrayal] : []),
     ...militaryMoves(context),
     ...strikeMoves(context),
+    ...fleetMoves(context),
     ...seaMoves(context),
     ...proposeMoves(context, memory.lastProposal),
     ...aidMoves(context),

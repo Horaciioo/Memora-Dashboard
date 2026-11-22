@@ -1,7 +1,7 @@
 'use client'
 
 import { useId } from 'react'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ModalHeader } from '@/components/structures/overlays/ModalHeader'
 import { useFocusTrap } from '@/core/hooks/interaction/layout/overlay/useFocusTrap'
@@ -23,6 +23,10 @@ export interface DrawerProps {
   isWide?: boolean
   // Whole screen on a phone
   isFullScreen?: boolean
+  // Own head in place of the centred title, given the id the dialog is named by
+  hero?: (head: { titleId: string; onClose: () => void }) => ReactNode
+  // Skin of the panel, classes and variables
+  skin?: { className: string; style?: CSSProperties }
   children: ReactNode
 }
 
@@ -37,6 +41,8 @@ export interface DrawerProps {
  * @param {ReactNode} [footer] - Controls pinned to the bottom
  * @param {boolean} [isWide] - Wider panel from md
  * @param {boolean} [isFullScreen] - Whole screen on a phone
+ * @param {Function} [hero] - Own head, replaces the centred title
+ * @param {Object} [skin] - Panel classes and variables
  * @param {ReactNode} children - Drawer content
  * @return {JSX.Element | null}
  */
@@ -51,6 +57,8 @@ export const Drawer = ({
   footer,
   isWide = false,
   isFullScreen = false,
+  hero,
+  skin,
   children,
 }: DrawerProps) => {
   const containerRef = useFocusTrap(open, onClose)
@@ -72,10 +80,16 @@ export const Drawer = ({
         className={cn(
           DRAWER_STYLES.panel,
           isWide && DRAWER_STYLES.wide,
-          isFullScreen && DRAWER_STYLES.fullScreen
+          isFullScreen && DRAWER_STYLES.fullScreen,
+          skin?.className
         )}
+        style={skin?.style}
       >
-        <ModalHeader titleId={titleId} title={title} icon={icon} onClose={onClose} />
+        {hero ? (
+          hero({ titleId, onClose })
+        ) : (
+          <ModalHeader titleId={titleId} title={title} icon={icon} onClose={onClose} />
+        )}
         {description && (
           <p id={descriptionId} className="sr-only">
             {description}

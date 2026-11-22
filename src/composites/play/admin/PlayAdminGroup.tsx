@@ -8,14 +8,15 @@ import { cn } from '@/utils/classnames'
 export interface PlayAdminGroupProps {
   name: string
   avatarUrl?: string | null
-  bannerUrl?: string | null
+  // Players held, written beside the name
+  note: string
   isOpen: boolean
   onToggle: () => void
   children: ReactNode
 }
 
 /**
- * Creator box: photo banner, its players unfold beneath
+ * Creator box: its players unfold beneath
  * @param {PlayAdminGroupProps} props - Creator, fold state and players
  * @return {JSX.Element}
  */
@@ -23,13 +24,12 @@ export interface PlayAdminGroupProps {
 export const PlayAdminGroup = ({
   name,
   avatarUrl,
-  bannerUrl,
+  note,
   isOpen,
   onToggle,
   children,
 }: PlayAdminGroupProps) => {
   const Chevron = ICONS.expand
-  const backdrop = bannerUrl ?? avatarUrl
 
   return (
     <section className={PLAY_ADMIN.group}>
@@ -37,17 +37,11 @@ export const PlayAdminGroup = ({
         type="button"
         aria-expanded={isOpen}
         onClick={onToggle}
-        className={PLAY_ADMIN.groupBanner}
+        className={PLAY_ADMIN.groupHead}
       >
-        {backdrop && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={backdrop} alt="" loading="lazy" className={PLAY_ADMIN.groupBackdrop} />
-        )}
-        <span className={PLAY_ADMIN.groupWash} aria-hidden="true" />
-        {avatarUrl && (
-          <Avatar name={name} src={avatarUrl} size="md" className={PLAY_ADMIN.groupPortrait} />
-        )}
+        <Avatar name={name} src={avatarUrl ?? undefined} size="md" />
         <h2 className={PLAY_ADMIN.groupName}>{name}</h2>
+        <span className={PLAY_ADMIN.groupNote}>{note}</span>
         <Chevron
           className={cn(PLAY_ADMIN.groupChevron, isOpen && PLAY_ADMIN.groupChevronOpen)}
           aria-hidden="true"
@@ -59,7 +53,7 @@ export const PlayAdminGroup = ({
         inert={!isOpen}
       >
         <div className={PLAY_ADMIN.groupClip}>
-          <div className={isOpen ? PLAY_ADMIN.groupBoxOpen : PLAY_ADMIN.groupBox}>{children}</div>
+          <div className={isOpen ? PLAY_ADMIN.groupBodyOpen : PLAY_ADMIN.groupBody}>{children}</div>
         </div>
       </div>
     </section>

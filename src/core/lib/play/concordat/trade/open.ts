@@ -57,7 +57,12 @@ const bestRoute = (
 
       const path =
         kind === ConcordatRouteKinds.Sea
-          ? seaPath(state.map, seaAround(state.map, mine.tile), seaAround(state.map, theirs.tile))
+          ? seaPath(
+              state.map,
+              seaAround(state.map, mine.tile),
+              seaAround(state.map, theirs.tile),
+              trade.ships.pathLimit
+            )
           : []
       if (!path) continue
 

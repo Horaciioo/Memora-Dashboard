@@ -233,7 +233,9 @@ export const SelectMenu = ({
             )}
           </>
         ) : (
-          <span className={SELECT_MENU_STYLES.placeholder}>
+          <span
+            className={isPlay ? SELECT_MENU_STYLES.placeholderPlay : SELECT_MENU_STYLES.placeholder}
+          >
             {placeholder ?? emptyLabel ?? PICKER_COPY.choose}
           </span>
         )}

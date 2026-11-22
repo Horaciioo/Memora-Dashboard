@@ -63,29 +63,31 @@ export const viewerSanctions = async (
       live: { youtuberId: live.youtuberId },
     },
     include: {
-      actor: { select: { displayName: true } },
+      actor: { select: { displayName: true, avatarUrl: true } },
       live: { select: { title: true } },
     },
     orderBy: { occurredAt: 'desc' },
     take: LIVE_SETTINGS.viewerHistorySize,
   })
 
-  return rows.map((row) => ({
-    id: row.id,
-    kind: row.kind,
-    durationSeconds: row.durationSeconds,
-    reason: row.reason,
-    messageExcerpt: row.messageExcerpt,
-    actorName:
-      reader.seesAll || (row.actorAccountId && readable.has(row.actorAccountId))
-        ? (row.actor?.displayName ?? row.actorLogin ?? '')
-        : null,
-    liveTitle: row.live.title,
-    fromPanel: row.offenseId !== null,
-    offenseId: row.offenseId,
-    rung: row.rung,
-    occurredAt: row.occurredAt.toISOString(),
-  }))
+  return rows.map((row) => {
+    const isVisible = reader.seesAll || (row.actorAccountId && readable.has(row.actorAccountId))
+
+    return {
+      id: row.id,
+      kind: row.kind,
+      durationSeconds: row.durationSeconds,
+      reason: row.reason,
+      messageExcerpt: row.messageExcerpt,
+      actorName: isVisible ? (row.actor?.displayName ?? row.actorLogin ?? '') : null,
+      actorAvatar: isVisible ? (row.actor?.avatarUrl ?? null) : null,
+      liveTitle: row.live.title,
+      fromPanel: row.offenseId !== null,
+      offenseId: row.offenseId,
+      rung: row.rung,
+      occurredAt: row.occurredAt.toISOString(),
+    }
+  })
 }
 
 /**

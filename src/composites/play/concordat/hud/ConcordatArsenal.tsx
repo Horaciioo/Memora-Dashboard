@@ -22,8 +22,12 @@ import {
   CONCORDAT_BUILDING_TITLES,
   CONCORDAT_HUD_COPY,
 } from '@/declarations/play/concordat/hudCopy'
-import { CONCORDAT_WEAPONS } from '@/utils/constants/concordat'
-import type { ConcordatWeaponName } from '@/utils/constants/concordat'
+import {
+  CONCORDAT_BOMBS,
+  CONCORDAT_WEAPONS,
+  ConcordatBuildingKinds,
+} from '@/utils/constants/concordat'
+import type { ConcordatBombName, ConcordatWeaponName } from '@/utils/constants/concordat'
 import { CONCORDAT, CONCORDAT_TICKS_PER_SECOND } from '@/declarations/play/concordat/rules'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { CONCORDAT_HUD } from '@/declarations/ui/variants'
@@ -51,12 +55,26 @@ const isSame = (first: ConcordatTool | null, second: ConcordatTool): boolean =>
 // Gold a tool costs, zero for a building whose price is on the slot
 const costOf = (tool: ConcordatTool): number => {
   if (tool.kind === 'sortie') return tool.air === 'heli' ? air.heli.cost : air.fighter.cost
+  if (tool.kind === 'fleet') return CONCORDAT.navy.warCost
   if (tool.kind !== 'launch') return 0
   if (tool.weapon === 'shell') return air.battery.shellCost
   if (tool.weapon === 'rocket') return air.battery.rocketCost
 
+  if (tool.weapon && tool.weapon in weapons.bombs)
+    return weapons.bombs[tool.weapon as ConcordatBombName].cost
+
   return tool.isHeavy ? weapons.heavyCost : weapons.missileCost
 }
+
+// A working silo of this level or higher
+const hasSiloOf = (client: ConcordatClientState, level: number): boolean =>
+  client.systems.buildings.some(
+    (building) =>
+      building.owner === client.me &&
+      building.kind === ConcordatBuildingKinds.Silo &&
+      building.readyAt <= client.tick &&
+      building.level >= level
+  )
 
 /**
  * Weapons side by side as pictograms: every building then both missiles, one click arms it on the map
@@ -83,7 +101,7 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
         key: kind,
         glyph: kind,
         title: CONCORDAT_BUILDING_TITLES[kind],
-        note: String(cost),
+        note: compactFigure(cost),
         count: builtCountOf(client, kind),
         isOff: gold < cost,
         tool: { kind: 'build', building: kind },
@@ -116,19 +134,39 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
         gold < mirvPrice(client.systems.mirvs),
       tool: { kind: 'launch', isHeavy: true, weapon: 'mirv' },
     },
+    ...CONCORDAT_BOMBS.map((bomb): Slot => {
+      const { cost, siloLevel } = weapons.bombs[bomb]
+
+      return {
+        key: bomb,
+        glyph: bomb,
+        title: CONCORDAT_HUD_COPY[bomb],
+        note: waitTicks > 0 ? '·' : compactFigure(cost),
+        isOff: waitTicks > 0 || gold < cost || !hasSiloOf(client, siloLevel),
+        tool: { kind: 'launch', isHeavy: false, weapon: bomb },
+      }
+    }),
     ...(['shell', 'rocket'] as const).map((weapon): Slot => ({
       key: weapon,
       glyph: weapon,
       title: CONCORDAT_HUD_COPY[weapon],
-      note: airWait > 0 ? '·' : String(costOf({ kind: 'launch', isHeavy: false, weapon })),
+      note: airWait > 0 ? '·' : compactFigure(costOf({ kind: 'launch', isHeavy: false, weapon })),
       isOff: airWait > 0 || gold < costOf({ kind: 'launch', isHeavy: false, weapon }),
       tool: { kind: 'launch', isHeavy: false, weapon },
     })),
+    {
+      key: 'warship',
+      glyph: 'warship',
+      title: CONCORDAT_HUD_COPY.warship,
+      note: compactFigure(CONCORDAT.navy.warCost),
+      isOff: gold < CONCORDAT.navy.warCost,
+      tool: { kind: 'fleet' },
+    },
     ...(['heli', 'fighter'] as const).map((kind): Slot => ({
       key: kind,
       glyph: kind,
       title: CONCORDAT_HUD_COPY[kind],
-      note: airWait > 0 ? '·' : String(costOf({ kind: 'sortie', air: kind })),
+      note: airWait > 0 ? '·' : compactFigure(costOf({ kind: 'sortie', air: kind })),
       isOff: airWait > 0 || gold < costOf({ kind: 'sortie', air: kind }),
       tool: { kind: 'sortie', air: kind },
     })),
@@ -167,7 +205,8 @@ export const ConcordatArsenal = ({ client }: { client: ConcordatClientState }) =
         const isGun =
           slot.tool.kind === 'sortie' || (slot.tool.kind === 'launch' && slot.tool.weapon)
         const isLocked = slot.tool.kind !== 'build' && (isGun ? airWait : waitTicks) > 0
-        const cost = slot.tool.kind === 'build' ? Number(slot.note) : costOf(slot.tool)
+        const cost =
+          slot.tool.kind === 'build' ? buildCostOf(client, slot.tool.building) : costOf(slot.tool)
         const lockText = isGun
           ? fillPlayMessage(CONCORDAT_HUD_COPY.weaponsLocked, {
               time: clockText(airWait / CONCORDAT_TICKS_PER_SECOND),

@@ -88,6 +88,11 @@ export const ROUTES = {
   playStats: '/play/stats',
   playSettings: '/play/settings',
   playAdmin: '/play/admin',
+  playAdminGames: '/play/admin/games',
+  playAdminBoosts: '/play/admin/boosts',
+  playAdminSettings: '/play/admin/settings',
+  playAdminLogs: '/play/admin/logs',
+  playAdminStats: '/play/admin/stats',
   playAdminPlayer: (id: string) => `/play/admin/${id}`,
   playStatsGame: (slug: string) => `/play/stats?game=${slug}`,
   playHistory: (game?: string, cursor?: string) => {
@@ -99,6 +104,7 @@ export const ROUTES = {
     return text ? `/play/history?${text}` : '/play/history'
   },
   playTrophies: '/play/trophies',
+  playQuests: '/play/quests',
   playRanking: (slug?: string) => (slug ? `/play/ranking?game=${slug}` : '/play/ranking'),
   playPlayer: (id: string) => `/play/players/${id}`,
   playPlayerGame: (id: string, slug: string) => `/play/players/${id}/${slug}`,
@@ -330,7 +336,13 @@ export const NAVIGATION: NavigationGroup[] = [
       },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences', maturity: 'new' },
       { href: ROUTES.changelog, label: 'Nouveautés', icon: 'news', quick: true },
-      { href: ROUTES.pages, label: NAV_COPY.railPrivate, icon: 'page', maturity: 'alpha' },
+      {
+        href: ROUTES.pages,
+        label: NAV_COPY.railPrivate,
+        icon: 'pagePrivate',
+        maturity: 'alpha',
+        quick: true,
+      },
       {
         href: ROUTES.play,
         label: 'Play',

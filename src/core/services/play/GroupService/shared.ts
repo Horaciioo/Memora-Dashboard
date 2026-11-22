@@ -131,4 +131,5 @@ export const toView = (group: LoadedGroup, accountId: string): PlayGroupView => 
     },
     isMine: message.accountId === accountId,
   })),
+  quest: null,
 })

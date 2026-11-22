@@ -1,51 +1,88 @@
 import type { CSSProperties } from 'react'
 
+import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { PlayFold } from '@/composites/play/mobile/PlayFold'
-import { PlayLevelBar } from '@/composites/play/member/stats/PlayLevelBar'
-import { recordOf } from '@/composites/play/member/stats/PlayStatTiles'
 import { levelShare } from '@/core/lib/play'
+import { ROUTES } from '@/declarations/navigation'
 import { fillPlayMessage, PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
-import { PLAY_STATS } from '@/declarations/ui/variants'
+import { PLAY_PROFILE_LEVELS } from '@/declarations/ui/variants'
 import type { PlayProfileView } from '@/types/play'
+import { cn } from '@/utils/classnames'
 
 /**
- * Level of each game out, secret games left aside
+ * Level of each game, small tiles in the colour of the game, unplayed ones dimmed
  * @param {Object} props - Games
  * @param {PlayProfileView['games']} props.games - Per game totals
- * @return {JSX.Element}
+ * @param {string} [props.playerId] - Another player, tiles open their figures
+ * @return {JSX.Element | null}
  */
 
-export const PlayGameLevels = ({ games }: { games: PlayProfileView['games'] }) => (
-  <PlayFold title={PLAY_HUB_COPY.sectionGamesLevels}>
-    <div className={PLAY_STATS.games}>
-      {games
-        .filter((entry) => PLAY_GAMES.has(entry.game) && PLAY_GAMES.get(entry.game).playable)
-        .map((entry) => (
-          <div
-            key={entry.game}
-            className={PLAY_STATS.game}
-            style={{ '--game': `var(${PLAY_GAMES.get(entry.game).tone})` } as CSSProperties}
-          >
-            <span className={PLAY_STATS.gameBand}>
-              <PlayGameLogo game={entry.game} className={PLAY_STATS.gameLogo} />
-            </span>
-            <div className={PLAY_STATS.gameText}>
-              <span className={PLAY_STATS.gameHead}>
-                <span className={PLAY_STATS.gameName}>{PLAY_GAMES.label(entry.game)}</span>
-                <span className={PLAY_STATS.gameLevel}>
-                  {fillPlayMessage(PLAY_HUB_COPY.level, { level: entry.level.level })}
+export const PlayGameLevels = ({
+  games,
+  playerId,
+}: {
+  games: PlayProfileView['games']
+  playerId?: string
+}) => {
+  const shown = games
+    .filter((entry) => PLAY_GAMES.has(entry.game) && PLAY_GAMES.get(entry.game).playable)
+    .sort((left, right) => right.xp - left.xp)
+
+  if (shown.length === 0) return null
+
+  return (
+    <PlayFold title={PLAY_HUB_COPY.sectionGamesLevels} isWide>
+      <div className={PLAY_PROFILE_LEVELS.grid}>
+        {shown.map((entry) => {
+          const { tone, slug } = PLAY_GAMES.get(entry.game)
+          const style = { '--game': `var(${tone})` } as CSSProperties
+          const content = (
+            <>
+              <PlayGameLogo game={entry.game} className={PLAY_PROFILE_LEVELS.logo} />
+              <span className={PLAY_PROFILE_LEVELS.body}>
+                <span className={PLAY_PROFILE_LEVELS.head}>
+                  <span className={PLAY_PROFILE_LEVELS.name}>{PLAY_GAMES.label(entry.game)}</span>
+                  <span className={PLAY_PROFILE_LEVELS.level}>
+                    {fillPlayMessage(PLAY_HUB_COPY.level, { level: entry.level.level })}
+                  </span>
+                </span>
+                <span className={PLAY_PROFILE_LEVELS.track}>
+                  <span
+                    className={PLAY_PROFILE_LEVELS.fill}
+                    style={{ width: `${levelShare(entry.level)}%` }}
+                  />
                 </span>
               </span>
-              <PlayLevelBar share={levelShare(entry.level)} isThin />
-              <span className={PLAY_STATS.caption}>
-                {fillPlayMessage(PLAY_HUB_COPY.xp, { xp: entry.xp })}
-                {' - '}
-                {recordOf(entry)}
-              </span>
+            </>
+          )
+
+          return playerId ? (
+            <AppLink
+              key={entry.game}
+              href={ROUTES.playPlayerGame(playerId, slug)}
+              className={cn(
+                PLAY_PROFILE_LEVELS.tile,
+                entry.played === 0 && PLAY_PROFILE_LEVELS.idle
+              )}
+              style={style}
+            >
+              {content}
+            </AppLink>
+          ) : (
+            <div
+              key={entry.game}
+              className={cn(
+                PLAY_PROFILE_LEVELS.tile,
+                entry.played === 0 && PLAY_PROFILE_LEVELS.idle
+              )}
+              style={style}
+            >
+              {content}
             </div>
-          </div>
-        ))}
-    </div>
-  </PlayFold>
-)
+          )
+        })}
+      </div>
+    </PlayFold>
+  )
+}

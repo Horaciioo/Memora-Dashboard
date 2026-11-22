@@ -2,7 +2,7 @@ import type { MaturityName } from '@/declarations/maturity/registries'
 import type { ParkourPhase } from '@/core/lib/academy/parkour'
 import type { LivePlatformName } from '@/utils/constants/lives'
 import type { RecruitmentStatusName } from '@/utils/constants/recruitment'
-import type { AttendanceStatusName } from '@/utils/constants/workflow'
+import type { AbsenceStatusName, AttendanceStatusName } from '@/utils/constants/workflow'
 import type { MilestoneView } from '@/core/lib/academy/parkourTimeline'
 import type { CourseSurface, CourseTrack } from '@/declarations/academy/curriculum/types'
 import type { FormValues } from '@/types/forms'
@@ -684,6 +684,24 @@ export interface JuniorLiveView {
   platform: LivePlatformName
   startedAt: string
   attendance: AttendanceStatusName
+}
+
+/**
+ * One absence of a junior, as their referent reads it
+ * @typedef {Object} JuniorAbsenceView
+ * @property {string} id - Absence identifier
+ * @property {string} startDate - ISO first day
+ * @property {string} endDate - ISO last day
+ * @property {number} dayCount - Days away
+ * @property {AbsenceStatusName} status - Pending or approved
+ */
+
+export interface JuniorAbsenceView {
+  id: string
+  startDate: string
+  endDate: string
+  dayCount: number
+  status: AbsenceStatusName
 }
 
 /**

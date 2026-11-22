@@ -9,6 +9,7 @@ import { signalNotices, signalPlay } from '@/core/lib/play/signal'
 import { startSession } from '@/core/services/play/GameService'
 import { joinSession } from '@/core/services/play/LobbyService'
 import { notifyPlayInvite } from '@/core/services/play/PlayInviteNotifier'
+import { listFriendIds } from '@/core/services/play/FriendService/shared'
 import { loadSession, requireSeat } from '@/core/services/play/PlaySessionService'
 import { PLAY_ERRORS, PLAY_SETTINGS } from '@/declarations/play'
 import type { PlayNoticeView, PlayRecentPlayer } from '@/types/play'
@@ -189,7 +190,7 @@ const recentPlayers = async (): Promise<Set<string>> => {
  */
 
 export const inviteCandidates = async (seated: string[], viewerId: string) => {
-  const [members, former, recent] = await Promise.all([
+  const [members, former, recent, friendIds] = await Promise.all([
     prisma.account.findMany({
       where: { id: { notIn: seated }, leftAt: null, anonymisedAt: null, frozenAt: null },
       select: { id: true, displayName: true, avatarUrl: true },
@@ -197,6 +198,7 @@ export const inviteCandidates = async (seated: string[], viewerId: string) => {
     }),
     playedWith(viewerId),
     recentPlayers(),
+    listFriendIds(viewerId),
   ])
 
   return members.map((member) => ({
@@ -204,6 +206,7 @@ export const inviteCandidates = async (seated: string[], viewerId: string) => {
     hasPlayedWith: former.has(member.id),
     playedAt: former.get(member.id) ?? 0,
     isRecent: recent.has(member.id),
+    isFriend: friendIds.has(member.id),
   }))
 }
 

@@ -65,7 +65,7 @@ export const scoreRows = (state: ConcordatState): ConcordatScoreRow[] => {
     living((id) => {
       const mine = state.players[id - 1]
 
-      return mine.tiles * CONCORDAT.score.perTile + mine.provincesHeld * CONCORDAT.score.perProvince
+      return mine.tiles * CONCORDAT.score.perTile
     })
   )
   const economy = sharesOf(

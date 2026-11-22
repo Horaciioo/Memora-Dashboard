@@ -22,7 +22,7 @@ export const jumbleBoards = async (session: EngineSession) => {
   const now = new Date()
   const revealUntil = game?.revealUntil ?? null
   const isReveal = revealUntil !== null
-  const totalMs = settings.roundSeconds * SECOND_MS
+  const totalMs = game ? game.endsAt.getTime() - game.startsAt.getTime() : SECOND_MS
   const current = rounds.find((entry) => entry.round === game?.round)
 
   // Everyone seated, plus whoever scored and left

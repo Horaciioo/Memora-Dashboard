@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { Avatar } from '@/components/elements/display/Avatar'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { MODERATION_KINDS } from '@/declarations/lives/moderation'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
@@ -57,9 +58,12 @@ export const ViewerSanctionList = ({ history }: ViewerSanctionListProps) => {
                   .filter(Boolean)
                   .join(' ')}
               </span>
-              <time className={MODVIEW_USER.sanctionDate} dateTime={row.occurredAt}>
-                {formatShortDay(row.occurredAt)}
-              </time>
+              <span className={MODVIEW_USER.sanctionBy}>
+                <time className={MODVIEW_USER.sanctionDate} dateTime={row.occurredAt}>
+                  {formatShortDay(row.occurredAt)}
+                </time>
+                {row.actorName && <Avatar name={row.actorName} src={row.actorAvatar} size="xs" />}
+              </span>
             </div>
             {row.reason && <p className={MODVIEW_USER.sanctionReason}>{row.reason}</p>}
             {row.messageExcerpt && (

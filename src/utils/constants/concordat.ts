@@ -152,10 +152,8 @@ export type ConcordatChokeKind = (typeof ConcordatChokes)[keyof typeof Concordat
 export const ConcordatBuildingKinds = {
   Market: 'market',
   Barracks: 'barracks',
-  Fortress: 'fortress',
   Port: 'port',
   Silo: 'silo',
-  Observatory: 'observatory',
   Post: 'post',
   Sam: 'sam',
   Airbase: 'airbase',
@@ -174,10 +172,8 @@ export type ConcordatBuildingKind =
 export const CONCORDAT_BUILDING_ORDER: readonly ConcordatBuildingKind[] = [
   'market',
   'barracks',
-  'fortress',
   'port',
   'silo',
-  'observatory',
   'post',
   'sam',
   'airbase',
@@ -198,7 +194,6 @@ export type ConcordatShipKind = (typeof ConcordatShipKinds)[keyof typeof Concord
 // What links two nations
 export const ConcordatTies = {
   Hostile: 'hostile',
-  Peace: 'peace',
   Alliance: 'alliance',
 } as const
 
@@ -209,15 +204,13 @@ export type ConcordatTieKind = (typeof ConcordatTies)[keyof typeof ConcordatTies
  * @type {readonly ConcordatTieKind[]}
  */
 
-export const CONCORDAT_TIE_ORDER: readonly ConcordatTieKind[] = ['hostile', 'peace', 'alliance']
+export const CONCORDAT_TIE_ORDER: readonly ConcordatTieKind[] = ['hostile', 'alliance']
 
 // What an offer proposes
 export const ConcordatOfferKinds = {
-  Peace: 'peace',
   Alliance: 'alliance',
   Trade: 'trade',
   Request: 'request',
-  Coalition: 'coalition',
 } as const
 
 export type ConcordatOfferKind = (typeof ConcordatOfferKinds)[keyof typeof ConcordatOfferKinds]
@@ -228,11 +221,9 @@ export type ConcordatOfferKind = (typeof ConcordatOfferKinds)[keyof typeof Conco
  */
 
 export const CONCORDAT_OFFER_ORDER: readonly ConcordatOfferKind[] = [
-  'peace',
   'alliance',
   'trade',
   'request',
-  'coalition',
 ]
 
 // Short asks of a request
@@ -262,7 +253,6 @@ export const ConcordatEventKinds = [
   'treaty',
   'broken',
   'betrayal',
-  'coalition',
   'landed',
   'sunk',
   'built',
@@ -318,6 +308,9 @@ export const ConcordatStrikeKinds = {
   Rocket: 'rocket',
   Mirv: 'mirv',
   Warhead: 'warhead',
+  BombSmall: 'bombSmall',
+  BombLarge: 'bombLarge',
+  BombHuge: 'bombHuge',
 } as const
 
 export type ConcordatStrikeKind = (typeof ConcordatStrikeKinds)[keyof typeof ConcordatStrikeKinds]
@@ -343,7 +336,18 @@ export const CONCORDAT_WEAPONS = [
   'rocket',
   'heli',
   'fighter',
+  'bombSmall',
+  'bombLarge',
+  'bombHuge',
 ] as const
+
+// Bombs dropped from a silo, no stock
+export const CONCORDAT_BOMBS = ['bombSmall', 'bombLarge', 'bombHuge'] as const
+
+export type ConcordatBombName = (typeof CONCORDAT_BOMBS)[number]
+
+// Weapon named on a launch, missing for a plain missile
+export type ConcordatLaunchWeapon = 'shell' | 'rocket' | 'mirv' | ConcordatBombName
 
 export type ConcordatWeaponName = (typeof CONCORDAT_WEAPONS)[number]
 
@@ -443,7 +447,6 @@ export type ConcordatBotPersonalityName =
 // Gestures offered on a nation
 export const ConcordatTargetActions = {
   Attack: 'attack',
-  Peace: 'peace',
   Alliance: 'alliance',
   Trade: 'trade',
   Aid: 'aid',

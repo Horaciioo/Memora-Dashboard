@@ -25,7 +25,6 @@ export const applyTechEffects = (state: ConcordatState): void => {
         effects.ships += tier.ships ?? 0
         effects.calm += tier.calm ?? 0
         effects.trustGain += tier.trustGain ?? 0
-        effects.peace += tier.peace ?? 0
         effects.blockade += tier.blockade ?? 0
         effects.upkeepCut += tier.upkeepCut ?? 0
         if (tier.feint) effects.canFeint = true

@@ -1,8 +1,4 @@
-import {
-  drawBoardBase,
-  drawCrossings,
-  drawProvinceLines,
-} from '@/composites/play/concordat/board/draw/drawBase'
+import { drawBoardBase } from '@/composites/play/concordat/board/draw/drawBase'
 import { drawEchoes } from '@/composites/play/concordat/board/draw/drawEchoes'
 import { drawArrows, drawPick } from '@/composites/play/concordat/board/draw/drawFront'
 import { drawNationNames } from '@/composites/play/concordat/board/draw/drawLabels'
@@ -34,8 +30,6 @@ export const drawBoard = (context: CanvasRenderingContext2D, scene: ConcordatSce
   drawBoardBase(context, scene)
   drawGroundMood(context, scene)
   drawScars(context, scene)
-  drawProvinceLines(context, scene)
-  drawCrossings(context, scene)
   drawNationNames(context, scene)
   drawZones(context, scene)
   drawArrows(context, scene)

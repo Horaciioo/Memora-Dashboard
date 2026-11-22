@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import AppLink from '@/components/elements/navigation/AppLink'
+import { FloatingLayer } from '@/components/structures/overlays/FloatingLayer'
 import { PlayCreateButton } from '@/composites/play/hub/lobby/PlayCreateButton'
 import { PlaySoloButton } from '@/composites/play/hub/lobby/PlaySoloButton'
 import { PlayJoinCode } from '@/composites/play/hub/lobby/PlayJoinCode'
@@ -71,7 +72,7 @@ export const PlayHubMenu = ({
     <Button
       key={entry.key}
       variant="arcade"
-      className={PLAY_HUB.hubButton}
+      className={PLAY_HUB.hubButtonSmall}
       onClick={() => setView(entry.key)}
     >
       {entry.label}
@@ -99,7 +100,7 @@ export const PlayHubMenu = ({
             />
             {canCreate && <PlayJoinCode className={PLAY_HUB.hubButton} />}
           </div>
-          <div className={PLAY_HUB.hubGroup}>
+          <div className={PLAY_HUB.hubRow}>
             {GAME_VIEWS.map(viewButton)}
             {PLAYER_VIEWS.map(viewButton)}
           </div>
@@ -115,27 +116,29 @@ export const PlayHubMenu = ({
       </div>
 
       {open && view && (
-        <div className={PLAY_HUB.sheet}>
-          <div className={PLAY_HUB.sheetScrim} onClick={() => setView(null)} aria-hidden="true" />
-          <section
-            className={PLAY_HUB.sheetWindow}
-            role="dialog"
-            aria-label={titles?.[view] ?? open.label}
-          >
-            <header className={PLAY_HUB.sheetHead}>
-              <h2 className={PLAY_HUB.sheetTitle}>{titles?.[view] ?? open.label}</h2>
-              <button
-                type="button"
-                className={PLAY_HUB.sheetClose}
-                aria-label={PLAY_HUB_COPY.close}
-                onClick={() => setView(null)}
-              >
-                <CloseIcon className={PLAY_HUB.sheetCloseIcon} aria-hidden="true" />
-              </button>
-            </header>
-            <div className={PLAY_HUB.sheetBody}>{panels[view]}</div>
-          </section>
-        </div>
+        <FloatingLayer>
+          <div className={cn(PLAY_HUB.sheet, 'z-[60]')}>
+            <div className={PLAY_HUB.sheetScrim} onClick={() => setView(null)} aria-hidden="true" />
+            <section
+              className={PLAY_HUB.sheetWindow}
+              role="dialog"
+              aria-label={titles?.[view] ?? open.label}
+            >
+              <header className={PLAY_HUB.sheetHead}>
+                <h2 className={PLAY_HUB.sheetTitle}>{titles?.[view] ?? open.label}</h2>
+                <button
+                  type="button"
+                  className={PLAY_HUB.sheetClose}
+                  aria-label={PLAY_HUB_COPY.close}
+                  onClick={() => setView(null)}
+                >
+                  <CloseIcon className={PLAY_HUB.sheetCloseIcon} aria-hidden="true" />
+                </button>
+              </header>
+              <div className={PLAY_HUB.sheetBody}>{panels[view]}</div>
+            </section>
+          </div>
+        </FloatingLayer>
       )}
     </div>
   )

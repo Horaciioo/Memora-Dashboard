@@ -6,6 +6,7 @@ import type { FormEvent } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { usePlayAdminLogs } from '@/core/hooks/data/play/usePlayAdminLogs'
+import { PlayEmpty } from '@/composites/play/shared/PlayEmpty'
 import { fillPlayMessage } from '@/declarations/play'
 import { PLAY_BOARD_ADMIN_COPY as COPY } from '@/declarations/play/admin'
 import { PLAY_LOG_EVENTS } from '@/declarations/play/journal'
@@ -15,6 +16,7 @@ import type { PlayAdminLog, PlayAdminLogStats, PlayAdminRow } from '@/types/play
 import { cn } from '@/utils/classnames'
 import { EVENT_TYPES } from '@/utils/constants/events'
 import { formatDayTime } from '@/utils/format/time/dates'
+import { formatNumber } from '@/utils/format/numbers'
 
 // Rows drawn grey while a page loads
 const SKELETON_ROWS = 8
@@ -32,9 +34,12 @@ const TYPES = PLAY_LOG_EVENTS.map((name) => ({
 }))
 
 export interface PlayAdminLogsProps {
-  stats: PlayAdminLogStats
+  // Figures of the journal, left out on a player file
+  stats?: PlayAdminLogStats
   // Players of the filter
-  players: PlayAdminRow[]
+  players?: PlayAdminRow[]
+  // Journal of this player only
+  playerId?: string
 }
 
 // One labelled fact of an opened line
@@ -47,7 +52,7 @@ const Fact = ({ label, value }: { label: string; value: string | null }) => (
 
 // One journal line, opened for its facts
 const Row = ({ log }: { log: PlayAdminLog }) => (
-  <li>
+  <li className={PLAY_LOGS.row}>
     <details>
       <summary className={PLAY_LOGS.summary}>
         <span className={PLAY_LOGS.moment}>{formatDayTime(log.createdAt)}</span>
@@ -69,15 +74,17 @@ const Row = ({ log }: { log: PlayAdminLog }) => (
 )
 
 /**
- * Play journal laid out like the Memora logs: figures, filter bar, table of lines opened for their facts, pager, each page fetched
+ * Play journal: figures, filters, lines opened for their facts, pager, each page fetched
  * @param {PlayAdminLogsProps} props - Figures and players
  * @return {JSX.Element}
  */
 
-export const PlayAdminLogs = ({ stats, players }: PlayAdminLogsProps) => {
+export const PlayAdminLogs = ({ stats, players = [], playerId }: PlayAdminLogsProps) => {
   const [filters, setFilters] = useState<Record<string, string>>({})
   const [search, setSearch] = useState('')
-  const { data, isLoading, isError } = usePlayAdminLogs(filters)
+  const { data, isLoading, isError } = usePlayAdminLogs(
+    playerId ? { ...filters, player: playerId } : filters
+  )
 
   // Change one filter, back to page one
   const apply = (key: string, value: string) =>
@@ -98,25 +105,29 @@ export const PlayAdminLogs = ({ stats, players }: PlayAdminLogsProps) => {
     setFilters({})
   }
 
-  const figures = [
-    [COPY.logsLast24h, stats.last24h],
-    [COPY.logsWeek, stats.week],
-    [COPY.logsAdminWeek, stats.adminWeek],
-  ] as const
+  const figures = stats
+    ? ([
+        [COPY.logsLast24h, stats.last24h],
+        [COPY.logsWeek, stats.week],
+        [COPY.logsAdminWeek, stats.adminWeek],
+      ] as const)
+    : []
 
   const page = data?.page ?? 1
   const go = (next: number) => setFilters((current) => ({ ...current, page: String(next) }))
 
   return (
     <div className={PLAY_LOGS.page}>
-      <div className={PLAY_LOGS.figures}>
-        {figures.map(([label, value]) => (
-          <div key={label} className={PLAY_LOGS.figure}>
-            <span className={PLAY_LOGS.figureValue}>{value.toLocaleString('fr-FR')}</span>
-            <span className={PLAY_LOGS.figureLabel}>{label}</span>
-          </div>
-        ))}
-      </div>
+      {stats && (
+        <div className={PLAY_LOGS.figures}>
+          {figures.map(([label, value]) => (
+            <div key={label} className={PLAY_LOGS.figure}>
+              <span className={PLAY_LOGS.figureValue}>{formatNumber(value)}</span>
+              <span className={PLAY_LOGS.figureLabel}>{label}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className={PLAY_LOGS.filters}>
         <form onSubmit={submit} className={PLAY_LOGS.search}>
@@ -148,49 +159,49 @@ export const PlayAdminLogs = ({ stats, players }: PlayAdminLogsProps) => {
             onChange={(value) => apply('type', value)}
           />
         </div>
-        <div className={PLAY_LOGS.select}>
-          <SelectMenu
-            isPlay
-            label={COPY.logsPlayer}
-            emptyLabel={COPY.logsAllPlayers}
-            options={players.map((entry) => ({ value: entry.accountId, label: entry.name }))}
-            value={filters.player ?? ''}
-            onChange={(value) => apply('player', value)}
-          />
-        </div>
-        <Button variant="arcade" onClick={reset}>
-          {COPY.logsReset}
-        </Button>
-      </div>
-
-      <div className={PLAY_LOGS.panel}>
-        {isLoading ? (
-          <div className={PLAY_LOGS.list} aria-busy="true">
-            {Array.from({ length: SKELETON_ROWS }, (_, index) => (
-              <span key={index} className={PLAY_LOGS.skeleton} />
-            ))}
+        {!playerId && (
+          <div className={PLAY_LOGS.select}>
+            <SelectMenu
+              isPlay
+              label={COPY.logsPlayer}
+              emptyLabel={COPY.logsAllPlayers}
+              options={players.map((entry) => ({ value: entry.accountId, label: entry.name }))}
+              value={filters.player ?? ''}
+              onChange={(value) => apply('player', value)}
+            />
           </div>
-        ) : isError ? (
-          <p className={PLAY_LOGS.empty}>{COPY.logsError}</p>
-        ) : !data || data.entries.length === 0 ? (
-          <p className={PLAY_LOGS.empty}>
-            {Object.keys(filters).length > 0 ? COPY.logsNoResultTitle : COPY.logsEmpty}
-          </p>
-        ) : (
-          <>
-            <div className={PLAY_LOGS.head}>
-              {COPY.logsColumns.map((column) => (
-                <span key={column}>{column}</span>
-              ))}
-            </div>
-            <ol className={PLAY_LOGS.list}>
-              {data.entries.map((log) => (
-                <Row key={log.id} log={log} />
-              ))}
-            </ol>
-          </>
         )}
       </div>
+      <Button variant="arcade" onClick={reset} className={PLAY_LOGS.reset}>
+        {COPY.logsReset}
+      </Button>
+
+      {isLoading ? (
+        <div className={PLAY_LOGS.list} aria-busy="true">
+          {Array.from({ length: SKELETON_ROWS }, (_, index) => (
+            <span key={index} className={PLAY_LOGS.skeleton} />
+          ))}
+        </div>
+      ) : isError ? (
+        <PlayEmpty icon="playHistory">{COPY.logsError}</PlayEmpty>
+      ) : !data || data.entries.length === 0 ? (
+        <PlayEmpty icon="playHistory">
+          {Object.keys(filters).length > 0 ? COPY.logsNoResultTitle : COPY.logsEmpty}
+        </PlayEmpty>
+      ) : (
+        <>
+          <div className={PLAY_LOGS.head}>
+            {COPY.logsColumns.map((column) => (
+              <span key={column}>{column}</span>
+            ))}
+          </div>
+          <ol className={PLAY_LOGS.list}>
+            {data.entries.map((log) => (
+              <Row key={log.id} log={log} />
+            ))}
+          </ol>
+        </>
+      )}
 
       {data && data.pages > 1 && (
         <div className={PLAY_LOGS.pager}>

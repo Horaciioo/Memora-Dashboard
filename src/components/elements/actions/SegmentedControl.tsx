@@ -23,6 +23,8 @@ export interface SegmentedControlProps<TValue extends string> {
   isFull?: boolean
   // Dressed for Memora Play
   isPlay?: boolean
+  // Play only: hugs its content and writes glyph and label together
+  isInline?: boolean
 }
 
 /**
@@ -33,6 +35,7 @@ export interface SegmentedControlProps<TValue extends string> {
  * @param {string} label - Accessible group name
  * @param {boolean} [isFull] - Spans the row
  * @param {boolean} [isPlay] - Memora Play look
+ * @param {boolean} [isInline] - Play: glyph beside label, hugging
  * @return {JSX.Element}
  */
 
@@ -43,10 +46,13 @@ export const SegmentedControl = <TValue extends string>({
   label,
   isFull,
   isPlay,
+  isInline,
 }: SegmentedControlProps<TValue>) => (
   <div
     className={
-      isPlay ? SEGMENTED_PLAY.group : cn(SEGMENTED_STYLES.group, isFull && SEGMENTED_STYLES.full)
+      isPlay
+        ? cn(SEGMENTED_PLAY.group, isInline && SEGMENTED_PLAY.groupInline)
+        : cn(SEGMENTED_STYLES.group, isFull && SEGMENTED_STYLES.full)
     }
     role="group"
     aria-label={label}
@@ -60,13 +66,14 @@ export const SegmentedControl = <TValue extends string>({
           key={option.value}
           type="button"
           aria-pressed={isSelected}
-          aria-label={Icon ? option.label : undefined}
-          title={Icon ? option.label : undefined}
+          aria-label={Icon && !isInline ? option.label : undefined}
+          title={Icon && !isInline ? option.label : undefined}
           onClick={() => onChange(option.value)}
           className={
             isPlay
               ? cn(
                   SEGMENTED_PLAY.option,
+                  isInline && SEGMENTED_PLAY.optionInline,
                   isSelected ? SEGMENTED_PLAY.selected : SEGMENTED_PLAY.idle
                 )
               : cn(
@@ -76,7 +83,12 @@ export const SegmentedControl = <TValue extends string>({
                 )
           }
         >
-          {Icon ? <Icon className="size-6" aria-hidden="true" /> : option.label}
+          {Icon ? <Icon className={isInline ? 'size-5' : 'size-6'} aria-hidden="true" /> : null}
+          {isInline ? (
+            <span className={SEGMENTED_PLAY.inlineLabel}>{option.label}</span>
+          ) : !Icon ? (
+            option.label
+          ) : null}
         </button>
       )
     })}

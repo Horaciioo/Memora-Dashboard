@@ -18,7 +18,7 @@ import {
 const { ships: cargo } = CONCORDAT.trade
 
 /**
- * Whether cargo may flow between two nations: itself, an ally or a nation at peace, never under an embargo
+ * Whether cargo may flow between two nations: itself or an ally, never under an embargo
  * @param {ConcordatState} state - Game
  * @param {number} first - Sender
  * @param {number} second - Receiver
@@ -30,7 +30,7 @@ export const canShip = (state: ConcordatState, first: number, second: number): b
   if (isEmbargoed(state, first, second)) return false
   const tie = tieKindOf(state, first, second)
 
-  return tie === ConcordatTies.Alliance || tie === ConcordatTies.Peace
+  return tie === ConcordatTies.Alliance
 }
 
 // Working ports of a living nation
@@ -63,16 +63,30 @@ const cargoGold = (state: ConcordatState, ship: ConcordatShip, receiver: number)
   return gold * ally * (isBlamed ? 1 - CONCORDAT.trade.condemnedMalus : 1)
 }
 
+// Warships of the tick, found once for every cargo ship
+const warCache = new WeakMap<ConcordatState, { tick: number; ships: ConcordatShip[] }>()
+
+export const warshipsOf = (state: ConcordatState): ConcordatShip[] => {
+  const known = warCache.get(state)
+  if (known && known.tick === state.tick) return known.ships
+
+  const ships = state.ships.filter((other) => other.kind === ConcordatShipKinds.War)
+  warCache.set(state, { tick: state.tick, ships })
+
+  return ships
+}
+
 // Foe warship close to the ship
 const pirateOf = (state: ConcordatState, ship: ConcordatShip): number => {
   const { width } = state.map
-  for (const other of state.ships) {
-    if (other.kind !== ConcordatShipKinds.War || other.owner === ship.owner) continue
-    if (tieKindOf(state, other.owner, ship.owner) !== ConcordatTies.Hostile) continue
+  for (const other of warshipsOf(state)) {
+    if (other.owner === ship.owner) continue
 
+    // Distance first, the tie lookup is the dear part
     const dx = (other.tile % width) - (ship.tile % width)
     const dy = Math.floor(other.tile / width) - Math.floor(ship.tile / width)
-    if (Math.hypot(dx, dy) <= cargo.pirateRadius) return other.owner
+    if (Math.hypot(dx, dy) > cargo.pirateRadius) continue
+    if (tieKindOf(state, other.owner, ship.owner) === ConcordatTies.Hostile) return other.owner
   }
 
   return 0
@@ -82,7 +96,7 @@ const pirateOf = (state: ConcordatState, ship: ConcordatShip): number => {
 const seize = (state: ConcordatState, ship: ConcordatShip, pirate: number): boolean => {
   let best: { port: ConcordatBuilding; path: number[] } | null = null
   for (const port of portsOf(state).filter((other) => other.owner === pirate)) {
-    const path = seaPath(state.map, [ship.tile], seaAround(state.map, port.tile))
+    const path = seaPath(state.map, [ship.tile], seaAround(state.map, port.tile), cargo.pathLimit)
     if (path && (!best || path.length < best.path.length)) best = { port, path }
   }
   if (!best) return false
@@ -134,6 +148,32 @@ const sailingFrom = (state: ConcordatState, port: ConcordatBuilding): number =>
   state.ships.filter((ship) => ship.kind === ConcordatShipKinds.Trade && ship.port === port.id)
     .length
 
+// Sea way between two ports, found once: the sea never changes
+const crossings = new WeakMap<ConcordatState, Map<number, number[] | null>>()
+
+const crossingOf = (
+  state: ConcordatState,
+  port: ConcordatBuilding,
+  target: ConcordatBuilding
+): number[] | null => {
+  const known = crossings.get(state) ?? new Map<number, number[] | null>()
+  crossings.set(state, known)
+  const key = port.id * 100003 + target.id
+  if (!known.has(key)) {
+    known.set(
+      key,
+      seaPath(
+        state.map,
+        seaAround(state.map, port.tile),
+        seaAround(state.map, target.tile),
+        cargo.pathLimit
+      )
+    )
+  }
+
+  return known.get(key) ?? null
+}
+
 // Launch one ship from a port toward a random partner port
 const launch = (
   state: ConcordatState,
@@ -149,11 +189,7 @@ const launch = (
   if (!partners.length) return
 
   const target = partners[Math.floor(nextRandom(state) * partners.length)]
-  const path = seaPath(
-    state.map,
-    seaAround(state.map, port.tile),
-    seaAround(state.map, target.tile)
-  )
+  const path = crossingOf(state, port, target)
   if (!path?.length) return
 
   state.ships.push({

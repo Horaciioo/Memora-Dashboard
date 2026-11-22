@@ -1,4 +1,5 @@
 import { PlayFold } from '@/composites/play/mobile/PlayFold'
+import { PlayEmpty } from '@/composites/play/shared/PlayEmpty'
 import { PLAY_PROFILE_COPY } from '@/declarations/play'
 import { PLAY_PROFILE } from '@/declarations/ui/variants'
 import type { PlayRecordView } from '@/types/play'
@@ -13,7 +14,7 @@ import type { PlayRecordView } from '@/types/play'
 export const PlayRecords = ({ records }: { records: PlayRecordView[] }) => (
   <PlayFold title={PLAY_PROFILE_COPY.records}>
     {records.length === 0 ? (
-      <p className={PLAY_PROFILE.empty}>{PLAY_PROFILE_COPY.recordsEmpty}</p>
+      <PlayEmpty>{PLAY_PROFILE_COPY.recordsEmpty}</PlayEmpty>
     ) : (
       <dl className={PLAY_PROFILE.records}>
         {records.map((record) => (

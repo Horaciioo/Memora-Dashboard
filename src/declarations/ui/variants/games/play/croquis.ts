@@ -33,8 +33,9 @@ export const CROQUIS_BOARD = {
   blank: 'play-croquis-blank absolute inset-0 grid place-items-center text-sm font-bold',
   tools:
     'play-hud-block z-10 mt-3 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2 lg:absolute lg:inset-x-auto lg:mt-0 lg:w-40 lg:top-1/2 lg:right-full lg:bottom-auto lg:mr-4 lg:-translate-y-1/2 lg:flex-col lg:gap-3 lg:p-3',
-  toolPens: 'grid grid-cols-8 gap-1.5 lg:grid-cols-4',
+  toolPens: 'grid grid-cols-9 gap-1.5 lg:grid-cols-4',
   toolSizes: 'flex items-center gap-1.5',
+  toolShapes: 'flex flex-wrap items-center justify-center gap-1.5 lg:grid lg:w-full lg:grid-cols-2',
   toolActions: 'flex items-center gap-1.5 lg:w-full lg:flex-col lg:items-stretch',
   pen: 'play-croquis-pen size-9 rounded-full lg:size-8',
   penOn: 'play-croquis-pen-on',
@@ -47,7 +48,8 @@ export const CROQUIS_BOARD = {
   // Fixed height, the board never jumps between phases
   zone: 'flex min-h-16 w-full flex-col items-center justify-center gap-3',
   // Answer field
-  form: 'flex w-full max-w-md items-center gap-2',
+  // Phone: the key under the field, full width
+  form: 'flex w-full max-w-md flex-col items-stretch gap-2 sm:flex-row sm:items-center',
   input:
     'min-w-0 flex-1 rounded-xl bg-[var(--play-chip)] px-4 py-3 text-center text-lg font-extrabold tracking-widest text-[var(--play-ink)] uppercase placeholder:font-normal placeholder:tracking-normal placeholder:normal-case placeholder:text-[var(--play-ink-faint)] focus:bg-[var(--play-panel-strong)] focus:outline-none',
   shake: 'play-croquis-shake',

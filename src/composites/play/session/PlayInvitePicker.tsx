@@ -8,7 +8,7 @@ import { PlayInviteSection } from '@/composites/play/session/PlayInviteSection'
 import { usePlayOnline } from '@/composites/play/mobile/PlayOnline'
 import { usePlayInvites } from '@/core/hooks/data/play/usePlayInvites'
 import { groupCandidates, PlayInviteGroups } from '@/core/lib/play/inviteGroups'
-import { PLAY_HUB_COPY, PLAY_SETTINGS } from '@/declarations/play'
+import { PLAY_FRIENDS_COPY, PLAY_HUB_COPY, PLAY_SETTINGS } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { PLAY_INVITE } from '@/declarations/ui/variants'
 import type { PlayInviteCandidate } from '@/types/play'
@@ -83,7 +83,16 @@ export const PlayInvitePicker = ({
     [candidates, online]
   )
   // Members in Play now, then lately played with, one row each
+  const onlineIds = new Set(online.map((member) => member.accountId))
   const sections = [
+    {
+      title: PLAY_FRIENDS_COPY.title,
+      // Friends here now come first
+      people: candidates
+        .filter((entry) => entry.isFriend)
+        .sort((a, b) => Number(onlineIds.has(b.id)) - Number(onlineIds.has(a.id)))
+        .slice(0, PLAY_INVITE_SHOWN),
+    },
     {
       title: PLAY_HUB_COPY.inviteOnline,
       people: groups[PlayInviteGroups.Online].slice(0, PLAY_INVITE_SHOWN),

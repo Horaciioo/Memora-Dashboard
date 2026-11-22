@@ -1,10 +1,9 @@
 'use client'
 
 import { incomingOf, inboundOf } from '@/composites/play/concordat/hud/ConcordatAlerts'
-import { playerRgb, rgbText, troopFigure } from '@/core/lib/play/concordat'
+import { troopFigure } from '@/core/lib/play/concordat'
 import type { ConcordatClientState } from '@/core/lib/play/concordat'
 import { useConcordatViewStore } from '@/core/store/play/concordatView'
-import { CONCORDAT_ART } from '@/declarations/play/concordat/art'
 import { CONCORDAT_HUD_COPY } from '@/declarations/play/concordat/hudCopy'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -56,13 +55,8 @@ export const ConcordatThreats = ({ client, names, act }: ConcordatThreatsProps) 
           className={CONCORDAT_HUD.threat}
           title={fillPlayMessage(CONCORDAT_HUD_COPY.underAttack, { name: names[corps.owner] })}
         >
-          <span
-            className={CONCORDAT_HUD.swatch}
-            style={{
-              background: rgbText(playerRgb(client.players[corps.owner - 1], CONCORDAT_ART.nation)),
-            }}
-          />
           <span className={CONCORDAT_HUD.threatFigure}>{troopFigure(corps.troops)}</span>
+          <span className={CONCORDAT_HUD.threatName}>{names[corps.owner]}</span>
           <button
             type="button"
             className={CONCORDAT_HUD.threatKey}

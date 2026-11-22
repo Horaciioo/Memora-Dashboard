@@ -322,6 +322,7 @@ export interface LiveFocusView {
  * @property {string | null} reason - Reason
  * @property {string | null} messageExcerpt - Message it answered
  * @property {string | null} actorName - Who did it, hidden from a Modo for a colleague
+ * @property {string | null} actorAvatar - Their picture, hidden with the name
  * @property {string} liveTitle - Live it happened on
  * @property {boolean} fromPanel - Applied from the panel
  * @property {string | null} offenseId - Panel offence applied
@@ -336,6 +337,7 @@ export interface ViewerSanction {
   reason: string | null
   messageExcerpt: string | null
   actorName: string | null
+  actorAvatar: string | null
   liveTitle: string
   fromPanel: boolean
   offenseId: string | null

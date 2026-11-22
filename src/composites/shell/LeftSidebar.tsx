@@ -19,7 +19,6 @@ import { RailShortcuts } from '@/composites/shell/rail/RailShortcuts'
 import { LiveRailNotice } from '@/composites/lives/notices/LiveRailNotice'
 import { PlayNotice } from '@/composites/play/hub/notices/PlayNotice'
 import { PlayInviteNotice } from '@/composites/play/invites/PlayInviteNotice'
-import { usePlayNotice } from '@/core/hooks/interaction/layout/usePlayNotice'
 import { usePendingNotice } from '@/core/store/play/playNotices'
 import { useCalendarRail } from '@/core/hooks/interaction/calendar/useCalendarRail'
 import { useCalendarRailView } from '@/core/hooks/interaction/calendar/useCalendarRailView'
@@ -103,15 +102,12 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   }, [isCompact])
 
   const { shortcuts, groups } = useRailEntries(viewContext)
-  const liveAt = shortcuts.findIndex((item) => item.href === ROUTES.lives)
-  const playAt = shortcuts.findIndex((item) => item.href === ROUTES.play)
-  // One bubble at a time, Play first until it is dismissed
-  const [isPlayDismissed] = usePlayNotice()
-  // A waiting invitation comes before both
+  const playShortcut = shortcuts.find((item) => item.href === ROUTES.play)
+  const rowShortcuts = shortcuts.filter((item) => item.href !== ROUTES.play)
+  const liveRowAt = rowShortcuts.findIndex((item) => item.href === ROUTES.lives)
   const hasInvite = usePendingNotice() !== null
-  const hasPlayNotice = playAt >= 0 && !isPlayDismissed
   // Pointer under the middle of a box
-  const pointAt = (index: number) => (index + 0.5) / shortcuts.length
+  const pointAt = (index: number) => (index + 0.5) / rowShortcuts.length
 
   const nav = (
     <RailNav
@@ -129,17 +125,13 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   // Shortcuts and the live notice, in every menu but a course's
   const topBlock = (
     <>
-      <RailShortcuts items={shortcuts} isUnlocking={isTouring} live={viewContext.live} />
+      <RailShortcuts items={rowShortcuts} isUnlocking={isTouring} live={viewContext.live} />
       {/* Hangs under the Live shortcut it announces */}
-      {!isCompact && !isCalendarMenu && liveAt >= 0 && (
-        <LiveRailNotice live={viewContext.live} pointedAt={pointAt(liveAt)} />
+      {!isCompact && !isCalendarMenu && liveRowAt >= 0 && (
+        <LiveRailNotice live={viewContext.live} pointedAt={pointAt(liveRowAt)} />
       )}
-      {!isCompact && !isCalendarMenu && hasInvite && (
-        <PlayInviteNotice pointedAt={playAt >= 0 ? pointAt(playAt) : undefined} />
-      )}
-      {!isCompact && !isCalendarMenu && !hasInvite && hasPlayNotice && (
-        <PlayNotice pointedAt={pointAt(playAt)} />
-      )}
+      {playShortcut && <PlayNotice isCompact={isCompact} />}
+      {!isCompact && !isCalendarMenu && hasInvite && <PlayInviteNotice pointedAt={0.5} />}
     </>
   )
 

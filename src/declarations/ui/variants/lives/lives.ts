@@ -177,30 +177,26 @@ export const CREATOR_BILAN = {
   hero: 'relative isolate flex min-h-[18rem] flex-col justify-end gap-4 overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-media-shade)] p-6 text-[var(--color-on-media)] shadow-[var(--shadow-lg)] sm:p-10',
   backdrop: 'absolute inset-0 -z-20 h-full w-full scale-110 object-cover blur-2xl saturate-150',
   wash: 'absolute inset-0 -z-10 bg-[radial-gradient(80%_70%_at_20%_30%,transparent,color-mix(in_srgb,var(--color-media-shade)_75%,transparent))]',
-  halo: 'absolute -top-24 -right-24 -z-10 h-80 w-80 rounded-full bg-[var(--color-brand-600)] opacity-35 blur-3xl',
   heroRow: 'flex flex-wrap items-end gap-6',
   portrait: 'shrink-0 shadow-[var(--shadow-lg)] ring-4 ring-[var(--color-on-media)]',
   eyebrow: 'text-xs font-bold tracking-widest uppercase opacity-80',
   name: 'text-5xl leading-none font-bold tracking-tight sm:text-7xl',
   day: 'text-lg font-semibold opacity-90',
-  // By the numbers: type does the work, thin lines split the figures
+  // By the numbers: type does the work, hairlines split the figures
   numbers:
-    'grid grid-cols-2 gap-y-10 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface px-6 py-10 shadow-[var(--shadow-md)] md:grid-cols-3 md:px-10',
-  number:
-    'flex flex-col gap-2 px-4 first:pl-0 md:border-l md:border-[var(--color-border)] md:first:border-l-0 md:[&:nth-child(4)]:border-l-0 md:[&:nth-child(n+4)]:pt-0',
-  numberValue:
-    'text-5xl leading-none font-bold tracking-tight tabular-nums text-[var(--tone)] md:text-7xl',
-  numberLabel: 'text-xs font-bold tracking-widest uppercase text-[var(--color-ink-subtle)]',
-  // Story: four cards, a big line each, a short hint under it
-  storyGrid: 'grid grid-cols-1 gap-4 md:grid-cols-2',
+    'overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface',
+  numbersGrid: '-mt-px -ml-px grid grid-cols-2 md:grid-cols-3',
+  number: 'flex flex-col gap-2 border-t border-l border-[var(--color-border)] p-6 md:p-8',
+  numberValue: 'text-5xl leading-none font-bold tracking-tight tabular-nums md:text-7xl',
+  numberLabel: 'text-xs font-bold tracking-wide uppercase text-[var(--color-ink)]',
+  // Story: one panel, cells split by hairlines
+  storyPanel:
+    'overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface',
+  storyGrid: '-mt-px -ml-px grid grid-cols-1 md:grid-cols-2',
   storyCard:
-    'relative isolate flex min-h-40 flex-col justify-between gap-4 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 shadow-[var(--shadow-md)]',
-  storyBlob:
-    'pointer-events-none absolute -right-12 -bottom-12 -z-10 size-48 rounded-full bg-[var(--tone)] opacity-[0.12] blur-2xl',
-  storyHead: 'flex items-center justify-between gap-3',
-  storyKicker: 'text-xs font-bold tracking-widest uppercase text-[var(--color-ink-subtle)]',
-  storyGlyph: 'size-7 text-[var(--tone)]',
-  storyBig: 'text-3xl leading-tight font-bold tracking-tight text-[var(--tone)] md:text-4xl',
+    'flex min-h-40 flex-col justify-between gap-4 border-t border-l border-[var(--color-border)] p-6',
+  storyKicker: 'text-xs font-bold tracking-wide uppercase text-[var(--color-ink)]',
+  storyBig: 'text-3xl leading-tight font-bold tracking-tight md:text-4xl',
   storyHint: 'text-sm text-[var(--color-ink-subtle)]',
   storyTimes:
     'flex flex-wrap items-baseline gap-x-3 text-4xl leading-none font-bold tracking-tight tabular-nums md:text-5xl',
@@ -217,39 +213,24 @@ export const LIVE_REPORT = {
   // Title of the bilan, the creator and the day
   heading: 'text-3xl leading-tight font-bold tracking-tight md:text-4xl',
   toolbar: 'flex flex-wrap items-center justify-center gap-3 print:hidden',
-  notice:
-    'rounded-[var(--radius-lg)] border-l-4 border-[var(--color-caution)] bg-[var(--color-caution-soft)] px-4 py-3 text-sm',
-  // Key figures: three big ones, then the audience, then the team
-  figures: 'flex flex-col gap-8',
-  figureGroup: 'flex flex-col gap-3',
+  notice: 'rounded-[var(--radius-lg)] bg-[var(--color-caution-soft)] px-4 py-3 text-sm',
+  // Key figures: one framed panel, cells split by hairlines
+  figures: 'flex flex-col gap-10',
   figureGroupTitle: PROPERTY_LABEL,
-  figureHero: 'grid grid-cols-1 gap-4 md:grid-cols-3',
-  heroCard:
-    'relative flex flex-col gap-3 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 shadow-[var(--shadow-md)]',
-  heroCardMain: 'bg-[image:var(--gradient-soft)]',
-  heroGlyph: 'absolute top-5 right-5 size-8 opacity-80',
-  heroLabel: PROPERTY_LABEL,
-  heroValue: 'text-5xl leading-none font-bold tracking-tight tabular-nums md:text-6xl',
-  figureRow: 'grid grid-cols-2 gap-3 lg:grid-cols-4',
-  figureRowThree: 'grid grid-cols-1 gap-3 sm:grid-cols-3',
-  figure:
-    'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-5 py-4 shadow-[var(--shadow-sm)]',
+  figurePanel:
+    'overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface',
+  // Shifted by one hairline so the outer edge draws none
+  figureGrid: '-mt-px -ml-px grid',
+  figureHero: 'grid-cols-1 sm:grid-cols-3',
+  figureRow: 'grid-cols-2 lg:grid-cols-4',
+  figureRowThree: 'grid-cols-1 sm:grid-cols-3',
+  figureCell:
+    'flex min-w-0 flex-col gap-2 border-t border-l border-[var(--color-border)] p-5 text-left sm:p-6',
+  figureCellPickable:
+    'cursor-pointer transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   figureLabel: PROPERTY_LABEL,
-  figureValue: 'text-2xl font-bold tracking-tight tabular-nums md:text-3xl',
-  // Stat card: tone colour through --tone, a soft blob, a bare glyph
-  statCard:
-    'group relative isolate flex flex-col gap-2 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]',
-  statCardPickable:
-    'cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  statCardHero: 'gap-3 p-6 shadow-[var(--shadow-md)]',
-  statBlob:
-    'pointer-events-none absolute -top-10 -right-10 -z-10 size-36 rounded-full bg-[var(--tone)] opacity-[0.14] blur-xl transition-opacity group-hover:opacity-25',
-  statIcon: 'absolute top-5 right-5 text-[var(--tone)] opacity-90',
-  statGlyph: 'size-6',
-  statLabel: 'pr-12 text-xs font-bold tracking-wide uppercase text-[var(--color-ink-subtle)]',
-  statValue:
-    'text-3xl leading-none font-bold tracking-tight tabular-nums text-[var(--tone)] md:text-4xl',
-  statValueHero: 'text-5xl md:text-6xl',
+  figureValue: 'truncate text-3xl leading-none font-bold tracking-tight tabular-nums md:text-4xl',
+  figureValueHero: 'text-5xl md:text-6xl',
   // Timeline
   chart: 'flex h-40 items-end gap-0.5',
   bar: 'group relative flex h-full flex-1 items-end',
@@ -267,20 +248,15 @@ export const LIVE_REPORT = {
   friseLegend: 'flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-ink-subtle)]',
   friseKey: 'inline-flex items-center gap-1.5',
   friseDot: 'h-2.5 w-2.5 rounded-full',
-  // Ranking of sanctions
-  rankGrid: 'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3',
-  rankCard:
-    'relative flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',
-  rankTop: 'bg-[image:var(--gradient-soft)] shadow-[var(--shadow-md)]',
-  rankPlace:
-    'absolute top-4 right-5 text-3xl font-bold tabular-nums text-[var(--color-ink-subtle)]',
-  rankWho: 'flex min-w-0 items-center gap-3 pr-10 font-bold tracking-tight',
-  rankCount: 'text-5xl leading-none font-bold tracking-tight tabular-nums',
-  rankCountLabel: PROPERTY_LABEL,
-  rankKinds: 'flex flex-wrap gap-2',
-  rankKind:
-    'inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] bg-[var(--color-surface-sunken)] px-2 py-1 text-xs font-semibold tabular-nums',
-  rankKindGlyph: 'size-4 shrink-0',
+  // Ranking of sanctions: one list, a hairline between people
+  rankList: 'flex flex-col divide-y divide-[var(--color-border)]',
+  rankRow:
+    'grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 py-4 first:pt-0 last:pb-0',
+  rankPlace: 'text-lg font-bold tabular-nums text-[var(--color-ink-subtle)]',
+  rankWho: 'flex min-w-0 items-center gap-3 font-bold tracking-tight',
+  rankKinds: 'col-start-2 text-sm text-[var(--color-ink-subtle)]',
+  rankCount:
+    'col-start-3 row-span-2 row-start-1 text-3xl leading-none font-bold tracking-tight tabular-nums',
   // Roll-call against what was done
   compare: 'w-full text-left text-sm',
   compareHead:
@@ -288,20 +264,19 @@ export const LIVE_REPORT = {
   compareRow: 'border-b border-[var(--color-border)] last:border-b-0',
   compareCell: 'py-3 pr-4 align-middle tabular-nums',
   compareWho: 'flex items-center gap-3 font-semibold',
-  compareExtra: 'font-semibold text-[var(--color-success)]',
+  compareExtra: 'font-semibold',
   compareMissed: 'inline-flex items-center gap-1.5 font-semibold text-[var(--color-danger)]',
   compareInside: 'inline-flex items-center gap-1.5 text-[var(--color-ink-subtle)]',
   compareGlyph: 'size-4 shrink-0',
   // Notes left on viewers
   noteTotal: 'text-5xl leading-none font-bold tracking-tight tabular-nums',
   noteTotalRow: 'flex flex-wrap items-baseline gap-3 pb-4',
-  noteGrid: 'grid grid-cols-1 gap-4 lg:grid-cols-2',
-  noteBox:
-    'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 shadow-[var(--shadow-sm)]',
+  noteGrid: 'flex flex-col divide-y divide-[var(--color-border)]',
+  noteBox: 'flex flex-col gap-3 py-5 first:pt-0 last:pb-0',
   noteAuthor: 'flex items-center gap-3 font-semibold',
   noteAuthorCount: 'ml-auto text-xs font-bold text-[var(--color-ink-subtle)]',
-  noteList: 'flex flex-col divide-y divide-[var(--color-border)]',
-  noteItem: 'flex flex-col gap-0.5 py-2 first:pt-0 last:pb-0',
+  noteList: 'grid grid-cols-1 gap-x-8 gap-y-3 md:grid-cols-2',
+  noteItem: 'flex flex-col gap-0.5',
   noteOn: 'text-xs font-bold text-[var(--color-ink-subtle)] tabular-nums',
   noteBody: 'text-sm',
   // Moderator picker and the page of one moderator
@@ -309,8 +284,7 @@ export const LIVE_REPORT = {
   pick: 'inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] card-surface px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   pickOn:
     'border-transparent bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
-  detailHead:
-    'flex flex-wrap items-center gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 shadow-[var(--shadow-md)]',
+  detailHead: 'flex flex-wrap items-center gap-5 px-1',
   detailWho: 'flex min-w-0 flex-col gap-1',
   detailName: 'flex flex-wrap items-center gap-3 text-3xl font-bold tracking-tight',
   detailColumns: 'grid grid-cols-1 gap-6 lg:grid-cols-2',
@@ -326,16 +300,16 @@ export const LIVE_REPORT = {
   teamText: 'flex min-w-0 flex-col gap-1',
   teamWho: 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-lg font-bold tracking-tight',
   teamTags: 'flex flex-wrap items-center gap-x-3 gap-y-1',
-  // Track: hour lines, the hours given as a tinted zone, the time done in blue, the extra in green
+  // Track: hour lines, the hours given as a tinted zone, the time done in brand, the extra in ink
   teamTrackBox: 'flex min-w-0 flex-col gap-1',
   teamTrack:
     'relative h-9 w-full overflow-hidden rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)]',
   teamGrid: 'absolute inset-y-0 w-px bg-[var(--color-border)]',
-  teamZone: 'absolute inset-y-0 bg-[var(--color-info-soft)]',
+  teamZone: 'absolute inset-y-0 bg-[color-mix(in_srgb,var(--color-ink)_8%,transparent)]',
   teamZoneMissed:
     'absolute inset-y-0 bg-[var(--color-danger-soft)] bg-[repeating-linear-gradient(135deg,transparent_0_6px,rgb(184_58_58/0.16)_6px_12px)]',
-  teamStretch: 'absolute inset-y-2.5 rounded-full bg-[var(--color-info)]',
-  teamExtra: 'absolute inset-y-2.5 rounded-full bg-[var(--color-success)]',
+  teamStretch: 'absolute inset-y-2.5 rounded-full bg-[var(--color-brand-600)]',
+  teamExtra: 'absolute inset-y-2.5 rounded-full bg-[var(--color-ink)]',
   teamMarks: 'relative h-4',
   teamMark:
     'absolute -translate-x-1/2 text-micro font-bold tabular-nums text-[var(--color-ink-subtle)]',
@@ -346,14 +320,17 @@ export const LIVE_REPORT = {
     'absolute -translate-x-1/2 text-micro font-semibold tabular-nums text-[var(--color-ink-subtle)]',
   teamNote: 'text-xs font-normal text-[var(--color-ink-subtle)]',
   teamSpan: 'text-sm text-[var(--color-ink-subtle)] tabular-nums',
-  spanTotal: 'font-bold text-[var(--color-info)]',
+  spanTotal: 'font-bold text-[var(--color-ink)]',
   spanHour: 'font-bold text-[var(--color-ink)]',
   spanAbsent:
     'inline-flex flex-wrap items-center gap-x-2 text-sm font-semibold text-[var(--color-danger)] tabular-nums [&_strong]:text-[var(--color-danger)]',
   spanAbsentGlyph: 'size-4 shrink-0',
   reinforcementTag:
     'inline-flex shrink-0 items-center rounded-[var(--radius-sm)] bg-[var(--color-info)] px-2 py-0.5 text-micro font-bold tracking-wide text-[var(--color-on-solid)] uppercase',
-  spanExtra: 'block text-xs font-semibold italic text-[var(--color-success)]',
+  spanExtra: 'block text-xs font-semibold italic text-[var(--color-ink-subtle)]',
+  // Where someone moderated, a bare logo beside the name
+  origin: 'inline-flex shrink-0 items-center',
+  originGlyph: 'size-4',
   // Moderators
   rows: 'flex flex-col',
   row: 'grid grid-cols-1 items-baseline gap-x-6 gap-y-1 border-t border-[var(--color-border)] py-4 first:border-t-0 md:grid-cols-[minmax(0,12rem)_minmax(0,1fr)]',
@@ -364,9 +341,9 @@ export const LIVE_REPORT = {
   rowValue: 'text-right text-sm tabular-nums',
   // Sentence of a moderator: colours and bold on the figures
   rowSentence: 'text-base leading-relaxed',
-  sentenceActive: 'font-bold text-[var(--color-info)]',
-  sentenceScreen: 'font-bold text-[var(--color-mauve-600)]',
-  sentenceActions: 'font-bold text-[var(--color-brand-700)]',
+  sentenceActive: 'font-bold',
+  sentenceScreen: 'font-bold',
+  sentenceActions: 'font-bold',
   rowMeta: 'block text-xs text-[var(--color-ink-subtle)]',
   kinds: 'grid grid-cols-1 gap-2 sm:grid-cols-2',
   kind: 'flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2',

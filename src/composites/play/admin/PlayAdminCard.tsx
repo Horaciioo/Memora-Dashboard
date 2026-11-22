@@ -8,6 +8,7 @@ import { PLAY_ADMIN } from '@/declarations/ui/variants'
 import { useMenu } from '@/managers/front-end'
 import type { PlayAdminRow } from '@/types/play'
 import { cn } from '@/utils/classnames'
+import { formatNumber } from '@/utils/format/numbers'
 
 export interface PlayAdminCardProps {
   player: PlayAdminRow
@@ -20,7 +21,7 @@ export interface PlayAdminCardProps {
 }
 
 /**
- * Moderator box of the Play admin: portrait, name, level and XP, role or functions
+ * Player row: portrait, name, level and XP, state
  * @param {PlayAdminCardProps} props - Member, Play figures and gestures
  * @return {JSX.Element}
  */
@@ -65,14 +66,19 @@ export const PlayAdminCard = ({
       className={cn(PLAY_ADMIN.card, isChosen && PLAY_ADMIN.cardChosen)}
     >
       <PlayAvatar accountId={player.accountId} name={player.name} src={player.avatarUrl} />
-      <span className={PLAY_ADMIN.cardName}>{player.name}</span>
-      {isOnline && <span className={PLAY_ADMIN.online} />}
-      {player.isBanned && <span className={PLAY_ADMIN.cardBanned}>{COPY.banned}</span>}
-      <span className={PLAY_ADMIN.cardXp}>
-        {fillPlayMessage(COPY.levelShort, { level: player.level })}
-        {' · '}
-        {fillPlayMessage(PLAY_MEMBER_COPY.xp, { xp: player.xp.toLocaleString('fr-FR') })}
+      <span className={PLAY_ADMIN.cardText}>
+        <span className={PLAY_ADMIN.cardName}>{player.name}</span>
+        <span className={PLAY_ADMIN.cardNote}>
+          {fillPlayMessage(COPY.levelShort, { level: player.level })}
+          {' · '}
+          {fillPlayMessage(PLAY_MEMBER_COPY.xp, { xp: formatNumber(player.xp) })}
+        </span>
       </span>
+      {player.isBanned ? (
+        <span className={PLAY_ADMIN.cardBanned}>{COPY.banned}</span>
+      ) : (
+        isOnline && <span className={PLAY_ADMIN.cardOnline}>{COPY.filterOnline}</span>
+      )}
     </div>
   )
 }

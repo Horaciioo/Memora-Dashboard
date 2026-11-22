@@ -11,6 +11,7 @@ import { PlayChat } from '@/composites/play/session/PlayChat'
 import { PLAY_CHAT_BUBBLE, PLAY_GAME_BAR } from '@/declarations/ui/variants'
 import { BAC_SESSION_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
+import type { PlayGameName } from '@/utils/constants/play'
 
 /**
  * Chat stuck to the right edge, a bubble that opens and closes, same height as the box in the middle
@@ -18,6 +19,7 @@ import { ICONS } from '@/declarations/ui/icons'
  * @param {Object} props.chat - Chat props, fold gesture added here
  * @param {ReactNode} props.above - Link centred right above the chat box
  * @param {string} props.skin - Block skin of the game
+ * @param {PlayGameName} props.game - Game, the phone bar wears its skin
  * @return {JSX.Element}
  */
 
@@ -25,11 +27,13 @@ export const PlayChatBubble = ({
   chat,
   above,
   skin,
+  game,
 }: {
   chat: Omit<ComponentProps<typeof PlayChat>, 'isSide' | 'onFold'>
   above?: ReactNode
   // Block skin of the game, the arcade look when empty
   skin?: string
+  game: PlayGameName
 }) => {
   const [isOpen, setOpen] = useState(true)
   const [isFolding, setFolding] = useState(false)
@@ -41,7 +45,7 @@ export const PlayChatBubble = ({
     return (
       <>
         <div className={PLAY_GAME_BAR.spacer} aria-hidden="true" />
-        <PlayGameChatBar chat={chat} />
+        <PlayGameChatBar chat={chat} game={game} />
       </>
     )
   }

@@ -8,6 +8,8 @@
   "hintRatio": 0.5,
   "lengths": { "min": 3, "max": 12 },
   "paceLength": 5,
+  "lengthSecondsStep": 0.08,
+  "lengthSecondsFloor": 0.7,
   "difficulty": "easy",
   "difficulties": {
     "easy": { "min": 3, "max": 6 },
@@ -21,7 +23,9 @@
     "flashRatio": 0.2,
     "flashBonus": 5,
     "streakStep": 2,
-    "streakMax": 3
+    "streakMax": 3,
+    "lengthBonus": 1,
+    "lengthFrom": 4
   },
   "wordLength": 30,
   "feedSize": 40
