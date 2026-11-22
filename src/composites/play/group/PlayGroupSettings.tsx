@@ -1,13 +1,16 @@
 'use client'
 
+import { useState } from 'react'
+
 import { Button } from '@/components/elements/actions/Button'
 import { usePlayGroup } from '@/core/hooks/data/play/usePlayGroup'
-import { PLAY_GROUP_COPY } from '@/declarations/play'
-import { PLAY_BOX, PLAY_GROUP } from '@/declarations/ui/variants'
+import { fillPlayMessage, PLAY_GROUP_COPY } from '@/declarations/play'
+import { PLAY_CREW } from '@/declarations/ui/variants'
 import type { PlayGroupView } from '@/types/play'
+import { cn } from '@/utils/classnames'
 
 /**
- * Settings of the group: leave it, or dissolve it for the host
+ * Settings of the group: leave it, hand it over or dissolve it for the host
  * @param {Object} props - Group and viewer
  * @param {PlayGroupView} props.group - Group
  * @param {string} props.viewerId - Viewer
@@ -22,12 +25,38 @@ export const PlayGroupSettings = ({
   viewerId: string
 }) => {
   const actions = usePlayGroup()
+  const [pending, setPending] = useState<string | null>(null)
+  const heirs = group.members.filter((member) => member.accountId !== viewerId)
 
   return (
-    <div className={PLAY_BOX.body}>
-      <div className={PLAY_GROUP.footer}>
+    <div className={cn(PLAY_CREW.panel, PLAY_CREW.panelBar)}>
+      {group.isHost && heirs.length > 0 && (
+        <div className={PLAY_CREW.menu}>
+          <p>{PLAY_GROUP_COPY.transferHint}</p>
+          {heirs.map((member) => (
+            <Button
+              key={member.accountId}
+              variant="arcadeGhostSmall"
+              disabled={actions.isSaving}
+              onClick={() =>
+                pending === member.accountId
+                  ? void actions.transfer(group.id, member.accountId)
+                  : setPending(member.accountId)
+              }
+            >
+              {fillPlayMessage(
+                pending === member.accountId
+                  ? PLAY_GROUP_COPY.transferSure
+                  : PLAY_GROUP_COPY.transferTo,
+                { name: member.name }
+              )}
+            </Button>
+          ))}
+        </div>
+      )}
+      <div className={PLAY_CREW.menu}>
         <Button
-          variant="arcadeGhost"
+          variant="arcadeGhostSmall"
           disabled={actions.isSaving}
           onClick={() => void actions.remove(group.id, viewerId)}
         >
@@ -35,7 +64,7 @@ export const PlayGroupSettings = ({
         </Button>
         {group.isHost && (
           <Button
-            variant="arcadeGhost"
+            variant="arcadeGhostSmall"
             disabled={actions.isSaving}
             onClick={() => void actions.dissolve(group.id)}
           >

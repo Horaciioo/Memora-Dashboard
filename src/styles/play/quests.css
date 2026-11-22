@@ -1,0 +1,192 @@
+/* Quests page: hero glow, flame, rings, chest */
+.quest-hero {
+  background:
+    radial-gradient(
+      36rem 20rem at 8% 0%,
+      color-mix(in srgb, var(--play-gold) 24%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      30rem 18rem at 100% 100%,
+      color-mix(in srgb, var(--play-key) 30%, transparent),
+      transparent 65%
+    ),
+    var(--play-panel-strong);
+}
+
+.quest-ring-arc {
+  stroke-dasharray: 100;
+  stroke-dashoffset: var(--ring-to);
+}
+
+.quest-rise {
+  animation-delay: calc(var(--rise, 0) * 70ms);
+}
+
+@keyframes quest-flicker {
+  0%,
+  100% {
+    transform: scale(1, 1) rotate(-1deg);
+  }
+  33% {
+    transform: scale(0.97, 1.05) rotate(1.5deg);
+  }
+  66% {
+    transform: scale(1.03, 0.97) rotate(-2deg);
+  }
+}
+
+@keyframes quest-ember {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(1);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-3.5rem) scale(0.4);
+  }
+}
+
+@keyframes quest-ring {
+  from {
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes quest-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@keyframes quest-glow {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes quest-lid {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  80% {
+    transform: rotate(-9deg);
+  }
+  90% {
+    transform: rotate(-3deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .quest-flame {
+    transform-origin: 50% 90%;
+    animation: quest-flicker 2.4s ease-in-out infinite;
+  }
+
+  .quest-ember {
+    animation: quest-ember 3s ease-out infinite;
+    animation-delay: calc(var(--ember) * 0.9s);
+  }
+
+  .quest-ring-arc {
+    animation: quest-ring 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .quest-rise {
+    animation-name: quest-rise;
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+    animation-fill-mode: both;
+  }
+
+  .quest-glow {
+    animation: quest-glow 2.2s ease-in-out infinite;
+  }
+
+  .quest-lid {
+    transform-origin: 8% 100%;
+    animation: quest-lid 2.6s ease-in-out infinite;
+  }
+}
+
+/* Group quest boost: burning XP bar and its label */
+@keyframes xp-fire {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+  100% {
+    background-position: 200% 50%;
+    filter: brightness(1);
+  }
+}
+
+@keyframes xp-fire-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0.4rem 0 rgb(255 120 30 / 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0.9rem 0.1rem rgb(255 190 40 / 0.85);
+  }
+}
+
+.play-xp-fire {
+  background: linear-gradient(90deg, #ff3d00, #ff9100, #ffd54f, #ff9100, #ff3d00) 0% 50% / 200% 100%;
+  animation:
+    xp-fire 1.2s linear infinite,
+    xp-fire-glow 1.6s ease-in-out infinite;
+}
+
+.play-xp-boost {
+  background: linear-gradient(90deg, #ff6d00, #ffd54f, #ff6d00) 0% 50% / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: xp-fire 2s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-xp-fire,
+  .play-xp-boost {
+    animation: none;
+  }
+}
+
+/* System card of the group chat when a quest is done */
+@keyframes quest-cheer-in {
+  0% {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.92);
+  }
+  60% {
+    transform: translateY(0) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.quest-cheer {
+  animation: quest-cheer-in 0.5s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quest-cheer {
+    animation: none;
+  }
+}
