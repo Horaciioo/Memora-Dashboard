@@ -1,3 +1,4 @@
+import { OriginMark } from '@/composites/lives/bilan/OriginMark'
 import { Section } from '@/components/structures/page/Section'
 import type { LiveReport } from '@/core/lib/lives/report'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
@@ -44,6 +45,7 @@ export const BilanTeam = ({ report }: BilanTeamProps) => {
                 <li key={row.key} className={LIVE_REPORT.row}>
                   <span className={row.isMember ? LIVE_REPORT.rowName : LIVE_REPORT.rowNameMuted}>
                     {row.name}
+                    <OriginMark onMemora={row.isMember} />
                   </span>
                   <p className={LIVE_REPORT.rowSentence}>
                     {row.isMember ? (

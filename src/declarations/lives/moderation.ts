@@ -91,6 +91,7 @@ export const LIVE_REPORT_COPY = {
   blindNotice:
     'Le journal n’a pas reçu les actions faites sur Twitch pendant {time} de ce live, faute d’un modérateur connecté à Memora. Les chiffres peuvent être plus bas que la réalité.',
   outsideMemora: 'Hors Memora',
+  originMemora: 'Sur Memora',
   active: 'actif',
   modSentence: 'A été actif {active} puis {visible} à l’écran. Il a réalisé au total {actions}',
   modActionsMany: '{count} actions de Mod.',

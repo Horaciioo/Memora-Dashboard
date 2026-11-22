@@ -12,6 +12,7 @@ import { GestureFields, GestureItem } from '@/composites/lives/EditableGesture'
 import { InlineText } from '@/components/structures/inline/InlineText'
 import { useLiveData } from '@/core/hooks/data/lives/useLiveData'
 import { useLiveRemoval } from '@/core/hooks/data/lives/useLiveRemoval'
+import { OriginMark } from '@/composites/lives/bilan/OriginMark'
 import { ReinforcementTag } from '@/composites/lives/coordination/ReinforcementTag'
 import { ModSpan } from '@/composites/lives/ModSpan'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
@@ -165,6 +166,7 @@ export const MemberModerationView = ({
                                 <span className={LIVE_REPORT.lineWhat}>
                                   <Icon className={LIVE_REPORT.lineIcon} aria-hidden="true" />
                                   {meta.label}
+                                  <OriginMark onMemora={line.origin === 'MEMORA'} />
                                   {line.status === 'FAILED' && (
                                     <span className={LIVE_REPORT.lineFailed}>
                                       {LIVE_REPORT_COPY.refused}
