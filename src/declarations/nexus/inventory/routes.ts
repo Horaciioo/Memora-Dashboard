@@ -21,6 +21,8 @@ export const OPEN_ROUTE_REASONS: Record<string, string> = {
   trainings: 'Parcours du membre connecté',
   pages: 'Pages bornées par leurs partages',
   notifications: 'Notifications du membre connecté',
+  recap: 'Récap du membre connecté',
+  'live-asks': 'Lives qui sollicitent le membre connecté',
   nexus: 'Propriétaire vérifié dans le garde',
   dev: 'Outillage local, jamais commité',
 }

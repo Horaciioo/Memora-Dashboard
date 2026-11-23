@@ -8,14 +8,16 @@ import { CANDIDATE_SCENARIO } from '@/core/lib/assistant/scenarios/candidate'
 import { IDENTITY_SCENARIO } from '@/core/lib/assistant/scenarios/identity'
 import { JUNIOR_SCENARIO } from '@/core/lib/assistant/scenarios/junior'
 import { LIVE_SCENARIO } from '@/core/lib/assistant/scenarios/live'
+import { RECAP_SCENARIO } from '@/core/lib/assistant/scenarios/recap'
 import { TASK_SCENARIO } from '@/core/lib/assistant/scenarios/task'
 import { RECRUITMENT_SCENARIO } from '@/core/lib/assistant/scenarios/recruitment'
 import { isStop, matchChoice } from '@/core/lib/assistant/scenarios/answers'
 import { failureOf } from '@/core/lib/assistant/scenarios/failure'
-import { typingDuration } from '@/core/lib/tour/chat'
+import { writtenLength } from '@/core/lib/assistant/scenarios/written'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { SCENARIO_COPY } from '@/declarations/assistant/scenarios/shared'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
+import type { RecapChapter } from '@/core/lib/recap/compose'
 import type {
   Scenario,
   ScenarioId,
@@ -23,6 +25,7 @@ import type {
   ScenarioAsk,
   ScenarioCard,
   ScenarioChoice,
+  ScenarioGroup,
   ScenarioLine,
   ScenarioLink,
 } from '@/types/scenario'
@@ -42,22 +45,24 @@ const SCENARIOS: Record<ScenarioId, Scenario> = {
   junior: JUNIOR_SCENARIO,
   identity: IDENTITY_SCENARIO,
   live: LIVE_SCENARIO,
+  recap: RECAP_SCENARIO,
 }
 
 export type { ScenarioId }
 
 /**
  * What Memora is doing between two answers
- * @type {'idle' | 'typing' | 'thinking'}
+ * @type {'idle' | 'typing' | 'thinking' | 'writing'}
  */
 
-export type ScenarioStatus = 'idle' | 'typing' | 'thinking'
+export type ScenarioStatus = 'idle' | 'typing' | 'thinking' | 'writing'
 
 /**
  * Guided talk state
  * @typedef {Object} ScenarioRunner
  * @property {ScenarioAsk | null} ask - Answer waited for
  * @property {ScenarioStatus} status - Memora typing or thinking
+ * @property {string | null} preparing - Line shown while a step loads
  * @property {boolean} isActive - A talk is on
  * @property {(id: ScenarioId, entry: string, data?: Record<string, string>) => void} start - Open a talk
  * @property {(answer: ScenarioAnswer) => void} answer - Answer by button
@@ -68,6 +73,7 @@ export type ScenarioStatus = 'idle' | 'typing' | 'thinking'
 export interface ScenarioRunner {
   ask: ScenarioAsk | null
   status: ScenarioStatus
+  preparing: string | null
   isActive: boolean
   start: (id: ScenarioId, entry: string, data?: Record<string, string>) => void
   answer: (answer: ScenarioAnswer) => void
@@ -78,12 +84,22 @@ export interface ScenarioRunner {
 /**
  * What the runner needs from the chat
  * @typedef {Object} ScenarioDeps
- * @property {(from: 'me' | 'memora', text: string, link?: ScenarioLink, card?: ScenarioCard) => void} say - Writes a line
+ * @property {(from: 'me' | 'memora', text: string, link?: ScenarioLink, card?: ScenarioCard, recap?: RecapChapter, items?: string[]) => void} say - Writes a line
+ * @property {(topic: string) => void} begin - Opens a conversation of its own
  * @property {() => void} refresh - Reloads the page behind
  */
 
 export interface ScenarioDeps {
-  say: (from: 'me' | 'memora', text: string, link?: ScenarioLink, card?: ScenarioCard) => void
+  say: (
+    from: 'me' | 'memora',
+    text: string,
+    link?: ScenarioLink,
+    card?: ScenarioCard,
+    recap?: RecapChapter,
+    items?: string[],
+    groups?: ScenarioGroup[]
+  ) => void
+  begin: (topic: string) => void
   refresh: () => void
 }
 
@@ -95,11 +111,12 @@ const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(
  * @return {ScenarioRunner} - Talk state and gestures
  */
 
-export const useAssistantScenario = ({ say, refresh }: ScenarioDeps): ScenarioRunner => {
+export const useAssistantScenario = ({ say, begin, refresh }: ScenarioDeps): ScenarioRunner => {
   const { session } = useAuthContext()
   const [ask, setAsk] = useState<ScenarioAsk | null>(null)
   const [status, setStatus] = useState<ScenarioStatus>('idle')
   const [isActive, setActive] = useState(false)
+  const [preparing, setPreparing] = useState<string | null>(null)
   const scenario = useRef<Scenario | null>(null)
   const data = useRef<Record<string, string>>({})
   // Step the next answer goes to
@@ -115,14 +132,15 @@ export const useAssistantScenario = ({ say, refresh }: ScenarioDeps): ScenarioRu
     waiting.current = null
     setAsk(null)
     setStatus('idle')
+    setPreparing(null)
     setActive(false)
   }
 
-  // A line written after Memora's typing dots
+  // A line Memora writes: a short pause on the dots, then the letters come one after the other
   const write = async (line: ScenarioLine, turn: number): Promise<boolean> => {
     const text = typeof line === 'string' ? line : line.text
     setStatus('typing')
-    if (!prefersReducedMotion()) await wait(typingDuration(text.length, ASSISTANT_SETTINGS))
+    if (!prefersReducedMotion()) await wait(ASSISTANT_SETTINGS.typingLeadMs)
     if (turn !== generation.current) return false
 
     if (typeof line === 'string') say('memora', text)
@@ -131,10 +149,22 @@ export const useAssistantScenario = ({ say, refresh }: ScenarioDeps): ScenarioRu
         'memora',
         text,
         'link' in line ? line.link : undefined,
-        'card' in line ? line.card : undefined
+        'card' in line ? line.card : undefined,
+        'recap' in line ? line.recap : undefined,
+        'items' in line ? line.items : undefined,
+        'groups' in line ? line.groups : undefined
       )
 
-    return true
+    // The next line waits until this one is fully written
+    if (!prefersReducedMotion()) {
+      setStatus('writing')
+      await wait(
+        writtenLength(line) * ASSISTANT_SETTINGS.typingMsPerChar + ASSISTANT_SETTINGS.typingLeadMs
+      )
+    }
+    setStatus('idle')
+
+    return turn === generation.current
   }
 
   const go = async (first: string, given: ScenarioAnswer | null, turn: number) => {
@@ -144,6 +174,7 @@ export const useAssistantScenario = ({ say, refresh }: ScenarioDeps): ScenarioRu
 
     try {
       while (step && scenario.current) {
+        setPreparing(scenario.current.preparing?.(step, data.current) ?? null)
         const move = await scenario.current.steps[step](
           {
             today: today(),
@@ -155,8 +186,10 @@ export const useAssistantScenario = ({ say, refresh }: ScenarioDeps): ScenarioRu
           answer
         )
         if (turn !== generation.current) return
+        setPreparing(null)
 
         data.current = { ...data.current, ...move.data }
+        if (move.topic) begin(move.topic)
         for (const line of move.say) if (!(await write(line, turn))) return
 
         if (move.ask) {
@@ -234,7 +267,7 @@ export const useAssistantScenario = ({ say, refresh }: ScenarioDeps): ScenarioRu
       return answer({ value: String(bounded), label: `${bounded} %` })
     }
 
-    if (ask.kind === 'multi') {
+    if (ask.kind === 'multi' || ask.kind === 'checklist') {
       const picked = typed.split(/,| et /).map((part) => matchChoice(part, ask.choices))
       if (picked.length > 0 && picked.every(Boolean)) {
         const choices = picked as ScenarioChoice[]
@@ -257,11 +290,14 @@ export const useAssistantScenario = ({ say, refresh }: ScenarioDeps): ScenarioRu
       return
     }
 
+    // Hours are picked with the fields, never typed
+    if (ask.kind === 'hours') return
+
     const period = readPeriod(typed, today())
     if (period) return answer({ value: `${period.start}/${period.end}`, label: typed })
     say('me', typed)
     say('memora', SCENARIO_COPY.periodUnreadable)
   }
 
-  return { ask, status, isActive, start, answer, reply, stop }
+  return { ask, status, preparing, isActive, start, answer, reply, stop }
 }

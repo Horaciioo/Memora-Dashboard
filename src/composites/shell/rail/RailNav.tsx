@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { LiveStartedBubble } from '@/composites/lives/notices/LiveStartedBubble'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/measure/useBreakpoint'
 import { RailBranches } from '@/composites/shell/rail/RailBranches'
+import { RailLiveBranches } from '@/composites/shell/rail/RailLiveBranches'
 import { RailPrivatePages } from '@/composites/shell/rail/RailPrivatePages'
 import { RailSlides } from '@/composites/shell/rail/RailSlides'
 import { RailSubPages } from '@/composites/shell/rail/RailSubPages'
@@ -80,6 +81,9 @@ export const RailNav = ({
 
   // One lit entry at a time: deepest destination, favorites only when nothing else matches
   const reaches = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
+  // Lives on air: Lives opens their creator, each Mod View hangs beneath
+  const onAir = live?.lives.filter((entry) => entry.status === LiveStatuses.Live) ?? []
+
   const current = groups
     .filter((group) => group.label !== FAVORITE_COPY.group)
     .flatMap((group) => group.items.map((item) => item.href))
@@ -124,7 +128,10 @@ export const RailNav = ({
                   // Unfolds its pages, never a destination of its own
                   const isBranching = Boolean(item.children) && !isCompact
                   const isBranchOpen = branchOverrides[item.href] ?? reaches(item.href)
-                  const target = item.children?.[0]?.href ?? item.href
+                  const target =
+                    item.children?.[0]?.href ??
+                    (item.onLive && onAir[0] ? ROUTES.livesOf(onAir[0].creatorId) : item.href)
+                  const hasLiveBranches = Boolean(item.onLive) && onAir.length > 0 && !isCompact
 
                   return (
                     <Fragment key={item.href}>
@@ -218,7 +225,8 @@ export const RailNav = ({
                       {isBranching && !isFavorite && item.children && (
                         <RailBranches isOpen={isBranchOpen} pages={item.children} />
                       )}
-                      {!isCompact && !isFavorite && !item.children && (
+                      {hasLiveBranches && !isFavorite && <RailLiveBranches lives={onAir} />}
+                      {!isCompact && !isFavorite && !item.children && !hasLiveBranches && (
                         <RailSubPages base={item.href} />
                       )}
                     </Fragment>

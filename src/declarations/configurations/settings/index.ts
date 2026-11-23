@@ -41,3 +41,4 @@ export {
 } from '@/declarations/configurations/settings/academy'
 export { UNBAN_SETTINGS } from '@/declarations/configurations/settings/unban'
 export { RESPONSIVE_SETTINGS } from '@/declarations/configurations/settings/responsive'
+export { RECAP_SETTINGS } from '@/declarations/configurations/settings/recap'

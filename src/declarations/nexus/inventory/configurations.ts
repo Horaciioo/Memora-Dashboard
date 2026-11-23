@@ -44,6 +44,7 @@ export const CONFIGURATION_FILES: Record<ConfigurationFolder, string[]> = {
     'platforms',
     'rate-limits',
     'realtime',
+    'recap',
     'recruitment',
     'responsive',
     'retention',

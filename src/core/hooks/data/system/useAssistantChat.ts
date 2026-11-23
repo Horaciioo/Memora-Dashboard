@@ -5,14 +5,16 @@ import { useRef, useState } from 'react'
 
 import { apiPost, ApiClientError } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { isRecapAsk } from '@/core/lib/assistant/recapAsk'
 import { useAssistantScenario } from '@/core/hooks/data/system/useAssistantScenario'
 import type { ScenarioId, ScenarioRunner } from '@/core/hooks/data/system/useAssistantScenario'
 import { useNexusHandoff } from '@/managers/front-end/NexusManager'
 import { useAssistantStore } from '@/core/store/assistant'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { IDEMPOTENCY_HEADER } from '@/declarations/system/security/idempotency'
+import type { RecapChapter } from '@/core/lib/recap/compose'
 import type { AssistantProposal } from '@/types/assistant'
-import type { ScenarioCard, ScenarioLink } from '@/types/scenario'
+import type { ScenarioCard, ScenarioGroup, ScenarioLink } from '@/types/scenario'
 import type { TaskSummary } from '@/types/work'
 
 /**
@@ -24,6 +26,9 @@ import type { TaskSummary } from '@/types/work'
  * @property {AssistantProposal} [proposal] - Answer behind it
  * @property {ScenarioLink} [link] - Page the line points at
  * @property {ScenarioCard} [card] - Person drawn under the line
+ * @property {RecapChapter} [recap] - Chapter of the recap drawn under the line
+ * @property {string[]} [items] - List drawn under the line
+ * @property {string} [topic] - Title of the conversation this turn opens
  */
 
 export interface AssistantTurn {
@@ -33,6 +38,11 @@ export interface AssistantTurn {
   proposal?: AssistantProposal
   link?: ScenarioLink
   card?: ScenarioCard
+  recap?: RecapChapter
+  items?: string[]
+  groups?: ScenarioGroup[]
+  // Opens a conversation of its own, this is its title
+  topic?: string
 }
 
 /**
@@ -102,11 +112,21 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
     text: string,
     proposal?: AssistantProposal,
     link?: ScenarioLink,
-    card?: ScenarioCard
-  ) => setTurns((lines) => [...lines, { id: lines.length, from, text, proposal, link, card }])
+    card?: ScenarioCard,
+    recap?: RecapChapter,
+    items?: string[],
+    groups?: ScenarioGroup[]
+  ) =>
+    setTurns((lines) => [
+      ...lines,
+      { id: lines.length, from, text, proposal, link, card, recap, items, groups },
+    ])
 
   const scenario = useAssistantScenario({
-    say: (from, text, link, card) => say(from, text, undefined, link, card),
+    say: (from, text, link, card, recap, items, groups) =>
+      say(from, text, undefined, link, card, recap, items, groups),
+    begin: (topic) =>
+      setTurns((lines) => [...lines, { id: lines.length, from: 'memora', text: '', topic }]),
     refresh: () => router.refresh(),
   })
 
@@ -148,6 +168,13 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
     if (inFlight.current || !text.trim() || handoff(text)) return
     setPending({ text, filled: {} })
     say('me', text)
+
+    // The recap is told by the talk Memora leads
+    if (isRecapAsk(text)) {
+      guide('recap', 'recap')
+      return
+    }
+
     if (known) receive(known)
     else void ask(text, {})
   }

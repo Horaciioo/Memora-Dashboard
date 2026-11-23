@@ -10,9 +10,7 @@ import { liveStartedKey } from '@/declarations/academy/welcome'
 import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { LIVE_STARTED_BUBBLE } from '@/declarations/ui/variants'
-
-// Life before it folds
-const BUBBLE_LIFE_MS = 8000
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 export interface LiveStartedBubbleProps {
   liveId: string
@@ -43,7 +41,7 @@ export const LiveStartedBubble = ({ liveId }: LiveStartedBubbleProps) => {
     const timer = window.setTimeout(() => {
       setClosed(true)
       void apiPost(API_ROUTES.seenGuide, { key: liveStartedKey(liveId) }).catch(() => null)
-    }, BUBBLE_LIFE_MS)
+    }, LIVE_SETTINGS.startedBubbleMs)
 
     return () => window.clearTimeout(timer)
   }, [liveId, isMobile])

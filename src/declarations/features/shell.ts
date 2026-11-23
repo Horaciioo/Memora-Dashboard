@@ -31,6 +31,14 @@ export const SHELL_FEATURES: FeatureDefinition[] = [
     api: ['/api/assistant'],
   },
   {
+    key: 'recap',
+    label: 'Récap d’absence',
+    description: 'Ce qui s’est passé pendant ton absence.',
+    kind: 'system',
+    section: 'tools',
+    api: ['/api/recap'],
+  },
+  {
     key: 'tour',
     label: 'Visite guidée',
     description: 'La première visite qui débloque les pages une à une.',

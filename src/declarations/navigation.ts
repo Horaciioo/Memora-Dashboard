@@ -73,6 +73,7 @@ export const ROUTES = {
   unbanEdit: '/moderation/unban/edit',
   unbanRequest: (id: string) => `/moderation/unban/${id}`,
   unbanPublic: (slug: string) => `/${slug}/contest`,
+  intelligence: '/intelligence',
   notifications: '/notifications',
   administration: '/administration',
   maturity: '/maturity',
@@ -367,6 +368,12 @@ export const NAVIGATION: NavigationGroup[] = [
         visibleWhen: { statuses: ['ACADEMY'], roles: ['ADMIN', 'EMPLOYE', 'RESPONSABLE'] },
         maturity: 'alpha',
       },
+      {
+        href: ROUTES.intelligence,
+        label: 'Memora Intelligence',
+        icon: 'spark',
+        maturity: 'alpha',
+      },
     ],
   },
   {
@@ -574,6 +581,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   discord: 'Panel Discord',
   marsha: 'Marsha Bots',
   unban: 'Débannissement',
+  intelligence: 'Memora Intelligence',
   notifications: 'Notifications',
   administration: 'Console admin',
   maturity: 'Maturité',

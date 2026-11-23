@@ -6,7 +6,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// Hierarchy level, drives the permission matrix
+// Hierarchy level
 enum MemberRole {
   ADMIN
   EMPLOYE
@@ -15,7 +15,7 @@ enum MemberRole {
   JUNIOR
 }
 
-// Rail section of the access console, grouping the roles and the functions under one heading
+// Rail section of the access console
 enum AccessCategory {
   LEADER
   EMPLOYE
@@ -231,6 +231,13 @@ enum ChatSource {
   IMPORT
 }
 
+// Where a message held by the automod stands
+enum ChatHold {
+  HELD
+  APPROVED
+  DENIED
+}
+
 // Gesture of a moderation log line
 enum ModerationKind {
   DELETE
@@ -301,6 +308,8 @@ model Account {
   historyConsentVersion Int?
   // Last release note read
   seenReleaseVersion    String?
+  // Last moment the member was around, the recap window opens there
+  recapSeenAt           DateTime?
   // One-time guides already shown, by key
   seenGuides            String[]     @default([])
   // Pages starred from the banner, by path
@@ -2251,6 +2260,8 @@ model LiveChatMessage {
   liveId         String?
   source         ChatSource   @default(LIVE)
   deletedAt      DateTime?
+  // Set when the automod held the message
+  hold           ChatHold?
 
   youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
   live     Live?    @relation(fields: [liveId], references: [id], onDelete: SetNull)

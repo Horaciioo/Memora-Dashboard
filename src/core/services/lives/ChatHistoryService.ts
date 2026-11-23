@@ -48,6 +48,7 @@ export const viewerChatHistory = async (
       liveId: row.liveId,
       source: row.source,
       deleted: row.deletedAt !== null,
+      hold: row.hold,
     })),
     nextCursor: rows.length > size ? (page.at(-1)?.id ?? null) : null,
     total: stat?.messageCount ?? 0,

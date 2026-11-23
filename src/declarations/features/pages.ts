@@ -366,6 +366,14 @@ export const PAGE_FEATURES: FeatureDefinition[] = [
     ],
   },
   {
+    key: 'intelligence',
+    label: 'Memora Intelligence',
+    description: 'La page de Memora, sa discussion et le récap.',
+    kind: 'page',
+    section: 'tools',
+    routes: ['/intelligence'],
+  },
+  {
     key: 'settings',
     label: 'Configuration',
     description: 'Les données de référence et la console de configuration.',

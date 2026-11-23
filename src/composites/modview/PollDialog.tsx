@@ -7,12 +7,13 @@ import { Input } from '@/components/elements/forms/inputs/Input'
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { Dialog } from '@/components/structures/overlays/Dialog'
 import { MODVIEW_POLL_COPY } from '@/declarations/modview/copy'
-import { POLL_DEFAULT_MINUTES, POLL_DURATIONS, POLL_LIMITS } from '@/declarations/modview/polls'
+import { POLL_DURATIONS, POLL_LIMITS } from '@/declarations/modview/polls'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_POLL } from '@/declarations/ui/variants'
 import type { ModViewIntent } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { MINUTE_SECONDS } from '@/utils/constants/time'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 export interface PollDialogProps {
   onStart: (intent: Extract<ModViewIntent, { kind: 'poll' }>) => void
@@ -31,7 +32,7 @@ export const PollDialog = ({ onStart, onClose }: PollDialogProps) => {
   const [choices, setChoices] = useState<string[]>(
     Array.from({ length: POLL_LIMITS.minChoices }, () => '')
   )
-  const [minutes, setMinutes] = useState(POLL_DEFAULT_MINUTES)
+  const [minutes, setMinutes] = useState(LIVE_SETTINGS.pollDefaultMinutes)
   const [hasPoints, setHasPoints] = useState(false)
   const [points, setPoints] = useState<number>(POLL_LIMITS.defaultPoints)
   const CloseIcon = ICONS.close

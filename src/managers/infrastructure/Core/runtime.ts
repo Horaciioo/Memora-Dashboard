@@ -7,6 +7,7 @@ import { bindLiveTransport, deliverLive } from '@/core/lib/lives/bus'
 import type { LiveEnvelope } from '@/core/lib/lives/bus'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { readPushIds } from '@/core/lib/push'
+import { runServiceStartSweep } from '@/core/services/lives/ServiceStartService'
 import { markRemindersScheduled, runReminderSweep } from '@/core/services/calendar/attendance'
 // Satellite on purpose, the push central reaches back into this file
 import { deliverPushes, PushRetryError } from '@/core/services/push/DeliveryService'
@@ -164,7 +165,11 @@ const registerJobs = (container: Sharding): void => {
 
   container.queues.register({
     queueName: 'reminders',
-    process: () => journalFailure('reminders', runReminderSweep),
+    process: () =>
+      journalFailure('reminders', async () => {
+        await runReminderSweep()
+        await runServiceStartSweep()
+      }),
   })
 
   container.queues.register({

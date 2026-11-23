@@ -9,7 +9,7 @@ import { LiveRemovalDialog, RemovableLive } from '@/composites/lives/RemovableLi
 import { useLiveData } from '@/core/hooks/data/lives/useLiveData'
 import { useLiveRemoval } from '@/core/hooks/data/lives/useLiveRemoval'
 import { historyFiguresOf } from '@/core/lib/lives/hub'
-import { LIVE_HISTORY_LIMIT, LIVE_HUB_COPY, LIVE_HUB_METRICS } from '@/declarations/lives/hub'
+import { LIVE_HUB_COPY, LIVE_HUB_METRICS } from '@/declarations/lives/hub'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
@@ -18,6 +18,7 @@ import type { LiveView, MemberLiveSummary } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { formatDay } from '@/utils/format/time/dates'
 import { roughDuration } from '@/utils/format/time/hours'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 export interface LiveHistoryProps {
   past: LiveView[]
@@ -69,7 +70,7 @@ export const LiveHistory = ({
       })),
   ]
     .sort((a, b) => Date.parse(b.day) - Date.parse(a.day))
-    .slice(0, LIVE_HISTORY_LIMIT)
+    .slice(0, LIVE_SETTINGS.hubHistoryLimit)
 
   // Timeline draws itself once it scrolls into view
   useEffect(() => {

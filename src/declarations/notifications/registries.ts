@@ -186,6 +186,15 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     trail: '',
     addressed: true,
   },
+  ServiceStarting: {
+    label: 'Service',
+    tone: 'brand',
+    icon: 'liveDot',
+    lead: 'Ton service de Modération est sur le point de',
+    verb: 'commencer',
+    trail: '!',
+    addressed: true,
+  },
   CreatorLive: {
     label: 'Live',
     tone: 'danger',

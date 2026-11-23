@@ -928,3 +928,157 @@
     animation: none;
   }
 }
+
+/* Memora's chat flies back to its button */
+/* Page switch when Memora takes the member somewhere */
+@keyframes recap-switch {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+[data-recap-switch='out'] main {
+  opacity: 0;
+  transform: translateY(-0.5rem) scale(0.99);
+  transition:
+    opacity 320ms ease-in,
+    transform 320ms ease-in;
+}
+
+[data-recap-switch='in'] main {
+  animation: recap-switch 700ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-recap-switch='in'] main {
+    animation: none;
+  }
+}
+
+/* Memora's chat grows out of its button, slowly enough to follow */
+@keyframes chat-enter {
+  from {
+    opacity: 0;
+    transform: translate(1.5rem, 4rem) scale(0.2);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.chat-enter {
+  transform-origin: bottom right;
+  animation: chat-enter 900ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-enter {
+    animation: none;
+  }
+}
+
+/* The composer box is the field, the textarea inside keeps no edge, halo or outline */
+.composer-field.composer-field:focus-visible {
+  outline: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* A card of the recap deck comes up from the one under it */
+@keyframes deck-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.98);
+  }
+}
+
+.deck-card {
+  animation: deck-card-in 380ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck-card {
+    animation: none;
+  }
+}
+
+/* Letters light up one after the other, then the wave starts again */
+@keyframes wave-letter {
+  0%,
+  60%,
+  100% {
+    color: var(--color-ink-subtle);
+  }
+
+  25% {
+    color: var(--color-ink);
+  }
+}
+
+.wave-letter {
+  color: var(--color-ink-subtle);
+  animation: wave-letter 1.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-letter {
+    animation: none;
+    color: var(--color-ink);
+  }
+}
+
+/* Soft ring on the box Memora lights, breathing slowly */
+@keyframes recap-ring {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px var(--color-brand-600),
+      0 0 0 6px color-mix(in srgb, var(--color-brand-600) 22%, transparent),
+      0 0 24px color-mix(in srgb, var(--color-brand-600) 30%, transparent);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 2px var(--color-brand-600),
+      0 0 0 9px color-mix(in srgb, var(--color-brand-600) 12%, transparent),
+      0 0 34px color-mix(in srgb, var(--color-brand-600) 38%, transparent);
+  }
+}
+
+.recap-ring {
+  animation: recap-ring 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recap-ring {
+    animation: none;
+    box-shadow: 0 0 0 3px var(--color-brand-600);
+  }
+}
+
+/* Memora's bubble settles beside what she shows */
+@keyframes recap-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.97);
+  }
+}
+
+.recap-bubble {
+  animation: recap-bubble-in 300ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recap-bubble {
+    animation: none;
+  }
+}

@@ -11,7 +11,6 @@ import { useClock } from '@/core/hooks/interaction/state/time/useClock'
 import { useActionMenu } from '@/core/hooks/interaction/layout/overlay/useActionMenu'
 import { FOCUS_OFFLINE_ALLOWED } from '@/declarations/lives/registries'
 import {
-  ARRIVAL_FRESH_MINUTES,
   TEAM_ORDER,
   TEAM_ROLES,
   TEAM_SECTIONS,
@@ -26,6 +25,7 @@ import { AttendanceStatuses } from '@/utils/constants/workflow'
 import { cn } from '@/utils/classnames'
 import { MINUTE_MS } from '@/utils/constants/time'
 import { formatHourMark } from '@/utils/format/time/dates'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 export interface TeamPanelProps {
   liveId: string
@@ -80,7 +80,7 @@ const TeamMember = ({
   )
   const isFollowed = tools.followingId === member.id
   const isFresh =
-    arrivedAt !== null && now - new Date(arrivedAt).getTime() < ARRIVAL_FRESH_MINUTES * MINUTE_MS
+    arrivedAt !== null && now - new Date(arrivedAt).getTime() < LIVE_SETTINGS.arrivalFreshMinutes * MINUTE_MS
 
   return (
     <button

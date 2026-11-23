@@ -39,6 +39,7 @@ import { AbsenceStatuses, AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AbsenceStatusName, AttendanceStatusName } from '@/utils/constants/workflow'
 import { absenceReasonText, absenceSpan } from '@/utils/format/absences'
 import { initialHours } from '@/utils/format/time/hours'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import {
   formatClock,
   formatDay,
@@ -369,7 +370,7 @@ export const HomeQueue = ({
 
       {askingCall && (
         <AttendanceHoursDialog
-          initial={initialHours(null, askingCall)}
+          initial={initialHours(null, askingCall.startsAt, LIVE_SETTINGS.presenceSuggestHours)}
           onConfirm={(hours) => void answerCall(askingCall, AttendanceStatuses.Present, hours)}
           onClose={() => setAskingCall(null)}
         />

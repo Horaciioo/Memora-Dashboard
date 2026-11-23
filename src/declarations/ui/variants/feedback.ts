@@ -162,8 +162,12 @@ export const FLOATING_ADD_STYLES = {
   alert: 'dock-alert',
   // Hidden on a phone, the top bar holds Memora there
   root: 'group glass-sunset hidden h-14 min-w-14 cursor-pointer items-center justify-center rounded-full border px-4 text-[var(--color-on-sunset)] transition-transform duration-[var(--motion-duration-panel)] md:flex ease-[var(--motion-ease-spring)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  // Chat above the button, one size, never grows
-  chat: 'speech-bubble speech-tail-down surface-enter absolute right-1 bottom-[calc(100%+1.75rem)] flex h-[min(34rem,calc(100dvh-12rem))] w-[26rem] max-w-[calc(100vw-2.5rem)] flex-col rounded-[var(--radius-xl)]',
+  // Chat above the button
+  chat: 'flex max-w-[calc(100vw-2.5rem)] flex-col rounded-[var(--radius-xl)] transition-[width,height] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
+  // Docked above the button, its tail pointing at it
+  chatDocked:
+    'speech-bubble speech-tail-down chat-enter absolute right-1 bottom-[calc(100%+1.75rem)]',
+  chatSize: 'h-[min(34rem,calc(100dvh-12rem))] w-[26rem]',
   // Memora's card, a soft sunset wash
   chatHead:
     'flex shrink-0 items-center gap-3 rounded-t-[var(--radius-xl)] border-b border-[var(--color-border)] bg-[linear-gradient(115deg,color-mix(in_srgb,var(--color-sunset-pink)_24%,transparent),color-mix(in_srgb,var(--color-sunset-amber)_18%,transparent))] py-3 pr-2 pl-4',
@@ -190,11 +194,16 @@ export const FLOATING_ADD_STYLES = {
     'replica-message-in flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)] transition-[transform,background-color] duration-150 hover:-translate-y-0.5 hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   chatPickGlyph: 'h-5 w-5 text-[var(--color-ink-accent)]',
   chatPickHint: 'min-h-5 text-caption text-[var(--color-ink-subtle)]',
-  chatBar: 'flex shrink-0 items-center gap-2 border-t border-[var(--color-border)] p-3',
+  chatBar: 'flex shrink-0 items-end gap-2 border-t border-[var(--color-border)] p-3',
+  // Grows with the text, like the field of any assistant
   chatInput:
-    'min-w-0 flex-1 rounded-full bg-[var(--color-surface-sunken)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--color-ink-subtle)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+    'field-sizing-content max-h-40 min-h-11 min-w-0 flex-1 resize-none rounded-[var(--radius-xl)] bg-[var(--color-surface-sunken)] px-4 py-3 text-sm leading-snug outline-none placeholder:text-[var(--color-ink-subtle)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // Ends what Memora is writing
+  chatStop:
+    'flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--color-ink)] transition-transform duration-150 hover:-translate-y-0.5',
+  chatStopGlyph: 'size-3 rounded-[2px] bg-[var(--color-surface)]',
   chatSend:
-    'glass-sunset flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border text-[var(--color-on-sunset)] transition-transform duration-150 hover:-translate-y-0.5 disabled:cursor-default disabled:opacity-50 disabled:hover:translate-y-0',
+    'glass-sunset flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border text-[var(--color-on-sunset)] transition-transform duration-150 hover:-translate-y-0.5 disabled:cursor-default disabled:opacity-50 disabled:hover:translate-y-0',
   chatSendGlyph: 'h-4 w-4',
   // Label, or Memora's line in its place
   label:

@@ -1,6 +1,6 @@
-import { POLL_RESULT_SECONDS } from '@/declarations/modview/polls'
 import type { LivePoll, LivePollChoice } from '@/types/modview'
 import { MINUTE_SECONDS, SECOND_MS } from '@/utils/constants/time'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
  * Poll as Twitch answers it
@@ -35,7 +35,7 @@ export const toLivePoll = (
   if (!isActive && !isClosed) return null
   if (isClosed && row.ended_at) {
     const age = now - new Date(row.ended_at).getTime()
-    if (age > POLL_RESULT_SECONDS * SECOND_MS) return null
+    if (age > LIVE_SETTINGS.pollResultSeconds * SECOND_MS) return null
   }
 
   return {

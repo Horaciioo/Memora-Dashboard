@@ -21,12 +21,3 @@ export const POLL_LIMITS = {
  */
 
 export const POLL_DURATIONS: readonly number[] = [1, 2, 3, 5, 10]
-
-// Duration picked at opening
-export const POLL_DEFAULT_MINUTES = 2
-
-// Seconds between two reads of a running poll
-export const POLL_REFRESH_SECONDS = 3
-
-// Seconds the results stay above the chat
-export const POLL_RESULT_SECONDS = 30

@@ -20,7 +20,7 @@ export interface PlayTabBarProps {
 }
 
 /**
- * Phone tab bar: the desktop pages, the games raised in the middle
+ * Phone tab bar: the desktop pages
  * @param {PlayTabBarProps} props - Waiting calls
  * @return {JSX.Element | null}
  */

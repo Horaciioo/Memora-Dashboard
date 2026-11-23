@@ -55,6 +55,7 @@ export const NOTIFICATION_KINDS = createEnumeration({
   UnbanAssigned: { id: 45, label: 'Demande de déban confiée' },
   JuniorAbsent: { id: 46, label: 'Absence d’un Junior' },
   CreatorLive: { id: 47, label: 'Créateur en live' },
+  ServiceStarting: { id: 48, label: 'Service de modération' },
 })
 
 /**

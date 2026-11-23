@@ -1,9 +1,12 @@
 import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { publishLive } from '@/core/lib/lives/bus'
+import { logger } from '@/core/lib/logger'
 import { readRunningStreams } from '@/core/lib/platforms/twitch/helix'
 import { syncRoster } from '@/core/services/calendar/attendance'
 import { convene } from '@/core/services/lives/LiveService/convene'
+import { moveLiveFromPlatform } from '@/core/services/lives/LiveService/lifecycle'
+import { missedBefore } from '@/core/services/lives/LiveService/recovery'
 import { readLiveTemplateId, readLiveTemplates } from '@/core/services/lives/LiveService/forms'
 import { notify } from '@/core/services/system/NotificationService'
 import { recordEvent } from '@/core/services/system/ActivityService'
@@ -11,7 +14,7 @@ import { LIVE_UNPLANNED_TITLE } from '@/declarations/lives/copy'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MINUTE_MS } from '@/utils/constants/time'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
-import { LivePlatforms, LiveStatuses, OPEN_LIVE_STATUSES } from '@/utils/constants/lives'
+import { LivePlatforms, LiveStatuses } from '@/utils/constants/lives'
 import { TWITCH_LIMITS } from '@/declarations/platforms/twitch'
 
 /**
@@ -43,21 +46,14 @@ const openFromStream = async (
   const entry = await prisma.calendarEvent.create({
     data: { title, templateId, youtuberId: stream.youtuberId, startsAt },
   })
-  await syncRoster(entry.id, memberIds)
 
-  const live = await prisma.live.create({
-    data: {
-      youtuberId: stream.youtuberId,
-      platform: LivePlatforms.Twitch,
-      title,
-      status: LiveStatuses.Live,
-      plannedStartAt: startsAt,
-      startedAt: startsAt,
-      streamExternalId: stream.id,
-      calendarEventId: entry.id,
-      members: { create: memberIds.map((accountId) => ({ accountId })) },
-    },
-  })
+  // An entry is never left without its live
+  const live = await createStreamLive({ entryId: entry.id, stream, title, memberIds }).catch(
+    async (error: unknown) => {
+      await prisma.calendarEvent.deleteMany({ where: { id: entry.id } })
+      throw error
+    }
+  )
 
   await publishLive(LIVE_TOPICS.lives, {
     liveId: live.id,
@@ -78,6 +74,45 @@ const openFromStream = async (
     targetType: 'live',
     targetId: live.id,
     summary: title,
+  })
+}
+
+/**
+ * Write the roll and the running live of an opened entry
+ * @param {Object} input - Live to write
+ * @param {string} input.entryId - Calendar entry
+ * @param {{ youtuberId: string, id: string, startedAt: string }} input.stream - Running stream
+ * @param {string} input.title - Live title
+ * @param {string[]} input.memberIds - Team convened
+ * @return {Promise<{ id: string }>} - Live
+ */
+
+const createStreamLive = async ({
+  entryId,
+  stream,
+  title,
+  memberIds,
+}: {
+  entryId: string
+  stream: { youtuberId: string; id: string; startedAt: string }
+  title: string
+  memberIds: string[]
+}): Promise<{ id: string }> => {
+  await syncRoster(entryId, memberIds)
+
+  return prisma.live.create({
+    select: { id: true },
+    data: {
+      youtuberId: stream.youtuberId,
+      platform: LivePlatforms.Twitch,
+      title,
+      status: LiveStatuses.Live,
+      plannedStartAt: new Date(stream.startedAt),
+      startedAt: new Date(stream.startedAt),
+      streamExternalId: stream.id,
+      calendarEventId: entryId,
+      members: { create: memberIds.map((accountId) => ({ accountId })) },
+    },
   })
 }
 
@@ -168,29 +203,46 @@ export const openUnplannedLives = async (): Promise<void> => {
     const youtuberId = byChannel.get(stream.channelId)
     if (!youtuberId || seen.has(stream.id)) continue
 
-    // A live or a live entry already on this slot: only the creator's team is told
-    const [planned, entry] = await Promise.all([
-      prisma.live.findFirst({
-        where: {
-          youtuberId,
-          platform: LivePlatforms.Twitch,
-          OR: [
-            { status: LiveStatuses.Live },
-            { status: LiveStatuses.Announced, plannedStartAt: { gte: from, lte: to } },
-          ],
-        },
-        select: { id: true },
-      }),
-      prisma.calendarEvent.findFirst({
-        where: { youtuberId, templateId: { in: liveTemplates }, startsAt: { gte: from, lte: to } },
-        select: { id: true },
-      }),
-    ])
-    if (planned || entry) {
-      await tellCreatorLive({ ...stream, youtuberId }, planned?.id ?? null)
+    // Already on air: only the creator's team is told
+    const running = await prisma.live.findFirst({
+      where: { youtuberId, platform: LivePlatforms.Twitch, status: LiveStatuses.Live },
+      select: { id: true },
+    })
+    if (running) {
+      await tellCreatorLive({ ...stream, youtuberId }, running.id)
       continue
     }
 
-    await openFromStream({ ...stream, youtuberId }, templateId).catch(() => null)
+    // The announced live takes the stream, however late it starts
+    const announced = await prisma.live.findFirst({
+      where: {
+        youtuberId,
+        platform: LivePlatforms.Twitch,
+        status: LiveStatuses.Announced,
+        plannedStartAt: { gte: missedBefore(), lte: to },
+      },
+      orderBy: { plannedStartAt: 'desc' },
+      select: { id: true },
+    })
+    if (
+      announced &&
+      (await moveLiveFromPlatform(announced.id, LiveStatuses.Live, stream.id, stream.title))
+    ) {
+      continue
+    }
+
+    // A live entry on this slot already had its live: only the team is told
+    const entry = await prisma.calendarEvent.findFirst({
+      where: { youtuberId, templateId: { in: liveTemplates }, startsAt: { gte: from, lte: to } },
+      select: { id: true },
+    })
+    if (entry) {
+      await tellCreatorLive({ ...stream, youtuberId }, null)
+      continue
+    }
+
+    await openFromStream({ ...stream, youtuberId }, templateId).catch((error: unknown) =>
+      logger.warn('[lives] unplanned live not opened', error instanceof Error ? error.message : '')
+    )
   }
 }

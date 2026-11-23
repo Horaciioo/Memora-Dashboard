@@ -17,6 +17,7 @@ import type { AssistantHello } from '@/declarations/assistant/copy'
 import { ASSISTANT_DOCK_COPY } from '@/declarations/assistant/offers'
 import { ICONS } from '@/declarations/ui/icons'
 import { FLOATING_ADD_STYLES } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 export interface FloatingChatProps {
   name: string
@@ -54,6 +55,16 @@ export const FloatingChat = ({
   })
   const SendGlyph = ICONS.forward
 
+  // Words typed on the Memora Intelligence page are answered here
+  const pending = useAssistantDock((state) => state.pending)
+  useEffect(() => {
+    if (!pending) return
+
+    useAssistantDock.getState().takePending()
+    chat.start(pending)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pending])
+
   // Newest line in sight, the intro included
   useEffect(() => {
     const box = thread.current
@@ -65,6 +76,12 @@ export const FloatingChat = ({
     return () => follow.disconnect()
   }, [])
 
+  // Memora is writing or thinking, the member can cut her short
+  const isWriting = chat.scenario.status !== 'idle' || chat.isBusy
+  const stopWriting = () => {
+    chat.scenario.stop()
+  }
+
   const submit = () => {
     if (!term.trim()) return
     chat.send(term)
@@ -72,7 +89,15 @@ export const FloatingChat = ({
   }
 
   return (
-    <div className={FLOATING_ADD_STYLES.chat} role="dialog" aria-label={ASSISTANT_COPY.name}>
+    <div
+      className={cn(
+        FLOATING_ADD_STYLES.chat,
+        FLOATING_ADD_STYLES.chatDocked,
+        FLOATING_ADD_STYLES.chatSize
+      )}
+      role="dialog"
+      aria-label={ASSISTANT_COPY.name}
+    >
       <div className={FLOATING_ADD_STYLES.chatHead}>
         <span className={FLOATING_ADD_STYLES.chatHeadMark}>
           <BrainMark className={FLOATING_ADD_STYLES.chatHeadGlyph} />
@@ -136,24 +161,43 @@ export const FloatingChat = ({
           submit()
         }}
       >
-        <input
+        <textarea
           autoFocus
+          rows={1}
           value={term}
           onChange={(event) => setTerm(event.target.value)}
+          onKeyDown={(event) => {
+            // Enter sends, Shift and Enter writes a new line
+            if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return
+
+            event.preventDefault()
+            submit()
+          }}
           placeholder={
             chat.isAnswering ? ASSISTANT_COPY.answerPlaceholder : ASSISTANT_DOCK_COPY.placeholder
           }
           aria-label={ASSISTANT_COPY.launcherTitle}
           className={FLOATING_ADD_STYLES.chatInput}
         />
-        <button
-          type="submit"
-          disabled={!term.trim()}
-          aria-label={ASSISTANT_INTRO_COPY.send}
-          className={FLOATING_ADD_STYLES.chatSend}
-        >
-          <SendGlyph className={FLOATING_ADD_STYLES.chatSendGlyph} />
-        </button>
+        {isWriting ? (
+          <button
+            type="button"
+            aria-label={ASSISTANT_COPY.stop}
+            onClick={stopWriting}
+            className={FLOATING_ADD_STYLES.chatStop}
+          >
+            <span className={FLOATING_ADD_STYLES.chatStopGlyph} />
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={!term.trim()}
+            aria-label={ASSISTANT_INTRO_COPY.send}
+            className={FLOATING_ADD_STYLES.chatSend}
+          >
+            <SendGlyph className={FLOATING_ADD_STYLES.chatSendGlyph} />
+          </button>
+        )}
       </form>
     </div>
   )

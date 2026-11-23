@@ -1,10 +1,12 @@
+import type { RecapChapter } from '@/core/lib/recap/compose'
+
 /**
  * Guided talks Memora can lead
- * @type {'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity' | 'live'}
+ * @type {'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity' | 'live' | 'recap'}
  */
 
 export type ScenarioId =
-  'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity' | 'live'
+  'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity' | 'live' | 'recap'
 
 /**
  * One answer Memora offers
@@ -36,7 +38,7 @@ export interface ScenarioSpan {
 
 /**
  * What Memora waits for after her lines
- * @type {{ kind: 'choices', choices: ScenarioChoice[] } | { kind: 'period', booked: ScenarioSpan[], focus?: string } | { kind: 'text' } | { kind: 'search', placeholder?: string } | { kind: 'multi', choices: ScenarioChoice[] } | { kind: 'percent', value: number, max: number }}
+ * @type {{ kind: 'choices', choices: ScenarioChoice[] } | { kind: 'period', booked: ScenarioSpan[], focus?: string } | { kind: 'text' } | { kind: 'search', placeholder?: string } | { kind: 'multi', choices: ScenarioChoice[] } | { kind: 'checklist', choices: ScenarioChoice[], allLabel: string, goLabel: string } | { kind: 'percent', value: number, max: number } | { kind: 'hours', from: string, to: string }}
  */
 
 export type ScenarioAsk =
@@ -45,7 +47,9 @@ export type ScenarioAsk =
   | { kind: 'text' }
   | { kind: 'search'; placeholder?: string }
   | { kind: 'multi'; choices: ScenarioChoice[] }
+  | { kind: 'checklist'; choices: ScenarioChoice[]; allLabel: string; goLabel: string }
   | { kind: 'percent'; value: number; max: number }
+  | { kind: 'hours'; from: string; to: string }
 
 /**
  * What the member answered
@@ -86,12 +90,31 @@ export interface ScenarioCard {
 }
 
 /**
- * A line, with a link or a person under it
- * @type {string | { text: string, link: ScenarioLink } | { text: string, card: ScenarioCard }}
+ * People Memora lists under a line, one colour per answer they gave
+ * @typedef {Object} ScenarioGroup
+ * @property {'success' | 'danger' | 'muted' | 'plain'} tone - Colour of the title
+ * @property {string} title - Title of the group
+ * @property {string[]} items - One line per person
+ */
+
+export interface ScenarioGroup {
+  tone: 'success' | 'danger' | 'muted' | 'plain'
+  title: string
+  items: string[]
+}
+
+/**
+ * A line, with a link, a person or a chapter of the recap under it
+ * @type {string | { text: string, link: ScenarioLink } | { text: string, card: ScenarioCard } | { text: string, recap: RecapChapter } | { text: string, items: string[] } | { text: string, groups: ScenarioGroup[] }}
  */
 
 export type ScenarioLine =
-  string | { text: string; link: ScenarioLink } | { text: string; card: ScenarioCard }
+  | string
+  | { text: string; link: ScenarioLink }
+  | { text: string; card: ScenarioCard }
+  | { text: string; recap: RecapChapter }
+  | { text: string; items: string[] }
+  | { text: string; groups: ScenarioGroup[] }
 
 /**
  * What a step hands back
@@ -99,6 +122,7 @@ export type ScenarioLine =
  * @property {ScenarioLine[]} say - Lines written one after the other
  * @property {ScenarioAsk} [ask] - Answer waited for, the next step gets it
  * @property {string} [next] - Step run after the answer, or straight on without an ask
+ * @property {string} [topic] - Opens a conversation of its own with this title
  * @property {boolean} [thinking] - Memora thinks before the next step
  * @property {Record<string, string>} [data] - Values kept for later steps
  */
@@ -107,6 +131,7 @@ export interface ScenarioMove {
   say: ScenarioLine[]
   ask?: ScenarioAsk
   next?: string
+  topic?: string
   thinking?: boolean
   data?: Record<string, string>
 }
@@ -144,9 +169,11 @@ export type ScenarioStep = (
  * @typedef {Object} Scenario
  * @property {Record<string, string>} entries - First step per way in
  * @property {Record<string, ScenarioStep>} steps - Every step by name
+ * @property {(step: string, data: Record<string, string>) => string | null} [preparing] - Line shown while a step loads
  */
 
 export interface Scenario {
   entries: Record<string, string>
   steps: Record<string, ScenarioStep>
+  preparing?: (step: string, data: Record<string, string>) => string | null
 }

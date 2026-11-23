@@ -1,9 +1,10 @@
 'use client'
 
 import { DotMark } from '@/components/elements/display/Dotted'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { DecisionRing } from '@/composites/modview/DecisionRing'
 import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { AutoModHistory } from '@/composites/modview/AutoModHistory'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
@@ -11,19 +12,23 @@ import { PersonalLine } from '@/composites/modview/PersonalLine'
 import { WatchPanel } from '@/composites/modview/WatchPanel'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { personalLines } from '@/core/lib/modview/personal'
-import { useGlideBox } from '@/core/hooks/interaction/layout/useGlideBox'
 import { useModPreferences } from '@/core/hooks/interaction/state/moderation/useModPreferences'
 import type { Watchlist } from '@/core/hooks/interaction/state/moderation/useWatchlist'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
+import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_FEED, MODVIEW_SUGGEST, MODVIEW_TABS } from '@/declarations/ui/variants'
 import type { ChatMessage, Chatter, HeldMessage, ModAct } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { chatColour } from '@/utils/format/chatColour'
 import { formatSince } from '@/utils/format/time/dates'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
-// Lines of personal badwords kept in the queue
-const MAX_PERSONAL = 50
+interface Decided {
+  entry: HeldMessage
+  approve: boolean
+  until: number
+}
 
 export interface AutoModWindowProps {
   held: HeldMessage[]
@@ -70,6 +75,8 @@ export const AutoModWindow = ({
 }: AutoModWindowProps) => {
   const [choice, setChoice] = useState<AutoModTab>('queue')
   const [dismissed, setDismissed] = useState<Set<string>>(new Set())
+  const [decided, setDecided] = useState<Record<string, Decided>>({})
+  const [now, setNow] = useState(() => Date.now())
   const { preferences } = useModPreferences()
   const tab: AutoModTab = hasQueue ? choice : 'watch'
 
@@ -79,30 +86,47 @@ export const AutoModWindow = ({
     setChoice(next)
   }
 
-  const tabs = [
-    ...(hasQueue
-      ? [
-          { key: 'queue' as const, label: MODVIEW_WATCH_COPY.queue, count: 0 },
-          { key: 'history' as const, label: MODVIEW_WATCH_COPY.history, count: 0 },
-        ]
-      : []),
-    ...(hasWatch
-      ? [
-          {
-            key: 'watch' as const,
-            label: MODVIEW_WATCH_COPY.watch,
-            count: tab === 'watch' ? 0 : watchlist.unseen,
-          },
-        ]
-      : []),
-  ]
+  // One tick a second while a decision is counting down
+  const counting = Object.keys(decided).length > 0
+  useEffect(() => {
+    if (!counting) return
+    const timer = setInterval(() => {
+      const time = Date.now()
+      setNow(time)
+      setDecided((current) => {
+        const kept = Object.entries(current).filter(([, value]) => value.until > time)
+        return kept.length === Object.keys(current).length ? current : Object.fromEntries(kept)
+      })
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [counting])
+
+  // Act, then open the viewer so a sanction needs no search
+  const decide = (entry: HeldMessage, approve: boolean) => {
+    onAct({ kind: 'automod', heldId: entry.id, approve })
+    const time = Date.now()
+    setNow(time)
+    setDecided((current) => ({
+      ...current,
+      [entry.id]: { entry, approve, until: time + LIVE_SETTINGS.automodDecidedSeconds * 1000 },
+    }))
+    onPick(entry.author)
+  }
 
   const personal = useMemo(
-    () => personalLines(messages, preferences.badwords, MAX_PERSONAL),
+    () => personalLines(messages, preferences.badwords, LIVE_SETTINGS.automodPersonalLines),
     [messages, preferences.badwords]
   )
   const rows = [
-    ...held.map((entry) => ({ key: entry.id, at: entry.at, held: entry, line: null })),
+    ...held
+      .filter((entry) => !decided[entry.id])
+      .map((entry) => ({ key: entry.id, at: entry.at, held: entry, line: null })),
+    ...Object.values(decided).map(({ entry }) => ({
+      key: entry.id,
+      at: entry.at,
+      held: entry,
+      line: null,
+    })),
     ...personal
       .filter((line) => !dismissed.has(line.message.id))
       .map((line) => ({
@@ -113,40 +137,54 @@ export const AutoModWindow = ({
       })),
   ].sort((left, right) => Date.parse(right.at) - Date.parse(left.at))
 
-  const { listRef, boxRef } = useGlideBox<HTMLSpanElement>(`${tab}:${tabs.length}`)
+  const watchCount = tab === 'watch' ? 0 : watchlist.unseen
 
   return (
     <ModWindow
       title={
-        tabs.length === 1 ? (
-          tabs[0]!.label
-        ) : (
-          <span
-            ref={listRef}
-            className={MODVIEW_TABS.list}
-            role="tablist"
-            aria-label={MODVIEW_WATCH_COPY.tabs}
+        hasQueue ? (
+          <button
+            type="button"
+            draggable={false}
+            className={MODVIEW_TABS.title}
+            onClick={() => select('queue')}
           >
-            <span ref={boxRef} className={MODVIEW_TABS.box} aria-hidden="true" />
-            {tabs.map((entry) => (
+            {MODVIEW_WATCH_COPY.queue}
+          </button>
+        ) : (
+          MODVIEW_WATCH_COPY.watch
+        )
+      }
+      actions={
+        hasQueue && (
+          <>
+            {hasWatch && (
               <button
-                key={entry.key}
                 type="button"
-                role="tab"
-                aria-selected={tab === entry.key}
                 draggable={false}
                 className={cn(
                   MODVIEW_TABS.tab,
-                  tab === entry.key && MODVIEW_TABS.tabOn,
-                  entry.key !== 'queue' && MODVIEW_TABS.tabFixed
+                  tab === 'watch' && MODVIEW_TABS.tabOn,
+                  MODVIEW_TABS.tabFixed
                 )}
-                onClick={() => select(entry.key)}
+                onClick={() => select('watch')}
               >
-                <span className={MODVIEW_TABS.tabLabel}>{entry.label}</span>
-                {entry.count > 0 && <span className={MODVIEW_TABS.badge}>{entry.count}</span>}
+                <span className={MODVIEW_TABS.tabLabel}>{MODVIEW_WATCH_COPY.watch}</span>
+                {watchCount > 0 && <span className={MODVIEW_TABS.badge}>{watchCount}</span>}
               </button>
-            ))}
-          </span>
+            )}
+            <button
+              type="button"
+              draggable={false}
+              className={cn(MODVIEW_TABS.icon, tab === 'history' && MODVIEW_TABS.iconOn)}
+              aria-label={MODVIEW_WATCH_COPY.history}
+              aria-pressed={tab === 'history'}
+              title={MODVIEW_WATCH_COPY.history}
+              onClick={() => select('history')}
+            >
+              <ICONS.history className={MODVIEW_TABS.iconGlyph} aria-hidden="true" />
+            </button>
+          </>
         )
       }
       label={MODVIEW_COPY.automod}
@@ -180,6 +218,7 @@ export const AutoModWindow = ({
             }
             if (!entry) return null
 
+            const verdict = decided[entry.id]
             const check = gate({ kind: 'automod', heldId: entry.id, approve: true })
 
             return (
@@ -198,7 +237,14 @@ export const AutoModWindow = ({
                       {entry.author.name}
                     </button>
                     <DotMark />
-                    {formatSince(entry.at)}
+                    {verdict ? (
+                      <DecisionRing
+                        left={Math.max(0, Math.ceil((verdict.until - now) / 1000))}
+                        total={LIVE_SETTINGS.automodDecidedSeconds}
+                      />
+                    ) : (
+                      formatSince(entry.at)
+                    )}
                   </p>
                   <p className={MODVIEW_FEED.quote}>
                     <FlaggedText text={entry.text} flagged={entry.flagged} />
@@ -218,8 +264,8 @@ export const AutoModWindow = ({
                       className={MODVIEW_SUGGEST.accept}
                       aria-label={MODVIEW_COPY.approve}
                       title={check.reason ?? MODVIEW_COPY.approve}
-                      disabled={!check.allowed}
-                      onClick={() => onAct({ kind: 'automod', heldId: entry.id, approve: true })}
+                      disabled={!check.allowed || !!verdict}
+                      onClick={() => decide(entry, true)}
                     />
                     <Button
                       variant="ghost"
@@ -227,8 +273,8 @@ export const AutoModWindow = ({
                       className={MODVIEW_SUGGEST.refuse}
                       aria-label={MODVIEW_COPY.deny}
                       title={check.reason ?? MODVIEW_COPY.deny}
-                      disabled={!check.allowed}
-                      onClick={() => onAct({ kind: 'automod', heldId: entry.id, approve: false })}
+                      disabled={!check.allowed || !!verdict}
+                      onClick={() => decide(entry, false)}
                     />
                   </div>
                 </div>

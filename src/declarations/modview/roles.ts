@@ -119,6 +119,3 @@ export const sectionOf = (
 
 // Order of the team list
 export const TEAM_ORDER: TeamRole[] = ['coordinator', 'admin', 'responsable', 'moderator']
-
-// Minutes a new arrival stays flagged
-export const ARRIVAL_FRESH_MINUTES = 3

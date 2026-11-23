@@ -127,6 +127,63 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.16.0',
+    date: '2026-11-23',
+    title: 'Les lives se fiabilisent',
+    intro:
+      'Les lives s’ouvrent sur le créateur en direct, et plusieurs blocages autour des lives et des présences disparaissent.',
+    description:
+      'Des lives restaient annoncés sans jamais démarrer, la création d’un live échouait parfois, et les horaires de présence étaient bridés par la fin prévue du live. L’ouverture de « Lives » et le suivi de l’automod dans la Mod View demandaient aussi trop de gestes. Ces points sont réglés, et une première version expérimentale de Memora Intelligence fait son apparition.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de la possibilité de retrouver, dans l’historique du chat d’un spectateur, la décision de l’automod pour chacun de ses messages retenus.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.intelligence,
+        text: 'Ajout d’une fonctionnalité expérimentale nommée « Memora Intelligence » : Memora discute avec toi et résume ce qui s’est passé pendant une absence.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de « Lives » : la page s’ouvre sur le créateur en direct, et sa Mod View se déplie sous « Lives » dans le menu.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la Mod View : un message de l’automod déjà tranché affiche un décompte avant de quitter la file.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        text: 'Amélioration visuelle de « Play » : la sélection glisse d’une section à l’autre dans les réglages.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui laissait certains lives annoncés sans jamais démarrer, ou affichés sans leur live.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui empêchait de choisir des horaires de présence ou de coordination après la fin prévue d’un live.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui empêchait parfois de créer un live.',
+      },
+    ],
+  },
+  {
     version: '0.15.0',
     date: '2026-11-22',
     title: 'Les lives suivent Twitch',

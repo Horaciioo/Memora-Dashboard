@@ -1,4 +1,5 @@
 import { HOUR_MS } from '@/utils/constants/time'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
  * Hour mark along the live
@@ -12,8 +13,6 @@ export interface TimeTick {
   at: string
 }
 
-// Marks wanted at most
-const MAX_TICKS = 9
 /**
  * Round-hour marks inside a span, spaced so they never crowd
  * @param {number} start - Span start, epoch ms
@@ -23,7 +22,7 @@ const MAX_TICKS = 9
 
 export const timeTicks = (start: number, end: number): TimeTick[] => {
   const span = Math.max(1, end - start)
-  const step = Math.max(1, Math.ceil(span / HOUR_MS / MAX_TICKS)) * HOUR_MS
+  const step = Math.max(1, Math.ceil(span / HOUR_MS / LIVE_SETTINGS.timeTicksMax)) * HOUR_MS
   const ticks: TimeTick[] = []
 
   for (let at = Math.ceil(start / HOUR_MS) * HOUR_MS; at <= end; at += step) {

@@ -1,7 +1,9 @@
 'use client'
 
 import { Button } from '@/components/elements/actions/Button'
+import { ScenarioHours } from '@/composites/search/assistant/ScenarioHours'
 import { ScenarioPercent } from '@/composites/search/assistant/ScenarioPercent'
+import { ScenarioChecklist } from '@/composites/search/assistant/ScenarioChecklist'
 import { ScenarioMulti } from '@/composites/search/assistant/ScenarioMulti'
 import { ScenarioSearch } from '@/composites/search/assistant/ScenarioSearch'
 import { ScenarioPeriod } from '@/composites/search/assistant/ScenarioPeriod'
@@ -35,6 +37,16 @@ export const AssistantAnswers = ({ chat }: AssistantAnswersProps) => {
     )
   }
 
+  if (ask?.kind === 'hours') {
+    return (
+      <ScenarioHours
+        from={ask.from}
+        to={ask.to}
+        onPick={(value, label) => chat.scenario.answer({ value, label })}
+      />
+    )
+  }
+
   if (ask?.kind === 'percent') {
     return (
       <ScenarioPercent
@@ -51,6 +63,17 @@ export const AssistantAnswers = ({ chat }: AssistantAnswersProps) => {
     return (
       <ScenarioMulti
         choices={ask.choices}
+        onPick={(value, label) => chat.scenario.answer({ value, label })}
+      />
+    )
+  }
+
+  if (ask?.kind === 'checklist') {
+    return (
+      <ScenarioChecklist
+        choices={ask.choices}
+        allLabel={ask.allLabel}
+        goLabel={ask.goLabel}
         onPick={(value, label) => chat.scenario.answer({ value, label })}
       />
     )

@@ -23,6 +23,19 @@ export const ChatSources = {
 export type ChatSourceName = (typeof ChatSources)[keyof typeof ChatSources]
 
 /**
+ * Where a message held by the automod stands
+ * @type {Record<string, string>}
+ */
+
+export const ChatHolds = {
+  Held: 'HELD',
+  Approved: 'APPROVED',
+  Denied: 'DENIED',
+} as const
+
+export type ChatHoldName = (typeof ChatHolds)[keyof typeof ChatHolds]
+
+/**
  * Lifecycle of an announced live
  * @type {Record<string, string>}
  */

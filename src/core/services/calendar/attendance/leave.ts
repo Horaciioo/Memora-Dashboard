@@ -6,6 +6,9 @@ import { LIVE_FUNCTIONS } from '@/declarations/lives/registries'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
+// Far enough to hold every leave, short of the largest date, which the zone shift would overflow
+const END_OF_TIME = new Date('9999-12-31T00:00:00.000Z')
+
 /**
  * Settle the unanswered rows of Live moderators on approved leave as absent
  * @param {Prisma.EventAttendanceWhereInput} where - Rows looked at
@@ -32,7 +35,7 @@ const settleOnLeave = async (where: Prisma.EventAttendanceWhereInput): Promise<v
   const leaves = await prisma.absence.findMany({
     where: {
       accountId: { in: [...new Set(rows.map((row) => row.accountId))] },
-      ...activeAbsenceFilter(new Date(0), new Date(8.64e15)),
+      ...activeAbsenceFilter(new Date(0), END_OF_TIME),
     },
     select: { accountId: true, startDate: true, endDate: true },
   })

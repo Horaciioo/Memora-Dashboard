@@ -39,6 +39,13 @@ export const APP_ENVIRONMENT = resolveEnvironment()
 export const WELCOMES_EVERY_ACCOUNT = APP_ENVIRONMENT === 'dev' || APP_ENVIRONMENT === 'staging'
 
 /**
+ * Whether the recap can show a made-up one
+ * @type {boolean}
+ */
+
+export const OFFERS_DEMO_RECAP = APP_ENVIRONMENT === 'dev'
+
+/**
  * Environment manifests
  * @type {Record<Environment, EnvironmentManifest>}
  */

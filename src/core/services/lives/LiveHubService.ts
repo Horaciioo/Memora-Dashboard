@@ -4,10 +4,11 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { readMemberModeration } from '@/core/services/lives/MemberModerationService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_HUB } from '@/declarations/lives/hub'
 import type { LiveHubCreator, LiveHubFigure } from '@/types/lives'
 import { LiveStatuses } from '@/utils/constants/lives'
-import { DAY_MS } from '@/utils/constants/time'
+import { DAY_MS, MINUTE_MS } from '@/utils/constants/time'
 
 // Gestures counted as infractions handled
 const INFRACTION_KINDS = ['DELETE', 'TIMEOUT', 'BAN', 'WARN'] as const
@@ -112,8 +113,13 @@ export const readLiveHub = async (
       ])
       const keys: LiveHubFigure['key'][] = ['infractions', 'time', 'messages', 'lives']
       const teamKeys: LiveHubFigure['key'][] = [...keys, 'moderators']
-      // On air first, else the soonest
-      const next = creator.lives.find((row) => row.status === LiveStatuses.Live) ?? creator.lives[0]
+      // On air first, else the soonest still to come
+      const next =
+        creator.lives.find((row) => row.status === LiveStatuses.Live) ??
+        creator.lives.find(
+          (row) => +row.plannedStartAt >= now - LIVE_SETTINGS.watchTrailMinutes * MINUTE_MS
+        ) ??
+        creator.lives[0]
 
       return {
         id: creator.id,

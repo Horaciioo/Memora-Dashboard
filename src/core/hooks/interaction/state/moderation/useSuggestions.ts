@@ -12,9 +12,7 @@ import { MODVIEW_PERSONAL_COPY, REPEAT_CATEGORY } from '@/declarations/modview/p
 import { CHAT_FLAG_CATEGORY } from '@/declarations/modview/suggestions'
 import type { ChatMessage, ModActKind, ModViewState } from '@/types/modview'
 import type { SanctionPanelView } from '@/types/sanctions'
-
-// Suggestions kept on screen
-const MAX_SUGGESTIONS = 12
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 // Acts that settle a suggestion
 const SETTLING_ACTS: ModActKind[] = ['delete', 'warn', 'timeout', 'ban']
@@ -116,7 +114,7 @@ export const useSuggestions = (
       [...held, ...flagged, ...repeated]
         .filter((source) => !dismissed.has(source.id) && !isSettled(source))
         .sort((left, right) => right.at.localeCompare(left.at))
-        .slice(0, MAX_SUGGESTIONS)
+        .slice(0, LIVE_SETTINGS.suggestionsMax)
         .map((source) => suggestFor(source, panel, memory, state.acts))
         // Nothing to do, nothing proposed
         .filter(isActionable)

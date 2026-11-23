@@ -1,5 +1,4 @@
-// Wait to gather a batch
-const BATCH_MS = 150
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 export type AvatarLoader = (ids: string[]) => Promise<Record<string, string | null>>
 
@@ -38,7 +37,7 @@ export const createAvatarBook = (load: AvatarLoader): AvatarBook => {
       if (asked.has(id)) return
       asked.add(id)
       waiting.push(id)
-      timer ??= setTimeout(flush, BATCH_MS)
+      timer ??= setTimeout(flush, LIVE_SETTINGS.avatarBatchMs)
     },
     subscribe: (listener) => {
       listeners.add(listener)

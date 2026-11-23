@@ -11,12 +11,17 @@ import { logger } from '@/core/lib/logger'
 import { readRunningStreams } from '@/core/lib/platforms/twitch/helix'
 import { EventSubSession } from '@/core/lib/platforms/twitch/session'
 import type { TwitchSignal } from '@/core/lib/platforms/twitch/eventsub'
-import { moveLiveFromPlatform, openUnplannedLives } from '@/core/services/lives/LiveService'
+import {
+  dropMissedLives,
+  moveLiveFromPlatform,
+  openOrphanLiveEntries,
+  openUnplannedLives,
+} from '@/core/services/lives/LiveService'
 import { liveconLevelOf, logPlatformGesture } from '@/core/services/lives/ModerationLogService'
 import { chatRecordOf } from '@/core/lib/platforms/twitch/chatRecord'
 import {
   markChatDeleted,
-  markChatReleased,
+  settleChatHold,
   recordChatMessage,
 } from '@/core/services/lives/ChatStoreService'
 import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
@@ -132,7 +137,7 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
       // Gathered then flushed
       pushRoomEvent(liveId, signal.event)
       return
-    case 'online':
+    case 'online': {
       // A short cut never ends the live
       if (watch?.offline) {
         clearTimeout(watch.offline)
@@ -147,6 +152,7 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
         running.find((stream) => stream.id === signal.streamId)?.title
       )
       return
+    }
     case 'offline':
       if (!watch || watch.offline) return
       watch.offline = setTimeout(() => {
@@ -180,10 +186,12 @@ const keepChat = (
     return
   }
 
-  // Approved by a moderator, the message is back
-  if (type === 'automod.message.update' && event.status === 'Approved') {
+  // A moderator or the timer settled the held message
+  if (type === 'automod.message.update') {
     if (typeof event.message_id === 'string')
-      void markChatReleased(live.youtuberId, event.message_id).catch(() => null)
+      void settleChatHold(live.youtuberId, event.message_id, event.status === 'Approved').catch(
+        () => null
+      )
     return
   }
 
@@ -494,8 +502,18 @@ export const startLiveWatcher = (): void => {
   const tick = async () => {
     if (!(await holdsWatchLease())) return releaseWatches()
 
+    // Announced lives whose stream never came are called off
+    await dropMissedLives().catch((error: unknown) =>
+      logger.warn('[watcher] missed lives', error instanceof Error ? error.message : '')
+    )
+    // A live entry left without its live gets one
+    await openOrphanLiveEntries().catch((error: unknown) =>
+      logger.warn('[watcher] orphan entries', error instanceof Error ? error.message : '')
+    )
     // A stream nobody planned opens its own live
-    await openUnplannedLives().catch(() => null)
+    await openUnplannedLives().catch((error: unknown) =>
+      logger.warn('[watcher] unplanned lives', error instanceof Error ? error.message : '')
+    )
     await syncLiveWatches()
     // Silent tabs closed at their last beat
     await sweepStalePresences().catch(() => null)

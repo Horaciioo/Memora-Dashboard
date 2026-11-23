@@ -4,12 +4,13 @@ import type { ModerationKind } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { logger } from '@/core/lib/logger'
-import { ECHO_WINDOW_SECONDS, isSameGesture } from '@/core/lib/lives/gestureMatch'
+import { isSameGesture } from '@/core/lib/lives/gestureMatch'
 import type { PlatformLogEntry } from '@/core/lib/platforms/twitch/logEntry'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import type { ModViewIntent } from '@/types/modview'
 import type { LivePlatformName } from '@/utils/constants/lives'
 import { DAY_MS, SECOND_MS } from '@/utils/constants/time'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 // Seconds a platform line may precede the Memora one it belongs to
 const EARLY_ECHO_SECONDS = 15
@@ -261,7 +262,7 @@ export const logPlatformGesture = async (input: {
         kind: entry.kind,
         externalEventId: null,
         actorPlatformUserId: entry.actorPlatformUserId,
-        occurredAt: { gte: new Date(occurredAt.getTime() - ECHO_WINDOW_SECONDS * SECOND_MS) },
+        occurredAt: { gte: new Date(occurredAt.getTime() - LIVE_SETTINGS.echoWindowSeconds * SECOND_MS) },
       },
       orderBy: { occurredAt: 'desc' },
       select: {

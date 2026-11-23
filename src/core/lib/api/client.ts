@@ -5,6 +5,13 @@ import { FEEDBACK_COPY } from '@/declarations/ui/copy/feedback'
 import { ERROR_MESSAGES, ErrorCodes } from '@/utils/constants/errors'
 
 /**
+ * Event fired on window once a change is saved
+ * @type {string}
+ */
+
+export const MUTATION_EVENT = 'memora:mutated'
+
+/**
  * Field level failure sent back by the API
  * @typedef {Object} ApiClientErrorIssue
  * @property {string} [field] - Field name
@@ -72,6 +79,11 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   // The envelope carries the outcome
   if (!envelope.success) {
     throw new ApiClientError(envelope.error, envelope.code, envelope.issues)
+  }
+
+  // A saved change is told to whoever waits for it, Memora's guided stops
+  if (!isRead && typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(MUTATION_EVENT, { detail: { path } }))
   }
 
   return envelope.data

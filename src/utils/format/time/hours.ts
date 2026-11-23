@@ -1,3 +1,4 @@
+import { HOUR_MS } from '@/utils/constants/time'
 import { toDateTimeInput } from '@/utils/format/time/dates'
 import { wallToInstant } from '@/utils/format/time/zone'
 
@@ -14,19 +15,24 @@ export interface HoursInput {
 }
 
 /**
- * Hours as the form first shows them
+ * Hours first shown, planned end ignored
  * @param {{ from: string, to: string } | null} given - Hours already given
- * @param {{ startsAt: string, endsAt: string | null }} entry - Event window
+ * @param {string} startsAt - ISO start of the live
+ * @param {number} hoursAhead - Hours proposed
  * @return {HoursInput} - Wall clocks
  */
 
 export const initialHours = (
   given: { from: string; to: string } | null,
-  entry: { startsAt: string; endsAt: string | null }
-): HoursInput => ({
-  from: toDateTimeInput(given?.from ?? entry.startsAt),
-  to: toDateTimeInput(given?.to ?? entry.endsAt),
-})
+  startsAt: string,
+  hoursAhead: number
+): HoursInput => {
+  const from = given?.from ?? startsAt
+  const to =
+    given?.to ?? new Date(Math.round((Date.parse(from) + hoursAhead * HOUR_MS) / HOUR_MS) * HOUR_MS)
+
+  return { from: toDateTimeInput(from), to: toDateTimeInput(to) }
+}
 
 /**
  * Hours as the request carries them

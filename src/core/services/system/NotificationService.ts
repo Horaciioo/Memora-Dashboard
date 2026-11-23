@@ -52,16 +52,14 @@ export const notify = async (input: NotificationInput): Promise<void> => {
 
   if (recipients.length === 0) return
 
-  // Members on approved leave are left in peace
+  // Members on approved leave get no ping, the row waits for their recap
+  let onLeave = new Set<string>()
   if (!LEAVE_PROOF_KINDS.includes(input.kind)) {
     const away = await prisma.absence.findMany({
       where: { accountId: { in: recipients }, ...activeAbsenceFilter() },
       select: { accountId: true },
     })
-    const onLeave = new Set(away.map((row) => row.accountId))
-    recipients = recipients.filter((id) => !onLeave.has(id))
-
-    if (recipients.length === 0) return
+    onLeave = new Set(away.map((row) => row.accountId))
   }
 
   /*
@@ -97,7 +95,10 @@ export const notify = async (input: NotificationInput): Promise<void> => {
     })),
   })
 
-  await pushNotifications(rows, input.actorId ?? null)
+  await pushNotifications(
+    rows.filter((row) => !onLeave.has(row.recipientId)),
+    input.actorId ?? null
+  )
 }
 
 /**

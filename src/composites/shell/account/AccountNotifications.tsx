@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import Link from '@/components/elements/navigation/AppLink'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
 import { NotificationsList } from '@/composites/notifications/NotificationsList'
+import { RecapMenuRows } from '@/composites/recap/RecapMenuRows'
 import { useNotificationFeed } from '@/core/hooks/data/system/useNotificationFeed'
 import { useNotificationsStore } from '@/core/store/notifications'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
@@ -45,6 +46,8 @@ export const AccountNotifications = ({ onNavigate }: AccountNotificationsProps) 
           {NOTIFICATION_COPY.seeAll}
         </Link>
       </div>
+
+      <RecapMenuRows onLeave={onNavigate} />
 
       {feed.isLoading && entries.length === 0 && (
         <SkeletonList shape="row" rows={NOTIFICATION_SETTINGS.panelSize} />

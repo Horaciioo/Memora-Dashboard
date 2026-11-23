@@ -1,4 +1,12 @@
 import {
+  liveAsk,
+  liveAskAnswer,
+  liveAskHours,
+  liveRemind,
+  liveRoster,
+  liveRosterAnswer,
+} from '@/core/lib/assistant/scenarios/live/ask'
+import {
   creatorAnswer,
   createStart,
   lengthAnswer,
@@ -50,10 +58,22 @@ const offerAnswer: ScenarioStep = async (context, answer) => {
  */
 
 export const LIVE_SCENARIO: Scenario = {
-  entries: { offer: 'offer', create: 'createStart', delete: 'deletePick' },
+  entries: {
+    offer: 'offer',
+    create: 'createStart',
+    delete: 'deletePick',
+    ask: 'liveAsk',
+    roster: 'liveRoster',
+  },
   steps: {
     offer,
     offerAnswer,
+    liveAsk,
+    liveAskAnswer,
+    liveAskHours,
+    liveRoster,
+    liveRosterAnswer,
+    liveRemind,
     createStart,
     platformAnswer,
     creatorAnswer,
