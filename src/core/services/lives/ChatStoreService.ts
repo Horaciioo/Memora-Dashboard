@@ -6,7 +6,7 @@ import { createBatcher } from '@/core/lib/lives/batcher'
 import { logger } from '@/core/lib/logger'
 import type { ChatRecord } from '@/core/lib/platforms/twitch/chatRecord'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
-import { ChatSources, LivePlatforms } from '@/utils/constants/lives'
+import { ChatHolds, ChatSources, LivePlatforms } from '@/utils/constants/lives'
 
 /**
  * Message with the channel it belongs to
@@ -78,6 +78,7 @@ const writeBatch = async (items: StoredChat[]): Promise<void> => {
         liveId: item.liveId,
         source: ChatSources.Live,
         deletedAt: item.blocked ? new Date(item.sentAt) : null,
+        hold: item.blocked ? ChatHolds.Held : null,
       })),
       skipDuplicates: true,
     }),
@@ -168,17 +169,22 @@ export const markChatDeleted = async (input: {
 }
 
 /**
- * Give back a message the automod released
+ * Settle a message the automod held
  * @param {string} youtuberId - Creator
- * @param {string} messageId - Message released
- * @return {Promise<void>} - Restored
+ * @param {string} messageId - Message held
+ * @param {boolean} isApproved - Released into the chat, else refused
+ * @return {Promise<void>} - Settled
  */
 
-export const markChatReleased = async (youtuberId: string, messageId: string): Promise<void> => {
+export const settleChatHold = async (
+  youtuberId: string,
+  messageId: string,
+  isApproved: boolean
+): Promise<void> => {
   await flushChatMessages()
 
   await prisma.liveChatMessage.updateMany({
     where: { youtuberId, platform: LivePlatforms.Twitch, externalId: messageId },
-    data: { deletedAt: null },
+    data: isApproved ? { deletedAt: null, hold: ChatHolds.Approved } : { hold: ChatHolds.Denied },
   })
 }

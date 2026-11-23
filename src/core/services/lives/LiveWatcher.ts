@@ -21,7 +21,7 @@ import { liveconLevelOf, logPlatformGesture } from '@/core/services/lives/Modera
 import { chatRecordOf } from '@/core/lib/platforms/twitch/chatRecord'
 import {
   markChatDeleted,
-  markChatReleased,
+  settleChatHold,
   recordChatMessage,
 } from '@/core/services/lives/ChatStoreService'
 import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
@@ -186,10 +186,12 @@ const keepChat = (
     return
   }
 
-  // Approved by a moderator, the message is back
-  if (type === 'automod.message.update' && event.status === 'Approved') {
+  // A moderator or the timer settled the held message
+  if (type === 'automod.message.update') {
     if (typeof event.message_id === 'string')
-      void markChatReleased(live.youtuberId, event.message_id).catch(() => null)
+      void settleChatHold(live.youtuberId, event.message_id, event.status === 'Approved').catch(
+        () => null
+      )
     return
   }
 

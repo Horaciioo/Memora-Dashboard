@@ -180,6 +180,11 @@ export const MODVIEW_USER_COPY = {
   messagesEmpty: 'Aucun message connu pour ce viewer.',
   historyOlder: 'Messages plus anciens',
   messageRemoved: 'Supprimé',
+  holdLabels: {
+    HELD: 'AutoMod, en attente',
+    APPROVED: 'AutoMod, accepté',
+    DENIED: 'AutoMod, refusé',
+  },
   mergeHistory: 'Fusionner les messages et les sanctions dans la fiche',
   sanctionBy: 'par {name}',
   imported: 'Importé',

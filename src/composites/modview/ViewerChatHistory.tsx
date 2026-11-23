@@ -8,7 +8,7 @@ import { useViewerChat } from '@/core/hooks/data/lives/useViewerChat'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_USER } from '@/declarations/ui/variants'
 import { MODERATION_KINDS } from '@/declarations/lives/moderation'
-import type { ViewerSanction } from '@/types/lives'
+import type { ChatHistoryMessage, ViewerSanction } from '@/types/lives'
 import type { ChatMessage } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { formatDay } from '@/utils/format/time/dates'
@@ -30,6 +30,8 @@ interface Line {
   sentAt: string
   isRemoved: boolean
   isImported: boolean
+  // Automod outcome of the message
+  hold?: ChatHistoryMessage['hold']
   message?: ChatMessage
   // A sanction line instead of a message
   sanction?: ViewerSanction
@@ -76,8 +78,9 @@ export const ViewerChatHistory = ({
           id: row.id,
           text: row.body,
           sentAt: row.sentAt,
-          isRemoved: row.deleted,
+          isRemoved: row.deleted && !row.hold,
           isImported: row.source === 'IMPORT',
+          hold: row.hold,
         })) ?? null)
 
   // Sanctions older than the loaded page wait for it
@@ -117,7 +120,13 @@ export const ViewerChatHistory = ({
           {(index === 0 || dayOf(lines[index - 1]!.sentAt) !== dayOf(line.sentAt)) && (
             <h5 className={MODVIEW_USER.dayHead}>{dayOf(line.sentAt)}</h5>
           )}
-          <p className={cn(MODVIEW_USER.line, line.isRemoved && MODVIEW_USER.lineRemoved)}>
+          <p
+            className={cn(
+              MODVIEW_USER.line,
+              line.isRemoved && MODVIEW_USER.lineRemoved,
+              line.hold && MODVIEW_USER.lineHold
+            )}
+          >
             <time dateTime={line.sentAt} className={MODVIEW_USER.lineTime}>
               {formatClock(line.sentAt)}
             </time>
@@ -132,6 +141,11 @@ export const ViewerChatHistory = ({
                 />
               ) : (
                 line.text
+              )}
+              {line.hold && (
+                <span className={MODVIEW_USER.lineTag}>
+                  {MODVIEW_USER_COPY.holdLabels[line.hold]}
+                </span>
               )}
               {line.isRemoved && !merged && (
                 <span className={MODVIEW_USER.lineTag}>{MODVIEW_USER_COPY.messageRemoved}</span>

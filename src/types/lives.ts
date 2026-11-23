@@ -386,6 +386,7 @@ export interface SharedWord {
  * @property {string | null} liveId - Live it was sent in
  * @property {'LIVE' | 'IMPORT'} source - Where it comes from
  * @property {boolean} deleted - Removed by a moderator
+ * @property {'HELD' | 'APPROVED' | 'DENIED' | null} hold - Automod outcome, none when never held
  */
 
 export interface ChatHistoryMessage {
@@ -395,6 +396,7 @@ export interface ChatHistoryMessage {
   liveId: string | null
   source: 'LIVE' | 'IMPORT'
   deleted: boolean
+  hold: 'HELD' | 'APPROVED' | 'DENIED' | null
 }
 
 /**
