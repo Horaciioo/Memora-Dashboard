@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLiveFeed } from '@/core/hooks/data/lives/useLiveFeed'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
@@ -64,6 +65,16 @@ export const useLiveModView = (live: LiveView): ModViewDriver => {
     []
   )
   const reload = useLiveFeed(live.id, setState, shape)
+
+  // Level name and panel come from the page, reread once the level moved, once per level
+  const router = useRouter()
+  const reread = useRef<number | null | undefined>(undefined)
+  const shown = live.liveconLevel?.level ?? null
+  useEffect(() => {
+    if (state.liveconLevel === shown || reread.current === state.liveconLevel) return
+    reread.current = state.liveconLevel
+    router.refresh()
+  }, [state.liveconLevel, shown, router])
 
   // Gestures still on their way, a second click on the same one is dropped
   const inFlight = useRef(new Set<string>())

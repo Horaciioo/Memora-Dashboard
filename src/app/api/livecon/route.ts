@@ -1,11 +1,13 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
+import { readText } from '@/core/lib/forms/values'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import {
   liveconFields,
   readCurrentState,
   switchLevel,
 } from '@/core/services/livecon/LiveconService'
+import { announceLivecon } from '@/core/services/lives/LiveconSignalService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -24,6 +26,9 @@ export const POST = createProtectedRoute({
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     const state = await switchLevel(parsed.values, session.id, await scope())
+
+    // Open Mod Views follow at once
+    await announceLivecon(readText(parsed.values, 'youtuberId'))
 
     await recordEvent({
       eventType: 'LiveconChanged',

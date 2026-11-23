@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { publishLive } from '@/core/lib/lives/bus'
+import { publishLive, subscribeLive } from '@/core/lib/lives/bus'
 import { queueLogWrite } from '@/core/lib/lives/logQueue'
 import { forgetLiveState, pollLiveState } from '@/core/services/lives/LiveStatePoller'
 import { forgetLive, keepConnection } from '@/core/lib/lives/recent'
@@ -77,6 +77,7 @@ const globalForWatcher = globalThis as unknown as {
     // Members whose seat failed to carry a live
     refused: Map<string, Set<string>>
     syncing?: boolean
+    stopLivecon?: () => void
   }
 }
 
@@ -86,6 +87,7 @@ const watcher = (globalForWatcher.liveWatcher ??= {
   livecon: new Map(),
   refused: new Map(),
   syncing: false,
+  stopLivecon: undefined,
 })
 
 /**
@@ -525,6 +527,13 @@ export const startLiveWatcher = (): void => {
       logger.warn('[watcher] sync failed', error instanceof Error ? error.message : '')
     )
 
+  // A switch drops the level remembered for its creator, or for all
+  watcher.stopLivecon ??= subscribeLive(LIVE_TOPICS.livecon, (payload) => {
+    const { youtuberId } = (payload ?? {}) as { youtuberId?: string | null }
+    if (youtuberId) watcher.livecon.delete(youtuberId)
+    else watcher.livecon.clear()
+  })
+
   run()
   watcher.timer = setInterval(run, LIVE_SETTINGS.watchSyncSeconds * SECOND_MS)
   logger.info('[watcher] watching open Twitch lives')
@@ -538,5 +547,7 @@ export const startLiveWatcher = (): void => {
 export const stopLiveWatcher = (): void => {
   if (watcher.timer) clearInterval(watcher.timer)
   watcher.timer = null
+  watcher.stopLivecon?.()
+  watcher.stopLivecon = undefined
   releaseWatches()
 }
