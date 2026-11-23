@@ -181,6 +181,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.LiveRead,
         text: 'Correction d’un bug qui empêchait parfois de créer un live.',
       },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui laissait la Mod View sur l’ancien niveau Livecon après un changement de niveau.',
+      },
     ],
   },
   {
