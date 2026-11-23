@@ -487,8 +487,8 @@ export const actOnLive = async (input: {
   }
   await settleGesture(logId, true)
 
-  // A warning takes its message down, logged once
-  if (input.intent.kind === 'warn' && input.intent.messageId) {
+  // A warning takes its message down only when asked, logged once
+  if (input.intent.kind === 'warn' && input.intent.messageId && input.intent.deleteMessage) {
     try {
       await performOnTwitch(
         { kind: 'delete', messageId: input.intent.messageId, chatterId: input.intent.chatterId },

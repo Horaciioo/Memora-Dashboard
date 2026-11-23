@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react'
 
+import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { ReasonDialog } from '@/composites/modview/ReasonDialog'
 import type { ActRunner } from '@/composites/modview/types'
 import { actionIntent, actionLabel, isHarsh, needsReason } from '@/core/lib/modview/actions'
@@ -26,14 +27,16 @@ interface Asked {
 
 export const useActionRunner = (onAct: ActRunner, confirmHarsh: boolean) => {
   const [asked, setAsked] = useState<Asked | null>(null)
+  const [alsoDelete, setAlsoDelete] = useState(false)
 
   const run = useCallback(
     (action: ModActionConfig, target: ActionTarget, name: string) => {
       const intent = actionIntent(action, target)
       if (!intent) return
-      if (needsReason(action) || (confirmHarsh && isHarsh(action)))
+      if (needsReason(action) || (confirmHarsh && isHarsh(action))) {
+        setAlsoDelete(false)
         setAsked({ action, target, name })
-      else onAct(intent)
+      } else onAct(intent)
     },
     [onAct, confirmHarsh]
   )
@@ -59,12 +62,21 @@ export const useActionRunner = (onAct: ActRunner, confirmHarsh: boolean) => {
       onConfirm={(reason) => {
         const intent = actionIntent(
           { ...asked.action, reason: reason || asked.action.reason },
-          asked.target
+          asked.target,
+          alsoDelete
         )
         if (intent) onAct(intent)
       }}
       onClose={() => setAsked(null)}
-    />
+    >
+      {asked.action.kind === 'warn' && asked.target.messageId && (
+        <Toggle
+          checked={alsoDelete}
+          onChange={setAlsoDelete}
+          label={MODVIEW_COPY.warnDeleteToo}
+        />
+      )}
+    </ReasonDialog>
   )
 
   return { run, dialog }

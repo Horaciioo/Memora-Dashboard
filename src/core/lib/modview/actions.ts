@@ -98,12 +98,14 @@ export const actionLabel = (action: ModActionConfig): string => {
  * Gesture of an action
  * @param {ModActionConfig} action - Action
  * @param {ActionTarget} target - Viewer and line
+ * @param {boolean} [deleteMessage] - A warning also removes the line
  * @return {ModViewIntent | null} - Gesture, null when the target lacks a line
  */
 
 export const actionIntent = (
   action: ModActionConfig,
-  target: ActionTarget
+  target: ActionTarget,
+  deleteMessage = false
 ): ModViewIntent | null => {
   const { chatterId, messageId } = target
   const { reason } = action
@@ -125,7 +127,13 @@ export const actionIntent = (
     case 'delete':
       return messageId ? { kind: 'delete', messageId, chatterId } : null
     case 'warn':
-      return { kind: 'warn', chatterId, reason: reason ?? '-', ...(messageId ? { messageId } : {}) }
+      return {
+        kind: 'warn',
+        chatterId,
+        reason: reason ?? '-',
+        ...(messageId ? { messageId } : {}),
+        ...(messageId && deleteMessage ? { deleteMessage } : {}),
+      }
   }
 }
 

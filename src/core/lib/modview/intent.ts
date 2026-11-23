@@ -62,7 +62,13 @@ export const readIntent = (raw: Record<string, unknown>): ModViewIntent | null =
       const reason = textOf(raw.reason)
       const messageId = textOf(raw.messageId, false)
       return chatterId && reason
-        ? { kind: 'warn', chatterId, reason, ...(messageId ? { messageId } : {}) }
+        ? {
+            kind: 'warn',
+            chatterId,
+            reason,
+            ...(messageId ? { messageId } : {}),
+            ...(messageId && raw.deleteMessage === true ? { deleteMessage: true } : {}),
+          }
         : null
     }
     case 'timeout': {

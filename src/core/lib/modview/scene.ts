@@ -418,7 +418,7 @@ export const applySceneIntent = (
       return applySceneEvent(state, {
         kind: 'act',
         act: act({ kind: 'warn', target: nameOf(view, intent.chatterId), reason: intent.reason }),
-        deleteMessageId: intent.messageId,
+        deleteMessageId: intent.deleteMessage ? intent.messageId : undefined,
       })
     case 'timeout':
     case 'ban': {

@@ -45,6 +45,7 @@ export const MODVIEW_COPY = {
   warnLead: 'Avertissement envoyé à {name}.',
   warnPlaceholder: 'Écris la raison de l’avertissement',
   warnConfirm: 'Avertir',
+  warnDeleteToo: 'Supprimer aussi son message',
   reply: 'Répondre',
   replyTo: 'Réponse à {name}',
   replyCancel: 'Annuler la réponse',

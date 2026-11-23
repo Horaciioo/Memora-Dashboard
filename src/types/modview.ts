@@ -499,7 +499,7 @@ export interface ChatScript {
 
 export type ModViewIntent =
   | { kind: 'delete'; messageId: string; chatterId: string }
-  | { kind: 'warn'; chatterId: string; reason: string; messageId?: string }
+  | { kind: 'warn'; chatterId: string; reason: string; messageId?: string; deleteMessage?: boolean }
   | { kind: 'timeout'; chatterId: string; seconds: number; reason: string | null }
   | { kind: 'ban'; chatterId: string; reason: string | null }
   | { kind: 'unban'; chatterId: string }
