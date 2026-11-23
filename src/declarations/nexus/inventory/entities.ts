@@ -227,6 +227,14 @@ export const ENTITY_INVENTORY: Record<string, EntityEntry> = {
     display: 'id',
     search: [],
   },
+  liveChatPresence: {
+    model: 'LiveChatPresence',
+    exposure: 'readOnly',
+    reason: 'Relevé de présence au chat, jamais réécrit',
+    display: 'id',
+    search: [],
+  },
+  liveCategory: { model: 'LiveCategory', exposure: 'full', display: 'name', search: ['name'] },
   liveTeamMessage: {
     model: 'LiveTeamMessage',
     exposure: 'readOnly',
