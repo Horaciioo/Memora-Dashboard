@@ -6,6 +6,7 @@ import { Button } from '@/components/elements/actions/Button'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { AttendanceHoursDialog } from '@/composites/calendar/attendance/AttendanceHoursDialog'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { ICONS } from '@/declarations/ui/icons'
 import { accentVars } from '@/declarations/ui/theme'
 import { CALENDAR_DETAIL, CALENDAR_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
@@ -138,7 +139,7 @@ export const AttendanceAnswer = ({ entry, pending, onRespond }: AttendanceAnswer
 
       {isAskingHours && (
         <AttendanceHoursDialog
-          initial={initialHours(roster.myHours, entry)}
+          initial={initialHours(roster.myHours, entry.startsAt, LIVE_SETTINGS.presenceSuggestHours)}
           isSaving={pending}
           onConfirm={(hours) => answer(AttendanceStatuses.Present, hours)}
           onClose={() => setAskingHours(false)}

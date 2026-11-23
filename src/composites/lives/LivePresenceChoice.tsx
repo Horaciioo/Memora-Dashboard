@@ -238,13 +238,7 @@ export const LivePresenceChoice = ({ live, decision, onDecide }: LivePresenceCho
 
       {dialog === 'until' && (
         <PresenceUntilDialog
-          initial={toDateTimeInput(
-            suggestedUntil(
-              new Date(),
-              live.plannedEndAt ? new Date(live.plannedEndAt) : null,
-              LIVE_SETTINGS.presenceSuggestHours
-            )
-          )}
+          initial={toDateTimeInput(suggestedUntil(new Date(), LIVE_SETTINGS.presenceSuggestHours))}
           onClose={() => setDialog(null)}
           onConfirm={(to) => {
             setDialog(null)

@@ -112,16 +112,10 @@ export const answerCoordination = async (
   if (!live || !seat) throw notFound()
   if (!isOpenLive(live.status as LiveStatusName)) throw conflict()
 
-  const end = live.plannedEndAt
   const { startsAt, endsAt } = answer
 
   if (answer.accept) {
-    const invalid =
-      !startsAt ||
-      !endsAt ||
-      startsAt >= endsAt ||
-      startsAt < live.plannedStartAt ||
-      (end !== null && endsAt > end)
+    const invalid = !startsAt || !endsAt || startsAt >= endsAt || startsAt < live.plannedStartAt
     if (invalid) {
       throw invalidInput([{ field: 'startsAt', message: LIVE_COORDINATION_COPY.badWindow }])
     }
@@ -140,7 +134,7 @@ export const answerCoordination = async (
   })
 
   const seats = await prisma.liveCoordination.findMany({ where: { liveId } })
-  const gaps = coordinationGaps(live.plannedStartAt, end, seats)
+  const gaps = coordinationGaps(live.plannedStartAt, live.plannedEndAt, seats)
 
   // Responsables learn the answer, coordinators learn what is still missing
   const anchors = await readAnchors(live.youtuberId)

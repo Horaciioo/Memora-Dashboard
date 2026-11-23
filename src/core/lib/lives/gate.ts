@@ -28,16 +28,11 @@ export const gateState = (
 }
 
 /**
- * End proposed to a member arriving: a round hour a few hours on, or the exact end of a live that stops sooner
- * @param {Date} now - Moment of arrival
- * @param {Date | null} plannedEnd - Planned end of the live
+ * End proposed from a moment, a round hour a few hours on, the planned end never counts
+ * @param {Date} from - Moment the hours start
  * @param {number} hoursAhead - Hours proposed
  * @return {Date} - Proposed end
  */
 
-export const suggestedUntil = (now: Date, plannedEnd: Date | null, hoursAhead: number): Date => {
-  const hour = HOUR_MS
-  const round = new Date(Math.round((+now + hoursAhead * hour) / hour) * hour)
-
-  return plannedEnd && plannedEnd < round ? plannedEnd : round
-}
+export const suggestedUntil = (from: Date, hoursAhead: number): Date =>
+  new Date(Math.round((+from + hoursAhead * HOUR_MS) / HOUR_MS) * HOUR_MS)

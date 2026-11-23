@@ -13,7 +13,7 @@ import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiPatch, apiPost } from '@/core/lib/api/client'
 import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { FORM_SETTINGS, LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_COPY, LIVE_PAGE_COPY } from '@/declarations/lives/copy'
 import { LIVE_GATE, LIVE_PREPARATION } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
@@ -94,10 +94,11 @@ export const LivePreparation = ({ live, canEdit }: LivePreparationProps) => {
             </div>
             {hoursOpen && (
               <AttendanceHoursDialog
-                initial={initialHours(live.myHours, {
-                  startsAt: live.plannedStartAt,
-                  endsAt: live.plannedEndAt,
-                })}
+                initial={initialHours(
+                  live.myHours,
+                  live.plannedStartAt,
+                  LIVE_SETTINGS.presenceSuggestHours
+                )}
                 isSaving={isSaving}
                 onClose={() => setHoursOpen(false)}
                 onConfirm={(hours) => void answer(AttendanceStatuses.Present, hours)}

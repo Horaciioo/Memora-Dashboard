@@ -31,23 +31,20 @@ export const liveAccess = (
 }
 
 /**
- * Whether a closed live may be put back: closed before its planned end, and not long ago
+ * Whether a closed live may be put back, closed not long ago
  * @param {Object} live - Live coordinates
  * @param {LiveStatusName} live.status - Live status
  * @param {Date | null} live.endedAt - Closing moment
- * @param {Date | null} live.plannedEndAt - Planned end
  * @param {Date} now - Current moment
  * @param {number} recentHours - Hours a closed live stays on the board
  * @return {boolean} - Can be reopened
  */
 
 export const isReopenable = (
-  live: { status: LiveStatusName; endedAt: Date | null; plannedEndAt: Date | null },
+  live: { status: LiveStatusName; endedAt: Date | null },
   now: Date,
   recentHours: number
 ): boolean =>
   live.status === LiveStatuses.Ended &&
   live.endedAt !== null &&
-  live.plannedEndAt !== null &&
-  +live.endedAt < +live.plannedEndAt &&
   +now - +live.endedAt < recentHours * HOUR_MS

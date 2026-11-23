@@ -160,7 +160,7 @@ export const LIVE_COORDINATION_COPY = {
   to: 'Jusqu’à',
   accept: 'Je coordonne',
   decline: 'Je ne peux pas',
-  badWindow: 'Choisis des horaires dans la durée du live.',
+  badWindow: 'Choisis une fin après le début, à partir de l’heure du live.',
   gapRange: 'de {from} à {to}',
   gapAlert: 'Il manque un Coordinateur {ranges}.',
   gapHint: 'Personne ne coordonne encore {ranges}.',
