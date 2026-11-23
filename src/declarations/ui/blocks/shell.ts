@@ -141,6 +141,7 @@ export const LEFT_SIDEBAR = {
   subLink:
     'flex h-8 items-center rounded-[var(--radius-md)] px-2 text-caption font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   subLinkActive: 'font-semibold text-[var(--color-ink)]',
+  branchAvatar: 'mr-1.5 h-4! w-4! text-[0.5rem]!',
   navIcon: 'size-[1.125rem] shrink-0 transition-colors',
   navIconActive: 'text-[var(--color-ink)]',
   // Pulse on the live entry, bubble anchored beside it

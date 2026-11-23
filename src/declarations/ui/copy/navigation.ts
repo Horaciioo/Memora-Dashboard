@@ -15,6 +15,7 @@ export const NAV_COPY = {
   railViewClassicShort: 'Menu',
   railPrivate: 'Pages privées',
   railBack: 'Retour au menu',
+  railModView: 'Mod. View',
   expandRail: 'Agrandir le menu',
   status: 'Statut',
   badges: 'Badges',
