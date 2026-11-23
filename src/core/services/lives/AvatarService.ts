@@ -12,9 +12,6 @@ import { SECOND_MS } from '@/utils/constants/time'
 // Pictures kept, none when the account has not one
 const avatarCache = new Map<string, { url: string | null; until: number }>()
 
-// Entries one cache holds at most
-const CACHE_LIMIT = 5000
-
 /**
  * Profile pictures of chatters, asked in batches and kept a day
  * @param {string} liveId - Live
@@ -44,7 +41,7 @@ export const readLiveAvatars = async (
   if (missing.length > 0) {
     const fresh = await readAvatars(found.seat, missing).catch(() => null)
     if (fresh) {
-      if (avatarCache.size > CACHE_LIMIT) avatarCache.clear()
+      if (avatarCache.size > LIVE_SETTINGS.avatarCacheEntries) avatarCache.clear()
       const until = now + LIVE_SETTINGS.avatarCacheSeconds * SECOND_MS
       for (const id of missing) avatarCache.set(id, { url: fresh.get(id) ?? null, until })
     }

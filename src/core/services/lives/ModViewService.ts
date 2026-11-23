@@ -133,9 +133,6 @@ const baseState = (live: LiveView): ModViewState => ({
 // Moderators confirmed lately, by seat
 const moderatorCache = new Map<string, number>()
 
-// Entries one cache holds at most
-const CACHE_LIMIT = 500
-
 /**
  * Make room in a cache: expired entries go, then the oldest
  * @param {Map<string, V>} cache - Cache
@@ -144,12 +141,12 @@ const CACHE_LIMIT = 500
  */
 
 const pruneCache = <V>(cache: Map<string, V>, expiry: (value: V) => number): void => {
-  if (cache.size < CACHE_LIMIT) return
+  if (cache.size < LIVE_SETTINGS.modViewCacheEntries) return
 
   const now = Date.now()
   for (const [key, value] of cache) if (expiry(value) <= now) cache.delete(key)
   for (const key of cache.keys()) {
-    if (cache.size < CACHE_LIMIT) break
+    if (cache.size < LIVE_SETTINGS.modViewCacheEntries) break
     cache.delete(key)
   }
 }

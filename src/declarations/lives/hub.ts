@@ -59,10 +59,3 @@ export const LIVE_HUB_COPY = {
   reinforcement: 'Renfort',
 } as const
 import type { IconName } from '@/declarations/ui/icons'
-
-/**
- * Lives shown in the history
- * @type {number}
- */
-
-export const LIVE_HISTORY_LIMIT = 4

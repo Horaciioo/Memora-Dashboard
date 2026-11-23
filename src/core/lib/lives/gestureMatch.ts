@@ -1,4 +1,5 @@
 import { SECOND_MS } from '@/utils/constants/time'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
  * Fields that tell whether two log lines are the same gesture
@@ -11,9 +12,6 @@ export interface GestureKey {
   targetPlatformUserId: string | null
   occurredAt: Date
 }
-
-// Seconds a Memora gesture and its platform echo may arrive apart
-export const ECHO_WINDOW_SECONDS = 90
 
 // Kinds whose Memora side never knows the viewer, the held message or request names it
 const BLIND_TARGET_KINDS = new Set([
@@ -34,7 +32,7 @@ const BLIND_TARGET_KINDS = new Set([
 export const isSameGesture = (
   memora: GestureKey,
   platform: GestureKey,
-  windowSeconds = ECHO_WINDOW_SECONDS
+  windowSeconds = LIVE_SETTINGS.echoWindowSeconds
 ): boolean => {
   if (memora.kind !== platform.kind) return false
   if (memora.actorPlatformUserId !== platform.actorPlatformUserId) return false

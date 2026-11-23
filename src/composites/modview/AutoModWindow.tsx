@@ -22,12 +22,7 @@ import type { ChatMessage, Chatter, HeldMessage, ModAct } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { chatColour } from '@/utils/format/chatColour'
 import { formatSince } from '@/utils/format/time/dates'
-
-// Lines of personal badwords kept in the queue
-const MAX_PERSONAL = 50
-
-// Seconds a decided message stays in the queue
-const DECIDED_SECONDS = 10
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 interface Decided {
   entry: HeldMessage
@@ -113,13 +108,13 @@ export const AutoModWindow = ({
     setNow(time)
     setDecided((current) => ({
       ...current,
-      [entry.id]: { entry, approve, until: time + DECIDED_SECONDS * 1000 },
+      [entry.id]: { entry, approve, until: time + LIVE_SETTINGS.automodDecidedSeconds * 1000 },
     }))
     onPick(entry.author)
   }
 
   const personal = useMemo(
-    () => personalLines(messages, preferences.badwords, MAX_PERSONAL),
+    () => personalLines(messages, preferences.badwords, LIVE_SETTINGS.automodPersonalLines),
     [messages, preferences.badwords]
   )
   const rows = [
@@ -245,7 +240,7 @@ export const AutoModWindow = ({
                     {verdict ? (
                       <DecisionRing
                         left={Math.max(0, Math.ceil((verdict.until - now) / 1000))}
-                        total={DECIDED_SECONDS}
+                        total={LIVE_SETTINGS.automodDecidedSeconds}
                       />
                     ) : (
                       formatSince(entry.at)

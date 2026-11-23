@@ -1,9 +1,7 @@
 import { POLL_LIMITS } from '@/declarations/modview/polls'
 import { CHAT_MODES } from '@/declarations/modview/registries'
 import type { ChatModeName, ModViewIntent } from '@/types/modview'
-
-// Longest text a gesture carries
-const MAX_TEXT = 500
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
  * Read a bounded string
@@ -14,7 +12,7 @@ const MAX_TEXT = 500
 
 const textOf = (value: unknown, required = true): string | null => {
   if (typeof value !== 'string') return required ? null : ''
-  const trimmed = value.trim().slice(0, MAX_TEXT)
+  const trimmed = value.trim().slice(0, LIVE_SETTINGS.gestureTextMax)
 
   return required && trimmed.length === 0 ? null : trimmed
 }

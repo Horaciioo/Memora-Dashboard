@@ -32,7 +32,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, modSlotMinutes: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, heldExpireMinutes: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, missedLiveHours: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, avatarCacheSeconds: number, avatarBatchMax: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number, chatFlushMs: number, chatBatchMax: number, chatBufferMax: number, chatPageSize: number, preferenceSaveMs: number, teamChatPageSize: number, teamChatMaxLength: number, teamChatBubbleSeconds: number, teamChatMentionAccountId: string, mobileStreamPercent: number, mobileFreezeSwipePx: number, mobileSuggestionTags: number }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, modSlotMinutes: number, maxOpenLives: number, watchSyncSeconds: number, coverageMinGapSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, heldExpireMinutes: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, missedLiveHours: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, avatarCacheSeconds: number, avatarBatchMax: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number, chatFlushMs: number, chatBatchMax: number, chatBufferMax: number, chatPageSize: number, preferenceSaveMs: number, teamChatPageSize: number, teamChatMaxLength: number, teamChatBubbleSeconds: number, teamChatMentionAccountId: string, mobileStreamPercent: number, mobileFreezeSwipePx: number, mobileSuggestionTags: number, automodPersonalLines: number, automodDecidedSeconds: number, avatarBatchMs: number, mentionSuggestions: number, gestureTextMax: number, suggestionsMax: number, avatarCacheEntries: number, presenceCountCacheEntries: number, modViewCacheEntries: number, seenChattersMax: number, roomQueueFactor: number, echoWindowSeconds: number, timeTicksMax: number, startedBubbleMs: number, arrivalFreshMinutes: number, pollDefaultMinutes: number, pollRefreshSeconds: number, pollResultSeconds: number, hubHistoryLimit: number, teamChatEmojiMax: number }}
  */
 
 export const LIVE_SETTINGS = {
@@ -359,6 +359,126 @@ export const LIVE_SETTINGS = {
   memberLivesPageSize: readInteger(lives.memberLivesPageSize, {
     path: 'system/lives.memberLivesPageSize',
     fallback: 5,
+    min: 1,
+  }),
+  // Personal badword lines kept in the AutoMod queue
+  automodPersonalLines: readInteger(lives.automodPersonalLines, {
+    path: 'system/lives.automodPersonalLines',
+    fallback: 50,
+    min: 1,
+  }),
+  // Seconds a decided message stays in the AutoMod queue
+  automodDecidedSeconds: readInteger(lives.automodDecidedSeconds, {
+    path: 'system/lives.automodDecidedSeconds',
+    fallback: 10,
+    min: 1,
+  }),
+  // Wait to gather an avatar batch
+  avatarBatchMs: readInteger(lives.avatarBatchMs, {
+    path: 'system/lives.avatarBatchMs',
+    fallback: 150,
+    min: 10,
+  }),
+  // Names offered under the cursor
+  mentionSuggestions: readInteger(lives.mentionSuggestions, {
+    path: 'system/lives.mentionSuggestions',
+    fallback: 8,
+    min: 1,
+  }),
+  // Longest text a gesture carries
+  gestureTextMax: readInteger(lives.gestureTextMax, {
+    path: 'system/lives.gestureTextMax',
+    fallback: 500,
+    min: 1,
+  }),
+  // Suggestions kept on screen
+  suggestionsMax: readInteger(lives.suggestionsMax, {
+    path: 'system/lives.suggestionsMax',
+    fallback: 12,
+    min: 1,
+  }),
+  // Avatar cache entries at most
+  avatarCacheEntries: readInteger(lives.avatarCacheEntries, {
+    path: 'system/lives.avatarCacheEntries',
+    fallback: 5000,
+    min: 10,
+  }),
+  // Presence verdict cache entries at most
+  presenceCountCacheEntries: readInteger(lives.presenceCountCacheEntries, {
+    path: 'system/lives.presenceCountCacheEntries',
+    fallback: 1000,
+    min: 10,
+  }),
+  // Mod View cache entries at most
+  modViewCacheEntries: readInteger(lives.modViewCacheEntries, {
+    path: 'system/lives.modViewCacheEntries',
+    fallback: 500,
+    min: 10,
+  }),
+  // Chatters remembered per live
+  seenChattersMax: readInteger(lives.seenChattersMax, {
+    path: 'system/lives.seenChattersMax',
+    fallback: 20000,
+    min: 100,
+  }),
+  // Burst kept before a flush, as a multiple of the room size
+  roomQueueFactor: readInteger(lives.roomQueueFactor, {
+    path: 'system/lives.roomQueueFactor',
+    fallback: 4,
+    min: 1,
+  }),
+  // Seconds a Memora gesture and its platform echo may arrive apart
+  echoWindowSeconds: readInteger(lives.echoWindowSeconds, {
+    path: 'system/lives.echoWindowSeconds',
+    fallback: 90,
+    min: 1,
+  }),
+  // Marks wanted at most on a time axis
+  timeTicksMax: readInteger(lives.timeTicksMax, {
+    path: 'system/lives.timeTicksMax',
+    fallback: 9,
+    min: 2,
+  }),
+  // Life of the live started bubble before it folds
+  startedBubbleMs: readInteger(lives.startedBubbleMs, {
+    path: 'system/lives.startedBubbleMs',
+    fallback: 8000,
+    min: 1000,
+  }),
+  // Minutes a new arrival stays flagged
+  arrivalFreshMinutes: readInteger(lives.arrivalFreshMinutes, {
+    path: 'system/lives.arrivalFreshMinutes',
+    fallback: 3,
+    min: 1,
+  }),
+  // Poll duration picked at opening
+  pollDefaultMinutes: readInteger(lives.pollDefaultMinutes, {
+    path: 'system/lives.pollDefaultMinutes',
+    fallback: 2,
+    min: 1,
+  }),
+  // Seconds between two reads of a running poll
+  pollRefreshSeconds: readInteger(lives.pollRefreshSeconds, {
+    path: 'system/lives.pollRefreshSeconds',
+    fallback: 3,
+    min: 1,
+  }),
+  // Seconds poll results stay above the chat
+  pollResultSeconds: readInteger(lives.pollResultSeconds, {
+    path: 'system/lives.pollResultSeconds',
+    fallback: 30,
+    min: 1,
+  }),
+  // Lives shown in the hub history
+  hubHistoryLimit: readInteger(lives.hubHistoryLimit, {
+    path: 'system/lives.hubHistoryLimit',
+    fallback: 4,
+    min: 1,
+  }),
+  // Longest emoji string accepted from the browser
+  teamChatEmojiMax: readInteger(lives.teamChatEmojiMax, {
+    path: 'system/lives.teamChatEmojiMax',
+    fallback: 16,
     min: 1,
   }),
 }

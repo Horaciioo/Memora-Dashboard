@@ -8,7 +8,7 @@ import { cleanMentions, cleanScope, groupReactions } from '@/core/lib/lives/team
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
-import { TEAM_CHAT_EMOJI_MAX, TEAM_CHAT_EVENTS } from '@/declarations/lives/teamChat'
+import { TEAM_CHAT_EVENTS } from '@/declarations/lives/teamChat'
 import type { TeamChatScope } from '@/declarations/lives/teamChat'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { SessionUser } from '@/types/auth'
@@ -243,7 +243,7 @@ export const toggleReaction = async (input: {
 }): Promise<void> => {
   const { liveId, session } = input
   const emoji = typeof input.emoji === 'string' ? input.emoji.trim() : ''
-  if (typeof input.messageId !== 'string' || !emoji || emoji.length > TEAM_CHAT_EMOJI_MAX) {
+  if (typeof input.messageId !== 'string' || !emoji || emoji.length > LIVE_SETTINGS.teamChatEmojiMax) {
     throw invalidInput([{ field: 'emoji', message: FORM_COPY.required }])
   }
 

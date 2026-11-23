@@ -5,9 +5,9 @@ import { toLivePoll } from '@/core/lib/modview/poll'
 import { readLatestPoll } from '@/core/lib/platforms/twitch/helix'
 import type { TwitchSeat } from '@/core/lib/platforms/twitch/helix'
 import { readChannelOwnerSeat } from '@/core/services/platforms/PlatformAccountService'
-import { POLL_REFRESH_SECONDS } from '@/declarations/modview/polls'
 import type { LivePoll } from '@/types/modview'
 import { SECOND_MS } from '@/utils/constants/time'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 // Running follows, per live
 const follows = new Map<string, ReturnType<typeof setInterval>>()
@@ -70,7 +70,7 @@ const followPoll = (liveId: string, broadcasterId: string): void => {
 
   const timer = setInterval(() => {
     void syncLivePoll(liveId, broadcasterId, true).catch(() => null)
-  }, POLL_REFRESH_SECONDS * SECOND_MS)
+  }, LIVE_SETTINGS.pollRefreshSeconds * SECOND_MS)
   follows.set(liveId, timer)
 }
 

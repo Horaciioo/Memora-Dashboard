@@ -18,9 +18,6 @@ import { SECOND_MS } from '@/utils/constants/time'
 // Verdicts per live and member, until when they hold
 const countCache = new Map<string, { allowed: boolean; until: number }>()
 
-// Entries the verdict cache holds at most
-const COUNT_CACHE_LIMIT = 1000
-
 // Lives function identifiers, fixed once seeded
 let livesFunctionIds: Promise<Set<string>> | null = null
 
@@ -57,7 +54,7 @@ export const mayCountTime = async (liveId: string, member: SessionUser): Promise
   if (known && known.until > Date.now()) return known.allowed
 
   const allowed = await judgeCount(liveId, member)
-  if (countCache.size >= COUNT_CACHE_LIMIT) countCache.clear()
+  if (countCache.size >= LIVE_SETTINGS.presenceCountCacheEntries) countCache.clear()
   countCache.set(key, {
     allowed,
     until: Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * SECOND_MS,

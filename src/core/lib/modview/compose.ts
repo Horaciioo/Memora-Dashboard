@@ -1,9 +1,7 @@
 import { CHAT_COMMANDS, findChatCommand } from '@/declarations/modview/commands'
 import type { ChatCommandOption } from '@/declarations/modview/commands'
 import type { ChatMessage, Chatter } from '@/types/modview'
-
-// Names offered under the cursor
-const MAX_MENTIONS = 8
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
  * Who spoke last, newest first, each once
@@ -65,7 +63,7 @@ export const matchChatters = (chatters: Chatter[], query: string): Chatter[] => 
     .filter(
       (chatter) => chatter.login.includes(wanted) || chatter.name.toLowerCase().startsWith(wanted)
     )
-    .slice(0, MAX_MENTIONS)
+    .slice(0, LIVE_SETTINGS.mentionSuggestions)
 }
 
 /**

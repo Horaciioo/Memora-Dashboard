@@ -15,9 +15,6 @@ import { HOUR_SECONDS, MINUTE_MS, SECOND_MS } from '@/utils/constants/time'
 // A live's memory outlives it this long at most
 const ROOM_TTL_SECONDS = LIVE_SETTINGS.memoryHours * HOUR_SECONDS
 
-// Burst kept before a flush
-const QUEUE_FACTOR = 4
-
 /**
  * What a live remembers of its chat
  * @typedef {Object} RoomMemory
@@ -46,9 +43,6 @@ interface LiveRoom {
   // Pending write of the shared memory
   shareTimer: ReturnType<typeof setTimeout> | null
 }
-
-// Chatters remembered per live
-const SEEN_LIMIT = 20_000
 
 // Badges of people who never "arrive"
 const REGULAR_BADGES = ['broadcaster', 'moderator', 'bot']
@@ -171,7 +165,7 @@ const markFirst = (room: LiveRoom, event: SceneEvent): SceneEvent => {
   if (event.kind !== 'message') return event
 
   const { author } = event.message
-  if (room.seen.has(author.id) || room.seen.size >= SEEN_LIMIT) return event
+  if (room.seen.has(author.id) || room.seen.size >= LIVE_SETTINGS.seenChattersMax) return event
   room.seen.add(author.id)
   if (author.badges.some((badge) => REGULAR_BADGES.includes(badge))) return event
 
@@ -212,7 +206,7 @@ export const pushRoomEvent = (liveId: string, event: SceneEvent): void => {
   if (event.kind === 'hold') scheduleExpiry(liveId, event.held.id)
 
   // A stalled flush never piles up
-  if (room.queue.length > LIVE_SETTINGS.roomMessages * QUEUE_FACTOR) {
+  if (room.queue.length > LIVE_SETTINGS.roomMessages * LIVE_SETTINGS.roomQueueFactor) {
     room.queue = shedChatBurst(room.queue)
   }
 

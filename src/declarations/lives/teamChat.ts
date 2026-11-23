@@ -112,9 +112,6 @@ export const TEAM_CHAT_SCOPE_TINTS = {
   responsables: 'RESPONSABLE',
 } as const satisfies Record<TeamChatScope, string>
 
-// Longest emoji string accepted from the browser
-export const TEAM_CHAT_EMOJI_MAX = 16
-
 /**
  * Texts of the internal chat
  * @type {Record<string, string>}
