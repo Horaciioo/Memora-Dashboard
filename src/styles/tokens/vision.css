@@ -22,6 +22,9 @@ html[data-color-vision='deuteranopia'],
   --color-warning: #7a3300;
   --color-warning-soft: #ede5e0;
   --color-danger: #8e1f5e;
+  --color-sanction-warn: var(--color-caution);
+  --color-sanction-timeout: var(--color-warning);
+  --color-sanction-ban: var(--color-danger);
   --color-danger-soft: #f0e2eb;
   --color-authority-admin: #8e1f5e;
   --color-authority-admin-soft: #f0e2eb;
@@ -56,6 +59,9 @@ html[data-color-vision='deuteranopia'],
   --color-warning: #e69f00;
   --color-warning-soft: #3c311b;
   --color-danger: #f0a0c8;
+  --color-sanction-warn: var(--color-caution);
+  --color-sanction-timeout: var(--color-warning);
+  --color-sanction-ban: var(--color-danger);
   --color-danger-soft: #3e313b;
   --color-authority-admin: #f0a0c8;
   --color-authority-admin-soft: #3e313b;
