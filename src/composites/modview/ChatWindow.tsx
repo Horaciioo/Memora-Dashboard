@@ -8,6 +8,7 @@ import { ChatComposer } from '@/composites/modview/ChatComposer'
 import { ChatModesMenu } from '@/composites/modview/ChatModesMenu'
 import { useMobileMod } from '@/composites/modview/mobile/MobileContext'
 import { ChatRow } from '@/composites/modview/ChatRow'
+import { ChatThread } from '@/composites/modview/ChatThread'
 import { ModWindow } from '@/composites/modview/ModWindow'
 import { PinnedBar } from '@/composites/modview/PinnedBar'
 import { PollBar } from '@/composites/modview/PollBar'
@@ -88,6 +89,7 @@ export const ChatWindow = ({
 }: ChatWindowProps) => {
   const [menu, setMenu] = useState<'modes' | 'options' | null>(null)
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null)
+  const [threadId, setThreadId] = useState<string | null>(null)
   const menusRef = useRef<HTMLDivElement>(null)
   const modesRef = useRef<HTMLButtonElement>(null)
   const optionsRef = useRef<HTMLButtonElement>(null)
@@ -139,6 +141,24 @@ export const ChatWindow = ({
     () => repeatCounts(state.messages, preferences.repeatWords),
     [state.messages, preferences.repeatWords]
   )
+
+  // Props every line shares, the thread's included
+  const rowProps = {
+    options: shown,
+    toolsPosition:
+      isMobile && preferences.toolsPosition === 'hover'
+        ? ('left' as const)
+        : preferences.toolsPosition,
+    actions: preferences.actions,
+    confirmHarsh: preferences.confirmHarsh,
+    roster: state.roster,
+    emblems: state.emblems,
+    gate,
+    onAct,
+    onPick,
+    onWatch,
+    onReply: setReplyTo,
+  }
 
   // Caret of the open menu points at its own title
   useLayoutEffect(() => {
@@ -242,23 +262,10 @@ export const ChatWindow = ({
           {visible.map((message) => (
             <ChatRow
               key={message.id}
+              {...rowProps}
               message={message}
-              options={shown}
-              toolsPosition={
-                isMobile && preferences.toolsPosition === 'hover'
-                  ? 'left'
-                  : preferences.toolsPosition
-              }
-              actions={preferences.actions}
-              confirmHarsh={preferences.confirmHarsh}
               repeat={repeats.get(message.id)}
-              roster={state.roster}
-              emblems={state.emblems}
-              gate={gate}
-              onAct={onAct}
-              onPick={onPick}
-              onWatch={onWatch}
-              onReply={setReplyTo}
+              onThread={setThreadId}
             />
           ))}
         </ul>
@@ -270,6 +277,15 @@ export const ChatWindow = ({
         </button>
       )}
       {pause === 'hover' && <p className={MODVIEW_CHAT.paused}>{MODVIEW_COPY.paused}</p>}
+
+      {threadId && (
+        <ChatThread
+          threadId={threadId}
+          messages={state.messages}
+          rowProps={rowProps}
+          onClose={() => setThreadId(null)}
+        />
+      )}
 
       <ChatComposer
         draft={draft}

@@ -126,6 +126,7 @@ const replyOf = (event: Payload): { reply?: ChatReply } => {
     ? {
         reply: {
           id,
+          threadId: text(parent.thread_message_id) || id,
           authorName: text(parent.parent_user_name) || text(parent.parent_user_login),
           text: text(parent.parent_message_body),
         },

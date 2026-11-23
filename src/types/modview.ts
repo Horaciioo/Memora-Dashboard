@@ -62,12 +62,14 @@ export interface ChatFragment {
  * Line a message answers
  * @typedef {Object} ChatReply
  * @property {string} id - Parent message identifier
+ * @property {string} threadId - First message of the thread
  * @property {string} authorName - Parent author
  * @property {string} text - Parent text
  */
 
 export interface ChatReply {
   id: string
+  threadId: string
   authorName: string
   text: string
 }

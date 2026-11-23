@@ -229,6 +229,13 @@ export const MODVIEW_CHAT = {
   // Line answered, above a reply
   replyLine:
     'mb-0.5 block truncate text-xs text-[var(--color-ink-subtle)] before:mr-1 before:content-["↪"]',
+  replyLineLink: 'w-full cursor-pointer text-left hover:text-[var(--color-ink)]',
+  thread:
+    'absolute inset-x-2 top-2 z-20 flex max-h-[70%] flex-col overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--twitch-background)] shadow-[var(--shadow-md)]',
+  threadHead:
+    'flex shrink-0 items-center gap-2 px-3 py-2 text-sm font-bold text-[var(--color-ink)]',
+  threadBody: 'flex min-h-0 flex-col overflow-y-auto pb-2',
+  threadReplies: 'ml-3 flex flex-col border-l-2 border-[var(--color-border-strong)]',
   replyBanner:
     'flex items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-2 py-1 text-xs text-[var(--color-ink-subtle)]',
   replyText: 'min-w-0 flex-1 truncate',

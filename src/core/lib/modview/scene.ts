@@ -353,7 +353,14 @@ const replyFrom = (view: ModViewState, parentId?: string): { reply?: ChatReply }
   const parent = parentId ? view.messages.find((line) => line.id === parentId) : undefined
 
   return parent
-    ? { reply: { id: parent.id, authorName: parent.author.name, text: parent.text } }
+    ? {
+        reply: {
+          id: parent.id,
+          threadId: parent.reply?.threadId ?? parent.id,
+          authorName: parent.author.name,
+          text: parent.text,
+        },
+      }
     : {}
 }
 
