@@ -12,6 +12,28 @@ export const ASSISTANT_STYLES = {
   rowHint: 'shrink-0 text-xs text-[var(--color-ink-subtle)]',
   // Conversation
   thread: 'flex flex-col gap-0.5 px-3 py-3',
+  // Who answered what, one colour per answer
+  groups: 'mt-2 flex flex-col gap-3',
+  group: 'flex flex-col gap-1',
+  groupTitle: 'text-caption font-bold',
+  groupTones: {
+    success: 'text-[var(--color-success)]',
+    danger: 'text-[var(--color-danger)]',
+    muted: 'text-[var(--color-ink-subtle)]',
+    plain: 'text-[var(--color-ink)]',
+  },
+  groupItems: 'flex flex-col gap-0.5 text-sm',
+  // Window of hours the member offers
+  hours: 'mt-2 flex flex-col gap-3',
+  hoursField: 'flex flex-col gap-1 text-caption font-semibold text-[var(--color-ink-subtle)]',
+  hoursInput:
+    'rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-body text-[var(--color-ink)]',
+  // Title of a conversation, folds once the next one begins
+  topic:
+    'mt-6 flex w-full cursor-pointer items-center gap-2 border-t border-[var(--color-border)] pt-3 text-left text-caption font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase first:mt-0',
+  topicGlyph: 'size-4 shrink-0 transition-transform',
+  topicGlyphOpen: 'rotate-90',
+  topicDone: 'ml-auto text-[var(--color-ink-subtle)] normal-case',
   // Same rhythm as the welcome chat: a new speaker breaks, a follow-up hugs
   groupBreak: 'mt-5',
   memora: 'replica-message-in flex w-full gap-3',
@@ -33,6 +55,16 @@ export const ASSISTANT_STYLES = {
     'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-left text-sm transition-colors duration-150 hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)]',
   choiceHint: 'ml-auto shrink-0 text-xs text-[var(--color-ink-subtle)]',
   actions: 'flex flex-wrap gap-2',
+  // Rows to tick
+  checklist: 'surface-enter mt-1 ml-11 flex flex-col gap-0.5',
+  checkRow:
+    'flex w-full cursor-pointer items-center gap-3 rounded-[var(--radius-md)] px-2 py-2 text-left text-sm transition-colors duration-150 hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)]',
+  checkMaster: 'mb-1 border-b border-[var(--color-border)] rounded-b-none pb-3 font-bold',
+  checkBox:
+    'flex size-5 shrink-0 items-center justify-center rounded-[0.4rem] border-2 border-[var(--color-border-strong)] transition-colors duration-150',
+  checkBoxOn: 'border-[var(--color-brand-600)] bg-[var(--color-brand-600)] text-white',
+  checkGlyph: 'size-3.5',
+  checkGo: 'mt-2 self-start rounded-full',
   // Slider of a percentage, under Memora's question
   percent: 'surface-enter mt-1 ml-11 flex items-center gap-3',
   percentRange: 'min-w-0 flex-1 accent-[var(--color-ink-accent)]',
@@ -57,5 +89,30 @@ export const ASSISTANT_STYLES = {
   periodPicked: 'text-sm font-semibold',
   suggestion:
     'w-fit rounded-[var(--radius-md)] px-2 py-1 text-left text-sm text-[var(--color-ink-accent)] hover:bg-[var(--color-hover)]',
+  // Points listed under a line
+  items: "flex list-['-_'] flex-col gap-1 pl-4 text-base font-semibold text-[var(--color-ink)]",
+  // A listed point, crossed off by a line that draws itself once it is done
+  item: "relative transition-colors duration-700 after:absolute after:top-1/2 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-current after:transition-[width] after:duration-700 after:ease-out after:content-['']",
+  itemDone: 'text-[var(--color-ink-subtle)] after:w-full',
+  // Loading line, alone in the middle of the thread
+  warming: 'flex items-center justify-center gap-3 py-8 text-center',
   thinking: 'flex items-center gap-2 text-caption text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Memora bubble, bottom centre of a page
+ * @type {Record<string, string>}
+ */
+
+export const ASSISTANT_BUBBLE_STYLES = {
+  // Centred without a transform so the entrance animation keeps its own
+  root: 'recap-bubble fixed inset-x-0 bottom-[calc(var(--shell-dock-clearance,0px)+1.25rem)] z-[60] mx-auto flex h-16 w-[min(34rem,calc(100vw-2rem))] items-center gap-3 overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-raised)] pr-2 pl-4 shadow-[var(--shadow-lg)] transition-[width,height,bottom,border-radius] duration-300 ease-[var(--motion-ease-spring)] motion-reduce:transition-none',
+  // Grown to the whole page, ready to become it
+  rootGrown: 'bottom-0 h-dvh w-screen rounded-none border-transparent',
+  mark: 'brain-mark-white h-8 shrink-0',
+  line: 'min-w-0 flex-1 text-body leading-snug font-semibold transition-opacity duration-150',
+  lineGrown: 'opacity-0',
+  enter:
+    'flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--color-brand)] text-[var(--color-on-accent)] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  enterGlyph: 'size-5',
 } as const

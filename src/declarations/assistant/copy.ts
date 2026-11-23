@@ -4,15 +4,16 @@
  */
 
 export const ASSISTANT_COPY = {
-  name: 'Memora',
+  name: 'Memora Intelligence',
   // Stage of the chat itself
   maturity: 'alpha',
   launcher: 'Demande à Memora…',
-  launcherTitle: 'Memora, recherche et actions',
+  launcherTitle: 'Memora Intelligence, recherche et actions',
   placeholder: 'Cherche, ou demande : « crée une tâche pour MODO X »',
   paletteRecents: 'Tes dernières pages',
   paletteAsks: 'Demande à Memora',
   paletteGoes: 'Aller à',
+  stop: 'Arrêter Memora',
   answerPlaceholder: 'Ta réponse…',
   section: 'Memora',
   thinking: 'Memora réfléchit',
@@ -20,6 +21,7 @@ export const ASSISTANT_COPY = {
   denied: 'Tu n’as pas l’accès pour ça.',
   failed: 'Ça n’a pas marché : {error}',
   offline: 'Je n’arrive pas à joindre Memora. Réessaie, rien n’a été créé en double.',
+  recapAgain: 'Je te refais le point, une seconde.',
   goTo: 'J’ouvre {page}.',
   noSuchPage: 'Je ne trouve pas cette page parmi celles que tu peux ouvrir.',
   notFound: 'Je ne trouve rien qui s’appelle « {name} ».',

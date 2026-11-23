@@ -6,6 +6,7 @@ import { MobileHold } from '@/components/structures/overlays/MobileHold'
 import { PlayEntry } from '@/composites/play/entry/PlayEntry'
 import { BrandSplash } from '@/composites/splash/BrandSplash'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
+import { RecapHost } from '@/composites/recap/RecapHost'
 import { PlayInviteHost } from '@/composites/play/invites/PlayInviteHost'
 import { AccessSignalListener } from '@/composites/access/AccessSignalListener'
 import { FeatureGate } from '@/composites/features/FeatureGate'
@@ -19,6 +20,7 @@ import { MobileTopBar } from '@/composites/shell/mobile/MobileTopBar'
 import { OfflineBanner } from '@/composites/pwa/OfflineBanner'
 import { NexusLauncher } from '@/composites/nexus/NexusLauncher'
 import { PwaHost } from '@/composites/pwa/PwaHost'
+import { LiveAskHost } from '@/composites/lives/ask/LiveAskHost'
 import { AssistantDock } from '@/composites/search/assistant/AssistantDock'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
@@ -163,6 +165,8 @@ const AppShellFrame = ({
         {session && <PwaHost isPushReady={isPushReady} />}
         {session && isNexusReady && <NexusLauncher />}
         {session && <NudgeHost />}
+        {session && !isBare && isOpen('recap') && <RecapHost />}
+        {session && !isBare && isOpen('assistant') && <LiveAskHost />}
         {session && !isBare && isOpen('assistant') && <AssistantDock viewContext={viewContext} />}
         {session && !isBare && can(Permissions.PlayAccess) && isOpen('play.notices') && (
           <PlayInviteHost />

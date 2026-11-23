@@ -1,0 +1,18 @@
+{
+  "awayAfterMs": 28800000,
+  "heartbeatMs": 300000,
+  "maxWindowDays": 30,
+  "manualWindowDays": 7,
+  "maxThreads": 40,
+  "maxBeats": 1,
+  "maxPeople": 50,
+  "chapterLines": 6,
+  "sourceTake": 200,
+  "guideWaitMs": 1200,
+  "warmMs": 2400,
+  "switchOutMs": 320,
+  "guideFindMs": 4000,
+  "switchMs": 600,
+  "leaveMs": 650,
+  "againNudgeMs": 9000
+}

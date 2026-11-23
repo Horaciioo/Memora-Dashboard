@@ -3,13 +3,13 @@ import { readInteger } from '@/declarations/configurations/readers'
 
 /**
  * Assistant behaviour
- * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number }}
+ * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number }}
  */
 
 export const ASSISTANT_SETTINGS = {
   debounceMs: readInteger(assistant.debounceMs, {
     path: 'system/assistant.debounceMs',
-    fallback: 220,
+    fallback: 50,
     min: 0,
   }),
   maxChoices: readInteger(assistant.maxChoices, {
@@ -40,28 +40,34 @@ export const ASSISTANT_SETTINGS = {
   }),
   typingMsPerChar: readInteger(assistant.typingMsPerChar, {
     path: 'system/assistant.typingMsPerChar',
-    fallback: 22,
+    fallback: 5,
+    min: 0,
+  }),
+  // Pause on the dots before a line starts to be written
+  typingLeadMs: readInteger(assistant.typingLeadMs, {
+    path: 'system/assistant.typingLeadMs',
+    fallback: 150,
     min: 0,
   }),
   typingMinMs: readInteger(assistant.typingMinMs, {
     path: 'system/assistant.typingMinMs',
-    fallback: 500,
+    fallback: 150,
     min: 0,
   }),
   typingMaxMs: readInteger(assistant.typingMaxMs, {
     path: 'system/assistant.typingMaxMs',
-    fallback: 1200,
+    fallback: 450,
     min: 0,
   }),
   // A drafted line is read, then wiped
   eraseMsPerChar: readInteger(assistant.eraseMsPerChar, {
     path: 'system/assistant.eraseMsPerChar',
-    fallback: 12,
+    fallback: 5,
     min: 0,
   }),
   draftPauseMs: readInteger(assistant.draftPauseMs, {
     path: 'system/assistant.draftPauseMs',
-    fallback: 600,
+    fallback: 300,
     min: 0,
   }),
   // A creation asked elsewhere opens on landing
@@ -90,7 +96,31 @@ export const ASSISTANT_SETTINGS = {
   // Memora thinks before she acts
   thinkingMs: readInteger(assistant.thinkingMs, {
     path: 'system/assistant.thinkingMs',
-    fallback: 900,
+    fallback: 350,
+    min: 0,
+  }),
+  // Two reminders on a roll-call never come closer than this
+  remindGapMinutes: readInteger(assistant.remindGapMinutes, {
+    path: 'system/assistant.remindGapMinutes',
+    fallback: 30,
+    min: 1,
+  }),
+  // The lives asking the member are looked up this often
+  liveAskEverySeconds: readInteger(assistant.liveAskEverySeconds, {
+    path: 'system/assistant.liveAskEverySeconds',
+    fallback: 60,
+    min: 10,
+  }),
+  // The service push goes out this long before it starts
+  serviceLeadMinutes: readInteger(assistant.serviceLeadMinutes, {
+    path: 'system/assistant.serviceLeadMinutes',
+    fallback: 10,
+    min: 1,
+  }),
+  // The bubble grows into the page for this long
+  bubbleGrowMs: readInteger(assistant.bubbleGrowMs, {
+    path: 'system/assistant.bubbleGrowMs',
+    fallback: 320,
     min: 0,
   }),
 }

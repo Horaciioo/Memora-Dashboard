@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
 import { NotificationsList } from '@/composites/notifications/NotificationsList'
+import { RecapMenuRows } from '@/composites/recap/RecapMenuRows'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
@@ -104,6 +105,9 @@ export const NotificationsPanel = ({
       </div>
 
       {entries.length > 0 && <div className={cn(NESTED_BOX.group, 'm-1.5 mt-0')}>{seeAll}</div>}
+      <div className={cn(NESTED_BOX.group, 'm-1.5 mt-0 empty:hidden')}>
+        <RecapMenuRows onLeave={onLeave} />
+      </div>
     </div>
   )
 }

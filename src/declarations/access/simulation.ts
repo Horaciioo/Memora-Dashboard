@@ -13,6 +13,7 @@ export const SIMULATION_SAFE_METHODS: string[] = ['GET', 'HEAD', 'OPTIONS']
 export const SIMULATION_OPEN_PATHS: string[] = [
   '/api/preferences',
   '/api/notifications',
+  '/api/recap',
   // Reads a sentence, writes nothing
   '/api/assistant',
 ]

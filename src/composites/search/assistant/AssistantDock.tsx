@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
 import { useRef } from 'react'
 
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
@@ -11,6 +12,7 @@ import { URGENT_SCENARIO, useAssistantDock } from '@/core/store/assistantDock'
 import { ASSISTANT_DOCK_COPY, ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import type { AssistantOffer } from '@/declarations/assistant/offers'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
+import { ROUTES } from '@/declarations/navigation'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
 import { FLOATING_ADD_STYLES } from '@/declarations/ui/variants'
@@ -37,6 +39,8 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
   const { session } = useAuthContext()
   const { shortcuts, groups } = useRailEntries(viewContext)
   const isOpen = greeting !== null
+  // Memora Intelligence holds her chat on the page itself, no corner chat there
+  const isIntelligence = usePathname() === ROUTES.intelligence
   const dockRef = useRef<HTMLDivElement>(null)
   useOutsideDismiss(isOpen, dockRef, close)
   // Creations of the pages the member reaches, this one apart
@@ -53,6 +57,8 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
   const cycled = useNudgeCycle(action?.offer.nudges ?? ASSISTANT_DOCK_COPY.nudges, !isOpen)
   // The landing welcome speaks before the usual lines
   const nudge = isOpen ? null : (welcome ?? cycled)
+
+  if (isIntelligence) return null
 
   return (
     <div

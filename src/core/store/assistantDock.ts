@@ -63,6 +63,8 @@ interface AssistantDockStore {
   hello: AssistantHello | null
   welcome: string | null
   handoff: Handoff | null
+  pending: string | null
+  carried: DockFocus | null
   say: (welcome: string | null) => void
   focusOn: (focus: DockFocus) => void
   focusOff: (focus: DockFocus) => void
@@ -73,8 +75,18 @@ interface AssistantDockStore {
   toggle: () => void
   handOff: (offer: AssistantOffer) => void
   alert: (data: Record<string, string>) => void
+  talk: (focus: DockFocus) => void
+  ask: (text: string) => void
+  takePending: () => void
+  carry: (focus: DockFocus) => void
+  takeCarried: () => DockFocus | null
   takeHandoff: (offer: AssistantOffer) => boolean
 }
+
+type Setter = (
+  partial:
+    Partial<AssistantDockStore> | ((state: AssistantDockStore) => Partial<AssistantDockStore>)
+) => void
 
 // A new line each time
 const pickGreeting = () =>
@@ -92,9 +104,15 @@ export const URGENT_SCENARIO: ScenarioId = 'identity'
 
 // Focus left behind once an urgent talk is over
 const leaveAlert = (focus: DockFocus | null): DockFocus | null =>
-  focus?.scenario === URGENT_SCENARIO ? null : focus
+  focus?.scenario === URGENT_SCENARIO || (focus?.scenario === 'live' && focus.entry !== 'offer')
+    ? null
+    : focus
 
 const pickOpening = () => ({ greeting: pickGreeting(), hello: pickHello(hourNow()) })
+
+// Chat closed, what it was about is left behind
+const closeChat = (set: Setter) =>
+  set((state) => ({ greeting: null, hello: null, focus: leaveAlert(state.focus) }))
 
 export const useAssistantDock = create<AssistantDockStore>()((set, get) => ({
   action: null,
@@ -103,6 +121,8 @@ export const useAssistantDock = create<AssistantDockStore>()((set, get) => ({
   hello: null,
   welcome: null,
   handoff: null,
+  pending: null,
+  carried: null,
   say: (welcome) => set({ welcome }),
   focusOn: (focus) => set({ focus }),
   // Only the page that placed it
@@ -112,15 +132,23 @@ export const useAssistantDock = create<AssistantDockStore>()((set, get) => ({
   clear: (action) => set((state) => (state.action === action ? { action: null } : state)),
   open: () => set((state) => (state.greeting ? state : pickOpening())),
   // An urgent talk ends with the chat, it never comes back by itself
-  close: () => set((state) => ({ greeting: null, hello: null, focus: leaveAlert(state.focus) })),
-  toggle: () =>
-    set((state) =>
-      state.greeting
-        ? { greeting: null, hello: null, focus: leaveAlert(state.focus) }
-        : pickOpening()
-    ),
+  close: () => closeChat(set),
+  toggle: () => (get().greeting ? closeChat(set) : set(pickOpening())),
   alert: (data) =>
     set({ focus: { scenario: URGENT_SCENARIO, entry: 'alert', data }, ...pickOpening() }),
+  // Memora opens a talk of her own, the chat opens on it
+  talk: (focus) => set({ focus, ...pickOpening() }),
+  // The page composer hands its words to the chat, which answers them
+  ask: (text) => set((state) => ({ pending: text, ...(state.greeting ? {} : pickOpening()) })),
+  takePending: () => set({ pending: null }),
+  // A bubble hands its talk to the Memora Intelligence page
+  carry: (carried) => set({ carried }),
+  takeCarried: () => {
+    const { carried } = get()
+    if (carried) set({ carried: null })
+
+    return carried
+  },
   handOff: (offer) => set({ handoff: { offer, at: Date.now() }, greeting: null, hello: null }),
   // Only fresh, only once
   takeHandoff: (offer) => {

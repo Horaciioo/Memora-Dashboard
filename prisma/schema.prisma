@@ -301,6 +301,8 @@ model Account {
   historyConsentVersion Int?
   // Last release note read
   seenReleaseVersion    String?
+  // Last moment the member was around, the recap window opens there
+  recapSeenAt           DateTime?
   // One-time guides already shown, by key
   seenGuides            String[]     @default([])
   // Pages starred from the banner, by path

@@ -24,6 +24,7 @@
   --color-brand-300: #7e3c52;
   --color-brand-400: #b35b78;
   --color-brand-500: #e0789a;
+  --color-brand: var(--color-brand-500);
   --color-brand-700: #f29ab5;
   --color-brand-800: #f8c0d0;
   --color-brand-900: #fde4ec;

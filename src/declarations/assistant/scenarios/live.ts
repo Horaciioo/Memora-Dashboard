@@ -8,6 +8,8 @@ export const LIVE_SCENARIO_COPY = {
   create: 'Planifier un live',
   remove: 'Supprimer un live',
   leave: 'Rien pour l’instant',
+  askYes: 'Je suis disponible pour ce live',
+  askNo: 'Je ne suis pas disponible pour ce live',
   offerNo: 'D’accord, je reste dispo si tu changes d’avis.',
   platformAsk: 'Sur quelle plateforme ?',
   platformNone: 'Je ne trouve aucun modèle de live, il faut en configurer un dans le calendrier.',
