@@ -4,6 +4,11 @@
  */
 
 export const MODVIEW_TABS = {
+  // Pink heading of a window, doubles as a button
+  title: 'min-w-0 truncate text-sm font-bold tracking-tight text-[var(--color-ink-accent)]',
+  icon: 'flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  iconOn: 'text-[var(--color-ink)]',
+  iconGlyph: 'h-4 w-4',
   list: 'relative flex min-w-0 flex-1 items-center gap-0.5',
   // Box gliding under the open tab
   box: 'relative flex flex-col',
