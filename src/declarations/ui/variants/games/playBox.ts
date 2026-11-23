@@ -68,11 +68,13 @@ export const PLAY_BOX = {
 
 export const PLAY_SETTINGS = {
   layout: 'grid items-start gap-4 md:gap-6 lg:grid-cols-[15rem_minmax(0,1fr)]',
-  nav: 'hidden flex-wrap gap-1 md:flex lg:sticky lg:top-4 lg:flex-col',
+  nav: 'relative hidden flex-wrap gap-1 md:flex lg:sticky lg:top-4 lg:flex-col',
   // Phone: one menu instead of the list
   pick: 'md:hidden',
-  item: 'flex min-h-11 shrink-0 items-center gap-3 rounded-xl px-3 text-left text-sm font-bold text-[var(--play-ink-soft)] transition-colors hover:bg-play-nest hover:text-[var(--play-ink)] focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
-  itemOn: 'bg-play-nest text-[var(--play-ink)]',
+  // Gliding highlight under the open section
+  box: 'tab-indicator pointer-events-none absolute top-0 left-0 rounded-xl bg-play-nest opacity-0',
+  item: 'relative z-10 flex min-h-11 shrink-0 items-center gap-3 rounded-xl px-3 text-left text-sm font-bold text-[var(--play-ink-soft)] transition-colors hover:text-[var(--play-ink)] focus-visible:outline-2 focus-visible:outline-[var(--play-key)]',
+  itemOn: 'text-[var(--play-ink)]',
   logo: 'size-6 shrink-0',
   icon: 'size-5 shrink-0',
   divider: 'my-1 h-6 w-px shrink-0 self-center bg-play-nest lg:h-px lg:w-full',

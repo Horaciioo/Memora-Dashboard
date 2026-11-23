@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { useGlideBox } from '@/core/hooks/interaction/layout/useGlideBox'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { GolfPrefToggles } from '@/composites/play/prefs/GolfPrefToggles'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
@@ -36,6 +37,7 @@ export const PlaySettings = () => {
   const [section, setSection] = useState<PlayGameName | typeof GENERAL>(GENERAL)
   const GeneralIcon = ICONS.settings
   const isGeneral = section === GENERAL
+  const { listRef, boxRef } = useGlideBox<HTMLElement>(section)
 
   const group = (title: string, body: React.ReactNode) => (
     <div className={PLAY_SETTINGS.group}>
@@ -58,10 +60,18 @@ export const PlaySettings = () => {
           onChange={(value) => setSection(value as PlayGameName | typeof GENERAL)}
         />
       </div>
-      <nav aria-label={PLAY_HUB_COPY.settingsNav} className={PLAY_SETTINGS.nav}>
+      <nav
+        ref={listRef}
+        role="tablist"
+        aria-orientation="vertical"
+        aria-label={PLAY_HUB_COPY.settingsNav}
+        className={PLAY_SETTINGS.nav}
+      >
+        <span ref={boxRef} className={PLAY_SETTINGS.box} aria-hidden="true" />
         <button
           type="button"
-          aria-current={isGeneral ? 'page' : undefined}
+          role="tab"
+          aria-selected={isGeneral}
           className={cn(PLAY_SETTINGS.item, isGeneral && PLAY_SETTINGS.itemOn)}
           onClick={() => setSection(GENERAL)}
         >
@@ -73,7 +83,8 @@ export const PlaySettings = () => {
           <button
             key={game}
             type="button"
-            aria-current={section === game ? 'page' : undefined}
+            role="tab"
+            aria-selected={section === game}
             className={cn(PLAY_SETTINGS.item, section === game && PLAY_SETTINGS.itemOn)}
             onClick={() => setSection(game)}
           >
