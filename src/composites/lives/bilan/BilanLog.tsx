@@ -13,8 +13,9 @@ import type { LiveReport } from '@/core/lib/lives/report'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_REPORT_COPY, MODERATION_KINDS } from '@/declarations/lives/moderation'
 import { ICONS } from '@/declarations/ui/icons'
-import { LIVE_REPORT } from '@/declarations/ui/variants'
+import { LIVE_REPORT, MODVIEW_VERDICT } from '@/declarations/ui/variants'
 import type { LiveLogLine } from '@/types/lives'
+import { cn } from '@/utils/classnames'
 import { formatClock, formatDuration } from '@/utils/format/modview'
 
 export interface BilanLogProps {
@@ -88,7 +89,7 @@ export const BilanLog = ({ log, moderators }: BilanLogProps) => {
                   <OriginMark onMemora={line.origin === 'MEMORA'} />
                 </span>
                 <span className={LIVE_REPORT.lineBody}>
-                  <span className={LIVE_REPORT.lineWhat}>
+                  <span className={cn(LIVE_REPORT.lineWhat, MODVIEW_VERDICT[line.kind]?.text)}>
                     <Icon className={LIVE_REPORT.lineIcon} aria-hidden="true" />
                     {meta.label}
                     {line.status === 'FAILED' && (
