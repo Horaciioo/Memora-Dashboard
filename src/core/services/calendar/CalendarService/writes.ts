@@ -195,7 +195,7 @@ export const createEntry = async (
   })
 
   if (live) {
-    // The live convenes its team and asks its Coordinators itself
+    // The live convenes its team and asks its Coordinators itself, its entry goes with it
     await openLive({
       entry: row,
       live: {
@@ -204,6 +204,9 @@ export const createEntry = async (
       },
       actorId: ownerId,
       scope,
+    }).catch(async (error: unknown) => {
+      await prisma.calendarEvent.deleteMany({ where: { id: row.id } })
+      throw error
     })
 
     const fresh = await prisma.calendarEvent.findUnique({

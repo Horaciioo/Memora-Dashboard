@@ -31,7 +31,7 @@ import { readLive } from '@/core/services/lives/LiveService/reads'
  * @param {Object} input - Entry and live fields
  * @param {{ id: string, title: string, startsAt: Date, endsAt: Date | null }} input.entry - Calendar entry
  * @param {LiveInput} input.live - Live fields
- * @param {string} input.actorId - Who posts it
+ * @param {string | null} input.actorId - Who posts it, none when Memora repairs it
  * @param {AccessScope} input.scope - Creator perimeter
  * @return {Promise<string>} - New live identifier
  */
@@ -44,7 +44,7 @@ export const openLive = async ({
 }: {
   entry: { id: string; title: string; startsAt: Date; endsAt: Date | null }
   live: LiveInput
-  actorId: string
+  actorId: string | null
   scope: AccessScope
 }): Promise<string> => {
   // Planned end is the one typed, none is invented, closing the live stays manual

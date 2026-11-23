@@ -22,6 +22,7 @@
   "idempotencyMinutes": 10,
   "watchLeadMinutes": 120,
   "watchTrailMinutes": 120,
+  "missedLiveHours": 12,
   "reportBucketMinutes": 5,
   "reportMaxSlices": 120,
   "reportMaxHours": 24,

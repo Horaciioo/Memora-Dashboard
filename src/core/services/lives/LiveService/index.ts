@@ -31,4 +31,5 @@ export {
   deleteLive,
 } from '@/core/services/lives/LiveService/lifecycle'
 export { openUnplannedLives } from '@/core/services/lives/LiveService/unplanned'
+export { dropMissedLives, openOrphanLiveEntries } from '@/core/services/lives/LiveService/recovery'
 export { syncStreamState } from '@/core/services/lives/LiveService/stream'
