@@ -117,6 +117,11 @@ export const useLiveFeed = (
         notice: current.readOnly ? current.notice : link.notice,
       }))
     })
+    source.addEventListener(LIVE_STREAM_EVENTS.livecon, (message) => {
+      const switched = readEvent<{ level: number | null }>(message)
+      if (!switched) return
+      setState((current) => ({ ...current, liveconLevel: switched.level }))
+    })
     // A reopening after a cut reads the snapshot again to catch up
     let opened = false
     source.addEventListener('open', () => {

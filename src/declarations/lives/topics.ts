@@ -1,6 +1,6 @@
 /**
  * Topics of the live bus
- * @type {{ lives: string, channel: string, live: (id: string) => string, room: (id: string) => string, connection: (id: string) => string, team: (id: string) => string, teamLiveIdOf: (topic: string) => string | null, privateRoom: (id: string, scope: string) => string, scopedOf: (topic: string) => { liveId: string, scope: string } | null }}
+ * @type {{ lives: string, channel: string, livecon: string, live: (id: string) => string, room: (id: string) => string, connection: (id: string) => string, team: (id: string) => string, teamLiveIdOf: (topic: string) => string | null, privateRoom: (id: string, scope: string) => string, scopedOf: (topic: string) => { liveId: string, scope: string } | null }}
  */
 
 export const LIVE_TOPICS = {
@@ -15,6 +15,8 @@ export const LIVE_TOPICS = {
   connection: (id: string) => `live:${id}:connection`,
   // Instance that watches the lives
   watchLease: 'lives:watcher',
+  // Livecon switches, heard by every instance
+  livecon: 'lives:livecon',
   // Internal chat of a live
   team: (id: string) => `live:${id}:team`,
   teamLiveIdOf: (topic: string): string | null => /^live:([^:]+):team$/.exec(topic)?.[1] ?? null,
@@ -38,4 +40,6 @@ export const LIVE_STREAM_EVENTS = {
   batch: 'batch',
   // Platform connection of a live
   connection: 'connection',
+  // Level in force changed
+  livecon: 'livecon',
 } as const

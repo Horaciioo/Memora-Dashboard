@@ -62,12 +62,14 @@ export interface ChatFragment {
  * Line a message answers
  * @typedef {Object} ChatReply
  * @property {string} id - Parent message identifier
+ * @property {string} threadId - First message of the thread
  * @property {string} authorName - Parent author
  * @property {string} text - Parent text
  */
 
 export interface ChatReply {
   id: string
+  threadId: string
   authorName: string
   text: string
 }
@@ -497,7 +499,7 @@ export interface ChatScript {
 
 export type ModViewIntent =
   | { kind: 'delete'; messageId: string; chatterId: string }
-  | { kind: 'warn'; chatterId: string; reason: string; messageId?: string }
+  | { kind: 'warn'; chatterId: string; reason: string; messageId?: string; deleteMessage?: boolean }
   | { kind: 'timeout'; chatterId: string; seconds: number; reason: string | null }
   | { kind: 'ban'; chatterId: string; reason: string | null }
   | { kind: 'unban'; chatterId: string }

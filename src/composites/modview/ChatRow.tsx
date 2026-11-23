@@ -64,6 +64,8 @@ export interface ChatRowProps {
   onPick: (chatter: Chatter) => void
   onWatch: (chatter: Chatter) => void
   onReply: (message: ChatMessage) => void
+  // Opens the thread of a reply, none inside the thread itself
+  onThread?: (threadId: string) => void
 }
 
 /**
@@ -86,6 +88,7 @@ const ChatLineBody = ({
   onPick,
   onWatch,
   onReply,
+  onThread,
 }: ChatRowProps) => {
   const { contextMenu } = useMenu()
   const chatterId = message.author.id
@@ -148,6 +151,16 @@ const ChatLineBody = ({
       ]
     : []
   const lineMenu: MenuItem[] = [
+    ...(message.reply && onThread
+      ? [
+          {
+            id: 'thread',
+            label: MODVIEW_COPY.threadOpen,
+            icon: 'chat' as const,
+            onSelect: () => onThread(message.reply!.threadId),
+          },
+        ]
+      : []),
     ...(isDeleted
       ? []
       : [
@@ -177,11 +190,16 @@ const ChatLineBody = ({
       )}
     >
       {isFirst && <span className={MODVIEW_CHAT.firstTag}>{MODVIEW_COPY.firstMessage}</span>}
-      {message.reply && (
-        <span className={MODVIEW_CHAT.replyLine}>
+      {message.reply && onThread && (
+        <button
+          type="button"
+          className={cn(MODVIEW_CHAT.replyLine, MODVIEW_CHAT.replyLineLink)}
+          title={MODVIEW_COPY.threadOpen}
+          onClick={() => onThread(message.reply!.threadId)}
+        >
           {MODVIEW_COPY.replyingTo.replace('{name}', message.reply.authorName)}
           {`: ${message.reply.text}`}
-        </span>
+        </button>
       )}
       {(toolsPosition === 'left' || toolsPosition === 'right') && toolsNode}
       {options.badges && emblem && (

@@ -159,6 +159,18 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Amélioration de la Mod View : un message de l’automod déjà tranché affiche un décompte avant de quitter la file.',
       },
       {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une fonctionnalité en Alpha, expérimentale, nommée « Fil de discussion » : un message en réponse s’ouvre dans son fil, depuis le clic droit ou en cliquant sur la ligne de réponse.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la Mod View : l’heure s’affiche maintenant à côté de la date de chaque sanction d’un spectateur.',
+      },
+      {
         tag: ChangelogTags.Improved,
         page: ROUTES.play,
         text: 'Amélioration visuelle de « Play » : la sélection glisse d’une section à l’autre dans les réglages.',
@@ -180,6 +192,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.lives,
         permission: Permissions.LiveRead,
         text: 'Correction d’un bug qui empêchait parfois de créer un live.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui laissait la Mod View sur l’ancien niveau Livecon après un changement de niveau.',
       },
     ],
   },

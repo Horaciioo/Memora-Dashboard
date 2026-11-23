@@ -9,7 +9,7 @@ import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_USER, MODVIEW_VERDICT } from '@/declarations/ui/variants'
 import type { ViewerSanction } from '@/types/lives'
 import { cn } from '@/utils/classnames'
-import { formatDuration, formatShortDay } from '@/utils/format/modview'
+import { formatClock, formatDuration, formatShortDay } from '@/utils/format/modview'
 
 export interface ViewerSanctionListProps {
   // Null while loading
@@ -60,7 +60,7 @@ export const ViewerSanctionList = ({ history }: ViewerSanctionListProps) => {
               </span>
               <span className={MODVIEW_USER.sanctionBy}>
                 <time className={MODVIEW_USER.sanctionDate} dateTime={row.occurredAt}>
-                  {formatShortDay(row.occurredAt)}
+                  {`${formatShortDay(row.occurredAt)} ${formatClock(row.occurredAt)}`}
                 </time>
                 {row.actorName && <Avatar name={row.actorName} src={row.actorAvatar} size="xs" />}
               </span>
