@@ -18,19 +18,24 @@ const LEFT_OUT: CalendarSourceName[] = [CalendarSources.Birthday, CalendarSource
  * whether a continuation exists
  * @param {SessionUser} session - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
+ * @param {{ days?: number, limit?: number }} [window] - Days looked at and entries kept, the home's own by default
  * @return {Promise<HomePlanned[]>} - Coming entries, soonest first
  */
 
 export const upcomingPlans = async (
   session: SessionUser,
-  access: PermissionHelpers
+  access: PermissionHelpers,
+  {
+    days = HOME_SETTINGS.plannedWindowDays,
+    limit = HOME_SETTINGS.plannedMax + 1,
+  }: { days?: number; limit?: number } = {}
 ): Promise<HomePlanned[]> => {
   if (!access.can(Permissions.CalendarRead)) return []
 
   const now = new Date()
   const entries = await listEntries({
     from: startOfDay(now),
-    to: addDays(now, HOME_SETTINGS.plannedWindowDays),
+    to: addDays(now, days),
     viewerId: session.id,
     access,
     scope: await readCalendarScope(session, access),
@@ -50,7 +55,7 @@ export const upcomingPlans = async (
       .filter((entry) => entry.attendance?.mine !== AttendanceStatuses.Absent)
       // What ended earlier today stays, struck through
       .filter((entry) => new Date(entry.endsAt ?? entry.startsAt) >= startOfDay(now))
-      .slice(0, HOME_SETTINGS.plannedMax + 1)
+      .slice(0, limit)
       .map((entry) => ({
         id: entry.id,
         title: entry.title,

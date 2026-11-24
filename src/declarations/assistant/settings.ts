@@ -3,7 +3,7 @@ import { readInteger } from '@/declarations/configurations/readers'
 
 /**
  * Assistant behaviour
- * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number, bubbleExpandMs: number, liveDefaultHours: number, bubbleOpenMs: number, bubbleStaySeconds: number, bubbleReloadMs: number, closeSeconds: number, undoSeconds: number }}
+ * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number, bubbleExpandMs: number, liveDefaultHours: number, bubbleOpenMs: number, bubbleStaySeconds: number, bubbleReloadMs: number, closeSeconds: number, undoSeconds: number, pointLines: number }}
  */
 
 export const ASSISTANT_SETTINGS = {
@@ -162,6 +162,11 @@ export const ASSISTANT_SETTINGS = {
   undoSeconds: readInteger(assistant.undoSeconds, {
     path: 'system/assistant.undoSeconds',
     fallback: 10,
+    min: 1,
+  }), // A point names this many items of a kind, the rest is counted
+  pointLines: readInteger(assistant.pointLines, {
+    path: 'system/assistant.pointLines',
+    fallback: 6,
     min: 1,
   }),
 }

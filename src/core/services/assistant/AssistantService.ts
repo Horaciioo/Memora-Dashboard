@@ -4,6 +4,7 @@ import { readPageContext } from '@/core/lib/assistant/context'
 import { isNexusInput } from '@/core/lib/nexus/intercept'
 import { parseCommand } from '@/core/lib/assistant/parse'
 import { resolveAbsence } from '@/core/services/assistant/absences'
+import { resolveDayPoint, resolveWeekPoint } from '@/core/services/assistant/point'
 import { resolveGesture } from '@/core/services/assistant/gestures'
 import { resolveCapabilities, resolveGuide, resolveWhere } from '@/core/services/assistant/help'
 import { resolveLive } from '@/core/services/assistant/lives'
@@ -21,6 +22,8 @@ import { instantToWall } from '@/utils/format/time/zone'
 
 // One resolver per intent
 const RESOLVERS: Record<AssistantIntentName, Resolver> = {
+  dayPoint: resolveDayPoint,
+  weekPoint: resolveWeekPoint,
   createTask: resolveCreateTask,
   completeTask: resolveGesture,
   reopenTask: resolveGesture,

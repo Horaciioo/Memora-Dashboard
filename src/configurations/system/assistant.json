@@ -27,6 +27,7 @@
   "bubbleReloadMs": 4000,
   "closeSeconds": 10,
   "undoSeconds": 10,
+  "pointLines": 6,
   "scores": {
     "phrase": 50,
     "noun": 40,
