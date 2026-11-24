@@ -215,3 +215,33 @@ export interface ViewContext {
   // Unseen comments that named the member, one per page
   mentions: MentionBubble[]
 }
+
+/**
+ * Member allowed onto Memora Intelligence
+ * @typedef {Object} WhitelistEntry
+ * @property {string} accountId - Account identifier
+ * @property {string} displayName - Display name
+ * @property {string | null} avatarUrl - Portrait URL
+ * @property {MemberRoleName} role - Hierarchy level
+ * @property {boolean} isAutomatic - Admitted by rank, the list cannot change it
+ */
+
+export interface WhitelistEntry {
+  accountId: string
+  displayName: string
+  avatarUrl: string | null
+  role: MemberRoleName
+  isAutomatic: boolean
+}
+
+/**
+ * Whitelist with the members that could still join it
+ * @typedef {Object} WhitelistState
+ * @property {WhitelistEntry[]} entries - Admitted members
+ * @property {Pick<WhitelistEntry, 'accountId' | 'displayName'>[]} candidates - Members not admitted yet
+ */
+
+export interface WhitelistState {
+  entries: WhitelistEntry[]
+  candidates: Pick<WhitelistEntry, 'accountId' | 'displayName'>[]
+}

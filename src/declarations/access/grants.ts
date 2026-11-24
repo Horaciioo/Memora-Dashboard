@@ -344,4 +344,12 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       [MemberRoles.Responsable]: [Permissions.PlayManage],
     },
   },
+  {
+    key: 'intelligence-whitelist',
+    // Everyone else comes in through the whitelist
+    grants: {
+      [MemberRoles.Admin]: [Permissions.IntelligenceUse],
+      [MemberRoles.Responsable]: [Permissions.IntelligenceUse],
+    },
+  },
 ]
