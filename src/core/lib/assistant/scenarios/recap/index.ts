@@ -7,6 +7,7 @@ import {
   eventRoll,
   withoutRollCalls,
 } from '@/core/lib/assistant/scenarios/recap/events'
+import { menu, settle, settleAnswer, todosOf } from '@/core/lib/assistant/scenarios/recap/settle'
 import { chaptersOf } from '@/core/lib/recap/compose'
 import type { RecapChapter } from '@/core/lib/recap/compose'
 import { useRecapAgenda } from '@/core/store/recapAgenda'
@@ -86,17 +87,12 @@ const alone: ScenarioStep = async ({ data }) => {
   const events = chosen.chapter === 'events' ? answeredEvents(chosen) : []
   if (events.length > 0) return eventsOpening(chosen, events)
 
+  // What waits for the member is offered to be done in their place
   return {
     topic: RECAP_CHAPTERS[chosen.chapter],
     say: [chapterLine(chosen)],
-    ask: {
-      kind: 'choices',
-      choices: [
-        { value: 'done', label: COPY.finish, tone: 'success' },
-        { value: 'later', label: COPY.later },
-      ],
-    },
-    next: 'close',
+    data: { todos: todosOf(chosen), todoIndex: '0', kept: '' },
+    next: 'settle',
   }
 }
 
@@ -107,19 +103,15 @@ const eventsOpening = (chosen: RecapChapter, events: string[]): ScenarioMove => 
   return {
     topic: RECAP_CHAPTERS.events,
     say: rest ? [chapterLine(rest)] : [],
-    data: { events: events.join(','), eventIndex: '0' },
+    data: {
+      events: events.join(','),
+      eventIndex: '0',
+      todos: todosOf(chosen),
+      todoIndex: '0',
+      kept: '',
+    },
     next: 'eventRoll',
   }
-}
-
-// The subject is struck once settled, the next one is the member's pick
-const close: ScenarioStep = async ({ data }, answer) => {
-  const chapter = data.chapter as RecapChapterName
-  if (answer?.value !== 'done') return { say: [COPY.postponed] }
-
-  useRecapAgenda.getState().finish(chapter)
-
-  return { say: [COPY.closed] }
 }
 
 /**
@@ -129,7 +121,7 @@ const close: ScenarioStep = async ({ data }, answer) => {
 
 export const RECAP_SCENARIO: Scenario = {
   entries: { recap: 'open', chapter: 'alone' },
-  steps: { open, pick, alone, close, eventRoll, eventRemind, eventNext },
+  steps: { open, pick, alone, settle, settleAnswer, menu, eventRoll, eventRemind, eventNext },
   preparing: (step, data) =>
     step === 'open'
       ? COPY.preparing
