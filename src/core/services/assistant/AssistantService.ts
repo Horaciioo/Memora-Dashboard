@@ -14,6 +14,14 @@ import {
   resolveWeekPoint,
 } from '@/core/services/assistant/point'
 import { resolveStats } from '@/core/services/assistant/stats'
+import {
+  resolveAnnouncements,
+  resolveLateProjects,
+  resolveNextMeeting,
+  resolvePendingAbsences,
+  resolvePendingUnban,
+  resolveProjectPoint,
+} from '@/core/services/assistant/work'
 import { resolveGesture } from '@/core/services/assistant/gestures'
 import { resolveWhy } from '@/core/services/assistant/access'
 import { resolveWhatsNew } from '@/core/services/assistant/news'
@@ -34,6 +42,12 @@ import { instantToWall } from '@/utils/format/time/zone'
 // One resolver per intent
 const RESOLVERS: Record<AssistantIntentName, Resolver> = {
   stats: resolveStats,
+  projectPoint: resolveProjectPoint,
+  lateProjects: resolveLateProjects,
+  nextMeeting: resolveNextMeeting,
+  weekAnnouncements: resolveAnnouncements,
+  pendingAbsences: resolvePendingAbsences,
+  pendingUnban: resolvePendingUnban,
   dayPoint: resolveDayPoint,
   weekPoint: resolveWeekPoint,
   myTodo: resolveTodo,

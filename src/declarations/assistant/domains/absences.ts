@@ -66,7 +66,7 @@ export const ABSENCES = defineDomain({
       boost: 15,
       permission: Permissions.AbsenceReview,
       pages: [ROUTES.absences],
-      examples: ['Valide l’absence de Léa', 'Accepte les congés en attente'],
+      examples: ['Valide l’absence de Léa', 'Accepte l’absence de Procy'],
     },
     refuseAbsence: {
       label: 'Refuser une absence',
