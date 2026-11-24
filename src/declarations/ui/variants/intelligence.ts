@@ -18,7 +18,8 @@ export const INTELLIGENCE_STYLES = {
   notebooks:
     'relative z-10 flex w-full flex-col items-center border-t border-[var(--color-border)] pt-8 max-md:pb-40',
   // Beside the chat, in the space the centred thread leaves empty
-  agenda: 'hidden flex-col gap-2 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:flex lg:mt-[var(--bleed,0px)] lg:self-start',
+  agenda:
+    'hidden flex-col gap-2 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:flex lg:mt-[var(--bleed,0px)] lg:self-start',
   agendaTitle: 'px-3 text-sm font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   agendaList: 'flex flex-col gap-0.5',
   agendaItem:

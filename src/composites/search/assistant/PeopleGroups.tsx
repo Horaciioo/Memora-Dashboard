@@ -23,7 +23,9 @@ export const PeopleGroups = ({ groups }: PeopleGroupsProps) => (
         </h4>
         <ul className={ASSISTANT_STYLES.groupItems}>
           {group.items.map((item) => (
-            <li key={item} className={ASSISTANT_STYLES.groupItem}>{item}</li>
+            <li key={item} className={ASSISTANT_STYLES.groupItem}>
+              {item}
+            </li>
           ))}
         </ul>
       </section>

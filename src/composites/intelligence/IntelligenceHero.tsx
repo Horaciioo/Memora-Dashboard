@@ -74,7 +74,11 @@ export const IntelligenceHero = ({ title }: IntelligenceHeroProps) => {
       ref={hero}
       style={
         fitted
-          ? ({ height: fitted.height, marginTop: -fitted.bleed, '--bleed': `${fitted.bleed}px` } as CSSProperties)
+          ? ({
+              height: fitted.height,
+              marginTop: -fitted.bleed,
+              '--bleed': `${fitted.bleed}px`,
+            } as CSSProperties)
           : undefined
       }
       data-talking={isTalking || undefined}
