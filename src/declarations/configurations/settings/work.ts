@@ -65,6 +65,13 @@ export const NOTIFICATION_SETTINGS = {
     min: 1,
     max: pageSize,
   }),
+  // Hours an unread notification waits before it counts as read
+  unreadExpiryHours: readInteger(notifications.unreadExpiryHours, {
+    path: 'system/notifications.unreadExpiryHours',
+    fallback: 24,
+    min: 1,
+    max: 24 * 30,
+  }),
   panelSize: readInteger(notifications.panelSize, {
     path: 'system/notifications.panelSize',
     fallback: 5,

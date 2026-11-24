@@ -1,3 +1,4 @@
+import { isExpired } from '@/core/lib/notifications/expiry'
 import { NOTIFICATION_TARGETS } from '@/declarations/notifications/targets'
 import type { NotificationEntry } from '@/types/notifications'
 import { NOTIFICATION_KINDS } from '@/utils/constants/notifications'
@@ -30,7 +31,7 @@ export const toEntry = (row: NotificationRow): NotificationEntry => {
     target: NOTIFICATION_TARGETS.has(target) ? target : null,
     targetId: row.targetId,
     subject: row.subject,
-    isRead: row.readAt !== null,
+    isRead: row.readAt !== null || isExpired(row.createdAt),
     createdAt: row.createdAt.toISOString(),
   }
 }

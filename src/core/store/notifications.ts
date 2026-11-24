@@ -34,6 +34,7 @@ interface NotificationsStore {
   receive: (entry: NotificationEntry, withBubble: boolean) => void
   settle: (id: string) => void
   settleEvery: () => void
+  clearBadge: () => void
   unsettle: (id: string) => void
   drop: (id: string) => void
   dropOpened: () => void
@@ -67,6 +68,7 @@ export const useNotificationsStore = create<NotificationsStore>()((set) => ({
     }),
   settle: (id) => set((state) => ({ feed: settleEntry(state.feed, id) })),
   settleEvery: () => set((state) => ({ feed: settleAll(state.feed) })),
+  clearBadge: () => set((state) => ({ feed: { ...state.feed, unread: 0 } })),
   unsettle: (id) => set((state) => ({ feed: unsettleEntry(state.feed, id) })),
   drop: (id) => set((state) => ({ feed: dropEntry(state.feed, id) })),
   dropOpened: () => set((state) => ({ feed: dropRead(state.feed) })),

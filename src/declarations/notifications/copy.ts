@@ -23,6 +23,7 @@ export const NOTIFICATION_COPY = {
   emptyDescription: 'Tu es à jour.',
   metaUnread: 'Du nouveau t’attend',
   metaRead: 'Tout est lu',
+  metaCount: '{count} à lire',
   backHome: 'Revenir à l’accueil',
   system: 'Le système',
 } as const
