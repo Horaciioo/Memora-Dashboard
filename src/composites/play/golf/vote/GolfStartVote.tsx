@@ -33,7 +33,7 @@ export const GolfStartVote = ({
       hostId={hostId}
       faces={faces}
       isSaving={moves.isSaving}
-      onSend={(payload) => void moves.vote(sessionId, payload)}
+      onSend={(payload, isQuiet) => moves.vote(sessionId, payload, isQuiet)}
     />
   )
 }

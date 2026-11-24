@@ -7,7 +7,7 @@ import { seatBoundsOf } from '@/core/lib/play/seats'
 import { conflict } from '@/core/lib/errors'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
-import { signalPlay, signalStarted, signalVote } from '@/core/lib/play/signal'
+import { signalFailed, signalPlay, signalStarted, signalVote } from '@/core/lib/play/signal'
 import { clearDeadline, scheduleDeadline } from '@/core/lib/play/timers'
 import { voteAt, voteOf, voteRulesOf } from '@/core/lib/play/vote'
 import type { PlayVoteRules, PlayVoteState } from '@/core/lib/play/vote'
@@ -58,7 +58,10 @@ interface VoteContext {
 }
 
 // Settings stored back, the game launched when the last step closed
-type VoteOutcome = { isStarting: boolean; pushed?: PlayVoteState }
+// A refused or stale gesture changes nothing, so it signals nothing
+type VoteOutcome = { isStarting: boolean; pushed?: PlayVoteState; isNoop?: boolean }
+
+const NOOP: VoteOutcome = { isStarting: false, isNoop: true }
 
 /**
  * Store a vote or its end
@@ -85,11 +88,10 @@ const open = async (context: VoteContext): Promise<VoteOutcome> => {
     throw conflict(PLAY_ERRORS.tooFewPlayers)
   }
   const seated = session.seats.filter(isPresent).length
-  if (!vote) {
-    await store(context, withVote(session.settings, voteAt(rules.steps({}, seated)[0], Date.now())))
-  }
+  const first = rules.steps({}, seated)[0]
+  if (!vote && first) await store(context, withVote(session.settings, voteAt(first, Date.now())))
 
-  return { isStarting: false }
+  return vote || !first ? NOOP : { isStarting: false }
 }
 
 /**
@@ -102,6 +104,8 @@ const pick = async (context: VoteContext): Promise<VoteOutcome> => {
   const { session, vote, accountId, raw, rules } = context
   requireSeat(session, accountId)
   if (!vote) throw conflict(PLAY_ERRORS.noVote)
+  // A pick of a step already closed, or of the draw, lands nowhere
+  if (vote.dealtAt || (raw.step !== undefined && raw.step !== vote.step)) return NOOP
   if (!rules.options(vote.step).includes(String(raw.key))) {
     throw conflict(PLAY_ERRORS.invalidSettings)
   }
@@ -124,7 +128,7 @@ const close = async (context: VoteContext): Promise<VoteOutcome> => {
   const isStale = !vote || raw.step !== vote.step
   const isOver = vote && Date.now() >= vote.endsAt - CLOCK_SLACK_MS
   if (isStale || !(isSystem || session.hostId === accountId || isOver)) {
-    return { isStarting: false }
+    return NOOP
   }
 
   // Draw over: the dealt settings are stored, the game starts
@@ -143,7 +147,8 @@ const close = async (context: VoteContext): Promise<VoteOutcome> => {
     [vote.step]: rules.winner(vote.step, picks, session.hostId, session.settings),
   }
   const steps = rules.steps(chosen, present.size)
-  const next = steps[steps.indexOf(vote.step) + 1]
+  // First step still unanswered, a table shrinking may have skipped some
+  const next = steps.find((step) => !(step in chosen))
   if (next) {
     await store(context, withVote(session.settings, voteAt(next, Date.now(), chosen)))
 
@@ -250,13 +255,23 @@ const runVote = async (
       hostId: session.hostId,
     }
   })
+  if (outcome.isNoop) return
   // The loading screen goes up before the table is built, a pick only pushes its vote
   if (outcome.isStarting) await signalStarted(sessionId)
   if (outcome.pushed) await signalVote(sessionId, outcome.pushed)
   else await signalPlay(sessionId)
   // A pick leaves the clock as it is
   if (raw.action !== GolfVoteActions.Pick) await armVote(sessionId)
-  if (outcome.isStarting) await startSession(sessionId, hostId)
+  if (!outcome.isStarting) return
+
+  // A refused start gives the lobby back, the loading screen never stays up
+  try {
+    await startSession(sessionId, hostId)
+  } catch (error) {
+    await signalFailed(sessionId)
+    await signalPlay(sessionId)
+    throw error
+  }
 }
 
 /**

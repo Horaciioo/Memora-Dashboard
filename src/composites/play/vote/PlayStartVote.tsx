@@ -83,12 +83,13 @@ const VoteScreen = ({
   const isHost = viewerId === hostId
   const spec = PLAY_VOTE_STEPS[game]?.find((entry) => entry.key === vote.step)
   const options = spec?.choices.map((choice) => choice.key) ?? []
-  const { picks, leader, pick, close, validate, back } = usePlayVote({
+  const { picks, leader, pick, expire, validate, back } = usePlayVote({
     vote,
     winner: (picked) => mostPicked(options, picked, hostId, spec?.initial),
     viewerId,
     isHost,
-    onSend: (payload) => void moves.vote(sessionId, payload),
+    isSeated: viewerId in faces,
+    onSend: (payload, isQuiet) => moves.vote(sessionId, payload, isQuiet),
   })
   const voters = Object.entries(picks).flatMap(([id, key]) =>
     faces[id] ? [{ id, key, ...faces[id] }] : []
@@ -144,7 +145,7 @@ const VoteScreen = ({
               key={vote.step}
               endsAt={vote.endsAt}
               serverTime={serverTime}
-              onExpire={close}
+              onExpire={expire}
               look={look}
             />
             {isHost && (
