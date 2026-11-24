@@ -147,6 +147,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Ajout d’une fonctionnalité expérimentale nommée « Memora Intelligence » : Memora discute avec toi et résume ce qui s’est passé pendant une absence.',
       },
       {
+        tag: ChangelogTags.Added,
+        page: ROUTES.whitelist,
+        permission: Permissions.ReferenceRead,
+        text: 'Ajout d’une liste blanche pour « Memora Intelligence » : les Responsables y entrent d’office, tu choisis qui d’autre peut s’en servir.',
+      },
+      {
         tag: ChangelogTags.Improved,
         page: ROUTES.lives,
         permission: Permissions.LiveRead,

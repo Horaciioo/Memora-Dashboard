@@ -234,6 +234,7 @@ const LEAD_PRESET: PermissionName[] = [
   Permissions.CalendarRead,
   Permissions.CalendarManage,
   Permissions.ReferenceRead,
+  Permissions.IntelligenceUse,
 ]
 
 /**

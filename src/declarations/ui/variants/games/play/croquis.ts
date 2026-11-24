@@ -32,18 +32,19 @@ export const CROQUIS_BOARD = {
   canvasDraw: 'cursor-crosshair',
   blank: 'play-croquis-blank absolute inset-0 grid place-items-center text-sm font-bold',
   tools:
-    'play-hud-block z-10 mt-3 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2 lg:absolute lg:inset-x-auto lg:mt-0 lg:w-40 lg:top-1/2 lg:right-full lg:bottom-auto lg:mr-4 lg:-translate-y-1/2 lg:flex-col lg:gap-3 lg:p-3',
-  toolPens: 'grid grid-cols-9 gap-1.5 lg:grid-cols-4',
+    'play-hud-block z-10 mt-3 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2 xl:absolute xl:inset-x-auto xl:mt-0 xl:w-56 xl:top-1/2 xl:right-full xl:bottom-auto xl:mr-4 xl:-translate-y-1/2 xl:flex-col xl:gap-3 xl:p-3',
+  toolPens: 'grid grid-cols-9 gap-1.5 xl:grid-cols-4 xl:justify-items-center',
   toolSizes: 'flex items-center gap-1.5',
-  toolShapes: 'flex flex-wrap items-center justify-center gap-1.5 lg:grid lg:w-full lg:grid-cols-2',
-  toolActions: 'flex items-center gap-1.5 lg:w-full lg:flex-col lg:items-stretch',
-  pen: 'play-croquis-pen size-9 rounded-full lg:size-8',
+  toolShapes:
+    'flex flex-wrap items-center justify-center gap-1.5 xl:grid xl:w-full xl:grid-cols-2 *:min-w-0',
+  toolActions: 'flex items-center gap-1.5 xl:w-full xl:flex-col xl:items-stretch',
+  pen: 'play-croquis-pen size-9 rounded-full xl:size-8',
   penOn: 'play-croquis-pen-on',
-  size: 'grid size-9 place-items-center rounded-xl bg-[var(--play-chip)] transition-colors hover:bg-[var(--play-panel-strong)]',
+  size: 'grid size-9 xl:size-8 place-items-center rounded-xl bg-[var(--play-chip)] transition-colors hover:bg-[var(--play-panel-strong)]',
   sizeOn: 'ring-2 ring-[var(--play-ink-soft)]',
   sizeDot: 'rounded-full bg-[var(--play-ink)]',
   action:
-    'rounded-xl bg-[var(--play-chip)] px-3 py-2 text-xs font-extrabold tracking-wide text-[var(--play-ink)] uppercase transition-colors hover:bg-[var(--play-panel-strong)] disabled:opacity-40',
+    'rounded-xl bg-[var(--play-chip)] px-2 py-2 text-xs font-extrabold tracking-wide text-[var(--play-ink)] uppercase transition-colors hover:bg-[var(--play-panel-strong)] disabled:opacity-40',
   actionOn: 'ring-2 ring-[var(--play-ink-soft)]',
   // Fixed height, the board never jumps between phases
   zone: 'flex min-h-16 w-full flex-col items-center justify-center gap-3',

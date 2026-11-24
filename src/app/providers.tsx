@@ -16,6 +16,7 @@ import {
   DisplayPreferencesManager,
   HintsProvider,
   MenuProvider,
+  SanctionColoursManager,
   ThemeManager,
 } from '@/managers/front-end'
 import type { SessionUser } from '@/types/auth'
@@ -52,6 +53,7 @@ export const Providers = ({ initialSession, children }: ProvidersProps) => {
           <ThemeManager />
           <AppearanceManager />
           <ColorVisionManager />
+          <SanctionColoursManager />
           <ComfortManager />
           <DisplayPreferencesManager preferences={initialSession?.display ?? null} />
           <BreadcrumbProvider>

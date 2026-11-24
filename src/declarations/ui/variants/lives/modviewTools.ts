@@ -126,10 +126,10 @@ export const MODVIEW_PICKER = {
  */
 
 export const MODVIEW_VERDICT: Record<string, { text: string }> = {
-  WARN: { text: 'text-[var(--color-caution)]' },
-  TIMEOUT: { text: 'text-[var(--color-apple-orange)]' },
-  BAN: { text: 'text-[var(--color-danger)]' },
-  DELETE: { text: 'text-[var(--color-info)]' },
+  WARN: { text: 'text-[var(--color-sanction-warn)]' },
+  TIMEOUT: { text: 'text-[var(--color-sanction-timeout)]' },
+  BAN: { text: 'text-[var(--color-sanction-ban)]' },
+  DELETE: { text: 'text-[var(--color-sanction-delete)]' },
 }
 
 /**

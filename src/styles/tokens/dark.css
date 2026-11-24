@@ -51,6 +51,10 @@
   --color-caution: #e3b341;
   --color-warning: #f0a35c;
   --color-danger: #f08080;
+  --color-sanction-delete: #bda3f2;
+  --color-sanction-warn: #e8d27a;
+  --color-sanction-timeout: #f5a04c;
+  --color-sanction-ban: #f08080;
   --color-status-minor: #ecd47e;
   --color-status-degraded: #eaa56c;
   --color-status-down: #de7d78;

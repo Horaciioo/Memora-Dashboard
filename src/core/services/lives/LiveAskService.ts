@@ -17,9 +17,9 @@ const NEWS_HOURS = 12
 const openLive: Prisma.LiveWhereInput = { status: { in: [...OPEN_LIVE_STATUSES] } }
 
 /**
- * Lives that ask a member whether they are there, unanswered
+ * Roll-calls waiting on a member, lives and other events, unanswered
  * @param {string} accountId - Member
- * @return {Promise<LiveAsk[]>} - One per live, soonest first
+ * @return {Promise<LiveAsk[]>} - One per event, soonest first
  */
 
 export const myLiveAsks = async (accountId: string): Promise<LiveAsk[]> => {
@@ -27,7 +27,11 @@ export const myLiveAsks = async (accountId: string): Promise<LiveAsk[]> => {
     where: {
       accountId,
       status: AttendanceStatuses.Pending,
-      event: { rollCall: true, live: { is: openLive } },
+      event: {
+        rollCall: true,
+        // A live is open by its status, any other event while it lasts
+        OR: [{ live: { is: openLive } }, { live: { is: null }, endsAt: { gt: new Date() } }],
+      },
     },
     include: {
       event: {
@@ -43,20 +47,14 @@ export const myLiveAsks = async (accountId: string): Promise<LiveAsk[]> => {
     orderBy: { event: { startsAt: 'asc' } },
   })
 
-  return rows.flatMap((row) =>
-    row.event.live
-      ? [
-          {
-            eventId: row.event.id,
-            liveId: row.event.live.id,
-            title: row.event.title,
-            creator: row.event.live.youtuber.name,
-            startsAt: row.event.startsAt.toISOString(),
-            endsAt: row.event.endsAt?.toISOString() ?? null,
-          },
-        ]
-      : []
-  )
+  return rows.map((row) => ({
+    eventId: row.event.id,
+    liveId: row.event.live?.id ?? '',
+    title: row.event.title,
+    creator: row.event.live?.youtuber.name ?? '',
+    startsAt: row.event.startsAt.toISOString(),
+    endsAt: row.event.endsAt?.toISOString() ?? null,
+  }))
 }
 
 /**

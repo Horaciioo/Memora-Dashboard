@@ -223,3 +223,19 @@ export const COLOUR_SWATCH_STYLES = {
   selected:
     'ring-2 ring-[var(--color-pick)] ring-offset-2 ring-offset-[var(--color-surface-raised)]',
 } as const
+
+/**
+ * Sanction colour picker styles
+ * @type {Record<string, string>}
+ */
+
+export const SANCTION_COLOUR_PICKER = {
+  row: 'flex flex-wrap items-center gap-x-4 gap-y-2',
+  label: 'w-32 shrink-0 text-sm font-semibold',
+  swatches: 'flex flex-wrap items-center gap-2',
+  swatch:
+    'size-7 rounded-full border border-[var(--color-border)] transition-transform hover:scale-110',
+  reset:
+    'rounded-full border border-[var(--color-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--color-hover)]',
+  on: 'ring-2 ring-[var(--color-pick)] ring-offset-2 ring-offset-[var(--color-surface-raised)]',
+} as const

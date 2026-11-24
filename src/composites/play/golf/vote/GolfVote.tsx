@@ -15,6 +15,7 @@ import {
   modeCards,
   roundCards,
 } from '@/composites/play/golf/vote/voteCards'
+import type { PlayVoteInput } from '@/composites/play/vote/usePlayVote'
 import { usePlayVote } from '@/composites/play/vote/usePlayVote'
 import { golfVoteSteps, winningCard } from '@/core/lib/play/golf'
 import type { GolfGameSettings, GolfVoteState } from '@/core/lib/play/golf'
@@ -48,7 +49,7 @@ export interface GolfVoteProps {
   faces: Record<string, { name: string; avatarUrl: string | null }>
   isSaving: boolean
   // Sends one action to the vote route
-  onSend: (payload: Record<string, unknown>) => void
+  onSend: PlayVoteInput['onSend']
 }
 
 /**
@@ -70,11 +71,12 @@ export const GolfVote = ({
   onSend,
 }: GolfVoteProps) => {
   const isHost = viewerId === hostId
-  const { picks, leader, pick, close, validate, back } = usePlayVote({
+  const { picks, leader, pick, expire, validate, back } = usePlayVote({
     vote,
     winner: (picked) => winningCard(vote.step, picked, hostId, settings),
     viewerId,
     isHost,
+    isSeated: viewerId in faces,
     onSend,
   })
   const [shots, setShots] = useState(() => new Map(SHOTS))
@@ -173,7 +175,7 @@ export const GolfVote = ({
               key={step}
               endsAt={vote.endsAt}
               serverTime={serverTime}
-              onExpire={close}
+              onExpire={expire}
             />
             {isHost && (
               <button

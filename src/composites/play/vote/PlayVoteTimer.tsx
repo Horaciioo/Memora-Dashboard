@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { GOLF_VOTE_COPY } from '@/declarations/play/golf/vote'
 import { GOLF_VOTE } from '@/declarations/ui/variants'
@@ -10,8 +10,12 @@ import { cn } from '@/utils/classnames'
 
 // Seconds left where the number starts to pulse
 const LOW_SECONDS = 5
-// Wait between two tries to close a step that ran out
+// Wait before the first retry, doubled each time
 const RETRY_MS = 1000
+// Longest wait between two tries
+const RETRY_MAX_MS = 16000
+// Tries before giving up on a step
+const MAX_TRIES = 6
 // Screen refresh of the number
 const TICK_MS = 250
 
@@ -41,14 +45,23 @@ export const PlayVoteTimer = ({
   const [left, setLeft] = useState(endsAt - serverTime)
   const expire = useEffectEvent(onExpire)
 
+  // Tries survive a new board of the same step, so the backoff holds
+  const attempts = useRef({ tries: 0, lastTry: 0 })
+
+  useEffect(() => {
+    attempts.current = { tries: 0, lastTry: 0 }
+  }, [endsAt])
+
   useEffect(() => {
     const offset = serverTime - Date.now()
-    let lastTry = 0
     const id = window.setInterval(() => {
+      const state = attempts.current
       const remaining = endsAt - (Date.now() + offset)
       setLeft(remaining)
-      if (remaining > 0 || Date.now() - lastTry < RETRY_MS) return
-      lastTry = Date.now()
+      const wait = Math.min(RETRY_MAX_MS, RETRY_MS * 2 ** state.tries)
+      if (remaining > 0 || state.tries >= MAX_TRIES || Date.now() - state.lastTry < wait) return
+      state.lastTry = Date.now()
+      state.tries += 1
       expire()
     }, TICK_MS)
 

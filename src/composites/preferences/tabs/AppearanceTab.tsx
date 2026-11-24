@@ -3,8 +3,10 @@
 import { ColorVisionPreferences } from '@/composites/preferences/ColorVisionPreferences'
 import { ComfortCards } from '@/composites/preferences/comfort/ComfortCards'
 import { ThemePicker } from '@/composites/preferences/DisplayPreferences'
+import { SanctionColourPicker } from '@/composites/preferences/SanctionColourPicker'
 import { SettingsGroup } from '@/composites/preferences/SettingsGroup'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
+import { SANCTION_COLOUR_COPY } from '@/declarations/preferences/sanctionColours'
 import { SETTINGS_GROUP_COPY } from '@/declarations/preferences/settings'
 import { PICKER_CARD, PREFERENCE_STYLES } from '@/declarations/ui/variants'
 
@@ -28,6 +30,9 @@ export const AppearanceTab = () => (
     </SettingsGroup>
     <SettingsGroup title={SETTINGS_GROUP_COPY.shape}>
       <ComfortCards settingKey="radius" />
+    </SettingsGroup>
+    <SettingsGroup title={SANCTION_COLOUR_COPY.title}>
+      <SanctionColourPicker />
     </SettingsGroup>
     <SettingsGroup title={PREFERENCES_COPY.colorVisionTitle} maturity="beta">
       <ColorVisionPreferences />

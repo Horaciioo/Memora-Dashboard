@@ -33,7 +33,7 @@ export const MemoraTurn = ({ text, isFollow, children }: MemoraTurnProps) => {
   return (
     <div className={cn(ASSISTANT_STYLES.memora, !isFollow && ASSISTANT_STYLES.groupBreak)}>
       <span className={ASSISTANT_STYLES.avatar}>
-        <BrainMark motion="idle" className={ASSISTANT_STYLES.avatarMark} />
+        {!isFollow && <BrainMark motion="idle" className={ASSISTANT_STYLES.avatarMark} />}
       </span>
       <div className={ASSISTANT_STYLES.body}>
         {!isFollow && <span className={ASSISTANT_STYLES.author}>{ASSISTANT_COPY.name}</span>}

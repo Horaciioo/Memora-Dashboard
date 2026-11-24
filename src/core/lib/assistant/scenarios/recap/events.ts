@@ -5,20 +5,11 @@ import type { RecapChapter } from '@/core/lib/recap/compose'
 import { RECAP_TALK_COPY as COPY } from '@/declarations/assistant/scenarios/recapTalk'
 import { SCENARIO_COPY } from '@/declarations/assistant/scenarios/shared'
 import type { LiveGroups } from '@/types/liveAsks'
-import type { ScenarioAsk, ScenarioMove, ScenarioStep } from '@/types/scenario'
+import type { ScenarioMove, ScenarioStep } from '@/types/scenario'
 import { fillTemplate } from '@/utils/format/strings'
 
 // Answers of the reminder question
 const YES = 'yes'
-
-// What the member closes the subject with
-const FINISH: ScenarioAsk = {
-  kind: 'choices',
-  choices: [
-    { value: 'done', label: COPY.finish, tone: 'success' },
-    { value: 'later', label: COPY.later },
-  ],
-}
 
 // Roll-call threads sit on their event
 const isRollCall = (beat: string): boolean => beat.startsWith('rollCall')
@@ -63,7 +54,7 @@ export const withoutRollCalls = (chapter: RecapChapter): RecapChapter | null => 
 // Next event, or the end of the subject
 const onward = (data: Record<string, string>): ScenarioMove => {
   const index = Number(data.eventIndex) + 1
-  if (index >= data.events.split(',').length) return { say: [], ask: FINISH, next: 'close' }
+  if (index >= data.events.split(',').length) return { say: [], next: 'settle' }
 
   return { say: [], data: { eventIndex: String(index) }, next: 'eventRoll' }
 }

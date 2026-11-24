@@ -1065,6 +1065,39 @@
   }
 }
 
+/* Memora's asking bubble opens from the left, closes back to it */
+@keyframes memora-bubble-open {
+  from {
+    clip-path: inset(0 100% 0 0 round 2rem);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0 round 2rem);
+  }
+}
+
+.memora-bubble {
+  animation: memora-bubble-open 450ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.memora-bubble-expanding {
+  animation: none;
+  transition-property: top, left, width, height, border-radius, translate;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.memora-bubble-out {
+  animation: memora-bubble-open 250ms cubic-bezier(0.32, 0.72, 0, 1) reverse both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memora-bubble,
+  .memora-bubble-expanding,
+  .memora-bubble-out {
+    animation: none;
+  }
+}
+
 /* Memora's bubble settles beside what she shows */
 @keyframes recap-bubble-in {
   from {

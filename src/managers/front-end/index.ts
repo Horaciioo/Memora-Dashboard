@@ -7,6 +7,7 @@ export {
   useTabMemory,
 } from './BreadcrumbManager'
 export { ColorVisionManager } from './ColorVisionManager'
+export { SanctionColoursManager } from './SanctionColoursManager'
 export { ComfortManager } from './ComfortManager'
 export { DisplayPreferencesManager } from './DisplayPreferencesManager'
 export { HintsProvider, useHints } from './HintsManager'

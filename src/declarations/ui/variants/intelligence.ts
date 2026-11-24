@@ -5,14 +5,14 @@
 
 export const INTELLIGENCE_STYLES = {
   // Phone: the greeting sits on top, the composer is pinned above the dock like Claude's app
-  page: 'mx-auto flex w-full max-w-3xl has-[[data-talking]]:max-w-6xl flex-col gap-10 pt-4 pb-6 has-[[data-talking]]:md:gap-0 has-[[data-talking]]:md:pt-4 has-[[data-talking]]:md:pb-4 md:gap-12 md:pt-12 md:pb-16',
+  page: 'mx-auto flex w-full max-w-3xl md:max-w-4xl has-[[data-talking]]:max-w-[88rem] flex-col gap-10 pt-4 pb-6 has-[[data-talking]]:md:gap-0 has-[[data-talking]]:md:pt-4 has-[[data-talking]]:md:pb-4 md:gap-12 md:pt-12 md:pb-16',
   // Conversation written on the page itself, scrolls inside so the composer stays in sight
   thread: 'min-h-0 w-full flex-1 overflow-y-auto overscroll-contain lg:col-start-2 lg:row-start-1',
   // Talking: the page keeps the window's height, only the thread scrolls, the chat sits in the middle
   heroChat:
     'h-[calc(100dvh-14rem)] items-stretch gap-4 lg:grid lg:grid-cols-[14rem_minmax(0,1fr)_14rem] lg:grid-rows-[minmax(0,1fr)_auto] lg:gap-x-8',
   // Reading column, same axis for the thread and the composer
-  column: 'mx-auto flex w-full max-w-3xl flex-col',
+  column: 'mx-auto flex w-full max-w-3xl md:max-w-4xl flex-col',
   // Under the composer, set apart by a divider
   notebooks:
     'relative z-10 flex w-full flex-col items-center border-t border-[var(--color-border)] pt-8 max-md:pb-40',
@@ -31,9 +31,11 @@ export const INTELLIGENCE_STYLES = {
   titleMark: 'size-9 shrink-0 md:size-14',
   // Pinned to the bottom of the screen on a phone, in the flow from md up
   dockWrap:
-    'max-md:fixed max-md:inset-x-0 max-md:bottom-[calc(var(--shell-dock-clearance,0px)+0.5rem)] max-md:z-30 max-md:flex max-md:flex-col max-md:gap-2 max-md:px-3 md:contents',
+    'max-md:fixed max-md:inset-x-0 max-md:bottom-[calc(var(--shell-dock-clearance,0px)+0.5rem)] max-md:z-30 max-md:flex max-md:flex-col max-md:gap-2 max-md:px-3 md:flex md:w-full md:flex-col md:gap-2 lg:col-start-2 lg:row-start-2',
+  // Small italic notice above the composer
+  notice: 'mx-auto w-full max-w-3xl md:max-w-4xl px-1 text-xs italic leading-snug text-[var(--color-ink-subtle)]',
   composer:
-    'mx-auto flex w-full max-w-3xl items-end lg:col-start-2 lg:row-start-2 gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 pr-2 pl-4 shadow-[var(--shadow-sm)] transition-shadow focus-within:shadow-[var(--shadow-md)]',
+    'mx-auto flex w-full max-w-3xl md:max-w-4xl items-end gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 pr-2 pl-4 shadow-[var(--shadow-sm)] transition-shadow focus-within:shadow-[var(--shadow-md)]',
   // No border, no ring: the box around it is the field
   input:
     'composer-field field-sizing-content max-h-40 min-h-9 flex-1 resize-none self-center appearance-none border-0 bg-transparent p-0 py-1.5 text-base leading-snug shadow-none ring-0 outline-none placeholder:text-[var(--color-ink-subtle)] focus:border-0 focus:shadow-none focus:ring-0 focus:outline-none focus-visible:outline-none',

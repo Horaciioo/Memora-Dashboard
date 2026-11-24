@@ -25,6 +25,7 @@ export interface RailShortcut {
  * @param {RailShortcut[]} props.items - Destinations
  * @param {boolean} [props.isUnlocking] - The first visit is adding them one by one
  * @param {LiveBeacon | null} [props.live] - Open lives, the Live box turns red while one is on air
+ * @param {(href: string) => void} [props.onSelect] - A box was chosen
  * @return {JSX.Element}
  */
 
@@ -32,10 +33,12 @@ export const RailShortcuts = ({
   items,
   isUnlocking,
   live,
+  onSelect,
 }: {
   items: RailShortcut[]
   isUnlocking?: boolean
   live?: LiveBeacon | null
+  onSelect?: (href: string) => void
 }) => {
   const pathname = usePathname()
   const { isFresh } = useFreshRelease()
@@ -51,6 +54,7 @@ export const RailShortcuts = ({
           <Link
             key={item.href}
             href={item.href}
+            onClick={() => onSelect?.(item.href)}
             aria-label={item.label}
             title={item.label}
             aria-current={isActive ? 'page' : undefined}

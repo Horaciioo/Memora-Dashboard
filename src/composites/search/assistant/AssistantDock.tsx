@@ -4,12 +4,10 @@ import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
 import { useRef } from 'react'
 
-import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/overlay/useOutsideDismiss'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
-import { useNudgeCycle } from '@/core/hooks/interaction/state/useNudgeCycle'
 import { URGENT_SCENARIO, useAssistantDock } from '@/core/store/assistantDock'
-import { ASSISTANT_DOCK_COPY, ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
+import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import type { AssistantOffer } from '@/declarations/assistant/offers'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { ROUTES } from '@/declarations/navigation'
@@ -29,13 +27,13 @@ export interface AssistantDockProps {
 }
 
 /**
- * Sunset glass Memora button, on every page
+ * Corner chat of Memora, opened from the search
  * @param {ViewContext} viewContext - View resolved server-side
  * @return {JSX.Element}
  */
 
 export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
-  const { action, focus, greeting, hello, welcome, toggle, close } = useAssistantDock()
+  const { action, focus, greeting, hello, close } = useAssistantDock()
   const { session } = useAuthContext()
   const { shortcuts, groups } = useRailEntries(viewContext)
   const isOpen = greeting !== null
@@ -53,10 +51,6 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
     // The page's own creation stays its chip, unless a guided talk exists for it
     return icon && (offer !== action?.offer || offer.scenario) ? [{ offer, icon }] : []
   })
-
-  const cycled = useNudgeCycle(action?.offer.nudges ?? ASSISTANT_DOCK_COPY.nudges, !isOpen)
-  // The landing welcome speaks before the usual lines
-  const nudge = isOpen ? null : (welcome ?? cycled)
 
   if (isIntelligence) return null
 
@@ -81,29 +75,6 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
           onClose={close}
         />
       )}
-      <button
-        type="button"
-        {...action?.attributes}
-        aria-expanded={isOpen}
-        aria-label={action?.label ?? ASSISTANT_DOCK_COPY.label}
-        onClick={toggle}
-        className={cn('brain-wake', FLOATING_ADD_STYLES.root)}
-      >
-        {/* Memora's line takes the label's place */}
-        <span
-          role="status"
-          className={cn(
-            FLOATING_ADD_STYLES.label,
-            nudge ? FLOATING_ADD_STYLES.labelOpen : FLOATING_ADD_STYLES.labelFolded
-          )}
-        >
-          {nudge ?? action?.label ?? ASSISTANT_DOCK_COPY.label}
-        </span>
-        <BrainMark
-          motion={nudge || isOpen ? 'loop' : 'idle'}
-          className={cn('brain-mark-white', FLOATING_ADD_STYLES.icon)}
-        />
-      </button>
     </div>
   )
 }

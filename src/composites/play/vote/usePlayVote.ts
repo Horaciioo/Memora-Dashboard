@@ -23,8 +23,10 @@ export interface PlayVoteInput {
   winner: (picks: Record<string, string>) => string
   viewerId: string
   isHost: boolean
-  // Sends one action to the vote route
-  onSend: (payload: Record<string, unknown>) => void
+  // Spectators never close a step, the server clock does
+  isSeated: boolean
+  // Sends one action to the vote route, a quiet one raises no toast, null when refused
+  onSend: (payload: Record<string, unknown>, isQuiet?: boolean) => Promise<unknown> | void
 }
 
 /**
@@ -33,7 +35,7 @@ export interface PlayVoteInput {
  * @return {Object} - Picks, leading card and gestures
  */
 
-export const usePlayVote = ({ vote, winner, viewerId, isHost, onSend }: PlayVoteInput) => {
+export const usePlayVote = ({ vote, winner, viewerId, isHost, isSeated, onSend }: PlayVoteInput) => {
   // Own pick, shown before the server answers
   const [mine, setMine] = useState<{ step: string; key: string } | null>(null)
   const timers = useRef<number[]>([])
@@ -56,7 +58,10 @@ export const usePlayVote = ({ vote, winner, viewerId, isHost, onSend }: PlayVote
       // The avatar lands a moment later
       timers.current.push(window.setTimeout(() => playGolfSound('voteHop'), GOLF_VOTE_TIMING.land))
       setMine({ step: vote.step, key })
-      onSend({ action: GolfVoteActions.Pick, key })
+      // A refused pick gives the card back
+      void Promise.resolve(onSend({ action: GolfVoteActions.Pick, key, step: vote.step })).then(
+        (done) => done === null && setMine((own) => (own?.key === key ? null : own))
+      )
     },
     [vote.step, onSend]
   )
@@ -65,6 +70,11 @@ export const usePlayVote = ({ vote, winner, viewerId, isHost, onSend }: PlayVote
     () => onSend({ action: GolfVoteActions.Close, step: vote.step }),
     [vote.step, onSend]
   )
+
+  // The clock ran out, quiet and only for seated players
+  const expire = () => {
+    if (isSeated) void onSend({ action: GolfVoteActions.Close, step: vote.step }, true)
+  }
 
   const validate = () => {
     playGolfSound('voteConfirm')
@@ -79,11 +89,16 @@ export const usePlayVote = ({ vote, winner, viewerId, isHost, onSend }: PlayVote
   // Escape drops the vote, the host's call
   const onEscape = useEffectEvent(() => isHost && back())
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => event.key === 'Escape' && onEscape()
+    const onKeyDown = (event: KeyboardEvent) => {
+      // Escape typed in the chat or a field is not a drop
+      const target = event.target as HTMLElement | null
+      if (target?.closest('input, textarea, select, [contenteditable="true"]')) return
+      if (event.key === 'Escape' && !event.defaultPrevented) onEscape()
+    }
     window.addEventListener('keydown', onKeyDown)
 
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  return { picks, leader, pick, close, validate, back }
+  return { picks, leader, pick, close, expire, validate, back }
 }

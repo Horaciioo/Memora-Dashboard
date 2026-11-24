@@ -84,6 +84,11 @@ export const API_ROUTES = {
 
   creatorTeams: (id: string) => `/api/settings/creators/${id}/teams`,
   /**
+   * Whitelist path
+   */
+
+  whitelist: '/api/settings/whitelist',
+  /**
    * Creator leads path
    * @param id - Entity ID
    * @return - Route path

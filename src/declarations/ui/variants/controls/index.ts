@@ -36,6 +36,7 @@ export {
   COLOUR_FIELD_STYLES,
   COLOUR_SWATCH_STYLES,
   COLOUR_WHEEL_STYLES,
+  SANCTION_COLOUR_PICKER,
 } from '@/declarations/ui/variants/controls/pickers'
 export type { SelectMenuSize } from '@/declarations/ui/variants/controls/pickers'
 export { BLOCK_EDITOR_INLINE, BLOCK_EDITOR } from '@/declarations/ui/variants/controls/editor'

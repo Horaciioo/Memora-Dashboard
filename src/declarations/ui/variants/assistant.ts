@@ -74,8 +74,15 @@ export const ASSISTANT_STYLES = {
   searchField:
     'min-w-0 flex-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm shadow-[var(--shadow-sm)] outline-none placeholder:text-[var(--color-ink-subtle)] focus-visible:border-[var(--color-border-strong)]',
   // Answers sit under Memora's lines, past her portrait
-  answers: 'surface-enter mt-1 ml-11 flex flex-wrap gap-2',
-  answer: 'min-w-24 justify-center rounded-full',
+  answers: 'surface-enter mt-1 ml-11 flex flex-col items-start gap-1.5',
+  // Toggles to tick keep their pill
+  pills: 'surface-enter mt-1 ml-11 flex flex-wrap gap-2',
+  pill: 'min-w-24 justify-center rounded-full',
+  // A reply is written like a link, the member clicks it as they would type it
+  answer:
+    'group flex w-fit cursor-pointer gap-2 text-left text-body font-semibold text-[var(--color-ink-accent)] transition-opacity duration-150 hover:opacity-70 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // The dash leads each reply and stays out of the underline
+  answerLabel: 'underline decoration-1 underline-offset-4',
   link: 'flex w-fit max-w-full cursor-pointer items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-left text-sm font-semibold shadow-[var(--shadow-sm)] transition-colors duration-150 hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   linkGlyph: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
   // A person drawn under a line, portrait on the left, name and identifier under it
@@ -96,6 +103,7 @@ export const ASSISTANT_STYLES = {
   itemDone: 'text-[var(--color-ink-subtle)] after:w-full',
   // Loading line, alone in the middle of the thread
   warming: 'flex items-center justify-center gap-3 py-8 text-center',
+  closed: 'flex items-center gap-2 pt-2 text-caption text-[var(--color-ink-subtle)]',
   thinking: 'flex items-center gap-2 text-caption text-[var(--color-ink-subtle)]',
 } as const
 
@@ -105,13 +113,21 @@ export const ASSISTANT_STYLES = {
  */
 
 export const ASSISTANT_BUBBLE_STYLES = {
-  // Centred without a transform so the entrance animation keeps its own
-  root: 'recap-bubble fixed inset-x-0 bottom-[calc(var(--shell-dock-clearance,0px)+1.25rem)] z-[60] mx-auto flex h-16 w-[min(34rem,calc(100vw-2rem))] items-center gap-3 overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-raised)] pr-2 pl-4 shadow-[var(--shadow-lg)] transition-[width,height,bottom,border-radius] duration-300 ease-[var(--motion-ease-spring)] motion-reduce:transition-none',
-  // Grown to the whole page, ready to become it
-  rootGrown: 'bottom-0 h-dvh w-screen rounded-none border-transparent',
+  // Centred by margins, moved by the individual translate, opened by a clip so neither fights the other
+  root: 'memora-bubble fixed inset-x-0 bottom-[calc(var(--shell-dock-clearance,0px)+1.25rem)] z-[60] mx-auto flex min-h-16 w-[min(34rem,calc(100vw-2rem))] cursor-grab touch-none items-center gap-3 rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 pr-2 pl-4 shadow-[var(--shadow-lg)] select-none active:cursor-grabbing',
+  rootLeaving: 'memora-bubble-out',
+  // Grown over the whole page, the page it opens on takes over
+  rootExpanding:
+    'memora-bubble-expanding cursor-default *:pointer-events-none *:opacity-0 *:transition-opacity *:duration-200',
   mark: 'brain-mark-white h-8 shrink-0',
-  line: 'min-w-0 flex-1 text-body leading-snug font-semibold transition-opacity duration-150',
-  lineGrown: 'opacity-0',
+  line: 'relative min-w-0 flex-1 text-body leading-snug font-semibold',
+  lineWritten: 'absolute inset-0',
+  // Reserves the full sentence so the bubble does not grow while it is written
+  lineGhost: 'invisible block',
+  caret: 'ml-0.5 inline-block h-4 w-0.5 translate-y-0.5 animate-pulse bg-current',
+  close:
+    'flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  closeGlyph: 'size-4',
   enter:
     'flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--color-brand)] text-[var(--color-on-accent)] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   enterGlyph: 'size-5',

@@ -23,7 +23,7 @@ export const actionsOf = (
       {
         label: COPY.taskDone,
         tone: 'success',
-        run: async () => void (await apiPatch(API_ROUTES.taskDone(id), {})),
+        run: async () => void (await apiPatch(API_ROUTES.taskDone(id), { done: true })),
       },
     ]
   }

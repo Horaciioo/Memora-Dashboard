@@ -1,3 +1,6 @@
+import { WHITELIST_COPY } from '@/declarations/intelligence/whitelist'
+import { ROUTES } from '@/declarations/navigation'
+import { Permissions } from '@/utils/constants/permissions'
 import type { IconName } from '@/declarations/ui/icons'
 import type { IllustrationName } from '@/declarations/ui/illustrations'
 import type { PermissionName } from '@/utils/constants/permissions'
@@ -415,7 +418,16 @@ export interface ReferenceScreen {
  * @type {ReferenceScreen[]}
  */
 
-export const REFERENCE_SCREENS: ReferenceScreen[] = []
+export const REFERENCE_SCREENS: ReferenceScreen[] = [
+  {
+    group: 'organisation',
+    href: ROUTES.whitelist,
+    label: WHITELIST_COPY.title,
+    description: WHITELIST_COPY.description,
+    icon: 'spark',
+    permission: Permissions.ReferenceRead,
+  },
+]
 
 /**
  * Screens of one console group

@@ -4,23 +4,23 @@
  */
 
 export const LIVE_VARIANTS = {
+  // A live asks for the member's availability, the bubble says it and so does the first line
   bubbleAsk: [
-    'Tu viens d’être invité à modérer un live, tu es présent ?',
-    'Un live a besoin de toi, tu peux être là ?',
-    'On compte sur toi pour un live, tu es dispo ?',
+    'Les Responsables ont besoin de connaître tes disponibilités pour le live {title}, tu es disponible ?',
+    'Pour le live {title}, les Responsables aimeraient savoir si tu es disponible, tu peux nous dire ?',
   ],
-  asked: [
-    'Tu as été demandé pour le live de {creator}, {when}. Je leur dis quoi ?',
-    '{creator} fait un live {when} et on aurait besoin de toi. Qu’est-ce que je réponds ?',
-    'On pense à toi pour le live de {creator}, {when}. Tu es là ?',
-    'Le live de {creator} approche, {when}. Je leur annonce quoi de ta part ?',
-    'Dis-moi : je peux compter sur toi pour le live de {creator}, {when} ?',
+  // Any other event that calls the roll
+  bubbleEvent: [
+    'Tu as été positionné sur {title}, tu es présent ?',
+    'On compte sur toi pour {title}, tu seras là ?',
   ],
-  window: [
-    'D’accord, et tu penses être dispo de quand à quand ?',
-    'Très bien ! Sur quelle plage tu es là ?',
-    'Super. Dis-moi de quelle heure à quelle heure tu peux être présent.',
-    'Parfait, tu serais dispo sur quelle plage ?',
+  until: [
+    'D’accord ! Tu seras là de quand à quand ?',
+    'Super ! Confirme-moi tes horaires.',
+  ],
+  undecided: [
+    'Pas de souci, prends ton temps. Je te reposerai la question un peu plus tard.',
+    'D’accord, tu me diras quand tu sauras, je te redemande plus tard.',
   ],
   sentYes: [
     'Ok, je leur transmets !',

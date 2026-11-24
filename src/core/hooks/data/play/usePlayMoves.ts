@@ -139,8 +139,14 @@ export const usePlayMoves = () => {
     openVote: (id: string) =>
       run(() => apiPost(API_ROUTES.playVote(id), { action: GolfVoteActions.Open })),
     // Quiet, the signal it raises refreshes the page
-    vote: (id: string, payload: Record<string, unknown>) =>
-      run(() => apiPost(API_ROUTES.playVote(id), payload)),
+    // A quiet vote (the clock closing a step) never raises a toast, a refusal is only dropped
+    vote: (id: string, payload: Record<string, unknown>, isQuiet = false) =>
+      isQuiet
+        ? apiPost(API_ROUTES.playVote(id), payload).then(
+            () => true as const,
+            () => null
+          )
+        : run(() => apiPost(API_ROUTES.playVote(id), payload)),
     rules: (id: string, setup: object) =>
       go(
         track('rules', () => apiPatch(API_ROUTES.playSession(id), setup)),

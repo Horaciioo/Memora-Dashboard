@@ -83,6 +83,7 @@ export const Permissions = {
   UnbanHandle: 'unban:handle',
   UnbanLinks: 'unban:links',
   UnbanManage: 'unban:manage',
+  IntelligenceUse: 'intelligence:use',
 } as const
 
 export type PermissionName = (typeof Permissions)[keyof typeof Permissions]
@@ -130,6 +131,7 @@ export const PermissionGroups = {
   Access: 'access',
   Play: 'play',
   Unban: 'unban',
+  Intelligence: 'intelligence',
 } as const
 
 export type PermissionGroup = (typeof PermissionGroups)[keyof typeof PermissionGroups]
@@ -789,6 +791,14 @@ export const PermissionsList: PermissionMeta[] = [
     description: 'Créer et modifier les données de référence.',
     important: true,
     parent: Permissions.ReferenceRead,
+  },
+  {
+    name: Permissions.IntelligenceUse,
+    group: PermissionGroups.Intelligence,
+    displayName: 'Utiliser Memora Intelligence',
+    description:
+      'Ouvrir la page de Memora et s’en servir. Les Responsables y entrent d’office, les autres par la liste blanche.',
+    important: false,
   },
   {
     name: Permissions.AccessManage,

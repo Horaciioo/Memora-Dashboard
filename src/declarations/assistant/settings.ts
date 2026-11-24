@@ -3,7 +3,7 @@ import { readInteger } from '@/declarations/configurations/readers'
 
 /**
  * Assistant behaviour
- * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number }}
+ * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number, bubbleExpandMs: number, liveDefaultHours: number, bubbleOpenMs: number, bubbleStaySeconds: number, bubbleReloadMs: number, closeSeconds: number }}
  */
 
 export const ASSISTANT_SETTINGS = {
@@ -117,10 +117,46 @@ export const ASSISTANT_SETTINGS = {
     fallback: 10,
     min: 1,
   }),
-  // The bubble grows into the page for this long
+  // The bubble opens for this long, the sentence is written after it
+  bubbleOpenMs: readInteger(assistant.bubbleOpenMs, {
+    path: 'system/assistant.bubbleOpenMs',
+    fallback: 450,
+    min: 0,
+  }),
+  // A bubble nobody touches folds away after this long
+  bubbleStaySeconds: readInteger(assistant.bubbleStaySeconds, {
+    path: 'system/assistant.bubbleStaySeconds',
+    fallback: 45,
+    min: 5,
+  }),
+  // The answers are read again this long after the bubble was entered
+  bubbleReloadMs: readInteger(assistant.bubbleReloadMs, {
+    path: 'system/assistant.bubbleReloadMs',
+    fallback: 4000,
+    min: 0,
+  }),
+  // The bubble closes for this long
   bubbleGrowMs: readInteger(assistant.bubbleGrowMs, {
     path: 'system/assistant.bubbleGrowMs',
     fallback: 320,
     min: 0,
+  }),
+  // The bubble grows over the page for this long before the page opens
+  bubbleExpandMs: readInteger(assistant.bubbleExpandMs, {
+    path: 'system/assistant.bubbleExpandMs',
+    fallback: 550,
+    min: 0,
+  }),
+  // A live with no planned end is taken to last this many hours
+  liveDefaultHours: readInteger(assistant.liveDefaultHours, {
+    path: 'system/assistant.liveDefaultHours',
+    fallback: 5,
+    min: 1,
+  }),
+  // A closed talk keeps its window this long
+  closeSeconds: readInteger(assistant.closeSeconds, {
+    path: 'system/assistant.closeSeconds',
+    fallback: 10,
+    min: 1,
   }),
 }
