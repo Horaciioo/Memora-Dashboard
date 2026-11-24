@@ -26,6 +26,7 @@
   "bubbleStaySeconds": 45,
   "bubbleReloadMs": 4000,
   "closeSeconds": 10,
+  "undoSeconds": 10,
   "scores": {
     "phrase": 50,
     "noun": 40,

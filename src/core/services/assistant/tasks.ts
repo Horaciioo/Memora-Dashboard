@@ -2,6 +2,7 @@ import 'server-only'
 
 import { resolveReference } from '@/core/lib/assistant/context'
 import { lookupName } from '@/core/lib/assistant/matching'
+import { proposeGesture } from '@/core/services/assistant/gestures'
 import { askChoice, fill, missing, propose, refuse, slot } from '@/core/services/assistant/reply'
 import type { Resolver, ResolverContext } from '@/core/services/assistant/reply'
 import { taskFields } from '@/core/services/work/TaskService'
@@ -175,19 +176,20 @@ export const resolveCreateTask: Resolver = async (context) => {
     })
   }
 
-  return propose('createTask', {
-    reply: ASSISTANT_COPY.taskReady,
-    slots,
-    confirm: true,
-    action: {
-      kind: 'createTask',
-      values: {
-        title,
-        ...(owner.option && { ownerId: owner.option.value }),
-        ...(project.option && { projectId: project.option.value }),
-        ...(due && { dueDate: due }),
-      },
+  const proposal = proposeGesture('createTask', {
+    id: '',
+    name: title,
+    values: {
+      title,
+      ...(owner.option && { ownerId: owner.option.value }),
+      ...(project.option && { projectId: project.option.value }),
+      ...(due && { dueDate: due }),
     },
-    memory: owner.option ? { member: { id: owner.option.value, label: owner.option.label } } : {},
   })
+
+  return {
+    ...proposal,
+    slots,
+    memory: owner.option ? { member: { id: owner.option.value, label: owner.option.label } } : {},
+  }
 }

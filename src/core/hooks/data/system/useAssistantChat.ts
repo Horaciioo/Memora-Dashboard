@@ -1,22 +1,27 @@
 'use client'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { apiPost, ApiClientError } from '@/core/lib/api/client'
+import { apiPost, apiSend, ApiClientError } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { isRecapAsk } from '@/core/lib/assistant/recapAsk'
 import { useAssistantScenario } from '@/core/hooks/data/system/useAssistantScenario'
 import type { ScenarioId, ScenarioRunner } from '@/core/hooks/data/system/useAssistantScenario'
+import { SECOND_MS } from '@/utils/constants/time'
 import { useNexusHandoff } from '@/managers/front-end/NexusManager'
 import { useAssistantStore } from '@/core/store/assistant'
 import { useAssistantDock } from '@/core/store/assistantDock'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
+import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { IDEMPOTENCY_HEADER } from '@/declarations/system/security/idempotency'
+import {
+  ASSISTANT_ORIGIN_HEADER,
+  ASSISTANT_ORIGIN_VALUE,
+} from '@/declarations/system/security/origin'
 import type { RecapChapter } from '@/core/lib/recap/compose'
-import type { AssistantProposal } from '@/types/assistant'
+import type { AssistantCall, AssistantProposal } from '@/types/assistant'
 import type { ScenarioCard, ScenarioGroup, ScenarioLink } from '@/types/scenario'
-import type { TaskSummary } from '@/types/work'
 
 /**
  * One line of the conversation
@@ -56,6 +61,8 @@ export interface AssistantTurn {
  * @property {(value: string, shown: string) => void} answer - Fill the question
  * @property {(text: string) => void} send - Typed line, answer or new ask
  * @property {() => void} confirm - Run the action
+ * @property {boolean} canUndo - The last gesture can still be taken back
+ * @property {() => void} undo - Take the last gesture back
  * @property {() => void} reset - Back to search
  * @property {ScenarioRunner} scenario - Guided talk Memora leads
  * @property {(id: ScenarioId, entry: string, data?: Record<string, string>) => void} guide - Open a guided talk
@@ -71,6 +78,8 @@ export interface AssistantChat {
   answer: (value: string, shown: string) => void
   send: (text: string) => void
   confirm: () => void
+  canUndo: boolean
+  undo: () => void
   reset: () => void
   scenario: ScenarioRunner
   guide: (id: ScenarioId, entry: string, data?: Record<string, string>) => void
@@ -104,6 +113,22 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
   const writeKey = useRef<string | null>(null)
   // Same frame double clicks
   const inFlight = useRef(false)
+  // Request that takes the last gesture back, for a few seconds
+  const [undoCall, setUndoCall] = useState<AssistantCall | null>(null)
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => void (undoTimer.current && clearTimeout(undoTimer.current)), [])
+
+  const armUndo = (call: AssistantCall | null) => {
+    if (undoTimer.current) clearTimeout(undoTimer.current)
+    setUndoCall(call)
+    if (call) {
+      undoTimer.current = setTimeout(
+        () => setUndoCall(null),
+        ASSISTANT_SETTINGS.undoSeconds * SECOND_MS
+      )
+    }
+  }
 
   const setBusy = (busy: boolean) => {
     inFlight.current = busy
@@ -221,29 +246,65 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
     else start(text)
   }
 
+  // Same route the screens call, signed as Memora's in the journal
+  const callRoute = (call: AssistantCall, key: string) =>
+    apiSend<{ id?: string; title?: string } | null>(call.method, call.path, call.body, {
+      [IDEMPOTENCY_HEADER]: key,
+      [ASSISTANT_ORIGIN_HEADER]: ASSISTANT_ORIGIN_VALUE,
+    })
+
   const confirm = async () => {
     const proposal = current
     const action = proposal?.action
-    if (inFlight.current || action?.kind !== 'createTask' || !writeKey.current) return
+    if (!proposal || inFlight.current || action?.kind !== 'act' || !writeKey.current) return
+
+    // A strong gesture asks twice
+    if (action.sure) {
+      say('memora', action.sure, {
+        ...proposal,
+        reply: action.sure,
+        action: { ...action, sure: null },
+      })
+      return
+    }
 
     setBusy(true)
     try {
-      const task = await apiPost<TaskSummary>(API_ROUTES.tasks, action.values, {
-        [IDEMPOTENCY_HEADER]: writeKey.current,
-      })
+      const result = await callRoute(action.call, writeKey.current)
       writeKey.current = null
-      remember({ task: { id: task.id, label: task.title } })
-      say('memora', ASSISTANT_COPY.taskCreated.replace('{title}', task.title))
+      if (action.remember && result?.id) {
+        remember({ [action.remember]: { id: result.id, label: result.title ?? '' } })
+      }
+      say('memora', action.done)
+      armUndo(action.undo)
       router.refresh()
     } catch (error) {
       // The key stays, a retry replays
-      say('memora', failureOf(error), proposal ?? undefined)
+      say('memora', failureOf(error), proposal)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const undo = async () => {
+    const call = undoCall
+    if (inFlight.current || !call) return
+
+    armUndo(null)
+    setBusy(true)
+    try {
+      await callRoute(call, crypto.randomUUID())
+      say('memora', ASSISTANT_COPY.undone)
+      router.refresh()
+    } catch (error) {
+      say('memora', failureOf(error))
     } finally {
       setBusy(false)
     }
   }
 
   const reset = () => {
+    armUndo(null)
     scenario.stop()
     writeKey.current = null
     setTurns([])
@@ -274,6 +335,8 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
     answer,
     send,
     confirm: () => void confirm(),
+    canUndo: undoCall !== null,
+    undo: () => void undo(),
     reset,
     scenario,
     guide,

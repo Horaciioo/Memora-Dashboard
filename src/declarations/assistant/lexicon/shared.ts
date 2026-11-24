@@ -20,6 +20,12 @@ export const CREATE_VERBS = [
 
 export const TASK_NOUNS = ['tache', 'taches', 'todo', 'task'] as const
 
+// Words that say a thing is done, they stand for the noun
+export const DONE_WORDS = ['faite', 'faites', 'terminee', 'terminees', 'finie', 'finies'] as const
+
+// Words that name an absence
+export const ABSENCE_NOUNS = ['absence', 'absences', 'conge', 'conges', 'vacances'] as const
+
 /**
  * Words that steer an absence talk, per way in
  * @type {Record<'edit' | 'delete' | 'list', string[]>}

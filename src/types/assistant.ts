@@ -1,4 +1,5 @@
 import type { AssistantIntentName } from '@/declarations/assistant/domains'
+import type { GestureId } from '@/declarations/assistant/gestures'
 import type { ScenarioLink } from '@/types/scenario'
 
 /**
@@ -6,7 +7,7 @@ import type { ScenarioLink } from '@/types/scenario'
  * @type {'member' | 'task' | 'project' | 'live'}
  */
 
-export type AssistantEntityKind = 'member' | 'task' | 'project' | 'live'
+export type AssistantEntityKind = 'member' | 'task' | 'project' | 'live' | 'absence'
 
 /**
  * One resource already named
@@ -139,14 +140,61 @@ export interface AssistantSayLine {
 }
 
 /**
+ * How much a gesture can hurt, it sets the confirmation
+ * @type {'light' | 'medium' | 'strong'}
+ */
+
+export type AssistantRisk = 'light' | 'medium' | 'strong'
+
+/**
+ * Request a gesture sends to an existing route
+ * @typedef {Object} AssistantCall
+ * @property {'POST' | 'PATCH' | 'DELETE'} method - HTTP verb
+ * @property {string} path - API path
+ * @property {Record<string, unknown>} [body] - Payload
+ */
+
+export interface AssistantCall {
+  method: 'POST' | 'PATCH' | 'DELETE'
+  path: string
+  body?: Record<string, unknown>
+}
+
+/**
+ * Gesture Memora does in the member's place
+ * @typedef {Object} AssistantGestureAction
+ * @property {'act'} kind - Action kind
+ * @property {GestureId} gesture - Registry entry
+ * @property {AssistantRisk} risk - Confirmation level
+ * @property {AssistantCall} call - Request to send
+ * @property {AssistantCall | null} undo - Request that takes it back
+ * @property {string} confirmLabel - Button that runs it
+ * @property {string} done - Sentence once done
+ * @property {string | null} sure - Second question of a strong gesture
+ * @property {AssistantEntityKind | null} remember - Kind the answer names
+ */
+
+export interface AssistantGestureAction {
+  kind: 'act'
+  gesture: GestureId
+  risk: AssistantRisk
+  call: AssistantCall
+  undo: AssistantCall | null
+  confirmLabel: string
+  done: string
+  sure: string | null
+  remember: AssistantEntityKind | null
+}
+
+/**
  * Action ready to run
- * @type {{ kind: 'navigate', href: string } | { kind: 'createTask', values: Record<string, string> } | { kind: 'say', lines: AssistantSayLine[] } | AssistantScenarioStart}
+ * @type {{ kind: 'navigate', href: string } | { kind: 'say', lines: AssistantSayLine[] } | AssistantGestureAction | AssistantScenarioStart}
  */
 
 export type AssistantAction =
   | { kind: 'navigate'; href: string }
-  | { kind: 'createTask'; values: Record<string, string> }
   | { kind: 'say'; lines: AssistantSayLine[] }
+  | AssistantGestureAction
   | AssistantScenarioStart
 
 /**

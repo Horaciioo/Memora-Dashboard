@@ -3,7 +3,7 @@ import { readInteger } from '@/declarations/configurations/readers'
 
 /**
  * Assistant behaviour
- * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number, bubbleExpandMs: number, liveDefaultHours: number, bubbleOpenMs: number, bubbleStaySeconds: number, bubbleReloadMs: number, closeSeconds: number }}
+ * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number, bubbleExpandMs: number, liveDefaultHours: number, bubbleOpenMs: number, bubbleStaySeconds: number, bubbleReloadMs: number, closeSeconds: number, undoSeconds: number }}
  */
 
 export const ASSISTANT_SETTINGS = {
@@ -156,6 +156,11 @@ export const ASSISTANT_SETTINGS = {
   // A closed talk keeps its window this long
   closeSeconds: readInteger(assistant.closeSeconds, {
     path: 'system/assistant.closeSeconds',
+    fallback: 10,
+    min: 1,
+  }), // A gesture can be taken back for this long
+  undoSeconds: readInteger(assistant.undoSeconds, {
+    path: 'system/assistant.undoSeconds',
     fallback: 10,
     min: 1,
   }),

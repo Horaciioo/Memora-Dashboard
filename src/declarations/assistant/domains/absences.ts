@@ -1,5 +1,9 @@
 import { defineDomain } from '@/declarations/assistant/domains/types'
-import { ASSISTANT_ABSENCE_MODES, CREATE_VERBS } from '@/declarations/assistant/lexicon/shared'
+import {
+  ABSENCE_NOUNS,
+  ASSISTANT_ABSENCE_MODES,
+  CREATE_VERBS,
+} from '@/declarations/assistant/lexicon/shared'
 import { ROUTES } from '@/declarations/navigation'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -36,13 +40,14 @@ const ABSENCE_VERBS = [
 
 export const ABSENCES = defineDomain({
   label: 'Absences',
-  summary: 'Je pose, décale, supprime ou liste tes absences.',
+  summary:
+    'Je pose, décale, supprime ou liste tes absences, et je valide ou refuse celles de ton équipe.',
   intents: {
     absence: {
       label: 'Gérer une absence',
       kind: 'scenario',
       verbs: ABSENCE_VERBS,
-      nouns: ['absence', 'absences', 'conge', 'conges', 'vacances', 'absent', 'indisponible'],
+      nouns: [...ABSENCE_NOUNS, 'absent', 'indisponible'],
       needs: 'both',
       permission: Permissions.AbsenceCreate,
       pages: [ROUTES.absences],
@@ -51,6 +56,28 @@ export const ABSENCES = defineDomain({
         'Décale mon absence',
         'Liste mes absences',
       ],
+    },
+    approveAbsence: {
+      label: 'Valider une absence',
+      kind: 'act',
+      verbs: ['valide', 'valider', 'valides', 'accepte', 'accepter', 'approuve', 'approuver'],
+      nouns: ABSENCE_NOUNS,
+      needs: 'both',
+      boost: 15,
+      permission: Permissions.AbsenceReview,
+      pages: [ROUTES.absences],
+      examples: ['Valide l’absence de Léa', 'Accepte les congés en attente'],
+    },
+    refuseAbsence: {
+      label: 'Refuser une absence',
+      kind: 'act',
+      verbs: ['refuse', 'refuser', 'refuses', 'rejette', 'rejeter', 'decline', 'declines'],
+      nouns: ABSENCE_NOUNS,
+      needs: 'both',
+      boost: 15,
+      permission: Permissions.AbsenceReview,
+      pages: [ROUTES.absences],
+      examples: ['Refuse l’absence de Procy', 'Rejette ce congé'],
     },
   },
 })
