@@ -1,15 +1,11 @@
 import { isSimilar } from '@/core/lib/assistant/normalize'
 import type { AssistantToken } from '@/core/lib/assistant/normalize'
-import {
-  ASSISTANT_INTENT_ORDER,
-  ASSISTANT_INTENTS,
-  ASSISTANT_PAGES,
-} from '@/declarations/assistant/lexicon'
-import type {
-  AssistantIntentName,
-  AssistantPage,
-  IntentRule,
-} from '@/declarations/assistant/lexicon'
+import { ASSISTANT_INTENT_ORDER, ruleOf } from '@/declarations/assistant/domains'
+import type { IntentDef } from '@/declarations/assistant/domains/types'
+import type { AssistantIntentName } from '@/declarations/assistant/domains'
+import { ASSISTANT_PAGES } from '@/declarations/assistant/lexicon'
+import type { AssistantPage } from '@/declarations/assistant/lexicon'
+import { ASSISTANT_SCORES } from '@/declarations/assistant/scoring'
 
 /**
  * Intent found in a sentence
@@ -17,47 +13,66 @@ import type {
  * @property {AssistantIntentName} intent - Recognised intent
  * @property {number[]} indices - Keywords used
  * @property {AssistantPage | null} page - Named page
+ * @property {number} score - Points earned
  */
 
 export interface IntentMatch {
   intent: AssistantIntentName
   indices: number[]
   page: AssistantPage | null
+  score: number
+}
+
+/**
+ * Best intent and those too close to call
+ * @typedef {Object} IntentReading
+ * @property {IntentMatch} best - Highest score
+ * @property {IntentMatch[]} rivals - Within the margin of the best
+ */
+
+export interface IntentReading {
+  best: IntentMatch
+  rivals: IntentMatch[]
+}
+
+// A keyword found, exact or through the typo budget
+interface Hit {
+  index: number
+  isExact: boolean
 }
 
 /**
  * Words matching a list
  * @param {AssistantToken[]} tokens - Sentence words
  * @param {readonly string[]} [words] - Expected words
- * @return {number[]} - Matching positions
+ * @return {Hit[]} - Matching positions
  */
 
-const positionsOf = (tokens: AssistantToken[], words?: readonly string[]): number[] =>
+const hitsOf = (tokens: AssistantToken[], words?: readonly string[]): Hit[] =>
   words
     ? tokens.flatMap((token, index) =>
-        !token.mention && words.some((word) => isSimilar(token.folded, word)) ? [index] : []
+        !token.mention && words.some((word) => isSimilar(token.folded, word))
+          ? [{ index, isExact: words.includes(token.folded) }]
+          : []
       )
     : []
 
 /**
- * Read one rule
+ * Find a run of words
  * @param {AssistantToken[]} tokens - Sentence words
- * @param {IntentRule} rule - Intent rule
- * @return {number[] | null} - Keywords or no match
+ * @param {string} phrase - Folded words joined by spaces
+ * @return {number[] | null} - Positions of the run
  */
 
-const readRule = (tokens: AssistantToken[], rule: IntentRule): number[] | null => {
-  const verbs = positionsOf(tokens, rule.verbs)
-  const nouns = positionsOf(tokens, rule.nouns)
-  const passes = {
-    verb: verbs.length > 0,
-    noun: nouns.length > 0,
-    both: verbs.length > 0 && nouns.length > 0,
-    either: verbs.length > 0 || nouns.length > 0,
-  }[rule.needs]
+export const findRun = (tokens: AssistantToken[], phrase: string): number[] | null => {
+  const words = phrase.split(' ')
 
-  // Only the first noun is a keyword
-  return passes ? [...verbs, ...nouns.slice(0, 1)] : null
+  for (let start = 0; start + words.length <= tokens.length; start += 1) {
+    const fits = words.every((word, offset) => isSimilar(tokens[start + offset].folded, word))
+    if (fits) return words.map((_, offset) => start + offset)
+  }
+
+  return null
 }
 
 /**
@@ -71,37 +86,108 @@ export const findPage = (
 ): { page: AssistantPage; indices: number[] } | null => {
   // Longest names first
   const phrases = ASSISTANT_PAGES.flatMap((page) =>
-    page.phrases.map((phrase) => ({ page, words: phrase.split(' ') }))
-  ).sort((left, right) => right.words.length - left.words.length)
+    page.phrases.map((phrase) => ({ page, phrase, size: phrase.split(' ').length }))
+  ).sort((left, right) => right.size - left.size)
 
-  for (const { page, words } of phrases) {
-    for (let start = 0; start + words.length <= tokens.length; start += 1) {
-      const fits = words.every((word, offset) => isSimilar(tokens[start + offset].folded, word))
-      if (fits) return { page, indices: words.map((_, offset) => start + offset) }
-    }
+  for (const { page, phrase } of phrases) {
+    const indices = findRun(tokens, phrase)
+    if (indices) return { page, indices }
   }
 
   return null
 }
 
 /**
- * Recognise the intent
+ * Score one rule against a sentence
  * @param {AssistantToken[]} tokens - Sentence words
- * @return {IntentMatch | null} - Intent or nothing
+ * @param {IntentDef} rule - Intent rule
+ * @param {string} pathname - Page on screen
+ * @return {{ score: number, indices: number[] } | null} - Points and keywords, or no match
  */
 
-export const detectIntent = (tokens: AssistantToken[]): IntentMatch | null => {
-  for (const intent of ASSISTANT_INTENT_ORDER) {
+const scoreRule = (
+  tokens: AssistantToken[],
+  rule: IntentDef,
+  pathname: string
+): { score: number; indices: number[] } | null => {
+  const verbs = hitsOf(tokens, rule.verbs)
+  const strong = hitsOf(tokens, rule.nouns)
+  const weak = strong.length > 0 ? [] : hitsOf(tokens, rule.weakNouns)
+  const nouns = [...strong, ...weak]
+  const phrase = (rule.phrases ?? []).map((text) => findRun(tokens, text)).find(Boolean) ?? null
+
+  const passes = {
+    verb: verbs.length > 0,
+    noun: nouns.length > 0,
+    both: verbs.length > 0 && nouns.length > 0,
+    either: verbs.length > 0 || nouns.length > 0,
+  }[rule.needs]
+  if (!passes && !phrase) return null
+
+  // Only the first noun is a keyword
+  const kept = [...verbs, ...nouns.slice(0, 1)]
+  const { phrase: phrasePoints, noun, weak: weakPoints, verb, typo } = ASSISTANT_SCORES
+  const base =
+    (phrase ? phrasePoints : 0) +
+    (verbs.length > 0 ? verb : 0) +
+    (strong.length > 0 ? noun : weak.length > 0 ? weakPoints : 0)
+  const companion = hitsOf(tokens, rule.companions).length > 0 ? ASSISTANT_SCORES.companion : 0
+  const isOnScreen = rule.pages?.some((route) => pathname.startsWith(route)) ?? false
+  const misspelt = kept.filter((hit) => !hit.isExact).length
+
+  return {
+    score:
+      base +
+      companion +
+      (rule.boost ?? 0) +
+      (isOnScreen ? ASSISTANT_SCORES.onScreen : 0) -
+      misspelt * typo,
+    indices: [...kept.map((hit) => hit.index), ...(phrase ?? [])],
+  }
+}
+
+/**
+ * Every intent a sentence reaches, best first
+ * @param {AssistantToken[]} tokens - Sentence words
+ * @param {string} [pathname] - Page on screen
+ * @return {IntentMatch[]} - Matches over the floor
+ */
+
+export const scoreIntents = (tokens: AssistantToken[], pathname = ''): IntentMatch[] => {
+  const matches = ASSISTANT_INTENT_ORDER.flatMap((intent): IntentMatch[] => {
     // Pages are named, not keyed
-    if (intent === 'navigate') {
+    if (ruleOf(intent).kind === 'navigate') {
       const found = findPage(tokens)
-      if (found) return { intent, indices: found.indices, page: found.page }
-      continue
+
+      return found
+        ? [{ intent, indices: found.indices, page: found.page, score: ASSISTANT_SCORES.namedPage }]
+        : []
     }
 
-    const indices = readRule(tokens, ASSISTANT_INTENTS[intent])
-    if (indices) return { intent, indices, page: null }
-  }
+    const read = scoreRule(tokens, ruleOf(intent), pathname)
 
-  return null
+    return read ? [{ intent, indices: read.indices, page: null, score: read.score }] : []
+  })
+
+  // Stable sort keeps the declared order on equal scores
+  return matches
+    .filter((match) => match.score >= ASSISTANT_SCORES.floor)
+    .sort((left, right) => right.score - left.score)
+}
+
+/**
+ * Recognise the intent
+ * @param {AssistantToken[]} tokens - Sentence words
+ * @param {string} [pathname] - Page on screen
+ * @return {IntentReading | null} - Best intent, its rivals, or nothing
+ */
+
+export const detectIntent = (tokens: AssistantToken[], pathname = ''): IntentReading | null => {
+  const [best, ...others] = scoreIntents(tokens, pathname)
+  if (!best) return null
+
+  return {
+    best,
+    rivals: others.filter((match) => best.score - match.score < ASSISTANT_SCORES.margin),
+  }
 }

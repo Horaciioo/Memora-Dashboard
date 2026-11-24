@@ -8,6 +8,10 @@ import { routeKey } from '@/core/lib/nexus/observe/metrics'
 import { OBSERVABILITY } from '@/core/lib/nexus/observe/registry'
 import { TAB_HEADER } from '@/core/lib/api/tab'
 import { readAddress } from '@/core/lib/http/rateLimit'
+import {
+  ASSISTANT_ORIGIN_HEADER,
+  ASSISTANT_ORIGIN_VALUE,
+} from '@/declarations/system/security/origin'
 import { runInRequestZone } from '@/core/lib/http/requestZone'
 
 /**
@@ -18,6 +22,7 @@ import { runInRequestZone } from '@/core/lib/http/requestZone'
  * @property {string | null} userAgent - Client software
  * @property {string | null} tab - Browser tab that wrote
  * @property {string | null} requestId - Identifier of the request
+ * @property {boolean} byAssistant - Memora did the gesture for the member
  */
 
 export interface RequestOrigin {
@@ -26,6 +31,7 @@ export interface RequestOrigin {
   userAgent: string | null
   tab: string | null
   requestId: string | null
+  byAssistant: boolean
 }
 
 // Header carrying the identifier
@@ -76,6 +82,7 @@ export const runWithOrigin = <T>(request: NextRequest, run: () => Promise<T>): P
       userAgent: clip(request.headers.get('user-agent')),
       tab: clip(request.headers.get(TAB_HEADER)),
       requestId,
+      byAssistant: request.headers.get(ASSISTANT_ORIGIN_HEADER) === ASSISTANT_ORIGIN_VALUE,
     },
     () =>
       runInRequestZone(run).then((result) => {
@@ -103,7 +110,8 @@ export const runWithRequestId = <T>(
   route: string,
   run: () => Promise<T>,
   requestId: string = crypto.randomUUID()
-): Promise<T> => storage.run({ route, ip: null, userAgent: null, tab: null, requestId }, run)
+): Promise<T> =>
+  storage.run({ route, ip: null, userAgent: null, tab: null, requestId, byAssistant: false }, run)
 
 /**
  * Identifier of the running request
@@ -133,8 +141,16 @@ export const readOrigin = async (): Promise<RequestOrigin> => {
       userAgent: clip(store.get('user-agent')),
       tab: clip(store.get(TAB_HEADER)),
       requestId: null,
+      byAssistant: false,
     }
   } catch {
-    return { route: null, ip: null, userAgent: null, tab: null, requestId: null }
+    return {
+      route: null,
+      ip: null,
+      userAgent: null,
+      tab: null,
+      requestId: null,
+      byAssistant: false,
+    }
   }
 }

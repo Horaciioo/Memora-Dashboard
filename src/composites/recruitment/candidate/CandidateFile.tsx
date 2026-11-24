@@ -19,7 +19,7 @@ import {
   RecruitmentFileProvider,
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { FloatingFocus } from '@/composites/search/assistant/FloatingFocus'
+import { usePageFocus } from '@/core/hooks/data/system/usePageFocus'
 import { useClock } from '@/core/hooks/interaction/state/time/useClock'
 import { useCandidateRecord } from '@/core/hooks/data/recruitment/useCandidateRecord'
 import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
@@ -58,6 +58,11 @@ const CandidateBody = ({
   const candidate = file.candidates.find((entry) => entry.id === candidateId)!
   const record = useCandidateRecord(candidate)
 
+  // Memora offers to update this candidate when the chat opens
+  usePageFocus(
+    can.writeCandidates ? { kind: 'candidate', id: candidate.id, label: candidate.name } : null
+  )
+
   const progress = progressOf(candidate, record.values)
   const states = candidateStates(progress, detail.outcomes, candidate.stageMarks, useClock())
 
@@ -72,14 +77,6 @@ const CandidateBody = ({
 
   return (
     <div className={MEMBER_FILE.layout}>
-      {/* Memora offers to update this candidate when the chat opens */}
-      {can.writeCandidates && (
-        <FloatingFocus
-          scenario="candidate"
-          entry="onFile"
-          data={{ candidateId: candidate.id, name: candidate.name }}
-        />
-      )}
       <CandidateBack label={CANDIDATE_COPY.back} href={back} />
       {/* On a phone the rail belongs to the overview alone */}
       <div

@@ -127,6 +127,64 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.16.1',
+    date: '2026-11-24',
+    title: 'Memora Intelligence arrive !',
+    intro: 'Memora sait désormais te répondre, te faire le point de ta journée et agir à ta place.',
+    description:
+      'Memora Intelligence se limitait à résumer une absence. Elle discute maintenant de tout ce qui fait ton quotidien dans Memora : elle retrouve une information, chiffre une période, raconte le point du jour et fait un geste après ta confirmation.',
+    items: [
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Amélioration de « Memora Intelligence » : Memora dit ce qu’elle sait faire selon les accès de chacun, indique où se trouve une page, explique comment s’y prendre et ce que veulent dire des mots comme « Livecon ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Amélioration de « Memora Intelligence » : quand une demande peut vouloir dire deux choses, Memora demande laquelle au lieu de se tromper.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Ajout de la possibilité de demander à « Memora Intelligence » de faire un geste à ta place, comme créer ou modifier une tâche ou prendre une demande de Déban., avec une confirmation avant et un bouton pour annuler après.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Ajout du point du jour et de la semaine dans « Memora Intelligence » : tâches, retards, événements, absents et anniversaires, racontés un sujet à la fois.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Ajout de la possibilité de demander à « Memora Intelligence » des chiffres sur une période, avec une comparaison à la période d’avant.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Ajout de la possibilité de retrouver avec « Memora Intelligence » un projet, une réunion, une annonce, une note ou une demande, et de demander ce qui a changé depuis ta dernière visite.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Amélioration de « Memora Intelligence » : Memora bavarde, prend soin de toi quand ça ne va pas et redirige poliment une demande hors sujet.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Amélioration de « Memora Intelligence » : des suggestions adaptées à la page ouverte apparaissent dans la recherche, ouverte aussi avec Cmd J.',
+      },
+    ],
+  },
+  {
     version: '0.16.0',
     date: '2026-11-23',
     title: 'Les lives se fiabilisent',

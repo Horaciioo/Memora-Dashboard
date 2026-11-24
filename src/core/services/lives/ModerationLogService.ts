@@ -262,7 +262,9 @@ export const logPlatformGesture = async (input: {
         kind: entry.kind,
         externalEventId: null,
         actorPlatformUserId: entry.actorPlatformUserId,
-        occurredAt: { gte: new Date(occurredAt.getTime() - LIVE_SETTINGS.echoWindowSeconds * SECOND_MS) },
+        occurredAt: {
+          gte: new Date(occurredAt.getTime() - LIVE_SETTINGS.echoWindowSeconds * SECOND_MS),
+        },
       },
       orderBy: { occurredAt: 'desc' },
       select: {

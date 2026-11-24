@@ -120,6 +120,18 @@ export const AssistantAnswers = ({ chat }: AssistantAnswersProps) => {
     )
   }
 
+  // The last gesture can be taken back for a few seconds
+  if (chat.canUndo) {
+    return (
+      <div className={ASSISTANT_STYLES.answers} role="group">
+        <button type="button" className={ASSISTANT_STYLES.answer} onClick={chat.undo}>
+          <span aria-hidden="true">-</span>
+          <span className={ASSISTANT_STYLES.answerLabel}>{ASSISTANT_COPY.undo}</span>
+        </button>
+      </div>
+    )
+  }
+
   if (!current) return null
 
   // Pick one of the offered answers
@@ -152,7 +164,11 @@ export const AssistantAnswers = ({ chat }: AssistantAnswersProps) => {
         onClick={chat.confirm}
         className={cn(BUTTON_STYLES.base, BUTTON_STYLES.primary)}
       >
-        {ASSISTANT_COPY.confirm}
+        {current.action?.kind === 'act' && current.action.risk === 'strong' && !current.action.sure
+          ? ASSISTANT_COPY.confirmSure
+          : current.action?.kind === 'act'
+            ? current.action.confirmLabel
+            : ASSISTANT_COPY.answer}
       </button>
       <button
         type="button"

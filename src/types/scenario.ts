@@ -2,11 +2,19 @@ import type { RecapChapter } from '@/core/lib/recap/compose'
 
 /**
  * Guided talks Memora can lead
- * @type {'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity' | 'live' | 'recap'}
+ * @type {'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity' | 'live' | 'recap' | 'point'}
  */
 
 export type ScenarioId =
-  'absence' | 'recruitment' | 'candidate' | 'task' | 'junior' | 'identity' | 'live' | 'recap'
+  | 'absence'
+  | 'recruitment'
+  | 'candidate'
+  | 'task'
+  | 'junior'
+  | 'identity'
+  | 'live'
+  | 'recap'
+  | 'point'
 
 /**
  * One answer Memora offers

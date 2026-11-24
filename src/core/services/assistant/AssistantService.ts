@@ -4,27 +4,99 @@ import { readPageContext } from '@/core/lib/assistant/context'
 import { isNexusInput } from '@/core/lib/nexus/intercept'
 import { parseCommand } from '@/core/lib/assistant/parse'
 import { resolveAbsence } from '@/core/services/assistant/absences'
+import {
+  resolveAway,
+  resolveBirthdays,
+  resolveDayPoint,
+  resolveLate,
+  resolveNextPlans,
+  resolveTodo,
+  resolveWeekPoint,
+} from '@/core/services/assistant/point'
+import { resolveStats } from '@/core/services/assistant/stats'
+import {
+  resolveAnnouncements,
+  resolveLateProjects,
+  resolveNextMeeting,
+  resolvePendingAbsences,
+  resolvePendingUnban,
+  resolveProjectPoint,
+} from '@/core/services/assistant/work'
+import { resolveBatch } from '@/core/services/assistant/batches'
+import { resolveTopic } from '@/core/services/assistant/meetingEdits'
+import { resolveNeverDo } from '@/core/services/assistant/forbidden'
+import { resolveGesture } from '@/core/services/assistant/gestures'
+import {
+  resolveAssign,
+  resolveComment,
+  resolvePostpone,
+  resolvePriority,
+} from '@/core/services/assistant/taskEdits'
+import { resolveWhy } from '@/core/services/assistant/access'
+import { resolveWhatsNew } from '@/core/services/assistant/news'
+import { resolveCapabilities, resolveGuide, resolveWhere } from '@/core/services/assistant/help'
 import { resolveLive } from '@/core/services/assistant/lives'
 import { resolveLogs } from '@/core/services/assistant/logs'
 import { resolveNavigation } from '@/core/services/assistant/navigation'
 import { resolveRecord } from '@/core/services/assistant/records'
-import { notUnderstood } from '@/core/services/assistant/reply'
+import { chatReply } from '@/core/services/assistant/chat'
+import { askChoice, notUnderstood, refuse } from '@/core/services/assistant/reply'
 import type { Resolver, ResolverContext } from '@/core/services/assistant/reply'
 import { resolveCreateTask } from '@/core/services/assistant/tasks'
-import type { AssistantIntentName } from '@/declarations/assistant/lexicon'
+import { ruleOf } from '@/declarations/assistant/domains'
+import type { AssistantIntentName } from '@/declarations/assistant/domains'
+import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import type { AssistantProposal, AssistantRequest } from '@/types/assistant'
 import { instantToWall } from '@/utils/format/time/zone'
 
 // One resolver per intent
 const RESOLVERS: Record<AssistantIntentName, Resolver> = {
+  stats: resolveStats,
+  projectPoint: resolveProjectPoint,
+  lateProjects: resolveLateProjects,
+  nextMeeting: resolveNextMeeting,
+  weekAnnouncements: resolveAnnouncements,
+  pendingAbsences: resolvePendingAbsences,
+  pendingUnban: resolvePendingUnban,
+  dayPoint: resolveDayPoint,
+  weekPoint: resolveWeekPoint,
+  myTodo: resolveTodo,
+  myLate: resolveLate,
+  nextPlans: resolveNextPlans,
+  whoAway: resolveAway,
+  nextBirthdays: resolveBirthdays,
   createTask: resolveCreateTask,
+  completeTask: resolveGesture,
+  reopenTask: resolveGesture,
+  deleteTask: resolveGesture,
+  completeAllTasks: resolveBatch,
+  approveAllAbsences: resolveBatch,
+  postponeTask: resolvePostpone,
+  assignTask: resolveAssign,
+  setTaskPriority: resolvePriority,
+  commentTask: resolveComment,
+  neverDo: resolveNeverDo,
+  addMeetingTopic: resolveTopic,
+  approveAbsence: resolveGesture,
+  refuseAbsence: resolveGesture,
+  takeUnban: resolveGesture,
+  releaseUnban: resolveGesture,
+  readNotifications: resolveGesture,
   absence: resolveAbsence,
   filterLogs: resolveLogs,
   liveReport: resolveLive,
   openLive: resolveLive,
   openTask: resolveRecord,
   openProject: resolveRecord,
+  openMeeting: resolveRecord,
+  openPage: resolveRecord,
   findMember: resolveRecord,
+  capabilities: resolveCapabilities,
+  howTo: resolveGuide,
+  define: resolveGuide,
+  whereIs: resolveWhere,
+  whyNot: resolveWhy,
+  whatsNew: resolveWhatsNew,
   navigate: resolveNavigation,
 }
 
@@ -44,13 +116,34 @@ export const interpret = async (
 
   // Today in the member zone
   const today = instantToWall(new Date()).slice(0, 10)
-  const parsed = parseCommand(request.text, today)
-  if (!parsed.intent) return notUnderstood()
+  const parsed = parseCommand(request.text, today, {
+    pathname: request.pathname,
+    intent: request.filled.intent,
+  })
+  // No intent: she chats instead of giving up
+  if (!parsed.intent) return chatReply(request.text, request.pathname, context.session.displayName)
+
+  // Two readings too close: the member picks one
+  if (parsed.rivals.length > 0) {
+    return askChoice({
+      intent: parsed.intent,
+      slotKey: 'intent',
+      reply: ASSISTANT_COPY.whichIntent,
+      choices: [parsed.intent, ...parsed.rivals].map((intent) => ({
+        value: intent,
+        label: ruleOf(intent).label,
+      })),
+    })
+  }
+
+  // The right is checked before anything is read
+  const permission = ruleOf(parsed.intent).permission
+  if (permission && !context.access.can(permission)) return refuse(parsed.intent)
 
   return RESOLVERS[parsed.intent]({
     ...context,
     parsed,
     request,
-    page: readPageContext(request.pathname),
+    page: readPageContext(request.pathname, request.element),
   })
 }

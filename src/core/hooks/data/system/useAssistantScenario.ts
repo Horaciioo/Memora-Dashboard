@@ -8,6 +8,7 @@ import { CANDIDATE_SCENARIO } from '@/core/lib/assistant/scenarios/candidate'
 import { IDENTITY_SCENARIO } from '@/core/lib/assistant/scenarios/identity'
 import { JUNIOR_SCENARIO } from '@/core/lib/assistant/scenarios/junior'
 import { LIVE_SCENARIO } from '@/core/lib/assistant/scenarios/live'
+import { POINT_SCENARIO } from '@/core/lib/assistant/scenarios/point'
 import { RECAP_SCENARIO } from '@/core/lib/assistant/scenarios/recap'
 import { TASK_SCENARIO } from '@/core/lib/assistant/scenarios/task'
 import { RECRUITMENT_SCENARIO } from '@/core/lib/assistant/scenarios/recruitment'
@@ -46,6 +47,7 @@ const SCENARIOS: Record<ScenarioId, Scenario> = {
   identity: IDENTITY_SCENARIO,
   live: LIVE_SCENARIO,
   recap: RECAP_SCENARIO,
+  point: POINT_SCENARIO,
 }
 
 export type { ScenarioId }

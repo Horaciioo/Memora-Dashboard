@@ -10,7 +10,9 @@ import { looksLikeCommand } from '@/core/lib/assistant/parse'
 import { useDebouncedValue } from '@/core/hooks/interaction/state/useDebouncedValue'
 import { useAssistantStore } from '@/core/store/assistant'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
+import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { AssistantProposal } from '@/types/assistant'
+import { Permissions } from '@/utils/constants/permissions'
 
 /**
  * Preview state
@@ -34,12 +36,15 @@ interface AssistantPreview {
 
 export const useAssistantPreview = (term: string): AssistantPreview => {
   const pathname = usePathname()
+  const { can } = useAuthContext()
+  // The route refuses members outside the allow list
+  const isAllowed = can(Permissions.IntelligenceUse)
   const memory = useAssistantStore((state) => state.memory)
   const text = term.trim()
   const settled = useDebouncedValue(text, ASSISTANT_SETTINGS.debounceMs)
 
   // Parsed locally first, resolved by the server
-  const isCommand = looksLikeCommand(text)
+  const isCommand = isAllowed && looksLikeCommand(text)
   const { data, isFetching } = useQuery({
     queryKey: QUERY_KEYS.assistant(settled, pathname),
     queryFn: () =>
@@ -49,7 +54,7 @@ export const useAssistantPreview = (term: string): AssistantPreview => {
         memory,
         filled: {},
       }),
-    enabled: looksLikeCommand(settled),
+    enabled: isAllowed && looksLikeCommand(settled),
     placeholderData: keepPreviousData,
     retry: false,
   })

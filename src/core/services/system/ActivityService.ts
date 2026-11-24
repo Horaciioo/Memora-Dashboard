@@ -96,7 +96,7 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
   await prisma.activityLog.create({
     data: {
       eventType: EVENT_TYPES.ids[input.eventType],
-      origin: EVENT_ORIGINS.ids[input.origin ?? 'User'],
+      origin: EVENT_ORIGINS.ids[input.origin ?? (origin.byAssistant ? 'Assistant' : 'User')],
       level: LOG_LEVELS.ids[level],
       ip: origin.ip,
       userAgent: origin.userAgent,

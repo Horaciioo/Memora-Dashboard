@@ -25,5 +25,30 @@
   "bubbleOpenMs": 450,
   "bubbleStaySeconds": 45,
   "bubbleReloadMs": 4000,
-  "closeSeconds": 10
+  "closeSeconds": 10,
+  "undoSeconds": 10,
+  "pointLines": 6,
+  "statsMaxDays": 366,
+  "memoryTurns": 3,
+  "maxBatch": 20,
+  "scores": {
+    "phrase": 50,
+    "noun": 40,
+    "weak": 25,
+    "verb": 25,
+    "companion": 20,
+    "onScreen": 15,
+    "namedPage": 20,
+    "typo": 5,
+    "floor": 20,
+    "margin": 15
+  },
+  "chat": {
+    "phrase": 60,
+    "group": 50,
+    "word": 40,
+    "floor": 40,
+    "shortWords": 2,
+    "nextShown": 3
+  }
 }

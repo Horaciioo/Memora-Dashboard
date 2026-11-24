@@ -243,7 +243,11 @@ export const toggleReaction = async (input: {
 }): Promise<void> => {
   const { liveId, session } = input
   const emoji = typeof input.emoji === 'string' ? input.emoji.trim() : ''
-  if (typeof input.messageId !== 'string' || !emoji || emoji.length > LIVE_SETTINGS.teamChatEmojiMax) {
+  if (
+    typeof input.messageId !== 'string' ||
+    !emoji ||
+    emoji.length > LIVE_SETTINGS.teamChatEmojiMax
+  ) {
     throw invalidInput([{ field: 'emoji', message: FORM_COPY.required }])
   }
 

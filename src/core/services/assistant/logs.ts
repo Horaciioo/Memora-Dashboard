@@ -2,7 +2,7 @@ import 'server-only'
 
 import { lookupName } from '@/core/lib/assistant/matching'
 import { goTo } from '@/core/services/assistant/navigation'
-import { refuse, slot } from '@/core/services/assistant/reply'
+import { slot } from '@/core/services/assistant/reply'
 import type { Resolver } from '@/core/services/assistant/reply'
 import { search } from '@/core/services/search/SearchService'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
@@ -12,7 +12,6 @@ import { JOURNAL_PARAMS, JOURNAL_PERIODS } from '@/declarations/system/monitorin
 import type { AssistantSlot } from '@/types/assistant'
 import type { SessionUser } from '@/types/auth'
 import { LOG_LEVELS } from '@/utils/constants/events'
-import { Permissions } from '@/utils/constants/permissions'
 
 /**
  * Account behind a typed name
@@ -42,9 +41,7 @@ const findActor = async (
  * @return {Promise<AssistantProposal>} - Proposal
  */
 
-export const resolveLogs: Resolver = async ({ parsed, session, access }) => {
-  if (!access.can(Permissions.AccessManage)) return refuse('filterLogs')
-
+export const resolveLogs: Resolver = async ({ parsed, session }) => {
   const params = new URLSearchParams()
   const slots: AssistantSlot[] = []
 

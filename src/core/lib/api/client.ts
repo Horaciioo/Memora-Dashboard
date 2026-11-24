@@ -147,6 +147,27 @@ export const apiDelete = <T>(path: string, body?: unknown): Promise<T> =>
   })
 
 /**
+ * Send a request built elsewhere
+ * @param {string} method - HTTP verb
+ * @param {string} path - API path
+ * @param {unknown} [body] - Payload to send
+ * @param {Record<string, string>} [headers] - Extra headers
+ * @return {Promise<T>} - Payload
+ */
+
+export const apiSend = <T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  headers?: Record<string, string>
+): Promise<T> =>
+  request<T>(path, {
+    method,
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    headers,
+  })
+
+/**
  * Upload a file
  * @param {string} path - API path
  * @param {FormData} form - Multipart payload

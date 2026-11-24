@@ -128,6 +128,7 @@ export const EVENT_ORIGINS = createEnumeration({
   System: { id: 1, label: 'Système' },
   Automation: { id: 2, label: 'Automatisation' },
   Scheduler: { id: 3, label: 'Planificateur' },
+  Assistant: { id: 4, label: 'Memora' },
 })
 
 export type EventOriginName = keyof typeof EVENT_ORIGINS.ids

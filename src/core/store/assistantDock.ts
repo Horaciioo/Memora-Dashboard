@@ -7,6 +7,7 @@ import { ASSISTANT_GREETINGS } from '@/declarations/assistant/copy'
 import type { AssistantHello } from '@/declarations/assistant/copy'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { instantToWall } from '@/utils/format/time/zone'
+import type { AssistantElement } from '@/types/assistant'
 import type { ScenarioId } from '@/types/scenario'
 import type { AssistantOffer } from '@/declarations/assistant/offers'
 import { SECOND_MS } from '@/utils/constants/time'
@@ -43,12 +44,14 @@ export interface DockAction {
  * @property {ScenarioId} scenario - Guided talk
  * @property {string} entry - Way in
  * @property {Record<string, string>} data - What the page already knows
+ * @property {AssistantElement} [element] - Record the page is about
  */
 
 export interface DockFocus {
   scenario: ScenarioId
   entry: string
   data: Record<string, string>
+  element?: AssistantElement
 }
 
 interface Handoff {

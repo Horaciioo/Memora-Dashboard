@@ -3,7 +3,7 @@ import 'server-only'
 import { resolveReference } from '@/core/lib/assistant/context'
 import { lookupName } from '@/core/lib/assistant/matching'
 import { goTo, openListPage } from '@/core/services/assistant/navigation'
-import { fill, missing, propose, refuse } from '@/core/services/assistant/reply'
+import { fill, missing, propose } from '@/core/services/assistant/reply'
 import type { Resolver, ResolverContext } from '@/core/services/assistant/reply'
 import { listOpenLives, listPastLives } from '@/core/services/lives/LiveService'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
@@ -11,7 +11,6 @@ import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { ROUTES } from '@/declarations/navigation'
 import type { AssistantProposal } from '@/types/assistant'
 import type { LiveView } from '@/types/lives'
-import { Permissions } from '@/utils/constants/permissions'
 
 /**
  * Lives worth reading
@@ -75,10 +74,9 @@ const pickLive = async (
  */
 
 export const resolveLive: Resolver = async (context) => {
-  const { parsed, access } = context
+  const { parsed } = context
   const intent = parsed.intent!
   const isReport = intent === 'liveReport'
-  if (!access.can(Permissions.LiveRead)) return refuse(intent)
 
   // A bare word opens the list
   const isBare =

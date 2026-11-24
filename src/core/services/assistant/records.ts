@@ -8,7 +8,7 @@ import type { Resolver, ResolverContext } from '@/core/services/assistant/reply'
 import { search } from '@/core/services/search/SearchService'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
-import type { AssistantIntentName } from '@/declarations/assistant/lexicon'
+import type { AssistantIntentName } from '@/declarations/assistant/domains'
 import { ROUTES } from '@/declarations/navigation'
 import type { SearchGroup } from '@/declarations/ui/copy/navigation'
 import type { AssistantEntityKind, AssistantProposal } from '@/types/assistant'
@@ -23,23 +23,34 @@ import type { SearchHit } from '@/types/search'
  * @property {(id: string) => string} detail - Detail page
  */
 
-interface RecordFamily {
+export interface RecordFamily {
   kind: AssistantEntityKind
   group: SearchGroup
   list: string
   detail: (id: string) => string
 }
 
-// Families per intent
-const FAMILIES: Partial<Record<AssistantIntentName, RecordFamily>> = {
-  findMember: { kind: 'member', group: 'members', list: ROUTES.members, detail: ROUTES.member },
-  openTask: { kind: 'task', group: 'tasks', list: ROUTES.tasks, detail: ROUTES.task },
-  openProject: {
+// Searchable families per kind
+export const FAMILIES: Partial<Record<AssistantEntityKind, RecordFamily>> = {
+  member: { kind: 'member', group: 'members', list: ROUTES.members, detail: ROUTES.member },
+  task: { kind: 'task', group: 'tasks', list: ROUTES.tasks, detail: ROUTES.task },
+  meeting: { kind: 'meeting', group: 'meetings', list: ROUTES.meetings, detail: ROUTES.meeting },
+  page: { kind: 'page', group: 'pages', list: ROUTES.pages, detail: ROUTES.page },
+  project: {
     kind: 'project',
     group: 'projects',
     list: ROUTES.projects,
     detail: ROUTES.project,
   },
+}
+
+// Family each opening intent looks in
+const INTENT_KINDS: Partial<Record<AssistantIntentName, AssistantEntityKind>> = {
+  findMember: 'member',
+  openTask: 'task',
+  openProject: 'project',
+  openMeeting: 'meeting',
+  openPage: 'page',
 }
 
 // Shortest stem tried
@@ -107,6 +118,42 @@ const openHit = (
   })
 
 /**
+ * Pick the record a name points at, or ask which
+ * @param {ResolverContext} context - Resolver context
+ * @param {AssistantIntentName} intent - Recognised intent
+ * @param {RecordFamily} family - Searched family
+ * @return {Promise<{ hit: SearchHit } | { proposal: AssistantProposal }>} - Hit or question
+ */
+
+export const pickRecord = async (
+  context: ResolverContext,
+  intent: AssistantIntentName,
+  family: RecordFamily
+): Promise<{ hit: SearchHit } | { proposal: AssistantProposal }> => {
+  const { parsed, request } = context
+  const hits = await findCandidates(parsed.subject, family, context)
+  const picked = hits.find((hit) => hit.id === request.filled[family.kind])
+  if (picked) return { hit: picked }
+
+  const found = lookupName(
+    parsed.subject,
+    hits.map((hit) => ({ ...hit, value: hit.id })),
+    ASSISTANT_SETTINGS.maxChoices
+  )
+  if (found.kind === 'none') return { proposal: missing(intent, parsed.subject) }
+  if (found.kind === 'one') return { hit: found.match }
+
+  return {
+    proposal: askChoice({
+      intent,
+      slotKey: family.kind,
+      reply: fill(ASSISTANT_COPY.pickOne, { name: parsed.subject }),
+      choices: found.matches.map(({ id, label, hint }) => ({ value: id, label, hint })),
+    }),
+  }
+}
+
+/**
  * Open a named record
  * @param {ResolverContext} context - Resolver context
  * @return {Promise<AssistantProposal>} - Proposal
@@ -115,7 +162,7 @@ const openHit = (
 export const resolveRecord: Resolver = async (context) => {
   const { parsed, request, page } = context
   const intent = parsed.intent!
-  const family = FAMILIES[intent]!
+  const family = FAMILIES[INTENT_KINDS[intent]!]!
 
   // Pointing word or bare list
   if (!parsed.subject) {
@@ -133,22 +180,7 @@ export const resolveRecord: Resolver = async (context) => {
     })
   }
 
-  const hits = await findCandidates(parsed.subject, family, context)
-  const picked = hits.find((hit) => hit.id === request.filled[family.kind])
-  if (picked) return openHit(intent, family, picked)
+  const found = await pickRecord(context, intent, family)
 
-  const found = lookupName(
-    parsed.subject,
-    hits.map((hit) => ({ ...hit, value: hit.id })),
-    ASSISTANT_SETTINGS.maxChoices
-  )
-  if (found.kind === 'none') return missing(intent, parsed.subject)
-  if (found.kind === 'one') return openHit(intent, family, found.match)
-
-  return askChoice({
-    intent,
-    slotKey: family.kind,
-    reply: fill(ASSISTANT_COPY.pickOne, { name: parsed.subject }),
-    choices: found.matches.map(({ id, label, hint }) => ({ value: id, label, hint })),
-  })
+  return 'proposal' in found ? found.proposal : openHit(intent, family, found.hit)
 }

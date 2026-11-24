@@ -1,11 +1,15 @@
-import type { AssistantIntentName } from '@/declarations/assistant/lexicon'
+import type { AssistantIntentName } from '@/declarations/assistant/domains'
+import type { GestureId } from '@/declarations/assistant/gestures'
+import type { RecapChapterName } from '@/declarations/recap/chapters'
+import type { ScenarioLink } from '@/types/scenario'
 
 /**
  * Resource the assistant can point at
  * @type {'member' | 'task' | 'project' | 'live'}
  */
 
-export type AssistantEntityKind = 'member' | 'task' | 'project' | 'live'
+export type AssistantEntityKind =
+  'member' | 'task' | 'project' | 'live' | 'absence' | 'meeting' | 'page' | 'unban'
 
 /**
  * One resource already named
@@ -27,10 +31,26 @@ export interface AssistantReference {
 export type AssistantMemory = Partial<Record<AssistantEntityKind, AssistantReference>>
 
 /**
+ * Record the page on screen is about
+ * @typedef {Object} AssistantElement
+ * @property {string} kind - Record kind, the guided talk it opens
+ * @property {string} id - Record identifier
+ * @property {string} label - Display name
+ */
+
+export interface AssistantElement {
+  kind: string
+  id: string
+  label: string
+}
+
+/**
  * What the palette sends
  * @typedef {Object} AssistantRequest
  * @property {string} text - Typed sentence
  * @property {string} pathname - Page on screen
+ * @property {string} tab - Tab open on that page
+ * @property {AssistantElement | null} element - Record the page declared
  * @property {AssistantMemory} memory - Earlier references
  * @property {Record<string, string>} filled - Answered slots
  */
@@ -38,6 +58,8 @@ export type AssistantMemory = Partial<Record<AssistantEntityKind, AssistantRefer
 export interface AssistantRequest {
   text: string
   pathname: string
+  tab: string
+  element: AssistantElement | null
   memory: AssistantMemory
   filled: Record<string, string>
 }
@@ -108,13 +130,77 @@ export interface AssistantScenarioStart {
 }
 
 /**
+ * One line Memora says, already written, with the page it points at
+ * @typedef {Object} AssistantSayLine
+ * @property {string} text - Sentence, names between « »
+ * @property {ScenarioLink} [link] - Page the line points at
+ * @property {RecapChapterName} [section] - Subject of the point the line belongs to
+ */
+
+export interface AssistantSayLine {
+  text: string
+  link?: ScenarioLink
+  section?: RecapChapterName
+}
+
+/**
+ * How much a gesture can hurt, it sets the confirmation
+ * @type {'light' | 'medium' | 'strong'}
+ */
+
+export type AssistantRisk = 'light' | 'medium' | 'strong'
+
+/**
+ * Request a gesture sends to an existing route
+ * @typedef {Object} AssistantCall
+ * @property {'POST' | 'PATCH' | 'DELETE'} method - HTTP verb
+ * @property {string} path - API path
+ * @property {Record<string, unknown>} [body] - Payload
+ */
+
+export interface AssistantCall {
+  method: 'POST' | 'PATCH' | 'DELETE'
+  path: string
+  body?: Record<string, unknown>
+}
+
+/**
+ * Gesture Memora does in the member's place
+ * @typedef {Object} AssistantGestureAction
+ * @property {'act'} kind - Action kind
+ * @property {GestureId} gesture - Registry entry
+ * @property {AssistantRisk} risk - Confirmation level
+ * @property {AssistantCall} call - Request to send
+ * @property {AssistantCall | null} undo - Request that takes it back
+ * @property {AssistantCall[]} batch - Series run one by one, empty for a single gesture
+ * @property {string} confirmLabel - Button that runs it
+ * @property {string} done - Sentence once done
+ * @property {string | null} sure - Second question of a strong gesture
+ * @property {AssistantEntityKind | null} remember - Kind the answer names
+ */
+
+export interface AssistantGestureAction {
+  kind: 'act'
+  gesture: GestureId
+  risk: AssistantRisk
+  call: AssistantCall
+  undo: AssistantCall | null
+  batch: AssistantCall[]
+  confirmLabel: string
+  done: string
+  sure: string | null
+  remember: AssistantEntityKind | null
+}
+
+/**
  * Action ready to run
- * @type {{ kind: 'navigate', href: string } | { kind: 'createTask', values: Record<string, string> } | AssistantScenarioStart}
+ * @type {{ kind: 'navigate', href: string } | { kind: 'say', lines: AssistantSayLine[], walk?: boolean } | AssistantGestureAction | AssistantScenarioStart}
  */
 
 export type AssistantAction =
   | { kind: 'navigate'; href: string }
-  | { kind: 'createTask'; values: Record<string, string> }
+  | { kind: 'say'; lines: AssistantSayLine[]; walk?: boolean }
+  | AssistantGestureAction
   | AssistantScenarioStart
 
 /**
@@ -134,7 +220,7 @@ export type AssistantStatus = 'ready' | 'question' | 'unknown' | 'denied' | 'not
  * @property {AssistantQuestion | null} question - Missing answer
  * @property {AssistantAction | null} action - Runnable action
  * @property {boolean} confirm - Needs a yes
- * @property {string[]} suggestions - Example sentences
+ * @property {string[]} suggestions - Answers the member can click
  * @property {AssistantMemory} memory - References to keep
  */
 

@@ -30,6 +30,7 @@ export const NAV_COPY = {
   notifications: 'Notifications',
   searchPlaceholder: 'Effectue une recherche...',
   searchShortcut: '⌘ K',
+  chatShortcut: '⌘ J',
   searchTitle: 'Recherche',
   searchEmpty: 'Rien ne correspond à cette recherche.',
   preferences: 'Paramètres',

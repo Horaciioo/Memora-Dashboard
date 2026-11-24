@@ -14,10 +14,7 @@ export const LIVE_VARIANTS = {
     'Tu as été positionné sur {title}, tu es présent ?',
     'On compte sur toi pour {title}, tu seras là ?',
   ],
-  until: [
-    'D’accord ! Tu seras là de quand à quand ?',
-    'Super ! Confirme-moi tes horaires.',
-  ],
+  until: ['D’accord ! Tu seras là de quand à quand ?', 'Super ! Confirme-moi tes horaires.'],
   undecided: [
     'Pas de souci, prends ton temps. Je te reposerai la question un peu plus tard.',
     'D’accord, tu me diras quand tu sauras, je te redemande plus tard.',

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { EmptyAsk } from '@/components/elements/feedback/EmptyAsk'
 import { ILLUSTRATIONS, type IllustrationName } from '@/declarations/ui/illustrations'
 import { EMPTY_STATE_STYLES } from '@/declarations/ui/variants'
 import { EMPTY_COPY } from '@/declarations/ui/copy/empty'
@@ -66,6 +67,7 @@ export const EmptyState = ({
         <p className="max-w-sm text-sm text-[var(--color-ink-subtle)]">{resolvedDescription}</p>
       )}
       {action && <div className="pt-1">{action}</div>}
+      {variant === 'start' && !compact && <EmptyAsk />}
     </div>
   )
 }

@@ -20,7 +20,7 @@ export interface RecapAgendaProps {
  */
 
 export const RecapAgenda = ({ onPick }: RecapAgendaProps) => {
-  const { chapters, done, current } = useRecapAgenda()
+  const { chapters, done, current, isPoint } = useRecapAgenda()
   const CheckGlyph = ICONS.check
   if (chapters.length === 0) return null
 
@@ -36,6 +36,7 @@ export const RecapAgenda = ({ onPick }: RecapAgendaProps) => {
               <button
                 type="button"
                 aria-current={current === chapter || undefined}
+                disabled={isPoint}
                 onClick={() => onPick(chapter)}
                 className={cn(
                   INTELLIGENCE_STYLES.agendaItem,

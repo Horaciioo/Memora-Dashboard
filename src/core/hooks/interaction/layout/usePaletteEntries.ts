@@ -6,17 +6,20 @@ import { usePageTree } from '@/core/hooks/data/pages'
 import { useVisitedPaths } from '@/core/hooks/interaction/state/saved/useVisitedPaths'
 import { pathLine } from '@/core/lib/favorites/lines'
 import type { FavoriteLine } from '@/core/lib/favorites/lines'
+import { examplesFor } from '@/declarations/assistant/domains'
 import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import type { AssistantOffer } from '@/declarations/assistant/offers'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { SEARCH_SETTINGS } from '@/declarations/configurations/settings'
 import { NavigationViews, visibleNavGroups } from '@/declarations/navigation'
 import type { NavigationItem } from '@/declarations/navigation'
+import { Permissions } from '@/utils/constants/permissions'
 import { useFeatures } from '@/managers/front-end/FeaturesManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 
 export interface PaletteEntries {
   asks: { offer: AssistantOffer; icon: NavigationItem['icon'] }[]
+  tries: string[]
   shortcuts: NavigationItem[]
   recents: FavoriteLine[]
 }
@@ -53,6 +56,9 @@ export const usePaletteEntries = (): PaletteEntries => {
   return {
     recents,
     asks: asks.slice(0, ASSISTANT_SETTINGS.paletteAsks),
+    tries: can(Permissions.IntelligenceUse)
+      ? examplesFor(pathname, can).slice(0, ASSISTANT_SETTINGS.paletteAsks)
+      : [],
     shortcuts: items.filter((item) => item.quick),
   }
 }

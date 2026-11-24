@@ -70,11 +70,7 @@ export const useActionRunner = (onAct: ActRunner, confirmHarsh: boolean) => {
       onClose={() => setAsked(null)}
     >
       {asked.action.kind === 'warn' && asked.target.messageId && (
-        <Toggle
-          checked={alsoDelete}
-          onChange={setAlsoDelete}
-          label={MODVIEW_COPY.warnDeleteToo}
-        />
+        <Toggle checked={alsoDelete} onChange={setAlsoDelete} label={MODVIEW_COPY.warnDeleteToo} />
       )}
     </ReasonDialog>
   )
