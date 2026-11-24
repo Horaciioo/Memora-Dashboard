@@ -4,14 +4,14 @@ import { LIVE_HUB_COPY, LIVE_HUB_FIGURE_ICONS } from '@/declarations/lives/hub'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_HUB_STYLES } from '@/declarations/ui/variants'
 import type { LiveHubFigure } from '@/types/lives'
-import { roughDuration } from '@/utils/format/time/hours'
+import { minutesDuration } from '@/utils/format/time/hours'
 
 // Figure said as the card prints it
 const say = (figure: LiveHubFigure): string =>
   figure.key === 'time'
     ? figure.value === 0
       ? '0 min'
-      : roughDuration(figure.value / 60)
+      : minutesDuration(figure.value)
     : String(figure.value)
 
 /**

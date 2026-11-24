@@ -182,6 +182,22 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.IntelligenceUse,
         text: 'Amélioration de « Memora Intelligence » : des suggestions adaptées à la page ouverte apparaissent dans la recherche, ouverte aussi avec Cmd J.',
       },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des « Notifications » : une notification non lue depuis plus de 24 heures compte comme lue, et la cloche indique combien il t’en reste à lire.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction du temps de modération affiché dans « Lives », qui s’arrêtait à une seule tranche et s’arrondissait au quart d’heure.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un stream qui créait un second live au lieu de reprendre celui déjà prévu par les responsables.',
+      },
     ],
   },
   {

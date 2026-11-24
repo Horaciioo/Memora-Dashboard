@@ -1,12 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { Pagination } from '@/components/elements/navigation/Pagination'
 import { Section } from '@/components/structures/page/Section'
 import { NotificationsList } from '@/composites/notifications/NotificationsList'
+import { apiPatch } from '@/core/lib/api/client'
+import { API_ROUTES } from '@/core/lib/api/routes'
+import { useNotificationsStore } from '@/core/store/notifications'
 import { useNotificationFeed } from '@/core/hooks/data/system/useNotificationFeed'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
@@ -28,6 +31,15 @@ export const NotificationsBoard = ({ feed }: NotificationsBoardProps) => {
     useNotificationFeed(feed)
   const [onlyUnread, setOnlyUnread] = useState(false)
   const [requestedPage, setRequestedPage] = useState(1)
+
+  // Landing here is seeing everything, rows keep their mark for this visit only
+  useEffect(() => {
+    if (feed.unread === 0) return
+
+    useNotificationsStore.getState().clearBadge()
+    void apiPatch(API_ROUTES.notifications(), {}).catch(() => undefined)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const matching = onlyUnread ? entries.filter((entry) => !entry.isRead) : entries
   const listSize = NOTIFICATION_SETTINGS.listSize

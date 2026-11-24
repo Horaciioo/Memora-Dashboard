@@ -11,6 +11,7 @@ import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService/sha
 import { LEAVE_PROOF_KINDS, NOTIFICATION_KINDS } from '@/utils/constants/notifications'
 import type { NotificationKindName } from '@/utils/constants/notifications'
 import { toEntry } from '@/core/lib/notifications/entry'
+import { stillUnread } from '@/core/lib/notifications/expiry'
 import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
 import type { Prisma } from '@prisma/client'
 import type { MentionMark } from '@/types/mentions'
@@ -179,7 +180,7 @@ export const notifyMentions = async (
  */
 
 export const countUnread = (accountId: string): Promise<number> =>
-  prisma.notification.count({ where: { recipientId: accountId, readAt: null } })
+  prisma.notification.count({ where: { recipientId: accountId, ...stillUnread() } })
 
 /**
  * Read one page of notifications and its badge in a single round trip
@@ -203,7 +204,7 @@ export const readNotifications = async (
       take: take + 1,
       ...(before ? { cursor: { id: before }, skip: 1 } : {}),
     }),
-    prisma.notification.count({ where: { recipientId: accountId, readAt: null } }),
+    prisma.notification.count({ where: { recipientId: accountId, ...stillUnread() } }),
   ])
 
   return { entries: rows.slice(0, take).map(toEntry), unread, hasMore: rows.length > take }
@@ -253,7 +254,7 @@ export const unreadMentions = async (
       recipientId: accountId,
       kind: NOTIFICATION_KINDS.ids.Mentioned,
       ...(target ? { targetType: target } : {}),
-      readAt: null,
+      ...stillUnread(),
     },
     include: { actor: { select: { displayName: true, avatarUrl: true } } },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
@@ -274,7 +275,7 @@ export const unreadReports = async (accountId: string): Promise<NotificationEntr
       recipientId: accountId,
       kind: NOTIFICATION_KINDS.ids.LiveReportReady,
       targetType: 'liveReport',
-      readAt: null,
+      ...stillUnread(),
     },
     include: { actor: { select: { displayName: true, avatarUrl: true } } },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],

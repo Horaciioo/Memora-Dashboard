@@ -32,12 +32,12 @@ export interface LiveHistoryFigures {
 
 /**
  * Recent Live figures
- * @param {Pick<MemberLiveSummary, 'kinds' | 'activeSeconds'>[]} lives - Moderated lives
+ * @param {Pick<MemberLiveSummary, 'kinds' | 'activeSeconds' | 'span'>[]} lives - Moderated lives
  * @return {LiveHistoryFigures} - Aggregated figures
  */
 
 export const historyFiguresOf = (
-  lives: Pick<MemberLiveSummary, 'kinds' | 'activeSeconds'>[]
+  lives: Pick<MemberLiveSummary, 'kinds' | 'activeSeconds' | 'span'>[]
 ): LiveHistoryFigures =>
   lives.reduce(
     (figures, live) => {
@@ -47,7 +47,8 @@ export const historyFiguresOf = (
       return {
         sanctions: figures.sanctions + gestures - messages,
         messages: figures.messages + messages,
-        time: figures.time + live.activeSeconds,
+        // Moderation time is the stretches, gestures included, never the Mod View alone
+        time: figures.time + (live.span?.seconds ?? live.activeSeconds),
       }
     },
     { sanctions: 0, messages: 0, time: 0 }

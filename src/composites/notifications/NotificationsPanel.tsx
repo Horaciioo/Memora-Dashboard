@@ -65,7 +65,9 @@ export const NotificationsPanel = ({
         <BellIcon className={RAIL_POPOVER.headGlyph} aria-hidden="true" />
         <p className={RAIL_POPOVER.headTitle}>{NOTIFICATION_COPY.title}</p>
         <p className={RAIL_POPOVER.headMeta}>
-          {unread > 0 ? NOTIFICATION_COPY.metaUnread : NOTIFICATION_COPY.metaRead}
+          {unread > 0
+            ? NOTIFICATION_COPY.metaCount.replace('{count}', String(unread))
+            : NOTIFICATION_COPY.metaRead}
         </p>
         {unread > 0 && (
           <Button

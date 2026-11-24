@@ -1,4 +1,4 @@
-import { HOUR_MS } from '@/utils/constants/time'
+import { HOUR_MS, MINUTE_SECONDS } from '@/utils/constants/time'
 import { toDateTimeInput } from '@/utils/format/time/dates'
 import { wallToInstant } from '@/utils/format/time/zone'
 
@@ -45,6 +45,9 @@ export const hoursPayload = (hours: HoursInput): { from: string; to: string } | 
     ? { from: wallToInstant(hours.from).toISOString(), to: wallToInstant(hours.to).toISOString() }
     : undefined
 
+// Minutes in an hour
+const MINUTES_PER_HOUR = 60
+
 // Length rounded to the nearest quarter hour
 const QUARTER_HOUR = 15
 
@@ -58,6 +61,22 @@ export const roughDuration = (minutes: number): string => {
   const rounded = Math.max(QUARTER_HOUR, Math.round(minutes / QUARTER_HOUR) * QUARTER_HOUR)
   const hours = Math.floor(rounded / 60)
   const rest = rounded % 60
+
+  if (hours === 0) return `${rest} min`
+
+  return rest === 0 ? `${hours}h` : `${hours}h${String(rest).padStart(2, '0')}`
+}
+
+/**
+ * Moderation time said to the minute, never rounded up to a quarter hour
+ * @param {number} seconds - Length in seconds
+ * @return {string} - Like 3 min, 45 min, 1h or 1h05
+ */
+
+export const minutesDuration = (seconds: number): string => {
+  const minutes = Math.max(1, Math.round(seconds / MINUTE_SECONDS))
+  const hours = Math.floor(minutes / MINUTES_PER_HOUR)
+  const rest = minutes % MINUTES_PER_HOUR
 
   if (hours === 0) return `${rest} min`
 

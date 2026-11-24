@@ -24,6 +24,7 @@ import { Permissions } from '@/utils/constants/permissions'
 import type { LiveInput } from '@/core/services/lives/LiveService/forms'
 import { conveneWithLeave } from '@/core/services/lives/LiveService/convene'
 import { assertCoordinators } from '@/core/services/lives/LiveService/coordinators'
+import { findDetectedLive, mergeEntries } from '@/core/services/lives/LiveService/adopt'
 import { readLive } from '@/core/services/lives/LiveService/reads'
 
 /**
@@ -61,6 +62,32 @@ export const openLive = async ({
   await syncRoster(entry.id, memberIds)
   // Moderators on leave sit in the roll as absent, never asked
   await syncRoster(entry.id, onLeave)
+
+  // A stream Memora already opened is this live: it keeps its stats under the planned entry
+  const detected = await findDetectedLive({
+    youtuberId: input.youtuberId,
+    platform: input.platform,
+    startsAt: entry.startsAt,
+  })
+  if (detected) {
+    await mergeEntries({
+      liveId: detected.id,
+      keepId: entry.id,
+      dropId: detected.calendarEventId,
+      plan: {
+        announcedById: actorId,
+        instructions: input.instructions ?? LIVE_INSTRUCTIONS_DEFAULT,
+        plannedStartAt: entry.startsAt,
+        plannedEndAt: endsAt,
+      },
+    })
+    await prisma.liveCoordination.createMany({
+      data: input.coordinatorIds.map((accountId) => ({ liveId: detected.id, accountId })),
+      skipDuplicates: true,
+    })
+
+    return detected.id
+  }
 
   const live = await prisma.live.create({
     data: {

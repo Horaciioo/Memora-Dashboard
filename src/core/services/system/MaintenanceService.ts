@@ -2,6 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { logger } from '@/core/lib/logger'
+import { expiryHorizon } from '@/core/lib/notifications/expiry'
 import { pruneSessions } from '@/core/services/auth/SessionService'
 import { purgeChatMessages } from '@/core/services/lives/ChatHistoryService'
 import { purgeModerationLog } from '@/core/services/lives/ModerationLogService'
@@ -55,6 +56,12 @@ const horizon = (days: number): Date => new Date(Date.now() - days * DAY_MS)
  */
 
 const pruneNotifications = async (): Promise<number> => {
+  // Unread ones past their window count as read, then follow the read retention
+  await prisma.notification.updateMany({
+    where: { readAt: null, createdAt: { lt: expiryHorizon() } },
+    data: { readAt: new Date() },
+  })
+
   const { count } = await prisma.notification.deleteMany({
     where: { readAt: { not: null, lt: horizon(RETENTION_POLICIES.readNotifications) } },
   })

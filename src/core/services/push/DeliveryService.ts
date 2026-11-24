@@ -6,6 +6,7 @@ import { prisma } from '@/core/lib/db'
 import { logger } from '@/core/lib/logger'
 import { toEntry } from '@/core/lib/notifications/entry'
 import type { NotificationRow } from '@/core/lib/notifications/entry'
+import { stillUnread } from '@/core/lib/notifications/expiry'
 import { buildPushPayload, pushOutcomeOf } from '@/core/lib/push'
 import type { PushOutcome } from '@/core/lib/push'
 import { sendPush } from '@/core/services/push/transport'
@@ -138,7 +139,7 @@ const attempt = async ({
 const unreadCounts = async (accountIds: string[]): Promise<Map<string, number>> => {
   const rows = await prisma.notification.groupBy({
     by: ['recipientId'],
-    where: { recipientId: { in: accountIds }, readAt: null },
+    where: { recipientId: { in: accountIds }, ...stillUnread() },
     _count: { _all: true },
   })
 

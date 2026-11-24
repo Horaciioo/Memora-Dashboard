@@ -86,7 +86,10 @@ for (const signal of ['SIGTERM', 'SIGINT']) {
   process.once(signal, () => {
     globalThis.memoraRealtime?.close()
     // Games kept in memory are saved before the exit
-    Promise.resolve(globalThis.concordatFlush?.())
+    // The watching lease goes to the next instance at once
+    Promise.resolve(globalThis.liveWatcherRelease?.())
+      .catch(() => {})
+      .then(() => globalThis.concordatFlush?.())
       .catch(() => {})
       .finally(() => server.close(() => process.exit(0)))
     setTimeout(() => process.exit(0), HUB_WAIT_MS).unref()
