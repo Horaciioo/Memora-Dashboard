@@ -7,7 +7,8 @@ export const INTELLIGENCE_STYLES = {
   // Phone: the greeting sits on top, the composer is pinned above the dock like Claude's app
   page: 'mx-auto flex w-full max-w-3xl md:max-w-4xl has-[[data-talking]]:max-w-[88rem] flex-col gap-10 pt-4 pb-6 has-[[data-talking]]:md:gap-0 has-[[data-talking]]:md:pt-4 has-[[data-talking]]:md:pb-4 md:gap-12 md:pt-12 md:pb-16',
   // Conversation written on the page itself, scrolls inside so the composer stays in sight
-  thread: 'min-h-0 w-full flex-1 overflow-y-auto overscroll-contain lg:col-start-2 lg:row-start-1',
+  thread:
+    'min-h-0 w-full flex-1 overflow-y-auto overscroll-contain pt-[var(--bleed,0px)] lg:col-start-2 lg:row-start-1',
   // Talking: the page keeps the window's height, only the thread scrolls, the chat sits in the middle
   heroChat:
     'h-[calc(100dvh-14rem)] items-stretch gap-4 lg:grid lg:grid-cols-[14rem_minmax(0,1fr)_14rem] lg:grid-rows-[minmax(0,1fr)_auto] lg:gap-x-8',
@@ -17,7 +18,7 @@ export const INTELLIGENCE_STYLES = {
   notebooks:
     'relative z-10 flex w-full flex-col items-center border-t border-[var(--color-border)] pt-8 max-md:pb-40',
   // Beside the chat, in the space the centred thread leaves empty
-  agenda: 'hidden flex-col gap-2 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:flex lg:self-start',
+  agenda: 'hidden flex-col gap-2 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:flex lg:mt-[var(--bleed,0px)] lg:self-start',
   agendaTitle: 'px-3 text-sm font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   agendaList: 'flex flex-col gap-0.5',
   agendaItem:

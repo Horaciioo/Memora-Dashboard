@@ -23,6 +23,8 @@ export const ASSISTANT_STYLES = {
     plain: 'text-[var(--color-ink)]',
   },
   groupItems: 'flex flex-col gap-0.5 text-sm',
+  // Hyphen before each name
+  groupItem: "before:mr-2 before:text-[var(--color-ink-subtle)] before:content-['-']",
   // Window of hours the member offers
   hours: 'mt-2 flex flex-col gap-3',
   hoursField: 'flex flex-col gap-1 text-caption font-semibold text-[var(--color-ink-subtle)]',

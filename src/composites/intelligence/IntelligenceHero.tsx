@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
@@ -33,7 +34,7 @@ export const IntelligenceHero = ({ title }: IntelligenceHeroProps) => {
   const hero = useRef<HTMLDivElement>(null)
   const isTalking = chat.turns.length > 0
   // The composer ends at the window's bottom, never below it
-  const fitted = useFitHeight(hero, isTalking)
+  const fitted = useFitHeight(hero, isTalking, true)
   const tail = chat.turns.at(-1)?.text.length ?? 0
 
   // Newest line in sight
@@ -71,7 +72,11 @@ export const IntelligenceHero = ({ title }: IntelligenceHeroProps) => {
   return (
     <div
       ref={hero}
-      style={fitted ? { height: fitted } : undefined}
+      style={
+        fitted
+          ? ({ height: fitted.height, marginTop: -fitted.bleed, '--bleed': `${fitted.bleed}px` } as CSSProperties)
+          : undefined
+      }
       data-talking={isTalking || undefined}
       className={cn(INTELLIGENCE_STYLES.hero, isTalking && INTELLIGENCE_STYLES.heroChat)}
     >
