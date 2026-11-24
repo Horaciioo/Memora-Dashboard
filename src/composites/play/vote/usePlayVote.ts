@@ -35,7 +35,14 @@ export interface PlayVoteInput {
  * @return {Object} - Picks, leading card and gestures
  */
 
-export const usePlayVote = ({ vote, winner, viewerId, isHost, isSeated, onSend }: PlayVoteInput) => {
+export const usePlayVote = ({
+  vote,
+  winner,
+  viewerId,
+  isHost,
+  isSeated,
+  onSend,
+}: PlayVoteInput) => {
   // Own pick, shown before the server answers
   const [mine, setMine] = useState<{ step: string; key: string } | null>(null)
   const timers = useRef<number[]>([])

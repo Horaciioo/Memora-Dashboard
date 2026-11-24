@@ -33,7 +33,8 @@ export const INTELLIGENCE_STYLES = {
   dockWrap:
     'max-md:fixed max-md:inset-x-0 max-md:bottom-[calc(var(--shell-dock-clearance,0px)+0.5rem)] max-md:z-30 max-md:flex max-md:flex-col max-md:gap-2 max-md:px-3 md:flex md:w-full md:flex-col md:gap-2 lg:col-start-2 lg:row-start-2',
   // Small italic notice above the composer
-  notice: 'mx-auto w-full max-w-3xl md:max-w-4xl px-1 text-xs italic leading-snug text-[var(--color-ink-subtle)]',
+  notice:
+    'mx-auto w-full max-w-3xl md:max-w-4xl px-1 text-xs italic leading-snug text-[var(--color-ink-subtle)]',
   composer:
     'mx-auto flex w-full max-w-3xl md:max-w-4xl items-end gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 pr-2 pl-4 shadow-[var(--shadow-sm)] transition-shadow focus-within:shadow-[var(--shadow-md)]',
   // No border, no ring: the box around it is the field

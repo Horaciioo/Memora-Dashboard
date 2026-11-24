@@ -80,7 +80,8 @@ const TeamMember = ({
   )
   const isFollowed = tools.followingId === member.id
   const isFresh =
-    arrivedAt !== null && now - new Date(arrivedAt).getTime() < LIVE_SETTINGS.arrivalFreshMinutes * MINUTE_MS
+    arrivedAt !== null &&
+    now - new Date(arrivedAt).getTime() < LIVE_SETTINGS.arrivalFreshMinutes * MINUTE_MS
 
   return (
     <button
