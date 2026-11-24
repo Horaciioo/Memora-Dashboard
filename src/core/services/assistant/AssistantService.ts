@@ -6,6 +6,8 @@ import { parseCommand } from '@/core/lib/assistant/parse'
 import { resolveAbsence } from '@/core/services/assistant/absences'
 import { resolveDayPoint, resolveWeekPoint } from '@/core/services/assistant/point'
 import { resolveGesture } from '@/core/services/assistant/gestures'
+import { resolveWhy } from '@/core/services/assistant/access'
+import { resolveWhatsNew } from '@/core/services/assistant/news'
 import { resolveCapabilities, resolveGuide, resolveWhere } from '@/core/services/assistant/help'
 import { resolveLive } from '@/core/services/assistant/lives'
 import { resolveLogs } from '@/core/services/assistant/logs'
@@ -42,6 +44,8 @@ const RESOLVERS: Record<AssistantIntentName, Resolver> = {
   howTo: resolveGuide,
   define: resolveGuide,
   whereIs: resolveWhere,
+  whyNot: resolveWhy,
+  whatsNew: resolveWhatsNew,
   navigate: resolveNavigation,
 }
 
