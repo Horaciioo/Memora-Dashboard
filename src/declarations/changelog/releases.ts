@@ -127,31 +127,13 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: '0.16.0',
-    date: '2026-11-23',
-    title: 'Les lives se fiabilisent',
-    intro:
-      'Les lives s’ouvrent sur le créateur en direct, et plusieurs blocages autour des lives et des présences disparaissent.',
+    version: '0.16.1',
+    date: '2026-11-24',
+    title: 'Memora Intelligence arrive !',
+    intro: 'Memora sait désormais te répondre, te faire le point de ta journée et agir à ta place.',
     description:
-      'Des lives restaient annoncés sans jamais démarrer, la création d’un live échouait parfois, et les horaires de présence étaient bridés par la fin prévue du live. L’ouverture de « Lives » et le suivi de l’automod dans la Mod View demandaient aussi trop de gestes. Ces points sont réglés, et une première version expérimentale de Memora Intelligence fait son apparition.',
+      'Memora Intelligence se limitait à résumer une absence. Elle discute maintenant de tout ce qui fait ton quotidien dans Memora : elle retrouve une information, chiffre une période, raconte le point du jour et fait un geste après ta confirmation.',
     items: [
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.lives,
-        permission: Permissions.LiveRead,
-        text: 'Ajout de la possibilité de retrouver, dans l’historique du chat d’un spectateur, la décision de l’automod pour chacun de ses messages retenus.',
-      },
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.intelligence,
-        text: 'Ajout d’une fonctionnalité expérimentale nommée « Memora Intelligence » : Memora discute avec toi et résume ce qui s’est passé pendant une absence.',
-      },
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.whitelist,
-        permission: Permissions.ReferenceRead,
-        text: 'Ajout d’une liste blanche pour « Memora Intelligence » : les Responsables y entrent d’office, tu choisis qui d’autre peut s’en servir.',
-      },
       {
         tag: ChangelogTags.Improved,
         page: ROUTES.intelligence,
@@ -199,6 +181,34 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.intelligence,
         permission: Permissions.IntelligenceUse,
         text: 'Amélioration de « Memora Intelligence » : des suggestions adaptées à la page ouverte apparaissent dans la recherche, ouverte aussi avec Cmd J.',
+      },
+    ],
+  },
+  {
+    version: '0.16.0',
+    date: '2026-11-23',
+    title: 'Les lives se fiabilisent',
+    intro:
+      'Les lives s’ouvrent sur le créateur en direct, et plusieurs blocages autour des lives et des présences disparaissent.',
+    description:
+      'Des lives restaient annoncés sans jamais démarrer, la création d’un live échouait parfois, et les horaires de présence étaient bridés par la fin prévue du live. L’ouverture de « Lives » et le suivi de l’automod dans la Mod View demandaient aussi trop de gestes. Ces points sont réglés, et une première version expérimentale de Memora Intelligence fait son apparition.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de la possibilité de retrouver, dans l’historique du chat d’un spectateur, la décision de l’automod pour chacun de ses messages retenus.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.intelligence,
+        text: 'Ajout d’une fonctionnalité expérimentale nommée « Memora Intelligence » : Memora discute avec toi et résume ce qui s’est passé pendant une absence.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.whitelist,
+        permission: Permissions.ReferenceRead,
+        text: 'Ajout d’une liste blanche pour « Memora Intelligence » : les Responsables y entrent d’office, tu choisis qui d’autre peut s’en servir.',
       },
       {
         tag: ChangelogTags.Improved,
