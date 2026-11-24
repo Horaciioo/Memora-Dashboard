@@ -92,6 +92,7 @@ export const IntelligenceHero = ({ title }: IntelligenceHeroProps) => {
         </div>
       )}
       <div className={INTELLIGENCE_STYLES.dockWrap}>
+        <p className={INTELLIGENCE_STYLES.notice}>{INTELLIGENCE_COPY.notice}</p>
         <form
           className={INTELLIGENCE_STYLES.composer}
           onSubmit={(event) => {
