@@ -3,7 +3,7 @@ import { readInteger } from '@/declarations/configurations/readers'
 
 /**
  * Assistant behaviour
- * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number, bubbleExpandMs: number, liveDefaultHours: number, bubbleOpenMs: number, bubbleStaySeconds: number, bubbleReloadMs: number, closeSeconds: number, undoSeconds: number, pointLines: number }}
+ * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number, bubbleExpandMs: number, liveDefaultHours: number, bubbleOpenMs: number, bubbleStaySeconds: number, bubbleReloadMs: number, closeSeconds: number, undoSeconds: number, pointLines: number, statsMaxDays: number }}
  */
 
 export const ASSISTANT_SETTINGS = {
@@ -168,5 +168,10 @@ export const ASSISTANT_SETTINGS = {
     path: 'system/assistant.pointLines',
     fallback: 6,
     min: 1,
+  }), // A figure is never read over more days than this
+  statsMaxDays: readInteger(assistant.statsMaxDays, {
+    path: 'system/assistant.statsMaxDays',
+    fallback: 366,
+    min: 7,
   }),
 }

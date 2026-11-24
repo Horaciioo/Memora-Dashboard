@@ -7,6 +7,7 @@ import { NAVIGATION_DOMAIN } from '@/declarations/assistant/domains/navigation'
 import { NOTIFICATIONS } from '@/declarations/assistant/domains/notifications'
 import { POINT } from '@/declarations/assistant/domains/point'
 import { PROJECTS } from '@/declarations/assistant/domains/projects'
+import { STATS } from '@/declarations/assistant/domains/stats'
 import { TASKS } from '@/declarations/assistant/domains/tasks'
 import type { DomainDef, IntentDef } from '@/declarations/assistant/domains/types'
 
@@ -18,6 +19,7 @@ import type { DomainDef, IntentDef } from '@/declarations/assistant/domains/type
 export const ASSISTANT_DOMAINS: readonly DomainDef[] = [
   POINT,
   TASKS,
+  STATS,
   NAVIGATION_DOMAIN,
   LIVES,
   LOGS,
@@ -35,6 +37,7 @@ export const ASSISTANT_DOMAINS: readonly DomainDef[] = [
 
 export const ASSISTANT_INTENTS = {
   ...POINT.intents,
+  ...STATS.intents,
   ...TASKS.intents,
   ...ABSENCES.intents,
   ...NOTIFICATIONS.intents,
