@@ -125,7 +125,12 @@ export const LeftSidebar = ({ viewContext }: LeftSidebarProps) => {
   // Shortcuts and the live notice, in every menu but a course's
   const topBlock = (
     <>
-      <RailShortcuts items={rowShortcuts} isUnlocking={isTouring} live={viewContext.live} />
+      <RailShortcuts
+        items={rowShortcuts}
+        isUnlocking={isTouring}
+        live={viewContext.live}
+        onSelect={(href) => setSection(href === ROUTES.pages ? 'private' : 'normal')}
+      />
       {/* Hangs under the Live shortcut it announces */}
       {!isCompact && !isCalendarMenu && liveRowAt >= 0 && (
         <LiveRailNotice live={viewContext.live} pointedAt={pointAt(liveRowAt)} />
