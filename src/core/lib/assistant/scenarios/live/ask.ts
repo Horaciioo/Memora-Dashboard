@@ -2,22 +2,23 @@ import { apiGet, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { failure } from '@/core/lib/assistant/scenarios/failure'
 import { varied } from '@/core/lib/assistant/variants'
+import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { LIVE_VARIANTS } from '@/declarations/assistant/variants/live'
 import { SCENARIO_COPY } from '@/declarations/assistant/scenarios/shared'
 import { LIVE_SCENARIO_COPY as COPY } from '@/declarations/assistant/scenarios/live'
 import type { AttendanceHours, AttendancePerson } from '@/types/calendar'
 import type { LiveGroups } from '@/types/liveAsks'
 import type { ScenarioGroup, ScenarioStep } from '@/types/scenario'
+import { HOUR_MS } from '@/utils/constants/time'
+import { fillTemplate } from '@/utils/format/strings'
 import { formatClock } from '@/utils/format/time/dates'
 import { instantToWall, wallToInstant } from '@/utils/format/time/zone'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 
-// Answers of the two questions
+// Answers of the question
 const YES = 'yes'
 const NO = 'no'
-
-// Length of a live whose end is not known, in hours
-const DEFAULT_HOURS = 3
+const MAYBE = 'maybe'
 
 // Day and hour spoken in a sentence, in the member's zone
 const whenOf = (iso: string): string => {
@@ -29,63 +30,76 @@ const whenOf = (iso: string): string => {
   return `${day} à ${wall.slice(11, 13)}h${wall.slice(14, 16) === '00' ? '' : wall.slice(14, 16)}`
 }
 
-// Live asking the member, the member asked whether they come
+// Live or event calling the roll, the member is asked whether they come
 export const liveAsk: ScenarioStep = async ({ data }) => ({
-  say: [
-    varied('live.asked', LIVE_VARIANTS.asked, {
-      creator: data.creator,
-      when: whenOf(data.startsAt),
-    }),
-  ],
+  say: [data.question],
   topic: data.title,
   ask: {
     kind: 'choices',
     choices: [
-      { value: YES, label: COPY.askYes, tone: 'success' },
-      { value: NO, label: COPY.askNo, tone: 'danger' },
+      { value: YES, label: COPY.askYes },
+      { value: NO, label: COPY.askNo },
+      { value: MAYBE, label: COPY.askMaybe },
     ],
   },
   next: 'liveAskAnswer',
 })
 
-// A no is sent right away, a yes asks for the hours first
+// A live asks for the hours, the end planned (or a few hours after the start) is already set
 export const liveAskAnswer: ScenarioStep = async ({ data }, answer) => {
-  if (answer?.value !== YES) {
-    try {
-      await apiPost(API_ROUTES.calendarEntryAttendance(data.eventId), {
-        status: AttendanceStatuses.Absent,
-      })
+  if (answer?.value === MAYBE) return { say: [varied('live.undecided', LIVE_VARIANTS.undecided)] }
 
-      return { say: [varied('live.sentNo', LIVE_VARIANTS.sentNo)] }
-    } catch (error) {
-      return failure(error)
+  if (answer?.value === YES && data.liveId) {
+    const end =
+      data.endsAt ||
+      new Date(
+        new Date(data.startsAt).getTime() + ASSISTANT_SETTINGS.liveDefaultHours * HOUR_MS
+      ).toISOString()
+
+    return {
+      say: [varied('live.until', LIVE_VARIANTS.until)],
+      ask: { kind: 'hours', from: instantToWall(data.startsAt), to: instantToWall(end) },
+      next: 'liveAskHours',
     }
   }
 
-  const end =
-    data.endsAt ||
-    new Date(new Date(data.startsAt).getTime() + DEFAULT_HOURS * 3_600_000).toISOString()
+  try {
+    await apiPost(API_ROUTES.calendarEntryAttendance(data.eventId), {
+      status: answer?.value === YES ? AttendanceStatuses.Present : AttendanceStatuses.Absent,
+    })
 
-  return {
-    say: [varied('live.window', LIVE_VARIANTS.window)],
-    ask: { kind: 'hours', from: instantToWall(data.startsAt), to: instantToWall(end) },
-    next: 'liveAskHours',
+    return {
+      say: [
+        answer?.value === YES
+          ? varied('live.sentYes', LIVE_VARIANTS.sentYes)
+          : varied('live.sentNo', LIVE_VARIANTS.sentNo),
+      ],
+    }
+  } catch (error) {
+    return failure(error)
   }
 }
 
-// The hours are sent with the presence
+// The hours picked are sent with the presence
 export const liveAskHours: ScenarioStep = async ({ data }, answer) => {
   const [from, to] = (answer?.value ?? '').split('/')
   if (!from || !to) return failure(new Error(SCENARIO_COPY.notUnderstood))
+
+  const end = wallToInstant(to).toISOString()
 
   try {
     await apiPost(API_ROUTES.calendarEntryAttendance(data.eventId), {
       status: AttendanceStatuses.Present,
       from: wallToInstant(from).toISOString(),
-      to: wallToInstant(to).toISOString(),
+      to: end,
     })
 
-    return { say: [varied('live.sentYes', LIVE_VARIANTS.sentYes)] }
+    return {
+      say: [
+        fillTemplate(COPY.untilNoted, { when: whenOf(end) }),
+        varied('live.sentYes', LIVE_VARIANTS.sentYes),
+      ],
+    }
   } catch (error) {
     return failure(error)
   }

@@ -4,9 +4,9 @@ import type { AttendancePerson } from '@/types/calendar'
  * Live that asks a member whether they are there
  * @typedef {Object} LiveAsk
  * @property {string} eventId - Roll-call event
- * @property {string} liveId - Live
- * @property {string} title - Live title
- * @property {string} creator - Creator of the live
+ * @property {string} liveId - Live, empty for an event that is not one
+ * @property {string} title - Live or event title
+ * @property {string} creator - Creator of the live, empty for an event
  * @property {string} startsAt - ISO start
  * @property {string | null} endsAt - ISO end
  */

@@ -64,6 +64,7 @@ export type ScenarioStatus = 'idle' | 'typing' | 'thinking' | 'writing'
  * @property {ScenarioStatus} status - Memora typing or thinking
  * @property {string | null} preparing - Line shown while a step loads
  * @property {boolean} isActive - A talk is on
+ * @property {boolean} isClosed - The talk reached its end by itself
  * @property {(id: ScenarioId, entry: string, data?: Record<string, string>) => void} start - Open a talk
  * @property {(answer: ScenarioAnswer) => void} answer - Answer by button
  * @property {(text: string) => void} reply - Answer by typing
@@ -75,6 +76,7 @@ export interface ScenarioRunner {
   status: ScenarioStatus
   preparing: string | null
   isActive: boolean
+  isClosed: boolean
   start: (id: ScenarioId, entry: string, data?: Record<string, string>) => void
   answer: (answer: ScenarioAnswer) => void
   reply: (text: string) => void
@@ -116,6 +118,7 @@ export const useAssistantScenario = ({ say, begin, refresh }: ScenarioDeps): Sce
   const [ask, setAsk] = useState<ScenarioAsk | null>(null)
   const [status, setStatus] = useState<ScenarioStatus>('idle')
   const [isActive, setActive] = useState(false)
+  const [isClosed, setClosed] = useState(false)
   const [preparing, setPreparing] = useState<string | null>(null)
   const scenario = useRef<Scenario | null>(null)
   const data = useRef<Record<string, string>>({})
@@ -208,6 +211,7 @@ export const useAssistantScenario = ({ say, begin, refresh }: ScenarioDeps): Sce
       }
 
       finish()
+      if (turn === generation.current) setClosed(true)
     } catch (error) {
       say('memora', failureOf(error))
       finish()
@@ -221,6 +225,7 @@ export const useAssistantScenario = ({ say, begin, refresh }: ScenarioDeps): Sce
     scenario.current = SCENARIOS[id]
     data.current = given
     setActive(true)
+    setClosed(false)
     setAsk(null)
 
     void go(SCENARIOS[id].entries[entry], null, generation.current)
@@ -299,5 +304,5 @@ export const useAssistantScenario = ({ say, begin, refresh }: ScenarioDeps): Sce
     say('memora', SCENARIO_COPY.periodUnreadable)
   }
 
-  return { ask, status, preparing, isActive, start, answer, reply, stop }
+  return { ask, status, preparing, isActive, isClosed, start, answer, reply, stop }
 }

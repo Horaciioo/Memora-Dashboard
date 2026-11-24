@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '@/components/elements/actions/Button'
 import { ScenarioHours } from '@/composites/search/assistant/ScenarioHours'
 import { ScenarioPercent } from '@/composites/search/assistant/ScenarioPercent'
 import { ScenarioChecklist } from '@/composites/search/assistant/ScenarioChecklist'
@@ -89,21 +88,22 @@ export const AssistantAnswers = ({ chat }: AssistantAnswersProps) => {
   }
 
   if (ask?.kind === 'choices') {
-    // Short answers are pills, answers with a detail are rows
+    // Short answers are links, answers with a detail are rows
     const isPlain = ask.choices.every((choice) => !choice.hint)
 
     return (
       <div className={isPlain ? ASSISTANT_STYLES.answers : ASSISTANT_STYLES.choices} role="group">
-        {ask.choices.map((choice, index) =>
+        {ask.choices.map((choice) =>
           isPlain ? (
-            <Button
+            <button
               key={choice.value}
-              variant={choice.tone ?? (index === 0 ? 'primary' : 'secondary')}
+              type="button"
               className={ASSISTANT_STYLES.answer}
               onClick={() => chat.scenario.answer({ value: choice.value, label: choice.label })}
             >
-              {choice.label}
-            </Button>
+              <span aria-hidden="true">-</span>
+              <span className={ASSISTANT_STYLES.answerLabel}>{choice.label}</span>
+            </button>
           ) : (
             <button
               key={choice.value}

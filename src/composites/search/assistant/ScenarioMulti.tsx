@@ -29,14 +29,14 @@ export const ScenarioMulti = ({ choices, onPick }: ScenarioMultiProps) => {
   const picked = choices.filter((choice) => ticked.includes(choice.value))
 
   return (
-    <div className={ASSISTANT_STYLES.answers} role="group">
+    <div className={ASSISTANT_STYLES.pills} role="group">
       {choices.map((choice) => (
         <Button
           key={choice.value}
           variant={ticked.includes(choice.value) ? 'primary' : 'secondary'}
           aria-pressed={ticked.includes(choice.value)}
           title={choice.hint}
-          className={ASSISTANT_STYLES.answer}
+          className={ASSISTANT_STYLES.pill}
           onClick={() => toggle(choice.value)}
         >
           {choice.label}
@@ -45,7 +45,7 @@ export const ScenarioMulti = ({ choices, onPick }: ScenarioMultiProps) => {
       <Button
         variant="primary"
         disabled={picked.length === 0}
-        className={ASSISTANT_STYLES.answer}
+        className={ASSISTANT_STYLES.pill}
         onClick={() =>
           onPick(
             picked.map((choice) => choice.value).join(','),

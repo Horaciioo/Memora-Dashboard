@@ -19,5 +19,11 @@
   "remindGapMinutes": 30,
   "liveAskEverySeconds": 60,
   "serviceLeadMinutes": 10,
-  "bubbleGrowMs": 320
+  "bubbleGrowMs": 250,
+  "bubbleExpandMs": 550,
+  "liveDefaultHours": 5,
+  "bubbleOpenMs": 450,
+  "bubbleStaySeconds": 45,
+  "bubbleReloadMs": 4000,
+  "closeSeconds": 10
 }

@@ -17,6 +17,7 @@ export const ASSISTANT_COPY = {
   answerPlaceholder: 'Ta réponse…',
   section: 'Memora',
   thinking: 'Memora réfléchit',
+  closed: 'Memora a clos cette discussion.',
   unknown: 'Je n’ai pas bien compris. Essaie par exemple :',
   denied: 'Tu n’as pas l’accès pour ça.',
   failed: 'Ça n’a pas marché : {error}',
