@@ -22,6 +22,7 @@ const DETAIL_ROOTS: Record<AssistantEntityKind, string> = {
   absence: ROUTES.absences,
   meeting: ROUTES.meetings,
   page: ROUTES.pages,
+  unban: ROUTES.unban,
 }
 
 /**

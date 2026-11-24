@@ -6,6 +6,7 @@ import { FAMILIES, pickRecord } from '@/core/services/assistant/records'
 import { askChoice, fill, missing, propose } from '@/core/services/assistant/reply'
 import type { Resolver, ResolverContext } from '@/core/services/assistant/reply'
 import { listReviewQueue } from '@/core/services/absences/AbsenceService'
+import { listRequests, readRequest } from '@/core/services/unban/UnbanRequestService'
 import { listTasks, readTask } from '@/core/services/work/TaskService'
 import { assertTaskVisible, workViewer } from '@/core/services/work/visibility'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
@@ -13,6 +14,7 @@ import { GESTURES } from '@/declarations/assistant/gestures'
 import type { GestureDef, GestureId } from '@/declarations/assistant/gestures'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import type { AssistantProposal, AssistantReference } from '@/types/assistant'
+import { UnbanStatuses } from '@/utils/constants/unban'
 import { formatDayRange } from '@/utils/format/time/dates'
 
 // Nothing to act on, said in words
@@ -174,6 +176,60 @@ const findAbsence = async (gesture: GestureId, context: ResolverContext): Promis
 }
 
 /**
+ * Deban. request to take or hand back: answered, named, or the only one
+ * @param {GestureId} gesture - Registry entry
+ * @param {ResolverContext} context - Resolver context
+ * @return {Promise<Found & { version?: number }>} - Request, its counter, or a question
+ */
+
+const findUnban = async (
+  gesture: GestureId,
+  context: ResolverContext
+): Promise<(Found & { version?: number }) | { proposal: AssistantProposal }> => {
+  const { parsed, request, session, access, scope } = context
+  const caller = { access, scope: await scope(), actorId: session.id }
+  const { items } = await listRequests(
+    {
+      statuses: [UnbanStatuses.Pending, UnbanStatuses.InReview],
+      assignee: gesture === 'takeUnban' ? 'none' : 'me',
+      limit: ASSISTANT_SETTINGS.maxChoices,
+    },
+    caller
+  )
+  if (items.length === 0) return { proposal: nothing(gesture, ASSISTANT_COPY.noRequest) }
+
+  const options = items.map((item) => ({
+    value: item.id,
+    label: item.discordName,
+    hint: item.youtuberName,
+  }))
+  const answered = options.find((option) => option.value === request.filled.unban)
+  const found = answered
+    ? ({ kind: 'one', match: answered } as const)
+    : parsed.subject
+      ? lookupName(parsed.subject, options, ASSISTANT_SETTINGS.maxChoices)
+      : options.length === 1
+        ? ({ kind: 'one', match: options[0] } as const)
+        : ({ kind: 'many', matches: options } as const)
+
+  if (found.kind === 'none') return { proposal: missing(gesture, parsed.subject) }
+  if (found.kind === 'many') {
+    return {
+      proposal: askChoice({
+        intent: gesture,
+        slotKey: 'unban',
+        reply: ASSISTANT_COPY.whichOne,
+        choices: found.matches,
+      }),
+    }
+  }
+
+  const { version } = await readRequest(found.match.value, caller)
+
+  return { target: { id: found.match.value, label: found.match.label }, version }
+}
+
+/**
  * Do something in the member's place, after a yes
  * @param {ResolverContext} context - Resolver context
  * @return {Promise<AssistantProposal>} - Proposal waiting for a yes
@@ -186,9 +242,17 @@ export const resolveGesture: Resolver = async (context) => {
   if (kind === null) return proposeGesture(gesture, { id: '', name: '' })
 
   const found =
-    kind === 'task' ? await findTask(gesture, context) : await findAbsence(gesture, context)
+    kind === 'task'
+      ? await findTask(gesture, context)
+      : kind === 'unban'
+        ? await findUnban(gesture, context)
+        : await findAbsence(gesture, context)
 
   return 'proposal' in found
     ? found.proposal
-    : proposeGesture(gesture, { id: found.target.id, name: found.target.label })
+    : proposeGesture(gesture, {
+        id: found.target.id,
+        name: found.target.label,
+        values: 'version' in found ? { version: found.version } : {},
+      })
 }

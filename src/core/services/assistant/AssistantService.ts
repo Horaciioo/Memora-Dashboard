@@ -61,6 +61,8 @@ const RESOLVERS: Record<AssistantIntentName, Resolver> = {
   deleteTask: resolveGesture,
   approveAbsence: resolveGesture,
   refuseAbsence: resolveGesture,
+  takeUnban: resolveGesture,
+  releaseUnban: resolveGesture,
   readNotifications: resolveGesture,
   absence: resolveAbsence,
   filterLogs: resolveLogs,

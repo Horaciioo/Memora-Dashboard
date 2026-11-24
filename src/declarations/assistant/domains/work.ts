@@ -18,6 +18,28 @@ export const WORK = defineDomain({
   summary:
     'Je te dis où en est un projet, lesquels sont en retard, ta prochaine réunion, les annonces de la semaine, les absences et les demandes de déban qui attendent.',
   intents: {
+    takeUnban: {
+      label: 'Prendre une demande de déban',
+      kind: 'act',
+      verbs: ['prends', 'prendre', 'prend', 'recupere', 'recuperer', 'charge'],
+      nouns: ['deban', 'debannissement', 'unban'],
+      needs: 'both',
+      boost: QUESTION_BOOST,
+      permission: Permissions.UnbanHandle,
+      pages: [ROUTES.unban],
+      examples: ['Je prends la demande de déban de Viewer', 'Prends le déban'],
+    },
+    releaseUnban: {
+      label: 'Libérer une demande de déban',
+      kind: 'act',
+      verbs: ['libere', 'liberer', 'relache', 'relacher', 'abandonne'],
+      nouns: ['deban', 'debannissement', 'unban'],
+      needs: 'both',
+      boost: QUESTION_BOOST,
+      permission: Permissions.UnbanHandle,
+      pages: [ROUTES.unban],
+      examples: ['Libère la demande de déban de Viewer', 'Relâche le déban'],
+    },
     projectPoint: {
       label: 'Savoir où en est un projet',
       kind: 'say',

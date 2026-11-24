@@ -19,6 +19,7 @@ const KINDS: AssistantEntityKind[] = [
   'absence',
   'meeting',
   'page',
+  'unban',
 ]
 
 // Plain object or nothing

@@ -104,6 +104,32 @@ export const GESTURES = {
       body: { status: AbsenceStatuses.Refused },
     }),
   },
+  takeUnban: {
+    risk: 'medium',
+    target: 'unban',
+    permission: Permissions.UnbanHandle,
+    ask: 'Je prends la demande de « {name} » ?',
+    done: 'C’est pris, la demande de « {name} » est à toi.',
+    confirmLabel: 'Prendre',
+    call: (id, values) => ({
+      method: 'POST',
+      path: API_ROUTES.unbanRequestAction(id, 'take'),
+      body: { version: values.version },
+    }),
+  },
+  releaseUnban: {
+    risk: 'medium',
+    target: 'unban',
+    permission: Permissions.UnbanHandle,
+    ask: 'Je libère la demande de « {name} » ?',
+    done: 'C’est fait, la demande de « {name} » est libérée.',
+    confirmLabel: 'Libérer',
+    call: (id, values) => ({
+      method: 'POST',
+      path: API_ROUTES.unbanRequestAction(id, 'release'),
+      body: { version: values.version },
+    }),
+  },
   readNotifications: {
     risk: 'light',
     target: null,
