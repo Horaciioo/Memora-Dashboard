@@ -478,6 +478,27 @@ const holdsWatchLease = async (): Promise<boolean> => {
 }
 
 /**
+ * Give the lease back so the next instance watches at once
+ * @return {Promise<void>} - Released
+ */
+
+const releaseLease = async (): Promise<void> => {
+  const container = runtime()
+  const cache = container?.redis.isReady() ? container.redis.cache : null
+  if (!cache) return
+
+  const key = `${container!.redis.prefix}${LIVE_TOPICS.watchLease}`
+  if ((await cache.get(key)) === INSTANCE_ID) await cache.del(key)
+}
+
+// The server entry calls it on SIGTERM
+;(globalThis as unknown as { liveWatcherRelease?: () => Promise<void> }).liveWatcherRelease =
+  async () => {
+    stopLiveWatcher()
+    await releaseLease().catch(() => null)
+  }
+
+/**
  * Drop every session and pending end, the watching moved to another instance
  * @return {void}
  */
