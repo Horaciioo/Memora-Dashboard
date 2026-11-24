@@ -34,6 +34,8 @@ export interface RecordFamily {
 export const FAMILIES: Partial<Record<AssistantEntityKind, RecordFamily>> = {
   member: { kind: 'member', group: 'members', list: ROUTES.members, detail: ROUTES.member },
   task: { kind: 'task', group: 'tasks', list: ROUTES.tasks, detail: ROUTES.task },
+  meeting: { kind: 'meeting', group: 'meetings', list: ROUTES.meetings, detail: ROUTES.meeting },
+  page: { kind: 'page', group: 'pages', list: ROUTES.pages, detail: ROUTES.page },
   project: {
     kind: 'project',
     group: 'projects',
@@ -47,6 +49,8 @@ const INTENT_KINDS: Partial<Record<AssistantIntentName, AssistantEntityKind>> = 
   findMember: 'member',
   openTask: 'task',
   openProject: 'project',
+  openMeeting: 'meeting',
+  openPage: 'page',
 }
 
 // Shortest stem tried

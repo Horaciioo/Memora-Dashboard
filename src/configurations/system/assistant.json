@@ -29,6 +29,7 @@
   "undoSeconds": 10,
   "pointLines": 6,
   "statsMaxDays": 366,
+  "memoryTurns": 3,
   "scores": {
     "phrase": 50,
     "noun": 40,

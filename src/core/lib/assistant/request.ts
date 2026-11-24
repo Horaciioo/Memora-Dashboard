@@ -11,7 +11,15 @@ const TEXT_MAX_LENGTH = 300
 // Longest single value
 const VALUE_MAX_LENGTH = 200
 
-const KINDS: AssistantEntityKind[] = ['member', 'task', 'project', 'live', 'absence']
+const KINDS: AssistantEntityKind[] = [
+  'member',
+  'task',
+  'project',
+  'live',
+  'absence',
+  'meeting',
+  'page',
+]
 
 // Plain object or nothing
 const recordOf = (value: unknown): Record<string, unknown> =>

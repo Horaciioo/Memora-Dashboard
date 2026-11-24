@@ -191,6 +191,7 @@ export const ASSISTANT_SLOT_LABELS = {
   member: 'Modérateur',
   task: 'Tâche',
   absence: 'Absence',
+  meeting: 'Réunion',
   project: 'Projet',
   intent: 'Demande',
   topic: 'Sujet',

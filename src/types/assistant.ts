@@ -7,7 +7,8 @@ import type { ScenarioLink } from '@/types/scenario'
  * @type {'member' | 'task' | 'project' | 'live'}
  */
 
-export type AssistantEntityKind = 'member' | 'task' | 'project' | 'live' | 'absence'
+export type AssistantEntityKind =
+  'member' | 'task' | 'project' | 'live' | 'absence' | 'meeting' | 'page'
 
 /**
  * One resource already named

@@ -20,6 +20,8 @@ const DETAIL_ROOTS: Record<AssistantEntityKind, string> = {
   project: ROUTES.projects,
   live: ROUTES.lives,
   absence: ROUTES.absences,
+  meeting: ROUTES.meetings,
+  page: ROUTES.pages,
 }
 
 /**

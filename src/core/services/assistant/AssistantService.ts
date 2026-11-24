@@ -41,6 +41,8 @@ const RESOLVERS: Record<AssistantIntentName, Resolver> = {
   openLive: resolveLive,
   openTask: resolveRecord,
   openProject: resolveRecord,
+  openMeeting: resolveRecord,
+  openPage: resolveRecord,
   findMember: resolveRecord,
   capabilities: resolveCapabilities,
   howTo: resolveGuide,

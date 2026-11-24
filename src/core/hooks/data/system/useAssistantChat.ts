@@ -105,7 +105,7 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
   const tab = useSearchParams().get('tab') ?? ''
   const element = useAssistantDock((state) => state.focus?.element ?? null)
   const handoff = useNexusHandoff()
-  const { memory, remember } = useAssistantStore()
+  const { memory, remember, tick, forget } = useAssistantStore()
   const [turns, setTurns] = useState<AssistantTurn[]>([])
   const [pending, setPending] = useState({ text: '', filled: {} as Record<string, string> })
   const [isBusy, setIsBusy] = useState(false)
@@ -210,6 +210,7 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
 
   const start = (text: string, known?: AssistantProposal | null) => {
     if (inFlight.current || !text.trim() || handoff(text)) return
+    tick()
     setPending({ text, filled: {} })
     say('me', text)
 
@@ -304,6 +305,7 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
   }
 
   const reset = () => {
+    forget()
     armUndo(null)
     scenario.stop()
     writeKey.current = null
