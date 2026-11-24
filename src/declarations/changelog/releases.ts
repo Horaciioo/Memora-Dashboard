@@ -154,6 +154,18 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Improved,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Amélioration de « Memora Intelligence » : Memora dit ce qu’elle sait faire selon les accès de chacun, indique où se trouve une page, explique comment s’y prendre et ce que veulent dire des mots comme « Livecon ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.intelligence,
+        permission: Permissions.IntelligenceUse,
+        text: 'Amélioration de « Memora Intelligence » : quand une demande peut vouloir dire deux choses, Memora demande laquelle au lieu de se tromper.',
+      },
+      {
+        tag: ChangelogTags.Improved,
         page: ROUTES.lives,
         permission: Permissions.LiveRead,
         text: 'Amélioration de « Lives » : la page s’ouvre sur le créateur en direct, et sa Mod View se déplie sous « Lives » dans le menu.',
