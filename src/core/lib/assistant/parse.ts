@@ -1,6 +1,6 @@
 import { readAbsenceMode } from '@/core/lib/assistant/absence'
 import { extractDue } from '@/core/lib/assistant/dates'
-import { detectIntent, findPage } from '@/core/lib/assistant/intents'
+import { detectIntent, findPage, scoreIntents } from '@/core/lib/assistant/intents'
 import { isSimilar, tokenize } from '@/core/lib/assistant/normalize'
 import type { AssistantToken } from '@/core/lib/assistant/normalize'
 import {
@@ -15,12 +15,10 @@ import {
   wordsAfter,
 } from '@/core/lib/assistant/slots'
 import type { OwnerMatch } from '@/core/lib/assistant/slots'
-import {
-  ASSISTANT_CURRENT,
-  ASSISTANT_INTENTS,
-  ASSISTANT_LATEST,
-} from '@/declarations/assistant/lexicon'
-import type { AssistantIntentName, AssistantPage } from '@/declarations/assistant/lexicon'
+import { ASSISTANT_INTENTS, ruleOf } from '@/declarations/assistant/domains'
+import type { AssistantIntentName } from '@/declarations/assistant/domains'
+import { ASSISTANT_CURRENT, ASSISTANT_LATEST } from '@/declarations/assistant/lexicon'
+import type { AssistantPage } from '@/declarations/assistant/lexicon'
 import type { JournalPeriod } from '@/declarations/system/monitoring/journal'
 import type { AssistantAbsenceMode } from '@/types/assistant'
 import type { LogLevelName } from '@/utils/constants/events'
@@ -29,6 +27,7 @@ import type { LogLevelName } from '@/utils/constants/events'
  * Sentence read into parts
  * @typedef {Object} ParsedCommand
  * @property {AssistantIntentName | null} intent - Recognised intent
+ * @property {AssistantIntentName[]} rivals - Intents too close to tell apart
  * @property {AssistantPage | null} page - Named page
  * @property {string} subject - Resource name typed
  * @property {OwnerMatch | null} owner - Assignee
@@ -47,6 +46,7 @@ import type { LogLevelName } from '@/utils/constants/events'
 
 export interface ParsedCommand {
   intent: AssistantIntentName | null
+  rivals: AssistantIntentName[]
   page: AssistantPage | null
   subject: string
   owner: OwnerMatch | null
@@ -166,8 +166,8 @@ const LIVE_NOISE = [...ASSISTANT_INTENTS.openLive.nouns, ...ASSISTANT_CURRENT.fl
  */
 
 const noiseOf = (intent: AssistantIntentName | undefined): string[] => {
-  const rule = intent ? ASSISTANT_INTENTS[intent] : null
-  const nouns = rule && 'nouns' in rule ? [...rule.nouns] : []
+  const rule = intent ? ruleOf(intent) : null
+  const nouns = [...(rule?.nouns ?? []), ...(rule?.weakNouns ?? [])]
   const isLive = intent === 'openLive' || intent === 'liveReport'
 
   return [...nouns, ...ASSISTANT_LATEST, ...(isLive ? LIVE_NOISE : [])]
@@ -202,21 +202,46 @@ const readSubject = (
 }
 
 /**
+ * What the reader knows beyond the words
+ * @typedef {Object} ParseOptions
+ * @property {string} [pathname] - Page on screen
+ * @property {AssistantIntentName | null} [intent] - Intent the member picked between rivals
+ */
+
+export interface ParseOptions {
+  pathname?: string
+  intent?: string | null
+}
+
+/**
  * Read a sentence
  * @param {string} text - Raw sentence
  * @param {string} today - ISO day
+ * @param {ParseOptions} [options] - Page and picked intent
  * @return {ParsedCommand} - Parts found
  */
 
-export const parseCommand = (text: string, today: string): ParsedCommand => {
+export const parseCommand = (
+  text: string,
+  today: string,
+  { pathname, intent: picked }: ParseOptions = {}
+): ParsedCommand => {
   const tokens = tokenize(text)
-  const match = detectIntent(tokens)
+  const reading = detectIntent(tokens, pathname)
+  const rivals = reading?.rivals ?? []
+
+  // The member settled a tie, only a rival can be chosen
+  const chosen = picked
+    ? scoreIntents(tokens, pathname).find((entry) => entry.intent === picked)
+    : null
+  const match = chosen ?? reading?.best ?? null
   const used = new Set(match?.indices ?? [])
   const isTask = match?.intent === 'createTask'
   const task = isTask ? readTask(text, tokens, used, today) : null
 
   return {
     intent: match?.intent ?? null,
+    rivals: chosen ? [] : rivals.map((entry) => entry.intent),
     page: match?.page ?? findPage(tokens)?.page ?? null,
     subject: isTask ? '' : readSubject(text, tokens, used, noiseOf(match?.intent)),
     owner: task?.owner ?? null,

@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useRef, useState } from 'react'
 
 import { apiPost, ApiClientError } from '@/core/lib/api/client'
@@ -10,6 +10,7 @@ import { useAssistantScenario } from '@/core/hooks/data/system/useAssistantScena
 import type { ScenarioId, ScenarioRunner } from '@/core/hooks/data/system/useAssistantScenario'
 import { useNexusHandoff } from '@/managers/front-end/NexusManager'
 import { useAssistantStore } from '@/core/store/assistant'
+import { useAssistantDock } from '@/core/store/assistantDock'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { IDEMPOTENCY_HEADER } from '@/declarations/system/security/idempotency'
 import type { RecapChapter } from '@/core/lib/recap/compose'
@@ -92,6 +93,8 @@ const failureOf = (error: unknown): string =>
 export const useAssistantChat = (onNavigate: (href: string) => void): AssistantChat => {
   const router = useRouter()
   const pathname = usePathname()
+  const tab = useSearchParams().get('tab') ?? ''
+  const element = useAssistantDock((state) => state.focus?.element ?? null)
   const handoff = useNexusHandoff()
   const { memory, remember } = useAssistantStore()
   const [turns, setTurns] = useState<AssistantTurn[]>([])
@@ -144,6 +147,15 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
       return
     }
 
+    // Written lines come out one by one, the last carries the answers
+    if (proposal.action?.kind === 'say') {
+      const { lines } = proposal.action
+      lines.forEach((line, index) =>
+        say('memora', line.text, index === lines.length - 1 ? proposal : undefined, line.link)
+      )
+      return
+    }
+
     say('memora', proposal.reply, proposal)
     if (proposal.confirm) writeKey.current = crypto.randomUUID()
     if (proposal.status === 'ready' && !proposal.confirm && proposal.action?.kind === 'navigate') {
@@ -155,7 +167,14 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
     setBusy(true)
     try {
       receive(
-        await apiPost<AssistantProposal>(API_ROUTES.assistant, { text, pathname, memory, filled })
+        await apiPost<AssistantProposal>(API_ROUTES.assistant, {
+          text,
+          pathname,
+          tab,
+          element,
+          memory,
+          filled,
+        })
       )
     } catch (error) {
       say('memora', failureOf(error))

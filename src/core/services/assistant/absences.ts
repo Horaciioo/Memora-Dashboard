@@ -1,10 +1,9 @@
 import 'server-only'
 
-import { propose, refuse } from '@/core/services/assistant/reply'
+import { propose } from '@/core/services/assistant/reply'
 import type { Resolver } from '@/core/services/assistant/reply'
 import { ABSENCE_SCENARIO_COPY } from '@/declarations/assistant/scenarios/absence'
 import type { AssistantAbsenceMode } from '@/types/assistant'
-import { Permissions } from '@/utils/constants/permissions'
 
 // Words answering each way in
 const OPENINGS: Record<AssistantAbsenceMode, string> = {
@@ -20,9 +19,7 @@ const OPENINGS: Record<AssistantAbsenceMode, string> = {
  * @return {Promise<AssistantProposal>} - Proposal opening the talk
  */
 
-export const resolveAbsence: Resolver = async ({ parsed, access }) => {
-  if (!access.can(Permissions.AbsenceCreate)) return refuse('absence')
-
+export const resolveAbsence: Resolver = async ({ parsed }) => {
   const entry = parsed.absenceMode ?? 'create'
 
   return propose('absence', {

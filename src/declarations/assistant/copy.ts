@@ -20,6 +20,15 @@ export const ASSISTANT_COPY = {
   closed: 'Memora a clos cette discussion.',
   unknown: 'Je n’ai pas bien compris. Essaie par exemple :',
   denied: 'Tu n’as pas l’accès pour ça.',
+  whichIntent: 'Je ne suis pas sûre de ce que tu veux, c’est plutôt :',
+  capabilitiesIntro: 'Voilà ce que je sais faire pour toi.',
+  capabilitiesOutro: 'Tu peux me dire par exemple :',
+  whichTopic: 'Tu parles de quoi exactement ?',
+  helpLink: 'Tu y vas quand tu veux :',
+  helpClosed:
+    'Cette page n’est pas ouverte à ton compte pour l’instant, c’est l’Administration qui accorde l’accès.',
+  helpMissing: 'Je n’ai pas encore de fiche là-dessus.',
+  whereMissing: 'Je ne connais pas de page qui s’appelle comme ça.',
   failed: 'Ça n’a pas marché : {error}',
   offline: 'Je n’arrive pas à joindre Memora. Réessaie, rien n’a été créé en double.',
   recapAgain: 'Je te refais le point, une seconde.',
@@ -171,6 +180,8 @@ export const ASSISTANT_SLOT_LABELS = {
   member: 'Modérateur',
   task: 'Tâche',
   project: 'Projet',
+  intent: 'Demande',
+  topic: 'Sujet',
 } as const
 
 export type AssistantSlotKey = keyof typeof ASSISTANT_SLOT_LABELS

@@ -25,5 +25,17 @@
   "bubbleOpenMs": 450,
   "bubbleStaySeconds": 45,
   "bubbleReloadMs": 4000,
-  "closeSeconds": 10
+  "closeSeconds": 10,
+  "scores": {
+    "phrase": 50,
+    "noun": 40,
+    "weak": 25,
+    "verb": 25,
+    "companion": 20,
+    "onScreen": 15,
+    "namedPage": 20,
+    "typo": 5,
+    "floor": 20,
+    "margin": 15
+  }
 }

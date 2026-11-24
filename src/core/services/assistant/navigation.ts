@@ -4,7 +4,8 @@ import { fill, notUnderstood, propose, refuse, slot } from '@/core/services/assi
 import type { Resolver } from '@/core/services/assistant/reply'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { ASSISTANT_PAGES } from '@/declarations/assistant/lexicon'
-import type { AssistantIntentName, AssistantPage } from '@/declarations/assistant/lexicon'
+import type { AssistantIntentName } from '@/declarations/assistant/domains'
+import type { AssistantPage } from '@/declarations/assistant/lexicon'
 import { matchesNavigation, NAVIGATION } from '@/declarations/navigation'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { AssistantMemory, AssistantProposal } from '@/types/assistant'
@@ -18,7 +19,7 @@ import type { AssistantMemory, AssistantProposal } from '@/types/assistant'
  */
 
 export const canOpenPage = (
-  page: AssistantPage,
+  page: Pick<AssistantPage, 'href' | 'permission'>,
   session: SessionUser,
   access: PermissionHelpers
 ): boolean => {
@@ -27,6 +28,17 @@ export const canOpenPage = (
 
   return (!permission || access.can(permission)) && matchesNavigation(item?.visibleWhen, session)
 }
+
+/**
+ * Name of a page as the rail shows it
+ * @param {string} href - Page address
+ * @return {string} - Rail label, else the label Memora knows it by
+ */
+
+export const pageName = (href: string): string =>
+  NAVIGATION.flatMap((group) => group.items).find((entry) => entry.href === href)?.label ??
+  ASSISTANT_PAGES.find((page) => page.href === href)?.label ??
+  href
 
 /**
  * Go somewhere

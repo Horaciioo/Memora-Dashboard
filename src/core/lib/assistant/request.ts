@@ -1,4 +1,9 @@
-import type { AssistantEntityKind, AssistantMemory, AssistantRequest } from '@/types/assistant'
+import type {
+  AssistantElement,
+  AssistantEntityKind,
+  AssistantMemory,
+  AssistantRequest,
+} from '@/types/assistant'
 
 // Longest sentence read
 const TEXT_MAX_LENGTH = 300
@@ -38,6 +43,20 @@ const readMemory = (value: unknown): AssistantMemory => {
 }
 
 /**
+ * Keep a well formed record
+ * @param {unknown} value - Raw element
+ * @return {AssistantElement | null} - Clean element or none
+ */
+
+const readElement = (value: unknown): AssistantElement | null => {
+  const raw = recordOf(value)
+  const kind = textOf(raw.kind)
+  const id = textOf(raw.id)
+
+  return kind && id ? { kind, id, label: textOf(raw.label) } : null
+}
+
+/**
  * Read a palette request
  * @param {Record<string, unknown>} raw - Untouched body
  * @return {AssistantRequest} - Bounded request
@@ -49,6 +68,8 @@ export const readAssistantRequest = (raw: Record<string, unknown>): AssistantReq
   return {
     text: textOf(raw.text, TEXT_MAX_LENGTH),
     pathname: pathname.startsWith('/') ? pathname : '/',
+    tab: textOf(raw.tab),
+    element: readElement(raw.element),
     memory: readMemory(raw.memory),
     filled: Object.fromEntries(
       Object.entries(recordOf(raw.filled))

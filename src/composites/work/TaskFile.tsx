@@ -6,7 +6,7 @@ import { OptionMark } from '@/components/elements/forms/selects/OptionMark'
 import { Status } from '@/components/elements/display/Status'
 import { CreatorLabels, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { pickedOptions } from '@/core/lib/forms/options'
-import { FloatingFocus } from '@/composites/search/assistant/FloatingFocus'
+import { usePageFocus } from '@/core/hooks/data/system/usePageFocus'
 import { WorkComments } from '@/composites/work/WorkComments'
 import { OverdueMark } from '@/composites/work/OverdueMark'
 import { TaskCheck } from '@/composites/work/TaskCheck'
@@ -62,6 +62,10 @@ export const TaskFile = ({
 }: TaskFileProps) => {
   // The system keeps its own tasks, they can only be ticked
   const canUpdate = mayUpdate && !task.isSystem
+
+  // Memora offers to update this task when the chat opens
+  usePageFocus(canUpdate ? { kind: 'task', id: task.id, label: task.title } : null)
+
   const file = useRecordFile({
     path: API_ROUTES.task(task.id),
     scope: WorkflowScopes.Task,
@@ -162,13 +166,6 @@ export const TaskFile = ({
   return (
     <div className="flex flex-col gap-8">
       {/* Memora offers to update this task when the chat opens */}
-      {canUpdate && (
-        <FloatingFocus
-          scenario="task"
-          entry="onFile"
-          data={{ taskId: task.id, name: task.title }}
-        />
-      )}
       <EditableHeading
         value={titleValue}
         lead={

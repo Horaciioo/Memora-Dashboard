@@ -1,4 +1,5 @@
-import type { AssistantIntentName } from '@/declarations/assistant/lexicon'
+import type { AssistantIntentName } from '@/declarations/assistant/domains'
+import type { ScenarioLink } from '@/types/scenario'
 
 /**
  * Resource the assistant can point at
@@ -27,10 +28,26 @@ export interface AssistantReference {
 export type AssistantMemory = Partial<Record<AssistantEntityKind, AssistantReference>>
 
 /**
+ * Record the page on screen is about
+ * @typedef {Object} AssistantElement
+ * @property {string} kind - Record kind, the guided talk it opens
+ * @property {string} id - Record identifier
+ * @property {string} label - Display name
+ */
+
+export interface AssistantElement {
+  kind: string
+  id: string
+  label: string
+}
+
+/**
  * What the palette sends
  * @typedef {Object} AssistantRequest
  * @property {string} text - Typed sentence
  * @property {string} pathname - Page on screen
+ * @property {string} tab - Tab open on that page
+ * @property {AssistantElement | null} element - Record the page declared
  * @property {AssistantMemory} memory - Earlier references
  * @property {Record<string, string>} filled - Answered slots
  */
@@ -38,6 +55,8 @@ export type AssistantMemory = Partial<Record<AssistantEntityKind, AssistantRefer
 export interface AssistantRequest {
   text: string
   pathname: string
+  tab: string
+  element: AssistantElement | null
   memory: AssistantMemory
   filled: Record<string, string>
 }
@@ -108,13 +127,26 @@ export interface AssistantScenarioStart {
 }
 
 /**
+ * One line Memora says, already written, with the page it points at
+ * @typedef {Object} AssistantSayLine
+ * @property {string} text - Sentence, names between « »
+ * @property {ScenarioLink} [link] - Page the line points at
+ */
+
+export interface AssistantSayLine {
+  text: string
+  link?: ScenarioLink
+}
+
+/**
  * Action ready to run
- * @type {{ kind: 'navigate', href: string } | { kind: 'createTask', values: Record<string, string> } | AssistantScenarioStart}
+ * @type {{ kind: 'navigate', href: string } | { kind: 'createTask', values: Record<string, string> } | { kind: 'say', lines: AssistantSayLine[] } | AssistantScenarioStart}
  */
 
 export type AssistantAction =
   | { kind: 'navigate'; href: string }
   | { kind: 'createTask'; values: Record<string, string> }
+  | { kind: 'say'; lines: AssistantSayLine[] }
   | AssistantScenarioStart
 
 /**
@@ -134,7 +166,7 @@ export type AssistantStatus = 'ready' | 'question' | 'unknown' | 'denied' | 'not
  * @property {AssistantQuestion | null} question - Missing answer
  * @property {AssistantAction | null} action - Runnable action
  * @property {boolean} confirm - Needs a yes
- * @property {string[]} suggestions - Example sentences
+ * @property {string[]} suggestions - Answers the member can click
  * @property {AssistantMemory} memory - References to keep
  */
 

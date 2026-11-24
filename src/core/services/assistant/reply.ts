@@ -3,14 +3,15 @@ import type { PageContext } from '@/core/lib/assistant/context'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { ASSISTANT_COPY, ASSISTANT_SLOT_LABELS } from '@/declarations/assistant/copy'
 import type { AssistantSlotKey } from '@/declarations/assistant/copy'
-import { ASSISTANT_EXAMPLES } from '@/declarations/assistant/lexicon'
-import type { AssistantIntentName } from '@/declarations/assistant/lexicon'
+import { ASSISTANT_EXAMPLES } from '@/declarations/assistant/domains'
+import type { AssistantIntentName } from '@/declarations/assistant/domains'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import { fillTemplate } from '@/utils/format/strings'
 import type {
   AssistantChoice,
   AssistantProposal,
   AssistantRequest,
+  AssistantSayLine,
   AssistantSlot,
 } from '@/types/assistant'
 
@@ -141,4 +142,28 @@ export const askChoice = ({
     reply,
     slots,
     question: { slot: slotKey, label: ASSISTANT_SLOT_LABELS[slotKey], kind: 'choice', choices },
+  })
+
+/**
+ * Say lines already written, then offer answers
+ * @param {Object} input - Speech parts
+ * @param {AssistantIntentName | null} input.intent - Recognised intent
+ * @param {AssistantSayLine[]} input.lines - What Memora says, one idea per line
+ * @param {string[]} [input.replies] - Sentences the member can click
+ * @return {AssistantProposal} - Ready proposal
+ */
+
+export const speak = ({
+  intent,
+  lines,
+  replies = [],
+}: {
+  intent: AssistantIntentName | null
+  lines: AssistantSayLine[]
+  replies?: string[]
+}): AssistantProposal =>
+  propose(intent, {
+    reply: lines[0]?.text ?? '',
+    action: { kind: 'say', lines },
+    suggestions: replies,
   })

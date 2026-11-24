@@ -6,7 +6,7 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { ActivityPanel } from '@/components/structures/data/ActivityPanel'
 import { FileHead } from '@/components/structures/page/FileHead'
 import { FileTabs } from '@/components/structures/page/FileTabs'
-import { FloatingFocus } from '@/composites/search/assistant/FloatingFocus'
+import { usePageFocus } from '@/core/hooks/data/system/usePageFocus'
 import { JuniorDrawers } from '@/composites/academy/junior/JuniorDrawers'
 import {
   JuniorFileProvider,
@@ -45,16 +45,15 @@ const JuniorBody = ({ activity }: { activity: ActivityEntry[] }) => {
   const { junior } = file
   const closeFlow = () => setFlow(null)
 
+  // Memora offers to help with this Junior when the chat opens, never on one's own file
+  usePageFocus(
+    junior.accountId !== can.viewerId && (can.manage || can.lead || can.writeNotes)
+      ? { kind: 'junior', id: junior.id, label: junior.displayName }
+      : null
+  )
+
   return (
     <div className="flex flex-col gap-8" {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.fsiTabs }}>
-      {/* Memora offers to help with this Junior when the chat opens, never on one's own file */}
-      {junior.accountId !== can.viewerId && (can.manage || can.lead || can.writeNotes) && (
-        <FloatingFocus
-          scenario="junior"
-          entry="onFile"
-          data={{ juniorId: junior.id, name: junior.displayName }}
-        />
-      )}
       <FileHead
         lead={<Avatar name={junior.displayName} src={junior.avatarUrl} size="xl" />}
         title={junior.displayName}

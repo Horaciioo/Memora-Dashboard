@@ -136,8 +136,6 @@ const knownSlots = (parts: {
 
 export const resolveCreateTask: Resolver = async (context) => {
   const { parsed, request, session, access, scope } = context
-  if (!access.can(Permissions.TaskCreate)) return refuse('createTask')
-
   const fields = await taskFields(await scope(), workViewer(session, access))
   const optionsOf = (name: string) => fields.find((field) => field.name === name)?.options ?? []
   const canManage = access.can(Permissions.TaskManage)
