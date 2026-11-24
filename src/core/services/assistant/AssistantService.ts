@@ -4,7 +4,15 @@ import { readPageContext } from '@/core/lib/assistant/context'
 import { isNexusInput } from '@/core/lib/nexus/intercept'
 import { parseCommand } from '@/core/lib/assistant/parse'
 import { resolveAbsence } from '@/core/services/assistant/absences'
-import { resolveDayPoint, resolveWeekPoint } from '@/core/services/assistant/point'
+import {
+  resolveAway,
+  resolveBirthdays,
+  resolveDayPoint,
+  resolveLate,
+  resolveNextPlans,
+  resolveTodo,
+  resolveWeekPoint,
+} from '@/core/services/assistant/point'
 import { resolveStats } from '@/core/services/assistant/stats'
 import { resolveGesture } from '@/core/services/assistant/gestures'
 import { resolveWhy } from '@/core/services/assistant/access'
@@ -28,6 +36,11 @@ const RESOLVERS: Record<AssistantIntentName, Resolver> = {
   stats: resolveStats,
   dayPoint: resolveDayPoint,
   weekPoint: resolveWeekPoint,
+  myTodo: resolveTodo,
+  myLate: resolveLate,
+  nextPlans: resolveNextPlans,
+  whoAway: resolveAway,
+  nextBirthdays: resolveBirthdays,
   createTask: resolveCreateTask,
   completeTask: resolveGesture,
   reopenTask: resolveGesture,

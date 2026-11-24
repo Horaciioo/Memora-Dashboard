@@ -2,7 +2,7 @@ import { varied } from '@/core/lib/assistant/variants'
 import { AGENDA_COPY, AGENDA_VARIANTS } from '@/declarations/assistant/variants/agenda'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { ROUTES } from '@/declarations/navigation'
-import type { AgendaFacts, AgendaPerson, AgendaSpan } from '@/types/agenda'
+import type { AgendaFacts, AgendaFocus, AgendaPerson, AgendaSpan } from '@/types/agenda'
 import type { AssistantSayLine } from '@/types/assistant'
 import { formatWeekday, formatWeekdayTime } from '@/utils/format/time/dates'
 
@@ -76,8 +76,27 @@ export interface Agenda {
  * @return {Agenda} - Lines and the way on
  */
 
-export const composeAgenda = (facts: AgendaFacts, today: string, span: AgendaSpan): Agenda => {
-  const last = lastDayOf(today, span)
+export const composeAgenda = (
+  source: AgendaFacts,
+  today: string,
+  span: AgendaSpan,
+  focus: AgendaFocus | null = null
+): Agenda => {
+  // A focus keeps one kind of fact and every date it has
+  const facts: AgendaFacts = focus
+    ? {
+        tasks:
+          focus === 'tasks'
+            ? source.tasks
+            : focus === 'late'
+              ? source.tasks.filter((task) => task.dueDay !== null && task.dueDay < today)
+              : [],
+        plans: focus === 'plans' ? source.plans : [],
+        away: focus === 'away' ? source.away : [],
+        birthdays: focus === 'birthdays' ? source.birthdays : [],
+      }
+    : source
+  const last = focus ? '9999-12-31' : lastDayOf(today, span)
   const isDay = span === 'day'
   const cap = ASSISTANT_SETTINGS.pointLines
 
@@ -93,10 +112,25 @@ export const composeAgenda = (facts: AgendaFacts, today: string, span: AgendaSpa
   const away = facts.away
 
   const count = tasks.length + plans.length + Number(away.length > 0) + Number(birthdays.length > 0)
+  if (count === 0 && focus) {
+    return {
+      count,
+      lines: [{ text: varied(`calm-${focus}`, AGENDA_VARIANTS.calmFocus[focus]) }],
+      replies: [],
+    }
+  }
+
   if (count === 0) {
     return {
       count,
-      lines: [{ text: varied(isDay ? 'calmDay' : 'calmWeek', AGENDA_VARIANTS[isDay ? 'calmDay' : 'calmWeek']) }],
+      lines: [
+        {
+          text: varied(
+            isDay ? 'calmDay' : 'calmWeek',
+            AGENDA_VARIANTS[isDay ? 'calmDay' : 'calmWeek']
+          ),
+        },
+      ],
       replies: [AGENDA_COPY[isDay ? 'weekAsk' : 'dayAsk']],
     }
   }
@@ -119,22 +153,24 @@ export const composeAgenda = (facts: AgendaFacts, today: string, span: AgendaSpa
     }
   })
 
-  const planLines = plans.slice(0, cap).map(
-    (plan): AssistantSayLine => ({
-      text: varied('plan', AGENDA_VARIANTS.plan, {
-        when: formatWeekdayTime(plan.startsAt),
-        title: plan.title,
-      }),
-    })
-  )
+  const planLines = plans.slice(0, cap).map((plan): AssistantSayLine => ({
+    text: varied('plan', AGENDA_VARIANTS.plan, {
+      when: formatWeekdayTime(plan.startsAt),
+      title: plan.title,
+    }),
+  }))
 
   const lines: AssistantSayLine[] = [
-    { text: varied(isDay ? 'openDay' : 'openWeek', opening, { count: String(count) }) },
+    ...(focus
+      ? []
+      : [{ text: varied(isDay ? 'openDay' : 'openWeek', opening, { count: String(count) }) }]),
     ...taskLines,
     ...(tasks.length > cap
       ? [
           {
-            text: varied('taskMore', AGENDA_VARIANTS.taskMore, { count: String(tasks.length - cap) }),
+            text: varied('taskMore', AGENDA_VARIANTS.taskMore, {
+              count: String(tasks.length - cap),
+            }),
             link: { href: ROUTES.home, label: AGENDA_COPY.openTasks },
           },
         ]
@@ -143,7 +179,9 @@ export const composeAgenda = (facts: AgendaFacts, today: string, span: AgendaSpa
     ...(plans.length > cap
       ? [
           {
-            text: varied('planMore', AGENDA_VARIANTS.planMore, { count: String(plans.length - cap) }),
+            text: varied('planMore', AGENDA_VARIANTS.planMore, {
+              count: String(plans.length - cap),
+            }),
             link: { href: ROUTES.calendar, label: AGENDA_COPY.openCalendar },
           },
         ]
@@ -165,7 +203,9 @@ export const composeAgenda = (facts: AgendaFacts, today: string, span: AgendaSpa
         when: dayWord(entry.day, today),
       }),
     })),
-    { text: varied(isDay ? 'end' : 'endWeek', AGENDA_VARIANTS[isDay ? 'end' : 'endWeek']) },
+    ...(focus
+      ? []
+      : [{ text: varied(isDay ? 'end' : 'endWeek', AGENDA_VARIANTS[isDay ? 'end' : 'endWeek']) }]),
   ]
 
   return {

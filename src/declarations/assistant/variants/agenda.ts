@@ -39,6 +39,14 @@ export const AGENDA_VARIANTS = {
   endWeek: ['C’est tout pour cette semaine.', 'Voilà pour ta semaine.'],
   calmDay: ['Rien de pressé aujourd’hui, ta journée est calme.', 'Rien ne t’attend aujourd’hui.'],
   calmWeek: ['Rien de pressé cette semaine, elle est calme.', 'Rien ne t’attend cette semaine.'],
+  // One kind of fact asked for alone, and nothing to say
+  calmFocus: {
+    tasks: ['Rien ne t’attend pour l’instant.', 'Ta liste est vide, bravo.'],
+    late: ['Rien n’est en retard, tout est à jour.', 'Aucun retard de ton côté.'],
+    plans: ['Rien de prévu au calendrier pour les prochains jours.', 'Ton calendrier est libre.'],
+    away: ['Personne n’est en absence aujourd’hui.', 'Tout le monde est là aujourd’hui.'],
+    birthdays: ['Aucun anniversaire à l’horizon.', 'Pas d’anniversaire dans les prochains jours.'],
+  },
 } as const
 
 /**

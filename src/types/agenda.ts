@@ -6,6 +6,13 @@
 export type AgendaSpan = 'day' | 'week'
 
 /**
+ * One kind of fact a member can ask for alone
+ * @type {'tasks' | 'late' | 'plans' | 'away' | 'birthdays'}
+ */
+
+export type AgendaFocus = 'tasks' | 'late' | 'plans' | 'away' | 'birthdays'
+
+/**
  * Something that waits for the member
  * @typedef {Object} AgendaTask
  * @property {string} title - What to do
