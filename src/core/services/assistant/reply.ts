@@ -3,7 +3,7 @@ import type { PageContext } from '@/core/lib/assistant/context'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { ASSISTANT_COPY, ASSISTANT_SLOT_LABELS } from '@/declarations/assistant/copy'
 import type { AssistantSlotKey } from '@/declarations/assistant/copy'
-import { ASSISTANT_EXAMPLES } from '@/declarations/assistant/domains'
+import { examplesFor } from '@/declarations/assistant/domains'
 import type { AssistantIntentName } from '@/declarations/assistant/domains'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import { fillTemplate } from '@/utils/format/strings'
@@ -82,15 +82,16 @@ export const slot = (key: AssistantSlotKey, value: string): AssistantSlot => ({
 })
 
 /**
- * Nothing understood
+ * Nothing understood, the suggestions are those of the page on screen
+ * @param {string} [pathname] - Page on screen
  * @return {AssistantProposal} - Unknown reply
  */
 
-export const notUnderstood = (): AssistantProposal =>
+export const notUnderstood = (pathname = ''): AssistantProposal =>
   propose(null, {
     status: 'unknown',
     reply: ASSISTANT_COPY.unknown,
-    suggestions: [...ASSISTANT_EXAMPLES],
+    suggestions: examplesFor(pathname),
   })
 
 /**

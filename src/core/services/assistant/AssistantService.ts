@@ -71,7 +71,7 @@ export const interpret = async (
     pathname: request.pathname,
     intent: request.filled.intent,
   })
-  if (!parsed.intent) return notUnderstood()
+  if (!parsed.intent) return notUnderstood(request.pathname)
 
   // Two readings too close: the member picks one
   if (parsed.rivals.length > 0) {

@@ -76,3 +76,19 @@ export const ASSISTANT_EXAMPLES: readonly string[] = ASSISTANT_DOMAINS.flatMap((
 
   return first?.examples[0] ? [first.examples[0]] : []
 }).slice(0, 5)
+
+/**
+ * Sentences worth trying on a page, then the general ones
+ * @param {string} pathname - Page on screen
+ * @return {string[]} - At most as many as the general list
+ */
+
+export const examplesFor = (pathname: string): string[] => {
+  const onPage = Object.values(ASSISTANT_INTENTS).flatMap((intent) =>
+    'pages' in intent && intent.pages?.some((route) => route !== '/' && pathname.startsWith(route))
+      ? [intent.examples[0]]
+      : []
+  )
+
+  return [...new Set([...onPage, ...ASSISTANT_EXAMPLES])].slice(0, ASSISTANT_EXAMPLES.length)
+}
