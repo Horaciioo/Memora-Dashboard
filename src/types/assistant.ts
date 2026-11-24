@@ -1,5 +1,6 @@
 import type { AssistantIntentName } from '@/declarations/assistant/domains'
 import type { GestureId } from '@/declarations/assistant/gestures'
+import type { RecapChapterName } from '@/declarations/recap/chapters'
 import type { ScenarioLink } from '@/types/scenario'
 
 /**
@@ -133,11 +134,13 @@ export interface AssistantScenarioStart {
  * @typedef {Object} AssistantSayLine
  * @property {string} text - Sentence, names between « »
  * @property {ScenarioLink} [link] - Page the line points at
+ * @property {RecapChapterName} [section] - Subject of the point the line belongs to
  */
 
 export interface AssistantSayLine {
   text: string
   link?: ScenarioLink
+  section?: RecapChapterName
 }
 
 /**
@@ -189,12 +192,12 @@ export interface AssistantGestureAction {
 
 /**
  * Action ready to run
- * @type {{ kind: 'navigate', href: string } | { kind: 'say', lines: AssistantSayLine[] } | AssistantGestureAction | AssistantScenarioStart}
+ * @type {{ kind: 'navigate', href: string } | { kind: 'say', lines: AssistantSayLine[], walk?: boolean } | AssistantGestureAction | AssistantScenarioStart}
  */
 
 export type AssistantAction =
   | { kind: 'navigate'; href: string }
-  | { kind: 'say'; lines: AssistantSayLine[] }
+  | { kind: 'say'; lines: AssistantSayLine[]; walk?: boolean }
   | AssistantGestureAction
   | AssistantScenarioStart
 

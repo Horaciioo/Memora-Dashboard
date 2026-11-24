@@ -19,7 +19,12 @@ const pointOf =
     const today = instantToWall(new Date()).slice(0, 10)
     const agenda = composeAgenda(await readAgendaFacts(context, span), today, span, focus)
 
-    return speak({ intent: context.parsed.intent, lines: agenda.lines, replies: agenda.replies })
+    return speak({
+      intent: context.parsed.intent,
+      lines: agenda.lines,
+      replies: agenda.replies,
+      walk: !focus && agenda.sections > 1,
+    })
   }
 
 // One resolver per window

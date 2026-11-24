@@ -60,12 +60,14 @@ const taskKey = (
  * @property {number} count - Subjects told
  * @property {AssistantSayLine[]} lines - One idea per line
  * @property {string[]} replies - Answers offered after it
+ * @property {number} sections - Subjects the lines are split in
  */
 
 export interface Agenda {
   count: number
   lines: AssistantSayLine[]
   replies: string[]
+  sections: number
 }
 
 /**
@@ -117,6 +119,7 @@ export const composeAgenda = (
       count,
       lines: [{ text: varied(`calm-${focus}`, AGENDA_VARIANTS.calmFocus[focus]) }],
       replies: [],
+      sections: 0,
     }
   }
 
@@ -132,6 +135,7 @@ export const composeAgenda = (
         },
       ],
       replies: [AGENDA_COPY[isDay ? 'weekAsk' : 'dayAsk']],
+      sections: 0,
     }
   }
 
@@ -150,6 +154,7 @@ export const composeAgenda = (
     return {
       text: varied(key, AGENDA_VARIANTS[key], values),
       link: { href: task.href, label: task.context || task.title },
+      section: 'tasks',
     }
   })
 
@@ -158,6 +163,7 @@ export const composeAgenda = (
       when: formatWeekdayTime(plan.startsAt),
       title: plan.title,
     }),
+    section: 'events',
   }))
 
   const lines: AssistantSayLine[] = [
@@ -172,6 +178,7 @@ export const composeAgenda = (
               count: String(tasks.length - cap),
             }),
             link: { href: ROUTES.home, label: AGENDA_COPY.openTasks },
+            section: 'tasks' as const,
           },
         ]
       : []),
@@ -183,6 +190,7 @@ export const composeAgenda = (
               count: String(plans.length - cap),
             }),
             link: { href: ROUTES.calendar, label: AGENDA_COPY.openCalendar },
+            section: 'events' as const,
           },
         ]
       : []),
@@ -194,6 +202,7 @@ export const composeAgenda = (
               away.length > 1 ? AGENDA_VARIANTS.awayMany : AGENDA_VARIANTS.awayOne,
               { names: namesOf(away) }
             ),
+            section: 'absences' as const,
           },
         ]
       : []),
@@ -202,6 +211,7 @@ export const composeAgenda = (
         names: entry.name,
         when: dayWord(entry.day, today),
       }),
+      section: 'around' as const,
     })),
     ...(focus
       ? []
@@ -211,6 +221,7 @@ export const composeAgenda = (
   return {
     count,
     lines,
+    sections: new Set(lines.flatMap((line) => (line.section ? [line.section] : []))).size,
     replies: [
       ...(plans.length > 0 ? [AGENDA_COPY.openCalendar] : []),
       AGENDA_COPY[isDay ? 'weekAsk' : 'dayAsk'],

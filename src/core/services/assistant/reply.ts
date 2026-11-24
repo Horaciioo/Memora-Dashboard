@@ -151,6 +151,7 @@ export const askChoice = ({
  * @param {AssistantIntentName | null} input.intent - Recognised intent
  * @param {AssistantSayLine[]} input.lines - What Memora says, one idea per line
  * @param {string[]} [input.replies] - Sentences the member can click
+ * @param {boolean} [input.walk] - The lines are subjects Memora can tell one by one
  * @return {AssistantProposal} - Ready proposal
  */
 
@@ -158,13 +159,15 @@ export const speak = ({
   intent,
   lines,
   replies = [],
+  walk = false,
 }: {
   intent: AssistantIntentName | null
   lines: AssistantSayLine[]
   replies?: string[]
+  walk?: boolean
 }): AssistantProposal =>
   propose(intent, {
     reply: lines[0]?.text ?? '',
-    action: { kind: 'say', lines },
+    action: { kind: 'say', lines, ...(walk && { walk }) },
     suggestions: replies,
   })

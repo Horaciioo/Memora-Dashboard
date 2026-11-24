@@ -173,6 +173,11 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
     }
 
     // Written lines come out one by one, the last carries the answers
+    if (proposal.action?.kind === 'say' && proposal.action.walk) {
+      guide('point', 'walk', { lines: JSON.stringify(proposal.action.lines) })
+      return
+    }
+
     if (proposal.action?.kind === 'say') {
       const { lines } = proposal.action
       lines.forEach((line, index) =>
