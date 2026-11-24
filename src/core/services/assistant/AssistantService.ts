@@ -30,6 +30,7 @@ import { resolveLive } from '@/core/services/assistant/lives'
 import { resolveLogs } from '@/core/services/assistant/logs'
 import { resolveNavigation } from '@/core/services/assistant/navigation'
 import { resolveRecord } from '@/core/services/assistant/records'
+import { chatReply } from '@/core/services/assistant/chat'
 import { askChoice, notUnderstood, refuse } from '@/core/services/assistant/reply'
 import type { Resolver, ResolverContext } from '@/core/services/assistant/reply'
 import { resolveCreateTask } from '@/core/services/assistant/tasks'
@@ -102,7 +103,8 @@ export const interpret = async (
     pathname: request.pathname,
     intent: request.filled.intent,
   })
-  if (!parsed.intent) return notUnderstood(request.pathname)
+  // No intent: she chats instead of giving up
+  if (!parsed.intent) return chatReply(request.text, request.pathname, context.session.displayName)
 
   // Two readings too close: the member picks one
   if (parsed.rivals.length > 0) {

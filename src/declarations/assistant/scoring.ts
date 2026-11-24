@@ -30,3 +30,29 @@ export const ASSISTANT_SCORES = Object.fromEntries(
     }),
   ])
 ) as Record<keyof typeof SCORE_FALLBACKS, number>
+
+// Weights of the free chat, and its bars
+const CHAT_FALLBACKS = {
+  phrase: 60,
+  group: 50,
+  word: 40,
+  floor: 40,
+  shortWords: 2,
+  nextShown: 3,
+} as const
+
+/**
+ * Points per chat signal, words under which a sentence is short, answers offered
+ * @type {Record<keyof typeof CHAT_FALLBACKS, number>}
+ */
+
+export const CHAT_SCORES = Object.fromEntries(
+  Object.entries(CHAT_FALLBACKS).map(([key, fallback]) => [
+    key,
+    readInteger(assistant.chat[key as keyof typeof CHAT_FALLBACKS], {
+      path: `system/assistant.chat.${key}`,
+      fallback,
+      min: 0,
+    }),
+  ])
+) as Record<keyof typeof CHAT_FALLBACKS, number>

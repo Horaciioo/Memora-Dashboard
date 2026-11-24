@@ -41,5 +41,13 @@
     "typo": 5,
     "floor": 20,
     "margin": 15
+  },
+  "chat": {
+    "phrase": 60,
+    "group": 50,
+    "word": 40,
+    "floor": 40,
+    "shortWords": 2,
+    "nextShown": 3
   }
 }
