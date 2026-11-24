@@ -1,3 +1,4 @@
+import { PriorityNames } from '@/declarations/reference/fixed'
 import type { JournalPeriod } from '@/declarations/system/monitoring/journal'
 import type { LogLevelName } from '@/utils/constants/events'
 
@@ -355,3 +356,19 @@ export const ASSISTANT_LOG_PERIODS: Record<string, JournalPeriod> = {
  */
 
 export const ASSISTANT_ACTOR_MARKERS = ['de', 'par', 'du'] as const
+
+/**
+ * Words naming a priority
+ * @type {Record<string, string>}
+ */
+
+export const ASSISTANT_PRIORITIES: Record<string, string> = {
+  basse: PriorityNames.Low,
+  faible: PriorityNames.Low,
+  normale: PriorityNames.Normal,
+  haute: PriorityNames.High,
+  importante: PriorityNames.High,
+  urgente: PriorityNames.Urgent,
+  urgent: PriorityNames.Urgent,
+  urgence: PriorityNames.Urgent,
+}

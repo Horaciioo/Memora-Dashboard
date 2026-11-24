@@ -61,7 +61,7 @@ export const SearchResults = ({
             <span className="min-w-0 flex-1 truncate">{recent}</span>
           </button>
         ))}
-      {isTooShort && <SearchSuggestions onGo={onGo} />}
+      {isTooShort && <SearchSuggestions onGo={onGo} onTry={onRecent} />}
       {!isTooShort && isLoading && (
         <div className="flex justify-center py-6">
           <BrandLoader variant="ink" />

@@ -1,5 +1,6 @@
 'use client'
 
+import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { Glyph } from '@/components/elements/display/glyphs/Glyph'
 import { usePaletteEntries } from '@/core/hooks/interaction/layout/usePaletteEntries'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
@@ -8,16 +9,17 @@ import { PALETTE_STYLES } from '@/declarations/ui/variants'
 
 export interface SearchSuggestionsProps {
   onGo: (href: string) => void
+  onTry: (sentence: string) => void
 }
 
 /**
  * Palette empty state
- * @param {SearchSuggestionsProps} props - Handler
+ * @param {SearchSuggestionsProps} props - Handlers
  * @return {JSX.Element}
  */
 
-export const SearchSuggestions = ({ onGo }: SearchSuggestionsProps) => {
-  const { asks, shortcuts, recents } = usePaletteEntries()
+export const SearchSuggestions = ({ onGo, onTry }: SearchSuggestionsProps) => {
+  const { asks, tries, shortcuts, recents } = usePaletteEntries()
 
   return (
     <div>
@@ -37,6 +39,18 @@ export const SearchSuggestions = ({ onGo }: SearchSuggestionsProps) => {
           </button>
         )
       })}
+      {tries.length > 0 && <p className={PALETTE_STYLES.group}>{ASSISTANT_COPY.paletteTries}</p>}
+      {tries.map((sentence) => (
+        <button
+          key={sentence}
+          type="button"
+          onClick={() => onTry(sentence)}
+          className={PALETTE_STYLES.suggestion}
+        >
+          <BrainMark motion="idle" className={PALETTE_STYLES.suggestionIcon} />
+          <span className="min-w-0 flex-1 truncate">{sentence}</span>
+        </button>
+      ))}
       {recents.length > 0 && (
         <p className={PALETTE_STYLES.group}>{ASSISTANT_COPY.paletteRecents}</p>
       )}

@@ -18,11 +18,11 @@ import { UnbanStatuses } from '@/utils/constants/unban'
 import { formatDayRange } from '@/utils/format/time/dates'
 
 // Nothing to act on, said in words
-const nothing = (gesture: GestureId, reply: string): AssistantProposal =>
+export const nothing = (gesture: GestureId, reply: string): AssistantProposal =>
   propose(gesture, { status: 'notFound', reply })
 
 // Target found, or the question that finds it
-type Found = { target: AssistantReference } | { proposal: AssistantProposal }
+export type Found = { target: AssistantReference } | { proposal: AssistantProposal }
 
 /**
  * Proposal that asks before doing a gesture
@@ -31,28 +31,43 @@ type Found = { target: AssistantReference } | { proposal: AssistantProposal }
  * @param {string} input.id - Target identifier, empty for a global gesture
  * @param {string} input.name - Target name told back
  * @param {Record<string, unknown>} [input.values] - Payload of a creation
+ * @param {Record<string, unknown>} [input.back] - Values the gesture takes back to
+ * @param {Record<string, string>} [input.tell] - Words the sentences also name
  * @return {AssistantProposal} - Proposal waiting for a yes
  */
 
 export const proposeGesture = (
   gesture: GestureId,
-  { id, name, values = {} }: { id: string; name: string; values?: Record<string, unknown> }
+  {
+    id,
+    name,
+    values = {},
+    back = {},
+    tell = {},
+  }: {
+    id: string
+    name: string
+    values?: Record<string, unknown>
+    back?: Record<string, unknown>
+    tell?: Record<string, string>
+  }
 ): AssistantProposal => {
   const def: GestureDef = GESTURES[gesture]
   const reverse: GestureDef | null = def.undo ? GESTURES[def.undo as GestureId] : null
 
   return propose(gesture, {
-    reply: fill(def.ask, { name }),
+    reply: fill(def.ask, { name, ...tell }),
     confirm: true,
     action: {
       kind: 'act',
       gesture,
       risk: def.risk,
       call: def.call(id, values),
-      undo: reverse ? reverse.call(id, {}) : null,
+      undo: reverse ? reverse.call(id, back) : null,
+      batch: [],
       confirmLabel: def.confirmLabel,
-      done: fill(def.done, { name }),
-      sure: def.sure ? fill(def.sure, { name }) : null,
+      done: fill(def.done, { name, ...tell }),
+      sure: def.sure ? fill(def.sure, { name, ...tell }) : null,
       remember: def.remember ?? null,
     },
     memory: def.target && id ? { [def.target]: { id, label: name } } : {},
@@ -114,7 +129,7 @@ const askTask = async (
  * @return {Promise<Found>} - Task or question
  */
 
-const findTask = async (gesture: GestureId, context: ResolverContext): Promise<Found> => {
+export const findTask = async (gesture: GestureId, context: ResolverContext): Promise<Found> => {
   const { parsed, request, page } = context
 
   // A name goes through the search the member is allowed

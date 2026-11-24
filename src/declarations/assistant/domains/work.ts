@@ -18,6 +18,21 @@ export const WORK = defineDomain({
   summary:
     'Je te dis où en est un projet, lesquels sont en retard, ta prochaine réunion, les annonces de la semaine, les absences et les demandes de déban qui attendent.',
   intents: {
+    addMeetingTopic: {
+      label: 'Ajouter un sujet à une réunion',
+      kind: 'act',
+      verbs: ['ajoute', 'ajouter', 'ajoutes', 'mets', 'inscris', 'inscrire'],
+      nouns: ['sujet', 'sujets', 'point'],
+      companions: ['reunion', 'reunions', 'meeting'],
+      needs: 'both',
+      boost: QUESTION_BOOST,
+      permission: Permissions.MeetingUpdate,
+      pages: [ROUTES.meetings],
+      examples: [
+        'Ajoute un sujet à la réunion du lundi : le budget',
+        'Inscris un sujet à la réunion d’équipe : les vacances',
+      ],
+    },
     takeUnban: {
       label: 'Prendre une demande de déban',
       kind: 'act',

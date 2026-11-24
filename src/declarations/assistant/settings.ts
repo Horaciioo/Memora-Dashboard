@@ -3,7 +3,7 @@ import { readInteger } from '@/declarations/configurations/readers'
 
 /**
  * Assistant behaviour
- * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number, bubbleExpandMs: number, liveDefaultHours: number, bubbleOpenMs: number, bubbleStaySeconds: number, bubbleReloadMs: number, closeSeconds: number, undoSeconds: number, pointLines: number, statsMaxDays: number, memoryTurns: number }}
+ * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingLeadMs: number, typingMinMs: number, typingMaxMs: number, eraseMsPerChar: number, draftPauseMs: number, handoffSeconds: number, maxPicks: number, paletteAsks: number, pickStaggerMs: number, thinkingMs: number, remindGapMinutes: number, liveAskEverySeconds: number, serviceLeadMinutes: number, bubbleGrowMs: number, bubbleExpandMs: number, liveDefaultHours: number, bubbleOpenMs: number, bubbleStaySeconds: number, bubbleReloadMs: number, closeSeconds: number, undoSeconds: number, pointLines: number, statsMaxDays: number, memoryTurns: number, maxBatch: number }}
  */
 
 export const ASSISTANT_SETTINGS = {
@@ -178,5 +178,17 @@ export const ASSISTANT_SETTINGS = {
     path: 'system/assistant.memoryTurns',
     fallback: 3,
     min: 1,
+  }), // A series never runs more gestures than this
+  maxBatch: readInteger(assistant.maxBatch, {
+    path: 'system/assistant.maxBatch',
+    fallback: 20,
+    min: 2,
   }),
 }
+
+/**
+ * Keys that answer Cmd or Ctrl
+ * @type {{ palette: string, chat: string }}
+ */
+
+export const ASSISTANT_KEYS = { palette: 'k', chat: 'j' } as const

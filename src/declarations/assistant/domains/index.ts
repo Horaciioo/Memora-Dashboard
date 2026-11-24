@@ -11,6 +11,7 @@ import { STATS } from '@/declarations/assistant/domains/stats'
 import { WORK } from '@/declarations/assistant/domains/work'
 import { TASKS } from '@/declarations/assistant/domains/tasks'
 import type { DomainDef, IntentDef } from '@/declarations/assistant/domains/types'
+import type { PermissionName } from '@/utils/constants/permissions'
 
 /**
  * Domains, in the order examples are offered
@@ -81,17 +82,32 @@ export const ASSISTANT_EXAMPLES: readonly string[] = ASSISTANT_DOMAINS.flatMap((
 }).slice(0, 5)
 
 /**
+ * Sentences of the page on screen, for those the member may say
+ * @param {string} pathname - Page on screen
+ * @param {(right: PermissionName) => boolean} [can] - Rights the member holds, all when omitted
+ * @return {string[]} - First example of each intent of the page
+ */
+
+export const onPageExamples = (
+  pathname: string,
+  can?: (right: PermissionName) => boolean
+): string[] =>
+  Object.values<IntentDef>(ASSISTANT_INTENTS).flatMap((intent) => {
+    const isOnPage = intent.pages?.some((route) => route !== '/' && pathname.startsWith(route))
+    const isAllowed = !intent.permission || !can || can(intent.permission)
+
+    return isOnPage && isAllowed ? [intent.examples[0]] : []
+  })
+
+/**
  * Sentences worth trying on a page, then the general ones
  * @param {string} pathname - Page on screen
+ * @param {(right: PermissionName) => boolean} [can] - Rights the member holds, all when omitted
  * @return {string[]} - At most as many as the general list
  */
 
-export const examplesFor = (pathname: string): string[] => {
-  const onPage = Object.values(ASSISTANT_INTENTS).flatMap((intent) =>
-    'pages' in intent && intent.pages?.some((route) => route !== '/' && pathname.startsWith(route))
-      ? [intent.examples[0]]
-      : []
+export const examplesFor = (pathname: string, can?: (right: PermissionName) => boolean): string[] =>
+  [...new Set([...onPageExamples(pathname, can), ...ASSISTANT_EXAMPLES])].slice(
+    0,
+    ASSISTANT_EXAMPLES.length
   )
-
-  return [...new Set([...onPage, ...ASSISTANT_EXAMPLES])].slice(0, ASSISTANT_EXAMPLES.length)
-}

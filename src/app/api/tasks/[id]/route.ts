@@ -22,11 +22,12 @@ export const PATCH = createProtectedRoute({
     const viewer = workViewer(session, access)
     const fields = await taskFields(perimeter, viewer)
 
-    const parsed = parseFormValues(fields, raw, { fillMissing: true })
-    if (!parsed.ok) throw invalidInput(parsed.issues)
-
     await assertTaskVisible(params.id, viewer)
     const before = await readTask(params.id)
+
+    // A field left out keeps its stored value
+    const parsed = parseFormValues(fields, { ...before.values, ...raw }, { fillMissing: true })
+    if (!parsed.ok) throw invalidInput(parsed.issues)
 
     // Owner, state and deadline stay where a manager put them
     const values = access.can(Permissions.TaskManage)

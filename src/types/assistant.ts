@@ -172,6 +172,7 @@ export interface AssistantCall {
  * @property {AssistantRisk} risk - Confirmation level
  * @property {AssistantCall} call - Request to send
  * @property {AssistantCall | null} undo - Request that takes it back
+ * @property {AssistantCall[]} batch - Series run one by one, empty for a single gesture
  * @property {string} confirmLabel - Button that runs it
  * @property {string} done - Sentence once done
  * @property {string | null} sure - Second question of a strong gesture
@@ -184,6 +185,7 @@ export interface AssistantGestureAction {
   risk: AssistantRisk
   call: AssistantCall
   undo: AssistantCall | null
+  batch: AssistantCall[]
   confirmLabel: string
   done: string
   sure: string | null

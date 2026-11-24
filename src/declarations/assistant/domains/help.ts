@@ -69,6 +69,23 @@ export const HELP = defineDomain({
       boost: QUESTION_BOOST,
       examples: ['Quoi de neuf', 'Qu’est-ce qui a changé'],
     },
+    neverDo: {
+      label: 'Demander ce que Memora ne fait jamais',
+      kind: 'help',
+      phrases: [
+        'change mon mot de passe',
+        'changer mon mot de passe',
+        'changer de mot de passe',
+        'supprime mon compte',
+        'supprimer mon compte',
+        'efface mon compte',
+        'desactive la double authentification',
+        'desactive mon 2fa',
+      ],
+      needs: 'noun',
+      boost: QUESTION_BOOST,
+      examples: ['Change mon mot de passe', 'Supprime mon compte'],
+    },
     whereIs: {
       label: 'Trouver où se trouve une page',
       kind: 'help',

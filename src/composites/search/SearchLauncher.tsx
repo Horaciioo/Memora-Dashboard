@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { useAssistantDock } from '@/core/store/assistantDock'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
+import { ASSISTANT_KEYS } from '@/declarations/assistant/settings'
 import { SEARCH_LAUNCHER } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { BUTTON_STYLES } from '@/declarations/ui/variants'
@@ -52,24 +53,31 @@ export const SearchLauncher = ({
     if (!shortcut) return
 
     const onKeyDown = (event: KeyboardEvent) => {
-      // Cmd or Ctrl plus K opens the palette from anywhere
-      if (event.key?.toLowerCase() !== 'k' || !(event.metaKey || event.ctrlKey)) return
+      // Cmd or Ctrl plus K opens the palette, plus J the chat, from anywhere
+      const key = event.key?.toLowerCase()
+      if (
+        !(event.metaKey || event.ctrlKey) ||
+        !(Object.values(ASSISTANT_KEYS) as string[]).includes(key)
+      ) {
+        return
+      }
 
       event.preventDefault()
-      setOpen((open) => !open)
+      if (key === ASSISTANT_KEYS.palette) setOpen((open) => !open)
+      else openChat()
     }
 
     document.addEventListener('keydown', onKeyDown)
 
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [shortcut])
+  }, [shortcut, openChat])
 
   return (
     <>
       <button
         type="button"
         aria-label={ASSISTANT_COPY.launcherTitle}
-        title={`${ASSISTANT_COPY.launcherTitle}, ${NAV_COPY.searchShortcut}`}
+        title={`${ASSISTANT_COPY.launcherTitle}, ${NAV_COPY.searchShortcut}, ${NAV_COPY.chatShortcut}`}
         onClick={() => {
           openChat()
           onOpen?.()

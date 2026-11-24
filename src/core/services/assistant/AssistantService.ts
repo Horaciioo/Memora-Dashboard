@@ -22,7 +22,16 @@ import {
   resolvePendingUnban,
   resolveProjectPoint,
 } from '@/core/services/assistant/work'
+import { resolveBatch } from '@/core/services/assistant/batches'
+import { resolveTopic } from '@/core/services/assistant/meetingEdits'
+import { resolveNeverDo } from '@/core/services/assistant/forbidden'
 import { resolveGesture } from '@/core/services/assistant/gestures'
+import {
+  resolveAssign,
+  resolveComment,
+  resolvePostpone,
+  resolvePriority,
+} from '@/core/services/assistant/taskEdits'
 import { resolveWhy } from '@/core/services/assistant/access'
 import { resolveWhatsNew } from '@/core/services/assistant/news'
 import { resolveCapabilities, resolveGuide, resolveWhere } from '@/core/services/assistant/help'
@@ -60,6 +69,14 @@ const RESOLVERS: Record<AssistantIntentName, Resolver> = {
   completeTask: resolveGesture,
   reopenTask: resolveGesture,
   deleteTask: resolveGesture,
+  completeAllTasks: resolveBatch,
+  approveAllAbsences: resolveBatch,
+  postponeTask: resolvePostpone,
+  assignTask: resolveAssign,
+  setTaskPriority: resolvePriority,
+  commentTask: resolveComment,
+  neverDo: resolveNeverDo,
+  addMeetingTopic: resolveTopic,
   approveAbsence: resolveGesture,
   refuseAbsence: resolveGesture,
   takeUnban: resolveGesture,

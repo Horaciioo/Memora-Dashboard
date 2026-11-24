@@ -259,6 +259,23 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
       [ASSISTANT_ORIGIN_HEADER]: ASSISTANT_ORIGIN_VALUE,
     })
 
+  // Gestures one by one, each with its own key
+  const runBatch = async (calls: AssistantCall[], key: string): Promise<string | null> => {
+    for (const [index, call] of calls.entries()) {
+      try {
+        await callRoute(call, `${key}:${index}`)
+      } catch (error) {
+        const reason = error instanceof ApiClientError ? error.message : ASSISTANT_COPY.offline
+
+        return ASSISTANT_COPY.batchStopped
+          .replace('{count}', String(index))
+          .replace('{error}', reason)
+      }
+    }
+
+    return null
+  }
+
   const confirm = async () => {
     const proposal = current
     const action = proposal?.action
@@ -276,6 +293,15 @@ export const useAssistantChat = (onNavigate: (href: string) => void): AssistantC
 
     setBusy(true)
     try {
+      // A series stops at the first refusal
+      if (action.batch.length > 0) {
+        const stopped = await runBatch(action.batch, writeKey.current)
+        writeKey.current = null
+        say('memora', stopped ?? action.done)
+        router.refresh()
+        return
+      }
+
       const result = await callRoute(action.call, writeKey.current)
       writeKey.current = null
       if (action.remember && result?.id) {

@@ -68,6 +68,17 @@ export const ABSENCES = defineDomain({
       pages: [ROUTES.absences],
       examples: ['Valide l’absence de Léa', 'Accepte l’absence de Procy'],
     },
+    approveAllAbsences: {
+      label: 'Valider toutes les absences',
+      kind: 'act',
+      verbs: ['valide', 'valider', 'valides', 'accepte', 'accepter', 'approuve', 'approuver'],
+      nouns: ABSENCE_NOUNS,
+      phrases: ['toutes les absences', 'tous les conges', 'toutes les demandes'],
+      needs: 'both',
+      permission: Permissions.AbsenceReview,
+      pages: [ROUTES.absences],
+      examples: ['Valide toutes les absences', 'Accepte tous les congés'],
+    },
     refuseAbsence: {
       label: 'Refuser une absence',
       kind: 'act',

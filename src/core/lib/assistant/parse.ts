@@ -17,7 +17,11 @@ import {
 import type { OwnerMatch } from '@/core/lib/assistant/slots'
 import { ASSISTANT_INTENTS, ruleOf } from '@/declarations/assistant/domains'
 import type { AssistantIntentName } from '@/declarations/assistant/domains'
-import { ASSISTANT_CURRENT, ASSISTANT_LATEST } from '@/declarations/assistant/lexicon'
+import {
+  ASSISTANT_CURRENT,
+  ASSISTANT_LATEST,
+  ASSISTANT_PRIORITIES,
+} from '@/declarations/assistant/lexicon'
 import type { AssistantPage } from '@/declarations/assistant/lexicon'
 import type { JournalPeriod } from '@/declarations/system/monitoring/journal'
 import type { AssistantAbsenceMode } from '@/types/assistant'
@@ -42,6 +46,8 @@ import type { LogLevelName } from '@/utils/constants/events'
  * @property {boolean} latest - Latest asked
  * @property {boolean} current - Running asked
  * @property {AssistantAbsenceMode | null} absenceMode - Way into the absence talk
+ * @property {string | null} priority - Priority named
+ * @property {string} note - Text after the colon
  */
 
 export interface ParsedCommand {
@@ -61,6 +67,8 @@ export interface ParsedCommand {
   latest: boolean
   current: boolean
   absenceMode: AssistantAbsenceMode | null
+  priority: string | null
+  note: string
 }
 
 // Leading words a title sheds
@@ -156,6 +164,47 @@ const readTask = (text: string, tokens: AssistantToken[], used: Set<number>, tod
   }
 }
 
+// Intents that act on one field of a record
+const EDITS = [
+  'postponeTask',
+  'assignTask',
+  'setTaskPriority',
+  'commentTask',
+  'addMeetingTopic',
+] as const
+
+/**
+ * Field a task edit names
+ * @param {string} text - Raw sentence
+ * @param {AssistantToken[]} tokens - Sentence words
+ * @param {Set<number>} used - Words taken
+ * @param {string} today - ISO day
+ * @return {Pick<ParsedCommand, 'owner' | 'due' | 'priority' | 'note'>} - Edit parts
+ */
+
+const readEdit = (text: string, tokens: AssistantToken[], used: Set<number>, today: string) => {
+  // Comment text follows the colon
+  const colon = text.indexOf(':')
+  const note = colon >= 0 ? text.slice(colon + 1).trim() : ''
+  tokens.forEach((token, index) => token.start > colon && colon >= 0 && used.add(index))
+
+  const due = extractDue(tokens, today)
+  due?.indices.forEach((index) => used.add(index))
+
+  const priorityAt = tokens.findIndex((token) => token.folded in ASSISTANT_PRIORITIES)
+  if (priorityAt >= 0) used.add(priorityAt)
+
+  const owner = extractOwner(tokens, used)
+  owner?.indices.forEach((index) => used.add(index))
+
+  return {
+    owner,
+    due: due?.value ?? null,
+    priority: priorityAt >= 0 ? ASSISTANT_PRIORITIES[tokens[priorityAt].folded] : null,
+    note,
+  }
+}
+
 // Words a live subject sheds
 const LIVE_NOISE = [...ASSISTANT_INTENTS.openLive.nouns, ...ASSISTANT_CURRENT.flat()]
 
@@ -238,17 +287,19 @@ export const parseCommand = (
   const used = new Set(match?.indices ?? [])
   const isTask = match?.intent === 'createTask'
   const task = isTask ? readTask(text, tokens, used, today) : null
+  const isEdit = (EDITS as readonly string[]).includes(match?.intent ?? '')
+  const edit = isEdit ? readEdit(text, tokens, used, today) : null
 
   return {
     intent: match?.intent ?? null,
     rivals: chosen ? [] : rivals.map((entry) => entry.intent),
     page: match?.page ?? findPage(tokens)?.page ?? null,
     subject: isTask ? '' : readSubject(text, tokens, used, noiseOf(match?.intent)),
-    owner: task?.owner ?? null,
+    owner: task?.owner ?? edit?.owner ?? null,
     project: task?.project ?? '',
     title: task?.title ?? '',
     looseTitle: task?.looseTitle ?? '',
-    due: task?.due ?? null,
+    due: task?.due ?? edit?.due ?? null,
     level: extractLevel(tokens),
     period: extractPeriod(tokens),
     actor: extractActor(tokens),
@@ -256,6 +307,8 @@ export const parseCommand = (
     latest: asksLatest(tokens),
     current: asksCurrent(tokens),
     absenceMode: match?.intent === 'absence' ? readAbsenceMode(tokens) : null,
+    priority: edit?.priority ?? null,
+    note: edit?.note ?? '',
   }
 }
 

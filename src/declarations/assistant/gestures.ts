@@ -130,6 +130,74 @@ export const GESTURES = {
       body: { version: values.version },
     }),
   },
+  postponeTask: {
+    risk: 'medium',
+    target: 'task',
+    permission: Permissions.TaskManage,
+    ask: 'Je décale « {name} » au {date} ?',
+    done: 'C’est fait, « {name} » est décalée au {date}.',
+    confirmLabel: 'Décaler',
+    call: (id, values) => ({
+      method: 'PATCH',
+      path: API_ROUTES.task(id),
+      body: { dueDate: values.dueDate ?? null },
+    }),
+    undo: 'postponeTask',
+  },
+  assignTask: {
+    risk: 'medium',
+    target: 'task',
+    permission: Permissions.TaskManage,
+    ask: 'Je donne « {name} » à « {who} » ?',
+    done: 'C’est fait, « {name} » est à « {who} », il ou elle est prévenu·e.',
+    confirmLabel: 'Assigner',
+    call: (id, values) => ({
+      method: 'PATCH',
+      path: API_ROUTES.task(id),
+      body: { ownerId: values.ownerId ?? null },
+    }),
+    undo: 'assignTask',
+  },
+  setTaskPriority: {
+    risk: 'light',
+    target: 'task',
+    permission: Permissions.TaskUpdate,
+    ask: 'Je passe « {name} » en priorité « {priority} » ?',
+    done: 'C’est fait, « {name} » est en priorité « {priority} ».',
+    confirmLabel: 'Changer',
+    call: (id, values) => ({
+      method: 'PATCH',
+      path: API_ROUTES.task(id),
+      body: { priorityId: values.priorityId ?? null },
+    }),
+    undo: 'setTaskPriority',
+  },
+  commentTask: {
+    risk: 'medium',
+    target: 'task',
+    permission: Permissions.TaskRead,
+    ask: 'Je laisse ce commentaire sur « {name} » : « {note} » ?',
+    done: 'C’est fait, le commentaire est sur « {name} ».',
+    confirmLabel: 'Commenter',
+    call: (id, values) => ({
+      method: 'POST',
+      path: API_ROUTES.workComments('task', id),
+      body: { body: values.note },
+    }),
+  },
+  addMeetingTopic: {
+    risk: 'medium',
+    target: 'meeting',
+    permission: Permissions.MeetingUpdate,
+    ask: 'J’ajoute le sujet « {title} » à « {name} » ?',
+    done: 'C’est fait, « {title} » est au programme de « {name} ».',
+    confirmLabel: 'Ajouter',
+    call: (id, values) => ({
+      method: 'POST',
+      path: API_ROUTES.meetingTopics(id),
+      body: { title: values.title },
+    }),
+  },
   readNotifications: {
     risk: 'light',
     target: null,
@@ -141,3 +209,48 @@ export const GESTURES = {
 } as const satisfies Record<string, GestureDef>
 
 export type GestureId = keyof typeof GESTURES
+
+/**
+ * One series of a gesture, run on every item
+ * @typedef {Object} BatchDef
+ * @property {GestureId} each - Gesture run on every item
+ * @property {AssistantRisk} risk - Confirmation level
+ * @property {PermissionName} [permission] - Right the route asks
+ * @property {string} ask - Question, {count} is the number of items
+ * @property {string} done - Sentence once done
+ * @property {string} confirmLabel - Button that runs it
+ */
+
+export interface BatchDef {
+  each: GestureId
+  risk: AssistantRisk
+  permission?: PermissionName
+  ask: string
+  done: string
+  confirmLabel: string
+}
+
+/**
+ * Series, never taken back as a whole
+ * @type {Record<string, BatchDef>}
+ */
+
+export const BATCHES = {
+  approveAllAbsences: {
+    each: 'approveAbsence',
+    risk: 'medium',
+    permission: Permissions.AbsenceReview,
+    ask: 'Je valide les {count} absences qui attendent ta réponse ?',
+    done: 'C’est fait, les {count} absences sont validées.',
+    confirmLabel: 'Tout valider',
+  },
+  completeAllTasks: {
+    each: 'completeTask',
+    risk: 'light',
+    ask: 'Je marque tes {count} tâches ouvertes comme faites ?',
+    done: 'C’est fait, tes {count} tâches sont faites.',
+    confirmLabel: 'Tout marquer fait',
+  },
+} as const satisfies Record<string, BatchDef>
+
+export type BatchId = keyof typeof BATCHES
