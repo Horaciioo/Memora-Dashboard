@@ -1,3 +1,5 @@
+import { CROQUIS_WORDS_EXTRA } from '@/declarations/play/croquis/wordsExtra'
+
 /**
  * Difficulty levels of a Croquis game
  * @type {readonly string[]}
@@ -7,12 +9,8 @@ export const CROQUIS_LEVELS = ['EASY', 'MEDIUM', 'HARD'] as const
 
 export type CroquisLevel = (typeof CROQUIS_LEVELS)[number]
 
-/**
- * Words to draw by level, accents kept, always doable in a few strokes
- * @type {Record<CroquisLevel, readonly string[]>}
- */
-
-export const CROQUIS_WORDS: Record<CroquisLevel, readonly string[]> = {
+// Base words, the extra lists come on top
+const BASE_WORDS: Record<CroquisLevel, readonly string[]> = {
   EASY: [
     'chat',
     'chien',
@@ -199,4 +197,15 @@ export const CROQUIS_WORDS: Record<CroquisLevel, readonly string[]> = {
     'bagarre',
     'fête',
   ],
+}
+
+/**
+ * Words to draw by level, accents kept, always doable in a few strokes
+ * @type {Record<CroquisLevel, readonly string[]>}
+ */
+
+export const CROQUIS_WORDS: Record<CroquisLevel, readonly string[]> = {
+  EASY: [...BASE_WORDS.EASY, ...CROQUIS_WORDS_EXTRA.EASY],
+  MEDIUM: [...BASE_WORDS.MEDIUM, ...CROQUIS_WORDS_EXTRA.MEDIUM],
+  HARD: [...BASE_WORDS.HARD, ...CROQUIS_WORDS_EXTRA.HARD],
 }

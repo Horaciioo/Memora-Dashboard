@@ -1,9 +1,7 @@
-/**
- * Common French words to unscramble, accents kept, length drives the difficulty, from three letters
- * @type {readonly string[]}
- */
+import { JUMBLE_WORDS_EXTRA } from '@/declarations/play/jumble/wordsExtra'
 
-export const JUMBLE_WORDS = [
+// Base words, the extra list comes on top
+const BASE_WORDS = [
   'maison',
   'soleil',
   'jardin',
@@ -258,3 +256,10 @@ export const JUMBLE_WORDS = [
   'paon',
   'pont',
 ] as const
+
+/**
+ * Common French words to unscramble, accents kept, length drives the difficulty, from three letters
+ * @type {readonly string[]}
+ */
+
+export const JUMBLE_WORDS: readonly string[] = [...BASE_WORDS, ...JUMBLE_WORDS_EXTRA]
