@@ -23,7 +23,7 @@ import { LIVE_HUB_STYLES, MODVIEW_MOBILE, MODVIEW_SETTINGS } from '@/declaration
 import { useFeatures } from '@/managers/front-end/FeaturesManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ModViewState } from '@/types/modview'
-import { roughDuration } from '@/utils/format/time/hours'
+import { minutesDuration } from '@/utils/format/time/hours'
 import { cn } from '@/utils/classnames'
 
 type SettingsSection = 'preferences' | 'actions' | 'windows' | 'pages' | 'unban'
@@ -100,7 +100,7 @@ export const MobileSettingsPage = ({
                       <Icon className={LIVE_HUB_STYLES.metricIcon} aria-hidden="true" />
                       <dd className={LIVE_HUB_STYLES.timelineValue}>
                         {key === 'time' && figures[key] > 0
-                          ? roughDuration(figures[key] / 60)
+                          ? minutesDuration(figures[key])
                           : String(figures[key])}
                       </dd>
                       <dt className={LIVE_HUB_STYLES.timelineLabel}>{metric.label}</dt>

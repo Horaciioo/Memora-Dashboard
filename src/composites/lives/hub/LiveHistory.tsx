@@ -17,7 +17,7 @@ import { BUTTON_STYLES, LIVE_HUB_STYLES } from '@/declarations/ui/variants'
 import type { LiveView, MemberLiveSummary } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { formatDay } from '@/utils/format/time/dates'
-import { roughDuration } from '@/utils/format/time/hours'
+import { minutesDuration } from '@/utils/format/time/hours'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 export interface LiveHistoryProps {
@@ -127,7 +127,7 @@ export const LiveHistory = ({
                           <Icon className={LIVE_HUB_STYLES.metricIcon} aria-hidden="true" />
                           <dd className={LIVE_HUB_STYLES.timelineValue}>
                             {key === 'time' && figures[key] > 0
-                              ? roughDuration(figures[key] / 60)
+                              ? minutesDuration(figures[key])
                               : String(figures[key])}
                           </dd>
                           <dt className={LIVE_HUB_STYLES.timelineLabel}>{metric.label}</dt>

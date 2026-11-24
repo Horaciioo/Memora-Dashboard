@@ -2,6 +2,7 @@ import { readTwitchBanners } from '@/core/services/platforms/TwitchBannerService
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { foldStints } from '@/core/lib/lives/stints'
 import { readMemberModeration } from '@/core/services/lives/MemberModerationService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
@@ -25,7 +26,7 @@ const INFRACTION_KINDS = ['DELETE', 'TIMEOUT', 'BAN', 'WARN'] as const
 const figuresOver = async (accountId: string | null, youtuberId: string, from: Date, to: Date) => {
   const live = { youtuberId }
   const who = accountId ? { actorAccountId: accountId } : {}
-  const [infractions, messages, presence, lives, moderators] = await Promise.all([
+  const [infractions, messages, stints, lives, moderators] = await Promise.all([
     prisma.moderationAction.count({
       where: {
         ...who,
@@ -43,9 +44,9 @@ const figuresOver = async (accountId: string | null, youtuberId: string, from: D
         occurredAt: { gte: from, lt: to },
       },
     }),
-    prisma.modViewPresence.aggregate({
-      where: { ...(accountId ? { accountId } : {}), live, openedAt: { gte: from, lt: to } },
-      _sum: { activeSeconds: true },
+    prisma.liveModStint.findMany({
+      where: { ...(accountId ? { accountId } : {}), live, startedAt: { gte: from, lt: to } },
+      select: { liveId: true, accountId: true, startedAt: true, stoppedAt: true },
     }),
     prisma.modViewPresence.groupBy({
       by: ['liveId'],
@@ -57,7 +58,12 @@ const figuresOver = async (accountId: string | null, youtuberId: string, from: D
     }),
   ])
 
-  return [infractions, presence._sum.activeSeconds ?? 0, messages, lives.length, moderators.length]
+  // Stretches of a member on a live merge, so a moment counts once
+  const seconds = [...Map.groupBy(stints, (row) => `${row.liveId}:${row.accountId}`).values()]
+    .flatMap((rows) => foldStints(rows, new Date(Math.min(+to, Date.now()))))
+    .reduce((sum, total) => sum + total.seconds, 0)
+
+  return [infractions, seconds, messages, lives.length, moderators.length]
 }
 
 /**
